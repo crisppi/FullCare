@@ -153,3 +153,4 @@ DirectoryIndex index.php
 # Opcional: se quiser acessar por "/inicio"
 RewriteRule ^inicio/?$ index.php [L,NC]
 
+
