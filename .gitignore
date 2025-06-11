@@ -1,0 +1,40 @@
+# Sistema e IDE
+.DS_Store
+.vscode/
+node_modules/
+vendor/
+cert/
+bfg.jar
+arquivos.txt
+
+# Arquivos sensíveis
+*.key
+*.pem
+*.env
+*.log
+*.crt
+db.php
+db*.php
+diversos/chatgpt_handler.php
+
+# Arquivos de teste e temporários
+*copy.php
+*copy 2.php
+test.html
+test_sockets.php
+relatorios copy.php
+cad_internacao copy.php
+process_negociacao copy.php
+process_capeante_pdf copy.php
+process_capeante_pdf (email OK).php
+show_capeantePrt copy.php
+show_capeantePrt copy 2.php
+
+# Pastas de upload
+uploads/
+
+# Arquivos e pastas de build
+FullCare/
+FullCare_New/
+Fullcare/
+

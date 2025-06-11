@@ -1,0 +1,155 @@
+RewriteEngine On
+RewriteBase /FullCare/
+
+# Ignora arquivos reais
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+
+# ----- pacientes -----
+RewriteRule ^pacientes/?$ list_paciente.php [L,NC]
+RewriteRule ^pacientes/novo/?$ cad_paciente.php [L,NC]
+RewriteRule ^pacientes/visualizar/([0-9]+)$ show_paciente.php?id=$1 [L,NC,QSA]
+RewriteRule ^pacientes/editar/([0-9]+)$ edit_paciente.php?id=$1 [L,NC,QSA]
+RewriteRule ^pacientes/excluir/([0-9]+)$ del_paciente.php?id=$1 [L,NC,QSA]
+
+# ----- antecedentes -----
+RewriteRule ^antecedentes/?$ list_antecedente.php [L,NC]
+RewriteRule ^antecedentes/novo/?$ cad_antecedente.php [L,NC]
+RewriteRule ^antecedentes/visualizar/([0-9]+)$ show_antecedente.php?id=$1 [L,NC,QSA]
+RewriteRule ^antecedentes/editar/([0-9]+)$ edit_antecedente.php?id=$1 [L,NC,QSA]
+RewriteRule ^antecedentes/excluir/([0-9]+)$ del_antecedente.php?id=$1 [L,NC,QSA]
+
+# ----- hospitais -----
+RewriteRule ^hospitais/?$ list_hospital.php [L,NC]
+RewriteRule ^hospitais/novo/?$ cad_hospital.php [L,NC]
+RewriteRule ^hospitais/visualizar/([0-9]+)$ show_hospital.php?id=$1 [L,NC,QSA]
+RewriteRule ^hospitais/editar/([0-9]+)$ edit_hospital.php?id=$1 [L,NC,QSA]
+RewriteRule ^hospitais/excluir/([0-9]+)$ del_hospital.php?id=$1 [L,NC,QSA]
+
+
+# ----- acomodacoes -----
+RewriteRule ^acomodacoes/?$ list_acomodacao.php [L,NC]
+RewriteRule ^acomodacoes/novo/?$ cad_acomodacao.php [L,NC]
+RewriteRule ^acomodacoes/visualizar/([0-9]+)$ show_acomodacao.php?id=$1 [L,NC,QSA]
+RewriteRule ^acomodacoes/editar/([0-9]+)$ edit_acomodacao.php?id=$1 [L,NC,QSA]
+RewriteRule ^acomodacoes/excluir/([0-9]+)$ del_acomodacao.php?id=$1 [L,NC,QSA]
+
+# ----- seguradoras -----
+RewriteRule ^seguradoras/?$ list_seguradora.php [L,NC]
+RewriteRule ^seguradoras/novo/?$ cad_seguradora.php [L,NC]
+RewriteRule ^seguradoras/visualizar/([0-9]+)$ show_seguradora.php?id=$1 [L,NC,QSA]
+RewriteRule ^seguradoras/editar/([0-9]+)$ edit_seguradora.php?id=$1 [L,NC,QSA]
+RewriteRule ^seguradoras/excluir/([0-9]+)$ del_seguradora.php?id=$1 [L,NC,QSA]
+
+# ----- estipulantes -----
+RewriteRule ^estipulantes/?$ list_estipulante.php [L,NC]
+RewriteRule ^estipulantes/novo/?$ cad_estipulante.php [L,NC]
+RewriteRule ^estipulantes/visualizar/([0-9]+)$ show_estipulante.php?id=$1 [L,NC,QSA]
+RewriteRule ^estipulantes/editar/([0-9]+)$ edit_estipulante.php?id=$1 [L,NC,QSA]
+RewriteRule ^estipulantes/excluir/([0-9]+)$ del_estipulante.php?id=$1 [L,NC,QSA]
+
+# ----- hospital-usuario -----
+RewriteRule ^hospital-usuarios/?$ list_hospitalUser.php [L,NC]
+RewriteRule ^hospital-usuarios/novo/?$ cad_hospitalUser.php [L,NC]
+RewriteRule ^hospital-usuarios/visualizar/([0-9]+)$ show_hospitalUser.php?id=$1 [L,NC,QSA]
+RewriteRule ^hospital-usuarios/editar/([0-9]+)$ edit_hospitalUser.php?id=$1 [L,NC,QSA]
+RewriteRule ^hospital-usuarios/excluir/([0-9]+)$ del_hospitalUser.php?id=$1 [L,NC,QSA]
+
+# ----- usuarios -----
+RewriteRule ^usuarios/?$ list_usuario.php [L,NC]
+RewriteRule ^usuarios/novo/?$ cad_usuario.php [L,NC]
+RewriteRule ^usuarios/visualizar/([0-9]+)$ show_usuario.php?id=$1 [L,NC,QSA]
+RewriteRule ^usuarios/editar/([0-9]+)$ edit_usuario.php?id=$1 [L,NC,QSA]
+RewriteRule ^usuarios/excluir/([0-9]+)$ del_usuario.php?id=$1 [L,NC,QSA]
+
+# ----- visitas -----
+RewriteRule ^visitas/?$ list_visita.php [L,NC]
+RewriteRule ^visitas/novo/?$ cad_visita.php [L,NC]
+RewriteRule ^visitas/visualizar/([0-9]+)$ show_visita.php?id=$1 [L,NC,QSA]
+RewriteRule ^visitas/editar/([0-9]+)$ edit_visita.php?id=$1 [L,NC,QSA]
+RewriteRule ^visitas/excluir/([0-9]+)$ del_visita.php?id=$1 [L,NC,QSA]
+
+# ----- patologias -----
+RewriteRule ^patologias/?$ list_patologia.php [L,NC]
+RewriteRule ^patologias/novo/?$ cad_patologia.php [L,NC]
+RewriteRule ^patologias/visualizar/([0-9]+)$ show_patologia.php?id=$1 [L,NC,QSA]
+RewriteRule ^patologias/editar/([0-9]+)$ edit_patologia.php?id=$1 [L,NC,QSA]
+RewriteRule ^patologias/excluir/([0-9]+)$ del_patologia.php?id=$1 [L,NC,QSA]
+
+# ----- mensagens -----
+RewriteRule ^mensagens/?$ list_mensagem.php [L,NC]
+RewriteRule ^mensagens/novo/?$ cad_mensagem.php [L,NC]
+RewriteRule ^mensagens/visualizar/([0-9]+)$ show_mensagem.php?id=$1 [L,NC,QSA]
+RewriteRule ^mensagens/editar/([0-9]+)$ edit_mensagem.php?id=$1 [L,NC,QSA]
+RewriteRule ^mensagens/excluir/([0-9]+)$ del_mensagem.php?id=$1 [L,NC,QSA]
+
+# ----- internacao-censo -----
+RewriteRule ^internacoes-censo/?$ list_internacao_censo.php [L,NC]
+RewriteRule ^internacoes-censo/novo/?$ cad_internacao_censo.php [L,NC]
+RewriteRule ^internacoes-censo/visualizar/([0-9]+)$ show_internacao_censo.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes-censo/editar/([0-9]+)$ edit_internacao_censo.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes-censo/excluir/([0-9]+)$ del_internacao_censo.php?id=$1 [L,NC,QSA]
+
+# ----- internacoes -----
+RewriteRule ^internacoes/?$ list_internacao.php [L,NC]
+RewriteRule ^internacoes/novo/?$ cad_internacao.php [L,NC]
+RewriteRule ^internacoes-patologias/?$ list_internacao_patologia.php [L,NC]
+RewriteRule ^internacoes/visualizar/([0-9]+)$ show_internacao.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes/editar/([0-9]+)$ edit_internacao.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes/excluir/([0-9]+)$ del_internacao.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes-patologias/visualizar/([0-9]+)$ show_internacao_patologia.php?id_internacao=$1 [L,NC,QSA]
+
+
+# ----- internacoes UTI -----
+RewriteRule ^internacoes-uti/?$ list_internacao_uti.php [L,NC]
+RewriteRule ^internacoes-uti/novo/?$ cad_internacao_uti.php [L,NC]
+RewriteRule ^internacoes-uti/visualizar/([0-9]+)$ show_internacao_uti.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes-uti/editar/([0-9]+)$ edit_internacao_uti.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes-uti/excluir/([0-9]+)$ del_internacao_uti.php?id=$1 [L,NC,QSA]
+
+# ----- internacoes alta -----
+RewriteRule ^internacoes-alta/?$ list_internacao_alta.php [L,NC]
+RewriteRule ^internacoes-alta/visualizar/([0-9]+)$ show_internacao_alta.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes-alta/editar/([0-9]+)$ edit_internacao_alta.php?id=$1 [L,NC,QSA]
+RewriteRule ^internacoes-alta/excluir/([0-9]+)$ del_internacao_alta.php?id=$1 [L,NC,QSA]
+
+# ----- censo -----
+RewriteRule ^censos/?$ list_censo.php [L,NC]
+RewriteRule ^censos/novo/?$ cad_censo.php [L,NC]
+RewriteRule ^censos/visualizar/([0-9]+)$ show_censo.php?id=$1 [L,NC,QSA]
+RewriteRule ^censos/editar/([0-9]+)$ edit_censo.php?id=$1 [L,NC,QSA]
+RewriteRule ^censos/excluir/([0-9]+)$ del_censo.php?id=$1 [L,NC,QSA]
+
+# ----- capeante audit -----
+RewriteRule ^capeantes/?$ list_internacao_cap.php [L,NC]
+RewriteRule ^capeantes-finalizados/?$ list_internacao_cap_fin.php [L,NC]
+RewriteRule ^senhas-finalizadas/?$ list_internacao_senha_fin.php [L,NC]
+RewriteRule ^contas-paradas/?$ list_internacao_cap_par.php [L,NC]
+RewriteRule ^capeantes/novo/?$ cad_capeante_audit.php [L,NC]
+RewriteRule ^capeantes/visualizar/([0-9]+)$ show_capeante_audit.php?id=$1 [L,NC,QSA]
+RewriteRule ^capeantes/editar/([0-9]+)$ edit_capeante_audit.php?id=$1 [L,NC,QSA]
+RewriteRule ^capeantes/excluir/([0-9]+)$ del_capeante_audit.php?id=$1 [L,NC,QSA]
+
+# ----- gestao -----
+RewriteRule ^gestao/?$ list_gestao.php [L,NC]
+RewriteRule ^gestao/novo/?$ cad_gestao.php [L,NC]
+RewriteRule ^gestao/visualizar/([0-9]+)$ show_gestao.php?id=$1 [L,NC,QSA]
+RewriteRule ^gestao/editar/([0-9]+)$ edit_gestao.php?id=$1 [L,NC,QSA]
+RewriteRule ^gestao/excluir/([0-9]+)$ del_gestao.php?id=$1 [L,NC,QSA]
+
+# ----- relatorios -----
+RewriteRule ^relatorios/?$ relatorios.php [L,NC]
+RewriteRule ^relatorios-capeante/?$ relatorios_capeante.php [L,NC]
+
+RewriteRule ^internacoes-alta/editar/([0-9]+)$ edit_alta.php?type=alta&id_internacao=$1 [L,NC,QSA]
+
+
+RewriteRule ^menu$ menu_app.php [L,NC]
+
+DirectoryIndex index.php
+
+# Opcional: se quiser acessar por "/inicio"
+RewriteRule ^inicio/?$ index.php [L,NC]
+
