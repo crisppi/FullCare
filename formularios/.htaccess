@@ -1,0 +1,19 @@
+RewriteEngine On
+
+# Ignora arquivos e diretórios reais
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Remove barra ao final das URLs amigáveis
+RewriteRule ^(.+)/?$ $1 [R=301,L]
+
+# Redireciona URLs amigáveis para a URL real (com ID)
+RewriteRule ^show_internacao/([0-9]+)/?$ show_internacao.php?id_internacao=$1 [QSA,L,NC]
+
+<IfModule mod_rewrite.c>
+    RewriteRule ^menu/?$ /menu.php [NC,L]
+
+    RewriteCond %{SCRIPT_FILENAME} !-f
+    RewriteCond %{SCRIPT_FILENAME} !-d
+    RewriteRule ^(.*)$ /menu.php?param=$1 [L,QSA]
+</IfModule>
