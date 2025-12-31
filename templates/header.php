@@ -870,6 +870,7 @@ if (!empty($sessionIdUsuario)) {
                 </div>
             </div>
         </nav>
+        <?php include_once(__DIR__ . '/bi_topbar.php'); ?>
 
         <!-- notification message -->
         <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start(); ?>

@@ -465,18 +465,18 @@ $custoMedioDiaria = $selInternação['total_diarias'] > 0 ? ($selFinanceiro['val
         <section class="bi-main bi-stack">
             <div class="bi-grid fixed-2">
                 <div class="bi-panel">
-                    <h3>Alocacao dos Custos</h3>
+                    <h3>Alocação dos Custos</h3>
                     <div class="bi-chart"><canvas id="chartAlocacao"></canvas></div>
                 </div>
                 <div class="bi-panel">
-                    <h3>Composicao do Custo (%)</h3>
+                    <h3>Composição do Custo (%)</h3>
                     <div class="bi-chart"><canvas id="chartComposicao"></canvas></div>
                 </div>
             </div>
 
             <div class="bi-grid fixed-2">
                 <div class="bi-panel">
-                    <h3>Analise da Glosa</h3>
+                    <h3>Análise da Glosa</h3>
                     <div class="bi-chart"><canvas id="chartGlosa"></canvas></div>
                 </div>
                 <div class="bi-panel">
