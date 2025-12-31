@@ -124,10 +124,31 @@ if (!empty($sessionIdUsuario)) {
         flex: 0 0 auto;
     }
 
+    .header-action-btn {
+        border: 1px solid rgba(94, 35, 99, 0.28) !important;
+        background: #fff;
+        color: #5e2363;
+    }
+
+    .header-action-btn:hover {
+        border-color: rgba(94, 35, 99, 0.45) !important;
+        background: #f9f7fb;
+    }
+
     .header-chat-launcher {
         display: inline-flex;
         align-items: center;
         gap: 0.35rem;
+    }
+
+    .header-zoom-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .header-zoom-actions .btn {
+        padding: 0.35rem 0.55rem;
     }
 
     .header-chat-launcher .chat-unread-badge {
@@ -207,6 +228,21 @@ if (!empty($sessionIdUsuario)) {
                                 <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
                                         Manual</a></li>
+                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacao_customizacao_pdf.php"
+                                        target="_blank">
+                                        <i class="bi bi-file-earmark-text"
+                                            style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
+                                        Solicitação de Customização (PDF)
+                                    </a></li>
+                                <?php if ($sessionNivel > 3) { ?>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">
+                                        <i class="bi bi-shield-lock"
+                                            style="font-size: 1rem;margin-right:5px; color: rgb(21, 56, 210);"></i>
+                                        Permissões
+                                    </a>
+                                </li>
+                                <?php }; ?>
                                 <?php }; ?>
                             </ul>
                         </li>
@@ -727,21 +763,6 @@ if (!empty($sessionIdUsuario)) {
                                             class="bi bi-pencil-square"
                                             style="font-size: 1rem;margin-right:5px; color:#fb923c;"></i>
                                         Assistente de Textos</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacao_customizacao_pdf.php"
-                                        target="_blank">
-                                        <i class="bi bi-file-earmark-text"
-                                            style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
-                                        Solicitação de Customização (PDF)
-                                    </a></li>
-                                <?php if ($sessionNivel > 3) { ?>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">
-                                        <i class="bi bi-shield-lock"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(21, 56, 210);"></i>
-                                        Permissões
-                                    </a>
-                                </li>
-                                <?php }; ?>
                             </ul>
                         </li>
                         <?php }; ?>
@@ -799,8 +820,18 @@ if (!empty($sessionIdUsuario)) {
             </div>
 
             <div class="d-flex align-items-center gap-2 ms-auto header-actions pe-3">
+                <div class="header-zoom-actions" role="group" aria-label="Zoom da página">
+                    <button type="button" class="btn btn-outline-secondary header-action-btn" id="zoom-out-btn"
+                        title="Diminuir zoom">
+                        <i class="bi bi-zoom-out"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary header-action-btn" id="zoom-in-btn"
+                        title="Aumentar zoom">
+                        <i class="bi bi-zoom-in"></i>
+                    </button>
+                </div>
                 <a href="<?= htmlspecialchars($chatAssistantLink) ?>"
-                    class="btn btn-outline-secondary position-relative header-chat-launcher"
+                    class="btn btn-outline-secondary position-relative header-chat-launcher header-action-btn"
                     title="Chat interno e Assistente Virtual">
                     <i class="bi bi-chat-dots"></i>
                     <span class="d-none d-xl-inline ms-1">Chat</span>
@@ -930,6 +961,52 @@ if (!empty($sessionIdUsuario)) {
 
 </body>
 <script src="js/fix-header.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var root = document.documentElement;
+    var minZoom = 0.8;
+    var maxZoom = 1.3;
+    var step = 0.1;
+
+    function clampZoom(value) {
+        return Math.min(maxZoom, Math.max(minZoom, value));
+    }
+
+    function getCurrentZoom() {
+        var current = parseFloat(root.style.zoom || '1');
+        if (Number.isNaN(current)) return 1;
+        return current;
+    }
+
+    function applyZoom(value) {
+        var next = clampZoom(value);
+        root.style.zoom = next;
+        try {
+            localStorage.setItem('fc_zoom', String(next));
+        } catch (e) {}
+    }
+
+    try {
+        var saved = parseFloat(localStorage.getItem('fc_zoom') || '');
+        if (!Number.isNaN(saved)) {
+            applyZoom(saved);
+        }
+    } catch (e) {}
+
+    var zoomOut = document.getElementById('zoom-out-btn');
+    var zoomIn = document.getElementById('zoom-in-btn');
+    if (zoomOut) {
+        zoomOut.addEventListener('click', function() {
+            applyZoom(getCurrentZoom() - step);
+        });
+    }
+    if (zoomIn) {
+        zoomIn.addEventListener('click', function() {
+            applyZoom(getCurrentZoom() + step);
+        });
+    }
+});
+</script>
 
 <!-- Jquery JS-->
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
