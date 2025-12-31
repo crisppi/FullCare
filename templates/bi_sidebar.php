@@ -5,46 +5,46 @@ if (!isset($BASE_URL)) {
 
 $biSections = [
     'Resumo' => [
-        ['label' => 'Navegação', 'href' => 'bi_navegacao.php', 'icon' => 'bi-grid'],
-        ['label' => 'Consolidado', 'href' => 'ConsolidadoGestaoBI.php', 'icon' => 'bi-layers'],
-        ['label' => 'Indicadores BI', 'href' => 'Indicadores.php', 'icon' => 'bi-speedometer2'],
+        ['label' => 'Navegação', 'href' => 'bi/navegacao', 'file' => 'bi_navegacao.php', 'icon' => 'bi-grid'],
+        ['label' => 'Consolidado', 'href' => 'bi/consolidado', 'file' => 'ConsolidadoGestaoBI.php', 'icon' => 'bi-layers'],
+        ['label' => 'Indicadores BI', 'href' => 'bi/indicadores', 'file' => 'Indicadores.php', 'icon' => 'bi-speedometer2'],
     ],
     'Clínico' => [
-        ['label' => 'UTI', 'href' => 'bi_uti.php', 'icon' => 'bi-heart-pulse'],
-        ['label' => 'Patologia', 'href' => 'bi_patologia.php', 'icon' => 'bi-bandaid'],
-        ['label' => 'Grupo Patologia', 'href' => 'GrupoPatologia.php', 'icon' => 'bi-diagram-3'],
-        ['label' => 'Antecedente', 'href' => 'Antecedente.php', 'icon' => 'bi-journal-medical'],
-        ['label' => 'Longa Permanência', 'href' => 'LongaPermanenciaBI.php', 'icon' => 'bi-hourglass-split'],
-        ['label' => 'Clínico Realizado', 'href' => 'ClinicoRealizadoBI.php', 'icon' => 'bi-activity'],
-        ['label' => 'Estratégia Terapêutica', 'href' => 'EstrategiaTerapeuticaBI.php', 'icon' => 'bi-compass'],
-        ['label' => 'Médico Titular', 'href' => 'MedicoTitularBI.php', 'icon' => 'bi-person-badge'],
-        ['label' => 'Auditor', 'href' => 'AuditorBI.php', 'icon' => 'bi-person-check'],
-        ['label' => 'Auditor Visitas', 'href' => 'AuditorVisitasBI.php', 'icon' => 'bi-clipboard-check'],
-        ['label' => 'Auditoria Produtividade', 'href' => 'AuditoriaProdutividadeBI.php', 'icon' => 'bi-bar-chart-line'],
+        ['label' => 'UTI', 'href' => 'bi/uti', 'file' => 'bi_uti.php', 'icon' => 'bi-heart-pulse'],
+        ['label' => 'Patologia', 'href' => 'bi/patologia', 'file' => 'bi_patologia.php', 'icon' => 'bi-bandaid'],
+        ['label' => 'Grupo Patologia', 'href' => 'bi/grupo-patologia', 'file' => 'GrupoPatologia.php', 'icon' => 'bi-diagram-3'],
+        ['label' => 'Antecedente', 'href' => 'bi/antecedente', 'file' => 'Antecedente.php', 'icon' => 'bi-journal-medical'],
+        ['label' => 'Longa Permanência', 'href' => 'bi/longa-permanencia', 'file' => 'LongaPermanenciaBI.php', 'icon' => 'bi-hourglass-split'],
+        ['label' => 'Clínico Realizado', 'href' => 'bi/clinico-realizado', 'file' => 'ClinicoRealizadoBI.php', 'icon' => 'bi-activity'],
+        ['label' => 'Estratégia Terapêutica', 'href' => 'bi/estrategia-terapeutica', 'file' => 'EstrategiaTerapeuticaBI.php', 'icon' => 'bi-compass'],
+        ['label' => 'Médico Titular', 'href' => 'bi/medico-titular', 'file' => 'MedicoTitularBI.php', 'icon' => 'bi-person-badge'],
+        ['label' => 'Auditor', 'href' => 'bi/auditor', 'file' => 'AuditorBI.php', 'icon' => 'bi-person-check'],
+        ['label' => 'Auditor Visitas', 'href' => 'bi/auditor-visitas', 'file' => 'AuditorVisitasBI.php', 'icon' => 'bi-clipboard-check'],
+        ['label' => 'Auditoria Produtividade', 'href' => 'bi/auditoria-produtividade', 'file' => 'AuditoriaProdutividadeBI.php', 'icon' => 'bi-bar-chart-line'],
     ],
     'Operacional' => [
-        ['label' => 'Seguradora', 'href' => 'SeguradoraBI.php', 'icon' => 'bi-shield-check'],
-        ['label' => 'Seguradora Detalhado', 'href' => 'SeguradoraDetalhadoBI.php', 'icon' => 'bi-shield-plus'],
-        ['label' => 'Alto Custo', 'href' => 'AltoCusto.php', 'icon' => 'bi-cash-stack'],
-        ['label' => 'Internações com Risco', 'href' => 'InternacoesRiscoBI.php', 'icon' => 'bi-exclamation-triangle'],
-        ['label' => 'Qualidade e Gestão', 'href' => 'QualidadeGestaoBI.php', 'icon' => 'bi-award'],
-        ['label' => 'Home Care', 'href' => 'HomeCare.php', 'icon' => 'bi-house-heart'],
-        ['label' => 'Desospitalização', 'href' => 'Desospitalizacao.php', 'icon' => 'bi-box-arrow-right'],
-        ['label' => 'OPME', 'href' => 'Opme.php', 'icon' => 'bi-capsule'],
-        ['label' => 'Evento Adverso', 'href' => 'EventoAdverso.php', 'icon' => 'bi-exclamation-circle'],
+        ['label' => 'Seguradora', 'href' => 'bi/seguradora', 'file' => 'SeguradoraBI.php', 'icon' => 'bi-shield-check'],
+        ['label' => 'Seguradora Detalhado', 'href' => 'bi/seguradora-detalhado', 'file' => 'SeguradoraDetalhadoBI.php', 'icon' => 'bi-shield-plus'],
+        ['label' => 'Alto Custo', 'href' => 'bi/alto-custo', 'file' => 'AltoCusto.php', 'icon' => 'bi-cash-stack'],
+        ['label' => 'Internações com Risco', 'href' => 'bi/internacoes-risco', 'file' => 'InternacoesRiscoBI.php', 'icon' => 'bi-exclamation-triangle'],
+        ['label' => 'Qualidade e Gestão', 'href' => 'bi/qualidade-gestao', 'file' => 'QualidadeGestaoBI.php', 'icon' => 'bi-award'],
+        ['label' => 'Home Care', 'href' => 'bi/home-care', 'file' => 'HomeCare.php', 'icon' => 'bi-house-heart'],
+        ['label' => 'Desospitalização', 'href' => 'bi/desospitalizacao', 'file' => 'Desospitalizacao.php', 'icon' => 'bi-box-arrow-right'],
+        ['label' => 'OPME', 'href' => 'bi/opme', 'file' => 'Opme.php', 'icon' => 'bi-capsule'],
+        ['label' => 'Evento Adverso', 'href' => 'bi/evento-adverso', 'file' => 'EventoAdverso.php', 'icon' => 'bi-exclamation-circle'],
     ],
     'Financeiro' => [
-        ['label' => 'Sinistro', 'href' => 'Sinistro.php', 'icon' => 'bi-graph-up'],
-        ['label' => 'Perfil Sinistro', 'href' => 'bi_perfil_sinistro.php', 'icon' => 'bi-clipboard-data'],
-        ['label' => 'Sinistro YTD', 'href' => 'bi_sinistro_ytd.php', 'icon' => 'bi-bar-chart'],
-        ['label' => 'Financeiro Realizado', 'href' => 'FinanceiroRealizadoBI.php', 'icon' => 'bi-currency-dollar'],
-        ['label' => 'Produção', 'href' => 'Producao.php', 'icon' => 'bi-graph-up-arrow'],
-        ['label' => 'Produção YTD', 'href' => 'bi_producao_ytd.php', 'icon' => 'bi-graph-up'],
-        ['label' => 'Saving', 'href' => 'bi_saving.php', 'icon' => 'bi-piggy-bank'],
-        ['label' => 'Pacientes', 'href' => 'bi_pacientes.php', 'icon' => 'bi-people'],
-        ['label' => 'Hospitais', 'href' => 'bi_hospitais.php', 'icon' => 'bi-hospital'],
-        ['label' => 'Inteligência Artificial', 'href' => 'bi_inteligencia.php', 'icon' => 'bi-cpu'],
-        ['label' => 'Sinistro BI', 'href' => 'bi_sinistro.php', 'icon' => 'bi-graph-down'],
+        ['label' => 'Sinistro', 'href' => 'bi/sinistro', 'file' => 'Sinistro.php', 'icon' => 'bi-graph-up'],
+        ['label' => 'Perfil Sinistro', 'href' => 'bi/perfil-sinistro', 'file' => 'bi_perfil_sinistro.php', 'icon' => 'bi-clipboard-data'],
+        ['label' => 'Sinistro YTD', 'href' => 'bi/sinistro-ytd', 'file' => 'bi_sinistro_ytd.php', 'icon' => 'bi-bar-chart'],
+        ['label' => 'Financeiro Realizado', 'href' => 'bi/financeiro-realizado', 'file' => 'FinanceiroRealizadoBI.php', 'icon' => 'bi-currency-dollar'],
+        ['label' => 'Produção', 'href' => 'bi/producao', 'file' => 'Producao.php', 'icon' => 'bi-graph-up-arrow'],
+        ['label' => 'Produção YTD', 'href' => 'bi/producao-ytd', 'file' => 'bi_producao_ytd.php', 'icon' => 'bi-graph-up'],
+        ['label' => 'Saving', 'href' => 'bi/saving', 'file' => 'bi_saving.php', 'icon' => 'bi-piggy-bank'],
+        ['label' => 'Pacientes', 'href' => 'bi/pacientes', 'file' => 'bi_pacientes.php', 'icon' => 'bi-people'],
+        ['label' => 'Hospitais', 'href' => 'bi/hospitais', 'file' => 'bi_hospitais.php', 'icon' => 'bi-hospital'],
+        ['label' => 'Inteligência Artificial', 'href' => 'bi/inteligencia', 'file' => 'bi_inteligencia.php', 'icon' => 'bi-cpu'],
+        ['label' => 'Sinistro BI', 'href' => 'bi/sinistro-bi', 'file' => 'bi_sinistro.php', 'icon' => 'bi-graph-down'],
     ],
 ];
 
@@ -52,7 +52,7 @@ $currentPage = basename($_SERVER['PHP_SELF'] ?? '');
 $flatPages = [];
 foreach ($biSections as $items) {
     foreach ($items as $item) {
-        $flatPages[] = $item['href'];
+        $flatPages[] = $item['file'] ?? $item['href'];
     }
 }
 
@@ -75,7 +75,7 @@ foreach ($biSections as $section => $items) {
 }
 
 $favoriteItems = array_values(array_filter($flatItems, function ($item) use ($favorites) {
-    return in_array($item['href'], $favorites, true);
+    return in_array($item['file'] ?? $item['href'], $favorites, true);
 }));
 ?>
 
@@ -194,7 +194,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="bi-side-heading">Favoritos</div>
     <div class="bi-sidebar-group">
         <?php foreach ($favoriteItems as $item): ?>
-        <a class="bi-side-link <?= $item['href'] === $currentPage ? 'is-active' : '' ?>"
+        <?php $itemFile = $item['file'] ?? $item['href']; ?>
+        <a class="bi-side-link <?= $itemFile === $currentPage ? 'is-active' : '' ?>"
             href="<?= $BASE_URL . $item['href'] ?>"
             data-tip="<?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>">
             <i class="bi <?= htmlspecialchars($item['icon'], ENT_QUOTES, 'UTF-8') ?>"></i>
@@ -205,7 +206,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="bi-side-heading">BI</div>
     <div class="bi-sidebar-group">
         <?php foreach ($flatItems as $item): ?>
-        <a class="bi-side-link <?= $item['href'] === $currentPage ? 'is-active' : '' ?>"
+        <?php $itemFile = $item['file'] ?? $item['href']; ?>
+        <a class="bi-side-link <?= $itemFile === $currentPage ? 'is-active' : '' ?>"
             href="<?= $BASE_URL . $item['href'] ?>"
             data-tip="<?= htmlspecialchars($item['section'] . ' • ' . $item['label'], ENT_QUOTES, 'UTF-8') ?>">
             <i class="bi <?= htmlspecialchars($item['icon'], ENT_QUOTES, 'UTF-8') ?>"></i>
