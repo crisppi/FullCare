@@ -58,6 +58,7 @@ class capeante
   public $senha_finalizada;
   public $usuario_create_cap;
   public $data_create_cap;
+  public $timer_cap;
   public $last_cap;
   public $conta_parada_cap;
   public $parada_motivo_cap;

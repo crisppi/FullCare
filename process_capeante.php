@@ -39,6 +39,10 @@ if ($type === "create") {
     $data_final_capeante = filter_input(INPUT_POST, "data_final_capeante") ?: null;
     $data_fech_capeante = filter_input(INPUT_POST, "data_fech_capeante") ?: null;
     $data_digit_capeante = filter_input(INPUT_POST, "data_digit_capeante") ?: null;
+    $timer_cap = filter_input(INPUT_POST, "timer_cap", FILTER_VALIDATE_INT);
+    if ($timer_cap === false) {
+        $timer_cap = null;
+    }
     $diarias_capeante = filter_input(INPUT_POST, "diarias_capeante");
     $lote_cap = filter_input(INPUT_POST, "lote_cap");
     $acomodacao_cap = filter_input(INPUT_POST, "acomodacao_cap");
@@ -117,6 +121,7 @@ if ($type === "create") {
         $capeante->data_digit_capeante = $data_digit_capeante;
         $capeante->data_final_capeante = $data_final_capeante;
         $capeante->data_inicial_capeante = $data_inicial_capeante;
+        $capeante->timer_cap = $timer_cap;
         $capeante->diarias_capeante = $diarias_capeante;
         $capeante->lote_cap = $lote_cap;
         $capeante->acomodacao_cap = $acomodacao_cap;
@@ -186,6 +191,10 @@ if ($type === "update") {
     $data_fech_capeante = filter_input(INPUT_POST, "data_fech_capeante") ?: null;
     $data_final_capeante = filter_input(INPUT_POST, "data_final_capeante") ?: null;
     $data_digit_capeante = filter_input(INPUT_POST, "data_digit_capeante") ?: null;
+    $timer_cap = filter_input(INPUT_POST, "timer_cap", FILTER_VALIDATE_INT);
+    if ($timer_cap === false) {
+        $timer_cap = null;
+    }
     $diarias_capeante = filter_input(INPUT_POST, "diarias_capeante");
     $lote_cap = filter_input(INPUT_POST, "lote_cap");
     $acomodacao_cap = filter_input(INPUT_POST, "acomodacao_cap");
@@ -262,6 +271,7 @@ if ($type === "update") {
     $capeanteUpdate->data_digit_capeante = $data_digit_capeante;
     $capeanteUpdate->data_final_capeante = $data_final_capeante;
         $capeanteUpdate->data_inicial_capeante = $data_inicial_capeante;
+        $capeanteUpdate->timer_cap = $timer_cap;
         $capeanteUpdate->diarias_capeante = $diarias_capeante;
         $capeanteUpdate->lote_cap = $lote_cap;
         $capeanteUpdate->acomodacao_cap = $acomodacao_cap;

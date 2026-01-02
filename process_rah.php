@@ -117,6 +117,10 @@ $data_inicial   = datePOST("data_inicial_capeante");
 $data_final     = datePOST("data_final_capeante");
 $data_fech      = datePOST("data_fech_capeante");
 $data_digit     = datePOST("data_digit_capeante");
+$timer_cap      = filter_input(INPUT_POST, "timer_cap", FILTER_VALIDATE_INT);
+if ($timer_cap === false) {
+    $timer_cap = null;
+}
 
 if (!$data_digit) {
     $message->setMessage("Data de digitação é obrigatória.", "error", "back");
@@ -385,6 +389,7 @@ $cap->data_inicial_capeante     = $data_inicial;
 $cap->data_final_capeante       = $data_final;
 $cap->data_fech_capeante        = $data_fech;
 $cap->data_digit_capeante       = $data_digit;
+$cap->timer_cap                 = $timer_cap;
 
 /* Parcelas/pacote */
 $cap->pacote                    = $pacote;
