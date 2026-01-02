@@ -155,11 +155,28 @@ li {
     max-height: 70vh !important;
     overflow: visible !important;
     z-index: 1055 !important;
+    opacity: 0;
+    transform: translateY(6px);
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
 }
 
 .navbar .dropdown-menu.bi-dropdown.bi-mega.show,
 .navbar .dropdown.show > .dropdown-menu.bi-dropdown.bi-mega {
     display: grid !important;
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.navbar .nav-item.dropdown:hover > .dropdown-menu.bi-dropdown.bi-mega {
+    display: grid !important;
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .bi-dropdown.bi-mega .bi-mega-col {

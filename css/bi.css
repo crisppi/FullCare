@@ -832,3 +832,65 @@ table.bi-table::after,
   box-shadow: 0 10px 18px rgba(3, 32, 54, 0.28);
   color: #ffffff;
 }
+
+.bi-theme .bi-panel a {
+  color: var(--bi-text);
+}
+
+.bi-theme .bi-panel a:hover {
+  color: #ffffff;
+}
+
+.bi-link-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.bi-link-card {
+  display: block;
+  text-decoration: none;
+  color: var(--bi-text);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--bi-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bi-link-card strong {
+  display: block;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.bi-link-card small {
+  display: block;
+  margin-top: 6px;
+  color: var(--bi-muted);
+}
+
+.bi-link-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px rgba(4, 28, 46, 0.3);
+}
+
+.bi-placeholder {
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  padding: 26px;
+  text-align: center;
+  color: var(--bi-muted);
+}
+
+.bi-split {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+@media (max-width: 960px) {
+  .bi-split {
+    grid-template-columns: 1fr;
+  }
+}

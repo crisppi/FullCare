@@ -141,6 +141,28 @@ if (!empty($sessionIdUsuario)) {
         gap: 0.35rem;
     }
 
+    @media (min-width: 992px) {
+        .navbar .dropdown:hover > .dropdown-menu {
+            display: block;
+        }
+
+        .navbar .dropdown-menu {
+            margin-top: 0;
+        }
+
+        .navbar .bi-dropdown:hover {
+            display: block;
+        }
+
+        .bi-submenu:hover > .bi-submenu-list {
+            display: block;
+        }
+
+        .navbar .nav-item.dropdown:hover > .dropdown-menu.bi-dropdown.bi-mega {
+            display: grid !important;
+        }
+    }
+
     .header-zoom-actions {
         display: inline-flex;
         align-items: center;
@@ -510,6 +532,46 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-grid-3x3-gap"
                                                     style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
                                                 Navegacao</a></li>
+                                        <li class="bi-submenu">
+                                            <a class="dropdown-item" href="#"><i
+                                                        class="bi bi-bar-chart"
+                                                        style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
+                                                Comparativa Rede Hospitalar</a>
+                                            <ul class="bi-submenu-list">
+                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-comparativa"><i
+                                                            class="bi bi-layout-text-window-reverse"
+                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
+                                                        Visao geral</a></li>
+                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-custo"><i
+                                                            class="bi bi-currency-dollar"
+                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
+                                                        Custo por caso</a></li>
+                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-glosa"><i
+                                                            class="bi bi-scissors"
+                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
+                                                        Taxa de glosa</a></li>
+                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-paradas-capeante"><i
+                                                            class="bi bi-pause-circle"
+                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
+                                                        Contas paradas</a></li>
+                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-permanencia"><i
+                                                            class="bi bi-hourglass-split"
+                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
+                                                        Permanencia media</a></li>
+                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-eventos-adversos"><i
+                                                            class="bi bi-exclamation-octagon"
+                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
+                                                        Eventos adversos</a></li>
+                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-readmissao"><i
+                                                            class="bi bi-arrow-repeat"
+                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
+                                                        Readmissao</a></li>
+                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-ranking"><i
+                                                            class="bi bi-trophy"
+                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
+                                                        Ranking custo x qualidade</a></li>
+                                            </ul>
+                                        </li>
                                         <li class="bi-submenu">
                                             <a class="dropdown-item" href="#"><i
                                                         class="bi bi-layers"

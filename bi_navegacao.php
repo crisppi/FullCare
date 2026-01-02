@@ -8,6 +8,7 @@ function e($v)
 }
 
 $links = [
+    ['label' => 'Comparativa Rede Hospitalar', 'href' => 'bi/rede-comparativa'],
     ['label' => 'UTI', 'href' => 'bi/uti'],
     ['label' => 'Patologia', 'href' => 'bi/patologia'],
     ['label' => 'Grupo Patologia', 'href' => 'bi/grupo-patologia'],
