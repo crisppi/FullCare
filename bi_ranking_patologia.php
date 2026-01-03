@@ -1,0 +1,314 @@
+<?php
+include_once("check_logado.php");
+require_once("templates/header.php");
+
+if (!isset($conn) || !($conn instanceof PDO)) {
+    die("Conexao invalida.");
+}
+
+function e($v)
+{
+    return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+}
+
+function fmtMoney($value): string
+{
+    return 'R$ ' . number_format((float)$value, 2, ',', '.');
+}
+
+function fmtInt($value): string
+{
+    return number_format((int)$value, 0, ',', '.');
+}
+
+function fmtFloat($value, int $dec = 1): string
+{
+    return number_format((float)$value, $dec, ',', '.');
+}
+
+function shortLabel(string $value, int $limit = 16): string
+{
+    $clean = trim($value);
+    if (strlen($clean) <= $limit) {
+        return $clean;
+    }
+    return substr($clean, 0, $limit - 3) . '...';
+}
+
+function topMetric(array $rows, string $metric, int $limit = 10): array
+{
+    $sorted = $rows;
+    usort($sorted, function ($a, $b) use ($metric) {
+        return (float)($b[$metric] ?? 0) <=> (float)($a[$metric] ?? 0);
+    });
+    $slice = array_slice($sorted, 0, $limit);
+    $labels = array_map(fn($r) => shortLabel((string)($r['label'] ?? 'Sem informacoes')), $slice);
+    $values = array_map(fn($r) => (float)($r[$metric] ?? 0), $slice);
+    return [$labels, $values];
+}
+$internado = trim((string)(filter_input(INPUT_GET, 'internado') ?? ''));
+$hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
+$mesInput = filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT);
+$anoInput = filter_input(INPUT_GET, 'ano', FILTER_VALIDATE_INT);
+$mes = $mesInput ? (int)$mesInput : null;
+$ano = $anoInput ? (int)$anoInput : null;
+
+$hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
+    ->fetchAll(PDO::FETCH_ASSOC);
+$anos = $conn->query("SELECT DISTINCT YEAR(data_intern_int) AS ano FROM tb_internacao WHERE data_intern_int IS NOT NULL AND data_intern_int <> '0000-00-00' ORDER BY ano DESC")
+    ->fetchAll(PDO::FETCH_COLUMN);
+
+$where = "i.data_intern_int IS NOT NULL";
+$params = [];
+if ($ano) {
+    $where .= " AND YEAR(i.data_intern_int) = :ano";
+    $params[':ano'] = $ano;
+}
+if ($mes) {
+    $where .= " AND MONTH(i.data_intern_int) = :mes";
+    $params[':mes'] = $mes;
+}
+if ($internado === 's' || $internado === 'n') {
+    $where .= " AND i.internado_int = :internado";
+    $params[':internado'] = $internado;
+}
+if ($hospitalId) {
+    $where .= " AND i.fk_hospital_int = :hospital_id";
+    $params[':hospital_id'] = $hospitalId;
+}
+
+$labelExpr = "COALESCE(NULLIF(i.grupo_patologia_int,''), p.patologia_pat, 'Sem informacoes')";
+$costExpr = "COALESCE(NULLIF(ca.valor_final_capeante,0), ca.valor_apresentado_capeante, 0)";
+
+$sql = "
+    SELECT
+        label,
+        SUM(custo) AS sinistro,
+        SUM(diarias) AS total_diarias,
+        COUNT(DISTINCT id_internacao) AS internacoes,
+        ROUND(AVG(diarias), 1) AS mp,
+        SUM(CASE WHEN is_uti = 1 THEN 1 ELSE 0 END) AS internacoes_uti,
+        ROUND(AVG(CASE WHEN is_uti = 1 THEN diarias END), 1) AS mp_uti
+    FROM (
+        SELECT
+            i.id_internacao,
+            {$labelExpr} AS label,
+            {$costExpr} AS custo,
+            GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1) AS diarias,
+            CASE WHEN ut.fk_internacao_uti IS NULL THEN 0 ELSE 1 END AS is_uti
+        FROM tb_internacao i
+        LEFT JOIN tb_patologia p ON p.id_patologia = i.fk_patologia_int
+        LEFT JOIN tb_capeante ca ON ca.fk_int_capeante = i.id_internacao
+        LEFT JOIN (SELECT DISTINCT fk_internacao_uti FROM tb_uti) ut ON ut.fk_internacao_uti = i.id_internacao
+        LEFT JOIN (
+            SELECT fk_id_int_alt, MAX(data_alta_alt) AS data_alta_alt
+            FROM tb_alta
+            GROUP BY fk_id_int_alt
+        ) al ON al.fk_id_int_alt = i.id_internacao
+        WHERE {$where}
+    ) t
+    GROUP BY label
+    ORDER BY sinistro DESC
+    LIMIT 12
+";
+$stmt = $conn->prepare($sql);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+}
+$stmt->execute();
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+$totalSinistro = 0.0;
+foreach ($rows as $row) {
+    $totalSinistro += (float)($row['sinistro'] ?? 0);
+}
+
+[$sinistroLabels, $sinistroVals] = topMetric($rows, 'sinistro');
+[$diariasLabels, $diariasVals] = topMetric($rows, 'total_diarias');
+[$internacoesLabels, $internacoesVals] = topMetric($rows, 'internacoes');
+[$mpLabels, $mpVals] = topMetric($rows, 'mp');
+[$internacoesUtiLabels, $internacoesUtiVals] = topMetric($rows, 'internacoes_uti');
+[$mpUtiLabels, $mpUtiVals] = topMetric($rows, 'mp_uti');
+?>
+
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260111">
+<script src="diversos/CoolAdmin-master/vendor/chartjs/Chart.bundle.min.js"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260111"></script>
+<script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
+
+<div class="bi-wrapper bi-theme">
+    <div class="bi-header">
+        <div>
+            <h1 class="bi-title">Ranking Patologia</h1>
+            <div style="color: var(--bi-muted); font-size: 0.95rem;">Sinistro, diarias e MP por patologia.</div>
+        </div>
+        <div class="bi-header-actions">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+                <i class="bi bi-grid-3x3-gap"></i>
+            </a>
+        </div>
+    </div>
+
+    <form method="get">
+        <div class="bi-panel bi-filters bi-filters-wrap">
+            <div class="bi-filter">
+                <label>Internados</label>
+                <select name="internado">
+                    <option value="" <?= $internado === '' ? 'selected' : '' ?>>Todos</option>
+                    <option value="s" <?= $internado === 's' ? 'selected' : '' ?>>Sim</option>
+                    <option value="n" <?= $internado === 'n' ? 'selected' : '' ?>>Nao</option>
+                </select>
+            </div>
+            <div class="bi-filter">
+                <label>Hospitais</label>
+                <select name="hospital_id">
+                    <option value="">Todos</option>
+                    <?php foreach ($hospitais as $h): ?>
+                        <option value="<?= (int)$h['id_hospital'] ?>" <?= $hospitalId == $h['id_hospital'] ? 'selected' : '' ?>>
+                            <?= e($h['nome_hosp']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="bi-filter">
+                <label>Mes</label>
+                <select name="mes">
+                    <option value="">Todos</option>
+                    <?php for ($m = 1; $m <= 12; $m++): ?>
+                        <option value="<?= $m ?>" <?= $mes == $m ? 'selected' : '' ?>><?= $m ?></option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <div class="bi-filter">
+                <label>Ano</label>
+                <select name="ano">
+                    <option value="">Todos</option>
+                    <?php foreach ($anos as $anoOpt): ?>
+                        <option value="<?= (int)$anoOpt ?>" <?= $ano == $anoOpt ? 'selected' : '' ?>>
+                            <?= (int)$anoOpt ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="bi-actions">
+                <button class="bi-btn" type="submit">Aplicar filtros</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="bi-panel">
+        <h3>Ranking</h3>
+        <table class="bi-table">
+            <thead>
+                <tr>
+                    <th>Patologia</th>
+                    <th>Sinistro</th>
+                    <th>Total diarias</th>
+                    <th>Internacoes</th>
+                    <th>MP</th>
+                    <th>Internacoes UTI</th>
+                    <th>MP UTI</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!$rows): ?>
+                    <tr>
+                        <td colspan="7" class="bi-empty">Sem dados com os filtros atuais.</td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($rows as $row): ?>
+                        <tr>
+                            <td><?= e($row['label'] ?? 'Sem informacoes') ?></td>
+                            <td><?= fmtMoney((float)($row['sinistro'] ?? 0)) ?></td>
+                            <td><?= fmtInt((int)($row['total_diarias'] ?? 0)) ?></td>
+                            <td><?= fmtInt((int)($row['internacoes'] ?? 0)) ?></td>
+                            <td><?= fmtFloat((float)($row['mp'] ?? 0), 1) ?></td>
+                            <td><?= fmtInt((int)($row['internacoes_uti'] ?? 0)) ?></td>
+                            <td><?= fmtFloat((float)($row['mp_uti'] ?? 0), 1) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bi-grid fixed-2">
+        <div class="bi-panel">
+            <h3>Sinistro</h3>
+            <div class="bi-chart"><canvas id="chartSinistro"></canvas></div>
+        </div>
+        <div class="bi-panel">
+            <h3>Total de Diarias</h3>
+            <div class="bi-chart"><canvas id="chartDiarias"></canvas></div>
+        </div>
+        <div class="bi-panel">
+            <h3>Internacoes</h3>
+            <div class="bi-chart"><canvas id="chartInternacoes"></canvas></div>
+        </div>
+        <div class="bi-panel">
+            <h3>MP</h3>
+            <div class="bi-chart"><canvas id="chartMp"></canvas></div>
+        </div>
+        <div class="bi-panel">
+            <h3>Internacoes em UTI</h3>
+            <div class="bi-chart"><canvas id="chartInternacoesUti"></canvas></div>
+        </div>
+        <div class="bi-panel">
+            <h3>MP UTI</h3>
+            <div class="bi-chart"><canvas id="chartMpUti"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const rpSinistroLabels = <?= json_encode($sinistroLabels) ?>;
+const rpSinistro = <?= json_encode($sinistroVals) ?>;
+const rpDiariasLabels = <?= json_encode($diariasLabels) ?>;
+const rpDiarias = <?= json_encode($diariasVals) ?>;
+const rpInternacoesLabels = <?= json_encode($internacoesLabels) ?>;
+const rpInternacoes = <?= json_encode($internacoesVals) ?>;
+const rpMpLabels = <?= json_encode($mpLabels) ?>;
+const rpMp = <?= json_encode($mpVals) ?>;
+const rpInternacoesUtiLabels = <?= json_encode($internacoesUtiLabels) ?>;
+const rpInternacoesUti = <?= json_encode($internacoesUtiVals) ?>;
+const rpMpUtiLabels = <?= json_encode($mpUtiLabels) ?>;
+const rpMpUti = <?= json_encode($mpUtiVals) ?>;
+
+function buildBarChart(canvasId, labels, values, tickFormatter) {
+    const el = document.getElementById(canvasId);
+    if (!el || !window.Chart) return;
+    new Chart(el, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: 'rgba(126,150,255,0.82)',
+                borderRadius: 10,
+                maxBarThickness: 48
+            }]
+        },
+        options: {
+            legend: { display: false },
+            scales: window.biChartScales ? window.biChartScales() : undefined,
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem) {
+                        const v = tooltipItem.yLabel || tooltipItem.value || 0;
+                        return tickFormatter ? tickFormatter(v) : v;
+                    }
+                }
+            }
+        }
+    });
+}
+
+buildBarChart('chartSinistro', rpSinistroLabels, rpSinistro, window.biMoneyTick);
+buildBarChart('chartDiarias', rpDiariasLabels, rpDiarias);
+buildBarChart('chartInternacoes', rpInternacoesLabels, rpInternacoes);
+buildBarChart('chartMp', rpMpLabels, rpMp);
+buildBarChart('chartInternacoesUti', rpInternacoesUtiLabels, rpInternacoesUti);
+buildBarChart('chartMpUti', rpMpUtiLabels, rpMpUti);
+</script>
+
+<?php require_once("templates/footer.php"); ?>

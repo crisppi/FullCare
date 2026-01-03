@@ -31,6 +31,13 @@ function fmtPct($value, int $dec = 1): string
     return fmtFloat($value, $dec) . '%';
 }
 
+function biBindParams(PDOStatement $stmt, array $params): void
+{
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+    }
+}
+
 function biRedeFetchOptions(PDO $conn, string $sql, string $valueKey, string $labelKey): array
 {
     try {

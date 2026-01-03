@@ -15,9 +15,8 @@ $anoInput = filter_input(INPUT_GET, 'ano', FILTER_VALIDATE_INT);
 $mesInput = filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT);
 $ano = ($anoInput !== null && $anoInput !== false) ? (int)$anoInput : null;
 $mes = ($mesInput !== null && $mesInput !== false) ? (int)$mesInput : null;
-if ($ano === null && !filter_has_var(INPUT_GET, 'ano')) {
-    $ano = (int)date('Y');
-}
+$limiarInput = filter_input(INPUT_GET, 'limiar', FILTER_VALIDATE_INT);
+$limiar = ($limiarInput !== null && $limiarInput !== false && $limiarInput > 0) ? (int)$limiarInput : null;
 
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 
@@ -40,6 +39,7 @@ if (!empty($hospitalId)) {
     $where .= " AND i.fk_hospital_int = :hospital_id";
     $params[':hospital_id'] = (int)$hospitalId;
 }
+$params[':limiar_override'] = $limiar;
 
 $sqlBase = "
     FROM tb_internacao i
@@ -63,7 +63,7 @@ $sqlLonga = "
             i.rel_int,
             i.data_intern_int,
             GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1) AS diarias,
-            COALESCE(NULLIF(se.longa_permanencia_seg, 0), 30) AS limiar
+            COALESCE(:limiar_override, COALESCE(NULLIF(se.longa_permanencia_seg, 0), 30)) AS limiar
         {$sqlBase}
     ) t
     WHERE t.diarias >= t.limiar
@@ -164,6 +164,17 @@ $valuesHosp = array_map(fn($r) => $hospTotals[$r['nome_hosp']] ?? 0, $hospitais)
                             <?php foreach ($anos as $anoOpt): ?>
                                 <option value="<?= (int)$anoOpt ?>" <?= $ano == $anoOpt ? 'selected' : '' ?>>
                                     <?= (int)$anoOpt ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="bi-filter">
+                        <label>Longa permanência (dias)</label>
+                        <select name="limiar" form="lp-form">
+                            <option value="">Padrão seguradora</option>
+                            <?php foreach ([15, 20, 30, 45, 60, 90, 120] as $dias): ?>
+                                <option value="<?= $dias ?>" <?= $limiar == $dias ? 'selected' : '' ?>>
+                                    <?= $dias ?> dias
                                 </option>
                             <?php endforeach; ?>
                         </select>
