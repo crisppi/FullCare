@@ -250,12 +250,18 @@ if (!empty($sessionIdUsuario)) {
                                 <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
                                         Manual</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacao_customizacao_pdf.php"
-                                        target="_blank">
+                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacao_customizacao.php">
                                         <i class="bi bi-file-earmark-text"
                                             style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
-                                        Solicitação de Customização (PDF)
+                                        Solicitação de Customização
                                     </a></li>
+                                <?php if (in_array(strtolower($_SESSION['cargo'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)) { ?>
+                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_solicitacao_customizacao.php">
+                                        <i class="bi bi-card-list"
+                                            style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
+                                        Listagem de Solicitações
+                                    </a></li>
+                                <?php } ?>
                                 <?php if ($sessionNivel > 3) { ?>
                                 <li class="nav-item">
                                     <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">

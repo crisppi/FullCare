@@ -8,7 +8,7 @@ $altaWhere = $altaFilters['where'];
 $altaParams = $altaFilters['params'];
 $altaJoins = $altaFilters['joins'];
 
-$summaryStmt = $conn->prepare("\n    SELECT\n        COUNT(*) AS altas,\n        SUM(CASE WHEN LOWER(COALESCE(al.tipo_alta_alt,'')) LIKE '%obito%' THEN 1 ELSE 0 END) AS obitos\n    FROM tb_alta al\n    JOIN tb_internacao i ON i.id_internacao = al.fk_id_int_alt\n    {$altaJoins}\n    WHERE {$altaWhere}\n");
+$summaryStmt = $conn->prepare("\n    SELECT\n        COUNT(DISTINCT al.id_alta) AS altas,\n        COUNT(DISTINCT CASE WHEN LOWER(COALESCE(al.tipo_alta_alt,'')) LIKE '%obito%' THEN al.id_alta END) AS obitos\n    FROM tb_alta al\n    JOIN tb_internacao i ON i.id_internacao = al.fk_id_int_alt\n    {$altaJoins}\n    WHERE {$altaWhere}\n");
 biBindParams($summaryStmt, $altaParams);
 $summaryStmt->execute();
 $summary = $summaryStmt->fetch(PDO::FETCH_ASSOC) ?: [];
@@ -17,7 +17,7 @@ $altas = (int)($summary['altas'] ?? 0);
 $obitos = (int)($summary['obitos'] ?? 0);
 $obitoPct = $altas > 0 ? ($obitos / $altas) * 100 : 0.0;
 
-$rowsStmt = $conn->prepare("\n    SELECT\n        h.nome_hosp AS hospital,\n        COUNT(*) AS altas,\n        SUM(CASE WHEN LOWER(COALESCE(al.tipo_alta_alt,'')) LIKE '%obito%' THEN 1 ELSE 0 END) AS obitos\n    FROM tb_alta al\n    JOIN tb_internacao i ON i.id_internacao = al.fk_id_int_alt\n    LEFT JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int\n    {$altaJoins}\n    WHERE {$altaWhere}\n    GROUP BY h.id_hospital\n    HAVING h.id_hospital IS NOT NULL\n    ORDER BY obitos DESC\n    LIMIT 10\n");
+$rowsStmt = $conn->prepare("\n    SELECT\n        h.nome_hosp AS hospital,\n        COUNT(DISTINCT al.id_alta) AS altas,\n        COUNT(DISTINCT CASE WHEN LOWER(COALESCE(al.tipo_alta_alt,'')) LIKE '%obito%' THEN al.id_alta END) AS obitos\n    FROM tb_alta al\n    JOIN tb_internacao i ON i.id_internacao = al.fk_id_int_alt\n    LEFT JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int\n    {$altaJoins}\n    WHERE {$altaWhere}\n    GROUP BY h.id_hospital\n    HAVING h.id_hospital IS NOT NULL\n    ORDER BY obitos DESC\n    LIMIT 10\n");
 biBindParams($rowsStmt, $altaParams);
 $rowsStmt->execute();
 $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
