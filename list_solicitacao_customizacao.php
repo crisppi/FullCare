@@ -110,8 +110,14 @@ $rows = $dao->findAll([
                                 <td><?= e($row['status'] ?? '') ?></td>
                                 <td><?= e($row['resolvido_em'] ?? '') ?></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#scViewModal" data-id="<?= (int)($row['id_solicitacao'] ?? 0) ?>">Ver</button>
-                                    <a class="btn btn-sm btn-outline-primary" href="solicitacao_customizacao.php?id=<?= (int)($row['id_solicitacao'] ?? 0) ?>">Editar</a>
+                                    <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#scViewModal" data-id="<?= (int)($row['id_solicitacao'] ?? 0) ?>" title="Ver">
+                                        <i class="bi bi-eye"></i>
+                                        <span class="ms-1">Ver</span>
+                                    </button>
+                                    <a class="btn btn-sm btn-outline-primary" href="solicitacao_customizacao.php?id=<?= (int)($row['id_solicitacao'] ?? 0) ?>" title="Editar">
+                                        <i class="bi bi-pencil-square"></i>
+                                        <span class="ms-1">Editar</span>
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

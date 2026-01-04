@@ -141,6 +141,16 @@ li {
     justify-content: center;
 }
 
+.navbar .dropdown-menu {
+    background: #f2f3f5;
+    border-color: #e1e4ea;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover,
+.navbar .dropdown-menu .dropdown-item:focus {
+    background: #e7eaee;
+}
+
 .navbar .dropdown-menu .bi-dropdown-featured {
     font-weight: 700;
 }

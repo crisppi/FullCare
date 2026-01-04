@@ -196,9 +196,12 @@ if (!in_array($currentPage, $flatPages, true)) {
 
 .bi-tabbar {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
     padding: 6px 18px 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
 }
 
 .bi-tab {
@@ -241,8 +244,11 @@ if (!in_array($currentPage, $flatPages, true)) {
 
 .bi-chipbar {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
 }
 
 .bi-chipbar-rail {
