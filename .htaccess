@@ -88,6 +88,7 @@ RewriteRule ^bi/negociacao-custo-beneficio/?$ bi_negociacao_custo_beneficio.php 
 RewriteRule ^bi/rede-volume-custo/?$ RedeVolumeCustoBI.php [L,QSA]
 RewriteRule ^bi/qualidade-complicacao/?$ bi_qualidade_complicacao.php [L,QSA]
 RewriteRule ^bi/qualidade-obito/?$ QualidadeObitosBI.php [L,QSA]
+RewriteRule ^bi/qualidade-obitos/?$ QualidadeObitosBI.php [L,QSA]
 RewriteRule ^bi/qualidade-infeccao/?$ bi_qualidade_infeccao.php [L,QSA]
 RewriteRule ^bi/qualidade-eventos/?$ QualidadeEventosBI.php [L,QSA]
 
