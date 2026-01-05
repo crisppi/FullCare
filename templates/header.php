@@ -216,6 +216,11 @@ if (!empty($sessionIdUsuario)) {
                         max-height: 100px;
                         min-height: 50px;" alt="FullCare">
                 </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false"
+                    aria-label="Alternar navegação">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
                 <div class="collapse navbar-collapse" id="navbarScroll">
                     <ul class="nav-tabs navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll align-items-center"
                         style="--bs-scroll-height: 80px;">
