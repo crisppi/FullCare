@@ -12,8 +12,33 @@ function e($v)
 }
 
 $hoje = date('Y-m-d');
-$dataIni = filter_input(INPUT_GET, 'data_ini') ?: date('Y-m-d', strtotime('-120 days'));
-$dataFim = filter_input(INPUT_GET, 'data_fim') ?: $hoje;
+$dataIni = filter_input(INPUT_GET, 'data_ini');
+$dataFim = filter_input(INPUT_GET, 'data_fim');
+
+if (!$dataIni || !$dataFim) {
+    $stmtRange = $conn->query("
+        SELECT
+            MIN(i.data_intern_int) AS min_dt,
+            MAX(i.data_intern_int) AS max_dt
+        FROM tb_internacao i
+        INNER JOIN tb_uti u ON u.fk_internacao_uti = i.id_internacao
+        WHERE i.data_intern_int IS NOT NULL
+          AND i.data_intern_int <> '0000-00-00'
+    ");
+    $range = $stmtRange->fetch(PDO::FETCH_ASSOC) ?: [];
+    $minDt = $range['min_dt'] ?? null;
+    $maxDt = $range['max_dt'] ?? null;
+    $dataIni = $dataIni ?: ($minDt ?: date('Y-m-d', strtotime('-120 days')));
+    $dataFim = $dataFim ?: ($maxDt ?: $hoje);
+}
+
+$fonteConexao = $GLOBALS['fonte_conexao'] ?? '';
+$utiCount = 0;
+try {
+    $utiCount = (int)$conn->query("SELECT COUNT(*) FROM tb_uti")->fetchColumn();
+} catch (Throwable $e) {
+    $utiCount = 0;
+}
 $internado = trim((string)(filter_input(INPUT_GET, 'internado') ?? ''));
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 $tipoInternação = trim((string)(filter_input(INPUT_GET, 'tipo_internacao') ?? ''));
@@ -146,7 +171,7 @@ function labelsAndValues(array $rows): array
 ?>
 
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">
-<script src="diversos/CoolAdmin-master/vendor/chartjs/Chart.bundle.min.js"></script>
+<script src="diversos/chartjs/Chart.min.js"></script>
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260110"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
@@ -154,7 +179,9 @@ function labelsAndValues(array $rows): array
     <div class="bi-header">
         <h1 class="bi-title">Dashboard UTI</h1>
         <div class="bi-header-actions">
-            <div class="text-end text-muted"></div>
+            <div class="text-end text-muted" style="font-size:0.75rem;">
+                <?= e($fonteConexao) ?> · UTI: <?= (int)$utiCount ?>
+            </div>
             <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>

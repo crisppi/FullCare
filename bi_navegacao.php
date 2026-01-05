@@ -7,83 +7,158 @@ function e($v)
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
 
-$links = [
-    ['label' => 'Comparativa Rede Hospitalar', 'href' => 'bi/rede-comparativa'],
-    ['label' => 'UTI', 'href' => 'bi/uti'],
-    ['label' => 'Patologia', 'href' => 'bi/patologia'],
-    ['label' => 'Grupo Patologia', 'href' => 'bi/grupo-patologia'],
-    ['label' => 'Antecedente', 'href' => 'bi/antecedente'],
-    ['label' => 'Longa Permanência', 'href' => 'bi/longa-permanencia'],
-    ['label' => 'Estratégia Terapêutica', 'href' => 'bi/estrategia-terapeutica'],
-    ['label' => 'Médico Titular', 'href' => 'bi/medico-titular'],
-    ['label' => 'Auditor', 'href' => 'bi/auditor'],
-    ['label' => 'Auditor Visitas', 'href' => 'bi/auditor-visitas'],
-    ['label' => 'Internações com Risco', 'href' => 'bi/internacoes-risco'],
-    ['label' => 'Seguradora', 'href' => 'bi/seguradora'],
-    ['label' => 'Seguradora Detalhado', 'href' => 'bi/seguradora-detalhado'],
-    ['label' => 'Qualidade e Gestão', 'href' => 'bi/qualidade-gestao'],
-    ['label' => 'Financeiro Realizado', 'href' => 'bi/financeiro-realizado'],
-    ['label' => 'Clínico Realizado', 'href' => 'bi/clinico-realizado'],
-    ['label' => 'Auditoria Produtividade', 'href' => 'bi/auditoria-produtividade'],
-    ['label' => 'Consolidado Gestão', 'href' => 'bi/consolidado'],
-    ['label' => 'Consolidado Gestão Cards', 'href' => 'bi/consolidado-cards'],
-    ['label' => 'Alto Custo', 'href' => 'bi/alto-custo'],
-    ['label' => 'Home Care', 'href' => 'bi/home-care'],
-    ['label' => 'Desospitalizacao', 'href' => 'bi/desospitalizacao'],
-    ['label' => 'OPME', 'href' => 'bi/opme'],
-    ['label' => 'Evento Adverso', 'href' => 'bi/evento-adverso'],
-    ['label' => 'Evolucao', 'href' => 'bi/evolucao'],
-    ['label' => 'Ranking Patologia', 'href' => 'bi/ranking-patologia'],
-    ['label' => 'Custo Medio Diarias', 'href' => 'bi/custo-medio-diarias'],
-    ['label' => 'Ranking Hospitais', 'href' => 'bi/ranking-hospitais'],
-    ['label' => 'Visita Inicial', 'href' => 'bi/visita-inicial'],
-    ['label' => 'Ranking Pacientes', 'href' => 'bi/ranking-pacientes'],
-    ['label' => 'Sinistro BI', 'href' => 'bi/sinistro'],
-    ['label' => 'Producao BI', 'href' => 'bi/producao'],
-    ['label' => 'Indicadores BI', 'href' => 'bi/indicadores'],
-    ['label' => 'Sinistro YTD', 'href' => 'bi/sinistro-ytd'],
-    ['label' => 'Producao YTD', 'href' => 'bi/producao-ytd'],
-    ['label' => 'Saving', 'href' => 'bi/saving'],
-    ['label' => 'Pacientes', 'href' => 'bi/pacientes'],
-    ['label' => 'Hospitais', 'href' => 'bi/hospitais'],
-    ['label' => 'Sinistro', 'href' => 'bi/sinistro-bi'],
-    ['label' => 'Perfil Sinistro', 'href' => 'bi/perfil-sinistro'],
-    ['label' => 'Sinistralidade por patologia', 'href' => 'bi/sinistro-patologia'],
-    ['label' => 'Sinistralidade por hospital', 'href' => 'bi/sinistro-hospital'],
-    ['label' => 'Tendencia de custo', 'href' => 'bi/sinistro-tendencia'],
-    ['label' => 'Analise de alto custo', 'href' => 'bi/sinistro-alto-custo'],
-    ['label' => 'Custo evitavel', 'href' => 'bi/sinistro-custo-evitavel'],
-    ['label' => 'Concentracao de risco', 'href' => 'bi/sinistro-concentracao'],
-    ['label' => 'Provisao vs. realizado', 'href' => 'bi/sinistro-provisao-realizado'],
-    ['label' => 'Inteligencia Artificial', 'href' => 'bi/inteligencia'],
-    ['label' => 'Tempo Médio Permanência', 'href' => 'inteligencia/tmp'],
-    ['label' => 'Prorrogacao x Alta', 'href' => 'inteligencia/prorrogacao-vs-alta'],
-    ['label' => 'Motivos Prorrogacao', 'href' => 'inteligencia/motivos-prorrogacao'],
-    ['label' => 'Backlog Autorizacoes', 'href' => 'inteligencia/backlog-autorizacoes'],
-    ['label' => 'Outliers de Permanência', 'href' => 'bi/anomalias-permanencia'],
-    ['label' => 'Negociação Suspeita', 'href' => 'bi/anomalias-negociacao'],
-    ['label' => 'Alto Custo sem Justificativa', 'href' => 'bi/anomalias-alto-custo'],
-    ['label' => 'Readmissão Precoce', 'href' => 'bi/anomalias-readmissao'],
-    ['label' => 'Variação de OPME', 'href' => 'bi/anomalias-opme-variacao'],
-    ['label' => 'Cumprimento de Protocolos', 'href' => 'bi/conformidade-protocolos'],
-    ['label' => 'Documentação Completa', 'href' => 'bi/conformidade-documentacao'],
-    ['label' => 'Tempo de Resposta', 'href' => 'bi/conformidade-tempo-resposta'],
-    ['label' => 'Adequação de Internação', 'href' => 'bi/conformidade-adequacao'],
-    ['label' => 'Conformidade de Faturamento', 'href' => 'bi/conformidade-faturamento'],
-    ['label' => 'Pacientes Crônicos', 'href' => 'bi/risco-cronicos'],
-    ['label' => 'Alto Risco de Readmissão', 'href' => 'bi/risco-readmissao'],
-    ['label' => 'Desospitalização Precoce', 'href' => 'bi/risco-desospitalizacao'],
-    ['label' => 'Risco de Longa Permanência', 'href' => 'bi/risco-longa-permanencia'],
-    ['label' => 'Casos Caros Previsíveis', 'href' => 'bi/risco-casos-previsiveis'],
-    ['label' => 'Volume vs Custo', 'href' => 'bi/negociacao-volume-custo'],
-    ['label' => 'Mix de Casos', 'href' => 'bi/negociacao-mix-casos'],
-    ['label' => 'Taxa de Utilização', 'href' => 'bi/negociacao-utilizacao'],
-    ['label' => 'Elasticidade de Preço', 'href' => 'bi/negociacao-elasticidade'],
-    ['label' => 'Custo-Benefício da Rede', 'href' => 'bi/negociacao-custo-beneficio'],
-    ['label' => 'Taxa de Complicação', 'href' => 'bi/qualidade-complicacao'],
-    ['label' => 'Taxa de Óbito', 'href' => 'bi/qualidade-obito'],
-    ['label' => 'Infecção Hospitalar', 'href' => 'bi/qualidade-infeccao'],
-    ['label' => 'Eventos Adversos', 'href' => 'bi/qualidade-eventos'],
+$navGroups = [
+    [
+        'title' => 'Resumo',
+        'key' => 'resumo',
+        'items' => [
+            ['label' => 'Consolidado Gestão', 'href' => 'bi/consolidado'],
+            ['label' => 'Consolidado Gestão Cards', 'href' => 'bi/consolidado-cards'],
+            ['label' => 'Indicadores BI', 'href' => 'bi/indicadores'],
+        ],
+    ],
+    [
+        'title' => 'Clínico',
+        'key' => 'clinico',
+        'items' => [
+            ['label' => 'UTI', 'href' => 'bi/uti'],
+            ['label' => 'Patologia', 'href' => 'bi/patologia'],
+            ['label' => 'Grupo Patologia', 'href' => 'bi/grupo-patologia'],
+            ['label' => 'Antecedente', 'href' => 'bi/antecedente'],
+            ['label' => 'Longa Permanência', 'href' => 'bi/longa-permanencia'],
+            ['label' => 'Evolução', 'href' => 'bi/evolucao'],
+            ['label' => 'Visita Inicial', 'href' => 'bi/visita-inicial'],
+            ['label' => 'Estratégia Terapêutica', 'href' => 'bi/estrategia-terapeutica'],
+            ['label' => 'Médico Titular', 'href' => 'bi/medico-titular'],
+            ['label' => 'Clínico Realizado', 'href' => 'bi/clinico-realizado'],
+        ],
+    ],
+    [
+        'title' => 'Auditoria',
+        'key' => 'auditoria',
+        'items' => [
+            ['label' => 'Auditor', 'href' => 'bi/auditor'],
+            ['label' => 'Auditor Visitas', 'href' => 'bi/auditor-visitas'],
+            ['label' => 'Auditoria Produtividade', 'href' => 'bi/auditoria-produtividade'],
+        ],
+    ],
+    [
+        'title' => 'Operacional',
+        'key' => 'operacional',
+        'items' => [
+            ['label' => 'Seguradora', 'href' => 'bi/seguradora'],
+            ['label' => 'Seguradora Detalhado', 'href' => 'bi/seguradora-detalhado'],
+            ['label' => 'Performance Rede Hospitalar', 'href' => 'bi/performance-rede-hospitalar'],
+            ['label' => 'Alto Custo', 'href' => 'bi/alto-custo'],
+            ['label' => 'Internações com Risco', 'href' => 'bi/internacoes-risco'],
+            ['label' => 'Qualidade e Gestão', 'href' => 'bi/qualidade-gestao'],
+            ['label' => 'Home Care', 'href' => 'bi/home-care'],
+            ['label' => 'Desospitalizacao', 'href' => 'bi/desospitalizacao'],
+            ['label' => 'OPME', 'href' => 'bi/opme'],
+            ['label' => 'Evento Adverso', 'href' => 'bi/evento-adverso'],
+        ],
+    ],
+    [
+        'title' => 'Rede Hospitalar',
+        'key' => 'rede',
+        'items' => [
+            ['label' => 'Comparativa', 'href' => 'bi/rede-comparativa'],
+            ['label' => 'Custo', 'href' => 'bi/rede-custo'],
+            ['label' => 'Glosa', 'href' => 'bi/rede-glosa'],
+            ['label' => 'Rejeição Capeante', 'href' => 'bi/rede-rejeicao-capeante'],
+            ['label' => 'Permanência', 'href' => 'bi/rede-permanencia'],
+            ['label' => 'Eventos Adversos', 'href' => 'bi/rede-eventos-adversos'],
+            ['label' => 'Readmissão', 'href' => 'bi/rede-readmissao'],
+            ['label' => 'Ranking', 'href' => 'bi/rede-ranking'],
+        ],
+    ],
+    [
+        'title' => 'Financeiro',
+        'key' => 'financeiro',
+        'items' => [
+            ['label' => 'Financeiro Realizado', 'href' => 'bi/financeiro-realizado'],
+            ['label' => 'Sinistro BI', 'href' => 'bi/sinistro'],
+            ['label' => 'Perfil Sinistro', 'href' => 'bi/perfil-sinistro'],
+            ['label' => 'Sinistro YTD', 'href' => 'bi/sinistro-ytd'],
+            ['label' => 'Producao BI', 'href' => 'bi/producao'],
+            ['label' => 'Producao YTD', 'href' => 'bi/producao-ytd'],
+            ['label' => 'Saving', 'href' => 'bi/saving'],
+            ['label' => 'Pacientes', 'href' => 'bi/pacientes'],
+            ['label' => 'Hospitais', 'href' => 'bi/hospitais'],
+            ['label' => 'Sinistro', 'href' => 'bi/sinistro-bi'],
+            ['label' => 'Inteligencia Artificial', 'href' => 'bi/inteligencia'],
+        ],
+    ],
+    [
+        'title' => 'Controle de Gastos',
+        'key' => 'gastos',
+        'items' => [
+            ['label' => 'Sinistralidade por Patologia', 'href' => 'bi/gastos-patologia'],
+            ['label' => 'Sinistralidade por Hospital', 'href' => 'bi/gastos-hospital'],
+            ['label' => 'Tendência de Custo', 'href' => 'bi/gastos-tendencia'],
+            ['label' => 'Análise de Alto Custo', 'href' => 'bi/gastos-alto-custo'],
+            ['label' => 'Custo Evitável', 'href' => 'bi/gastos-custo-evitavel'],
+            ['label' => 'Concentração de Risco', 'href' => 'bi/gastos-concentracao'],
+            ['label' => 'Provisão vs Realizado', 'href' => 'bi/gastos-provisao-realizado'],
+            ['label' => 'Custo Médio Diárias', 'href' => 'bi/custo-medio-diarias'],
+            ['label' => 'Ranking Patologia', 'href' => 'bi/ranking-patologia'],
+            ['label' => 'Ranking Hospitais', 'href' => 'bi/ranking-hospitais'],
+            ['label' => 'Ranking Pacientes', 'href' => 'bi/ranking-pacientes'],
+        ],
+    ],
+    [
+        'title' => 'Anomalias & Fraude',
+        'key' => 'anomalias',
+        'items' => [
+            ['label' => 'Outliers de Permanência', 'href' => 'bi/anomalias-permanencia'],
+            ['label' => 'Negociações Suspeitas', 'href' => 'bi/anomalias-negociacao'],
+            ['label' => 'OPME sem Justificativa', 'href' => 'bi/anomalias-opme'],
+        ],
+    ],
+    [
+        'title' => 'Conformidade & Auditoria',
+        'key' => 'conformidade',
+        'items' => [
+            ['label' => 'Documentação Completa', 'href' => 'bi/auditoria-documentacao'],
+            ['label' => 'Tempo de Resposta', 'href' => 'bi/auditoria-resposta'],
+        ],
+    ],
+    [
+        'title' => 'Segmentação de Risco',
+        'key' => 'risco',
+        'items' => [
+            ['label' => 'Pacientes Crônicos', 'href' => 'bi/risco-cronicos'],
+            ['label' => 'Risco Readmissão', 'href' => 'bi/risco-readmissao'],
+            ['label' => 'Casos Caros Previsíveis', 'href' => 'bi/risco-casos-caros'],
+        ],
+    ],
+    [
+        'title' => 'Negociação & Rede',
+        'key' => 'negociacao',
+        'items' => [
+            ['label' => 'Volume vs Custo', 'href' => 'bi/rede-volume-custo'],
+            ['label' => 'Mix de Casos', 'href' => 'bi/rede-mix-casos'],
+            ['label' => 'Elasticidade de Preço', 'href' => 'bi/rede-elasticidade'],
+        ],
+    ],
+    [
+        'title' => 'Qualidade & Desfecho',
+        'key' => 'qualidade',
+        'items' => [
+            ['label' => 'Eventos Adversos', 'href' => 'bi/qualidade-eventos'],
+            ['label' => 'Óbitos', 'href' => 'bi/qualidade-obitos'],
+        ],
+    ],
+    [
+        'title' => 'Inteligência',
+        'key' => 'inteligencia',
+        'items' => [
+            ['label' => 'Tempo Médio Permanência', 'href' => 'inteligencia/tmp'],
+            ['label' => 'Prorrogacao x Alta', 'href' => 'inteligencia/prorrogacao-vs-alta'],
+            ['label' => 'Motivos Prorrogacao', 'href' => 'inteligencia/motivos-prorrogacao'],
+            ['label' => 'Backlog Autorizacoes', 'href' => 'inteligencia/backlog-autorizacoes'],
+        ],
+    ],
 ];
 ?>
 
@@ -95,7 +170,7 @@ $links = [
     <div class="bi-header">
         <h1 class="bi-title">Navegação BI</h1>
         <div class="bi-header-actions">
-            <div class="text-end text-muted"></div>
+            <a class="bi-btn bi-btn-secondary" href="javascript:history.back()" title="Voltar">Voltar</a>
             <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
@@ -104,13 +179,18 @@ $links = [
 
     <div class="bi-panel">
         <div class="bi-nav-title">Painel de Navegação</div>
-        <div class="bi-nav-grid">
-            <?php foreach ($links as $link): ?>
-                <a class="bi-nav-card" href="<?= $BASE_URL . e($link['href']) ?>">
-                    <?= e($link['label']) ?>
-                </a>
-            <?php endforeach; ?>
-        </div>
+        <?php foreach ($navGroups as $group): ?>
+            <div class="bi-nav-group" data-theme="<?= e($group['key']) ?>">
+                <div class="bi-nav-group-title"><?= e($group['title']) ?></div>
+                <div class="bi-nav-grid">
+                    <?php foreach ($group['items'] as $link): ?>
+                        <a class="bi-nav-card" href="<?= $BASE_URL . e($link['href']) ?>">
+                            <?= e($link['label']) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
 </div>
 

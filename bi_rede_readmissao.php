@@ -1,194 +1,80 @@
 <?php
-$pageTitle = 'Readmissao - Rede Hospitalar';
-$pageSlug = 'bi/rede-readmissao';
-require_once("templates/bi_rede_bootstrap.php");
+$pageTitle = 'Readmissao 30 dias por hospital';
+$pageSubtitle = 'Indicador de resolucao e qualidade assistencial';
+$clearUrl = 'bi/rede-readmissao';
+$redeCurrent = 'readmissao';
+require_once('bi_rede_bootstrap.php');
 
-$readmFilters = biRedeBuildWhere($filterValues, 'al.data_alta_alt', 'i', true);
-$readmWhere = $readmFilters['where'];
-$readmParams = $readmFilters['params'];
-$readmJoins = $readmFilters['joins'];
-
-$summaryStmt = $conn->prepare("
-    SELECT
-        COUNT(*) AS total_altas,
-        SUM(
-            CASE WHEN EXISTS (
-                SELECT 1
-                FROM tb_internacao i2
-                WHERE i2.fk_paciente_int = i.fk_paciente_int
-                  AND i2.data_intern_int > al.data_alta_alt
-                  AND i2.data_intern_int <= DATE_ADD(al.data_alta_alt, INTERVAL 30 DAY)
-            ) THEN 1 ELSE 0 END
-        ) AS readm30,
-        SUM(
-            CASE WHEN EXISTS (
-                SELECT 1
-                FROM tb_internacao i3
-                WHERE i3.fk_paciente_int = i.fk_paciente_int
-                  AND i3.data_intern_int > al.data_alta_alt
-                  AND i3.data_intern_int <= DATE_ADD(al.data_alta_alt, INTERVAL 7 DAY)
-            ) THEN 1 ELSE 0 END
-        ) AS readm7
-    FROM tb_alta al
-    JOIN tb_internacao i ON i.id_internacao = al.fk_id_int_alt
-    {$readmJoins}
-    WHERE {$readmWhere}
-");
-$summaryStmt->execute($readmParams);
-$summary = $summaryStmt->fetch(PDO::FETCH_ASSOC) ?: [];
-$totalAltas = (int)($summary['total_altas'] ?? 0);
-$readm30 = (int)($summary['readm30'] ?? 0);
-$readm7 = (int)($summary['readm7'] ?? 0);
-$readm30Pct = $totalAltas > 0 ? ($readm30 / $totalAltas) * 100 : 0.0;
-$readm7Pct = $totalAltas > 0 ? ($readm7 / $totalAltas) * 100 : 0.0;
-
-$rowsStmt = $conn->prepare("
-    SELECT
-        h.nome_hosp AS hospital,
-        COUNT(*) AS total_altas,
-        SUM(
-            CASE WHEN EXISTS (
-                SELECT 1
-                FROM tb_internacao i2
-                WHERE i2.fk_paciente_int = i.fk_paciente_int
-                  AND i2.data_intern_int > al.data_alta_alt
-                  AND i2.data_intern_int <= DATE_ADD(al.data_alta_alt, INTERVAL 30 DAY)
-            ) THEN 1 ELSE 0 END
-        ) AS readm30,
-        SUM(
-            CASE WHEN EXISTS (
-                SELECT 1
-                FROM tb_internacao i3
-                WHERE i3.fk_paciente_int = i.fk_paciente_int
-                  AND i3.data_intern_int > al.data_alta_alt
-                  AND i3.data_intern_int <= DATE_ADD(al.data_alta_alt, INTERVAL 7 DAY)
-            ) THEN 1 ELSE 0 END
-        ) AS readm7
-    FROM tb_alta al
-    JOIN tb_internacao i ON i.id_internacao = al.fk_id_int_alt
-    LEFT JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int
-    {$readmJoins}
-    WHERE {$readmWhere}
-    GROUP BY h.id_hospital
-    HAVING h.id_hospital IS NOT NULL
-    ORDER BY readm30 DESC
-    LIMIT 12
-");
-$rowsStmt->execute($readmParams);
-$readmRows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-$maiorReadm = '-';
-$menorReadm = '-';
-$alertas = 0;
-foreach ($readmRows as $row) {
-    $total = (int)($row['total_altas'] ?? 0);
-    $r30 = (int)($row['readm30'] ?? 0);
-    $rate30 = $total > 0 ? ($r30 / $total) * 100 : 0.0;
-    if ($maiorReadm === '-' && $r30 > 0) {
-        $maiorReadm = $row['hospital'] ?? '-';
-    }
-    if ($menorReadm === '-') {
-        $menorReadm = $row['hospital'] ?? '-';
-    } elseif ($rate30 < 3) {
-        $menorReadm = $row['hospital'] ?? $menorReadm;
-    }
-    if ($rate30 >= 10) {
-        $alertas++;
-    }
-}
+$rowsSorted = $rows;
+usort($rowsSorted, function ($a, $b) {
+    return ($b['readm_rate'] ?? 0) <=> ($a['readm_rate'] ?? 0);
+});
+$chartRows = array_slice($rowsSorted, 0, 10);
+$chartLabels = array_map(fn($r) => $r['hospital'] ?: 'Sem hospital', $chartRows);
+$chartVals = array_map(fn($r) => round((float)($r['readm_rate'] ?? 0) * 100, 1), $chartRows);
 ?>
-
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260111">
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260111"></script>
-<script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
-        <div>
-            <h1 class="bi-title">Readmissao</h1>
-            <div style="color: var(--bi-muted); font-size: 0.95rem;">Retorno do paciente apos alta.</div>
-        </div>
+        <h1 class="bi-title"><?= e($pageTitle) ?></h1>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/rede-comparativa" title="Comparativa da rede">
-                <i class="bi bi-chevron-left"></i>
-            </a>
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <div class="text-end text-muted"><?= e($pageSubtitle) ?></div>
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
     </div>
 
-    <?php include "templates/bi_rede_filters.php"; ?>
+    <?php include 'bi_rede_filters.php'; ?>
 
     <div class="bi-panel">
         <h3>Indicadores-chave</h3>
-        <div class="bi-kpis kpi-grid-4">
-            <div class="bi-kpi kpi-compact">
-                <small>Readmissao 30d</small>
-                <strong><?= fmtPct($readm30Pct, 1) ?></strong>
+        <div class="bi-kpis kpi-compact">
+            <div class="bi-kpi">
+                <small>Readmissao media</small>
+                <strong><?= number_format($network['readm_rate'] * 100, 1, ',', '.') ?>%</strong>
             </div>
-            <div class="bi-kpi kpi-compact">
-                <small>Readmissao 7d</small>
-                <strong><?= fmtPct($readm7Pct, 1) ?></strong>
+            <div class="bi-kpi">
+                <small>Readmissoes</small>
+                <strong><?= (int)$totals['readm'] ?></strong>
             </div>
-            <div class="bi-kpi kpi-compact">
-                <small>Hospitais criticos</small>
-                <strong><?= fmtInt($alertas) ?></strong>
-            </div>
-            <div class="bi-kpi kpi-compact">
-                <small>Casos analisados</small>
-                <strong><?= fmtInt($totalAltas) ?></strong>
+            <div class="bi-kpi">
+                <small>Altas analisadas</small>
+                <strong><?= (int)$totals['altas'] ?></strong>
             </div>
         </div>
     </div>
 
     <div class="bi-panel">
         <h3>Readmissao por hospital</h3>
-        <div class="bi-split">
-            <div class="bi-placeholder">Grafico de readmissao por hospital.</div>
-            <div class="bi-list">
-                <div class="bi-list-item">
-                    <span>Maior readmissao</span>
-                    <strong><?= e($maiorReadm) ?></strong>
-                </div>
-                <div class="bi-list-item">
-                    <span>Menor readmissao</span>
-                    <strong><?= e($menorReadm) ?></strong>
-                </div>
-                <div class="bi-list-item">
-                    <span>Alertas ativos</span>
-                    <strong><?= fmtInt($alertas) ?></strong>
-                </div>
-            </div>
+        <div class="bi-chart">
+            <canvas id="chartReadm"></canvas>
         </div>
-        <table class="bi-table" style="margin-top: 16px;">
+    </div>
+
+    <div class="bi-panel">
+        <h3>Detalhe por hospital</h3>
+        <table class="bi-table">
             <thead>
                 <tr>
                     <th>Hospital</th>
-                    <th>Readmissao 30d</th>
-                    <th>Readmissao 7d</th>
-                    <th>Casos</th>
+                    <th>Readmissao</th>
+                    <th>Readmissoes</th>
+                    <th>Altas analisadas</th>
                 </tr>
             </thead>
             <tbody>
-                <?php if (!$readmRows): ?>
+                <?php if (!$rowsSorted): ?>
                     <tr>
-                        <td colspan="4" class="bi-empty">Sem dados com os filtros atuais.</td>
+                        <td colspan="4" class="text-center">Sem dados no periodo.</td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($readmRows as $row): ?>
-                        <?php
-                        $total = (int)($row['total_altas'] ?? 0);
-                        $r30 = (int)($row['readm30'] ?? 0);
-                        $r7 = (int)($row['readm7'] ?? 0);
-                        $rate30 = $total > 0 ? ($r30 / $total) * 100 : 0.0;
-                        $rate7 = $total > 0 ? ($r7 / $total) * 100 : 0.0;
-                        ?>
+                    <?php foreach ($rowsSorted as $row): ?>
                         <tr>
-                            <td><?= e($row['hospital'] ?? 'Sem informacoes') ?></td>
-                            <td><?= fmtPct($rate30, 1) ?></td>
-                            <td><?= fmtPct($rate7, 1) ?></td>
-                            <td><?= fmtInt($total) ?></td>
+                            <td><?= e($row['hospital'] ?: 'Sem hospital') ?></td>
+                            <td><?= number_format((float)$row['readm_rate'] * 100, 1, ',', '.') ?>%</td>
+                            <td><?= (int)($row['readm'] ?? 0) ?></td>
+                            <td><?= (int)($row['total_altas'] ?? 0) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -196,5 +82,36 @@ foreach ($readmRows as $row) {
         </table>
     </div>
 </div>
+
+<script>
+function barChart(ctx, labels, data, color) {
+    if (!ctx || !labels.length) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: color,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            legend: { display: false },
+            scales: {
+                xAxes: [{ ticks: { fontColor: '#eaf6ff' }, gridLines: { color: 'rgba(255,255,255,0.1)' } }],
+                yAxes: [{
+                    ticks: { fontColor: '#eaf6ff', callback: function (v) { return v + '%'; } },
+                    gridLines: { color: 'rgba(255,255,255,0.1)' }
+                }]
+            }
+        }
+    });
+}
+
+const chartLabels = <?= json_encode($chartLabels) ?>;
+const chartVals = <?= json_encode($chartVals) ?>;
+barChart(document.getElementById('chartReadm'), chartLabels, chartVals, 'rgba(127, 196, 255, 0.7)');
+</script>
 
 <?php require_once("templates/footer.php"); ?>

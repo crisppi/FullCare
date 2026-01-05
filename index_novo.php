@@ -184,57 +184,7 @@
         border-radius: 5px;
     }
 
-    /* ===============================
-       CONEX AUD no topo + TAGLINE abaixo
-       (sem alterar HTML)
-    =============================== */
-    :root {
-        --conex-side-h: 30px;
-        /* altura do logo */
-        --conex-side-top: 18px;
-        /* distância do topo */
-        --conex-tagline-gap: 8px;
-        /* espaço entre logo e texto */
-        --conex-tagline-size: 12px;
-    }
-
-    @media (max-width:768px) {
-        :root {
-            --conex-side-h: 28px;
-            --conex-side-top: 16px;
-            --conex-tagline-size: 11px;
-        }
-    }
-
-    @media (max-width:480px) {
-        :root {
-            --conex-side-h: 26px;
-            --conex-side-top: 14px;
-            --conex-tagline-size: 10.5px;
-        }
-    }
-
-    /* Logo removido do Conex */
-
-    /* Texto/Tagline abaixo do logo */
-    .side-panel::after {
-        /* >>> edite aqui o texto que você quer mostrar abaixo do logo <<< */
-        content: "Acesso a plataforma";
-        position: absolute;
-        top: calc(var(--conex-side-top) + var(--conex-side-h) + var(--conex-tagline-gap));
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: var(--conex-tagline-size);
-        font-weight: 600;
-        letter-spacing: .06em;
-        color: #E9EDF2;
-        /* cinza claro/branco suave */
-        opacity: .95;
-        pointer-events: none;
-        white-space: nowrap;
-        text-transform: uppercase;
-        text-shadow: 0 1px 0 rgba(0, 0, 0, .10);
-    }
+    /* Conex logo removido do painel lateral. */
 
     /* ===============================
        Mensagem de erro (flutuante)
@@ -321,18 +271,6 @@
 
         .form-content {
             width: 100%;
-        }
-
-        .side-panel {
-            padding: 24px 18px 28px;
-        }
-
-        .side-panel h3 {
-            font-size: 1.1rem;
-        }
-
-        .side-panel p {
-            font-size: .95rem;
         }
     }
     </style>

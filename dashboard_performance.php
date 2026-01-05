@@ -48,14 +48,29 @@ function perfFetchValue(PDO $conn, string $sql, array $params = [], $default = 0
 function perfFetchAll(PDO $conn, string $sql, array $params = []): array
 {
     try {
+        error_log('[PERF_RANKING] Executando query...');
+        error_log('[PERF_RANKING] SQL: ' . substr($sql, 0, 200) . '...');
+        error_log('[PERF_RANKING] PARAMS: ' . json_encode($params));
+
         $stmt = $conn->prepare($sql);
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        error_log('[PERF_RANKING] ✓ Sucesso! Linhas retornadas: ' . count($result));
+        if (count($result) > 0) {
+            error_log('[PERF_RANKING] Primeira linha: ' . json_encode($result[0]));
+        }
+
+        return $result;
     } catch (Throwable $e) {
-        error_log('[PERF_DASH][ALL] ' . $e->getMessage());
+        error_log('[PERF_RANKING] ✗ ERRO: ' . $e->getMessage());
+        error_log('[PERF_RANKING] CÓDIGO: ' . $e->getCode());
+        error_log('[PERF_RANKING] SQL COMPLETO: ' . $sql);
+        error_log('[PERF_RANKING] PARAMS: ' . json_encode($params));
+        error_log('[PERF_RANKING] TRACE: ' . $e->getTraceAsString());
         return [];
     }
 }
@@ -85,6 +100,15 @@ $rangeParams = [
 ];
 $capeanteRangeExpr = buildCapeanteDateExpr('ca');
 $internRangeExpr  = buildInternDateExpr('i');
+$hasCapeanteTimer = perfFetchValue(
+    $conn,
+    "SELECT COUNT(*) FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'tb_capeante'
+       AND COLUMN_NAME = 'timer_cap'",
+    [],
+    0
+) > 0;
 
 $visitaDateExpr = "COALESCE(
     NULLIF(v.data_visita_vis, '0000-00-00 00:00:00'),
@@ -105,15 +129,15 @@ $negociacaoDateExpr = "COALESCE(
     data_fim_neg
 )";
 
-$tempoMedioContaSeg = perfFetchValue(
+$tempoMedioContaSeg = $hasCapeanteTimer ? perfFetchValue(
     $conn,
-    "SELECT ROUND(AVG(timer_cap),1)
-     FROM tb_capeante
+    "SELECT ROUND(AVG(NULLIF(ca.timer_cap,0)),1)
+     FROM tb_capeante ca
     WHERE {$capeanteRangeExpr} BETWEEN :dt_ini AND :dt_fim
-      AND timer_cap IS NOT NULL AND timer_cap > 0",
+      AND ca.timer_cap IS NOT NULL",
     $rangeParams,
-    null
-);
+    0.0
+) : 0.0;
 
 $visitasPeriodo = perfFetchValue(
     $conn,
@@ -135,16 +159,6 @@ $tempoMedioVisita = perfFetchValue(
       WHERE $visitaDateExpr BETWEEN :dt_ini AND :dt_fim",
     $rangeParams,
     0.0
-);
-
-$tempoMedioVisitaSeg = perfFetchValue(
-    $conn,
-    "SELECT ROUND(AVG(v.timer_vis))
-       FROM tb_visita v
-      WHERE $visitaDateExpr BETWEEN :dt_ini AND :dt_fim
-        AND v.timer_vis IS NOT NULL AND v.timer_vis > 0",
-    $rangeParams,
-    null
 );
 
 $contasPeriodo = perfFetchValue(
@@ -191,7 +205,7 @@ $auditorRows = perfFetchAll(
     $conn,
     "SELECT 
         v.fk_usuario_vis AS auditor_id,
-        COALESCE(u.usuario_user, u.nome_user, CONCAT('ID ', v.fk_usuario_vis)) AS auditor,
+        COALESCE(u.usuario_user, u.login_user, u.email_user, CONCAT('ID ', v.fk_usuario_vis)) AS auditor,
         COUNT(*) AS visitas_30d,
         ROUND(AVG(GREATEST(0, TIMESTAMPDIFF(DAY, $visitaDateExpr, $visitaLancExpr))),1) AS sla_dias
      FROM tb_visita v
@@ -244,10 +258,13 @@ usort($auditorRanking, function ($a, $b) {
 });
 
 $capeanteUserKey = "LOWER(TRIM(COALESCE(
-    NULLIF(ca.usuario_create_cap,''),
+    NULLIF(CASE WHEN CHAR_LENGTH(TRIM(ca.usuario_create_cap)) < 3 THEN NULL ELSE TRIM(ca.usuario_create_cap) END,''),
     NULLIF(u.email_user,''),
     NULLIF(u.login_user,''),
-    CONCAT('id#', u.id_usuario),
+    NULLIF(u2.email_user,''),
+    NULLIF(u2.login_user,''),
+    CONCAT('id#', ca.fk_id_aud_adm),
+    CONCAT('id#', ca.fk_user_cap),
     ''
 )))";
 $capeanteStartExpr = "
@@ -268,7 +285,7 @@ $capeanteDigitExpr = "
     )";
 $capeanteSlaDaysExpr = "GREATEST(0, TIMESTAMPDIFF(DAY, {$capeanteStartExpr}, {$capeanteDigitExpr}))";
 $capeanteSlaHoursExpr = "GREATEST(0, TIMESTAMPDIFF(HOUR, {$capeanteStartExpr}, {$capeanteDigitExpr}))";
-$capeanteTimerExpr = "NULLIF(ca.timer_cap,0)";
+$capeanteTimerExpr = $hasCapeanteTimer ? "NULLIF(ca.timer_cap,0)" : "NULL";
 $internUserKey = "LOWER(TRIM(COALESCE(
     NULLIF(i.usuario_create_int,''),
     NULLIF(u.email_user,''),
@@ -278,42 +295,39 @@ $internUserKey = "LOWER(TRIM(COALESCE(
 )))";
 $visitaUserKey = "LOWER(TRIM(COALESCE(v.usuario_create,'')))";
 
-$adminRows = perfFetchAll(
+$adminRows = []; // Removido - usando cálculos diretos abaixo
+
+// Cálculos simples e diretos para a Central Administrativa
+$totalContasSLA = perfFetchValue(
     $conn,
-    "SELECT 
-        {$capeanteUserKey} AS admin_key,
-        COALESCE(
-            NULLIF(TRIM(ca.usuario_create_cap),''),
-            NULLIF(TRIM(u.email_user),''),
-            NULLIF(TRIM(u.login_user),''),
-            CONCAT('ID ', u.id_usuario),
-            'Usuário sem identificação'
-        ) AS admin_nome,
-        COUNT(*) AS total_contas,
-        ROUND(AVG({$capeanteTimerExpr}),1) AS timer_seg,
-        ROUND(SUM(COALESCE(ca.valor_final_capeante, ca.valor_apresentado_capeante)),2) AS valor_total,
-        ROUND(AVG(CASE 
-            WHEN {$capeanteStartExpr} IS NOT NULL AND {$capeanteDigitExpr} IS NOT NULL
-                THEN {$capeanteSlaDaysExpr}
-        END),1) AS sla_dias
-     FROM tb_capeante ca
-     LEFT JOIN tb_user u ON u.id_usuario = ca.fk_id_aud_adm
-    WHERE {$capeanteRangeExpr} BETWEEN :dt_ini AND :dt_fim
-      AND (TRIM(ca.usuario_create_cap) <> '' OR u.id_usuario IS NOT NULL)
-    GROUP BY admin_key, admin_nome
-    HAVING admin_key IS NOT NULL AND admin_key <> ''
-    ORDER BY total_contas DESC",
-    $rangeParams
+    "SELECT ROUND(AVG(CASE 
+        WHEN ca.data_inicial_capeante IS NOT NULL AND ca.data_inicial_capeante <> '0000-00-00'
+          AND ca.data_digit_capeante IS NOT NULL AND ca.data_digit_capeante <> '0000-00-00'
+        THEN TIMESTAMPDIFF(DAY, ca.data_inicial_capeante, ca.data_digit_capeante)
+    END),1)
+    FROM tb_capeante ca
+    WHERE DATE(COALESCE(ca.data_digit_capeante, ca.data_create_cap)) BETWEEN DATE(:dt_ini) AND DATE(:dt_fim)",
+    $rangeParams,
+    null
 );
+
+$totalContasTimer = $hasCapeanteTimer ? perfFetchValue(
+    $conn,
+    "SELECT ROUND(AVG(NULLIF(ca.timer_cap,0)),1)
+    FROM tb_capeante ca
+    WHERE DATE(COALESCE(ca.data_digit_capeante, ca.data_create_cap)) BETWEEN DATE(:dt_ini) AND DATE(:dt_fim)",
+    $rangeParams,
+    null
+) : null;
 
 $adminMonthly = perfFetchAll(
     $conn,
     "SELECT 
-        DATE_FORMAT(data_digit_capeante, '%Y-%m-01') AS mes_ref,
-        DATE_FORMAT(data_digit_capeante, '%b/%Y') AS etiqueta,
+        DATE_FORMAT(ca.data_digit_capeante, '%Y-%m-01') AS mes_ref,
+        DATE_FORMAT(ca.data_digit_capeante, '%b/%Y') AS etiqueta,
         COUNT(*) AS total,
-        ROUND(AVG(NULLIF(timer_cap,0)),1) AS tempo_seg
-     FROM tb_capeante
+        ROUND(AVG({$capeanteTimerExpr}),1) AS tempo_seg
+     FROM tb_capeante ca
     WHERE {$capeanteRangeExpr} BETWEEN :dt_ini AND :dt_fim
     GROUP BY mes_ref, etiqueta
     ORDER BY mes_ref ASC",
@@ -336,17 +350,19 @@ $contaTempoRows = perfFetchAll(
             NULLIF(TRIM(ca.usuario_create_cap),''),
             NULLIF(TRIM(u.email_user),''),
             NULLIF(TRIM(u.login_user),''),
+            NULLIF(TRIM(u2.email_user),''),
+            NULLIF(TRIM(u2.login_user),''),
             CONCAT('ID ', u.id_usuario),
+            CONCAT('ID ', ca.fk_user_cap),
             'Usuário sem identificação'
         ) AS admin_nome,
         COUNT(*) AS total_registros,
         ROUND(AVG({$capeanteTimerExpr}),1) AS timer_seg
      FROM tb_capeante ca
      LEFT JOIN tb_user u ON u.id_usuario = ca.fk_id_aud_adm
+     LEFT JOIN tb_user u2 ON u2.id_usuario = ca.fk_user_cap
     WHERE {$capeanteRangeExpr} BETWEEN :dt_ini AND :dt_fim
-      AND (TRIM(ca.usuario_create_cap) <> '' OR u.id_usuario IS NOT NULL)
     GROUP BY admin_id, admin_nome
-    HAVING admin_id <> ''
     ORDER BY timer_seg ASC
     LIMIT 10",
     $rangeParams
@@ -395,34 +411,182 @@ $internTempoRows = perfFetchAll(
     $rangeParams
 );
 
+$internTempoSummary = [
+    'total' => 0,
+    'tempo_dias' => null,
+    'timer_seg' => null,
+];
+if (!empty($internTempoRows)) {
+    $sumTotal = 0;
+    $sumTempo = 0.0;
+    $sumTempoCount = 0;
+    $sumTimer = 0.0;
+    $sumTimerCount = 0;
+    foreach ($internTempoRows as $row) {
+        $count = (int)($row['total_registros'] ?? 0);
+        if ($count <= 0) {
+            continue;
+        }
+        $sumTotal += $count;
+        if (isset($row['tempo_dias']) && $row['tempo_dias'] !== null) {
+            $sumTempo += ((float)$row['tempo_dias']) * $count;
+            $sumTempoCount += $count;
+        }
+        if (isset($row['timer_seg']) && $row['timer_seg'] !== null) {
+            $sumTimer += ((float)$row['timer_seg']) * $count;
+            $sumTimerCount += $count;
+        }
+    }
+    $internTempoSummary['total'] = $sumTotal;
+    if ($sumTempoCount > 0) {
+        $internTempoSummary['tempo_dias'] = round($sumTempo / $sumTempoCount, 1);
+    }
+    if ($sumTimerCount > 0) {
+        $internTempoSummary['timer_seg'] = round($sumTimer / $sumTimerCount, 1);
+    }
+}
+
+error_log('[PERF_RANKING] Iniciando query de contas por usuário...');
+error_log('[PERF_RANKING] Período: ' . $rangeParams[':dt_ini'] . ' até ' . $rangeParams[':dt_fim']);
+
 $rankingContaUsers = perfFetchAll(
     $conn,
     "SELECT 
-        {$capeanteUserKey} AS user_key,
         COALESCE(
-            NULLIF(TRIM(ca.usuario_create_cap),''),
-            NULLIF(TRIM(u.email_user),''),
-            NULLIF(TRIM(u.login_user),''),
-            CONCAT('ID ', u.id_usuario),
-            'Usuário sem identificação'
+            NULLIF(CASE WHEN CHAR_LENGTH(TRIM(ca.usuario_create_cap)) < 3 THEN NULL ELSE TRIM(ca.usuario_create_cap) END, ''),
+            NULLIF(TRIM(u.login_user), ''),
+            NULLIF(TRIM(u.email_user), ''),
+            NULLIF(TRIM(u2.login_user), ''),
+            NULLIF(TRIM(u2.email_user), ''),
+            CONCAT('ID_', ca.fk_id_aud_adm),
+            CONCAT('ID_', ca.fk_user_cap),
+            'Sem usuário'
         ) AS admin_nome,
         COUNT(*) AS total_contas,
-        ROUND(SUM(COALESCE(ca.valor_final_capeante, ca.valor_apresentado_capeante)),2) AS valor_total,
+        ROUND(SUM(COALESCE(ca.valor_final_capeante, ca.valor_apresentado_capeante, 0)),2) AS valor_total,
         ROUND(AVG(CASE 
-            WHEN {$capeanteStartExpr} IS NOT NULL AND {$capeanteDigitExpr} IS NOT NULL
-                THEN {$capeanteSlaDaysExpr}
+            WHEN ca.data_inicial_capeante IS NOT NULL 
+                 AND ca.data_inicial_capeante != '0000-00-00'
+                 AND ca.data_digit_capeante IS NOT NULL 
+                 AND ca.data_digit_capeante != '0000-00-00'
+                 AND ca.data_digit_capeante != '0000-00-00 00:00:00'
+                THEN TIMESTAMPDIFF(DAY, ca.data_inicial_capeante, ca.data_digit_capeante)
+            ELSE NULL
         END),1) AS sla_dias,
         ROUND(AVG({$capeanteTimerExpr}),1) AS timer_seg
      FROM tb_capeante ca
      LEFT JOIN tb_user u ON u.id_usuario = ca.fk_id_aud_adm
+     LEFT JOIN tb_user u2 ON u2.id_usuario = ca.fk_user_cap
     WHERE {$capeanteRangeExpr} BETWEEN :dt_ini AND :dt_fim
-      AND (TRIM(ca.usuario_create_cap) <> '' OR u.id_usuario IS NOT NULL)
-    GROUP BY user_key, admin_nome
-    HAVING user_key <> ''
+    GROUP BY admin_nome
     ORDER BY total_contas DESC
-    LIMIT 8",
+    LIMIT 10",
     $rangeParams
 );
+
+error_log('[PERF_RANKING] Query finalizada. Registros: ' . count($rankingContaUsers));
+
+if (empty($rankingContaUsers)) {
+    $rankingContaUsers = perfFetchAll(
+        $conn,
+        "SELECT 
+            COALESCE(
+                NULLIF(CASE WHEN CHAR_LENGTH(TRIM(ca.usuario_create_cap)) < 3 THEN NULL ELSE TRIM(ca.usuario_create_cap) END, ''),
+            NULLIF(TRIM(u.login_user), ''),
+            NULLIF(TRIM(u.email_user), ''),
+            NULLIF(TRIM(u2.login_user), ''),
+            NULLIF(TRIM(u2.email_user), ''),
+            CONCAT('ID_', ca.fk_id_aud_adm),
+            CONCAT('ID_', ca.fk_user_cap),
+            'Sem usuário'
+            ) AS admin_nome,
+            COUNT(*) AS total_contas,
+            ROUND(SUM(COALESCE(ca.valor_final_capeante, ca.valor_apresentado_capeante, 0)),2) AS valor_total,
+            ROUND(AVG(CASE 
+                WHEN ca.data_inicial_capeante IS NOT NULL 
+                     AND ca.data_inicial_capeante != '0000-00-00'
+                     AND ca.data_digit_capeante IS NOT NULL 
+                     AND ca.data_digit_capeante != '0000-00-00'
+                     AND ca.data_digit_capeante != '0000-00-00 00:00:00'
+                    THEN TIMESTAMPDIFF(DAY, ca.data_inicial_capeante, ca.data_digit_capeante)
+                ELSE NULL
+            END),1) AS sla_dias,
+            ROUND(AVG({$capeanteTimerExpr}),1) AS timer_seg
+         FROM tb_capeante ca
+         LEFT JOIN tb_user u ON u.id_usuario = ca.fk_id_aud_adm
+         LEFT JOIN tb_user u2 ON u2.id_usuario = ca.fk_user_cap
+        GROUP BY admin_nome
+        ORDER BY total_contas DESC
+        LIMIT 10",
+        []
+    );
+}
+
+$contaSummaryRow = [
+    'total' => 0,
+    'sla_dias' => null,
+    'timer_seg' => null,
+];
+if (!empty($rankingContaUsers)) {
+    $sumTotal = 0;
+    $sumSla = 0.0;
+    $sumSlaCount = 0;
+    $sumTimer = 0.0;
+    $sumTimerCount = 0;
+    foreach ($rankingContaUsers as $row) {
+        $count = (int)($row['total_contas'] ?? 0);
+        if ($count <= 0) {
+            continue;
+        }
+        $sumTotal += $count;
+        if (isset($row['sla_dias']) && $row['sla_dias'] !== null) {
+            $sumSla += ((float)$row['sla_dias']) * $count;
+            $sumSlaCount += $count;
+        }
+        if (isset($row['timer_seg']) && $row['timer_seg'] !== null) {
+            $sumTimer += ((float)$row['timer_seg']) * $count;
+            $sumTimerCount += $count;
+        }
+    }
+    $contaSummaryRow['total'] = $sumTotal;
+    if ($sumSlaCount > 0) {
+        $contaSummaryRow['sla_dias'] = round($sumSla / $sumSlaCount, 1);
+    }
+    if ($sumTimerCount > 0) {
+        $contaSummaryRow['timer_seg'] = round($sumTimer / $sumTimerCount, 1);
+    }
+}
+
+if (empty($rankingContaUsers)) {
+    $rankingContaUsers = perfFetchAll(
+        $conn,
+        "SELECT 
+            COALESCE(
+                NULLIF(CASE WHEN CHAR_LENGTH(TRIM(ca.usuario_create_cap)) < 3 THEN NULL ELSE TRIM(ca.usuario_create_cap) END, ''),
+                CONCAT('ID_', NULLIF(ca.fk_user_cap, 0)),
+                CONCAT('ID_', NULLIF(ca.fk_id_aud_adm, 0)),
+                'Sem usuário'
+            ) AS admin_nome,
+            COUNT(*) AS total_contas,
+            ROUND(SUM(COALESCE(ca.valor_final_capeante, ca.valor_apresentado_capeante, 0)),2) AS valor_total,
+            ROUND(AVG(CASE 
+                WHEN {$capeanteStartExpr} IS NOT NULL
+                     AND {$capeanteStartExpr} <> '0000-00-00'
+                     AND {$capeanteDigitExpr} IS NOT NULL
+                     AND {$capeanteDigitExpr} <> '0000-00-00'
+                     AND {$capeanteDigitExpr} <> '0000-00-00 00:00:00'
+                    THEN TIMESTAMPDIFF(DAY, {$capeanteStartExpr}, {$capeanteDigitExpr})
+                ELSE NULL
+            END),1) AS sla_dias,
+            ROUND(AVG({$capeanteTimerExpr}),1) AS timer_seg
+         FROM tb_capeante ca
+        WHERE {$capeanteRangeExpr} BETWEEN :dt_ini AND :dt_fim
+        GROUP BY admin_nome
+        ORDER BY total_contas DESC
+        LIMIT 10",
+        $rangeParams
+    );
+}
 
 $visitaLaunchExpr = "
     COALESCE(
@@ -452,18 +616,71 @@ $rankingVisitas = perfFetchAll(
       AND TRIM(v.usuario_create) <> ''
       AND {$visitaLaunchExpr} BETWEEN :dt_ini AND :dt_fim
     GROUP BY user_key, auditor_nome
-    HAVING user_key <> ''
     ORDER BY total_visitas DESC
     LIMIT 8",
     $rangeParams
 );
 
+$visitasSummaryRow = [
+    'total' => 0,
+    'sla_dias' => null,
+    'timer_seg' => null,
+];
+if (!empty($rankingVisitas)) {
+    $sumTotal = 0;
+    $sumSla = 0.0;
+    $sumSlaCount = 0;
+    $sumTimer = 0.0;
+    $sumTimerCount = 0;
+    foreach ($rankingVisitas as $row) {
+        $count = (int)($row['total_visitas'] ?? 0);
+        if ($count <= 0) {
+            continue;
+        }
+        $sumTotal += $count;
+        if (isset($row['sla_dias']) && $row['sla_dias'] !== null) {
+            $sumSla += ((float)$row['sla_dias']) * $count;
+            $sumSlaCount += $count;
+        }
+        if (isset($row['timer_medio_seg']) && $row['timer_medio_seg'] !== null) {
+            $sumTimer += ((float)$row['timer_medio_seg']) * $count;
+            $sumTimerCount += $count;
+        }
+    }
+    $visitasSummaryRow['total'] = $sumTotal;
+    if ($sumSlaCount > 0) {
+        $visitasSummaryRow['sla_dias'] = round($sumSla / $sumSlaCount, 1);
+    }
+    if ($sumTimerCount > 0) {
+        $visitasSummaryRow['timer_seg'] = round($sumTimer / $sumTimerCount, 1);
+    }
+}
+
 $centralProfiles = [];
+// Calcular totais simples diretamente
 $centralTotals = [
-    'contas' => ['total' => 0, 'sla_num' => 0, 'sla_den' => 0, 'timer_num' => 0, 'timer_den' => 0, 'valor' => 0],
+    'contas' => [
+        'total' => $contasPeriodo,
+        'sla_num' => 0,
+        'sla_den' => 1,
+        'timer_num' => 0,
+        'timer_den' => 1,
+        'valor' => 0,
+    ],
     'internacoes' => ['total' => 0, 'sla_num' => 0, 'sla_den' => 0, 'timer_num' => 0, 'timer_den' => 0],
     'visitas' => ['total' => 0, 'sla_num' => 0, 'sla_den' => 0, 'timer_num' => 0, 'timer_den' => 0],
 ];
+
+// Popular com dados diretos
+if ($totalContasSLA !== null) {
+    $centralTotals['contas']['sla_num'] = $totalContasSLA;
+    $centralTotals['contas']['sla_den'] = 1;
+}
+if ($totalContasTimer !== null) {
+    $centralTotals['contas']['timer_num'] = $totalContasTimer;
+    $centralTotals['contas']['timer_den'] = 1;
+}
+
 $registerProfile = function (string $rawKey = null, string $nome = null) use (&$centralProfiles) {
     $key = strtolower(trim((string) $rawKey));
     if ($key === '') {
@@ -482,29 +699,6 @@ $registerProfile = function (string $rawKey = null, string $nome = null) use (&$
     }
     return $key;
 };
-
-foreach ($adminRows as $row) {
-    $key = $registerProfile($row['admin_key'] ?? null, $row['admin_nome'] ?? null);
-    if (!$key)
-        continue;
-    $centralProfiles[$key]['contas'] = [
-        'total' => (int) ($row['total_contas'] ?? 0),
-        'sla' => $row['sla_dias'] ?? null,
-        'timer' => $row['timer_seg'] ?? null,
-        'valor' => $row['valor_total'] ?? 0,
-    ];
-    $cnt = $centralProfiles[$key]['contas']['total'];
-    $centralTotals['contas']['total'] += $cnt;
-    $centralTotals['contas']['valor'] += (float) ($row['valor_total'] ?? 0);
-    if ($cnt > 0 && is_numeric($row['sla_dias'])) {
-        $centralTotals['contas']['sla_num'] += ((float) $row['sla_dias']) * $cnt;
-        $centralTotals['contas']['sla_den'] += $cnt;
-    }
-    if ($cnt > 0 && is_numeric($row['timer_seg'])) {
-        $centralTotals['contas']['timer_num'] += ((float) $row['timer_seg']) * $cnt;
-        $centralTotals['contas']['timer_den'] += $cnt;
-    }
-}
 
 foreach ($internTempoRows as $row) {
     $key = $registerProfile($row['usuario_id'] ?? null, $row['admin_nome'] ?? null);
@@ -846,13 +1040,17 @@ function perfTimerClock($seconds)
     .perf-table th,
     .perf-table td {
         padding: 10px 8px;
-        text-align: center;
+        text-align: left;
         border-bottom: 1px solid #f1ecf6;
     }
-
-    .perf-table th:first-child,
-    .perf-table td:first-child {
-        text-align: left;
+    .perf-table th:not(:first-child),
+    .perf-table td:not(:first-child) {
+        text-align: center;
+    }
+    .perf-table .summary-row td {
+        background: #f8f6ff;
+        font-weight: 600;
+        border-top: 2px solid #d7c9f4;
     }
 
     .perf-table th {
@@ -979,6 +1177,9 @@ function perfTimerClock($seconds)
     }
 </style>
 
+<?php
+?>
+
 <div class="performance-wrapper">
     <div class="perf-hero">
         <h1>Painel de performance das equipes</h1>
@@ -1003,24 +1204,13 @@ function perfTimerClock($seconds)
         <div class="perf-card">
             <h3>Contas lançadas</h3>
             <strong><?= perfFmt($contasPeriodo) ?></strong>
-            <div class="card-pill">
-                <?php if ($tempoMedioContaSeg !== null): ?>
-                    Tempo médio <?= round(((float)$tempoMedioContaSeg) / 60, 1) ?> min
-                <?php else: ?>
-                    Tempo médio —
-                <?php endif; ?>
-            </div>
+            <div class="card-pill">Tempo médio <?= perfTimerClock($tempoMedioContaSeg) ?? '—' ?></div>
             <span>Volume de capeantes digitados no período selecionado.</span>
         </div>
         <div class="perf-card">
             <h3>Visitas registradas</h3>
             <strong><?= perfFmt($visitasPeriodo) ?></strong>
-            <div class="card-pill">
-                SLA médio <?= perfFmt($tempoMedioVisita, 1) ?> d
-                <?php if ($tempoMedioVisitaSeg !== null): ?>
-                    • Tempo médio <?= round(((float)$tempoMedioVisitaSeg) / 60, 1) ?> min
-                <?php endif; ?>
-            </div>
+            <div class="card-pill">SLA médio <?= perfFmt($tempoMedioVisita, 1) ?> d</div>
             <span>Produção assistencial com visitas preenchidas.</span>
         </div>
         <div class="perf-card">
@@ -1034,6 +1224,24 @@ function perfTimerClock($seconds)
     <div class="perf-sections">
         <div class="perf-panel">
             <h2><i class="bi bi-diagram-3"></i> Central administrativa</h2>
+            <?php
+            if (!empty($centralSummary['contas']['total'])): ?>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:20px;">
+                    <div style="background:#f8f6ff;padding:15px;border-radius:8px;border-left:4px solid #7c3aed;">
+                        <small style="color:#7a6a8a;font-weight:500;">Registros</small>
+                        <div style="font-size:1.5rem;font-weight:bold;color:#7c3aed;margin-top:5px;"><?= perfFmt($centralSummary['contas']['total'] ?? 0) ?></div>
+                    </div>
+                    <div style="background:#f8f6ff;padding:15px;border-radius:8px;border-left:4px solid #7c3aed;">
+                        <small style="color:#7a6a8a;font-weight:500;">Tempo médio</small>
+                        <div style="font-size:1.5rem;font-weight:bold;color:#7c3aed;margin-top:5px;"><?= perfTimerClock($centralSummary['contas']['timer_seg'] ?? null) ?? '—' ?></div>
+                    </div>
+                    <div style="background:#f8f6ff;padding:15px;border-radius:8px;border-left:4px solid #7c3aed;">
+                        <small style="color:#7a6a8a;font-weight:500;">SLA médio</small>
+                        <div style="font-size:1.5rem;font-weight:bold;color:#7c3aed;margin-top:5px;"><?= isset($centralSummary['contas']['sla']) && $centralSummary['contas']['sla'] !== null ? perfFmt($centralSummary['contas']['sla'], 1) . ' d' : '—' ?></div>
+                    </div>
+                </div>
+                <hr style="margin:15px 0;border-color:#f1ecf6;">
+            <?php endif; ?>
             <?php
             $centralSummaryRows = [
                 [
@@ -1075,12 +1283,10 @@ function perfTimerClock($seconds)
                     <tbody>
                         <?php foreach ($centralSummaryRows as $row):
                             $data = $row['data'];
-                            if (($data['total'] ?? 0) <= 0)
-                                continue;
                         ?>
                             <tr>
                                 <td><?= htmlspecialchars($row['label']) ?></td>
-                                <td><?= perfFmt($data['total']) ?></td>
+                                <td><?= perfFmt($data['total'] ?? 0) ?></td>
                                 <td><?= isset($data['sla']) && $data['sla'] !== null ? perfFmt($data['sla'], 1) . ' d' : '—' ?></td>
                                 <td><?= $row['timer'] ?? '—' ?></td>
                             </tr>
@@ -1088,12 +1294,8 @@ function perfTimerClock($seconds)
                     </tbody>
                 </table>
             <?php endif; ?>
-        </div>
-    </div>
-
-    <div class="perf-sections" style="margin-top:28px;">
-        <div class="perf-panel">
-            <h2><i class="bi bi-graph-up"></i> Produção mensal</h2>
+            <hr style="margin:20px 0;border-color:#f1ecf6;">
+            <h2 style="font-size:1rem;margin-bottom:10px;"><i class="bi bi-graph-up"></i> Produção mensal</h2>
             <?php if (!$adminMonthly): ?>
                 <p style="color:#7a6a8a;">Ainda não há histórico suficiente.</p>
             <?php else: ?>
@@ -1140,20 +1342,15 @@ function perfTimerClock($seconds)
                                 <td><?= is_numeric($row['tempo_dias']) ? perfFmt($row['tempo_dias'], 1) . ' d' : '—' ?></td>
                             </tr>
                         <?php endforeach; ?>
-                        <?php if ($internTempoRows): ?>
-                            <tr style="background-color: #f5f3f9; font-weight: 600; border-top: 2px solid #d4c9eb;">
-                                <td><strong>MÉDIA GERAL</strong></td>
-                                <td><?= perfFmt($centralSummary['internacoes']['total']) ?></td>
-                                <?php
-                                $timerMinAvg = null;
-                                if (isset($centralSummary['internacoes']['timer_seg']) && $centralSummary['internacoes']['timer_seg'] !== null) {
-                                    $timerMinAvg = round(((float)$centralSummary['internacoes']['timer_seg']) / 60, 1);
-                                }
-                                ?>
-                                <td><?= $timerMinAvg !== null ? perfFmt($timerMinAvg, 1) . ' min' : '—' ?></td>
-                                <td><?= is_numeric($centralSummary['internacoes']['sla']) ? perfFmt($centralSummary['internacoes']['sla'], 1) . ' d' : '—' ?></td>
-                            </tr>
-                        <?php endif; ?>
+                        <tr class="summary-row">
+                            <?php
+                            $internTimerMin = $internTempoSummary['timer_seg'] !== null ? round(((float)$internTempoSummary['timer_seg']) / 60, 1) : null;
+                            ?>
+                            <td>Média geral</td>
+                            <td>Total: <?= perfFmt($internTempoSummary['total']) ?></td>
+                            <td><?= $internTimerMin !== null ? perfFmt($internTimerMin, 1) . ' min' : '—' ?></td>
+                            <td><?= $internTempoSummary['tempo_dias'] !== null ? perfFmt($internTempoSummary['tempo_dias'], 1) . ' d' : '—' ?></td>
+                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -1175,41 +1372,26 @@ function perfTimerClock($seconds)
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!$rankingContaUsers): ?>
+                    <?php foreach ($rankingContaUsers as $row): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['admin_nome']) ?></td>
+                            <td><?= perfFmt($row['total_contas']) ?></td>
+                            <td><?= isset($row['sla_dias']) && $row['sla_dias'] !== null ? perfFmt($row['sla_dias'], 1) . ' d' : '—' ?></td>
+                            <td><?= perfTimerClock($row['timer_seg'] ?? null) ?? '—' ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (empty($rankingContaUsers)): ?>
                         <tr>
                             <td colspan="4" style="text-align:center;padding:24px;color:#7a6a8a;">Sem produtividade registrada
                                 nos últimos <?= $rangeDays ?> dias.</td>
                         </tr>
                     <?php else: ?>
-                        <?php foreach ($rankingContaUsers as $row): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($row['admin_nome']) ?></td>
-                                <td><?= perfFmt($row['total_contas']) ?></td>
-                                <td><?= isset($row['sla_dias']) && $row['sla_dias'] !== null ? perfFmt($row['sla_dias'], 1) . ' d' : '—' ?>
-                                </td>
-                                <?php
-                                $timerMin = null;
-                                if (isset($row['timer_seg']) && $row['timer_seg'] !== null) {
-                                    $timerMin = round(((float)$row['timer_seg']) / 60, 1);
-                                }
-                                ?>
-                                <td><?= $timerMin !== null ? perfFmt($timerMin, 1) . ' min' : '—' ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                        <?php if ($rankingContaUsers): ?>
-                            <tr style="background-color: #f5f3f9; font-weight: 600; border-top: 2px solid #d4c9eb;">
-                                <td><strong>MÉDIA GERAL</strong></td>
-                                <td><?= perfFmt($centralSummary['contas']['total']) ?></td>
-                                <td><?= is_numeric($centralSummary['contas']['sla']) ? perfFmt($centralSummary['contas']['sla'], 1) . ' d' : '—' ?></td>
-                                <?php
-                                $timerMinAvg = null;
-                                if (isset($centralSummary['contas']['timer_seg']) && $centralSummary['contas']['timer_seg'] !== null) {
-                                    $timerMinAvg = round(((float)$centralSummary['contas']['timer_seg']) / 60, 1);
-                                }
-                                ?>
-                                <td><?= $timerMinAvg !== null ? perfFmt($timerMinAvg, 1) . ' min' : '—' ?></td>
-                            </tr>
-                        <?php endif; ?>
+                        <tr class="summary-row">
+                            <td>Média geral</td>
+                            <td>Total: <?= perfFmt($contaSummaryRow['total']) ?></td>
+                            <td><?= $contaSummaryRow['sla_dias'] !== null ? perfFmt($contaSummaryRow['sla_dias'], 1) . ' d' : '—' ?></td>
+                            <td><?= perfTimerClock($contaSummaryRow['timer_seg'] ?? null) ?? '—' ?></td>
+                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -1246,20 +1428,15 @@ function perfTimerClock($seconds)
                                 <td><?= $timerMin !== null ? perfFmt($timerMin, 1) . ' min' : '—' ?></td>
                             </tr>
                         <?php endforeach; ?>
-                        <?php if ($rankingVisitas): ?>
-                            <tr style="background-color: #f5f3f9; font-weight: 600; border-top: 2px solid #d4c9eb;">
-                                <td><strong>MÉDIA GERAL</strong></td>
-                                <td><?= perfFmt($centralSummary['visitas']['total']) ?></td>
-                                <td><?= is_numeric($centralSummary['visitas']['sla']) ? perfFmt($centralSummary['visitas']['sla'], 1) . ' d' : '—' ?></td>
-                                <?php
-                                $timerMinAvg = null;
-                                if (isset($centralSummary['visitas']['timer_seg']) && $centralSummary['visitas']['timer_seg'] !== null) {
-                                    $timerMinAvg = round(((float)$centralSummary['visitas']['timer_seg']) / 60, 1);
-                                }
-                                ?>
-                                <td><?= $timerMinAvg !== null ? perfFmt($timerMinAvg, 1) . ' min' : '—' ?></td>
-                            </tr>
-                        <?php endif; ?>
+                        <tr class="summary-row">
+                            <?php
+                            $visitaTimerMin = $visitasSummaryRow['timer_seg'] !== null ? round(((float)$visitasSummaryRow['timer_seg']) / 60, 1) : null;
+                            ?>
+                            <td>Média geral</td>
+                            <td>Total: <?= perfFmt($visitasSummaryRow['total']) ?></td>
+                            <td><?= $visitasSummaryRow['sla_dias'] !== null ? perfFmt($visitasSummaryRow['sla_dias'], 1) . ' d' : '—' ?></td>
+                            <td><?= $visitaTimerMin !== null ? perfFmt($visitaTimerMin, 1) . ' min' : '—' ?></td>
+                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>

@@ -15,6 +15,15 @@ $defaultFoto = $BASE_URL . 'img/user-default.png';
 $sessionNivel = isset($_SESSION['nivel']) ? (int) $_SESSION['nivel'] : 0;
 $sessionUsuario = $_SESSION['usuario_user'] ?? '';
 $sessionIdUsuario = $_SESSION['id_usuario'] ?? null;
+$normAccess = function ($txt) {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $c !== false ? $c : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$isDiretoria = in_array($normAccess($_SESSION['cargo'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+    || in_array($normAccess($_SESSION['nivel'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+    || ($sessionNivel === -1);
 
 $chatUnreadCount = 0;
 $chatAssistantLink = $BASE_URL . 'show_chat.php';
@@ -83,130 +92,109 @@ if (!empty($sessionIdUsuario)) {
 
     <!-- ======= APENAS DESIGN (logos alinhados e simétricos) ======= -->
     <style>
-    .navbar .navbar-brand {
-        display: inline-flex !important;
-        align-items: center;
-        line-height: 1;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
+        .navbar .navbar-brand {
+            display: inline-flex !important;
+            align-items: center;
+            line-height: 1;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
 
-    .navbar .navbar-brand .logo-novo {
-        height: 56px !important;
-        width: auto !important;
-        max-height: none !important;
-        min-height: 0 !important;
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-
-    @media (max-width: 1199.98px) {
         .navbar .navbar-brand .logo-novo {
-            height: 52px !important;
-        }
-    }
-
-    @media (max-width: 575.98px) {
-        .navbar .navbar-brand .logo-novo {
-            height: 48px !important;
-        }
-    }
-
-    .header-actions {
-        margin-left: auto !important;
-        margin-right: 0 !important;
-        gap: 0.75rem !important;
-    }
-
-    .header-actions #global-patient-search {
-        min-width: 300px;
-        flex: 0 0 auto;
-    }
-
-    .header-action-btn {
-        border: 1px solid rgba(94, 35, 99, 0.28) !important;
-        background: #fff;
-        color: #5e2363;
-    }
-
-    .header-action-btn:hover {
-        border-color: rgba(94, 35, 99, 0.45) !important;
-        background: #f9f7fb;
-    }
-
-    .header-chat-launcher {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-    }
-
-    @media (min-width: 992px) {
-        .navbar .dropdown:hover > .dropdown-menu {
-            display: block;
+            height: 56px !important;
+            width: auto !important;
+            max-height: none !important;
+            min-height: 0 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
-        .navbar .dropdown-menu {
-            margin-top: 0;
+        @media (max-width: 1199.98px) {
+            .navbar .navbar-brand .logo-novo {
+                height: 52px !important;
+            }
         }
 
-        .navbar .bi-dropdown:hover {
-            display: block;
+        @media (max-width: 575.98px) {
+            .navbar .navbar-brand .logo-novo {
+                height: 48px !important;
+            }
         }
 
-        .bi-submenu:hover > .bi-submenu-list {
-            display: block;
-        }
 
-        .navbar .nav-item.dropdown:hover > .dropdown-menu.bi-dropdown.bi-mega {
-            display: grid !important;
-        }
-    }
-
-    .header-zoom-actions {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-    }
-
-    .header-zoom-actions .btn {
-        padding: 0.35rem 0.55rem;
-    }
-
-    .header-chat-launcher .chat-unread-badge {
-        font-size: 0.65rem;
-    }
-
-    #search-results-dropdown {
-        z-index: 2000;
-    }
-
-    #search-results-dropdown .dropdown-item {
-        white-space: normal;
-        line-height: 1.2;
-    }
-
-    #search-results-dropdown .dropdown-item.active,
-    #search-results-dropdown .dropdown-item:focus,
-    #search-results-dropdown .dropdown-item:hover {
-        background: #f2f6ff;
-        color: #1f1f1f;
-    }
-
-    #search-results-dropdown .dropdown-item small {
-        color: #5c5c5c;
-    }
-
-    @media (max-width: 575.98px) {
         .header-actions {
-            width: 100%;
+            margin-left: auto !important;
+            margin-right: 0 !important;
+            gap: 0.75rem !important;
         }
 
         .header-actions #global-patient-search {
-            min-width: 0;
-            width: 100%;
+            min-width: 300px;
+            flex: 0 0 auto;
         }
-    }
+
+        .header-action-btn {
+            border: 1px solid rgba(94, 35, 99, 0.28) !important;
+            background: #fff;
+            color: #5e2363;
+        }
+
+        .header-action-btn:hover {
+            border-color: rgba(94, 35, 99, 0.45) !important;
+            background: #f9f7fb;
+        }
+
+        .header-chat-launcher {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .header-zoom-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .header-zoom-actions .btn {
+            padding: 0.35rem 0.55rem;
+        }
+
+        .header-chat-launcher .chat-unread-badge {
+            font-size: 0.65rem;
+        }
+
+        #search-results-dropdown {
+            z-index: 2000;
+        }
+
+        #search-results-dropdown .dropdown-item {
+            white-space: normal;
+            line-height: 1.2;
+        }
+
+        #search-results-dropdown .dropdown-item.active,
+        #search-results-dropdown .dropdown-item:focus,
+        #search-results-dropdown .dropdown-item:hover {
+            background: #f2f6ff;
+            color: #1f1f1f;
+        }
+
+        #search-results-dropdown .dropdown-item small {
+            color: #5c5c5c;
+        }
+
+        @media (max-width: 575.98px) {
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-actions #global-patient-search {
+                min-width: 0;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -221,7 +209,7 @@ if (!empty($sessionIdUsuario)) {
             ">
             </div>
             <div class="container-fluid">
-                <a class="navbar-brand" href="index.php">
+                <a class="navbar-brand" href="index.php" style="gap:12px;">
                     <img src="<?= $BASE_URL ?>img/LogoFullCare.png" class="logo-novo" style="max-width: 100%;
                         height: auto;
                         width: auto\9;
@@ -235,104 +223,104 @@ if (!empty($sessionIdUsuario)) {
 
                         <?php if ($sessionNivel > 0) { ?>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                    class="bi bi-stack edit-icon"></i>
-                                Menu
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard"><i
-                                            class="bi bi-speedometer2"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
-                                        Dashboard</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
-                                        Manual</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacao_customizacao.php">
-                                        <i class="bi bi-file-earmark-text"
-                                            style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
-                                        Solicitação de Customização
-                                    </a></li>
-                                <?php if (in_array(strtolower($_SESSION['cargo'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)) { ?>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_solicitacao_customizacao.php">
-                                        <i class="bi bi-card-list"
-                                            style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
-                                        Listagem de Solicitações
-                                    </a></li>
-                                <?php } ?>
-                                <?php if ($sessionNivel > 3) { ?>
-                                <li class="nav-item">
-                                    <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">
-                                        <i class="bi bi-shield-lock"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(21, 56, 210);"></i>
-                                        Permissões
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                        class="bi bi-stack edit-icon"></i>
+                                    Menu
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                    <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard"><i
+                                                class="bi bi-speedometer2"
+                                                style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                            Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
+                                                style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                            Manual</a></li>
+                                    <li><a class="dropdown-item" href="<?= $BASE_URL ?>SolicitacaoCustomizacao.php">
+                                            <i class="bi bi-file-earmark-text"
+                                                style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
+                                            Solicitação de Customização
+                                        </a></li>
+                                    <?php if ($isDiretoria) { ?>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>SolicitacaoCustomizacaoList.php">
+                                                <i class="bi bi-clipboard-check"
+                                                    style="font-size: 1rem;margin-right:5px; color: #0d6efd;"></i>
+                                                Solicitações (Lista)
+                                            </a></li>
+                                    <?php } ?>
+                                    <?php if ($sessionNivel > 3) { ?>
+                                        <li class="nav-item">
+                                            <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">
+                                                <i class="bi bi-shield-lock"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(21, 56, 210);"></i>
+                                                Permissões
+                                            </a>
+                                        </li>
+                                    <?php }; ?>
+                                <?php }; ?>
+                                </ul>
+                            </li>
+
+                            <?php if ($sessionNivel > 3) { ?>
+                                <li id="drop1" class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="<?= $BASE_URL ?>pacientes"
+                                        id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="bi bi-people-fill edit-icon"></i>
+                                        Usuários
                                     </a>
+                                    <ul class="dropdown-menu" id="dropMenu1" aria-labelledby="navbarScrollingDropdown">
+
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_usuario.php"><i
+                                                    class="bi bi-file-medical"
+                                                    style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
+                                                Pesquisa Usuários</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_hospitalUser.php"><i
+                                                    class="bi bi-person-badge"
+                                                    style="font-size: 1rem; margin-right:5px; color: rgb(15, 155, 176);"></i>
+                                                Hospital por Usuário</a>
+                                        </li>
+                                    </ul>
                                 </li>
-                                <?php }; ?>
-                                <?php }; ?>
-                            </ul>
-                        </li>
 
-                        <?php if ($sessionNivel > 3) { ?>
-                        <li id="drop1" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="<?= $BASE_URL ?>pacientes"
-                                id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                    class="bi bi-people-fill edit-icon"></i>
-                                Usuários
-                            </a>
-                            <ul class="dropdown-menu" id="dropMenu1" aria-labelledby="navbarScrollingDropdown">
+                            <?php }; ?>
+                            <?php if ($sessionNivel > 3) { ?>
 
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_usuario.php"><i
-                                            class="bi bi-file-medical"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
-                                        Pesquisa Usuários</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_hospitalUser.php"><i
-                                            class="bi bi-person-badge"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(15, 155, 176);"></i>
-                                        Hospital por Usuário</a>
-                                </li>
-                            </ul>
-                        </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="fa-solid fa-pen-to-square edit-icon"></i>
+                                        Cadastros
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>pacientes"><i class="bi bi-person"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                                Pacientes</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>hospitais"><span
+                                                    class="bi bi-hospital"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"></span>
+                                                Hospitais</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>seguradoras"><span
+                                                    class=" bi bi-heart-pulse"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(178, 156, 55);"></span>
+                                                Seguradora</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>estipulantes"><i
+                                                    class="bi bi-building"
+                                                    style="font-size:  1rem;margin-right:5px; color: rgb(213, 12, 155);"></i>
+                                                Estipulante</a></li>
+                                        <li>
 
-                        <?php }; ?>
-                        <?php if ($sessionNivel > 3) { ?>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                    class="fa-solid fa-pen-to-square edit-icon"></i>
-                                Cadastros
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>pacientes"><i class="bi bi-person"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
-                                        Pacientes</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>hospitais"><span
-                                            class="bi bi-hospital"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"></span>
-                                        Hospitais</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>seguradoras"><span
-                                            class=" bi bi-heart-pulse"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(178, 156, 55);"></span>
-                                        Seguradora</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>estipulantes"><i
-                                            class="bi bi-building"
-                                            style="font-size:  1rem;margin-right:5px; color: rgb(213, 12, 155);"></i>
-                                        Estipulante</a></li>
-                                <li>
-
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_acomodacao.php"><i
-                                            class=" bi bi-clipboard-heart"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(145, 156, 55);"></i>
-                                        Acomodação</a></li>
-                                <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_patologia.php"><span
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_acomodacao.php"><i
+                                                    class=" bi bi-clipboard-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(145, 156, 55);"></i>
+                                                Acomodação</a></li>
+                                        <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_patologia.php"><span
                                             class=" bi bi-virus"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(178, 155, 155);"></span>
                                         Patologia</a></li>
@@ -340,687 +328,320 @@ if (!empty($sessionIdUsuario)) {
                                             class="bi bi-people"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(178, 156, 55);"></i>
                                         Antecedente</a></li> -->
-                            </ul>
-                        </li>
-                        <?php }; ?>
-                        <?php if ($sessionNivel >= 3) { ?>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                    class="fa-solid fa-calendar edit-icon"></i>
-                                Produção
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-
-                                <li><a class="dropdown-item" href="<?php $BASE_URL ?>internacoes/nova"><i
-                                            class="bi bi-calendar2-date"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i> Nova
-                                        Internação</a></li>
-                                <li><a class="dropdown-item" href="<?php $BASE_URL ?>censo/lista"><i class="bi bi-book"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
-                                        Censo</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
+                                    </ul>
                                 </li>
+                            <?php }; ?>
+                            <?php if ($sessionNivel >= 3) { ?>
 
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista"> <i
-                                            class="bi bi-calendar2-date"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="fa-solid fa-calendar edit-icon"></i>
+                                        Produção
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
 
-                                        Internação</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/uti"> <i
-                                            class="bi bi-clipboard-heart"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
-                                        Internação UTI</a>
-                                </li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
-                                            class="bi bi-postcard-heart"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
-                                        Gestão</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_internacao_uti_alta.php"><span
+                                        <li><a class="dropdown-item" href="<?php $BASE_URL ?>internacoes/nova"><i
+                                                    class="bi bi-calendar2-date"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i> Nova
+                                                Internação</a></li>
+                                        <li><a class="dropdown-item" href="<?php $BASE_URL ?>censo/lista"><i class="bi bi-book"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
+                                                Censo</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista"> <i
+                                                    class="bi bi-calendar2-date"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+
+                                                Internação</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/uti"> <i
+                                                    class="bi bi-clipboard-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
+                                                Internação UTI</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
+                                                    class="bi bi-postcard-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
+                                                Gestão</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_internacao_uti_alta.php"><span
                                             id="boot-icon3" class="bi bi-box-arrow-left"
                                             style="font-size: 1rem; margin-right:5px; color: rgb(167, 25, 55);"></span>
                                         Alta UTI</a></li> -->
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/reverter-alta"><span
-                                            id="boot-icon3" class="bi bi-postcard-heart"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(16, 15, 155);"></span>
-                                        Reverter altas</a>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/reverter-alta"><span
+                                                    id="boot-icon3" class="bi bi-postcard-heart"
+                                                    style="font-size: 1rem; margin-right:5px; color: rgb(16, 15, 155);"></span>
+                                                Reverter altas</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/gerar-alta"><span
+                                                    class="bi bi-clipboard-check"
+                                                    style="font-size: 1rem; margin-right:5px; color: rgb(9, 132, 227);"></span>
+                                                Gerar altas</a>
+                                        </li>
+                                    </ul>
                                 </li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/gerar-alta"><span
-                                            class="bi bi-clipboard-check"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(9, 132, 227);"></span>
-                                        Gerar altas</a>
+                            <?php }; ?>
+                            <?php if ($sessionNivel >= 3): ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="dropdownContasRah" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-journal-richtext me-1" style="color:#5e2363;"></i>Contas
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownContasRah">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_rah.php">
+                                                <i class="bi bi-currency-dollar text-success me-2"></i>Contas para Auditar
+                                            </a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_fin.php">
+                                                <i class="bi bi-shield-check text-primary me-2"></i>Contas Finalizadas
+                                            </a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_senha_fin.php">
+                                                <i class="bi bi-bookmark-check text-danger me-2"></i>Senhas Finalizadas
+                                            </a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_par.php">
+                                                <i class="bi bi-pause-circle text-warning me-2"></i>Contas Paradas
+                                            </a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_jornada.php">
+                                                <i class="bi bi-diagram-3 text-info me-2"></i>Jornada da Conta
+                                            </a></li>
+                                    </ul>
                                 </li>
-                            </ul>
-                        </li>
-                        <?php }; ?>
-                        <?php if ($sessionNivel >= 3): ?>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="dropdownContasRah" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-journal-richtext me-1" style="color:#5e2363;"></i>Contas
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownContasRah">
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_rah.php">
-                                        <i class="bi bi-currency-dollar text-success me-2"></i>Contas para Auditar
-                                    </a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_fin.php">
-                                        <i class="bi bi-shield-check text-primary me-2"></i>Contas Finalizadas
-                                    </a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_senha_fin.php">
-                                        <i class="bi bi-bookmark-check text-danger me-2"></i>Senhas Finalizadas
-                                    </a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_par.php">
-                                        <i class="bi bi-pause-circle text-warning me-2"></i>Contas Paradas
-                                    </a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_jornada.php">
-                                        <i class="bi bi-diagram-3 text-info me-2"></i>Jornada da Conta
-                                    </a></li>
-                            </ul>
-                        </li>
-                        <?php endif; ?>
+                            <?php endif; ?>
 
-                        <?php if ($sessionNivel >= 3) { ?>
+                            <?php if ($sessionNivel >= 3) { ?>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                    class="fa-solid fa-list edit-icon"></i>
-                                Listas
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="fa-solid fa-list edit-icon"></i>
+                                        Listas
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
 
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
-                                        Censo</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista"> <i
-                                            class="bi bi-calendar2-date"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
-                                        Internação</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/uti"> <i
-                                            class="bi bi-clipboard-heart"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
-                                        Internação UTI</a>
-                                </li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
-                                            class="bi bi-postcard-heart"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
-                                        Gestão</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>listas/altas"><i
-                                            class="bi bi-clipboard-check"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(9,132,227);"></i>
-                                        Lista de altas</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/ciclo"><i
-                                            class="bi bi-postcard-heart"
-                                            style="font-size:  1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
-                                        Rota do Paciente</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
-                                            class="bi bi-postcard-heart"
-                                            style="font-size:  1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
-                                        Lista de Visitas</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/sem-senha"><i
-                                            class="bi bi-shield-exclamation"
-                                            style="font-size:  1rem;margin-right:5px; color:#d63384;"></i>
-                                        Internações sem senha</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes"><i
-                                            class="bi bi-currency-dollar"
-                                            style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
-                                        Negociações</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes/graficos"><i
-                                            class="bi bi-bar-chart"
-                                            style="font-size: 1rem;margin-right:5px; color:#20c997;"></i>
-                                        Gráfico Negociações</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_fila_tarefas.php"><i
-                                            class="bi bi-list-check"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(20, 120, 90);"></i>
-                                        Fila de Tarefas</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
+                                                Censo</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista"> <i
+                                                    class="bi bi-calendar2-date"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                                Internação</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/uti"> <i
+                                                    class="bi bi-clipboard-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
+                                                Internação UTI</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
+                                                    class="bi bi-postcard-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
+                                                Gestão</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>listas/altas"><i
+                                                    class="bi bi-clipboard-check"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(9,132,227);"></i>
+                                                Lista de altas</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/ciclo"><i
+                                                    class="bi bi-postcard-heart"
+                                                    style="font-size:  1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
+                                                Rota do Paciente</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
+                                                    class="bi bi-postcard-heart"
+                                                    style="font-size:  1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
+                                                Lista de Visitas</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/sem-senha"><i
+                                                    class="bi bi-shield-exclamation"
+                                                    style="font-size:  1rem;margin-right:5px; color:#d63384;"></i>
+                                                Internações sem senha</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes"><i
+                                                    class="bi bi-currency-dollar"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                Negociações</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes/graficos"><i
+                                                    class="bi bi-bar-chart"
+                                                    style="font-size: 1rem;margin-right:5px; color:#20c997;"></i>
+                                                Gráfico Negociações</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_fila_tarefas.php"><i
+                                                    class="bi bi-list-check"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(20, 120, 90);"></i>
+                                                Fila de Tarefas</a></li>
 
-                            </ul>
-                        </li>
-                        <?php }; ?>
-                        <?php if ($sessionNivel >= 3) { ?>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                    class="fa-solid fa-file-invoice edit-icon"></i>
-                                Faturamento
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
-                                            class="bi bi-list-check"
-                                            style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
-                                        Lista Visitas</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_visitas.php"><i
-                                            class="bi bi-clipboard-check"
-                                            style="font-size: 1rem;margin-right:5px; color:#0a4fa3;"></i>
-                                        Faturamento Visitas</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_mensal.php"><i
-                                            class="bi bi-calendar-range"
-                                            style="font-size: 1rem;margin-right:5px; color:#0a6840;"></i>
-                                        Faturamento Mensal Visitas</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_mensal_contas.php"><i
-                                            class="bi bi-calendar3"
-                                            style="font-size: 1rem;margin-right:5px; color:#b35400;"></i>
-                                        Faturamento Mensal Contas</a></li>
-                                <!-- <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_fin.php"><i
+                                    </ul>
+                                </li>
+                            <?php }; ?>
+                            <?php if ($sessionNivel >= 3) { ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="fa-solid fa-file-invoice edit-icon"></i>
+                                        Faturamento
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
+                                                    class="bi bi-list-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
+                                                Lista Visitas</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_visitas.php"><i
+                                                    class="bi bi-clipboard-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0a4fa3;"></i>
+                                                Faturamento Visitas</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_mensal.php"><i
+                                                    class="bi bi-calendar-range"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0a6840;"></i>
+                                                Faturamento Mensal Visitas</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_mensal_contas.php"><i
+                                                    class="bi bi-calendar3"
+                                                    style="font-size: 1rem;margin-right:5px; color:#b35400;"></i>
+                                                Faturamento Mensal Contas</a></li>
+                                        <!-- <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_fin.php"><i
                                             class="bi bi-card-checklist"
                                             style="font-size: 1rem;margin-right:5px; color:rgb(28, 118, 175);"></i>
                                         Contas</a></li> -->
-                            </ul>
-                        </li>
-                        <?php }; ?>
-                        <?php if ($sessionNivel >= 3) { ?>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                    class="bi bi-bar-chart-line edit-icon"></i>
-                                BI
-                            </a>
-                            <ul class="dropdown-menu bi-dropdown bi-mega" aria-labelledby="navbarScrollingDropdown">
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Resumo</span>
-                                    <ul class="bi-mega-list">
+                                    </ul>
+                                </li>
+                            <?php }; ?>
+                            <?php if ($sessionNivel >= 3) { ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="bi bi-bar-chart-line edit-icon"></i>
+                                        BI
+                                    </a>
+                                    <ul class="dropdown-menu bi-dropdown" aria-labelledby="navbarScrollingDropdown">
                                         <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/navegacao"><i
                                                     class="bi bi-grid-3x3-gap"
                                                     style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Navegacao</a></li>
-                                        <li class="bi-submenu">
-                                            <a class="dropdown-item" href="#"><i
-                                                        class="bi bi-bar-chart"
-                                                        style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Comparativa Rede Hospitalar</a>
-                                            <ul class="bi-submenu-list">
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-comparativa"><i
-                                                            class="bi bi-layout-text-window-reverse"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Visao geral</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-custo"><i
-                                                            class="bi bi-currency-dollar"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Custo por caso</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-glosa"><i
-                                                            class="bi bi-scissors"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Taxa de glosa</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-paradas-capeante"><i
-                                                            class="bi bi-pause-circle"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Contas paradas</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-permanencia"><i
-                                                            class="bi bi-hourglass-split"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Permanencia media</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-eventos-adversos"><i
-                                                            class="bi bi-exclamation-octagon"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Eventos adversos</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-readmissao"><i
-                                                            class="bi bi-arrow-repeat"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Readmissao</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-ranking"><i
-                                                            class="bi bi-trophy"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Ranking custo x qualidade</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="bi-submenu">
-                                            <a class="dropdown-item" href="#"><i
-                                                        class="bi bi-layers"
-                                                        style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                Consolidado</a>
-                                            <ul class="bi-submenu-list">
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/consolidado-cards"><i
-                                                            class="bi bi-grid"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Consolidado Gestao Cards</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/consolidado"><i
-                                                            class="bi bi-layers"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Consolidado Gestao</a></li>
-                                            </ul>
+                                                Navegação BI</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/indicadores"><i
                                                     class="bi bi-speedometer2"
                                                     style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Indicadores BI</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Clinico</span>
-                                    <ul class="bi-mega-list">
+                                                Resumo</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/uti"><i
                                                     class="bi bi-heart-pulse"
                                                     style="font-size: 1rem;margin-right:5px; color:#ff9fb3;"></i>
-                                                UTI</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/patologia"><i
-                                                    class="bi bi-clipboard2-pulse"
-                                                    style="font-size: 1rem;margin-right:5px; color:#b7d3ff;"></i>
-                                                Patologia</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/grupo-patologia"><i
-                                                    class="bi bi-diagram-3"
-                                                    style="font-size: 1rem;margin-right:5px; color:#a6d8c0;"></i>
-                                                Grupo Patologia</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/antecedente"><i
-                                                    class="bi bi-journal-text"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f0b67f;"></i>
-                                                Antecedente</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/longa-permanencia"><i
-                                                    class="bi bi-hourglass-split"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9ad0f5;"></i>
-                                                Longa Permanencia</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/clinico-realizado"><i
-                                                    class="bi bi-activity"
-                                                    style="font-size: 1rem;margin-right:5px; color:#8bd3ff;"></i>
-                                                Clínico Realizado</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/estrategia-terapeutica"><i
-                                                    class="bi bi-compass"
-                                                    style="font-size: 1rem;margin-right:5px; color:#c6b5e8;"></i>
-                                                Estrategia Terapeutica</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/medico-titular"><i
-                                                    class="bi bi-person-badge"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ffb3d1;"></i>
-                                                Medico Titular</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/auditor"><i
-                                                    class="bi bi-person-lines-fill"
-                                                    style="font-size: 1rem;margin-right:5px; color:#b7d3ff;"></i>
-                                                Auditor</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/auditor-visitas"><i
-                                                    class="bi bi-table"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Auditor Visitas</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/auditoria-produtividade"><i
-                                                    class="bi bi-bar-chart"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Auditoria Produtividade</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Operacional</span>
-                                    <ul class="bi-mega-list">
-                                        <li class="bi-submenu">
-                                            <a class="dropdown-item" href="#"><i
-                                                        class="bi bi-shield-check"
-                                                        style="font-size: 1rem;margin-right:5px; color:#8dd0ff;"></i>
-                                                Seguradora</a>
-                                            <ul class="bi-submenu-list">
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/seguradora"><i
-                                                            class="bi bi-shield-check"
-                                                            style="font-size: 1rem;margin-right:5px; color:#8dd0ff;"></i>
-                                                        Seguradora</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/seguradora-detalhado"><i
-                                                            class="bi bi-shield-plus"
-                                                            style="font-size: 1rem;margin-right:5px; color:#8dd0ff;"></i>
-                                                        Seguradora Detalhado</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/alto-custo"><i
-                                                    class="bi bi-exclamation-diamond"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ff9fb3;"></i>
-                                                Alto Custo</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/internacoes-risco"><i
-                                                    class="bi bi-exclamation-triangle"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ffb86c;"></i>
-                                                Internações com Risco</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/qualidade-gestao"><i
+                                                Clínico</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/seguradora"><i
+                                                    class="bi bi-shield-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#8dd0ff;"></i>
+                                                Operacional</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro"><i
                                                     class="bi bi-clipboard-data"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9ad0f5;"></i>
-                                                Qualidade e Gestão</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/home-care"><i
-                                                    class="bi bi-house-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9ad0f5;"></i>
-                                                Home Care</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/desospitalizacao"><i
-                                                    class="bi bi-arrow-down-right-circle"
-                                                    style="font-size: 1rem;margin-right:5px; color:#c6b5e8;"></i>
-                                                Desospitalização</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/opme"><i
-                                                    class="bi bi-bandaid"
-                                                    style="font-size: 1rem;margin-right:5px; color:#c8a6ff;"></i>
-                                                OPME</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/evento-adverso"><i
-                                                    class="bi bi-exclamation-octagon"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ff9f9f;"></i>
-                                                Evento Adverso</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Auditoria</span>
-                                    <ul class="bi-mega-list">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/evolucao"><i
-                                                    class="bi bi-graph-up"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Evolucao</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/ranking-patologia"><i
-                                                    class="bi bi-clipboard2-pulse"
-                                                    style="font-size: 1rem;margin-right:5px; color:#b7d3ff;"></i>
-                                                Ranking Patologia</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/custo-medio-diarias"><i
-                                                    class="bi bi-bar-chart"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Custo Medio Diarias</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/ranking-hospitais"><i
-                                                    class="bi bi-hospital"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Ranking Hospitais</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/visita-inicial"><i
-                                                    class="bi bi-file-earmark-text"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Visita Inicial</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/ranking-pacientes"><i
-                                                    class="bi bi-people"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                Ranking Pacientes</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Financeiro</span>
-                                    <ul class="bi-mega-list">
-                                        <li class="bi-submenu">
-                                            <a class="dropdown-item" href="#"><i
-                                                        class="bi bi-clipboard-data"
-                                                        style="font-size: 1rem;margin-right:5px; color:#ff8fb1;"></i>
-                                                Sinistro</a>
-                                            <ul class="bi-submenu-list">
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro"><i
-                                                            class="bi bi-clipboard-data"
-                                                            style="font-size: 1rem;margin-right:5px; color:#ff8fb1;"></i>
-                                                        Sinistro BI</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro-ytd"><i
-                                                            class="bi bi-bar-chart-steps"
-                                                            style="font-size: 1rem;margin-right:5px; color:#8dd0ff;"></i>
-                                                        Sinistro YTD</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/perfil-sinistro"><i
-                                                            class="bi bi-pie-chart"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Perfil Sinistro</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="bi-submenu">
-                                            <a class="dropdown-item" href="#"><i
-                                                        class="bi bi-cash-coin"
-                                                        style="font-size: 1rem;margin-right:5px; color:#5fd3b5;"></i>
-                                                Controle de Gastos &amp; Sinistro</a>
-                                            <ul class="bi-submenu-list">
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro-patologia"><i
-                                                            class="bi bi-heart-pulse"
-                                                            style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                        Sinistralidade por patologia</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro-hospital"><i
-                                                            class="bi bi-hospital"
-                                                            style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                        Sinistralidade por hospital</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro-tendencia"><i
-                                                            class="bi bi-graph-up"
-                                                            style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
-                                                        Tendência de custo</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro-alto-custo"><i
-                                                            class="bi bi-exclamation-diamond"
-                                                            style="font-size: 1rem;margin-right:5px; color:#ff9fb3;"></i>
-                                                        Análise de alto custo</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro-custo-evitavel"><i
-                                                            class="bi bi-shield-exclamation"
-                                                            style="font-size: 1rem;margin-right:5px; color:#ffb86c;"></i>
-                                                        Custo evitável</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro-concentracao"><i
-                                                            class="bi bi-pie-chart"
-                                                            style="font-size: 1rem;margin-right:5px; color:#7cc4ff;"></i>
-                                                        Concentração de risco</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro-provisao-realizado"><i
-                                                            class="bi bi-bar-chart-steps"
-                                                            style="font-size: 1rem;margin-right:5px; color:#8dd0ff;"></i>
-                                                        Provisão vs. realizado</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/financeiro-realizado"><i
-                                                    class="bi bi-currency-exchange"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ffd166;"></i>
-                                                Financeiro Realizado</a></li>
-                                        <li class="bi-submenu">
-                                            <a class="dropdown-item" href="#"><i
-                                                        class="bi bi-graph-up"
-                                                        style="font-size: 1rem;margin-right:5px; color:#d071b0;"></i>
-                                                Produção</a>
-                                            <ul class="bi-submenu-list">
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/producao"><i
-                                                            class="bi bi-graph-up"
-                                                            style="font-size: 1rem;margin-right:5px; color:#d071b0;"></i>
-                                                        Producao BI</a></li>
-                                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/producao-ytd"><i
-                                                            class="bi bi-graph-up"
-                                                            style="font-size: 1rem;margin-right:5px; color:#d071b0;"></i>
-                                                        Produção YTD</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/saving"><i
-                                                    class="bi bi-cash-coin"
-                                                    style="font-size: 1rem;margin-right:5px; color:#5fd3b5;"></i>
-                                                Saving</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/pacientes"><i
-                                                    class="bi bi-people"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ffc56c;"></i>
-                                                Pacientes</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/hospitais"><i
-                                                    class="bi bi-hospital"
-                                                    style="font-size: 1rem;margin-right:5px; color:#a2b5ff;"></i>
-                                                Hospitais</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/inteligencia"><i
-                                                    class="bi bi-lightbulb"
-                                                    style="font-size: 1rem;margin-right:5px; color:#8bd3ff;"></i>
-                                                Inteligencia Artificial</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Anomalias &amp; Fraude</span>
-                                    <ul class="bi-mega-list">
+                                                    style="font-size: 1rem;margin-right:5px; color:#ff8fb1;"></i>
+                                                Financeiro</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/gastos-patologia"><i
+                                                    class="bi bi-activity"
+                                                    style="font-size: 1rem;margin-right:5px; color:#ff8fa3;"></i>
+                                                Controle de Gastos</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/anomalias-permanencia"><i
                                                     class="bi bi-exclamation-triangle"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f59e0b;"></i>
-                                                Outliers de Permanência</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/anomalias-negociacao"><i
-                                                    class="bi bi-cash-stack"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f97316;"></i>
-                                                Negociação Suspeita</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/anomalias-alto-custo"><i
-                                                    class="bi bi-exclamation-diamond"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
-                                                Alto Custo sem Justificativa</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/anomalias-readmissao"><i
-                                                    class="bi bi-arrow-repeat"
-                                                    style="font-size: 1rem;margin-right:5px; color:#3b82f6;"></i>
-                                                Readmissão Precoce</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/anomalias-opme-variacao"><i
-                                                    class="bi bi-clipboard2-pulse"
-                                                    style="font-size: 1rem;margin-right:5px; color:#a855f7;"></i>
-                                                Variação de OPME</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Conformidade &amp; Auditoria</span>
-                                    <ul class="bi-mega-list">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/conformidade-protocolos"><i
-                                                    class="bi bi-shield-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#14b8a6;"></i>
-                                                Cumprimento de Protocolos</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/conformidade-documentacao"><i
-                                                    class="bi bi-file-earmark-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#22c55e;"></i>
-                                                Documentação Completa</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/conformidade-tempo-resposta"><i
-                                                    class="bi bi-stopwatch"
-                                                    style="font-size: 1rem;margin-right:5px; color:#38bdf8;"></i>
-                                                Tempo de Resposta</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/conformidade-adequacao"><i
-                                                    class="bi bi-check2-circle"
-                                                    style="font-size: 1rem;margin-right:5px; color:#10b981;"></i>
-                                                Adequação de Internação</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/conformidade-faturamento"><i
-                                                    class="bi bi-receipt"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f97316;"></i>
-                                                Conformidade de Faturamento</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Segmentação de Risco</span>
-                                    <ul class="bi-mega-list">
+                                                    style="font-size: 1rem;margin-right:5px; color:#ff7b7b;"></i>
+                                                Anomalias &amp; Fraude</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/auditoria-documentacao"><i
+                                                    class="bi bi-clipboard-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#61d2c6;"></i>
+                                                Conformidade &amp; Auditoria</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/risco-cronicos"><i
-                                                    class="bi bi-heart-pulse"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
-                                                Pacientes Crônicos</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/risco-readmissao"><i
-                                                    class="bi bi-arrow-repeat"
-                                                    style="font-size: 1rem;margin-right:5px; color:#6366f1;"></i>
-                                                Alto Risco de Readmissão</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/risco-desospitalizacao"><i
-                                                    class="bi bi-house-down"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
-                                                Desospitalização Precoce</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/risco-longa-permanencia"><i
-                                                    class="bi bi-clock-history"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f59e0b;"></i>
-                                                Risco de Longa Permanência</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/risco-casos-previsiveis"><i
-                                                    class="bi bi-graph-up"
-                                                    style="font-size: 1rem;margin-right:5px; color:#22c55e;"></i>
-                                                Casos Caros Previsíveis</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Negociação &amp; Rede</span>
-                                    <ul class="bi-mega-list">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/negociacao-volume-custo"><i
-                                                    class="bi bi-diagram-3"
-                                                    style="font-size: 1rem;margin-right:5px; color:#6366f1;"></i>
-                                                Volume vs Custo</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/negociacao-mix-casos"><i
-                                                    class="bi bi-pie-chart"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
-                                                Mix de Casos</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/negociacao-utilizacao"><i
-                                                    class="bi bi-bar-chart-steps"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f59e0b;"></i>
-                                                Taxa de Utilização</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/negociacao-elasticidade"><i
-                                                    class="bi bi-arrows-angle-expand"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f97316;"></i>
-                                                Elasticidade de Preço</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/negociacao-custo-beneficio"><i
-                                                    class="bi bi-cash-coin"
-                                                    style="font-size: 1rem;margin-right:5px; color:#10b981;"></i>
-                                                Custo-Benefício da Rede</a></li>
-                                    </ul>
-                                </li>
-                                <li class="bi-mega-col">
-                                    <span class="bi-mega-title">Qualidade &amp; Desfecho</span>
-                                    <ul class="bi-mega-list">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/qualidade-complicacao"><i
-                                                    class="bi bi-bandaid"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
-                                                Taxa de Complicação</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/qualidade-obito"><i
-                                                    class="bi bi-heartbreak"
-                                                    style="font-size: 1rem;margin-right:5px; color:#8b5cf6;"></i>
-                                                Taxa de Óbito</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/qualidade-infeccao"><i
-                                                    class="bi bi-bug"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f59e0b;"></i>
-                                                Infecção Hospitalar</a></li>
+                                                    class="bi bi-person-exclamation"
+                                                    style="font-size: 1rem;margin-right:5px; color:#ffd36e;"></i>
+                                                Segmentação de Risco</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-volume-custo"><i
+                                                    class="bi bi-bar-chart-line"
+                                                    style="font-size: 1rem;margin-right:5px; color:#72d2ff;"></i>
+                                                Negociação &amp; Rede</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/qualidade-eventos"><i
                                                     class="bi bi-exclamation-octagon"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f97316;"></i>
-                                                Eventos Adversos</a></li>
+                                                    style="font-size: 1rem;margin-right:5px; color:#b897ff;"></i>
+                                                Qualidade &amp; Desfecho</a></li>
                                     </ul>
                                 </li>
-                            </ul>
-                        </li>
-                        <?php }; ?>
-                        <?php if ($sessionNivel > 0) { ?>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                    class="bi bi-robot edit-icon"></i>
-                                Inteligência Operacional
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/dashboard-360"><i
-                                            class="bi bi-grid-3x3-gap"
-                                            style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
-                                        Dashboard 360°</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/performance-equipes"><i
-                                            class="bi bi-trophy"
-                                            style="font-size: 1rem;margin-right:5px; color:#7c3aed;"></i>
-                                        Performance equipes</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/previsao-faturamento"><i
-                                            class="bi bi-graph-up-arrow"
-                                            style="font-size: 1rem;margin-right:5px; color:#1d9ad8;"></i>
-                                        Previsão faturamento</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/painel-mensal"><i
-                                            class="bi bi-graph-up-arrow"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i>
-                                        Painel Mensal</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/inteligencia-operadora"><i
-                                            class="bi bi-shield-check"
-                                            style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
-                                        Inteligência da Operadora</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/tmp"><i
-                                            class="bi bi-activity"
-                                            style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
-                                        TMP por CID/Procedimento/Convênio</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/prorrogacao-vs-alta"><i
-                                            class="bi bi-hourglass-split"
-                                            style="font-size: 1rem;margin-right:5px; color:#f59e0b;"></i>
-                                        Prorrogação vs Alta no prazo</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/motivos-prorrogacao"><i
-                                            class="bi bi-list-check"
-                                            style="font-size: 1rem;margin-right:5px; color:#10b981;"></i>
-                                        Motivos de Prorrogação</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/backlog-autorizacoes"><i
-                                            class="bi bi-card-checklist"
-                                            style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
-                                        Backlog de Autorizações</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/previsoes-operacionais"><i
-                                            class="bi bi-robot"
-                                            style="font-size: 1rem;margin-right:5px; color:#20c997;"></i>
-                                        Previsões Operacionais</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/permanencias-alertas"><i
-                                            class="bi bi-clock-history"
-                                            style="font-size: 1rem;margin-right:5px; color:#0d9488;"></i>
-                                        Permanências e alertas</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/insights-explicaveis"><i
-                                            class="bi bi-lightbulb"
-                                            style="font-size: 1rem;margin-right:5px; color:#f97316;"></i>
-                                        Insights explicáveis</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/oportunidade-glosa"><i
-                                            class="bi bi-exclamation-octagon"
-                                            style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
-                                        Oportunidade de glosa / contas</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/clusterizacao-clinica"><i
-                                            class="bi bi-diagram-3"
-                                            style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
-                                        Clusterização clínica</a></li>
-                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/assistente-textos"><i
-                                            class="bi bi-pencil-square"
-                                            style="font-size: 1rem;margin-right:5px; color:#fb923c;"></i>
-                                        Assistente de Textos</a></li>
-                            </ul>
-                        </li>
-                        <?php }; ?>
-                        <!-- <?php if ($_SESSION['nivel'] >= 2) { ?>
+                            <?php }; ?>
+                            <?php if ($sessionNivel > 0) { ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="bi bi-robot edit-icon"></i>
+                                        Inteligência Operacional
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/dashboard-360"><i
+                                                    class="bi bi-grid-3x3-gap"
+                                                    style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
+                                                Dashboard 360°</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/performance-equipes"><i
+                                                    class="bi bi-trophy"
+                                                    style="font-size: 1rem;margin-right:5px; color:#7c3aed;"></i>
+                                                Performance equipes</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/previsao-faturamento"><i
+                                                    class="bi bi-graph-up-arrow"
+                                                    style="font-size: 1rem;margin-right:5px; color:#1d9ad8;"></i>
+                                                Previsão faturamento</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/painel-mensal"><i
+                                                    class="bi bi-graph-up-arrow"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i>
+                                                Painel Mensal</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/inteligencia-operadora"><i
+                                                    class="bi bi-shield-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
+                                                Inteligência da Operadora</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/tmp"><i
+                                                    class="bi bi-activity"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
+                                                TMP por CID/Procedimento/Convênio</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/prorrogacao-vs-alta"><i
+                                                    class="bi bi-hourglass-split"
+                                                    style="font-size: 1rem;margin-right:5px; color:#f59e0b;"></i>
+                                                Prorrogação vs Alta no prazo</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/motivos-prorrogacao"><i
+                                                    class="bi bi-list-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#10b981;"></i>
+                                                Motivos de Prorrogação</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/backlog-autorizacoes"><i
+                                                    class="bi bi-card-checklist"
+                                                    style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
+                                                Backlog de Autorizações</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/previsoes-operacionais"><i
+                                                    class="bi bi-robot"
+                                                    style="font-size: 1rem;margin-right:5px; color:#20c997;"></i>
+                                                Previsões Operacionais</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/permanencias-alertas"><i
+                                                    class="bi bi-clock-history"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0d9488;"></i>
+                                                Permanências e alertas</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/insights-explicaveis"><i
+                                                    class="bi bi-lightbulb"
+                                                    style="font-size: 1rem;margin-right:5px; color:#f97316;"></i>
+                                                Insights explicáveis</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/oportunidade-glosa"><i
+                                                    class="bi bi-exclamation-octagon"
+                                                    style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
+                                                Oportunidade de glosa / contas</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/clusterizacao-clinica"><i
+                                                    class="bi bi-diagram-3"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
+                                                Clusterização clínica</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/assistente-textos"><i
+                                                    class="bi bi-pencil-square"
+                                                    style="font-size: 1rem;margin-right:5px; color:#fb923c;"></i>
+                                                Assistente de Textos</a></li>
+                                    </ul>
+                                </li>
+                            <?php }; ?>
+                            <!-- <?php if ($_SESSION['nivel'] >= 2) { ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -1039,7 +660,7 @@ if (!empty($sessionIdUsuario)) {
                             </ul>
                         </li>
                         <?php }; ?> -->
-                        <!-- <?php if ($_SESSION['nivel'] > 3) { ?>
+                            <!-- <?php if ($_SESSION['nivel'] > 3) { ?>
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
@@ -1090,10 +711,10 @@ if (!empty($sessionIdUsuario)) {
                     <i class="bi bi-chat-dots"></i>
                     <span class="d-none d-xl-inline ms-1">Chat</span>
                     <?php if ($chatUnreadCount > 0): ?>
-                    <span
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger chat-unread-badge">
-                        <?= $chatUnreadCount > 99 ? '99+' : $chatUnreadCount ?>
-                    </span>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger chat-unread-badge">
+                            <?= $chatUnreadCount > 99 ? '99+' : $chatUnreadCount ?>
+                        </span>
                     <?php endif; ?>
                 </a>
                 <form class="d-flex position-relative" id="global-patient-search" autocomplete="off">
@@ -1165,37 +786,37 @@ if (!empty($sessionIdUsuario)) {
         unset($_SESSION['mensagem'], $_SESSION['mensagem_tipo']);
         ?>
         <?php if ($flashMsg): ?>
-        <div class="container mt-3">
-            <div id="app-flash"
-                class="alert alert-<?= htmlspecialchars($flashType) ?> text-center alert-dismissible fade show"
-                role="alert">
-                <?= htmlspecialchars($flashMsg) ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            <div class="container mt-3">
+                <div id="app-flash"
+                    class="alert alert-<?= htmlspecialchars($flashType) ?> text-center alert-dismissible fade show"
+                    role="alert">
+                    <?= htmlspecialchars($flashMsg) ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
             </div>
-        </div>
 
-        <script>
-        (function() {
-            var el = document.getElementById('app-flash');
-            if (!el) return;
+            <script>
+                (function() {
+                    var el = document.getElementById('app-flash');
+                    if (!el) return;
 
-            // fecha visualmente ~9.8s (para dar tempo da transição)
-            setTimeout(function() {
-                try {
-                    if (window.bootstrap && bootstrap.Alert) {
-                        bootstrap.Alert.getOrCreateInstance(el).close();
-                    } else {
-                        el.classList.remove('show'); // some a classe de exibição
-                    }
-                } catch (e) {}
-            }, 9800);
+                    // fecha visualmente ~9.8s (para dar tempo da transição)
+                    setTimeout(function() {
+                        try {
+                            if (window.bootstrap && bootstrap.Alert) {
+                                bootstrap.Alert.getOrCreateInstance(el).close();
+                            } else {
+                                el.classList.remove('show'); // some a classe de exibição
+                            }
+                        } catch (e) {}
+                    }, 9800);
 
-            // remove do DOM em 10s (garantia)
-            setTimeout(function() {
-                if (el && el.parentNode) el.parentNode.removeChild(el);
-            }, 5000);
-        })();
-        </script>
+                    // remove do DOM em 10s (garantia)
+                    setTimeout(function() {
+                        if (el && el.parentNode) el.parentNode.removeChild(el);
+                    }, 5000);
+                })();
+            </script>
         <?php endif; ?>
 
         <div class="modal fade" id="globalModal">
@@ -1216,50 +837,51 @@ if (!empty($sessionIdUsuario)) {
 </body>
 <script src="js/fix-header.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var root = document.documentElement;
-    var minZoom = 0.8;
-    var maxZoom = 1.3;
-    var step = 0.1;
+    document.addEventListener('DOMContentLoaded', function() {
+        var root = document.documentElement;
+        var minZoom = 0.8;
+        var maxZoom = 1.3;
+        var step = 0.1;
 
-    function clampZoom(value) {
-        return Math.min(maxZoom, Math.max(minZoom, value));
-    }
-
-    function getCurrentZoom() {
-        var current = parseFloat(root.style.zoom || '1');
-        if (Number.isNaN(current)) return 1;
-        return current;
-    }
-
-    function applyZoom(value) {
-        var next = clampZoom(value);
-        root.style.zoom = next;
-        try {
-            localStorage.setItem('fc_zoom', String(next));
-        } catch (e) {}
-    }
-
-    try {
-        var saved = parseFloat(localStorage.getItem('fc_zoom') || '');
-        if (!Number.isNaN(saved)) {
-            applyZoom(saved);
+        function clampZoom(value) {
+            return Math.min(maxZoom, Math.max(minZoom, value));
         }
-    } catch (e) {}
 
-    var zoomOut = document.getElementById('zoom-out-btn');
-    var zoomIn = document.getElementById('zoom-in-btn');
-    if (zoomOut) {
-        zoomOut.addEventListener('click', function() {
-            applyZoom(getCurrentZoom() - step);
-        });
-    }
-    if (zoomIn) {
-        zoomIn.addEventListener('click', function() {
-            applyZoom(getCurrentZoom() + step);
-        });
-    }
-});
+        function getCurrentZoom() {
+            var current = parseFloat(root.style.zoom || '1');
+            if (Number.isNaN(current)) return 1;
+            return current;
+        }
+
+        function applyZoom(value) {
+            var next = clampZoom(value);
+            root.style.zoom = next;
+            try {
+                localStorage.setItem('fcx_zoom', String(next));
+            } catch (e) {}
+        }
+
+        try {
+            var saved = parseFloat(localStorage.getItem('fcx_zoom') || '');
+            if (!Number.isNaN(saved)) {
+                applyZoom(saved);
+            }
+        } catch (e) {}
+
+        var zoomOut = document.getElementById('zoom-out-btn');
+        var zoomIn = document.getElementById('zoom-in-btn');
+
+        if (zoomOut) {
+            zoomOut.addEventListener('click', function() {
+                applyZoom(getCurrentZoom() - step);
+            });
+        }
+        if (zoomIn) {
+            zoomIn.addEventListener('click', function() {
+                applyZoom(getCurrentZoom() + step);
+            });
+        }
+    });
 </script>
 
 <!-- Jquery JS-->
@@ -1284,7 +906,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script src="./diversos/CoolAdmin-master/vendor/circle-progress/circle-progress.min.js"></script>
 <script src="./diversos/CoolAdmin-master/vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
-<script src="./diversos/CoolAdmin-master/vendor/chartjs/Chart.bundle.min.js"></script>
+<script src="diversos/chartjs/Chart.min.js"></script>
 <script src="./diversos/CoolAdmin-master/vendor/select2/select2.min.js"></script>
 <script src="./scripts/cadastro/general.js"></script>
 <script src="js/stepper.js"></script>
@@ -1292,158 +914,158 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="<?= $BASE_URL ?>js/contextual-assistant.js"></script>
 </script>
 <script>
-// Base para links absolutos
-const BASE_URL = '<?= $BASE_URL ?>';
+    // Base para links absolutos
+    const BASE_URL = '<?= $BASE_URL ?>';
 
-function setupModalForms(container, modalEl) {
-    if (!container || !modalEl) return;
-    const forms = container.querySelectorAll('form');
-    forms.forEach((form) => {
-        if (form.dataset.modalAjaxBound === '1') return;
-        form.dataset.modalAjaxBound = '1';
+    function setupModalForms(container, modalEl) {
+        if (!container || !modalEl) return;
+        const forms = container.querySelectorAll('form');
+        forms.forEach((form) => {
+            if (form.dataset.modalAjaxBound === '1') return;
+            form.dataset.modalAjaxBound = '1';
 
-        form.addEventListener('submit', function modalFormSubmit(ev) {
-            if (!modalEl.contains(form)) return;
-            ev.preventDefault();
+            form.addEventListener('submit', function modalFormSubmit(ev) {
+                if (!modalEl.contains(form)) return;
+                ev.preventDefault();
 
-            const action = form.getAttribute('action') || window.location.href;
-            const method = (form.getAttribute('method') || 'POST').toUpperCase();
-            const submitBtn = form.querySelector('[type="submit"]');
-            if (submitBtn) submitBtn.disabled = true;
+                const action = form.getAttribute('action') || window.location.href;
+                const method = (form.getAttribute('method') || 'POST').toUpperCase();
+                const submitBtn = form.querySelector('[type="submit"]');
+                if (submitBtn) submitBtn.disabled = true;
 
-            fetch(action, {
-                    method,
-                    body: new FormData(form),
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
+                fetch(action, {
+                        method,
+                        body: new FormData(form),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(resp => {
+                        const ct = resp.headers.get('content-type') || '';
+                        if (ct.includes('application/json')) {
+                            return resp.json();
+                        }
+                        return resp.text().then(html => ({
+                            html
+                        }));
+                    })
+                    .then(payload => {
+                        if (payload && payload.success) {
+                            if (window.bootstrap && bootstrap.Modal) {
+                                const inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                                inst.hide();
+                            } else if (window.$ && typeof $('#globalModal').modal === 'function') {
+                                $('#globalModal').modal('hide');
+                            }
+                            document.dispatchEvent(new CustomEvent('modalFormSuccess', {
+                                detail: payload
+                            }));
+                            if (payload.paciente) {
+                                document.dispatchEvent(new CustomEvent('paciente:cadastrado', {
+                                    detail: payload.paciente
+                                }));
+                            }
+                            return;
+                        }
+                        if (payload && payload.html) {
+                            const temp = document.createElement('div');
+                            temp.innerHTML = payload.html;
+                            let inner = temp.querySelector('#main-container') || temp.querySelector('main') || temp.querySelector('body');
+                            const html = inner ? inner.innerHTML : payload.html;
+                            renderModalBody(container, html, modalEl);
+                            return;
+                        }
+                        throw new Error('Resposta inesperada');
+                    })
+                    .catch(() => {
+                        container.innerHTML = '<div class="p-4 text-danger">Erro ao processar o formulário.</div>';
+                    })
+                    .finally(() => {
+                        if (submitBtn) submitBtn.disabled = false;
+                    });
+            });
+        });
+    }
+
+    function renderModalBody(target, html, modalEl) {
+        if (!target) return;
+        target.innerHTML = html;
+
+        try {
+            if (window.$ && typeof $('.selectpicker').selectpicker === 'function') {
+                $('.selectpicker', target).selectpicker();
+                $('.selectpicker', target).selectpicker('refresh');
+            }
+        } catch (_) {}
+
+        setupModalForms(target, modalEl);
+    }
+
+    if (typeof window.openModalPac !== 'function') {
+        window.openModalPac = function(url, titulo = 'Cadastro') {
+            const modalEl = document.getElementById('globalModal');
+            if (!modalEl) {
+                console.warn('[openModalPac] #globalModal não encontrado. Navegando para:', url);
+                window.location.href = url;
+                return;
+            }
+
+            const body = modalEl.querySelector('.modal-body');
+            const titleEl = modalEl.querySelector('.modal-title');
+            if (titleEl) titleEl.textContent = titulo;
+            body.innerHTML = '<div class="p-4 text-center text-muted">Carregando...</div>';
+
+            // Bootstrap 5.0/5.1: não tem getOrCreateInstance
+            let bsModal = null;
+            if (window.bootstrap && bootstrap.Modal) {
+                if (typeof bootstrap.Modal.getInstance === 'function') {
+                    bsModal = bootstrap.Modal.getInstance(modalEl);
+                }
+                if (!bsModal) {
+                    bsModal = new bootstrap.Modal(modalEl); // 5.0/5.1 OK
+                }
+                bsModal.show();
+            } else if (window.$ && typeof $('#globalModal').modal === 'function') {
+                // fallback jQuery/BS4
+                $('#globalModal').modal('show');
+            }
+
+            fetch(url, {
                     credentials: 'same-origin'
                 })
-                .then(resp => {
-                    const ct = resp.headers.get('content-type') || '';
-                    if (ct.includes('application/json')) {
-                        return resp.json();
-                    }
-                    return resp.text().then(html => ({
-                        html
-                    }));
+                .then(r => r.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    let inner = temp.querySelector('#main-container') || temp.querySelector('main') || temp.querySelector('body');
+                    const resolvedHtml = inner ? inner.innerHTML : html;
+                    renderModalBody(body, resolvedHtml, modalEl);
                 })
-                .then(payload => {
-                    if (payload && payload.success) {
-                        if (window.bootstrap && bootstrap.Modal) {
-                            const inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                            inst.hide();
-                        } else if (window.$ && typeof $('#globalModal').modal === 'function') {
-                            $('#globalModal').modal('hide');
-                        }
-                        document.dispatchEvent(new CustomEvent('modalFormSuccess', {
-                            detail: payload
-                        }));
-                        if (payload.paciente) {
-                            document.dispatchEvent(new CustomEvent('paciente:cadastrado', {
-                                detail: payload.paciente
-                            }));
-                        }
-                        return;
-                    }
-                    if (payload && payload.html) {
-                        const temp = document.createElement('div');
-                        temp.innerHTML = payload.html;
-                        let inner = temp.querySelector('#main-container') || temp.querySelector('main') || temp.querySelector('body');
-                        const html = inner ? inner.innerHTML : payload.html;
-                        renderModalBody(container, html, modalEl);
-                        return;
-                    }
-                    throw new Error('Resposta inesperada');
-                })
-                .catch(() => {
-                    container.innerHTML = '<div class="p-4 text-danger">Erro ao processar o formulário.</div>';
-                })
-                .finally(() => {
-                    if (submitBtn) submitBtn.disabled = false;
+                .catch(err => {
+                    console.error(err);
+                    body.innerHTML = '<div class="p-4 text-danger">Falha ao carregar conteúdo do modal.</div>';
                 });
-        });
-    });
-}
-
-function renderModalBody(target, html, modalEl) {
-    if (!target) return;
-    target.innerHTML = html;
-
-    try {
-        if (window.$ && typeof $('.selectpicker').selectpicker === 'function') {
-            $('.selectpicker', target).selectpicker();
-            $('.selectpicker', target).selectpicker('refresh');
-        }
-    } catch (_) {}
-
-    setupModalForms(target, modalEl);
-}
-
-if (typeof window.openModalPac !== 'function') {
-    window.openModalPac = function(url, titulo = 'Cadastro') {
-        const modalEl = document.getElementById('globalModal');
-        if (!modalEl) {
-            console.warn('[openModalPac] #globalModal não encontrado. Navegando para:', url);
-            window.location.href = url;
-            return;
-        }
-
-        const body = modalEl.querySelector('.modal-body');
-        const titleEl = modalEl.querySelector('.modal-title');
-        if (titleEl) titleEl.textContent = titulo;
-        body.innerHTML = '<div class="p-4 text-center text-muted">Carregando...</div>';
-
-        // Bootstrap 5.0/5.1: não tem getOrCreateInstance
-        let bsModal = null;
-        if (window.bootstrap && bootstrap.Modal) {
-            if (typeof bootstrap.Modal.getInstance === 'function') {
-                bsModal = bootstrap.Modal.getInstance(modalEl);
-            }
-            if (!bsModal) {
-                bsModal = new bootstrap.Modal(modalEl); // 5.0/5.1 OK
-            }
-            bsModal.show();
-        } else if (window.$ && typeof $('#globalModal').modal === 'function') {
-            // fallback jQuery/BS4
-            $('#globalModal').modal('show');
-        }
-
-        fetch(url, {
-                credentials: 'same-origin'
-            })
-            .then(r => r.text())
-            .then(html => {
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                let inner = temp.querySelector('#main-container') || temp.querySelector('main') || temp.querySelector('body');
-                const resolvedHtml = inner ? inner.innerHTML : html;
-                renderModalBody(body, resolvedHtml, modalEl);
-            })
-            .catch(err => {
-                console.error(err);
-                body.innerHTML = '<div class="p-4 text-danger">Falha ao carregar conteúdo do modal.</div>';
-            });
-    };
-}
-
-// --- debounce simples ---
-function debounce(fn, wait) {
-    let t;
-    return function(...args) {
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(this, args), wait);
+        };
     }
-}
 
-const $input = $('#inp-search-paciente');
-const $menu = $('#search-results-dropdown');
+    // --- debounce simples ---
+    function debounce(fn, wait) {
+        let t;
+        return function(...args) {
+            clearTimeout(t);
+            t = setTimeout(() => fn.apply(this, args), wait);
+        }
+    }
 
-// Renderiza itens no dropdown
-function renderResults(items) {
-    if (!items || !items.length) {
-        const termo = $input.val().trim();
-        $menu.html(`
+    const $input = $('#inp-search-paciente');
+    const $menu = $('#search-results-dropdown');
+
+    // Renderiza itens no dropdown
+    function renderResults(items) {
+        if (!items || !items.length) {
+            const termo = $input.val().trim();
+            $menu.html(`
         <div class="dropdown-item text-muted">Nada encontrado. Tente outra senha, matrícula ou nome.</div>
         <a href="#" id="create-new-pac" class="dropdown-item d-flex justify-content-between align-items-center">
             <div>
@@ -1453,18 +1075,18 @@ function renderResults(items) {
             <i class="bi bi-plus-circle"></i>
         </a>
         `).show();
-        return;
-    }
+            return;
+        }
 
-    const html = items.map((p, idx) => {
-        const metaParts = [];
-        if (p.senha) metaParts.push(`Senha: ${p.senha}`);
-        if (p.matricula) metaParts.push(`Matrícula: ${p.matricula}`);
-        if (p.nascimento_fmt) metaParts.push(`Nasc.: ${p.nascimento_fmt}`);
-        const meta = metaParts.length ? `<small class="text-muted">${metaParts.join(' • ')}</small>` : '';
-        const nome = p.nome || 'Paciente sem nome';
+        const html = items.map((p, idx) => {
+            const metaParts = [];
+            if (p.senha) metaParts.push(`Senha: ${p.senha}`);
+            if (p.matricula) metaParts.push(`Matrícula: ${p.matricula}`);
+            if (p.nascimento_fmt) metaParts.push(`Nasc.: ${p.nascimento_fmt}`);
+            const meta = metaParts.length ? `<small class="text-muted">${metaParts.join(' • ')}</small>` : '';
+            const nome = p.nome || 'Paciente sem nome';
 
-        return `
+            return `
         <a href="hub_paciente/paciente${encodeURIComponent(p.id_paciente)}"
             class="dropdown-item d-flex justify-content-between align-items-center ${idx === 0 ? 'active' : ''}"
             data-id="${p.id_paciente}">
@@ -1475,341 +1097,376 @@ function renderResults(items) {
             <i class="bi bi-arrow-return-right"></i>
         </a>
         `;
-    }).join('');
-    $menu.html(html).show();
-}
-
-
-// Faz a busca
-const doSearch = debounce(function() {
-    const q = $input.val().trim();
-    if (q.length < 2) {
-        $menu.hide();
-        return;
+        }).join('');
+        $menu.html(html).show();
     }
-    $.getJSON('ajax/pacientes_search.php', {
-            q
-        })
-        .done(res => {
-            console.log('[BUSCA OK]', res);
-            renderResults(res);
-        })
-        .fail((jqXHR, textStatus, errorThrown) => {
-            console.error('[BUSCA ERRO]', {
-                status: jqXHR.status,
-                textStatus,
-                errorThrown,
-                responseText: jqXHR.responseText
-            });
-            $menu
-                .html(
-                    `<div class="dropdown-item text-danger">
+
+
+    // Faz a busca
+    const doSearch = debounce(function() {
+        const q = $input.val().trim();
+        if (q.length < 2) {
+            $menu.hide();
+            return;
+        }
+        $.getJSON('ajax/pacientes_search.php', {
+                q
+            })
+            .done(res => {
+                console.log('[BUSCA OK]', res);
+                renderResults(res);
+            })
+            .fail((jqXHR, textStatus, errorThrown) => {
+                console.error('[BUSCA ERRO]', {
+                    status: jqXHR.status,
+                    textStatus,
+                    errorThrown,
+                    responseText: jqXHR.responseText
+                });
+                $menu
+                    .html(
+                        `<div class="dropdown-item text-danger">
             Erro ao buscar (${jqXHR.status} / ${textStatus})<br>
                 <small>${errorThrown}</small>
         </div>`
-                )
-                .show();
-        });
-
-}, 250);
-
-$input.on('input', doSearch);
-
-// Fecha dropdown ao clicar fora
-$(document).on('click', function(e) {
-    if (!$(e.target).closest('#global-patient-search').length) {
-        $menu.hide();
-    }
-});
-
-// Teclas: ↑ ↓ Enter Esc
-$input.on('keydown', function(e) {
-    const $items = $menu.find('.dropdown-item');
-    if (!$items.length || $menu.is(':hidden')) return;
-
-    let $current = $items.filter('.active');
-    let idx = $items.index($current);
-
-    if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        $current.removeClass('active');
-        idx = (idx + 1) % $items.length;
-        $items.eq(idx).addClass('active')[0].scrollIntoView({
-            block: 'nearest'
-        });
-    } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        $current.removeClass('active');
-        idx = (idx - 1 + $items.length) % $items.length;
-        $items.eq(idx).addClass('active')[0].scrollIntoView({
-            block: 'nearest'
-        });
-    } else if (e.key === 'Enter') {
-        e.preventDefault();
-        const href = ($current.length ? $current : $items.eq(0)).attr('href');
-        if (href) window.location.href = href;
-    } else if (e.key === 'Escape') {
-        $menu.hide();
-    }
-});
-
-// Clique em item
-$menu.on('click', '.dropdown-item', function(e) {
-    // deixa o link funcionar (navegar)
-});
-$menu.on('click', '#create-new-pac', function(e) {
-    e.preventDefault();
-    const termo = $input.val().trim();
-    // Se quiser pré-preencher:
-    // const url = BASE_URL + 'cad_paciente.php' + (termo ? ('?nome_pac=' + encodeURIComponent(termo)) : '');
-    const url = BASE_URL + 'cad_paciente.php';
-    openModalPac(url, 'Cadastrar novo paciente'); // <— só isso
-    $menu.hide();
-});
-
-function escapeAttrValue(val) {
-    return String(val)
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"');
-}
-
-function navigateWithReturn(url) {
-    try {
-        sessionStorage.setItem('return_flow_url', window.location.href);
-    } catch (e) {}
-    try {
-        const draft = collectFormDraft();
-        if (draft) {
-            sessionStorage.setItem('return_form_draft', JSON.stringify(draft));
-        } else {
-            sessionStorage.removeItem('return_form_draft');
-        }
-    } catch (e) {}
-    window.location.href = url;
-}
-
-function collectFormDraft() {
-    const form = document.getElementById('myForm');
-    if (!form) return null;
-    const elements = Array.from(form.elements || []);
-    const values = {};
-    const checks = {};
-    let hasValue = false;
-
-    const skipTypes = ['button', 'submit', 'reset', 'file'];
-
-    elements.forEach(el => {
-        if (!el || !el.name || el.disabled) return;
-        const type = (el.type || '').toLowerCase();
-        if (skipTypes.includes(type)) return;
-
-        if (type === 'checkbox') {
-            if (!checks[el.name]) checks[el.name] = {};
-            const key = el.value || '__on__';
-            checks[el.name][key] = el.checked;
-            if (el.checked) hasValue = true;
-            return;
-        }
-
-        if (type === 'radio') {
-            if (el.checked) {
-                values[el.name] = el.value;
-                hasValue = true;
-            } else if (!(el.name in values)) {
-                values[el.name] = null;
-            }
-            return;
-        }
-
-        if (el.tagName === 'SELECT' && el.multiple) {
-            const selected = Array.from(el.options || [])
-                .filter(opt => opt.selected)
-                .map(opt => opt.value);
-            values[el.name] = selected;
-            if (selected.length) hasValue = true;
-            return;
-        }
-
-        values[el.name] = el.value;
-        if (el.value) hasValue = true;
-    });
-
-    if (!hasValue) return null;
-
-    return {
-        url: window.location.href,
-        timestamp: Date.now(),
-        values,
-        checks
-    };
-}
-
-function restoreFormDraft() {
-    let raw = null;
-    try {
-        raw = sessionStorage.getItem('return_form_draft');
-    } catch (e) {
-        raw = null;
-    }
-    if (!raw) return;
-    let payload;
-    try {
-        payload = JSON.parse(raw);
-    } catch (e) {
-        sessionStorage.removeItem('return_form_draft');
-        return;
-    }
-    if (!payload || payload.url !== window.location.href) return;
-    const form = document.getElementById('myForm');
-    if (!form) return;
-
-    const values = payload.values || {};
-    Object.keys(values).forEach(name => {
-        const field = form.elements.namedItem(name);
-        if (!field) return;
-        const stored = values[name];
-
-        if (field instanceof RadioNodeList || (field.length && field[0] && field[0].type === 'radio')) {
-            const radios = field.length ? Array.from(field) : [field];
-            radios.forEach(radio => {
-                radio.checked = stored !== null && radio.value === stored;
+                    )
+                    .show();
             });
-            return;
-        }
 
-        if (field.tagName === 'SELECT' && field.multiple && Array.isArray(stored)) {
-            Array.from(field.options || []).forEach(opt => {
-                opt.selected = stored.includes(opt.value);
+    }, 250);
+
+    $input.on('input', doSearch);
+
+    // Fecha dropdown ao clicar fora
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#global-patient-search').length) {
+            $menu.hide();
+        }
+    });
+
+    // Teclas: ↑ ↓ Enter Esc
+    $input.on('keydown', function(e) {
+        const $items = $menu.find('.dropdown-item');
+        if (!$items.length || $menu.is(':hidden')) return;
+
+        let $current = $items.filter('.active');
+        let idx = $items.index($current);
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            $current.removeClass('active');
+            idx = (idx + 1) % $items.length;
+            $items.eq(idx).addClass('active')[0].scrollIntoView({
+                block: 'nearest'
             });
-            return;
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            $current.removeClass('active');
+            idx = (idx - 1 + $items.length) % $items.length;
+            $items.eq(idx).addClass('active')[0].scrollIntoView({
+                block: 'nearest'
+            });
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const href = ($current.length ? $current : $items.eq(0)).attr('href');
+            if (href) window.location.href = href;
+        } else if (e.key === 'Escape') {
+            $menu.hide();
         }
-
-        field.value = stored ?? '';
     });
 
-    const checkboxStates = payload.checks || {};
-    Object.keys(checkboxStates).forEach(name => {
-        const states = checkboxStates[name];
-        const selector = 'input[type="checkbox"][name="' + escapeAttrValue(name) + '"]';
-        const boxes = form.querySelectorAll(selector);
-        boxes.forEach(box => {
-            const key = box.value || '__on__';
-            if (Object.prototype.hasOwnProperty.call(states, key)) {
-                box.checked = !!states[key];
-            }
-        });
+    // Clique em item
+    $menu.on('click', '.dropdown-item', function(e) {
+        // deixa o link funcionar (navegar)
     });
-
-    if (window.$ && $.fn.selectpicker) {
-        $('.selectpicker', form).each(function() {
-            try {
-                $(this).selectpicker('refresh');
-            } catch (_) {}
-        });
-    }
-
-    try {
-        sessionStorage.removeItem('return_form_draft');
-    } catch (_) {}
-}
-
-document.addEventListener('keydown', function(e) {
-    if (!e.ctrlKey || !e.shiftKey) return;
-    const key = (e.key || '').toUpperCase();
-    let handled = false;
-
-    if (key === 'I') {
-        handled = true;
-        navigateWithReturn(BASE_URL + 'internacoes/nova');
-    } else if (key === 'P') {
-        handled = true;
-        openModalPac(BASE_URL + 'cad_paciente.php', 'Cadastrar novo paciente');
-    } else if (key === 'V') {
-        handled = true;
-        navigateWithReturn(BASE_URL + 'cad_visita.php');
-    } else if (key === 'S') {
-        handled = true;
-        if (typeof triggerInternacaoAutoSave === 'function') {
-            triggerInternacaoAutoSave();
-        } else {
-            const form = document.getElementById('myForm');
-            form && form.submit();
-        }
-    } else if (key === 'L') {
-        handled = true;
-        navigateWithReturn(BASE_URL + 'internacoes/lista');
-    } else if (key === 'C') {
-        handled = true;
-        navigateWithReturn(BASE_URL + 'internacoes/rah');
-    } else if (key === 'A') {
-        handled = true;
-        navigateWithReturn(BASE_URL + 'listas/altas');
-    }
-
-    if (handled) {
+    $menu.on('click', '#create-new-pac', function(e) {
         e.preventDefault();
-        e.stopPropagation();
-    }
-});
+        const termo = $input.val().trim();
+        // Se quiser pré-preencher:
+        // const url = BASE_URL + 'cad_paciente.php' + (termo ? ('?nome_pac=' + encodeURIComponent(termo)) : '');
+        const url = BASE_URL + 'cad_paciente.php';
+        openModalPac(url, 'Cadastrar novo paciente'); // <— só isso
+        $menu.hide();
+    });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const btn = document.getElementById('return-flow-btn');
-    let target = null;
-    try {
-        target = sessionStorage.getItem('return_flow_url');
-    } catch (e) {
-        target = null;
+    function escapeAttrValue(val) {
+        return String(val)
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"');
     }
-    if (target && window.location.href === target) {
+
+    function navigateWithReturn(url) {
         try {
-            sessionStorage.removeItem('return_flow_url');
-        } catch (_) {}
-        target = null;
+            sessionStorage.setItem('return_flow_url', window.location.href);
+        } catch (e) {}
+        try {
+            const draft = collectFormDraft();
+            if (draft) {
+                sessionStorage.setItem('return_form_draft', JSON.stringify(draft));
+            } else {
+                sessionStorage.removeItem('return_form_draft');
+            }
+        } catch (e) {}
+        window.location.href = url;
     }
-    if (target && btn) {
-        btn.style.display = 'flex';
-        btn.addEventListener('click', function() {
+
+    function collectFormDraft() {
+        const form = document.getElementById('myForm');
+        if (!form) return null;
+        const elements = Array.from(form.elements || []);
+        const values = {};
+        const checks = {};
+        let hasValue = false;
+
+        const skipTypes = ['button', 'submit', 'reset', 'file'];
+
+        elements.forEach(el => {
+            if (!el || !el.name || el.disabled) return;
+            const type = (el.type || '').toLowerCase();
+            if (skipTypes.includes(type)) return;
+
+            if (type === 'checkbox') {
+                if (!checks[el.name]) checks[el.name] = {};
+                const key = el.value || '__on__';
+                checks[el.name][key] = el.checked;
+                if (el.checked) hasValue = true;
+                return;
+            }
+
+            if (type === 'radio') {
+                if (el.checked) {
+                    values[el.name] = el.value;
+                    hasValue = true;
+                } else if (!(el.name in values)) {
+                    values[el.name] = null;
+                }
+                return;
+            }
+
+            if (el.tagName === 'SELECT' && el.multiple) {
+                const selected = Array.from(el.options || [])
+                    .filter(opt => opt.selected)
+                    .map(opt => opt.value);
+                values[el.name] = selected;
+                if (selected.length) hasValue = true;
+                return;
+            }
+
+            values[el.name] = el.value;
+            if (el.value) hasValue = true;
+        });
+
+        if (!hasValue) return null;
+
+        return {
+            url: window.location.href,
+            timestamp: Date.now(),
+            values,
+            checks
+        };
+    }
+
+    function restoreFormDraft() {
+        let raw = null;
+        try {
+            raw = sessionStorage.getItem('return_form_draft');
+        } catch (e) {
+            raw = null;
+        }
+        if (!raw) return;
+        let payload;
+        try {
+            payload = JSON.parse(raw);
+        } catch (e) {
+            sessionStorage.removeItem('return_form_draft');
+            return;
+        }
+        if (!payload || payload.url !== window.location.href) return;
+        const form = document.getElementById('myForm');
+        if (!form) return;
+
+        const values = payload.values || {};
+        Object.keys(values).forEach(name => {
+            const field = form.elements.namedItem(name);
+            if (!field) return;
+            const stored = values[name];
+
+            if (field instanceof RadioNodeList || (field.length && field[0] && field[0].type === 'radio')) {
+                const radios = field.length ? Array.from(field) : [field];
+                radios.forEach(radio => {
+                    radio.checked = stored !== null && radio.value === stored;
+                });
+                return;
+            }
+
+            if (field.tagName === 'SELECT' && field.multiple && Array.isArray(stored)) {
+                Array.from(field.options || []).forEach(opt => {
+                    opt.selected = stored.includes(opt.value);
+                });
+                return;
+            }
+
+            field.value = stored ?? '';
+        });
+
+        const checkboxStates = payload.checks || {};
+        Object.keys(checkboxStates).forEach(name => {
+            const states = checkboxStates[name];
+            const selector = 'input[type="checkbox"][name="' + escapeAttrValue(name) + '"]';
+            const boxes = form.querySelectorAll(selector);
+            boxes.forEach(box => {
+                const key = box.value || '__on__';
+                if (Object.prototype.hasOwnProperty.call(states, key)) {
+                    box.checked = !!states[key];
+                }
+            });
+        });
+
+        if (window.$ && $.fn.selectpicker) {
+            $('.selectpicker', form).each(function() {
+                try {
+                    $(this).selectpicker('refresh');
+                } catch (_) {}
+            });
+        }
+
+        try {
+            sessionStorage.removeItem('return_form_draft');
+        } catch (_) {}
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (!e.ctrlKey || !e.shiftKey) return;
+        const key = (e.key || '').toUpperCase();
+        let handled = false;
+
+        if (key === 'I') {
+            handled = true;
+            navigateWithReturn(BASE_URL + 'internacoes/nova');
+        } else if (key === 'P') {
+            handled = true;
+            openModalPac(BASE_URL + 'cad_paciente.php', 'Cadastrar novo paciente');
+        } else if (key === 'V') {
+            handled = true;
+            navigateWithReturn(BASE_URL + 'cad_visita.php');
+        } else if (key === 'S') {
+            handled = true;
+            if (typeof triggerInternacaoAutoSave === 'function') {
+                triggerInternacaoAutoSave();
+            } else {
+                const form = document.getElementById('myForm');
+                form && form.submit();
+            }
+        } else if (key === 'L') {
+            handled = true;
+            navigateWithReturn(BASE_URL + 'internacoes/lista');
+        } else if (key === 'C') {
+            handled = true;
+            navigateWithReturn(BASE_URL + 'internacoes/rah');
+        } else if (key === 'A') {
+            handled = true;
+            navigateWithReturn(BASE_URL + 'listas/altas');
+        }
+
+        if (handled) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('return-flow-btn');
+        let target = null;
+        try {
+            target = sessionStorage.getItem('return_flow_url');
+        } catch (e) {
+            target = null;
+        }
+        if (target && window.location.href === target) {
             try {
                 sessionStorage.removeItem('return_flow_url');
             } catch (_) {}
+            target = null;
+        }
+        if (target && btn) {
+            btn.style.display = 'flex';
+            btn.addEventListener('click', function() {
+                try {
+                    sessionStorage.removeItem('return_flow_url');
+                } catch (_) {}
                 window.location.href = target;
-        });
-    } else if (btn) {
-        btn.style.display = 'none';
-    }
-    restoreFormDraft();
-});
+            });
+        } else if (btn) {
+            btn.style.display = 'none';
+        }
+        restoreFormDraft();
+    });
 </script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var delay = 160;
-    document.querySelectorAll('.bi-dropdown.bi-mega').forEach(function(menu) {
-        menu.addEventListener('mouseleave', function() {
-            menu.querySelectorAll('.bi-submenu.open').forEach(function(openItem) {
-                openItem.classList.remove('open');
+    document.addEventListener('DOMContentLoaded', function() {
+        var delay = 160;
+        document.querySelectorAll('.bi-dropdown.bi-mega').forEach(function(menu) {
+            menu.addEventListener('mouseleave', function() {
+                menu.querySelectorAll('.bi-submenu.open').forEach(function(openItem) {
+                    openItem.classList.remove('open');
+                });
             });
         });
-    });
 
-    document.querySelectorAll('.bi-dropdown.bi-mega .bi-submenu').forEach(function(item) {
-        var timer;
-        var trigger = item.querySelector('.dropdown-item');
-        if (trigger) {
-            trigger.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                item.parentElement.querySelectorAll('.bi-submenu.open').forEach(function(openItem) {
-                    if (openItem !== item) {
-                        openItem.classList.remove('open');
-                        openItem.classList.remove('submenu-left');
+        document.querySelectorAll('.bi-dropdown.bi-mega .bi-submenu').forEach(function(item) {
+            var timer;
+            var trigger = item.querySelector('.dropdown-item');
+            if (trigger) {
+                trigger.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    item.parentElement.querySelectorAll('.bi-submenu.open').forEach(function(openItem) {
+                        if (openItem !== item) {
+                            openItem.classList.remove('open');
+                            openItem.classList.remove('submenu-left');
+                        }
+                    });
+                    if (item.classList.contains('open')) {
+                        item.classList.remove('open');
+                        item.classList.remove('submenu-left');
+                        return;
+                    }
+                    item.classList.add('open');
+                    item.classList.remove('submenu-left');
+                    var submenu = item.querySelector('.bi-submenu-list');
+                    if (submenu) {
+                        var rect = submenu.getBoundingClientRect();
+                        if (rect.right > window.innerWidth) {
+                            item.classList.add('submenu-left');
+                        }
                     }
                 });
-                if (item.classList.contains('open')) {
-                    item.classList.remove('open');
+            }
+            item.addEventListener('mouseenter', function() {
+                timer = setTimeout(function() {
+                    item.parentElement.querySelectorAll('.bi-submenu.open').forEach(function(openItem) {
+                        if (openItem !== item) {
+                            openItem.classList.remove('open');
+                        }
+                    });
+                    item.classList.add('open');
                     item.classList.remove('submenu-left');
-                    return;
-                }
+                    var submenu = item.querySelector('.bi-submenu-list');
+                    if (submenu) {
+                        var rect = submenu.getBoundingClientRect();
+                        if (rect.right > window.innerWidth) {
+                            item.classList.add('submenu-left');
+                        }
+                    }
+                }, delay);
+            });
+            item.addEventListener('mouseleave', function() {
+                clearTimeout(timer);
+                item.classList.remove('open');
+                item.classList.remove('submenu-left');
+            });
+            item.addEventListener('focusin', function() {
                 item.classList.add('open');
                 item.classList.remove('submenu-left');
                 var submenu = item.querySelector('.bi-submenu-list');
@@ -1820,47 +1477,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
-        }
-        item.addEventListener('mouseenter', function() {
-            timer = setTimeout(function() {
-                item.parentElement.querySelectorAll('.bi-submenu.open').forEach(function(openItem) {
-                    if (openItem !== item) {
-                        openItem.classList.remove('open');
-                    }
-                });
-                item.classList.add('open');
+            item.addEventListener('focusout', function() {
+                item.classList.remove('open');
                 item.classList.remove('submenu-left');
-                var submenu = item.querySelector('.bi-submenu-list');
-                if (submenu) {
-                    var rect = submenu.getBoundingClientRect();
-                    if (rect.right > window.innerWidth) {
-                        item.classList.add('submenu-left');
-                    }
-                }
-            }, delay);
-        });
-        item.addEventListener('mouseleave', function() {
-            clearTimeout(timer);
-            item.classList.remove('open');
-            item.classList.remove('submenu-left');
-        });
-        item.addEventListener('focusin', function() {
-            item.classList.add('open');
-            item.classList.remove('submenu-left');
-            var submenu = item.querySelector('.bi-submenu-list');
-            if (submenu) {
-                var rect = submenu.getBoundingClientRect();
-                if (rect.right > window.innerWidth) {
-                    item.classList.add('submenu-left');
-                }
-            }
-        });
-        item.addEventListener('focusout', function() {
-            item.classList.remove('open');
-            item.classList.remove('submenu-left');
+            });
         });
     });
-});
 </script>
 
 </html>

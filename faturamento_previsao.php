@@ -63,9 +63,7 @@ foreach ($mesesHistorico as $mesInfo) {
     $totalFinal += (float)$mesInfo['valor_final'];
     $totalContas += (int)$mesInfo['total_contas'];
 }
-$totalGlosa = max(0.0, $totalApresentado - $totalFinal);
-$glosaRate = $totalApresentado > 0 ? max(0, min(0.9, ($totalGlosa / $totalApresentado))) : 0.12;
-$glosaMediaValor = $totalContas > 0 ? ($totalGlosa / $totalContas) : 0.0;
+$glosaRate = $totalApresentado > 0 ? max(0, min(0.9, 1 - ($totalFinal / $totalApresentado))) : 0.12;
 $ticketMedio = $totalContas > 0 ? ($totalFinal / $totalContas) : 0;
 
 $recentHistory = array_slice($mesesHistorico, -3);
@@ -222,8 +220,8 @@ for ($i = 0; $i < 4; $i++) {
         </div>
         <div class="forecast-card">
             <h3>Glosa média</h3>
-            <strong>R$ <?= number_format($glosaMediaValor, 2, ',', '.') ?></strong>
-            <small class="text-muted d-block mt-1">Média do valor glosado por conta.</small>
+            <strong><?= number_format($glosaRate * 100, 1, ',', '.') ?>%</strong>
+            <small class="text-muted d-block mt-1">1 - (valor final / apresentado).</small>
         </div>
     </div>
 

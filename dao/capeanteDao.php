@@ -8,31 +8,11 @@ class capeanteDAO implements capeanteDAOInterface
     private $conn;
     private $url;
     public $message;
-    private $hasTimerColumn = null;
-
     public function __construct(PDO $conn, $url)
     {
         $this->conn = $conn;
         $this->url = $url;
         $this->message = new Message($url);
-        $this->ensureTimerColumn();
-    }
-
-    private function ensureTimerColumn(): void
-    {
-        if ($this->hasTimerColumn !== null) {
-            return;
-        }
-        try {
-            $stmt = $this->conn->query("SHOW COLUMNS FROM tb_capeante LIKE 'timer_cap'");
-            if ($stmt && $stmt->rowCount() === 0) {
-                $this->conn->exec("ALTER TABLE tb_capeante ADD COLUMN timer_cap INT NULL DEFAULT NULL AFTER data_digit_capeante");
-            }
-            $this->hasTimerColumn = true;
-        } catch (Throwable $e) {
-            $this->hasTimerColumn = false;
-            error_log('Falha ao garantir coluna timer_cap: ' . $e->getMessage());
-        }
     }
 
     /** Monta objeto */
@@ -78,6 +58,8 @@ class capeanteDAO implements capeanteDAOInterface
         $capeante->valor_sadt                 = $data["valor_sadt"]              ?? null;
         $capeante->valor_opme                 = $data["valor_opme"]              ?? null;
         $capeante->data_digit_capeante        = $data['data_digit_capeante']     ?? null;
+        $capeante->timer_start_cap            = $data['timer_start_cap']         ?? null;
+        $capeante->timer_end_cap              = $data['timer_end_cap']           ?? null;
         $capeante->timer_cap                  = $data['timer_cap']               ?? null;
 
         $capeante->valor_hemoderivados        = $data["valor_hemoderivados"]     ?? null;
@@ -185,7 +167,8 @@ class capeanteDAO implements capeanteDAOInterface
                 valor_honorarios, valor_matmed, valor_oxig, valor_sadt, valor_opme,
                 senha_finalizada, desconto_valor_cap, negociado_desconto_cap,
                 em_auditoria_cap, aberto_cap, encerrado_cap, valor_taxa,
-                usuario_create_cap, data_create_cap, conta_parada_cap, parada_motivo_cap, timer_cap,
+                usuario_create_cap, data_create_cap, conta_parada_cap, parada_motivo_cap,
+                timer_start_cap, timer_end_cap, timer_cap,
                 fk_id_aud_enf, fk_id_aud_med, fk_id_aud_adm, fk_id_aud_hosp,
                 valor_medicamentos, valor_materiais, glosa_medicamentos, glosa_materiais
             ) VALUES (
@@ -200,7 +183,8 @@ class capeanteDAO implements capeanteDAOInterface
                 :valor_honorarios, :valor_matmed, :valor_oxig, :valor_sadt, :valor_opme,
                 :senha_finalizada, :desconto_valor_cap, :negociado_desconto_cap,
                 :em_auditoria_cap, :aberto_cap, :encerrado_cap, :valor_taxa,
-                :usuario_create_cap, :data_create_cap, :conta_parada_cap, :parada_motivo_cap, :timer_cap,
+                :usuario_create_cap, :data_create_cap, :conta_parada_cap, :parada_motivo_cap,
+                :timer_start_cap, :timer_end_cap, :timer_cap,
                 :fk_id_aud_enf, :fk_id_aud_med, :fk_id_aud_adm, :fk_id_aud_hosp,
                 :valor_medicamentos, :valor_materiais, :glosa_medicamentos, :glosa_materiais
             )
@@ -256,6 +240,8 @@ class capeanteDAO implements capeanteDAOInterface
         $stmt->bindParam(":data_create_cap", $capeante->data_create_cap);
         $stmt->bindParam(":conta_parada_cap", $capeante->conta_parada_cap);
         $stmt->bindParam(":parada_motivo_cap", $capeante->parada_motivo_cap);
+        $stmt->bindParam(":timer_start_cap", $capeante->timer_start_cap);
+        $stmt->bindParam(":timer_end_cap", $capeante->timer_end_cap);
         $stmt->bindParam(":timer_cap", $capeante->timer_cap);
         $stmt->bindParam(":fk_id_aud_enf", $capeante->fk_id_aud_enf);
         $stmt->bindParam(":fk_id_aud_med", $capeante->fk_id_aud_med);
@@ -327,6 +313,8 @@ class capeanteDAO implements capeanteDAOInterface
                 data_create_cap = :data_create_cap,
                 conta_parada_cap = :conta_parada_cap,
                 parada_motivo_cap = :parada_motivo_cap,
+                timer_start_cap = :timer_start_cap,
+                timer_end_cap = :timer_end_cap,
                 timer_cap = :timer_cap,
                 impresso_cap = :impresso_cap,
                 fk_id_aud_enf = :fk_id_aud_enf,
@@ -391,6 +379,8 @@ class capeanteDAO implements capeanteDAOInterface
             $stmt->bindParam(":encerrado_cap", $capeante->encerrado_cap);
             $stmt->bindParam(":conta_parada_cap", $capeante->conta_parada_cap);
             $stmt->bindParam(":parada_motivo_cap", $capeante->parada_motivo_cap);
+            $stmt->bindParam(":timer_start_cap", $capeante->timer_start_cap);
+            $stmt->bindParam(":timer_end_cap", $capeante->timer_end_cap);
             $stmt->bindParam(":timer_cap", $capeante->timer_cap);
             $stmt->bindParam(":usuario_create_cap", $capeante->usuario_create_cap);
             $stmt->bindParam(":data_create_cap", $capeante->data_create_cap);
