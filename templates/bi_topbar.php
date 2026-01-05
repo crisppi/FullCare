@@ -88,6 +88,13 @@ $biSections = [
         ['label' => 'Risco Readmissão', 'href' => 'bi/risco-readmissao', 'file' => 'RiscoReadmissaoBI.php'],
         ['label' => 'Casos Caros Previsíveis', 'href' => 'bi/risco-casos-caros', 'file' => 'RiscoCasosCarosBI.php'],
     ],
+    'Risco & Prevenção' => [
+        ['label' => 'Matriz de Risco', 'href' => 'bi/risco-prevencao-matriz', 'file' => 'bi_risco_prevencao_matriz.php'],
+        ['label' => 'Preditores', 'href' => 'bi/risco-prevencao-preditores', 'file' => 'bi_risco_prevencao_preditores.php'],
+        ['label' => 'Eventos Adversos', 'href' => 'bi/risco-prevencao-eventos', 'file' => 'bi_risco_prevencao_eventos.php'],
+        ['label' => 'Desospitalização Precoce', 'href' => 'bi/risco-prevencao-desospitalizacao', 'file' => 'bi_risco_prevencao_desospitalizacao.php'],
+        ['label' => 'Score por Internação', 'href' => 'bi/risco-prevencao-score', 'file' => 'bi_risco_prevencao_score.php'],
+    ],
     'Negociação & Rede' => [
         ['label' => 'Volume vs Custo', 'href' => 'bi/rede-volume-custo', 'file' => 'RedeVolumeCustoBI.php'],
         ['label' => 'Mix de Casos', 'href' => 'bi/rede-mix-casos', 'file' => 'RedeMixCasosBI.php'],

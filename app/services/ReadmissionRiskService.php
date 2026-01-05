@@ -93,7 +93,7 @@ class ReadmissionRiskService
                 TIMESTAMPDIFF(YEAR, pa.data_nasc_pac, CURDATE()) AS idade,
                 se.longa_permanencia_seg,
                 pat.patologia_pat,
-                pat.descricao AS descricao_pat,
+                pat.patologia_pat AS descricao_pat,
                 GREATEST(
                     DATEDIFF(
                         COALESCE(al.data_alta_alt, CURRENT_DATE),

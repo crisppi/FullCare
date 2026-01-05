@@ -1,0 +1,161 @@
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT 
+        v.fk_usuario_vis AS auditor_id,
+        COALESCE(u.usuario_user, u.login_user, u.email_user, CONCAT('ID ', v.fk_usuario_vis)) AS auditor,
+        COUNT(*) AS visitas_30d,
+        ROUND...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 6
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"auditor_id":null,"auditor":null,"visitas_30d":172,"sla_dias":"1.5"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT fk_usuario_neg AS auditor_id,
+            SUM(CASE WHEN data_fim_neg IS NOT NULL AND data_fim_neg <> '0000-00-00' THEN 1 ELSE 0 END) AS concluidas,
+            COUNT(*) AS total
+       FROM tb_...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 2
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"auditor_id":5,"concluidas":"2","total":2}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT 
+        DATE_FORMAT(ca.data_digit_capeante, '%Y-%m-01') AS mes_ref,
+        DATE_FORMAT(ca.data_digit_capeante, '%b/%Y') AS etiqueta,
+        COUNT(*) AS total,
+        ROUND(AVG(NULLIF(ca.tim...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 3
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"mes_ref":null,"etiqueta":null,"total":10,"tempo_seg":null}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT 
+        LOWER(TRIM(COALESCE(
+    NULLIF(CASE WHEN CHAR_LENGTH(TRIM(ca.usuario_create_cap)) < 3 THEN NULL ELSE TRIM(ca.usuario_create_cap) END,''),
+    NULLIF(u.email_user,''),
+    NULLIF(u.log...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 4
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"admin_id":"adm@conex.com.br","admin_nome":"adm@conex.com.br","total_registros":25,"timer_seg":null}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT 
+        LOWER(TRIM(COALESCE(
+    NULLIF(i.usuario_create_int,''),
+    NULLIF(u.email_user,''),
+    NULLIF(u.login_user,''),
+    CONCAT('id#', u.id_usuario),
+    ''
+))) AS usuario_id,
+        C...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 6
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"usuario_id":"diretor@conex.com.br","admin_nome":"diretor@conex.com.br","total_registros":8,"tempo_dias":"7.0","timer_seg":null}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Iniciando query de contas por usuário...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Período: 2025-09-07 00:00:00 até 2026-01-04 23:59:59
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT 
+        COALESCE(
+            NULLIF(CASE WHEN CHAR_LENGTH(TRIM(ca.usuario_create_cap)) < 3 THEN NULL ELSE TRIM(ca.usuario_create_cap) END, ''),
+            NULLIF(TRIM(u.login_user), ''),
+   ...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 4
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"admin_nome":"Sem usu\u00e1rio","total_contas":100,"valor_total":3047363.99,"sla_dias":"40.0","timer_seg":null}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Query finalizada. Registros: 4
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT 
+        LOWER(TRIM(COALESCE(v.usuario_create,''))) AS user_key,
+        COALESCE(NULLIF(TRIM(v.usuario_create),''), 'Usuário sem identificação') AS auditor_nome,
+        COUNT(*) AS total_v...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 4
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"user_key":"joubene@conexaud.com.br","auditor_nome":"joubene@conexaud.com.br","total_visitas":117,"sla_dias":"3.0","timer_medio_seg":"37.5"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT 
+            COALESCE(
+                NULLIF(TRIM(ca.usuario_create_cap),''),
+                NULLIF(TRIM(u.email_user),''),
+                NULLIF(TRIM(u.login_user),''),
+                CONC...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59",":fallback":"diretor@conex.com.br",":uid_cap":1,":email_cap":"diretor@conex.com.br",":login_cap":"diretor@conex.com.br"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 1
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"admin_nome":"diretor@conex.com.br","total_registros":1,"timer_seg":null}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Executando query...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] SQL: SELECT 
+            COALESCE(
+                NULLIF(TRIM(i.usuario_create_int),''),
+                NULLIF(TRIM(u.email_user),''),
+                NULLIF(TRIM(u.login_user),''),
+                CONCA...
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] PARAMS: {":dt_ini":"2025-09-07 00:00:00",":dt_fim":"2026-01-04 23:59:59",":fallback":"diretor@conex.com.br",":uid_int":1,":email_int":"diretor@conex.com.br",":login_int":"diretor@conex.com.br"}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] ✓ Sucesso! Linhas retornadas: 1
+[04-Jan-2026 22:16:30 America/Sao_Paulo] [PERF_RANKING] Primeira linha: {"admin_nome":"diretor@conex.com.br","total_registros":8,"tempo_dias":"7.0","timer_seg":null}
+[04-Jan-2026 22:16:30 America/Sao_Paulo] PHP Deprecated:  ucfirst(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dashboard_performance.php on line 1306
+[04-Jan-2026 22:58:43 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pat.descricao' in 'SELECT' in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php:113
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(113): PDO->prepare('\n            SE...')
+#1 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(24): ReadmissionRiskService->fetchInternacaoContext(160)
+#2 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_matriz.php(105): ReadmissionRiskService->scoreInternacao(160)
+#3 {main}
+  thrown in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php on line 113
+[04-Jan-2026 22:59:51 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pat.descricao' in 'SELECT' in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php:113
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(113): PDO->prepare('\n            SE...')
+#1 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(24): ReadmissionRiskService->fetchInternacaoContext(160)
+#2 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_matriz.php(105): ReadmissionRiskService->scoreInternacao(160)
+#3 {main}
+  thrown in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php on line 113
+[04-Jan-2026 23:00:42 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pat.descricao' in 'SELECT' in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php:113
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(113): PDO->prepare('\n            SE...')
+#1 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(24): ReadmissionRiskService->fetchInternacaoContext(160)
+#2 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_matriz.php(105): ReadmissionRiskService->scoreInternacao(160)
+#3 {main}
+  thrown in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php on line 113
+[04-Jan-2026 23:01:11 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pat.descricao' in 'SELECT' in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php:113
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(113): PDO->prepare('\n            SE...')
+#1 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(24): ReadmissionRiskService->fetchInternacaoContext(160)
+#2 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_matriz.php(105): ReadmissionRiskService->scoreInternacao(160)
+#3 {main}
+  thrown in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php on line 113
+[04-Jan-2026 23:01:13 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'al.data_alta_alt' in 'WHERE' in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php:112
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php(112): PDO->prepare('\n    SELECT\n   ...')
+#1 {main}
+  thrown in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php on line 112
+[04-Jan-2026 23:01:14 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pat.descricao' in 'SELECT' in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php:113
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(113): PDO->prepare('\n            SE...')
+#1 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(24): ReadmissionRiskService->fetchInternacaoContext(160)
+#2 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_score.php(93): ReadmissionRiskService->scoreInternacao(160)
+#3 {main}
+  thrown in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php on line 113
+[04-Jan-2026 23:01:16 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pat.descricao' in 'SELECT' in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php:113
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(113): PDO->prepare('\n            SE...')
+#1 /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php(24): ReadmissionRiskService->fetchInternacaoContext(160)
+#2 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_matriz.php(105): ReadmissionRiskService->scoreInternacao(160)
+#3 {main}
+  thrown in /Applications/AMPPS/www/FullCare/app/services/ReadmissionRiskService.php on line 113
+[04-Jan-2026 23:03:10 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php:115
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php(115): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php on line 115
+[04-Jan-2026 23:03:29 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php:115
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php(115): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php on line 115
+[04-Jan-2026 23:03:47 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php:115
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php(115): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php on line 115
+[04-Jan-2026 23:04:27 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php:115
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php(115): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php on line 115
+[04-Jan-2026 23:04:42 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php:115
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php(115): PDOStatement->execute(Array)
+#1 {main}
+  thrown in /Applications/AMPPS/www/FullCare/bi_risco_prevencao_desospitalizacao.php on line 115
