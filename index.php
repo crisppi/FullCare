@@ -9,40 +9,345 @@ require_once("models/usuario.php");
 $usuarioDao = new userDAO($conn, $BASE_URL);
 ?>
 <!DOCTYPE html>
-<link rel="shortcut icon" type="image/x-icon" href="img/full-ico.ico">
-
-<html>
+<html lang="pt-br">
 
 <head>
-    <!-- <link href="<?php $BASE_URL ?>css/login.css" rel="stylesheet"> -->
-    <!-- <link href="<?php $BASE_URL ?>css/styleIndex.css" rel="stylesheet"> -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FullCare</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/full-ico.ico">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <style>
+    /* ===============================
+       Base
+    =============================== */
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(45deg, #5e2363 50%, #5bd9f3 50%);
+        opacity: 0;
+        animation: fadeIn .3s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0
+        }
+
+        to {
+            opacity: 1
+        }
+    }
+
+    .login-container {
+        display: flex;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, .2);
+        overflow: visible;
+        width: 990px;
+        max-width: 95vw;
+    }
+
+    /* ===============================
+       Bloco Azul (formulario)
+    =============================== */
+    .login-form {
+        padding: 40px;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        width: 60%;
+        background: linear-gradient(to bottom right, rgba(53, 186, 225, .8), rgba(91, 217, 243, .9));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    .login-form-logo {
+        width: 100%;
+        max-width: 320px;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .form-content {
+        width: 60%;
+    }
+
+    .input-container {
+        position: relative;
+        margin: 20px 0;
+        width: 100%;
+    }
+
+    .input-container input {
+        width: 100%;
+        padding: 10px 0;
+        border: none;
+        border-bottom: 2px solid #fff;
+        background: transparent;
+        font-size: 16px;
+        outline: none;
+    }
+
+    .input-container label {
+        position: absolute;
+        top: 10px;
+        left: 0;
+        color: rgba(255, 255, 255, .7);
+        pointer-events: none;
+        transition: all .3s ease;
+    }
+
+    .input-container input:focus+label,
+    .input-container input:not(:placeholder-shown)+label {
+        top: -20px;
+        font-size: 12px;
+        color: #fff;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 15px;
+        background: rgba(91, 217, 243, .1);
+        color: #fff;
+        border: 2px solid #fff;
+        cursor: pointer;
+        font-size: 18px;
+        border-radius: 30px;
+        margin-top: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
+        transition: all .3s ease;
+    }
+
+    .login-btn:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, .2);
+        background: #5e2363;
+    }
+
+    .forgot-password {
+        color: #fff;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .forgot-password a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    /* ===============================
+       Bloco Lilas (lado direito)
+    =============================== */
+    .side-panel {
+        padding: 40px;
+        background: #421849;
+        color: #fff;
+        width: 40%;
+        min-height: 570px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+        border-radius: 10px;
+        margin-top: -20px;
+        margin-bottom: -50px;
+        text-align: center;
+        position: relative;
+    }
+
+    .side-panel-content {
+        margin-top: 70px;
+    }
+
+    .side-panel img.monitor-image {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+
+    .side-panel h3,
+    .side-panel p,
+    .side-panel .email-btn {
+        margin: 10px 0;
+    }
+
+    .side-panel p {
+        margin-bottom: 10px;
+        line-height: 1.5;
+        color: #c9c9c9;
+    }
+
+    .side-panel .email-btn {
+        background: #421849;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 16px;
+        border-radius: 5px;
+    }
+
+    /* Conex logo removido do painel lateral. */
+
+    /* ===============================
+       Mensagem de erro (flutuante)
+    =============================== */
+    .error-message {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        max-width: 450px;
+        padding: 15px;
+        background: rgba(53, 186, 225, .8);
+        border-left: 5px solid red;
+        border-radius: 5px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
+        color: #fff;
+        font-size: 17px;
+        animation: fadeIn .5s ease-in-out;
+        z-index: 1000;
+    }
+
+    /* ===============================
+       Responsivo
+    =============================== */
+    @media (max-width: 1024px) {
+        body {
+            padding: 24px 16px;
+            height: auto;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 860px;
+        }
+
+        .form-content {
+            width: 70%;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .login-container {
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .login-form,
+        .side-panel {
+            width: 100%;
+            border-radius: 0;
+        }
+
+        .login-form {
+            padding: 32px 24px;
+        }
+
+        .side-panel {
+            min-height: 0;
+            margin: 0;
+            padding: 28px 24px 32px;
+        }
+
+        .side-panel-content {
+            margin-top: calc(var(--conex-side-top) + var(--conex-side-h) + var(--conex-tagline-gap) + 24px);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .side-panel {
+            display: none;
+        }
+
+        .login-form {
+            padding: 28px 20px;
+        }
+
+        .login-form-logo {
+            max-width: 240px;
+            margin-bottom: 16px;
+        }
+
+        .form-content {
+            width: 100%;
+        }
+    }
+    </style>
 </head>
 
 <body>
+    <div class="login-container">
+        <div class="login-form">
+            <img src="img/logo_branco.svg" alt="Login Form Logo" class="login-form-logo" />
+            <div class="form-content">
+                <form action="check_login.php" method="post" autocomplete="off">
+                    <div class="input-container">
+                        <input type="email" name="email_login" autocomplete="off" id="email_login" required
+                            style="border-radius:10px; border:1px solid #ccc; padding:10px; font-size:14px; width:100%; box-sizing:border-box; background-color: rgba(255,255,255,.6);" />
+                        <label for="email_login">Email</label>
+                    </div>
 
-    <?php include_once("index_novo.php"); ?>
+                    <div class="input-container">
+                        <input type="password" id="senha_login" autocomplete="off" name="senha_login" required
+                            style="border-radius:10px; border:1px solid #ccc; padding:10px; font-size:14px; width:100%; box-sizing:border-box; background-color: rgba(255,255,255,.6);" />
+                        <label for="senha_login">Senha</label>
+                    </div>
 
-    
+                    <input type="submit" value="Login" class="login-btn" />
+                </form>
+
+                <!-- Error message -->
+                <?php if (isset($_SESSION['mensagem']) && $_SESSION['mensagem'] != "") { ?>
+                <div class="error-message">
+                    <p><?php echo $_SESSION['mensagem']; ?></p>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="side-panel-content">
+                <img src="img/notebook_full.svg" alt="Exciting News Image" class="monitor-image" />
+                <h3>Novidades!</h3>
+                <p>Decisoes melhores comecam com dados claros. Veja internacoes e contas evoluindo em tempo real.
+
+                    Mais visao, menos suposicao: indicadores que conectam cuidado e eficiencia.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // limpar os campos manualmente e evitar autocompletar
+    document.addEventListener("DOMContentLoaded", () => {
+        const emailInput = document.getElementById("email_login");
+        const senhaInput = document.getElementById("senha_login");
+        emailInput.value = "";
+        senhaInput.value = "";
+        setTimeout(() => {
+            emailInput.value = "";
+            senhaInput.value = "";
+        }, 100);
+    });
+
+    // resetar campos apos o submit
+    document.querySelector("form").addEventListener("submit", function() {
+        setTimeout(() => {
+            this.reset();
+        }, 100);
+    });
+    </script>
 </body>
 
 </html>
-<script type="text/javascript">
-    function ocultar() {
-        let msgErr = document.getElementById('msgErr').style.display = "none";
-        let email = document.getElementById('email_login');
-        let senha = document.getElementById('senha_login');
-        email.value = ""
-        senha.value = ""
-
-    }
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
-    </script>
-<script src="https://code.jquery.com/jquery-3.6.3.slim.min.js"
-    integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
