@@ -169,3 +169,13 @@ Stack trace:
 [05-Jan-2026 20:57:35 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
 [05-Jan-2026 20:57:35 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
 [05-Jan-2026 20:57:35 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
+[06-Jan-2026 02:30:02 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 475
+[06-Jan-2026 02:30:02 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[06-Jan-2026 02:30:02 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
+[06-Jan-2026 02:30:02 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[06-Jan-2026 02:30:02 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
+[06-Jan-2026 12:53:44 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 475
+[06-Jan-2026 12:53:44 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[06-Jan-2026 12:53:44 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
+[06-Jan-2026 12:53:44 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[06-Jan-2026 12:53:44 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
