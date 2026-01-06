@@ -493,11 +493,10 @@ $complexInfo = $complexMap[$riskLevel ?: 'baixo'];
                 <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
                 <input id="buscaInternacoes" type="text" class="form-control" placeholder="Filtrar...">
               </div>
-              <button class="btn btn-sm btn-primary"
-                data-bs-toggle="modal" data-bs-target="#hubModal"
-                onclick="openModal('<?= $BASE_URL ?>cad_internacao.php?id_paciente=<?= (int)$p['id_paciente'] ?>')">
+              <a class="btn btn-sm btn-primary"
+                href="<?= $BASE_URL ?>cad_internacao.php?id_paciente=<?= (int)$p['id_paciente'] ?>">
                 <i class="fa-solid fa-plus me-1"></i> Nova Internação
-              </button>
+              </a>
             </div>
           </div>
 
