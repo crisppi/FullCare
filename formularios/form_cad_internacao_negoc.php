@@ -77,7 +77,7 @@ if (!isset($dados_acomodacao) || !is_array($dados_acomodacao)) {
 
 <div id="container-negoc" style="display:none; margin:5px">
     <div class="adicional-card">
-        <div class="adicional-card__header">
+        <div class="adicional-card__header section-header-with-bar">
             <h4 class="adicional-card__title">
                 <span class="adicional-card__marker"></span>
                 Negociações

@@ -332,22 +332,17 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
             <!--************ div de detalhes ***********-->
             <!--****************************************-->
             <input type="hidden" class="form-control" id="select_detalhes" name="select_detalhes">
-            <h4 class="text-center w-100"
+            <h4 class="text-center w-100 section-header-with-bar"
                 style="margin: 7px 10px 0px 0px;background-color: #5e2363;color: #fff;padding: 13px 0;border-radius: 0.25rem;">
                 Detalhes do relatório</h4>
             <hr>
             <div class="form-group col-sm-2" style=" margin-top:-15px">
-                <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório
-                    detalhado</label>
-                <select class="form-control-sm form-control" id="relatorio-detalhado" name="relatorio-detalhado">
+                <select aria-label="Relatório detalhado"
+                    class="form-control-sm form-control select-purple" id="relatorio-detalhado" name="relatorio-detalhado">
                     <option value="">Selecione</option>
                     <option value="s">Sim</option>
                     <option value="n">Não</option>
                 </select>
-                <p id="text-detalhado" style="font-size:0.7em; text-align:center; margin-top:8px; margin-left:8px">
-                    Selecione este
-                    campo caso deseje
-                    detalhar a visita</p>
             </div>
             <div id="div-detalhado" class="form-group row">
                 <div class="form-group row">

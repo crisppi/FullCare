@@ -76,7 +76,7 @@
 
 <div class="prorrogacao-container" id="container-prorrog" style="display:none;">
     <div class="adicional-card">
-        <div class="adicional-card__header">
+        <div class="adicional-card__header section-header-with-bar">
             <h4 class="adicional-card__title">
                 <span class="adicional-card__marker"></span>
                 Prorrogação

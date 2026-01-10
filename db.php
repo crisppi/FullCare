@@ -18,9 +18,16 @@ $user3 = "diretoria2";
 $pass3 = "Guga@0401";
 $dbname3 = "mydb_accert";
 
+// Conexão alternativa 3 (Cloud SQL público)
+$host4 = "35.199.123.232";
+$user4 = "cloudsql_user"; // atualize com o usuário do Cloud SQL
+$pass4 = "cloudsql_password"; // atualize com a senha do Cloud SQL
+$dbname4 = "fullcare"; // atualize com o nome do banco de dados dentro do Cloud SQL
+
 $charset = "utf8";
 $port = 3306;
 $fonte_conexao = "";
+$dbConnectionStart = microtime(true);
 
 try {
     // Tentativa com a conexão principal (Hostinger)
@@ -43,11 +50,21 @@ try {
             $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $fonte_conexao = "UOLHOST Fallback ($dbname3)";
         } catch (Exception $e3) {
-            header("Location: sem_conexao.html");
-            exit("❌ Falha nas conexões com os bancos de dados.");
+            try {
+                // Tentativa com a alternativa 3 (Cloud SQL público)
+                $conn = new PDO("mysql:host=$host4;dbname=$dbname4;charset=$charset", $user4, $pass4);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                $fonte_conexao = "Cloud SQL Público ($dbname4)";
+            } catch (Exception $e4) {
+                header("Location: sem_conexao.html");
+                exit("❌ Falha nas conexões com os bancos de dados.");
+            }
         }
     }
 }
+
+$dbConnectionDurationMs = (int) round((microtime(true) - $dbConnectionStart) * 1000, 0);
 
 try {
     $userId = $_SESSION['id_usuario'] ?? null;

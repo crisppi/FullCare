@@ -579,12 +579,12 @@ document.addEventListener('DOMContentLoaded', function() {
         var pacienteId = pacienteField ? parseInt(pacienteField.value || '0', 10) : null;
         var selected = Array.from(selectAntecedente.selectedOptions || []);
         var payload = selected.map(function(option) {
-            var idAntecedente = parseInt(option.value, 10);
-            if (!idAntecedente) return null;
+            var idCid = parseInt(option.value, 10);
+            if (!idCid) return null;
             return {
                 fk_id_paciente: pacienteId,
                 fk_internacao_ant_int: null,
-                intern_antec_ant_int: idAntecedente
+                intern_antec_ant_int: idCid
             };
         }).filter(function(item) { return item !== null; });
         jsonAntecedenteField.value = payload.length ? JSON.stringify(payload) : '';

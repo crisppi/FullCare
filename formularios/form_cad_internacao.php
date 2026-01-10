@@ -1007,29 +1007,30 @@ if (!isset($listaHospitais) || !is_array($listaHospitais)) {
                 <label for="senha_int">Senha</label>
                 <input type="text" maxlength="20" class="form-control form-control-sm" id="senha_int" name="senha_int">
             </div>
-            <div class="form-group col-sm-2">
-                <label for="num_atendimento_int">Num. Atendimento</label>
+            <div class="form-group col-sm-1">
+                <label for="num_atendimento_int">Atend.</label>
                 <input type="text" maxlength="20" class="form-control form-control-sm" id="num_atendimento_int"
                     name="num_atendimento_int">
             </div>
 
-            <!-- <div class="form-group col-sm-2">
+            <div class="form-group col-sm-2">
                 <label class="control-label" for="fk_patologia2">Antecedente</label>
                 <select class="form-control-sm form-control selectpicker show-tick" data-size="5"
                     data-live-search="true" id="fk_patologia2" name="fk_patologia2[]" multiple title="Selecione">
+                    <?php foreach ($cids as $cidEntry): ?>
                     <?php
-                    if (!is_array($antecedentes)) {
-                        $antecedentes = [];
-                    };
-                    usort($antecedentes, fn($a, $b) => strcmp($a["antecedente_ant"], $b["antecedente_ant"]));
-                    foreach ($antecedentes as $antecedente): ?>
-                    <option value="<?= (int) $antecedente["id_antecedente"] ?>">
-                        <?= htmlspecialchars($antecedente["antecedente_ant"]) ?>
+                    $label = implode(" - ", array_filter([
+                        $cidEntry["cat"] ?? '',
+                        $cidEntry["descricao"] ?? ''
+                    ]));
+                    ?>
+                    <option value="<?= (int) ($cidEntry["id_cid"] ?? 0) ?>">
+                        <?= htmlspecialchars($label) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
-            </div> -->
-            <!-- <input type="hidden" value="" id="json-antec" name="json-antec"> -->
+            </div>
+            <input type="hidden" value="" id="json-antec" name="json-antec">
         </div>
 
         <div><br></div>
@@ -1108,7 +1109,7 @@ if (!isset($listaHospitais) || !is_array($listaHospitais)) {
             </style>
 
             <div class="detalhes-card">
-                <div class="detalhes-card__header">
+                <div class="detalhes-card__header section-header-with-bar">
                     <h4 class="detalhes-card__title">
                         <span class="detalhes-card__marker"></span>
                         Detalhes do relatório
@@ -1119,18 +1120,12 @@ if (!isset($listaHospitais) || !is_array($listaHospitais)) {
 
                 <div class="form-group row">
                     <div class="form-group col-sm-2" style="margin-left:10px;">
-                        <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório
-                            detalhado</label>
-                        <select class="form-control-sm form-control" id="relatorio-detalhado" name="relatorio-detalhado"
-                            style="color:white; font-weight:normal; border:1px solid #5e2363; background-color:#5e2363;">
+                        <select aria-label="Relatório detalhado" class="form-control-sm form-control select-purple"
+                            id="relatorio-detalhado" name="relatorio-detalhado">
                             <option value="">Selecione</option>
                             <option value="s">Sim</option>
                             <option value="n">Não</option>
                         </select>
-                        <p id="text-detalhado"
-                            style="font-size:0.7em; text-align:center; margin-top:8px; margin-left:8px">
-                            Selecione este campo caso deseje detalhar a visita
-                        </p>
                     </div>
                     <div class="form-group col-sm-3">
                         <input type="hidden" id="data_create_int" value='<?= $agora; ?>' name="data_create_int">
@@ -1375,7 +1370,7 @@ if (!isset($listaHospitais) || !is_array($listaHospitais)) {
         </style>
 
         <div class="tabelas-adicionais-card">
-            <div class="tabelas-adicionais-card__header">
+            <div class="tabelas-adicionais-card__header section-header-with-bar">
                 <h4 class="tabelas-adicionais-card__title">
                     <span class="tabelas-adicionais-card__marker"></span>
                     Tabelas Adicionais
@@ -2003,12 +1998,12 @@ if (!isset($listaHospitais) || !is_array($listaHospitais)) {
     //     const selectedOptions = Array.from(this.selectedOptions).map(o => parseInt(o.value, 10));
     //     const fkPaciente = parseInt(document.getElementById('fk_paciente_int').value || '0', 10);
     //     const fkInternacao = parseInt(document.getElementById('id_internacao').value || '0', 10);
-    //     const jsonAntecedentes = selectedOptions.map(idAntecedente => ({
+    //     const jsonCids = selectedOptions.map(idCid => ({
     //         fk_id_paciente: fkPaciente,
     //         fk_internacao_ant_int: fkInternacao + 1,
-    //         intern_antec_ant_int: idAntecedente
+    //         intern_antec_ant_int: idCid
     //     }));
-    //     document.getElementById('json-antec').value = JSON.stringify(jsonAntecedentes);
+    //     document.getElementById('json-antec').value = JSON.stringify(jsonCids);
     // });
 
     // Mostrar/ocultar campos de alta conforme "Internado"

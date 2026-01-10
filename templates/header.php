@@ -25,6 +25,10 @@ $isDiretoria = in_array($normAccess($_SESSION['cargo'] ?? ''), ['diretoria', 'di
     || in_array($normAccess($_SESSION['nivel'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
     || ($sessionNivel === -1);
 
+// connection info for header badge
+$connectionLabel = $fonte_conexao ?: 'Fonte indefinida';
+$connectionLatencyLabel = isset($dbConnectionDurationMs) ? $dbConnectionDurationMs . ' ms' : 'latência indisponível';
+
 $chatUnreadCount = 0;
 $chatAssistantLink = $BASE_URL . 'show_chat.php';
 if (!empty($sessionIdUsuario)) {
@@ -165,6 +169,23 @@ if (!empty($sessionIdUsuario)) {
             font-size: 0.65rem;
         }
 
+        .connection-status {
+            font-size: 0.78rem;
+            color: #5e2363;
+            letter-spacing: 0.02em;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .connection-status strong {
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .connection-status .connection-separator {
+            color: rgba(0, 0, 0, 0.35);
+        }
+
         #search-results-dropdown {
             z-index: 2000;
         }
@@ -216,6 +237,12 @@ if (!empty($sessionIdUsuario)) {
                         max-height: 100px;
                         min-height: 50px;" alt="FullCare">
                 </a>
+                <div class="connection-status d-none d-lg-inline-flex ms-3 text-nowrap">
+                    <span class="text-uppercase" style="letter-spacing:0.1em;">Banco:</span>
+                    <strong><?= htmlspecialchars($connectionLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                    <span class="connection-separator">•</span>
+                    <span>Conexão <?= htmlspecialchars($connectionLatencyLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                </div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false"
                     aria-label="Alternar navegação">
