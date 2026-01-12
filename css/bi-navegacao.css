@@ -65,21 +65,21 @@ body.bi-theme {
 }
 
 .bi-nav-panel {
-    background: #fff;
-    border-radius: 36px;
-    padding: 28px 32px 32px;
-    box-shadow: 0 30px 60px rgba(18, 20, 40, 0.12);
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 0.5px;
 }
 
 .bi-nav-row {
     display: grid;
     grid-template-columns: 280px 1fr;
-    gap: 14px;
-    align-items: flex-start;
-    padding: 8px 0;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 0;
     border-bottom: 1px solid #f1f4fe;
     --theme-start: #4f6aff;
     --theme-end: #643cff;
@@ -111,21 +111,21 @@ body.bi-theme {
 .bi-nav-row-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px 12px;
+    gap: 8px;
 }
 
 .bi-chip {
     position: relative;
     display: inline-flex;
     align-items: center;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 999px;
     border: 1px solid #eceef7;
     background: #fff;
     color: #26254f;
     font-weight: 600;
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     white-space: nowrap;
 }
