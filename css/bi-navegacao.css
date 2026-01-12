@@ -1,0 +1,251 @@
+body.bi-theme {
+    background: #eef0ff;
+}
+
+.bi-wrapper {
+    min-height: 100vh;
+    padding: 32px 60px 48px;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(180deg, #fdfdff 0%, #eef0ff 100%);
+}
+
+.bi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 26px;
+}
+
+.bi-title {
+    font-size: 1rem;
+    letter-spacing: 0.6rem;
+    font-weight: 600;
+    color: #0f162d;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.bi-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bi-btn {
+    font-size: 0.85rem;
+    padding: 10px 22px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.bi-btn.bi-btn-secondary {
+    background: #fff;
+    color: #2b2d4f;
+    border: 1px solid rgba(89, 93, 143, 0.25);
+    box-shadow: 0 10px 25px rgba(19, 21, 48, 0.12);
+}
+
+.bi-nav-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #2b2d4f;
+    text-decoration: none;
+    font-size: 1.2rem;
+    border: 1px solid rgba(27, 33, 54, 0.1);
+    box-shadow: 0 14px 30px rgba(27, 33, 54, 0.15);
+}
+
+.bi-nav-panel {
+    background: #fff;
+    border-radius: 36px;
+    padding: 28px 32px 32px;
+    box-shadow: 0 30px 60px rgba(18, 20, 40, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.bi-nav-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f4fe;
+    --theme-start: #4f6aff;
+    --theme-end: #643cff;
+}
+
+.bi-nav-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.bi-nav-row-label {
+    background: linear-gradient(135deg, var(--theme-start), var(--theme-end));
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.4rem;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 260px;
+    white-space: nowrap;
+}
+
+.bi-nav-row-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+}
+
+.bi-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1px solid #eceef7;
+    background: #fff;
+    color: #26254f;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    white-space: nowrap;
+}
+
+.bi-chip::before {
+    content: "";
+    position: absolute;
+    left: -9px;
+    top: 8px;
+    bottom: 8px;
+    width: 6px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--theme-start), var(--theme-end));
+}
+
+.bi-chip:hover,
+.bi-chip:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(24, 27, 70, 0.15);
+}
+
+.bi-chip:active {
+    transform: translateY(0);
+}
+
+.bi-nav-row[data-theme="resumo"] {
+    --theme-start: #1a57ff;
+    --theme-end: #6633ff;
+}
+
+.bi-nav-row[data-theme="clinico"] {
+    --theme-start: #0a9cff;
+    --theme-end: #0aa18d;
+}
+
+.bi-nav-row[data-theme="auditoria"] {
+    --theme-start: #6946ff;
+    --theme-end: #3a56f9;
+}
+
+.bi-nav-row[data-theme="operacional"] {
+    --theme-start: #0b9e7b;
+    --theme-end: #16c6e5;
+}
+
+.bi-nav-row[data-theme="rede"] {
+    --theme-start: #2564ff;
+    --theme-end: #29a6ff;
+}
+
+.bi-nav-row[data-theme="financeiro"] {
+    --theme-start: #157f5c;
+    --theme-end: #1abf8b;
+}
+
+.bi-nav-row[data-theme="gastos"] {
+    --theme-start: #cd6f18;
+    --theme-end: #ff9c34;
+}
+
+.bi-nav-row[data-theme="anomalias"] {
+    --theme-start: #c51f1f;
+    --theme-end: #e23d49;
+}
+
+.bi-nav-row[data-theme="conformidade"] {
+    --theme-start: #6d3aff;
+    --theme-end: #9575ff;
+}
+
+.bi-nav-row[data-theme="risco"] {
+    --theme-start: #dc5230;
+    --theme-end: #ff7a43;
+}
+
+.bi-nav-row[data-theme="prevencao"] {
+    --theme-start: #dc3f52;
+    --theme-end: #fb5d4a;
+}
+
+.bi-nav-row[data-theme="negociacao"] {
+    --theme-start: #1b78ff;
+    --theme-end: #43c5ff;
+}
+
+.bi-nav-row[data-theme="qualidade"] {
+    --theme-start: #1174b6;
+    --theme-end: #15b28c;
+}
+
+.bi-nav-row[data-theme="inteligencia"] {
+    --theme-start: #2f4aff;
+    --theme-end: #3f9bff;
+}
+
+@media (max-width: 1024px) {
+    .bi-wrapper {
+        padding: 24px 28px;
+    }
+
+    .bi-nav-row {
+        grid-template-columns: 1fr;
+    }
+
+    .bi-nav-row-label {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+    .bi-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .bi-nav-panel {
+        padding: 24px;
+    }
+
+    .bi-chip {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+}

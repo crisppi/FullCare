@@ -1,10 +1,10 @@
 <?php
 // Conexão principal (mydb_accert_ho - Hostinger)
 
-$host1 = "2.59.150.2";
-$user1 = "u650318666_diretoria10";
-$pass1 = "FullCare@BD2025!";
-$dbname1 = "u650318666_mydb_accert_ho";
+$host4 = "2.59.150.2";
+$user4 = "u650318666_diretoria10";
+$pass4 = "FullCare@BD2025!";
+$dbname4 = "u650318666_mydb_accert_ho";
 
 // Conexão alternativa 1 (mydb_accert_new - UOLHOST)
 $host2 = "mydb-accert-new.mysql.uhserver.com";
@@ -19,10 +19,10 @@ $pass3 = "Guga@0401";
 $dbname3 = "mydb_accert";
 
 // Conexão alternativa 3 (Cloud SQL público)
-$host4 = "35.199.123.232";
-$user4 = "cloudsql_user"; // atualize com o usuário do Cloud SQL
-$pass4 = "cloudsql_password"; // atualize com a senha do Cloud SQL
-$dbname4 = "fullcare"; // atualize com o nome do banco de dados dentro do Cloud SQL
+$host1 = "35.199.123.232";
+$user1 = "id-mysql-fullcare"; // atualize com o usuário do Cloud SQL
+$pass1 = "CB*hND.46`an46$~"; // atualize com a senha do Cloud SQL
+$dbname1 = "fullcare"; // atualize com o nome do banco de dados dentro do Cloud SQL
 
 $charset = "utf8";
 $port = 3306;
@@ -34,7 +34,7 @@ try {
     $conn = new PDO("mysql:host=$host1;dbname=$dbname1;charset=$charset", $user1, $pass1);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    $fonte_conexao = "Hostinger ($dbname1)";
+    $fonte_conexao = "Conexao 1 ($dbname1)";
 } catch (Exception $e1) {
     try {
         // Tentativa com a alternativa 1 (UOLHOST NEW)

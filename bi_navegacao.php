@@ -134,7 +134,7 @@ $navGroups = [
     ],
     [
         'title' => 'Risco & Prevenção',
-        'key' => 'risco-prevencao',
+        'key' => 'prevencao',
         'items' => [
             ['label' => 'Matriz de Risco', 'href' => 'bi/risco-prevencao-matriz'],
             ['label' => 'Preditores', 'href' => 'bi/risco-prevencao-preditores'],
@@ -157,7 +157,7 @@ $navGroups = [
         'key' => 'qualidade',
         'items' => [
             ['label' => 'Eventos Adversos', 'href' => 'bi/qualidade-eventos'],
-            ['label' => 'Óbitos', 'href' => 'bi/qualidade-obitos'],
+            ['label' => 'Óbitos', 'href' => 'QualidadeObitosBI.php'],
         ],
     ],
     [
@@ -174,8 +174,11 @@ $navGroups = [
 ?>
 
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi-navegacao.css?v=20260110">
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260110"></script>
-<script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme', 'bi-navegacao'));
+</script>
 
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
@@ -188,19 +191,18 @@ $navGroups = [
         </div>
     </div>
 
-    <div class="bi-panel">
-        <div class="bi-nav-title">Painel de Navegação</div>
+    <div class="bi-nav-panel">
         <?php foreach ($navGroups as $group): ?>
-            <div class="bi-nav-group" data-theme="<?= e($group['key']) ?>">
-                <div class="bi-nav-group-title"><?= e($group['title']) ?></div>
-                <div class="bi-nav-grid">
+            <section class="bi-nav-row" data-theme="<?= e($group['key']) ?>">
+                <div class="bi-nav-row-label"><?= e($group['title']) ?></div>
+                <div class="bi-nav-row-links">
                     <?php foreach ($group['items'] as $link): ?>
-                        <a class="bi-nav-card" href="<?= $BASE_URL . e($link['href']) ?>">
+                        <a class="bi-chip" href="<?= $BASE_URL . e($link['href']) ?>">
                             <?= e($link['label']) ?>
                         </a>
                     <?php endforeach; ?>
                 </div>
-            </div>
+            </section>
         <?php endforeach; ?>
     </div>
 </div>

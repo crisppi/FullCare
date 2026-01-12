@@ -1696,3 +1696,564 @@ Stack trace:
 [10-Jan-2026 17:25:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
 [10-Jan-2026 17:25:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
 [10-Jan-2026 17:25:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:27:43 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:27:43 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:27:43 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:27:43 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:27:43 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:27:43 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:27:43 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:27:43 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:03 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:04 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:53 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:29:53 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:29:53 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:53 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:54 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:29:54 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:29:54 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:29:54 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:30:43 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:30:43 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:30:43 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:30:43 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:30:43 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:30:43 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:30:43 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:30:43 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:31:53 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:31:53 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:31:53 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:31:53 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:31:54 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:31:54 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:31:54 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:31:54 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:32:27 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:32:27 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:32:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:32:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:32:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:32:28 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 17:32:28 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 17:32:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:32:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:32:28 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 17:33:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 524
+[10-Jan-2026 17:33:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 525
+[10-Jan-2026 17:33:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 526
+[10-Jan-2026 17:33:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 528
+[10-Jan-2026 17:33:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 529
+[10-Jan-2026 17:33:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 530
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:11 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 524
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 525
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 526
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 528
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 529
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 530
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:14 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:15 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:15 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:15 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:15 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:15 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:15 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:33:15 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:33:15 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:35:12 America/Sao_Paulo] PHP Warning:  Undefined variable $connectionLabel in /Applications/AMPPS/www/FullCare/templates/header.php on line 221
+[10-Jan-2026 17:35:12 America/Sao_Paulo] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/templates/header.php on line 221
+[10-Jan-2026 17:35:12 America/Sao_Paulo] PHP Warning:  Undefined variable $connectionLatencyLabel in /Applications/AMPPS/www/FullCare/templates/header.php on line 223
+[10-Jan-2026 17:35:12 America/Sao_Paulo] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/templates/header.php on line 223
+[10-Jan-2026 20:35:31 UTC] Processando o ID do hospital: 2
+[10-Jan-2026 20:35:31 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/acomodacaoDao.php on line 272
+[10-Jan-2026 20:35:31 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/acomodacaoDao.php on line 273
+[10-Jan-2026 20:35:32 UTC] Processando o ID do hospital: 2
+[10-Jan-2026 20:35:32 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/acomodacaoDao.php on line 272
+[10-Jan-2026 20:35:32 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/acomodacaoDao.php on line 273
+[10-Jan-2026 20:35:49 UTC] Dados recebidos para salvar internação:
+[10-Jan-2026 20:35:49 UTC] Array
+(
+    [type] => create
+    [timer_int] => 
+    [censo_int] => n
+    [fk_usuario_int] => 6
+    [fk_hospital_int] => 2
+    [fk_paciente_int] => 347
+    [data_intern_int_dt] => 2026-01-07T17:35
+    [data_intern_int] => 2026-01-07
+    [hora_intern_int] => 17:35
+    [data_lancamento_int] => 2026-01-10T17:35
+    [data_visita_int] => 2026-01-10
+    [internado_int] => s
+    [data_alta_alt] => 
+    [tipo_alta_alt] => 
+    [retroativa_confirmada] => 0
+    [id_internacao] => 342
+    [primeira_vis_int] => s
+    [visita_no_int] => 0
+    [visita_enf_int] => n
+    [visita_med_int] => s
+    [visita_auditor_prof_enf] => 
+    [visita_auditor_prof_med] => 6
+    [cad_central_obrigatorio] => 1
+    [acomodacao_int] => Apto
+    [especialidade_int] => 
+    [titular_int] => 
+    [crm_int] => 
+    [modo_internacao_int] => 
+    [tipo_admissao_int] => 
+    [int_pertinente_int] => 
+    [rel_pertinente_int] => 
+    [fk_cid_int] => 
+    [grupo_patologia_int] => 
+    [origem_int] => 
+    [senha_int] => 
+    [num_atendimento_int] => 
+    [json-antec] => 
+    [rel_int] => 
+    [acoes_int] => 
+    [programacao_int] => 
+    [select_detalhes] => 
+    [relatorio-detalhado] => 
+    [data_create_int] => 2026-01-10
+    [fk_int_det] => 343
+    [curativo_det] => 
+    [dieta_det] => 
+    [nivel_consc_det] => 
+    [oxig_det] => 
+    [oxig_uso_det] => 
+    [hemoderivados_det] => 
+    [dialise_det] => 
+    [oxigenio_hiperbarica_det] => 
+    [qt_det] => 
+    [rt_det] => 
+    [acamado_det] => 
+    [atb_det] => 
+    [atb_uso_det] => 
+    [medic_alto_custo_det] => n
+    [qual_medicamento_det] => 
+    [exames_det] => 
+    [oportunidades_det] => 
+    [liminar_det] => n
+    [paliativos_det] => n
+    [parto_det] => n
+    [braden_det] => 
+    [select_tuss] => 
+    [select_prorrog] => 
+    [select_gestao] => 
+    [select_uti] => 
+    [select_negoc] => 
+    [fk_int_capeante] => 343
+    [encerrado_cap] => n
+    [aberto_cap] => s
+    [em_auditoria_cap] => n
+    [senha_finalizada] => n
+    [tuss-json] => 
+    [fk_int_tuss] => 343
+    [fk_usuario_tuss] => 6
+    [tuss_solicitado] => 
+    [data_realizacao_tuss] => 2026-01-10
+    [qtd_tuss_solicitado] => 
+    [qtd_tuss_liberado] => 
+    [tuss_liberado_sn] => 
+    [fk_internacao_ges] => 343 
+    [alto_custo_ges] => n
+    [rel_alto_custo_ges] => 
+    [home_care_ges] => n
+    [rel_home_care_ges] => 
+    [opme_ges] => n
+    [rel_opme_ges] => 
+    [desospitalizacao_ges] => n
+    [rel_desospitalizacao_ges] => 
+    [evento_adverso_ges] => n
+    [tipo_evento_adverso_gest] => 
+    [evento_sinalizado_ges] => n
+    [rel_evento_adverso_ges] => 
+    [evento_data_ges] => 
+    [evento_classificacao_ges] => 
+    [evento_discutido_ges] => n
+    [evento_negociado_ges] => n
+    [evento_valor_negoc_ges] => 
+    [evento_retorno_qual_hosp_ges] => n
+    [evento_encerrar_ges] => n
+    [evento_impacto_financ_ges] => n
+    [evento_prolongou_internacao_ges] => n
+    [evento_fech_ges] => n
+    [evento_prorrogar_ges] => n
+    [fk_internacao_uti] => 343
+    [internacao_uti] => s
+    [internado_uti_int] => s
+    [fk_user_uti] => 6
+    [internado_uti] => s
+    [motivo_uti] =>  
+    [just_uti] => Pertinente
+    [data_internacao_uti] => 2026-01-10
+    [hora_internacao_uti] => 17:35
+    [vm_uti] => n
+    [dva_uti] => n
+    [suporte_vent_uti] => n
+    [glasgow_uti] => 
+    [dist_met_uti] => n
+    [score_uti] => 3
+    [justifique_uti] => 
+    [saps_uti] =>  
+    [rel_uti] => 
+    [fk_internacao_pror] => 343
+    [fk_usuario_pror] => 6
+    [acomod1_pror] => 
+    [prorrog1_ini_pror] => 
+    [prorrog1_fim_pror] => 
+    [diarias_1] => 
+    [isol_1_pror] => n
+    [prorrogacoes-json] => 
+    [fk_id_int] => 343
+    [fk_usuario_neg] => 6
+    [negociacoes_json] => 
+    [tipo_negociacao] => 
+    [data_inicio_negoc] => 
+    [data_fim_negoc] => 
+    [troca_de] => 
+    [troca_para] => 
+    [qtd] => 
+    [saving_show] => 
+    [saving] => 
+)
+
+[10-Jan-2026 20:35:49 UTC] Nenhum JSON foi recebido.
+[10-Jan-2026 20:35:49 UTC] PHP Deprecated:  substr(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/process_internacao.php on line 142
+[10-Jan-2026 20:35:49 UTC] Salvando internação com os seguintes dados: Internacao Object
+(
+    [id_internacao] => 
+    [rel_auditoria_int] => 
+    [fk_paciente_int] => 347
+    [fk_hospital_int] => 2
+    [data_create_int] => 2026-01-10
+    [usuario_create_int] => 
+    [acoes_int] => 
+    [acomodacao_int] => Apto
+    [visita_med_int] => s
+    [visita_enf_int] => n
+    [data_intern_int] => 2026-01-07
+    [data_lancamento_int] => 2026-01-10 20:35:49
+    [data_visita_int] => 2026-01-10
+    [timer_int] => 
+    [forecast_total_days] => 
+    [forecast_lower_days] => 
+    [forecast_upper_days] => 
+    [forecast_generated_at] => 
+    [forecast_model] => 
+    [forecast_confidence] => 
+    [especialidade_int] => 
+    [fk_antecedente_int] => 
+    [fk_patologia_int] => 1
+    [fk_cid_int] => 1
+    [fk_patologia2] => 1
+    [fk_user_int] => 
+    [grupo_patologia_int] => 
+    [internado_int] => s
+    [tipo_admissao_int] => 
+    [no_visita_int] => 
+    [primeira_visita_int] => 
+    [senha_int] => 
+    [rel_int] => 
+    [crm_int] => 
+    [modo_internacao_int] => 
+    [titular_int] => 
+    [primeira_vis_int] => s
+    [visita_no_int] => 0
+    [visita_auditor_prof_med] => 6
+    [visita_auditor_prof_enf] => 
+    [fk_usuario_int] => 6
+    [censo_int] => n
+    [conta_auditada_int] => 
+    [origem_int] => 
+    [conta_em_analise_int] => 
+    [programacao_int] => 
+    [rel_pertinente_int] => 
+    [int_pertinente_int] => 
+    [hora_intern_int] => 17:35
+    [curativo_enf] => 
+    [dieta_enf] => 
+    [tqt_enf] => 
+    [oxig_enf] => 
+    [exames_enf] => 
+    [oportunidades_enf] => 
+    [programacao_enf] => 
+    [num_atendimento_int] => 
+)
+
+[10-Jan-2026 20:35:49 UTC] Internação salva com sucesso. Último ID: 343
+[10-Jan-2026 20:35:49 UTC] [DEBUG] select_negoc=
+[10-Jan-2026 20:35:49 UTC] Dados recebidos para salvar internação:
+[10-Jan-2026 20:35:49 UTC] Array
+(
+    [type] => create
+    [timer_int] => 
+    [censo_int] => n
+    [fk_usuario_int] => 6
+    [fk_hospital_int] => 2
+    [fk_paciente_int] => 347
+    [data_intern_int_dt] => 2026-01-07T17:35
+    [data_intern_int] => 2026-01-07
+    [hora_intern_int] => 17:35
+    [data_lancamento_int] => 2026-01-10T17:35
+    [data_visita_int] => 2026-01-10
+    [internado_int] => s
+    [data_alta_alt] => 
+    [tipo_alta_alt] => 
+    [retroativa_confirmada] => 0
+    [id_internacao] => 342
+    [primeira_vis_int] => s
+    [visita_no_int] => 0
+    [visita_enf_int] => n
+    [visita_med_int] => s
+    [visita_auditor_prof_enf] => 
+    [visita_auditor_prof_med] => 6
+    [cad_central_obrigatorio] => 1
+    [acomodacao_int] => Apto
+    [especialidade_int] => 
+    [titular_int] => 
+    [crm_int] => 
+    [modo_internacao_int] => 
+    [tipo_admissao_int] => 
+    [int_pertinente_int] => 
+    [rel_pertinente_int] => 
+    [fk_cid_int] => 
+    [grupo_patologia_int] => 
+    [origem_int] => 
+    [senha_int] => 
+    [num_atendimento_int] => 
+    [json-antec] => 
+    [rel_int] => 
+    [acoes_int] => 
+    [programacao_int] => 
+    [select_detalhes] => 
+    [relatorio-detalhado] => 
+    [data_create_int] => 2026-01-10
+    [fk_int_det] => 343
+    [curativo_det] => 
+    [dieta_det] => 
+    [nivel_consc_det] => 
+    [oxig_det] => 
+    [oxig_uso_det] => 
+    [hemoderivados_det] => 
+    [dialise_det] => 
+    [oxigenio_hiperbarica_det] => 
+    [qt_det] => 
+    [rt_det] => 
+    [acamado_det] => 
+    [atb_det] => 
+    [atb_uso_det] => 
+    [medic_alto_custo_det] => n
+    [qual_medicamento_det] => 
+    [exames_det] => 
+    [oportunidades_det] => 
+    [liminar_det] => n
+    [paliativos_det] => n
+    [parto_det] => n
+    [braden_det] => 
+    [select_tuss] => 
+    [select_prorrog] => 
+    [select_gestao] => 
+    [select_uti] => 
+    [select_negoc] => 
+    [fk_int_capeante] => 343
+    [encerrado_cap] => n
+    [aberto_cap] => s
+    [em_auditoria_cap] => n
+    [senha_finalizada] => n
+    [tuss-json] => 
+    [fk_int_tuss] => 343
+    [fk_usuario_tuss] => 6
+    [tuss_solicitado] => 
+    [data_realizacao_tuss] => 2026-01-10
+    [qtd_tuss_solicitado] => 
+    [qtd_tuss_liberado] => 
+    [tuss_liberado_sn] => 
+    [fk_internacao_ges] => 343 
+    [alto_custo_ges] => n
+    [rel_alto_custo_ges] => 
+    [home_care_ges] => n
+    [rel_home_care_ges] => 
+    [opme_ges] => n
+    [rel_opme_ges] => 
+    [desospitalizacao_ges] => n
+    [rel_desospitalizacao_ges] => 
+    [evento_adverso_ges] => n
+    [tipo_evento_adverso_gest] => 
+    [evento_sinalizado_ges] => n
+    [rel_evento_adverso_ges] => 
+    [evento_data_ges] => 
+    [evento_classificacao_ges] => 
+    [evento_discutido_ges] => n
+    [evento_negociado_ges] => n
+    [evento_valor_negoc_ges] => 
+    [evento_retorno_qual_hosp_ges] => n
+    [evento_encerrar_ges] => n
+    [evento_impacto_financ_ges] => n
+    [evento_prolongou_internacao_ges] => n
+    [evento_fech_ges] => n
+    [evento_prorrogar_ges] => n
+    [fk_internacao_uti] => 343
+    [internacao_uti] => s
+    [internado_uti_int] => s
+    [fk_user_uti] => 6
+    [internado_uti] => s
+    [motivo_uti] =>  
+    [just_uti] => Pertinente
+    [data_internacao_uti] => 2026-01-10
+    [hora_internacao_uti] => 17:35
+    [vm_uti] => n
+    [dva_uti] => n
+    [suporte_vent_uti] => n
+    [glasgow_uti] => 
+    [dist_met_uti] => n
+    [score_uti] => 3
+    [justifique_uti] => 
+    [saps_uti] =>  
+    [rel_uti] => 
+    [fk_internacao_pror] => 343
+    [fk_usuario_pror] => 6
+    [acomod1_pror] => 
+    [prorrog1_ini_pror] => 
+    [prorrog1_fim_pror] => 
+    [diarias_1] => 
+    [isol_1_pror] => n
+    [prorrogacoes-json] => 
+    [fk_id_int] => 343
+    [fk_usuario_neg] => 6
+    [negociacoes_json] => 
+    [tipo_negociacao] => 
+    [data_inicio_negoc] => 
+    [data_fim_negoc] => 
+    [troca_de] => 
+    [troca_para] => 
+    [qtd] => 
+    [saving_show] => 
+    [saving] => 
+)
+
+[10-Jan-2026 20:35:49 UTC] Nenhum JSON foi recebido.
+[10-Jan-2026 20:35:49 UTC] PHP Deprecated:  substr(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/process_internacao.php on line 142
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 524
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 525
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 526
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 528
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 529
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao.php on line 530
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
+[10-Jan-2026 17:36:00 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[10-Jan-2026 21:28:40 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 475
+[10-Jan-2026 21:28:40 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[10-Jan-2026 21:28:40 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
+[10-Jan-2026 21:28:40 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[10-Jan-2026 21:28:40 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
+[10-Jan-2026 18:28:45 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 18:28:45 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 18:28:45 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:45 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:45 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:46 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 18:28:46 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 18:28:46 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:46 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:46 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:28:55 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:29:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 18:29:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 18:29:10 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:29:10 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:29:10 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:29:10 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:29:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 26
+[10-Jan-2026 18:29:10 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/seguradoraDao.php on line 375
+[10-Jan-2026 18:29:11 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:29:11 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:29:11 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[10-Jan-2026 18:29:11 America/Sao_Paulo] PHP Warning:  Undefined variable $id_paciente in /Applications/AMPPS/www/FullCare/formularios/form_list_seguradora.php on line 232
+[12-Jan-2026 00:26:54 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 475
+[12-Jan-2026 00:26:54 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[12-Jan-2026 00:26:54 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
+[12-Jan-2026 00:26:54 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[12-Jan-2026 00:26:54 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
