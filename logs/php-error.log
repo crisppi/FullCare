@@ -2283,3 +2283,22 @@ Stack trace:
 [11-Jan-2026 22:04:24 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
 [11-Jan-2026 22:04:24 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 632
 [11-Jan-2026 22:04:24 America/Sao_Paulo] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/gestaoDao.php on line 633
+[11-Jan-2026 22:48:49 America/Sao_Paulo] PHP Warning:  include(templates/bi_rede_filters.php): Failed to open stream: No such file or directory in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php on line 42
+[11-Jan-2026 22:48:49 America/Sao_Paulo] PHP Warning:  include(templates/bi_rede_filters.php): Failed to open stream: No such file or directory in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php on line 42
+[11-Jan-2026 22:48:49 America/Sao_Paulo] PHP Warning:  include(): Failed opening 'templates/bi_rede_filters.php' for inclusion (include_path='.:') in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php on line 42
+[11-Jan-2026 22:48:49 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to undefined function e() in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php:81
+Stack trace:
+#0 {main}
+  thrown in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php on line 81
+[11-Jan-2026 22:50:06 America/Sao_Paulo] PHP Warning:  include(templates/bi_rede_filters.php): Failed to open stream: No such file or directory in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php on line 42
+[11-Jan-2026 22:50:06 America/Sao_Paulo] PHP Warning:  include(templates/bi_rede_filters.php): Failed to open stream: No such file or directory in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php on line 42
+[11-Jan-2026 22:50:06 America/Sao_Paulo] PHP Warning:  include(): Failed opening 'templates/bi_rede_filters.php' for inclusion (include_path='.:') in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php on line 42
+[11-Jan-2026 22:50:06 America/Sao_Paulo] PHP Fatal error:  Uncaught Error: Call to undefined function e() in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php:81
+Stack trace:
+#0 {main}
+  thrown in /Applications/AMPPS/www/FullCare/bi_risco_readmissao.php on line 81
+[12-Jan-2026 20:20:21 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 475
+[12-Jan-2026 20:20:21 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[12-Jan-2026 20:20:21 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477
+[12-Jan-2026 20:20:21 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 476
+[12-Jan-2026 20:20:21 UTC] PHP Deprecated:  strlen(): Passing null to parameter #1 ($string) of type string is deprecated in /Applications/AMPPS/www/FullCare/dao/usuarioDao.php on line 477

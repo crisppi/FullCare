@@ -110,6 +110,25 @@ $countAud = array_map(fn($r) => (int)$r['total_registros'], $auditorRows);
 $labelsTipo = array_map(fn($r) => $r['tipo'] ?: 'Sem tipo', $tipoRows);
 $savingTipo = array_map(fn($r) => (float)$r['total_saving'], $tipoRows);
 $countTipo = array_map(fn($r) => (int)$r['total_registros'], $tipoRows);
+
+$sqlMensal = "
+    SELECT
+        DATE_FORMAT(ng.data_inicio_neg, '%Y-%m') AS mes,
+        SUM(ng.saving) AS total_saving
+    FROM tb_negociacao ng
+    INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
+    WHERE {$where}
+    GROUP BY mes
+    ORDER BY mes ASC
+";
+$stmt = $conn->prepare($sqlMensal);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+}
+$stmt->execute();
+$mensalRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$mensalLabels = array_map(fn($r) => $r['mes'], $mensalRows);
+$mensalSaving = array_map(fn($r) => (float)$r['total_saving'], $mensalRows);
 ?>
 
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">
@@ -179,6 +198,13 @@ $countTipo = array_map(fn($r) => (int)$r['total_registros'], $tipoRows);
         </div>
     </div>
 
+    <div class="bi-panel">
+        <h3>Evolução mensal do saving</h3>
+        <div class="bi-chart">
+            <canvas id="chartSavingMensal"></canvas>
+        </div>
+    </div>
+
     <div class="bi-panel" style="margin-top:16px;">
         <h3>Valor de saving por auditor</h3>
         <div class="bi-chart">
@@ -212,6 +238,8 @@ const countAud = <?= json_encode($countAud) ?>;
 const labelsTipo = <?= json_encode($labelsTipo) ?>;
 const savingTipo = <?= json_encode($savingTipo) ?>;
 const countTipo = <?= json_encode($countTipo) ?>;
+const mensalLabels = <?= json_encode($mensalLabels) ?>;
+const mensalSaving = <?= json_encode($mensalSaving) ?>;
 
 function barChart(ctx, labels, data, color) {
     return new Chart(ctx, {
@@ -226,10 +254,32 @@ function barChart(ctx, labels, data, color) {
     });
 }
 
+function lineChart(ctx, labels, data, color) {
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                data,
+                borderColor: color,
+                backgroundColor: 'rgba(0, 0, 0, 0)',
+                fill: false,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: window.biChartScales ? window.biChartScales() : undefined,
+            legend: { display: false },
+        },
+    });
+}
+
 barChart(document.getElementById('chartSavingAuditor'), labelsAud, savingAud, 'rgba(141, 208, 255, 0.7)');
 barChart(document.getElementById('chartQtdeAuditor'), labelsAud, countAud, 'rgba(208, 113, 176, 0.7)');
 barChart(document.getElementById('chartTipoSavingValor'), labelsTipo, savingTipo, 'rgba(121, 199, 255, 0.7)');
 barChart(document.getElementById('chartTipoSavingQtd'), labelsTipo, countTipo, 'rgba(111, 223, 194, 0.7)');
+lineChart(document.getElementById('chartSavingMensal'), mensalLabels, mensalSaving, 'rgba(76, 175, 80, 0.9)');
 </script>
 
 <?php require_once("templates/footer.php"); ?>
