@@ -44,6 +44,7 @@ try {
             'id_paciente' => (int) $r['id_paciente'],
             'nome' => $r['nome_pac'] ?? '',
             'matricula' => $r['matricula_pac'] ?? '',
+            'cpf' => $r['cpf_pac'] ?? '',
             'nascimento_fmt' => $nasc_fmt,
             'senha' => $r['ultima_senha'] ?? ''
         ];

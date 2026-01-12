@@ -10,28 +10,37 @@
     include_once("templates/header.php");
     include_once("array_dados.php");
 
+    if (!function_exists('e')) {
+        function e($v)
+        {
+            return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+        }
+    }
+
     //Instanciando a classe 
     $paciente = new PacienteDAO($conn, $BASE_URL);
     $QtdTotalpac = new PacienteDAO($conn, $BASE_URL);
 
     // METODO DE BUSCA DE PAGINACAO
-    $busca = filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $buscaMatricula = filter_input(INPUT_GET, 'pesquisa_matricula', FILTER_SANITIZE_SPECIAL_CHARS);
-
-    $pesquisa_nome = filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS);
+    $pesquisa_nome = trim((string)(filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
+    $pesquisaSeguradora = trim((string)(filter_input(INPUT_GET, 'pesquisa_seguradora', FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
+    $pacienteId = filter_input(INPUT_GET, 'paciente_id', FILTER_VALIDATE_INT);
+    $seguradoraId = filter_input(INPUT_GET, 'seguradora_id', FILTER_VALIDATE_INT);
     $buscaAtivo = filter_input(INPUT_GET, 'ativo_pac', FILTER_SANITIZE_SPECIAL_CHARS);
     $limite = filter_input(INPUT_GET, 'limite') ? filter_input(INPUT_GET, 'limite') : 10;
     $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar') : '';
     $buscaAtivo = in_array($buscaAtivo, ['s', 'n']) ?: "";
     $pacienteInicio = ' 1 ';
     $condicoes = [
-        strlen($busca) ? 'nome_pac LIKE "%' . $busca . '%"' : null,
-        strlen($buscaMatricula)
-            ? 'CONCAT(
-              matricula_pac,
-              CASE WHEN recem_nascido_pac = "s" THEN "RN" ELSE "" END,
-              IFNULL(numero_rn_pac, "")
-          ) LIKE "%' . $buscaMatricula . '%"'
+        $pacienteId ? 'pa.id_paciente = ' . (int)$pacienteId : null,
+        (!$pacienteId && strlen($pesquisa_nome))
+            ? '(pa.nome_pac LIKE "%' . $pesquisa_nome . '%"
+               OR pa.matricula_pac LIKE "%' . $pesquisa_nome . '%"
+               OR pa.cpf_pac LIKE "%' . $pesquisa_nome . '%")'
+            : null,
+        $seguradoraId ? 'se.id_seguradora = ' . (int)$seguradoraId : null,
+        (!$seguradoraId && strlen($pesquisaSeguradora))
+            ? 'se.seguradora_seg LIKE "%' . $pesquisaSeguradora . '%"'
             : null,
         strlen($buscaAtivo) ? 'ativo_pac = "' . $buscaAtivo . '"' : null,
         strlen($pacienteInicio) ? 'id_paciente > ' . $pacienteInicio . ' ' : null
@@ -57,8 +66,10 @@
     $totalcasos = ceil($qtdIntItens / 5);
 
     $pacientePaginationBaseParams = [
-        'pesquisa_nome'     => $pesquisa_nome,
-        'pesquisa_matricula'=> $buscaMatricula,
+        'pesquisa_nome'        => $pesquisa_nome,
+        'paciente_id'          => $pacienteId,
+        'pesquisa_seguradora'  => $pesquisaSeguradora,
+        'seguradora_id'        => $seguradoraId,
         'ativo_pac'         => $buscaAtivo,
         'limite'            => $limite,
         'ordenar'           => $ordenar,
@@ -120,10 +131,29 @@
             <div id="navbarToggleExternalContent" class="table-filters">
                 <form id="form_pesquisa" method="GET">
                     <div class="row">
-                        <div class="form-group col-sm-2" style="padding:2px !important;padding-left:16px !important;">
+                        <div class="form-group col-sm-3" style="padding:2px !important;padding-left:16px !important;">
                             <input class="form-control form-control-sm" style="margin-top:7px" type="text"
-                                value="<?= $busca ?>" name="pesquisa_nome" id="pesquisa_nome"
-                                placeholder="Pesquisa por paciente">
+                                name="pesquisa_nome"
+                                id="pesquisa_paciente_input"
+                                list="pacienteSuggestions"
+                                placeholder="Pesquisa por nome ou matrícula ou CPF"
+                                value="<?= e($pesquisa_nome) ?>"
+                                autocomplete="off">
+                            <input type="hidden" name="paciente_id" id="pesquisa_paciente_id"
+                                value="<?= e($pacienteId) ?>">
+                            <datalist id="pacienteSuggestions"></datalist>
+                        </div>
+                        <div class="form-group col-sm-3" style="padding:2px !important">
+                            <input class="form-control form-control-sm" style="margin-top:7px" type="text"
+                                name="pesquisa_seguradora"
+                                id="pesquisa_seguradora_input"
+                                list="seguradoraSuggestions"
+                                placeholder="Pesquisa por seguradora"
+                                value="<?= e($pesquisaSeguradora) ?>"
+                                autocomplete="off">
+                            <input type="hidden" name="seguradora_id" id="seguradora_id"
+                                value="<?= e($seguradoraId) ?>">
+                            <datalist id="seguradoraSuggestions"></datalist>
                         </div>
                         <div class="col-sm-1" style="padding:2px !important">
                             <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="limite"
@@ -139,7 +169,7 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="form-group col-sm-2" style="padding:2px !important">
+                        <div class="form-group col-sm-3" style="padding:2px !important">
                             <select class="form-control form-control-sm"
                                 style="margin-top:7px;font-size:.8em; color:#878787" id="ordenar" name="ordenar">
                                 <option value="">Classificar por</option>
@@ -149,11 +179,6 @@
                                 <option value="nome_pac" <?= $ordenar == 'nome_pac' ? 'selected' : null ?>>Nome Paciente
                                 </option>
                             </select>
-                        </div>
-                        <div class="form-group col-sm-1" style="padding:2px !important;">
-                            <input class="form-control form-control-sm" style="margin-top:7px" type="text"
-                                value="<?= $buscaMatricula ?>" name="pesquisa_matricula" id="pesquisa_matricula"
-                                placeholder="Matrícula">
                         </div>
 
                         <div class="form-group col-sm-1" style="padding:2px !important" style="margin:0px 0px 20px 0px">
@@ -483,6 +508,7 @@ if (typeof window.paginatePacientes !== 'function') {
 
 }
 </style>
+<script src="<?= $BASE_URL ?>js/bi-saving-filters.js?v=20260111"></script>
 <script src="./js/input-estilo.js"></script>
 
 <script src="./js/ajaxNav.js"></script>
