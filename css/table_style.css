@@ -1,5 +1,6 @@
 /* Aplicando bordas arredondadas à tabela */
-.table {
+.table,
+table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -11,33 +12,40 @@
 }
 
 .table th,
-.table td {
+.table td,
+table th,
+table td {
     padding: 12px 14px;
     border-bottom: 1px solid #ececec;
 }
 
-.table thead {
+.table thead,
+table thead {
     text-align: left;
 }
 
-.table thead th {
-    background: linear-gradient(135deg, #542776, #7a3bbd);
+.table thead th,
+table thead th {
+    background: linear-gradient(135deg, #0c2e68, #1c5db5 45%, #35bae1);
     color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     font-size: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.table tbody tr:nth-child(odd) {
+.table tbody tr:nth-child(odd),
+table tbody tr:nth-child(odd) {
     background: #f7f7fb;
 }
 
-.table tbody tr:nth-child(even) {
+.table tbody tr:nth-child(even),
+table tbody tr:nth-child(even) {
     background: #ffffff;
 }
 
-.table tbody tr:hover {
+.table tbody tr:hover,
+table tbody tr:hover {
     background: #eceaf7;
     transition: background 0.2s ease;
 }
