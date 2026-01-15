@@ -24,14 +24,30 @@ table thead {
     text-align: left;
 }
 
+.table thead,
+table thead {
+    background: linear-gradient(135deg, #722975, #5c3dc4, #3557d8, #2da1ff);
+    border-bottom: none;
+}
+
 .table thead th,
 table thead th {
-    background: linear-gradient(135deg, #0c2e68, #1c5db5 45%, #35bae1);
+    background: transparent;
     color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     font-size: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: none;
+}
+
+.table thead tr th:first-child,
+table thead tr th:first-child {
+    border-top-left-radius: 14px;
+}
+
+.table thead tr th:last-child,
+table thead tr th:last-child {
+    border-top-right-radius: 14px;
 }
 
 .table tbody tr:nth-child(odd),
