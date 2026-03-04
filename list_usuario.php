@@ -27,12 +27,7 @@ include_once("formularios/form_list_usuario.php");
 include_once("templates/footer.php");
 ?>
 <script>
-function deletar() {
-    let idAcoes = (document.getElementById('id-confirmacao'));
-    idAcoes.style.display = 'none';
-    window.location = "<?= $BASE_URL ?>del_usuario.php?id_usuario=<?= $id_usuario ?>";
-
-};
+function deletar() {}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>

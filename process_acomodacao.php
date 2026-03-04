@@ -130,11 +130,19 @@ if (!$typeDelete) {
 }
 
 if ($typeDelete === "delete") {
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+        http_response_code(405);
+        redirectAcomodacao($BASE_URL, $redirect_hospital_id);
+    }
+    $csrf = (string)filter_input(INPUT_POST, 'csrf', FILTER_UNSAFE_RAW);
+    if (!csrf_is_valid($csrf)) {
+        http_response_code(400);
+        $message->setMessage("CSRF inválido.", "error", "back");
+        exit;
+    }
+
     // Recebe os dados do form
     $id_acomodacao = filter_input(INPUT_POST, "id_acomodacao", FILTER_VALIDATE_INT);
-    if (!$id_acomodacao) {
-        $id_acomodacao = filter_input(INPUT_GET, "id_acomodacao", FILTER_VALIDATE_INT);
-    }
 
     $acomodacaoDao = new acomodacaoDAO($conn, $BASE_URL);
 

@@ -680,6 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('id_visita', currentId);
         formData.append('redirect', window.location.href);
         formData.append('ajax', '1');
+        formData.append('csrf', '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>');
 
         fetch('process_visita.php', {
             method: 'POST',

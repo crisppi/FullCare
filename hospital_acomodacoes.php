@@ -187,6 +187,7 @@ function h($value)
                                             <input type="hidden" name="type" value="delete">
                                             <input type="hidden" name="id_acomodacao" value="<?= (int) $aco['id_acomodacao'] ?>">
                                             <input type="hidden" name="redirect_hospital_id" value="<?= (int) $id_hospital ?>">
+                                            <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
                                         </form>
                                     </td>

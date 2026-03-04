@@ -13,28 +13,24 @@ require_once("dao/acomodacaoDao.php");
 $userDao = new UserDAO($conn, $BASE_URL);
 $acomodacaoDao = new acomodacaoDAO($conn, $BASE_URL);
 Gate::enforceAction($conn, $BASE_URL, 'delete', 'Você não tem permissão para excluir acomodação.');
-//$acomodacao = new Paciente();
-// Resgata o tipo do formulário
-
-$type = "delete";
-//$type = filter_input(INPUT_POST, "type");
-
-if ($type === "delete") {
-    // Recebe os dados do form
-    $id_acomodacao = filter_input(INPUT_GET, "id_acomodacao");
-
-
-    $acomodacaoDao = new acomodacaoDAO($conn, $BASE_URL);
-
-    $acomodacao = $acomodacaoDao->joinAcomodacaoHospitalShow($id_acomodacao);
-
-    if ($acomodacao) {
-
-        $acomodacaoDao->destroy($id_acomodacao);
-
-        include_once('list_acomodacao.php');
-    } else {
-
-        //$message->setMessage("Informações inválidas!", "error", "index.php");
-    }
+if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+    http_response_code(405);
+    header('Location: ' . $BASE_URL . 'list_acomodacao.php', true, 303);
+    exit;
 }
+
+$csrf = (string)filter_input(INPUT_POST, 'csrf', FILTER_UNSAFE_RAW);
+if (!csrf_is_valid($csrf)) {
+    http_response_code(400);
+    header('Location: ' . $BASE_URL . 'list_acomodacao.php', true, 303);
+    exit;
+}
+
+$id_acomodacao = filter_input(INPUT_POST, "id_acomodacao", FILTER_VALIDATE_INT);
+$acomodacao = $acomodacaoDao->joinAcomodacaoHospitalShow($id_acomodacao);
+if ($acomodacao) {
+    $acomodacaoDao->destroy($id_acomodacao);
+}
+
+header('Location: ' . $BASE_URL . 'list_acomodacao.php', true, 303);
+exit;

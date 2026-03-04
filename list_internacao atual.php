@@ -180,6 +180,7 @@ include_once("models/pagination.php");
                             <form class="d-inline-block delete-form" action="del_internacao.php" method="POST">
                                 <input type="hidden" name="type" value="delete">
                                 <input type="hidden" name="id_internacao" value="<?= $intern["id_internacao"] ?>">
+                                <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                                 <button type="submit"
                                     style="margin-left:3px; font-size: 16px; background:transparent; border-color:transparent; color:red"
                                     class="delete-btn"><i

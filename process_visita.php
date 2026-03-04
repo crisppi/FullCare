@@ -367,10 +367,10 @@ function processProrrogacoesEntries(
 // ======================================================================
 // Roteamento por tipo
 // ======================================================================
-$type = filter_input(INPUT_POST, "type"); // create | update | delete (delete pode vir por GET no seu fluxo)
+$type = filter_input(INPUT_POST, "type"); // create | update | delete
 $flowCtx = flowLogStart('process_visita', [
     'type' => $type,
-    'id_visita' => $_POST['id_visita'] ?? $_GET['id_visita'] ?? null,
+    'id_visita' => $_POST['id_visita'] ?? null,
     'fk_internacao_vis' => $_POST['fk_internacao_vis'] ?? null,
     'fk_usuario_vis' => $_POST['fk_usuario_vis'] ?? null
 ]);
@@ -378,10 +378,27 @@ $flowCtx = flowLogStart('process_visita', [
 if ($type === "delete") {
     flowLog($flowCtx, 'delete.start', 'INFO');
     if (session_status() !== PHP_SESSION_ACTIVE) session_start();
-    $idVisitaDelete = toIntOrNull($_POST['id_visita'] ?? $_GET['id_visita'] ?? null);
-    $redirectRaw    = strOrNull($_POST['redirect'] ?? $_GET['redirect'] ?? '');
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+        http_response_code(405);
+        exit;
+    }
+    $csrf = (string)filter_input(INPUT_POST, 'csrf', FILTER_UNSAFE_RAW);
+    if (!csrf_is_valid($csrf)) {
+        flowLog($flowCtx, 'delete.validation', 'WARN', ['error' => 'csrf_invalido']);
+        $isAjaxCsrf = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest' || isset($_POST['ajax']);
+        if ($isAjaxCsrf) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['success' => false, 'message' => 'CSRF inválido.']);
+        } else {
+            http_response_code(400);
+            $message->setMessage("CSRF inválido.", "error", "back");
+        }
+        exit;
+    }
+    $idVisitaDelete = toIntOrNull($_POST['id_visita'] ?? null);
+    $redirectRaw    = strOrNull($_POST['redirect'] ?? '');
     $redirectUrl    = $redirectRaw ?: ($BASE_URL . "internacoes/lista");
-    $isAjax         = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest' || isset($_POST['ajax']) || isset($_GET['ajax']);
+    $isAjax         = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest' || isset($_POST['ajax']);
 
     $respond = function (array $payload, bool $ajax) use ($redirectUrl) {
         if ($ajax) {
@@ -719,14 +736,14 @@ if ($type === "update") {
 }
 
 // ----------------------------------------------------------------------
-// DELETE (no seu fluxo vinha por GET id_visita)
+// DELETE legado (mantido por compatibilidade)
 // ----------------------------------------------------------------------
 if ($type === "delete") {
     Gate::enforceAction($conn, $BASE_URL, 'delete', 'Você não tem permissão para excluir visita.');
     flowLog($flowCtx, 'delete.legacy.start', 'INFO');
 
     try {
-        $id_visita = toIntOrNull($_GET['id_visita'] ?? null);
+        $id_visita = toIntOrNull($_POST['id_visita'] ?? null);
 
         if (!$id_visita) {
             if ($__DEBUG) {

@@ -13,27 +13,24 @@ require_once("dao/internacaoDao.php");
 $userDao = new UserDAO($conn, $BASE_URL);
 $internacaoDao = new internacaoDAO($conn, $BASE_URL);
 Gate::enforceAction($conn, $BASE_URL, 'delete', 'Você não tem permissão para excluir internação.');
-//$internacao = new Paciente();
-// Resgata o tipo do formulário
-
-$type = "delete";
-//$type = filter_input(INPUT_POST, "type");
-
-if ($type === "delete") {
-    // Recebe os dados do form
-    $id_internacao = filter_input(INPUT_GET, "id_internacao");
-
-    $internacaoDao = new internacaoDAO($conn, $BASE_URL);
-
-    $internacao = $internacaoDao->findById($id_internacao);
-
-    if ($internacao) {
-
-        $internacaoDao->destroy($id_internacao);
-
-        include_once('internacoes/lista');
-    } else {
-
-        //$message->setMessage("Informações inválidas!", "error", "index.php");
-    }
+if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+    http_response_code(405);
+    header('Location: ' . $BASE_URL . 'internacoes/lista', true, 303);
+    exit;
 }
+
+$csrf = (string)filter_input(INPUT_POST, 'csrf', FILTER_UNSAFE_RAW);
+if (!csrf_is_valid($csrf)) {
+    http_response_code(400);
+    header('Location: ' . $BASE_URL . 'internacoes/lista', true, 303);
+    exit;
+}
+
+$id_internacao = filter_input(INPUT_POST, "id_internacao", FILTER_VALIDATE_INT);
+$internacao = $internacaoDao->findById($id_internacao);
+if ($internacao) {
+    $internacaoDao->destroy($id_internacao);
+}
+
+header('Location: ' . $BASE_URL . 'internacoes/lista', true, 303);
+exit;

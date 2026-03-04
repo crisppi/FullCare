@@ -817,6 +817,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
             formData.append('id_visita', selectedVisitaId);
             formData.append('redirect', redirectUrl);
             formData.append('ajax', '1');
+            formData.append('csrf', '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>');
 
             fetch('process_visita.php', {
                 method: 'POST',

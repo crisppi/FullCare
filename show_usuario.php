@@ -104,6 +104,11 @@ if (strlen($usuario->telefone02_user) > 0) {
             <!-- <button class="btn btn-success" type="button" id="btn-cancelar" name="cancelar">Cancelar</button> -->
             <button class="btn btn-danger" onclick=deletar() value="default" type="button" id="deletar-btn"
                 name="deletar">Deletar</button>
+            <form id="delete-usuario-form" action="<?= $BASE_URL ?>del_usuario.php" method="POST" style="display:none;">
+                <input type="hidden" name="id_usuario" value="<?= (int)$id_usuario ?>">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="type" value="delete">
+            </form>
         </div>
         <br>
     </div>
@@ -123,8 +128,8 @@ function apareceOpcoes() {
 function deletar() {
     let idAcoes = (document.getElementById('id-confirmacao'));
     idAcoes.style.display = 'none';
-    window.location = "<?= $BASE_URL ?>del_usuario.php?id_usuario=<?= $id_usuario ?>";
-
+    var form = document.getElementById('delete-usuario-form');
+    if (form) form.submit();
 };
 
 

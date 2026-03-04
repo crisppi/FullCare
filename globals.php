@@ -99,6 +99,14 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+if (empty($_SESSION['csrf'])) {
+    try {
+        $_SESSION['csrf'] = bin2hex(random_bytes(32));
+    } catch (Throwable $e) {
+        $_SESSION['csrf'] = bin2hex(openssl_random_pseudo_bytes(32));
+    }
+}
+
 // ------------------ 5) DB primeiro -------------------------
 require_once __DIR__ . '/db.php';   // aqui dentro você cria $conn (PDO)
 
@@ -213,5 +221,21 @@ if (!function_exists('flash')) {
         }
         $_SESSION[$key] = $val;
         return true;
+    }
+}
+
+if (!function_exists('csrf_token')) {
+    function csrf_token(): string
+    {
+        return (string)($_SESSION['csrf'] ?? '');
+    }
+}
+
+if (!function_exists('csrf_is_valid')) {
+    function csrf_is_valid(?string $token): bool
+    {
+        $sessionToken = (string)($_SESSION['csrf'] ?? '');
+        $token = (string)$token;
+        return $sessionToken !== '' && $token !== '' && hash_equals($sessionToken, $token);
     }
 }

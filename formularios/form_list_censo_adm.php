@@ -279,9 +279,10 @@ $user = $_SESSION['id_usuario'];
                                         </li>
                                         <li>
                                             <form class="d-inline-block delete-form" action="del_censo.php"
-                                                method="get">
-                                                <input type="hidden" name="type" value="create">
+                                                method="post">
+                                                <input type="hidden" name="type" value="delete">
                                                 <input type="hidden" name="id_censo" value="<?= $intern["id_censo"] ?>">
+                                                <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                                                 <button class="btn btn-default" style="font-size: .9rem;"><i
                                                         style="font-size: 1rem;margin-right:5px; color: red;"
                                                         class="bi bi-x-circle-fill"></i>Deletar</button>
