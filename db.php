@@ -105,6 +105,42 @@ if (!function_exists('db_try_local_profile')) {
     }
 }
 
+if (!function_exists('db_legacy_profiles')) {
+    function db_legacy_profiles(): array
+    {
+        // Modo de compatibilidade para evitar quebra após pull em ambientes sem .env.
+        return [
+            [
+                'host' => 'srv953.hstgr.io',
+                'name' => 'u650318666_mydb_accert_ho',
+                'user' => 'u650318666_diretoria10',
+                'pass' => 'FullCare@BD2025!',
+                'port' => 3306,
+                'charset' => 'utf8',
+                'label' => 'LegacyHostinger',
+            ],
+            [
+                'host' => 'mydb-accert-new.mysql.uhserver.com',
+                'name' => 'mydb_accert_new',
+                'user' => 'diretoria5',
+                'pass' => 'Fullcare12@',
+                'port' => 3306,
+                'charset' => 'utf8',
+                'label' => 'LegacyUolNew',
+            ],
+            [
+                'host' => 'mdb-accert.mysql.uhserver.com',
+                'name' => 'mydb_accert',
+                'user' => 'diretoria2',
+                'pass' => 'Guga@0401',
+                'port' => 3306,
+                'charset' => 'utf8',
+                'label' => 'LegacyUolFallback',
+            ],
+        ];
+    }
+}
+
 // Carrega .env local sem sobrescrever variaveis ja exportadas no ambiente.
 db_load_env_file(__DIR__ . '/.env');
 
@@ -138,9 +174,7 @@ if (!$profiles) {
     if ($autoLocal) {
         $profiles[] = $autoLocal;
     } else {
-        error_log('[DB] Nenhum profile DB configurado. Defina DB_HOST/DB_NAME/DB_USER/DB_PASS (e opcionais _2/_3).');
-        header("Location: sem_conexao.html");
-        exit("Falha na conexao com banco: configuracao ausente.");
+        $profiles = db_legacy_profiles();
     }
 }
 
@@ -157,6 +191,32 @@ foreach ($profiles as $profile) {
         break;
     } catch (Throwable $e) {
         $errors[] = "{$profile['label']}: " . $e->getMessage();
+    }
+}
+
+if (!$conn) {
+    // Segunda chance: se veio de .env e falhou, tenta perfis legados.
+    $hasLegacyTried = false;
+    foreach ($profiles as $p) {
+        if (strpos((string)($p['label'] ?? ''), 'Legacy') === 0) {
+            $hasLegacyTried = true;
+            break;
+        }
+    }
+
+    if (!$hasLegacyTried) {
+        foreach (db_legacy_profiles() as $profile) {
+            try {
+                $dsn = "mysql:host={$profile['host']};port={$profile['port']};dbname={$profile['name']};charset={$profile['charset']}";
+                $conn = new PDO($dsn, $profile['user'], $profile['pass']);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                $fonte_conexao = "{$profile['label']} ({$profile['name']})";
+                break;
+            } catch (Throwable $e) {
+                $errors[] = "{$profile['label']}: " . $e->getMessage();
+            }
+        }
     }
 }
 
