@@ -13,7 +13,7 @@
 .btn-remove {background-color:#dc3545;color:#fff;}
 
 .adicional-card {
-    background:#fff;
+    background:#f5f5f9;
     border-radius:22px;
     border:1px solid #ebe1f5;
     box-shadow:0 12px 28px rgba(45,18,70,.08);
@@ -44,7 +44,7 @@
 
 <div id="container-tuss" style="display:none; margin:5px;">
     <div class="adicional-card">
-        <div class="adicional-card__header section-header-with-bar">
+        <div class="adicional-card__header">
             <h4 class="adicional-card__title">
                 <span class="adicional-card__marker"></span>
                 TUSS

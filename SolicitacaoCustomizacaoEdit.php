@@ -27,9 +27,9 @@ if (!$solicitacao) {
 }
 
 $emailSessao = strtolower(trim((string)($_SESSION['email_user'] ?? '')));
-$isFullCare = $emailSessao !== '' && strpos($emailSessao, '@fullcare.com.br') !== false;
-$canEditSolicitacao = !$isFullCare;
-$canEditResposta = $isFullCare;
+$isConex = $emailSessao !== '' && strpos($emailSessao, '@conex.') !== false;
+$canEditSolicitacao = $isConex;
+$canEditResposta = !$isConex;
 
 $modules = ['Internação', 'Paciente', 'Hospital', 'Auditoria', 'Financeiro', 'Relatórios', 'Outro'];
 $tipos = [

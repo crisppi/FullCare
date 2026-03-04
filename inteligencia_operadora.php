@@ -18,10 +18,42 @@ $dataFim = filter_input(INPUT_GET, 'data_fim') ?: $hoje;
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 $seguradoraId = filter_input(INPUT_GET, 'seguradora_id', FILTER_VALIDATE_INT) ?: null;
 
+$normCargoAccess = static function ($txt): string {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $ascii !== false ? $ascii : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$isSeguradoraRole = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
+$seguradoraUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+if ($isSeguradoraRole && $seguradoraUserId <= 0) {
+    try {
+        $uid = (int)($_SESSION['id_usuario'] ?? 0);
+        if ($uid > 0) {
+            $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
+            $stmtSeg->execute();
+            $seguradoraUserId = (int)($stmtSeg->fetchColumn() ?: 0);
+            if ($seguradoraUserId > 0) {
+                $_SESSION['fk_seguradora_user'] = $seguradoraUserId;
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('[INTEL_OPERADORA][SEGURADORA] ' . $e->getMessage());
+    }
+}
+
 $hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
     ->fetchAll(PDO::FETCH_ASSOC);
 $seguradoras = $conn->query("SELECT id_seguradora, seguradora_seg FROM tb_seguradora ORDER BY seguradora_seg")
     ->fetchAll(PDO::FETCH_ASSOC);
+if ($isSeguradoraRole) {
+    $seguradoraId = $seguradoraUserId > 0 ? $seguradoraUserId : -1;
+    $seguradoras = array_values(array_filter($seguradoras, static function ($s) use ($seguradoraUserId) {
+        return (int)($s['id_seguradora'] ?? 0) === (int)$seguradoraUserId;
+    }));
+}
+$seguradoraEscopoNome = (string)($seguradoras[0]['seguradora_seg'] ?? '');
 
 $where = "i.data_intern_int BETWEEN :data_ini AND :data_fim";
 $params = [
@@ -262,6 +294,19 @@ include_once("templates/header.php");
         .risk-pill.alto {background:#fee2e2;color:#991b1b;}
         .risk-pill.moderado {background:#fff1c3;color:#a15c00;}
         .risk-pill.baixo {background:#dcfce7;color:#166534;}
+        .scope-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: .82rem;
+            font-weight: 700;
+            background: #f3edff;
+            border: 1px solid #d6c5f7;
+            color: #5e2363;
+        }
     </style>
 </head>
 <body>
@@ -269,6 +314,11 @@ include_once("templates/header.php");
         <div class="report-header">
             <h1>Inteligência da Operadora</h1>
             <div class="text-muted">Foco em redução de custo assistencial e priorização de ações de auditoria.</div>
+            <?php if ($isSeguradoraRole): ?>
+                <div class="scope-badge">
+                    Escopo: Seguradora <?= e($seguradoraEscopoNome !== '' ? $seguradoraEscopoNome : ('#' . $seguradoraUserId)) ?>
+                </div>
+            <?php endif; ?>
         </div>
 
         <form class="report-card" method="get">
@@ -294,17 +344,23 @@ include_once("templates/header.php");
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Operadora</label>
-                    <select class="form-select" name="seguradora_id">
-                        <option value="">Todas</option>
-                        <?php foreach ($seguradoras as $s): ?>
-                            <option value="<?= (int)$s['id_seguradora'] ?>" <?= $seguradoraId == $s['id_seguradora'] ? 'selected' : '' ?>>
-                                <?= e($s['seguradora_seg']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <?php if ($isSeguradoraRole): ?>
+                        <input type="hidden" name="seguradora_id" value="<?= (int)$seguradoraId ?>">
+                        <input type="text" class="form-control" readonly value="<?= e($seguradoras[0]['seguradora_seg'] ?? 'Minha operadora') ?>">
+                    <?php else: ?>
+                        <select class="form-select" name="seguradora_id">
+                            <option value="">Todas</option>
+                            <?php foreach ($seguradoras as $s): ?>
+                                <option value="<?= (int)$s['id_seguradora'] ?>" <?= $seguradoraId == $s['id_seguradora'] ? 'selected' : '' ?>>
+                                    <?= e($s['seguradora_seg']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php endif; ?>
                 </div>
                 <div class="col-12">
                     <button class="btn btn-primary" type="submit">Aplicar filtros</button>
+                    <a class="btn btn-outline-secondary btn-filtro-limpar" href="<?= htmlspecialchars($BASE_URL . 'inteligencia_operadora.php', ENT_QUOTES, 'UTF-8') ?>">Limpar filtros</a>
                 </div>
             </div>
         </form>
@@ -327,7 +383,7 @@ include_once("templates/header.php");
                     </thead>
                     <tbody>
                         <?php if (!$alertas): ?>
-                            <tr><td colspan="7" class="text-muted">Nenhum alerta no período.</td></tr>
+                            <tr><td colspan="7" class="text-muted">Sem registros para os filtros aplicados.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($alertas as $row): ?>
                             <?php
@@ -371,7 +427,7 @@ include_once("templates/header.php");
                     </thead>
                     <tbody>
                         <?php if (!$altaProvavel): ?>
-                            <tr><td colspan="6" class="text-muted">Nenhum caso identificado.</td></tr>
+                            <tr><td colspan="6" class="text-muted">Sem registros para os filtros aplicados.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($altaProvavel as $row): ?>
                             <tr>
@@ -409,6 +465,9 @@ include_once("templates/header.php");
                             </tr>
                         </thead>
                         <tbody>
+                            <?php if (empty($glosaData['entries'])): ?>
+                                <tr><td colspan="5" class="text-muted">Sem registros para os filtros aplicados.</td></tr>
+                            <?php endif; ?>
                             <?php foreach ($glosaData['entries'] as $entry): ?>
                                 <tr>
                                     <td>
@@ -448,7 +507,7 @@ include_once("templates/header.php");
                     </thead>
                     <tbody>
                         <?php if (!$opmeRows): ?>
-                            <tr><td colspan="4" class="text-muted">Nenhum registro.</td></tr>
+                            <tr><td colspan="4" class="text-muted">Sem registros para os filtros aplicados.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($opmeRows as $row): ?>
                             <tr>
@@ -475,7 +534,7 @@ include_once("templates/header.php");
                     </thead>
                     <tbody>
                         <?php if (!$utiRows): ?>
-                            <tr><td colspan="4" class="text-muted">Nenhum registro.</td></tr>
+                            <tr><td colspan="4" class="text-muted">Sem registros para os filtros aplicados.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($utiRows as $row): ?>
                             <tr>
@@ -503,7 +562,7 @@ include_once("templates/header.php");
                     </thead>
                     <tbody>
                         <?php if (!$duplicRows): ?>
-                            <tr><td colspan="5" class="text-muted">Nenhuma duplicidade detectada.</td></tr>
+                            <tr><td colspan="5" class="text-muted">Sem registros para os filtros aplicados.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($duplicRows as $row): ?>
                             <tr>
@@ -533,7 +592,7 @@ include_once("templates/header.php");
                     </thead>
                     <tbody>
                         <?php if (!$foraRows): ?>
-                            <tr><td colspan="6" class="text-muted">Nenhuma pendência encontrada.</td></tr>
+                            <tr><td colspan="6" class="text-muted">Sem registros para os filtros aplicados.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($foraRows as $row): ?>
                             <tr>

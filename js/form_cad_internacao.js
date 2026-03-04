@@ -53,12 +53,57 @@ function triggerInternacaoAutoSave() {
     }, 150);
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     var form = document.getElementById('myForm');
     var timerField = document.getElementById('timer_int');
     var pacienteSelect = document.getElementById('fk_paciente_int');
+    var matriculaField = document.getElementById('matricula_paciente_display');
+    var dataInternDt = document.getElementById('data_intern_int_dt');
+    var dataIntern = document.getElementById('data_intern_int');
+    var horaIntern = document.getElementById('hora_intern_int');
     var timerStart = null;
     var intervalId = null;
+    var lastMatriculaMatch = '';
+
+    function normalizeMatricula(value) {
+        return (value || '').toLowerCase().replace(/[^0-9a-z]/g, '');
+    }
+
+    function selectPacienteByMatricula(value, options = {}) {
+        if (!pacienteSelect) return;
+        var search = normalizeMatricula(value);
+        if (!search) return;
+        var listOptions = Array.from(pacienteSelect.options || []);
+        var match = listOptions.find(function(opt) {
+            return normalizeMatricula(opt.getAttribute('data-matricula') || '') === search;
+        });
+        if (!match && (options.allowPartial !== false) && search.length >= 3) {
+            match = listOptions.find(function(opt) {
+                return normalizeMatricula(opt.getAttribute('data-matricula') || '').includes(search);
+            });
+        }
+        if (match && match.value) {
+            pacienteSelect.value = match.value;
+            if (window.jQuery && window.jQuery.fn && window.jQuery(pacienteSelect).hasClass('selectpicker')) {
+                window.jQuery(pacienteSelect).selectpicker('val', match.value);
+            }
+            handlePacienteChange();
+            return true;
+        }
+        return false;
+    }
+
+    window.sortPacienteOptionsDesc = function() {
+        var select = document.getElementById('fk_paciente_int');
+        if (!select || select.options.length <= 1) return;
+        var options = Array.from(select.options).slice(1);
+        options.sort(function(a, b) {
+            return parseInt(b.value || '0', 10) - parseInt(a.value || '0', 10);
+        });
+        options.forEach(function(opt) {
+            select.appendChild(opt);
+        });
+    };
 
     function startTimer() {
         if (timerStart === null) {
@@ -72,27 +117,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function scheduleValueWatch() {
         if (!pacienteSelect || intervalId) return;
-        intervalId = setInterval(function () {
+        intervalId = setInterval(function() {
             if (pacienteSelect.value) {
                 startTimer();
-                if (typeof handlePacienteChange === 'function') {
-                    handlePacienteChange();
-                }
+                handlePacienteChange();
             }
         }, 700);
     }
 
     function handlePacienteChange() {
         if (!pacienteSelect) return;
-        const selectedText = pacienteSelect.options[pacienteSelect.selectedIndex]?.text?.trim() || '';
-        const id = pacienteSelect.value;
+        var selectedText = pacienteSelect.options[pacienteSelect.selectedIndex]?.text?.trim() || '';
+        var id = pacienteSelect.value;
+        if (matriculaField) {
+            var opt = pacienteSelect.options[pacienteSelect.selectedIndex];
+            var matricula = opt ? (opt.getAttribute('data-matricula') || '') : '';
+            matriculaField.value = id ? matricula : '';
+        }
         if (id) startTimer();
         if (patientInsightsHelper && typeof patientInsightsHelper.fetch === 'function') {
             patientInsightsHelper.fetch(id, selectedText);
         }
+        if (typeof window.triggerInternacaoCheck === 'function') {
+            window.triggerInternacaoCheck();
+        }
     }
 
     if (pacienteSelect) {
+        window.sortPacienteOptionsDesc();
         if (pacienteSelect.value) {
             startTimer();
             handlePacienteChange();
@@ -101,8 +153,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         pacienteSelect.addEventListener('change', handlePacienteChange);
 
-        if (window.jQuery && typeof jQuery.fn.on === 'function') {
-            jQuery(function ($) {
+        if (window.jQuery && window.jQuery.fn && typeof window.jQuery.fn.on === 'function') {
+            window.jQuery(function() {
                 $('#fk_paciente_int').on('changed.bs.select', function () {
                     handlePacienteChange();
                 });
@@ -112,18 +164,75 @@ document.addEventListener('DOMContentLoaded', function () {
         startTimer();
     }
 
-    ['pacienteSelecionado', 'paciente-selecionado'].forEach(function (evtName) {
+    function triggerMatriculaSearch(eventSource) {
+        if (!matriculaField) return;
+        var value = matriculaField.value;
+        if (eventSource === 'input') {
+            var normalized = normalizeMatricula(value);
+            if (!normalized) {
+                lastMatriculaMatch = '';
+                return;
+            }
+            if (normalized === lastMatriculaMatch) return;
+            if (selectPacienteByMatricula(value, {
+                    allowPartial: false
+                })) {
+                lastMatriculaMatch = normalized;
+            }
+            return;
+        }
+        lastMatriculaMatch = '';
+        selectPacienteByMatricula(value);
+    }
+
+    if (matriculaField) {
+        matriculaField.addEventListener('keydown', function(evt) {
+            if (evt.key === 'Enter') {
+                evt.preventDefault();
+                triggerMatriculaSearch('enter');
+            }
+        });
+        matriculaField.addEventListener('blur', function() {
+            triggerMatriculaSearch('blur');
+        });
+        matriculaField.addEventListener('input', function() {
+            triggerMatriculaSearch('input');
+        });
+    }
+
+    ['pacienteSelecionado', 'paciente-selecionado'].forEach(function(evtName) {
         document.addEventListener(evtName, startTimer);
     });
 
     if (form && timerField) {
-        form.addEventListener('submit', function () {
+        form.addEventListener('submit', function() {
             var elapsed = 0;
             if (timerStart !== null) {
                 elapsed = Math.max(0, Math.round((Date.now() - timerStart) / 1000));
             }
             timerField.value = elapsed;
         });
+    }
+
+    function syncInternacaoHidden() {
+        if (!dataInternDt || !dataIntern || !horaIntern) return;
+        if (!dataInternDt.value) {
+            dataIntern.value = '';
+            horaIntern.value = '';
+            return;
+        }
+        var parts = dataInternDt.value.split('T');
+        dataIntern.value = parts[0] || '';
+        horaIntern.value = parts[1] ? parts[1].slice(0, 5) : '';
+    }
+
+    if (dataInternDt) {
+        dataInternDt.addEventListener('change', syncInternacaoHidden);
+        dataInternDt.addEventListener('input', syncInternacaoHidden);
+        syncInternacaoHidden();
+    }
+    if (form) {
+        form.addEventListener('submit', syncInternacaoHidden);
     }
 });
 
@@ -140,7 +249,7 @@ if (config.prefillPacienteId) {
             $sel.val(idPac);
 
             if ($.fn.selectpicker && $sel.hasClass('selectpicker')) {
-                $sel.selectpicker('refresh');
+                $sel.selectpicker('val', idPac);
             }
 
             if (typeof window.triggerInternacaoCheck === 'function') {
@@ -193,10 +302,18 @@ document.addEventListener('DOMContentLoaded', function() {
 // selectpicker só se o plugin existir (evita quebrar tudo)
 $(function() {
     if ($.fn.selectpicker) {
-        $('.selectpicker').selectpicker();
-        $('.selectpicker').selectpicker('refresh');
-        $('.selectpicker').on('loaded.bs.select', function() {
-            $('.bs-searchbox input').attr('placeholder', 'Digite para pesquisar...');
+        var $allPickers = $('.selectpicker').filter(function() {
+            return $(this).attr('data-fcx-picker-locked') !== '1';
+        });
+        $allPickers.each(function() {
+            var $el = $(this);
+            if (!$el.data('selectpicker')) {
+                $el.selectpicker();
+            }
+        });
+
+        $allPickers.on('loaded.bs.select', function() {
+            $(this).parent().find('.bs-searchbox input').attr('placeholder', 'Digite para pesquisar...');
         });
     }
 });
@@ -498,38 +615,90 @@ document.getElementById("acomodacao_int").addEventListener("change", function() 
     if (divUti) divUti.style.display = (this.value === "UTI") ? "block" : "none";
 });
 
-// Validação de datas
-document.getElementById("data_intern_int").addEventListener("blur", function() {
-    const input = this;
-    const dataInternacao = new Date(input.value);
-    const dataHoje = new Date();
+// Validação de data/hora da internação (campo visível)
+(function() {
+    const dataInternDt = document.getElementById("data_intern_int_dt");
+    const dataIntern = document.getElementById("data_intern_int");
+    const horaIntern = document.getElementById("hora_intern_int");
     const erroDiv = document.getElementById("erro-data-internacao");
+    let alertTimer = null;
 
-    erroDiv.style.display = "none";
-    erroDiv.textContent = "";
-    if (!input.value) return;
-    const dataFormatadaHoje = dataHoje.toISOString().split("T")[0];
-
-    if (input.value > dataFormatadaHoje) {
-        erroDiv.textContent = "A data da internação não pode ser maior que a data atual.";
-        erroDiv.style.display = "block";
-        input.value = "";
-        return setTimeout(() => {
-            erroDiv.style.display = "none";
-            erroDiv.textContent = "";
-        }, 5000);
+    function hideInternacaoAlert() {
+        if (!erroDiv) return;
+        erroDiv.classList.add("d-none");
+        erroDiv.classList.remove("alert-danger", "alert-warning");
+        erroDiv.textContent = "";
     }
 
-    const diffDias = (dataHoje - dataInternacao) / (1000 * 60 * 60 * 24);
-    if (diffDias > 30) {
-        erroDiv.textContent = "Deseja prorrogar acima de 30 dias?";
-        erroDiv.style.display = "block";
-        setTimeout(() => {
-            erroDiv.style.display = "none";
-            erroDiv.textContent = "";
-        }, 7000);
+    function showInternacaoAlert(message, type) {
+        if (!erroDiv) return;
+        const isWarning = type === "warning";
+        erroDiv.classList.remove("d-none");
+        erroDiv.classList.remove("alert-danger", "alert-warning");
+        erroDiv.classList.add(isWarning ? "alert-warning" : "alert-danger");
+        erroDiv.textContent = message;
+        erroDiv.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (alertTimer) clearTimeout(alertTimer);
+        alertTimer = setTimeout(hideInternacaoAlert, 5000);
     }
-});
+
+    function parseLocalDateTime(value) {
+        if (!value || value.indexOf('T') === -1) return null;
+        const parts = value.split('T');
+        const datePart = parts[0] || '';
+        const timePart = parts[1] || '';
+        const d = datePart.split('-').map(Number);
+        const t = timePart.split(':').map(Number);
+        if (d.length !== 3 || t.length < 2) return null;
+        const year = d[0];
+        const month = d[1];
+        const day = d[2];
+        const hour = t[0];
+        const minute = t[1];
+        if (!year || !month || !day || Number.isNaN(hour) || Number.isNaN(minute)) return null;
+        return new Date(year, month - 1, day, hour, minute, 0, 0);
+    }
+
+    function clearInternacaoDateField() {
+        if (dataInternDt) {
+            dataInternDt.value = "";
+            dataInternDt.focus();
+        }
+        if (dataIntern) dataIntern.value = "";
+        if (horaIntern) horaIntern.value = "";
+    }
+
+    function validarDataInternacao() {
+        if (!dataInternDt) return true;
+        hideInternacaoAlert();
+        if (!dataInternDt.value) return true;
+
+        const dataSelecionada = parseLocalDateTime(dataInternDt.value);
+        if (!dataSelecionada || Number.isNaN(dataSelecionada.getTime())) return true;
+
+        const agora = new Date();
+        if (dataSelecionada > agora) {
+            showInternacaoAlert("A data da internação não pode ser maior que a data atual.", "error");
+            clearInternacaoDateField();
+            return false;
+        }
+
+        const diffDias = (agora - dataSelecionada) / (1000 * 60 * 60 * 24);
+        if (diffDias > 30) {
+            showInternacaoAlert("Internação com mais de 30 dias. Verifique a necessidade de prorrogação.", "warning");
+        }
+        return true;
+    }
+
+    if (dataInternDt) {
+        dataInternDt.removeAttribute("max");
+        dataInternDt.addEventListener("change", validarDataInternacao);
+        dataInternDt.addEventListener("blur", validarDataInternacao);
+        dataInternDt.addEventListener("input", validarDataInternacao);
+    }
+
+    window.validateDataInternacaoFuture = validarDataInternacao;
+})();
 
 document.getElementById("data_visita_int").addEventListener("change", function() {
     const dataInternacao = new Date(document.getElementById("data_intern_int").value);
@@ -552,13 +721,20 @@ document.getElementById("data_visita_int").addEventListener("change", function()
 });
 
 // Internação pertinente (quando tipo = Urgência)
+const rowPertinente = document.getElementById("row-int-pertinente");
 document.getElementById("tipo_admissao_int").addEventListener("change", function() {
     const tipo = this.value;
     const divPertinente = document.getElementById("div_int_pertinente_int");
     const divRelPertinente = document.getElementById("div_rel_pertinente_int");
+    if (rowPertinente) {
+        rowPertinente.style.display = "none";
+    }
     divPertinente.style.display = "none";
     divRelPertinente.style.display = "none";
     if (tipo === "Urgência") {
+        if (rowPertinente) {
+            rowPertinente.style.display = "flex";
+        }
         divPertinente.style.display = "block";
         document.getElementById("int_pertinente_int").addEventListener("change", function() {
             divRelPertinente.style.display = (this.value === "n") ? "block" : "none";
@@ -579,12 +755,12 @@ document.addEventListener('DOMContentLoaded', function() {
         var pacienteId = pacienteField ? parseInt(pacienteField.value || '0', 10) : null;
         var selected = Array.from(selectAntecedente.selectedOptions || []);
         var payload = selected.map(function(option) {
-            var idCid = parseInt(option.value, 10);
-            if (!idCid) return null;
+            var idAntecedente = parseInt(option.value, 10);
+            if (!idAntecedente) return null;
             return {
                 fk_id_paciente: pacienteId,
                 fk_internacao_ant_int: null,
-                intern_antec_ant_int: idCid
+                intern_antec_ant_int: idAntecedente
             };
         }).filter(function(item) { return item !== null; });
         jsonAntecedenteField.value = payload.length ? JSON.stringify(payload) : '';
@@ -596,23 +772,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Mostrar/ocultar campos de alta conforme "Internado"
 document.addEventListener("DOMContentLoaded", function() {
-    const selectInternado = document.getElementById("internado_int");
+    const altaContainer = document.getElementById("alta-obrigatoria-container");
     const divDataAlta = document.getElementById("div-data-alta");
     const divMotivoAlta = document.getElementById("div-motivo-alta");
+    const dataAltaInput = document.getElementById("data_alta_alt");
+    const motivoAltaInput = document.getElementById("tipo_alta_alt");
+    const retroativaInput = document.getElementById("retroativa_confirmada");
 
-    function toggleDataAlta() {
-        if (selectInternado.value === "s") {
+    if (!altaContainer || !divDataAlta || !divMotivoAlta) return;
+
+    function toggleAltaObrigatoria(ativa, clearValues) {
+        if (!ativa) {
+            altaContainer.classList.add('d-none');
             divDataAlta.style.display = "none";
             divMotivoAlta.style.display = "none";
-            document.getElementById("data_alta_alt").value = "";
-            document.getElementById("tipo_alta_alt").value = "";
+            altaContainer.hidden = true;
+            divDataAlta.hidden = true;
+            divMotivoAlta.hidden = true;
+            if (dataAltaInput) dataAltaInput.required = false;
+            if (motivoAltaInput) motivoAltaInput.required = false;
+            divDataAlta.classList.add('d-none');
+            divMotivoAlta.classList.add('d-none');
+            if (clearValues) {
+                if (dataAltaInput) dataAltaInput.value = "";
+                if (motivoAltaInput) motivoAltaInput.value = "";
+            }
         } else {
+            altaContainer.classList.remove('d-none');
             divDataAlta.style.display = "block";
             divMotivoAlta.style.display = "block";
+            altaContainer.hidden = false;
+            divDataAlta.hidden = false;
+            divMotivoAlta.hidden = false;
+            if (dataAltaInput) dataAltaInput.required = true;
+            if (motivoAltaInput) motivoAltaInput.required = true;
+            divDataAlta.classList.remove('d-none');
+            divMotivoAlta.classList.remove('d-none');
         }
     }
-    toggleDataAlta();
-    selectInternado.addEventListener("change", toggleDataAlta);
+
+    window.setAltaObrigatoriaForRetroativa = function(ativa, opts) {
+        var clearValues = Boolean(opts && opts.clearValues);
+        toggleAltaObrigatoria(Boolean(ativa), clearValues);
+    };
+
+    toggleAltaObrigatoria(retroativaInput?.value === '1', false);
 });
 
 
@@ -809,6 +1013,13 @@ $("#myForm").submit(function(event) {
     let request_method = $(this).attr("method"); // Obtém o método do formulário (GET/POST)
     let form_data = new FormData(this); // Cria um objeto FormData com os dados do formulário
 
+    if (typeof window.validateDataInternacaoFuture === 'function') {
+        const okDataInternacao = window.validateDataInternacaoFuture();
+        if (!okDataInternacao) {
+            return;
+        }
+    }
+
 
     // 1. Salva o valor selecionado do select de hospitais
     const hospitalSelected = document.getElementById("hospital_selected").value;
@@ -960,9 +1171,31 @@ $("#myForm").submit(function(event) {
                 // document.getElementById("hospital_selected").value = hospitalSelected; // Não precisa redefinir aqui
 
                 // 4. Atualiza outros selects (exceto o de hospitais)
-                $('#fk_paciente_int').val('').selectpicker('refresh');
-                $('#fk_patologia2').val('').selectpicker('refresh');
-                $('#fk_patologia_int').val('').selectpicker('refresh');
+                const forceClearPicker = (selector) => {
+                    const el = document.querySelector(selector);
+                    if (!el) return;
+                    el.value = '';
+                    el.selectedIndex = 0;
+                    Array.from(el.options || []).forEach((opt, idx) => {
+                        opt.selected = idx === 0;
+                    });
+                    if (window.jQuery && $.fn.selectpicker && $(el).hasClass('selectpicker')) {
+                        $(el).selectpicker('val', '');
+                        $(el).selectpicker('render');
+                        $(el).selectpicker('refresh');
+                    }
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                };
+
+                forceClearPicker('#fk_paciente_int');
+                forceClearPicker('#fk_cid_int');
+                forceClearPicker('#fk_patologia2');
+                forceClearPicker('#fk_patologia_int');
+                $('#matricula_paciente_display').val('');
+                if (typeof window.triggerInternacaoCheck === 'function') {
+                    window.triggerInternacaoCheck();
+                    setTimeout(window.triggerInternacaoCheck, 120);
+                }
 
                 // 5. Update other values
                 const adicionarValor = parseInt(document.querySelector("#proximoId_int")
@@ -984,6 +1217,10 @@ $("#myForm").submit(function(event) {
                 document.getElementById("internado_int").value = "s";
                 document.getElementById("internado_int").querySelector("option[value='s']")
                     .selected = true;
+                document.getElementById("internado_int").dispatchEvent(new Event('change'));
+                if (typeof window.setAltaObrigatoriaForRetroativa === 'function') {
+                    window.setAltaObrigatoriaForRetroativa(false, { clearValues: true });
+                }
 
                 // 6. Hide containers
                 const containers = [
@@ -1042,7 +1279,6 @@ $("#myForm").submit(function(event) {
 
         error: function(xhr, status, error) {
             console.error("AJAX Error:", status, error);
-            console.log("XHR response:", xhr.responseText);
         }
     });
 });
@@ -1250,6 +1486,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (retroContainer) retroContainer.classList.add('d-none');
         if (retroBanner) retroBanner.classList.add('d-none');
         if (retroInput) retroInput.value = '0';
+        if (typeof window.setAltaObrigatoriaForRetroativa === 'function') {
+            window.setAltaObrigatoriaForRetroativa(false, { clearValues: true });
+        }
     }
 
     function showRetroBanner(info) {
@@ -1314,12 +1553,23 @@ document.addEventListener('DOMContentLoaded', function() {
             hideRetroBanner();
             consultarInternacaoAtiva(this.value, false);
         });
+        if (window.jQuery && jQuery.fn && typeof jQuery.fn.on === 'function') {
+            jQuery(function($) {
+                $('#fk_paciente_int').on('changed.bs.select', function() {
+                    hideRetroBanner();
+                    consultarInternacaoAtiva(this.value, false);
+                });
+            });
+        }
     }
 
     if (confirmBtn) {
         confirmBtn.addEventListener('click', function() {
             if (retroInput) retroInput.value = '1';
             if (activeInfo) showRetroBanner(activeInfo);
+            if (typeof window.setAltaObrigatoriaForRetroativa === 'function') {
+                window.setAltaObrigatoriaForRetroativa(true, { clearValues: false });
+            }
             forcarAltaCampos();
             modalInstance && modalInstance.hide();
         });
@@ -1333,7 +1583,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 pacienteSelect.value = '';
                 if (window.jQuery && jQuery.fn.selectpicker && jQuery(pacienteSelect).hasClass(
                         'selectpicker')) {
-                    jQuery(pacienteSelect).selectpicker('refresh');
+                    jQuery(pacienteSelect).selectpicker('val', '');
                 }
             }
         });

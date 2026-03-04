@@ -141,19 +141,14 @@ header("Content-type: text/html; charset=utf-8");
                                 <li><a class="dropdown-item" href="<?= $BASE_URL ?>seguradoras"><span
                                             class=" bi bi-heart-pulse"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(178, 156, 55);"></span>
-                                        Seguradora</a></li>
+                                        Seguradoras</a></li>
                                 <li><a class="dropdown-item" href="<?= $BASE_URL ?>estipulantes"><i
                                             class="bi bi-building"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(213, 12, 155);"></i>
-                                        Estipulante</a></li>
+                                        Estipulantes</a></li>
                                 <li>
-
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_acomodacao.php"><i
-                                            class=" bi bi-clipboard-heart"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(145, 156, 55);"></i>
-                                        Acomodação</a></li>
                                 <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_patologia.php"><span
                                             class=" bi bi-virus"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(178, 155, 155);"></span>
@@ -206,10 +201,6 @@ header("Content-type: text/html; charset=utf-8");
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="<?php $BASE_URL ?>censo/lista"><i
-                                            class="bi bi-book"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(27, 156, 55);"></i>
-                                        Lista Censo</a></li>
                                 <li><a class="dropdown-item" href="<?php $BASE_URL ?>internacoes/lista"> <i
                                             class="bi bi-calendar2-date"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i> Lista
@@ -265,6 +256,14 @@ header("Content-type: text/html; charset=utf-8");
                                             class="bi bi-postcard-heart"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i> Lista
                                         Gestão</a></li>
+                                <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_prorrogacao_pendente.php"><i
+                                            class="bi bi-hourglass-split"
+                                            style="font-size: 1rem;margin-right:5px; color: rgb(180, 120, 20);"></i>
+                                        Prorrogações Pendentes</a></li>
+                                <li><a class="dropdown-item" href="<?php $BASE_URL ?>censo/lista"><i
+                                            class="bi bi-book"
+                                            style="font-size: 1rem;margin-right:5px; color: rgb(27, 156, 55);"></i>
+                                        Lista Censo</a></li>
 
                             </ul>
                         </li>

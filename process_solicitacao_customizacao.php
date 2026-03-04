@@ -1,5 +1,28 @@
 <?php
 
+if (!defined("FLOW_LOGGER_AUTO_V1")) {
+    define("FLOW_LOGGER_AUTO_V1", 1);
+    @require_once(__DIR__ . "/utils/flow_logger.php");
+    if (function_exists("flowLogStart") && function_exists("flowLog")) {
+        $__flowCtxAuto = flowLogStart(basename(__FILE__, ".php"), [
+            "type" => $_POST["type"] ?? $_GET["type"] ?? null,
+            "method" => $_SERVER["REQUEST_METHOD"] ?? null,
+        ]);
+        register_shutdown_function(function () use ($__flowCtxAuto) {
+            $err = error_get_last();
+            if ($err && in_array(($err["type"] ?? 0), [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+                flowLog($__flowCtxAuto, "shutdown.fatal", "ERROR", [
+                    "message" => $err["message"] ?? null,
+                    "file" => $err["file"] ?? null,
+                    "line" => $err["line"] ?? null,
+                ]);
+            }
+            flowLog($__flowCtxAuto, "request.finish", "INFO");
+        });
+    }
+}
+
+
 require_once("globals.php");
 require_once("db.php");
 require_once("models/message.php");
@@ -13,7 +36,7 @@ $type = filter_input(INPUT_POST, 'type');
 $idSolicitacao = filter_input(INPUT_POST, 'id_solicitacao', FILTER_VALIDATE_INT);
 
 $emailSessao = strtolower(trim((string)($_SESSION['email_user'] ?? '')));
-$isFullCare = $emailSessao !== '' && strpos($emailSessao, '@fullcare.com.br') !== false;
+$isConex = $emailSessao !== '' && strpos($emailSessao, '@conex.') !== false;
 
 $nome = trim((string)filter_input(INPUT_POST, 'nome'));
 $empresa = trim((string)filter_input(INPUT_POST, 'empresa'));
@@ -116,7 +139,7 @@ if ($type === 'update' && $idSolicitacao) {
 }
 
 if ($type === 'update' && $existing) {
-    if (!$isFullCare) {
+    if ($isConex) {
         $solicitacao->prazo_resposta = $existing->prazo_resposta;
         $solicitacao->precificacao = $existing->precificacao;
         $solicitacao->observacoes_resposta = $existing->observacoes_resposta;
@@ -166,11 +189,11 @@ $allowedMime = [
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 
-if ($type === 'update' && $isFullCare) {
+if ($type === 'update' && !$isConex) {
     $removerAnexos = [];
 }
 
-if (!empty($_FILES['anexos']) && is_array($_FILES['anexos']['name']) && ($type !== 'update' || !$isFullCare)) {
+if (!empty($_FILES['anexos']) && is_array($_FILES['anexos']['name']) && ($type !== 'update' || $isConex)) {
     $uploadDir = __DIR__ . '/uploads/customizacao';
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);

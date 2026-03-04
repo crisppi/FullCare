@@ -48,16 +48,6 @@ require_once("templates/header.php");
             </li>
             <hr>
 
-            <li>
-                <a href="internacoes/lista" <?php if ($_SESSION['nivel'] < 2) { ?> style="pointer-events: none"
-                    ?<?php } ?>><i class="bi bi-calendar2-date"
-                        style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i> Lista Internação</a>
-            </li>
-            <li>
-                <a href="list_internacao_uti.php" <?php if ($_SESSION['nivel'] < 2) { ?> style="pointer-events: none"
-                    ?<?php } ?>><i class="bi bi-clipboard-heart"
-                        style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i> Internação UTI</a>
-            </li>
             <hr>
 
             <li>
@@ -71,6 +61,14 @@ require_once("templates/header.php");
                 <a href="dashboard_performance.php"><i class="bi bi-trophy"
                         style="font-size: 1rem;margin-right:5px; color: rgb(120, 46, 200);"></i> Painel de
                     performance</a>
+            </li>
+            <li>
+                <a href="dashboard_operacional.php"><i class="bi bi-activity"
+                        style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i> Dashboard operacional</a>
+            </li>
+            <li>
+                <a href="inteligencia/performance-equipes"><i class="bi bi-trophy"
+                        style="font-size: 1rem;margin-right:5px; color: rgb(124, 58, 237);"></i> Performance equipes</a>
             </li>
             <li>
                 <a href="faturamento_previsao.php"><i class="bi bi-graph-up"
@@ -90,11 +88,6 @@ require_once("templates/header.php");
                         style="font-size: 1rem; margin-right:5px; color: rgb(16, 15, 155);"></span> Alta Hospitalar</a>
             </li>
             <hr>
-            <li>
-                <a href="list_gestao.php" <?php if ($_SESSION['nivel'] < 2) { ?> style="pointer-events: none"
-                    ?<?php } ?>><i class=" bi bi-clipboard-heart"
-                        style="font-size: 1rem;margin-right:5px; color: rgb(142, 15, 15);"></i> Gestão</a>
-            </li>
             <hr>
             <li>
                 <a href="list_internacao_patologia.php" <?php if ($_SESSION['nivel'] < 2) { ?>
@@ -177,7 +170,7 @@ require_once("templates/header.php");
             <li>
                 <a href="cad_paciente.php" <?php if ($_SESSION['nivel'] < 2) { ?> style="pointer-events: none"
                     ?<?php } ?>><span class="bi bi-person"
-                        style="font-size: 1rem;margin-right:5px; color: rgb(155, 155, 76);"></span> Pacientes</a>
+                        style="font-size: 1rem;margin-right:5px; color: rgb(155, 155, 76);"></span> Lista Pacientes</a>
             </li>
             <li>
                 <a href="cad_hospital.php" <?php if ($_SESSION['nivel'] < 4) { ?> style="pointer-events: none"
@@ -236,6 +229,11 @@ require_once("templates/header.php");
             <li>
                 <a href="list_fila_tarefas.php"><span class="bi bi-list-check"
                         style="font-size: 1rem;margin-right:5px; color: rgb(20, 120, 90);"></span> Fila de Tarefas</a>
+            </li>
+            <li>
+                <a href="list_prorrogacao_pendente.php"><span class="bi bi-hourglass-split"
+                        style="font-size: 1rem;margin-right:5px; color: rgb(180, 120, 20);"></span> Prorrogação
+                    Pendente</a>
             </li>
         </div>
         <hr>

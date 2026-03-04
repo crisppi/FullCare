@@ -48,10 +48,6 @@ function perfFetchValue(PDO $conn, string $sql, array $params = [], $default = 0
 function perfFetchAll(PDO $conn, string $sql, array $params = []): array
 {
     try {
-        error_log('[PERF_RANKING] Executando query...');
-        error_log('[PERF_RANKING] SQL: ' . substr($sql, 0, 200) . '...');
-        error_log('[PERF_RANKING] PARAMS: ' . json_encode($params));
-
         $stmt = $conn->prepare($sql);
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
@@ -59,20 +55,28 @@ function perfFetchAll(PDO $conn, string $sql, array $params = []): array
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        error_log('[PERF_RANKING] ✓ Sucesso! Linhas retornadas: ' . count($result));
-        if (count($result) > 0) {
-            error_log('[PERF_RANKING] Primeira linha: ' . json_encode($result[0]));
-        }
-
         return $result;
     } catch (Throwable $e) {
-        error_log('[PERF_RANKING] ✗ ERRO: ' . $e->getMessage());
-        error_log('[PERF_RANKING] CÓDIGO: ' . $e->getCode());
-        error_log('[PERF_RANKING] SQL COMPLETO: ' . $sql);
-        error_log('[PERF_RANKING] PARAMS: ' . json_encode($params));
-        error_log('[PERF_RANKING] TRACE: ' . $e->getTraceAsString());
+        error_log('[PERF_RANKING] ' . $e->getMessage());
         return [];
     }
+}
+
+function perfColumnExists(PDO $conn, string $table, string $column): bool
+{
+    $count = perfFetchValue(
+        $conn,
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = :table
+           AND COLUMN_NAME = :column",
+        [
+            ':table' => $table,
+            ':column' => $column,
+        ],
+        0
+    );
+    return $count > 0;
 }
 
 $defaultEnd = new DateTime('today');
@@ -446,9 +450,6 @@ if (!empty($internTempoRows)) {
     }
 }
 
-error_log('[PERF_RANKING] Iniciando query de contas por usuário...');
-error_log('[PERF_RANKING] Período: ' . $rangeParams[':dt_ini'] . ' até ' . $rangeParams[':dt_fim']);
-
 $rankingContaUsers = perfFetchAll(
     $conn,
     "SELECT 
@@ -483,8 +484,6 @@ $rankingContaUsers = perfFetchAll(
     LIMIT 10",
     $rangeParams
 );
-
-error_log('[PERF_RANKING] Query finalizada. Registros: ' . count($rankingContaUsers));
 
 if (empty($rankingContaUsers)) {
     $rankingContaUsers = perfFetchAll(
@@ -621,6 +620,23 @@ $rankingVisitas = perfFetchAll(
     $rangeParams
 );
 
+$logUserColumn = perfColumnExists($conn, 'tb_log_historico', 'usuario_id') ? 'usuario_id' : 'email_user';
+$logUserCondition = $logUserColumn === 'usuario_id' ? "$logUserColumn IS NOT NULL" : "TRIM($logUserColumn) <> ''";
+$logUserLabel = $logUserColumn === 'usuario_id' ? 'ID do usuário' : 'E-mail do usuário';
+$logHourlyUsers = perfFetchAll(
+    $conn,
+    "SELECT 
+        DATE_FORMAT(data_hora, '%Y-%m-%d %H:00:00') AS hora,
+        COUNT(DISTINCT $logUserColumn) AS usuarios
+     FROM tb_log_historico
+    WHERE data_hora BETWEEN :dt_ini AND :dt_fim
+      AND {$logUserCondition}
+    GROUP BY hora
+    ORDER BY hora DESC
+    LIMIT 24",
+    $rangeParams
+);
+
 $visitasSummaryRow = [
     'total' => 0,
     'sla_dias' => null,
@@ -681,7 +697,7 @@ if ($totalContasTimer !== null) {
     $centralTotals['contas']['timer_den'] = 1;
 }
 
-$registerProfile = function (string $rawKey = null, string $nome = null) use (&$centralProfiles) {
+$registerProfile = function (?string $rawKey = null, ?string $nome = null) use (&$centralProfiles) {
     $key = strtolower(trim((string) $rawKey));
     if ($key === '') {
         return null;

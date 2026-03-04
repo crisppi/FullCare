@@ -10,10 +10,66 @@
     include_once("templates/header.php");
     include_once("array_dados.php");
 
-    if (!function_exists('e')) {
-        function e($v)
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    $normCargoAccess = function ($txt)
+    {
+        $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+        $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+        $txt = $c !== false ? $c : $txt;
+        return preg_replace('/[^a-z]/', '', $txt);
+    };
+    $isGestorSeguradora = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
+    $seguradoraUserId = isset($_SESSION['fk_seguradora_user']) ? (int)$_SESSION['fk_seguradora_user'] : 0;
+    if ($isGestorSeguradora && $seguradoraUserId <= 0) {
+        try {
+            $uid = (int)($_SESSION['id_usuario'] ?? 0);
+            if ($uid > 0) {
+                $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+                $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
+                $stmtSeg->execute();
+                $seguradoraUserId = (int)($stmtSeg->fetchColumn() ?: 0);
+                if ($seguradoraUserId > 0) {
+                    $_SESSION['fk_seguradora_user'] = $seguradoraUserId;
+                }
+            }
+        } catch (Throwable $e) {
+            error_log('[LIST_PAC][SEGURADORA] ' . $e->getMessage());
+        }
+    }
+    $seguradoraUserNome = '';
+    if ($isGestorSeguradora && $seguradoraUserId > 0) {
+        try {
+            $stmtSegNome = $conn->prepare("SELECT seguradora_seg FROM tb_seguradora WHERE id_seguradora = :id LIMIT 1");
+            $stmtSegNome->bindValue(':id', $seguradoraUserId, PDO::PARAM_INT);
+            $stmtSegNome->execute();
+            $seguradoraUserNome = (string)($stmtSegNome->fetchColumn() ?: '');
+        } catch (Throwable $e) {
+            $seguradoraUserNome = '';
+        }
+    }
+
+    if (!function_exists('paciente_escape')) {
+        function paciente_escape($valor)
         {
-            return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+            return htmlentities((string)$valor, ENT_QUOTES, 'UTF-8');
+        }
+    }
+
+    $autocompletePacientes = [];
+    if (isset($conn) && $conn instanceof PDO) {
+        try {
+            $stmt = $conn->query("
+                SELECT nome_pac, matricula_pac, recem_nascido_pac, IFNULL(numero_rn_pac, '') AS numero_rn_pac
+                FROM tb_paciente
+                WHERE deletado_pac <> 's'
+                ORDER BY nome_pac ASC
+                LIMIT 200
+            ");
+            $autocompletePacientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $autocompletePacientes = [];
         }
     }
 
@@ -22,38 +78,65 @@
     $QtdTotalpac = new PacienteDAO($conn, $BASE_URL);
 
     // METODO DE BUSCA DE PAGINACAO
-    $pesquisa_nome = trim((string)(filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
-    $pesquisaSeguradora = trim((string)(filter_input(INPUT_GET, 'pesquisa_seguradora', FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
-    $pacienteId = filter_input(INPUT_GET, 'paciente_id', FILTER_VALIDATE_INT);
-    $seguradoraId = filter_input(INPUT_GET, 'seguradora_id', FILTER_VALIDATE_INT);
+    $busca = trim((string) filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS));
+    $buscaSeguradora = filter_input(INPUT_GET, 'pesquisa_seguradora', FILTER_SANITIZE_SPECIAL_CHARS);
+    if ($isGestorSeguradora) {
+        $buscaSeguradora = $seguradoraUserNome !== '' ? $seguradoraUserNome : $buscaSeguradora;
+    }
+
+    $pesquisa_nome = filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS);
     $buscaAtivo = filter_input(INPUT_GET, 'ativo_pac', FILTER_SANITIZE_SPECIAL_CHARS);
     $limite = filter_input(INPUT_GET, 'limite') ? filter_input(INPUT_GET, 'limite') : 10;
-    $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar') : '';
+    $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar') : 'id_paciente_desc';
     $buscaAtivo = in_array($buscaAtivo, ['s', 'n']) ?: "";
     $pacienteInicio = ' 1 ';
+    $buscaMatriculaForcada = $busca;
+    if ($busca !== '' && preg_match('/^(.*?)\\s*-\\s*([0-9]+(?:\\s*RN\\s*\\d+)?)$/i', $busca, $matches)) {
+        $busca = trim($matches[1]);
+        $buscaMatriculaForcada = trim(str_replace(' ', '', strtoupper($matches[2])));
+    }
+
+    $nameFilter = $busca !== '' ? 'nome_pac LIKE "%' . $busca . '%"' : '';
+    $matriculaFilter = $buscaMatriculaForcada !== '' ? 'CONCAT(
+              matricula_pac,
+              CASE WHEN recem_nascido_pac = "s" THEN "RN" ELSE "" END,
+              IFNULL(numero_rn_pac, "")
+          ) LIKE "%' . $buscaMatriculaForcada . '%"' : '';
+
+    $nameMatClause = implode(' OR ', array_filter([$nameFilter, $matriculaFilter]));
+
     $condicoes = [
-        $pacienteId ? 'pa.id_paciente = ' . (int)$pacienteId : null,
-        (!$pacienteId && strlen($pesquisa_nome))
-            ? '(pa.nome_pac LIKE "%' . $pesquisa_nome . '%"
-               OR pa.matricula_pac LIKE "%' . $pesquisa_nome . '%"
-               OR pa.cpf_pac LIKE "%' . $pesquisa_nome . '%")'
-            : null,
-        $seguradoraId ? 'se.id_seguradora = ' . (int)$seguradoraId : null,
-        (!$seguradoraId && strlen($pesquisaSeguradora))
-            ? 'se.seguradora_seg LIKE "%' . $pesquisaSeguradora . '%"'
-            : null,
+        $nameMatClause ? '(' . $nameMatClause . ')' : null,
+        strlen($buscaSeguradora) ? 'se.seguradora_seg LIKE "%' . $buscaSeguradora . '%"' : null,
         strlen($buscaAtivo) ? 'ativo_pac = "' . $buscaAtivo . '"' : null,
-        strlen($pacienteInicio) ? 'id_paciente > ' . $pacienteInicio . ' ' : null
+        strlen($pacienteInicio) ? 'id_paciente > ' . $pacienteInicio . ' ' : null,
+        $isGestorSeguradora
+            ? ($seguradoraUserId > 0 ? 'pa.fk_seguradora_pac = ' . $seguradoraUserId : '1=0')
+            : null,
     ];
 
 
 
     $condicoes = array_filter($condicoes);
     // print_r($condicoes);
-    $order = $ordenar ?: 'id_paciente DESC';
+    $orderMap = [
+        'id_paciente' => 'pa.id_paciente',
+        'id_paciente_desc' => 'pa.id_paciente DESC',
+        'nome_pac' => 'pa.nome_pac',
+        'nome_pac_desc' => 'pa.nome_pac DESC',
+        'matricula_pac' => 'pa.matricula_pac',
+        'matricula_pac_desc' => 'pa.matricula_pac DESC',
+        'cpf_pac' => 'pa.cpf_pac',
+        'cpf_pac_desc' => 'pa.cpf_pac DESC',
+        'seguradora_seg' => 'se.seguradora_seg',
+        'seguradora_seg_desc' => 'se.seguradora_seg DESC',
+        'cidade_pac' => 'pa.cidade_pac',
+        'cidade_pac_desc' => 'pa.cidade_pac DESC',
+    ];
+    $order = $orderMap[$ordenar] ?? 'pa.id_paciente DESC';
 
     // REMOVE POSICOES VAZIAS DO FILTRO
-    $where = implode(' AND ', $condicoes);
+        $where = implode(' AND ', $condicoes);
     $qtdpacItens1 = $QtdTotalpac->selectAllpaciente($where, $order, $obLimite ?? null);
     $qtdIntItens = count($qtdpacItens1); // total de registros
     // PAGINACAO
@@ -66,10 +149,8 @@
     $totalcasos = ceil($qtdIntItens / 5);
 
     $pacientePaginationBaseParams = [
-        'pesquisa_nome'        => $pesquisa_nome,
-        'paciente_id'          => $pacienteId,
-        'pesquisa_seguradora'  => $pesquisaSeguradora,
-        'seguradora_id'        => $seguradoraId,
+        'pesquisa_nome'     => $pesquisa_nome,
+        'pesquisa_seguradora'=> $buscaSeguradora,
         'ativo_pac'         => $buscaAtivo,
         'limite'            => $limite,
         'ordenar'           => $ordenar,
@@ -87,9 +168,28 @@
             global $BASE_URL;
             $baseUrl = rtrim($BASE_URL, '/') . '/pacientes';
 
-            return $query ? $baseUrl . '?' . $query : $baseUrl;
+        return $query ? $baseUrl . '?' . $query : $baseUrl;
         }
     }
+
+    $pacSortFieldCurrent = preg_replace('/_desc$/', '', (string)$ordenar);
+    $pacSortDirCurrent = (substr((string)$ordenar, -5) === '_desc') ? 'desc' : 'asc';
+    $buildPacienteSortUrl = function (string $field) use ($pacSortFieldCurrent, $pacSortDirCurrent, $pacientePaginationBaseParams) {
+        $isCurrentField = ($pacSortFieldCurrent === $field);
+        $nextDir = ($isCurrentField && $pacSortDirCurrent === 'asc') ? 'desc' : 'asc';
+        $nextOrder = ($nextDir === 'desc') ? ($field . '_desc') : $field;
+        return buildPacientePaginationUrl($pacientePaginationBaseParams, [
+            'ordenar' => $nextOrder,
+            'pag' => 1,
+            'bl' => 0,
+        ]);
+    };
+    $pacSortIcon = function (string $field) use ($pacSortFieldCurrent, $pacSortDirCurrent): string {
+        if ($pacSortFieldCurrent !== $field) {
+            return '↕';
+        }
+        return $pacSortDirCurrent === 'asc' ? '↑' : '↓';
+    };
 
     // PAGINACAO
     if ($qtdIntItens > $limite) {
@@ -115,45 +215,54 @@
     ?>
 
     <div class="container-fluid form_container" id="main-container" style="margin-top:-5px;">
-        <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
+        <div class="d-flex justify-content-between align-items-center list-header-row" style="margin-bottom: 0;">
             <h4 class="page-title" style="margin-top:-10px;line-height: 1.5;">Pacientes</h4>
-            <div style="margin-left: auto;">
-                <button onclick="openModal('cad_paciente.php')" data-bs-toggle="modal" data-bs-target="#myModal"
+            <div class="list-action-slot" style="margin-left: auto;">
+                <a href="<?= htmlspecialchars($BASE_URL . 'cad_paciente.php', ENT_QUOTES, 'UTF-8') ?>"
                     class="btn btn-success styled"
                     style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
                     <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Novo Paciente
-                </button>
+                </a>
             </div>
         </div>
         <hr style="margin-top: 1px; margin-bottom: 10px;">
 
         <div class="complete-table">
+            <?php if ($isGestorSeguradora): ?>
+                <div style="display:inline-flex;align-items:center;gap:8px;margin:0 0 8px 16px;padding:6px 12px;border-radius:999px;font-size:.82rem;font-weight:700;background:#f3edff;border:1px solid #d6c5f7;color:#5e2363;">
+                    Escopo: Seguradora <?= paciente_escape($seguradoraUserNome !== '' ? $seguradoraUserNome : ('#' . $seguradoraUserId)) ?>
+                </div>
+            <?php endif; ?>
             <div id="navbarToggleExternalContent" class="table-filters">
                 <form id="form_pesquisa" method="GET">
                     <div class="row">
                         <div class="form-group col-sm-3" style="padding:2px !important;padding-left:16px !important;">
                             <input class="form-control form-control-sm" style="margin-top:7px" type="text"
-                                name="pesquisa_nome"
-                                id="pesquisa_paciente_input"
-                                list="pacienteSuggestions"
-                                placeholder="Pesquisa por nome ou matrícula ou CPF"
-                                value="<?= e($pesquisa_nome) ?>"
-                                autocomplete="off">
-                            <input type="hidden" name="paciente_id" id="pesquisa_paciente_id"
-                                value="<?= e($pacienteId) ?>">
-                            <datalist id="pacienteSuggestions"></datalist>
+                                value="<?= paciente_escape($busca) ?>" name="pesquisa_nome" id="pesquisa_nome"
+                                placeholder="Pesquisa por nome ou matrícula" list="pacienteSuggestions">
+                            <datalist id="pacienteSuggestions">
+                                <?php foreach ($autocompletePacientes as $entry):
+                                    $matriculaLabel = trim($entry['matricula_pac'] ?? '');
+                                    if ($entry['recem_nascido_pac'] === 's' && $entry['numero_rn_pac'] !== '') {
+                                        $matriculaLabel .= ' RN' . $entry['numero_rn_pac'];
+                                    }
+                                    $label = trim($entry['nome_pac'] . ($matriculaLabel ? ' - ' . $matriculaLabel : ''));
+                                ?>
+                                    <option value="<?= paciente_escape($label) ?>">
+                                <?php endforeach; ?>
+                            </datalist>
                         </div>
-                        <div class="form-group col-sm-3" style="padding:2px !important">
-                            <input class="form-control form-control-sm" style="margin-top:7px" type="text"
-                                name="pesquisa_seguradora"
-                                id="pesquisa_seguradora_input"
-                                list="seguradoraSuggestions"
-                                placeholder="Pesquisa por seguradora"
-                                value="<?= e($pesquisaSeguradora) ?>"
-                                autocomplete="off">
-                            <input type="hidden" name="seguradora_id" id="seguradora_id"
-                                value="<?= e($seguradoraId) ?>">
-                            <datalist id="seguradoraSuggestions"></datalist>
+                        <div class="form-group col-sm-2" style="padding:2px !important;">
+                            <?php if ($isGestorSeguradora): ?>
+                                <input type="hidden" name="pesquisa_seguradora" id="pesquisa_seguradora"
+                                    value="<?= paciente_escape($seguradoraUserNome !== '' ? $seguradoraUserNome : $buscaSeguradora) ?>">
+                                <input class="form-control form-control-sm" style="margin-top:7px;background:#f3edff;color:#6b5b8b" type="text"
+                                    value="<?= paciente_escape($seguradoraUserNome !== '' ? $seguradoraUserNome : '-') ?>" readonly>
+                            <?php else: ?>
+                                <input class="form-control form-control-sm" style="margin-top:7px" type="text"
+                                    value="<?= paciente_escape((string)$buscaSeguradora) ?>" name="pesquisa_seguradora" id="pesquisa_seguradora"
+                                    placeholder="Pesquisa por seguradora">
+                            <?php endif; ?>
                         </div>
                         <div class="col-sm-1" style="padding:2px !important">
                             <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="limite"
@@ -169,24 +278,33 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="form-group col-sm-3" style="padding:2px !important">
+                        <div class="form-group col-sm-2" style="padding:2px !important">
                             <select class="form-control form-control-sm"
                                 style="margin-top:7px;font-size:.8em; color:#878787" id="ordenar" name="ordenar">
                                 <option value="">Classificar por</option>
-                                <option value="id_paciente" <?= $ordenar == 'id_paciente' ? 'selected' : null ?>>Id
+                                <option value="id_paciente_desc" <?= $ordenar == 'id_paciente_desc' ? 'selected' : null ?>>Id
                                     Paciente
                                 </option>
                                 <option value="nome_pac" <?= $ordenar == 'nome_pac' ? 'selected' : null ?>>Nome Paciente
                                 </option>
+                                <option value="matricula_pac" <?= $ordenar == 'matricula_pac' ? 'selected' : null ?>>Matrícula</option>
+                                <option value="cpf_pac" <?= $ordenar == 'cpf_pac' ? 'selected' : null ?>>CPF</option>
+                                <option value="seguradora_seg" <?= $ordenar == 'seguradora_seg' ? 'selected' : null ?>>Seguradora</option>
+                                <option value="cidade_pac" <?= $ordenar == 'cidade_pac' ? 'selected' : null ?>>Cidade</option>
                             </select>
                         </div>
 
                         <div class="form-group col-sm-1" style="padding:2px !important" style="margin:0px 0px 20px 0px">
-                            <button type="submit" class="btn btn-primary"
+                            <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
                                 style="background-color:#5e2363;width:42px;height:32px;margin-top:7px;border-color:#5e2363"><span
                                     class="material-icons" style="margin-left:-3px;margin-top:-2px;">
                                     search
                                 </span></button>
+                        </div>
+                        <div class="form-group col-sm-2" style="padding:2px !important">
+                            <a href="<?= htmlspecialchars($BASE_URL . 'pacientes', ENT_QUOTES, 'UTF-8') ?>" class="btn btn-outline-secondary btn-sm btn-filtro-limpar" style="margin-top:7px;">
+                                Limpar filtros
+                            </a>
                         </div>
 
 
@@ -198,16 +316,51 @@
                     <table class="table table-sm table-striped table-hover table-condensed">
                         <thead>
                             <tr>
-                                <th scope="col">Id</th>
-                                <th scope="col">Paciente</th>
-                                <th scope="col">Matrícula</th>
-                                <th scope="col">CPF</th>
-                                <th scope="col">Seguradora</th>
-                                <th scope="col">Cidade</th>
-                                <th scope="col" width="8%">Ações</th>
+                                <th scope="col" data-sort="false">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($buildPacienteSortUrl('id_paciente'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginatePacientes('<?= htmlspecialchars($buildPacienteSortUrl('id_paciente'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Id</span><span class="rah-sort-icon"><?= $pacSortIcon('id_paciente') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" data-sort="false">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($buildPacienteSortUrl('nome_pac'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginatePacientes('<?= htmlspecialchars($buildPacienteSortUrl('nome_pac'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Paciente</span><span class="rah-sort-icon"><?= $pacSortIcon('nome_pac') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" data-sort="false">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($buildPacienteSortUrl('matricula_pac'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginatePacientes('<?= htmlspecialchars($buildPacienteSortUrl('matricula_pac'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Matrícula</span><span class="rah-sort-icon"><?= $pacSortIcon('matricula_pac') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" data-sort="false">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($buildPacienteSortUrl('cpf_pac'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginatePacientes('<?= htmlspecialchars($buildPacienteSortUrl('cpf_pac'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>CPF</span><span class="rah-sort-icon"><?= $pacSortIcon('cpf_pac') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" data-sort="false">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($buildPacienteSortUrl('seguradora_seg'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginatePacientes('<?= htmlspecialchars($buildPacienteSortUrl('seguradora_seg'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Seguradora</span><span class="rah-sort-icon"><?= $pacSortIcon('seguradora_seg') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" data-sort="false">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($buildPacienteSortUrl('cidade_pac'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginatePacientes('<?= htmlspecialchars($buildPacienteSortUrl('cidade_pac'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Cidade</span><span class="rah-sort-icon"><?= $pacSortIcon('cidade_pac') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" width="8%" data-sort="false">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <?php if (empty($query)): ?>
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Sem registros para os filtros aplicados.</td>
+                            </tr>
+                            <?php endif; ?>
                             <?php
 
                             foreach ($query as $paciente):
@@ -258,15 +411,15 @@
                                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
 
                                             <li>
-                                                <button class="btn btn-default" style="font-size: .9rem;"
-                                                    onclick="openModal('<?= $BASE_URL ?>edit_paciente.php?id_paciente=<?= $id_paciente ?>')"
-                                                    data-bs-toggle="modal" data-bs-target="#myModal"><i
-                                                        style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
+                                                <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/edit_paciente.php?id_paciente=' . (int) $id_paciente, ENT_QUOTES, 'UTF-8') ?>">
+                                                    <i style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
                                                         name="type" value="edite"
-                                                        class="far fa-edit edit-icon"></i>Editar</button>
+                                                        class="far fa-edit edit-icon"></i>Editar
+                                                </a>
                                             </li>
                                             <li>
-                                                <button class="btn btn-default" style="font-size: .9rem;"
+                                                <button class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     onclick="openModal('<?= $BASE_URL ?>show_paciente_historico.php?id_paciente=<?= $id_paciente ?>')"
                                                     data-bs-toggle="modal" data-bs-target="#myModal"><i
                                                         style="font-size: 1rem; margin-right:5px; color: rgb(67, 125, 525);"
@@ -275,7 +428,7 @@
                                             </li>
                                             <li>
                                                 <a href="<?= $BASE_URL ?>hub_paciente/paciente<?= $id_paciente ?>"
-                                                    class="btn" style="font-size: .9rem;">
+                                                    class="btn" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;">
                                                     <i class="fa-solid fas fa-book-medical"
                                                         style="font-size: 1rem; margin-right:5px; color: rgb(0, 123, 255);"></i>
                                                     Hub Paciente
@@ -284,7 +437,7 @@
 
                                             <li>
                                                 <a href="<?= $BASE_URL ?>internacoes/nova?id_paciente=<?= (int)$id_paciente ?>"
-                                                    class="btn" style="font-size:.9rem;">
+                                                    class="btn" style="font-size:.9rem; font-weight: 400 !important; text-transform: none !important;">
                                                     <i class="fa-solid fa-notes-medical"
                                                         style="font-size:1rem;margin-right:5px;color:#007bff;"></i>
                                                     Internação
@@ -491,6 +644,26 @@ if (typeof window.paginatePacientes !== 'function') {
 </script>
 
 <style>
+.rah-sort-link {
+    color: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rah-sort-link:hover,
+.rah-sort-link:focus {
+    color: inherit;
+    text-decoration: none;
+    opacity: .9;
+}
+
+.rah-sort-icon {
+    font-size: .85em;
+    opacity: .95;
+}
+
 .modal-backdrop {
     display: none;
 
@@ -508,7 +681,6 @@ if (typeof window.paginatePacientes !== 'function') {
 
 }
 </style>
-<script src="<?= $BASE_URL ?>js/bi-saving-filters.js?v=20260111"></script>
 <script src="./js/input-estilo.js"></script>
 
 <script src="./js/ajaxNav.js"></script>

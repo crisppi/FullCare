@@ -1,8 +1,6 @@
 <?php
 
 declare(strict_types=1);
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 date_default_timezone_set('America/Sao_Paulo');
 
@@ -160,7 +158,7 @@ if (!function_exists('sel')) {
             flex-wrap: wrap;
             gap: 15px;
             margin-bottom: 12px;
-            background: #fff
+            background: #f5f5f9
         }
 
         .negoc-row label {

@@ -10,9 +10,31 @@ require_once("models/message.php");
 
 $seguradoraDao = new seguradoraDAO($conn, $BASE_URL);
 $seguradoras = $seguradoraDao->findAll();
+// Evita nomes duplicados no select (mantem o registro mais recente: ORDER BY id DESC)
+$seguradorasSelect = [];
+$seguradorasSeen = [];
+foreach ($seguradoras as $seguradoraItem) {
+    $nomeKey = strtolower(trim((string) ($seguradoraItem['seguradora_seg'] ?? '')));
+    if ($nomeKey === '' || isset($seguradorasSeen[$nomeKey])) {
+        continue;
+    }
+    $seguradorasSeen[$nomeKey] = true;
+    $seguradorasSelect[] = $seguradoraItem;
+}
 
 $estipulanteDao = new estipulanteDAO($conn, $BASE_URL);
 $estipulantes = $estipulanteDao->findAll();
+// Evita nomes duplicados no select (mantem o registro mais recente: ORDER BY id DESC)
+$estipulantesSelect = [];
+$estipulantesSeen = [];
+foreach ($estipulantes as $estipulanteItem) {
+    $nomeKey = strtolower(trim((string) ($estipulanteItem['nome_est'] ?? '')));
+    if ($nomeKey === '' || isset($estipulantesSeen[$nomeKey])) {
+        continue;
+    }
+    $estipulantesSeen[$nomeKey] = true;
+    $estipulantesSelect[] = $estipulanteItem;
+}
 
 // Receber id do usuário
 $id_hospital = filter_input(INPUT_GET, "id_hospital");
@@ -20,22 +42,97 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
 
 <!-- Incluindo o Font Awesome para os ícones -->
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/form_cad_internacao.css">
+<style>
+    #main-container.internacao-page {
+        margin: 2px 0 0 !important;
+        padding-inline: 5px !important;
+        padding-top: 0 !important;
+        width: auto !important;
+        max-width: 100% !important;
+        overflow-x: hidden;
+    }
 
-<div class="container-fluid" id="main-container">
-    <div class="progress mb-4">
-        <div class="progress-bar bg-success" role="progressbar" id="progressBar" style="width: 100%;"
-            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Dados do Paciente</div>
+    #main-container.internacao-page .internacao-page__hero {
+        margin: 0 0 6px !important;
+    }
+
+    #main-container.internacao-page .hero-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    #main-container.internacao-page .hero-back-btn {
+        border-radius: 999px;
+        border: 1px solid #d9c3f4;
+        color: #5e2363;
+        padding: 7px 14px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: .85rem;
+        background: #f4ecfb;
+    }
+
+    #main-container.internacao-page .hero-back-btn:hover {
+        color: #4a1b4e;
+        background: #eadcf8;
+    }
+
+    #main-container.internacao-page .internacao-card__eyebrow {
+        font-weight: 700 !important;
+    }
+
+    #multi-step-form .form-control {
+        min-height: 42px;
+        border-radius: 8px;
+    }
+
+    #multi-step-form select.form-control {
+        height: 42px;
+        padding-top: .375rem;
+        padding-bottom: .375rem;
+    }
+
+    #multi-step-form textarea.form-control {
+        min-height: 120px;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="internacao-page" id="main-container">
+    <div class="internacao-page__hero">
+        <div>
+            <h1>Cadastrar paciente</h1>
+        </div>
+        <div class="hero-actions">
+            <a class="hero-back-btn" href="<?= htmlspecialchars($BASE_URL . 'pacientes', ENT_QUOTES, 'UTF-8') ?>">
+                Voltar para lista
+            </a>
+            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
+        </div>
     </div>
-    <form action="<?= $BASE_URL ?>process_paciente.php" id="multi-step-form" method="POST" enctype="multipart/form-data"
-        class="needs-validation">
+    <div class="internacao-page__content">
+        <form action="<?= $BASE_URL ?>process_paciente.php" id="multi-step-form" method="POST" enctype="multipart/form-data"
+            class="needs-validation visible">
 
-        <input type="hidden" name="type" value="create">
-        <input type="hidden" name="deletado_pac" value="n">
+            <div class="internacao-card internacao-card--general">
+                <div class="internacao-card__header">
+                    <div>
+                        <p class="internacao-card__eyebrow">Dados do paciente</p>
+                    </div>
+                </div>
+                <div class="internacao-card__body">
+
+                    <input type="hidden" name="type" value="create">
+                    <input type="hidden" name="deletado_pac" value="n">
+                    <input type="hidden" name="confirmar_homonimo_pac" id="confirmar_homonimo_pac" value="0">
 
         <!-- Step 1: Personal Information -->
         <div id="step-1" class="step">
             <div class="row">
-                <div class="form-group col-md-4 mb-3">
+                <div class="form-group col-md-2 mb-3">
                     <label for="cpf_pac">CPF</label>
                     <input class="form-control" type="text" oninput="mascara(this, 'cpf')" id="cpf_pac" name="cpf_pac"
                         placeholder="000.000.000-00">
@@ -46,16 +143,14 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                         CPF já cadastrado.
                     </div>
                 </div>
-                <div class="form-group col-md-8 mb-3">
+                <div class="form-group col-md-6 mb-3">
                     <label for="nome_pac">Nome</label>
                     <input type="text" class="form-control" id="nome_pac" name="nome_pac" required>
                     <div class="invalid-feedback">
                         Por favor, insira o nome.
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-4 mb-3">
+                <div class="form-group col-md-2 mb-3">
                     <label for="recem_nascido_pac">Recém-nascido?</label>
                     <select class="form-control" id="recem_nascido_pac" name="recem_nascido_pac"
                         onchange="handleRecemNascidoChange()">
@@ -64,6 +159,15 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                         <option value="n" selected>Não</option>
                     </select>
                 </div>
+                <div class="form-group col-md-2 mb-3">
+                    <label for="data_nasc_pac">Nascimento</label>
+                    <input type="date" class="form-control" id="data_nasc_pac" name="data_nasc_pac">
+                    <div class="invalid-feedback">
+                        Por favor, insira a data de nascimento.
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <!-- <div class="invalid-feedback" id="validar_matricula_rn" style="display: none;">
                     Matrícula já cadastrada para RN.
                 </div> -->
@@ -97,14 +201,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-md-4 mb-3">
-                    <label for="data_nasc_pac">Nascimento</label>
-                    <input type="date" class="form-control" id="data_nasc_pac" name="data_nasc_pac">
-                    <div class="invalid-feedback">
-                        Por favor, insira a data de nascimento.
-                    </div>
-                </div>
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-md-3 mb-2">
                     <label for="matricula_pac">Matrícula</label>
                     <input type="text" class="form-control" onkeyup="validarMatriculaExistente()" id="matricula_pac"
                         name="matricula_pac" required>
@@ -116,7 +213,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     </div>
 
                 </div>
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-md-3 mb-2">
                     <label for="sexo_pac">Sexo</label>
                     <select class="form-control" name="sexo_pac" id="sexo_pac">
                         <option value="" selected disabled>Selecione...</option>
@@ -125,58 +222,33 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     </select>
                     <div class="invalid-feedback">Por favor, selecione o sexo.</div>
                 </div>
-
-            </div>
-            <!-- <div class="form-group col-md-8 mb-3">
-                    <label for="mae_pac">Mãe</label>
-                    <input type="text" class="form-control" id="mae_pac" name="mae_pac">
-                </div> -->
-
-            <div class="row">
-                <div class="form-group col-md-6 mb-3">
+                <div class="form-group col-md-3 mb-3">
                     <label for="fk_seguradora_pac">Seguradora</label>
                     <select class="form-control" id="fk_seguradora_pac" name="fk_seguradora_pac">
                         <option value="1">Selecione</option>
-                        <?php foreach ($seguradoras as $seguradora): ?>
+                        <?php foreach ($seguradorasSelect as $seguradora): ?>
                         <option value="<?= $seguradora["id_seguradora"] ?>"><?= $seguradora['seguradora_seg'] ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group col-md-6 mb-3">
+                <div class="form-group col-md-3 mb-3">
                     <label for="fk_estipulante_pac">Estipulante</label>
                     <select class="form-control" id="fk_estipulante_pac" name="fk_estipulante_pac">
                         <option value="1">Selecione</option>
-                        <?php foreach ($estipulantes as $estipulante): ?>
+                        <?php foreach ($estipulantesSelect as $estipulante): ?>
                         <option value="<?= $estipulante["id_estipulante"] ?>"><?= $estipulante['nome_est'] ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <!-- <div class="form-group col-md-6 mb-3">
-                    <label for="matricula_pac">Matrícula</label>
-                    <input type="text" class="form-control" id="matricula_pac" name="matricula_pac">
-                </div> -->
-            </div>
-            <div class="form-group mb-3">
-                <label for="obs_pac">Observações</label>
-                <textarea rows="5" class="form-control" id="obs_pac" name="obs_pac"></textarea>
             </div>
             <hr>
-            <div class="d-flex gap-2">
-                <!-- <button type="button" class="btn btn-primary" id="next-1" onclick="nextStep(2)">
-                    Próximo <i class="fas fa-arrow-right"></i>
-                </button> -->
-                <button type="submit" class="btn btn-success" name="finalizar_etapa1" id="finalizar_etapa1">
-                    <i class="fas fa-check"></i> Finalizar Cadastro
-                </button>
-            </div>
-
-
         </div>
 
         <!-- Step 2: Address Information -->
-        <div id="step-2" class="step" style="display:none;">
+        <div id="step-2" class="step">
+            <p class="internacao-card__eyebrow mb-3">Dados de endereço</p>
             <div class="row">
                 <div class="form-group col-md-3 mb-3">
                     <label for="cep_pac">CEP</label>
@@ -227,16 +299,11 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 <input type="text" class="form-control" id="complemento_pac" name="complemento_pac">
             </div>
             <hr>
-            <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </button>
-            <button type="button" class="btn btn-primary" onclick="nextStep(3)">
-                Próximo <i class="fas fa-arrow-right"></i>
-            </button>
         </div>
 
         <!-- Step 3: Contact & Other Information -->
-        <div id="step-3" class="step" style="display:none;">
+        <div id="step-3" class="step">
+            <p class="internacao-card__eyebrow mb-3">Dados de contato</p>
             <div class="row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="email01_pac">Email Principal</label>
@@ -268,19 +335,68 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     </div>
                 </div>
             </div>
+            <div class="form-group mb-3">
+                <label for="obs_pac">Observações</label>
+                <textarea rows="5" class="form-control" id="obs_pac" name="obs_pac"></textarea>
+            </div>
             <hr>
-            <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </button>
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-success" id="finalizar_etapa1" name="finalizar_etapa1">
                 <i class="fas fa-check"></i> Cadastrar
             </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="modalNomeDuplicadoPaciente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-warning">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    Possível paciente já cadastrado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">
+                    Encontramos paciente(s) com nome igual ou muito parecido. Confirme se é homônimo antes de continuar.
+                </p>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Paciente</th>
+                                <th>Matrícula</th>
+                                <th>CPF</th>
+                                <th>Nascimento</th>
+                                <th>Seguradora</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dupPacienteBody">
+                            <tr>
+                                <td colspan="6" class="text-muted text-center">Sem dados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <small class="text-muted d-block mt-2">
+                    Se for a mesma pessoa, cancele e use o cadastro existente.
+                </small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmarHomonimo">
+                    É outro paciente, continuar
+                </button>
+            </div>
         </div>
-    </form>
+    </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="css/style.css">
 
 <?php
 require_once("templates/footer.php");

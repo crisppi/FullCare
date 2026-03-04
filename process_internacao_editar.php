@@ -1,4 +1,27 @@
 <?php
+
+if (!defined("FLOW_LOGGER_AUTO_V1")) {
+    define("FLOW_LOGGER_AUTO_V1", 1);
+    @require_once(__DIR__ . "/utils/flow_logger.php");
+    if (function_exists("flowLogStart") && function_exists("flowLog")) {
+        $__flowCtxAuto = flowLogStart(basename(__FILE__, ".php"), [
+            "type" => $_POST["type"] ?? $_GET["type"] ?? null,
+            "method" => $_SERVER["REQUEST_METHOD"] ?? null,
+        ]);
+        register_shutdown_function(function () use ($__flowCtxAuto) {
+            $err = error_get_last();
+            if ($err && in_array(($err["type"] ?? 0), [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+                flowLog($__flowCtxAuto, "shutdown.fatal", "ERROR", [
+                    "message" => $err["message"] ?? null,
+                    "file" => $err["file"] ?? null,
+                    "line" => $err["line"] ?? null,
+                ]);
+            }
+            flowLog($__flowCtxAuto, "request.finish", "INFO");
+        });
+    }
+}
+
 /*──────────────────────────────────────────────────────
   process_internacao_editar.php – fluxo UPDATE / CREATE
 ────────────────────────────────────────────────────────*/
@@ -66,6 +89,14 @@ if (!function_exists('normalizeDateTimeInput')) {
     }
 }
 
+if (!function_exists('internacaoEditarDebugLog')) {
+    function internacaoEditarDebugLog(string $message): void
+    {
+        $line = '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL;
+        @file_put_contents(__DIR__ . '/logs/process_internacao_editar.debug.log', $line, FILE_APPEND);
+    }
+}
+
 /*──────── session/inputs mínimos ────────*/
 $idInternacao = (int) ($_POST['id_internacao'] ?? 0);
 if (!$idInternacao) {
@@ -82,6 +113,14 @@ $negDao        = new negociacaoDAO($conn, $BASE_URL);
 $prorrogDao    = new prorrogacaoDAO($conn, $BASE_URL);
 $tussDao       = new tussDAO($conn, $BASE_URL);
 $gestaoDao     = new gestaoDAO($conn, $BASE_URL);
+
+internacaoEditarDebugLog(
+    'START id_int=' . (int)$idInternacao
+    . ' type=' . (string)($type ?? '')
+    . ' select_gestao=' . (string)($_POST['select_gestao'] ?? '')
+    . ' evento_adverso_ges=' . (string)($_POST['evento_adverso_ges'] ?? '')
+    . ' id_gestao=' . (string)($_POST['id_gestao'] ?? '')
+);
 
 try {
     $conn->beginTransaction();
@@ -217,22 +256,16 @@ try {
         $d->liminar_det               = filter_input(INPUT_POST, 'liminar_det');
         $d->parto_det                 = filter_input(INPUT_POST, 'parto_det');
 
-        error_log('[detalhes] Dados recebidos: ' . print_r($d, true));
-
         if (!$idDetalhes) {
             unset($d->id_detalhes);
-            error_log('[detalhes] Criando novo registro de detalhes');
             $detalhesDao->create($d);
         } else {
-            error_log('[detalhes] Atualizando registro de detalhes com ID: ' . $idDetalhes);
             $detalhesDao->update($d);
         }
     }
 
     /*──────── UTI (CREATE/UPDATE) ────────*/
     if (filter_input(INPUT_POST, 'select_uti') === 's') {
-        error_log("DADOS RECEBIDOS EM UTI:\n" . print_r($_POST, true));
-
         $u = new uti();
         $u->id_uti              = filter_input(INPUT_POST, 'id_uti', FILTER_VALIDATE_INT);
         $u->fk_internacao_uti   = filter_input(INPUT_POST, 'fk_internacao_uti', FILTER_VALIDATE_INT);
@@ -256,7 +289,18 @@ try {
     }
 
     /*──────── GESTAO (CREATE/UPDATE) ────────*/
-    if (filter_input(INPUT_POST, 'select_gestao') === 's') {
+    $selectGestaoPost = (string)($_POST['select_gestao'] ?? '');
+    $eventoAdversoPost = strtolower(trim((string)($_POST['evento_adverso_ges'] ?? 'n')));
+    $tipoEventoAdversoPost = trim((string)($_POST['tipo_evento_adverso_gest'] ?? ''));
+    $relEventoAdversoPost = trim((string)($_POST['rel_evento_adverso_ges'] ?? ''));
+    $deveSalvarGestao = (
+        $selectGestaoPost === 's'
+        || $eventoAdversoPost === 's'
+        || $tipoEventoAdversoPost !== ''
+        || $relEventoAdversoPost !== ''
+    );
+
+    if ($deveSalvarGestao) {
         $idGestao = filter_input(INPUT_POST, 'id_gestao', FILTER_VALIDATE_INT);
 
         $gestao = new gestao();
@@ -272,9 +316,9 @@ try {
         $gestao->rel_home_care_ges              = limpa(filter_input(INPUT_POST, 'rel_home_care_ges'));
         $gestao->desospitalizacao_ges           = filter_input(INPUT_POST, 'desospitalizacao_ges');
         $gestao->rel_desospitalizacao_ges       = limpa(filter_input(INPUT_POST, 'rel_desospitalizacao_ges'));
-        $gestao->evento_adverso_ges             = filter_input(INPUT_POST, 'evento_adverso_ges');
-        $gestao->rel_evento_adverso_ges         = limpa(filter_input(INPUT_POST, 'rel_evento_adverso_ges'));
-        $gestao->tipo_evento_adverso_gest       = filter_input(INPUT_POST, 'tipo_evento_adverso_gest');
+        $gestao->evento_adverso_ges             = $eventoAdversoPost;
+        $gestao->rel_evento_adverso_ges         = limpa($relEventoAdversoPost);
+        $gestao->tipo_evento_adverso_gest       = $tipoEventoAdversoPost;
         $gestao->evento_sinalizado_ges          = filter_input(INPUT_POST, 'evento_sinalizado_ges');
         $gestao->evento_discutido_ges           = filter_input(INPUT_POST, 'evento_discutido_ges');
         $gestao->evento_negociado_ges           = filter_input(INPUT_POST, 'evento_negociado_ges');
@@ -292,11 +336,19 @@ try {
         $gestao->fk_user_ges                    = filter_input(INPUT_POST, 'fk_user_ges', FILTER_VALIDATE_INT)
             ?? ($_SESSION['id_usuario'] ?? null);
 
+        if ($gestao->evento_encerrar_ges === 's' || $gestao->evento_fech_ges === 's') {
+            Gate::enforceAction($conn, $BASE_URL, 'close_management', 'Você não tem permissão para fechar gestão.');
+        }
+
         if ($idGestao) {
             $gestaoDao->update($gestao);
+            internacaoEditarDebugLog('GESTAO update ok id_int=' . (int)$idInt . ' id_gestao=' . (int)$idGestao . ' evento=' . (string)$gestao->evento_adverso_ges);
         } else {
             $gestaoDao->create($gestao);
+            internacaoEditarDebugLog('GESTAO create ok id_int=' . (int)$idInt . ' evento=' . (string)$gestao->evento_adverso_ges);
         }
+    } else {
+        internacaoEditarDebugLog('GESTAO skip id_int=' . (int)$idInt . ' select_gestao=' . (string)$selectGestaoPost . ' evento=' . (string)$eventoAdversoPost);
     }
 
     /*──────── NEGOCIAÇÕES (UPDATE/CREATE/DELETE) ────────*/
@@ -422,12 +474,14 @@ try {
     }
 
     $conn->commit();
+    internacaoEditarDebugLog('COMMIT ok id_int=' . (int)$idInternacao);
 
     // redirect único após todo o processamento
     header('Location: internacoes/lista');
     exit;
 } catch (Throwable $e) {
     $conn->rollBack();
+    internacaoEditarDebugLog('ERROR id_int=' . (int)$idInternacao . ' msg=' . $e->getMessage());
     error_log('[process_internacao_editar][ERROR] ' . $e->getMessage() . "\n" . $e->getTraceAsString());
     http_response_code(500);
     echo "Erro ao processar atualização. Detalhes no log.";

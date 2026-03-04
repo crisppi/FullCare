@@ -62,6 +62,10 @@ $biSections = [
         ['label' => 'Inteligência Artificial', 'href' => 'bi/inteligencia', 'file' => 'bi_inteligencia.php'],
         ['label' => 'Sinistro BI', 'href' => 'bi/sinistro-bi', 'file' => 'bi_sinistro.php'],
     ],
+    'Faturamento' => [
+        ['label' => 'Visitas', 'href' => 'bi/faturamento-visitas', 'file' => 'faturamento_visitas.php'],
+        ['label' => 'Consolidado', 'href' => 'bi/faturamento-consolidado', 'file' => 'bi_faturamento_consolidado.php'],
+    ],
     'Controle de Gastos' => [
         ['label' => 'Sinistralidade por Patologia', 'href' => 'bi/gastos-patologia', 'file' => 'ControleGastosPatologiaBI.php'],
         ['label' => 'Sinistralidade por Hospital', 'href' => 'bi/gastos-hospital', 'file' => 'ControleGastosHospitalBI.php'],
@@ -90,11 +94,11 @@ $biSections = [
         ['label' => 'Casos Caros Previsíveis', 'href' => 'bi/risco-casos-caros', 'file' => 'RiscoCasosCarosBI.php'],
     ],
     'Risco & Prevenção' => [
-        ['label' => 'Matriz de Risco', 'href' => 'bi/risco-prevencao-matriz', 'file' => 'bi_risco_prevencao_matriz.php'],
-        ['label' => 'Preditores', 'href' => 'bi/risco-prevencao-preditores', 'file' => 'bi_risco_prevencao_preditores.php'],
-        ['label' => 'Eventos Adversos', 'href' => 'bi/risco-prevencao-eventos', 'file' => 'bi_risco_prevencao_eventos.php'],
-        ['label' => 'Desospitalização Precoce', 'href' => 'bi/risco-prevencao-desospitalizacao', 'file' => 'bi_risco_prevencao_desospitalizacao.php'],
-        ['label' => 'Score por Internação', 'href' => 'bi/risco-prevencao-score', 'file' => 'bi_risco_prevencao_score.php'],
+        ['label' => 'Matriz de Risco', 'href' => 'bi/risco-prevencao-matriz', 'file' => 'RiscoPrevencaoMatrizBI.php'],
+        ['label' => 'Preditores', 'href' => 'bi/risco-prevencao-preditores', 'file' => 'RiscoPrevencaoPreditoresBI.php'],
+        ['label' => 'Eventos Adversos', 'href' => 'bi/risco-prevencao-eventos', 'file' => 'RiscoPrevencaoEventosBI.php'],
+        ['label' => 'Desospitalização Precoce', 'href' => 'bi/risco-prevencao-desospitalizacao', 'file' => 'RiscoPrevencaoDesospitalizacaoBI.php'],
+        ['label' => 'Score por Internação', 'href' => 'bi/risco-prevencao-score', 'file' => 'RiscoPrevencaoScoreBI.php'],
     ],
     'Negociação & Rede' => [
         ['label' => 'Volume vs Custo', 'href' => 'bi/rede-volume-custo', 'file' => 'RedeVolumeCustoBI.php'],
@@ -103,7 +107,7 @@ $biSections = [
     ],
     'Qualidade & Desfecho' => [
         ['label' => 'Eventos Adversos', 'href' => 'bi/qualidade-eventos', 'file' => 'QualidadeEventosBI.php'],
-        ['label' => 'Óbitos', 'href' => 'bi/qualidade-obitos', 'file' => 'QualidadeObitosBI.php'],
+        ['label' => 'Óbitos', 'href' => 'QualidadeObitosBI.php', 'file' => 'QualidadeObitosBI.php'],
     ],
 ];
 
@@ -200,7 +204,7 @@ if (!in_array($currentPage, $flatPages, true) && !$matchedByHref) {
 
 .bi-section-tabs {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
     padding: 6px 18px 4px;
     width: 100%;
@@ -208,9 +212,18 @@ if (!in_array($currentPage, $flatPages, true) && !$matchedByHref) {
     overflow-x: auto;
 }
 
+.bi-nav-inline {
+    margin-left: auto;
+    margin-right: 16px;
+    align-self: center;
+    display: flex;
+    gap: 8px;
+}
+
 .bi-section-tab {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     padding: 6px 12px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.7);
@@ -221,6 +234,8 @@ if (!in_array($currentPage, $flatPages, true) && !$matchedByHref) {
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .bi-section-tab:hover {
@@ -312,6 +327,12 @@ if (!in_array($currentPage, $flatPages, true) && !$matchedByHref) {
     background: linear-gradient(135deg, #ffd36e, #d69a3a);
     border-color: rgba(215, 160, 70, 0.9);
     color: #2c1b05;
+}
+
+.bi-section-tabs[data-section="prevencao"] .bi-section-tab.is-active {
+    background: linear-gradient(135deg, #ff6b6b, #c43d3d);
+    border-color: rgba(190, 70, 70, 0.9);
+    color: #2a0c0c;
 }
 
 .bi-section-tabs[data-section="negociacao"] .bi-section-tab.is-active {
@@ -554,8 +575,10 @@ $sectionDisplay = [
     'Auditoria' => 'Auditoria',
     'Conformidade & Auditoria' => 'Conformidade & Auditoria',
     'Segmentação de Risco' => 'Segmentação de Risco',
+    'Risco & Prevenção' => 'Risco & Prevenção',
     'Negociação & Rede' => 'Negociação & Rede',
     'Qualidade & Desfecho' => 'Qualidade & Desfecho',
+    'Faturamento' => 'Faturamento',
 ];
 $sectionSlugMap = [
     'Resumo' => 'resumo',
@@ -568,12 +591,16 @@ $sectionSlugMap = [
     'Anomalias & Fraude' => 'anomalias',
     'Conformidade & Auditoria' => 'conformidade',
     'Segmentação de Risco' => 'risco',
+    'Risco & Prevenção' => 'prevencao',
     'Negociação & Rede' => 'negociacao',
     'Qualidade & Desfecho' => 'qualidade',
+    'Faturamento' => 'faturamento',
 ];
 $activeSection = $currentSection ?: array_key_first($biSections);
 $activeSectionSlug = $sectionSlugMap[$activeSection] ?? 'resumo';
-$activeItems = $biSections[$activeSection] ?? [];
+ $activeItems = $biSections[$activeSection] ?? [];
+$navUrl = $BASE_URL . 'bi/navegacao';
+$navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, '/') === 'bi/navegacao';
 ?>
 
 <div class="bi-topbar">
@@ -585,6 +612,12 @@ $activeItems = $biSections[$activeSection] ?? [];
                 <span>/</span>
                 <?= htmlspecialchars($currentLabel ?: 'Painel', ENT_QUOTES, 'UTF-8') ?>
             </div>
+        </div>
+        <div class="bi-nav-inline">
+            <a class="bi-section-tab bi-section-tab-nav <?= $navActive ? 'is-active' : '' ?>"
+                href="<?= htmlspecialchars($navUrl, ENT_QUOTES, 'UTF-8') ?>">
+                Navegação
+            </a>
         </div>
         <select class="bi-topbar-select" onchange="if (this.value) window.location.href=this.value;">
             <option value="">Ir para relatório...</option>
@@ -603,14 +636,6 @@ $activeItems = $biSections[$activeSection] ?? [];
         </select>
     </div>
     <div class="bi-section-tabs" data-section="<?= htmlspecialchars($activeSectionSlug, ENT_QUOTES, 'UTF-8') ?>">
-        <?php
-        $navUrl = $BASE_URL . 'bi/navegacao';
-        $navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, '/') === 'bi/navegacao';
-        ?>
-        <a class="bi-section-tab bi-section-tab-nav <?= $navActive ? 'is-active' : '' ?>"
-            href="<?= htmlspecialchars($navUrl, ENT_QUOTES, 'UTF-8') ?>">
-            Navegação
-        </a>
         <?php foreach ($biSections as $section => $items): ?>
         <?php
         $sectionName = $sectionDisplay[$section] ?? $section;

@@ -25,7 +25,7 @@
   const stateContas = { loaded: false, page: 1, total: 0 };
 
   // ================== UTILS ==================
-  const log = (...a) => console.log('[hub_paciente]', ...a);
+  const log = () => {};
 
   const debounce = (fn, wait = 150) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), wait); }; };
 
@@ -204,6 +204,7 @@
       const isAlta = String(status).toLowerCase() === 'alta' ||
         String(row.internado_int).toLowerCase() === 'n';
 
+      const partialUrl = `${window.BASE_URL || ''}cad_capeante_rah.php?type=create&nova_parcial=1&id_internacao=${encodeURIComponent(iid)}`;
       const tr = document.createElement('tr');
       tr.classList.add('row-int');
       tr.dataset.idInt = iid;
@@ -431,9 +432,11 @@
     const resumo = document.querySelector('#tab-contas .card:nth-of-type(1) .card-body');
     const resumoValores = document.getElementById('contasResumoValores');
     if (resumoValores) {
+      const glosaSomada = Math.max(0, (summary?.soma_glosa_total || 0));
       resumoValores.innerHTML = `
         <div><strong>Valor apresentado:</strong> R$ ${Number(summary?.soma_apresentado || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-        <div><strong>Glosa total:</strong> R$ ${Number(summary?.soma_glosa_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+        <div><strong>Glosa total:</strong> R$ ${Number(glosaSomada).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+        <div><strong>Desconto total:</strong> R$ ${Number(summary?.soma_desconto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
         <div><strong>Valor final:</strong> R$ ${Number(summary?.soma_final || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>`;
     }
     const resumoIndicadores = document.getElementById('contasResumoIndicadores');
@@ -441,8 +444,8 @@
       resumoIndicadores.innerHTML = `
         <div><strong>Total de contas:</strong> ${summary?.total_contas ?? 0}</div>
         <div><strong>Total de internações:</strong> ${summary?.total_internacoes ?? 0}</div>
-        <div><strong>Custo médio / conta:</strong> R$ ${Number(summary?.custo_medio_conta || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-        <div><strong>Custo médio / internação:</strong> R$ ${Number(summary?.custo_medio_internacao || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>`;
+        <div><strong>Custo médio / conta:</strong> R$ ${Number(summary?.custo_medio_conta || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+        <div><strong>Custo médio / internação:</strong> R$ ${Number(summary?.custo_medio_internacao || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
     }
   }
 
@@ -458,8 +461,8 @@
               <tr>
                 <th>Internação</th><th>Conta</th><th>Hospital</th><th>Período</th>
                 <th>Fechamento</th><th>Lançamento</th>
-                <th class="text-end">Apresentado</th><th class="text-end">Glosa</th><th class="text-end">Final</th>
-                <th>Status</th><th>Parcial / Nº</th><th>Ações</th>
+                <th class="text-end">Apresentado</th><th class="text-end">Glosa</th><th class="text-end">Desconto</th><th class="text-end">Liberado</th>
+                <th>Parcial / Nº</th><th>Ações</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -595,7 +598,7 @@
 
     groupEntries.forEach(({ key, contas, hasOpen, hasOverlap, hasEncerrado, uncoveredRanges }) => {
       const openSegments = [];
-      contas.forEach((r) => {
+      contas.forEach((r, idx) => {
         if (r.__periodoAberto) openSegments.push(r.periodo || 'Período sem data final');
       });
       (uncoveredRanges || []).forEach((range) => {
@@ -622,7 +625,7 @@
         </td>`;
       tbody.appendChild(trHead);
 
-      contas.forEach((r) => {
+      contas.forEach((r, idx) => {
         const tr = document.createElement('tr');
         const rowClasses = [];
         if (r.__periodoAberto) rowClasses.push('conta-periodo-aberto');
@@ -631,7 +634,7 @@
         const valorId = r.id_valor ? String(r.id_valor) : '';
         const capeanteId = r.id_capeante ? String(r.id_capeante) : '';
         const intId = r.id_internacao ? String(r.id_internacao) : '';
-        const baseRahUrl = `cad_capeante_rah.php?id_capeante=${encodeURIComponent(capeanteId)}${intId ? `&id_internacao=${encodeURIComponent(intId)}` : ''}`;
+        const baseRahUrl = `cad_capeante_rah.php?type=create&nova_parcial=1&id_capeante=${encodeURIComponent(capeanteId)}${intId ? `&id_internacao=${encodeURIComponent(intId)}` : ''}`;
         const rahEditUrl = valorId
           ? `edit_capeante_rah.php?id_valor=${encodeURIComponent(valorId)}`
           : `edit_capeante_rah.php?id_capeante=${encodeURIComponent(capeanteId)}${intId ? `&id_internacao=${encodeURIComponent(intId)}` : ''}`;
@@ -649,6 +652,11 @@
         const periodoLabel = `${esc(r.periodo || '—')}${r.__periodoAberto ? ' <span class="badge badge-soft badge-open-period">Em aberto</span>' : ''}`;
         const overlapIndicator = r.__hasOverlap ? '<div class="text-danger small mt-1">Intervalo conflitante</div>' : '';
 
+        const showParcialButton = idx === 0;
+        const partialButtonHtml = showParcialButton
+          ? `<button class="btn btn-sm btn-warning" type="button" data-action="parcial-conta" data-url="${esc(baseRahUrl)}" title="Lançar parcial do capeante">Parcial</button>`
+          : '';
+
         tr.innerHTML = `
           <td>${esc(r.id_internacao ?? '—')}</td>
           <td>#${esc(r.id_capeante)}</td>
@@ -658,13 +666,14 @@
           <td>${esc(r.data_lancamento || '—')}</td>
           <td class="text-end">R$ ${Number(r.valor_apresentado || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
           <td class="text-end">R$ ${Number(r.glosa_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+          <td class="text-end">R$ ${Number(r.desconto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
           <td class="text-end">R$ ${Number(r.valor_final || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-          <td>${esc(r.status || '—')}</td>
           <td>${parcialBadge}${parcialNumText && parcialNumText !== '—' ? ` <span class="text-muted small ms-1">(${parcialNumText})</span>` : ''}</td>
           <td class="d-flex gap-1 flex-wrap">
             <a class="btn btn-sm btn-outline-primary" href="${rahEditUrl}" title="Editar RAH da conta">Editar RAH</a>
             <a class="btn btn-sm btn-outline-success" href="${rahDownloadUrl}" target="_blank" rel="noopener" title="Baixar PDF do RAH">PDF - RAH</a>
             <button class="btn btn-sm btn-rah-view" type="button" data-action="preview-rah" data-url="${rahPreviewUrl}" title="Visualizar RAH em tela">Ver RAH</button>
+          ${partialButtonHtml}
           </td>`;
         tbody.appendChild(tr);
       });
@@ -709,11 +718,19 @@
     modal.show();
   }
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action="preview-rah"]');
-    if (!btn) return;
-    e.preventDefault();
-    const url = btn.getAttribute('data-url');
-    openRahPreview(url);
+    const previewBtn = e.target.closest('[data-action="preview-rah"]');
+    if (previewBtn) {
+      e.preventDefault();
+      const url = previewBtn.getAttribute('data-url');
+      openRahPreview(url);
+      return;
+    }
+    const partialBtn = e.target.closest('[data-action="parcial-conta"]');
+    if (partialBtn) {
+      e.preventDefault();
+      const url = partialBtn.getAttribute('data-url');
+      if (url) window.location.href = url;
+    }
   });
   async function loadContas() {
     const pacId = getPacienteId(); if (!pacId) return; ensureContasTable();

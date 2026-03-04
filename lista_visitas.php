@@ -1,6 +1,9 @@
 <?php
 ob_start();
 
+if (!defined('SKIP_HEADER')) {
+    define('SKIP_HEADER', true);
+}
 include_once __DIR__ . "/check_logado.php";
 include_once __DIR__ . "/globals.php";
 include_once __DIR__ . "/db.php";
@@ -46,6 +49,8 @@ $T_ALT = 'tb_alta';
 $T_PAT = 'tb_patologia';
 $T_CID = 'tb_cid';
 $T_USR = 'tb_user';
+$T_CAP = 'tb_capeante';
+$T_SEG = 'tb_seguradora';
 
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '/lista_visitas.php';
 
@@ -55,6 +60,7 @@ $pageTitle = $isFaturamentoView ? 'Faturamento - Visitas' : 'Lista de Visitas';
 
 /* ==== Entrada ==== */
 $nomePaciente = trim($_GET['nome'] ?? '');
+$matriculaPaciente = trim($_GET['matricula'] ?? '');
 $hospitalIdsRaw = $_GET['hospital_id'] ?? [];
 if ($hospitalIdsRaw === '' || $hospitalIdsRaw === null) {
     $hospitalIdsRaw = [];
@@ -69,6 +75,23 @@ foreach ($hospitalIdsRaw as $hid) {
     }
 }
 $hospitalIds = array_values(array_unique($hospitalIds));
+$seguradoraIdsRaw = $_GET['seguradora_id'] ?? [];
+if ($seguradoraIdsRaw === '' || $seguradoraIdsRaw === null) {
+    $seguradoraIdsRaw = [];
+} elseif (!is_array($seguradoraIdsRaw)) {
+    $seguradoraIdsRaw = [$seguradoraIdsRaw];
+}
+$seguradoraIds = [];
+foreach ($seguradoraIdsRaw as $sidRaw) {
+    foreach (explode(',', (string)$sidRaw) as $part) {
+        $sid = (int)preg_replace('/\D+/', '', $part);
+        if ($sid > 0) {
+            $seguradoraIds[] = $sid;
+        }
+    }
+}
+$seguradoraIds = array_values(array_unique($seguradoraIds));
+$seguradoraIdsRawNormalized = array_map(fn($v) => trim((string)$v), $seguradoraIdsRaw);
 $dtIni        = trim($_GET['dt_ini'] ?? ''); // YYYY-MM-DD
 $dtFim        = trim($_GET['dt_fim'] ?? ''); // YYYY-MM-DD
 $faturadoVis  = strtolower(trim($_GET['faturado'] ?? 'n'));
@@ -100,6 +123,7 @@ $fieldsMap = [
     'hospital'        => ['label' => 'Hospital',         'sql' => "ho.nome_hosp AS hospital"],
     'cnpj_hospital'   => ['label' => 'CNPJ do hospital', 'sql' => "ho.cnpj_hosp AS cnpj_hospital"],
     'nome_paciente'   => ['label' => 'Nome do paciente', 'sql' => "pa.nome_pac AS nome_paciente"],
+    'seguradora'      => ['label' => 'Seguradora', 'sql' => "COALESCE(NULLIF(TRIM(se.seguradora_seg),''),'Sem seguradora') AS seguradora"],
     'matricula'       => ['label' => 'Matrícula do paciente', 'sql' => "pa.matricula_pac AS matricula"],
     'data_internacao' => ['label' => 'Data internação',  'sql' => "i.data_intern_int AS data_internacao"],
     'data_visita'     => ['label' => 'Data visita',      'sql' => "v.data_visita_fmt AS data_visita"],
@@ -107,6 +131,7 @@ $fieldsMap = [
         'label' => 'Data lançamento',
         'sql'   => "v1.data_lancamento_vis AS data_lancamento"
     ],
+    'valor_liberado'  => ['label' => 'Valor Liberado',  'sql' => "ca.valor_final_capeante AS valor_liberado"],
     'periodo_faturamento' => [
         'label' => 'Período faturamento (30 dias)',
         'sql'   => "CASE WHEN v.last_data_lancamento_iso IS NULL THEN NULL ELSE CONCAT(IFNULL(v.periodo_ini_fmt,''), ' a ', v.last_data_lancamento_fmt) END AS periodo_faturamento"
@@ -192,6 +217,18 @@ LEFT JOIN (
 ) v ON v.fk_internacao = i.id_internacao
 ";
 
+$capPick = "
+LEFT JOIN (
+  SELECT fk_int_capeante, MAX(id_capeante) AS id_capeante_pick
+  FROM $T_CAP
+  GROUP BY fk_int_capeante
+) cap ON cap.fk_int_capeante = i.id_internacao
+";
+
+$capJoin = "LEFT JOIN $T_CAP ca ON ca.id_capeante = cap.id_capeante_pick";
+
+$segJoin = "LEFT JOIN $T_SEG se ON se.id_seguradora = pa.fk_seguradora_pac";
+
 /* ==== JOINs ==== */
 $v1Join = "LEFT JOIN $T_VIS v1 ON v1.id_visita = CAST(v.id_visita_pick AS UNSIGNED)";
 $uJoin  = "LEFT JOIN $T_USR u  ON u.id_usuario  = v1.fk_usuario_vis";
@@ -220,6 +257,10 @@ if ($nomePaciente !== '') {
     $whereConditions .= " AND pa.nome_pac LIKE :nome ";
     $paramsBase[':nome'] = "%$nomePaciente%";
 }
+if ($matriculaPaciente !== '') {
+    $whereConditions .= " AND pa.matricula_pac LIKE :matricula ";
+    $paramsBase[':matricula'] = "%$matriculaPaciente%";
+}
 if (!empty($hospitalIds)) {
     $placeholders = [];
     foreach ($hospitalIds as $idx => $hid) {
@@ -228,6 +269,15 @@ if (!empty($hospitalIds)) {
         $paramsBase[$ph] = $hid;
     }
     $whereConditions .= " AND i.fk_hospital_int IN (" . implode(', ', $placeholders) . ") ";
+}
+if (!empty($seguradoraIds)) {
+    $placeholders = [];
+    foreach ($seguradoraIds as $idx => $sid) {
+        $ph = ":seg{$idx}";
+        $placeholders[] = $ph;
+        $paramsBase[$ph] = $sid;
+    }
+    $whereConditions .= " AND pa.fk_seguradora_pac IN (" . implode(', ', $placeholders) . ") ";
 }
 
 // Se período definido, garante que só traga internações com visita escolhida
@@ -245,6 +295,9 @@ FROM $T_INT i
 JOIN $T_PAC pa ON pa.id_paciente = i.fk_paciente_int
 LEFT JOIN $T_HOS ho ON ho.id_hospital = i.fk_hospital_int
 $vPick
+$capPick
+$capJoin
+$segJoin
 $v1Join
 $uJoin
 $uJoin2
@@ -266,7 +319,9 @@ $sortableColumns = [
     'hospital'        => "ho.nome_hosp",
     'nome_paciente'   => "pa.nome_pac",
     'data_internacao' => "COALESCE(STR_TO_DATE(i.data_intern_int,'%Y-%m-%d %H:%i:%s'), STR_TO_DATE(i.data_intern_int,'%Y-%m-%d'), STR_TO_DATE(i.data_intern_int,'%d/%m/%Y'), i.data_intern_int)",
-    'data_lancamento' => "v1.data_lancamento_vis"
+    'data_lancamento' => "v1.data_lancamento_vis",
+    'seguradora'      => "COALESCE(NULLIF(TRIM(se.seguradora_seg),''),'Sem seguradora')",
+    'valor_liberado'  => "IFNULL(ca.valor_final_capeante, 0)"
 ];
 $sqlOrder = "ORDER BY " . $defaultOrderExpr;
 if (isset($sortableColumns[$sortField])) {
@@ -308,6 +363,44 @@ $hospitais = [];
 try {
     $hStmt = $conn->query("SELECT id_hospital, nome_hosp FROM $T_HOS ORDER BY nome_hosp");
     if ($hStmt) $hospitais = $hStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+}
+ $seguradoras = [];
+try {
+    $sStmt = $conn->query("SELECT id_seguradora, seguradora_seg FROM $T_SEG WHERE COALESCE(deletado_seg,'n') <> 's' ORDER BY seguradora_seg");
+    if ($sStmt) {
+        $rawSeguradoras = $sStmt->fetchAll(PDO::FETCH_ASSOC);
+        $bucket = [];
+        foreach ($rawSeguradoras as $row) {
+            $label = trim((string)($row['seguradora_seg'] ?? ''));
+            if ($label === '') {
+                continue;
+            }
+            $key = function_exists('mb_strtolower') ? mb_strtolower($label, 'UTF-8') : strtolower($label);
+            $key = trim($key);
+            if ($key === '') {
+                continue;
+            }
+            if (!isset($bucket[$key])) {
+                $bucket[$key] = [
+                    'label' => $label,
+                    'ids' => [],
+                ];
+            }
+            $bucket[$key]['ids'][] = (int)($row['id_seguradora'] ?? 0);
+        }
+        $seguradoras = array_values(array_filter(array_map(function ($entry) {
+            $ids = array_values(array_filter(array_unique($entry['ids'])));
+            if (!$ids) {
+                return null;
+            }
+            return [
+                'label' => $entry['label'],
+                'ids' => $ids,
+                'value' => implode(',', $ids),
+            ];
+        }, $bucket)));
+    }
 } catch (Throwable $e) {
 }
 
@@ -436,6 +529,7 @@ if ($isExport) {
 }
 
 /* ==== Render ==== */
+$hideBIMenu = $isFaturamentoView;
 include_once __DIR__ . "/templates/header.php";
 
 $brandColor = $isFaturamentoView ? '#0a4fa3' : '#0b3d91';
@@ -651,7 +745,7 @@ $fieldIcons = [
             <div class="d-flex gap-2">
                 <button type="button" class="btn btn-light btn-sm" id="btn-check-all"><i
                         class="bi bi-check2-all me-1"></i>Selecionar todos</button>
-                <button type="button" class="btn btn-light btn-sm" id="btn-uncheck-all"><i
+                <button type="button" class="btn btn-light btn-sm btn-filtro-limpar" id="btn-uncheck-all"><i
                         class="bi bi-x-lg me-1"></i>Limpar</button>
             </div>
         </div>
@@ -679,12 +773,32 @@ $fieldIcons = [
             </div>
             <div class="col-12 col-xl-3 filters-item">
                 <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-123"></i></span>
+                    <input type="text" name="matricula" class="form-control form-control-sm" placeholder="Matrícula do paciente"
+                        value="<?= h($matriculaPaciente) ?>">
+                </div>
+            </div>
+            <div class="col-12 col-xl-3 filters-item">
+                <div class="input-group input-group-sm">
                     <span class="input-group-text"><i class="bi bi-hospital"></i></span>
                     <select name="hospital_id[]" id="filtro-hospital" class="form-select form-select-sm" multiple>
                         <?php foreach ($hospitais as $h): ?>
                             <?php $isSelected = in_array((int)$h['id_hospital'], $hospitalIds, true); ?>
                             <option value="<?= $h['id_hospital'] ?>" <?= $isSelected ? 'selected' : '' ?>>
                                 <?= h($h['nome_hosp']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="col-12 col-xl-3 filters-item">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-heart-pulse"></i></span>
+                    <select name="seguradora_id[]" id="filtro-seguradora" class="form-select form-select-sm" multiple>
+                        <?php foreach ($seguradoras as $s): ?>
+                            <?php $segSelected = in_array($s['value'], $seguradoraIdsRawNormalized, true); ?>
+                            <option value="<?= h($s['value']) ?>" <?= $segSelected ? 'selected' : '' ?>>
+                                <?= h($s['label']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -862,12 +976,19 @@ $fieldIcons = [
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         if (window.jQuery && typeof jQuery.fn.select2 === 'function') {
-            jQuery('#filtro-hospital').select2({
-                placeholder: 'Hospitais',
-                allowClear: true,
-                width: '100%',
-                closeOnSelect: false
-            });
+            const initSelect2 = (selector, placeholder) => {
+                const $el = jQuery(selector);
+                if (!$el.length) return;
+                $el.select2({
+                    placeholder,
+                    allowClear: true,
+                    width: '100%',
+                    closeOnSelect: false,
+                    dropdownParent: $el.parent()
+                });
+            };
+            initSelect2('#filtro-hospital', 'Hospitais');
+            initSelect2('#filtro-seguradora', 'Seguradoras');
         }
         const formEl = document.getElementById('form-visitas');
         const updateColumnVisibility = (checkbox) => {

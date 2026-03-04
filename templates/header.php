@@ -8,8 +8,6 @@ header("Content-type: text/html; charset=utf-8");
 // Caminho default
 $defaultFoto = $BASE_URL . 'img/user-default.png';
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 
 $sessionNivel = isset($_SESSION['nivel']) ? (int) $_SESSION['nivel'] : 0;
@@ -21,9 +19,115 @@ $normAccess = function ($txt) {
     $txt = $c !== false ? $c : $txt;
     return preg_replace('/[^a-z]/', '', $txt);
 };
-$isDiretoria = in_array($normAccess($_SESSION['cargo'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || in_array($normAccess($_SESSION['nivel'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+$normCargoAccess = $normAccess($_SESSION['cargo'] ?? '');
+$isBiHubOnly = (strpos($normCargoAccess, 'gestorseguradora') === 0);
+$isSeguradoraRole = (strpos($normCargoAccess, 'seguradora') !== false);
+$canSeeFullMenu = ($sessionNivel > 0) && !$isBiHubOnly;
+$canSeeBiMenu = ($sessionNivel >= 3) || $isBiHubOnly;
+$canSeeInteligenciaMenu = ($sessionNivel > 0);
+$canSeeHubMenu = $isBiHubOnly;
+$canSeeInternadosMenu = $isBiHubOnly;
+$canSeeGestorListas = $isBiHubOnly;
+$normNivelAccess = $normAccess($_SESSION['nivel'] ?? '');
+$isDiretoria = in_array($normCargoAccess, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+    || (strpos($normCargoAccess, 'diretor') !== false)
+    || (strpos($normCargoAccess, 'diretoria') !== false)
+    || in_array($normNivelAccess, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
     || ($sessionNivel === -1);
+$seguradoraHeaderLogoUrl = null;
+$seguradoraHeaderNome = null;
+$resolveSeguradoraLogoUrl = static function (string $logoSeg, int $seguradoraId, string $seguradoraNome) use ($BASE_URL): ?string {
+    $logoSeg = trim($logoSeg);
+    if ($logoSeg !== '') {
+        if (preg_match('#^https?://#i', $logoSeg)) {
+            return $logoSeg;
+        }
+
+        $logoPath = ltrim($logoSeg, '/');
+        $localCandidates = [];
+        $urlCandidates = [];
+
+        if (stripos($logoPath, 'img/') === 0 || stripos($logoPath, 'uploads/') === 0) {
+            $localCandidates[] = __DIR__ . '/../' . $logoPath;
+            $urlCandidates[] = $BASE_URL . $logoPath;
+        } else {
+            $localCandidates[] = __DIR__ . '/../img/' . $logoPath;
+            $urlCandidates[] = $BASE_URL . 'img/' . $logoPath;
+            $localCandidates[] = __DIR__ . '/../uploads/' . $logoPath;
+            $urlCandidates[] = $BASE_URL . 'uploads/' . $logoPath;
+        }
+
+        foreach ($localCandidates as $idx => $localFile) {
+            if (is_file($localFile)) {
+                return $urlCandidates[$idx] ?? null;
+            }
+        }
+    }
+
+    $nomeNorm = mb_strtolower(trim($seguradoraNome), 'UTF-8');
+    $nomeAscii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nomeNorm);
+    $nomeNorm = $nomeAscii !== false ? $nomeAscii : $nomeNorm;
+    $nomeNorm = preg_replace('/[^a-z0-9]+/', '_', $nomeNorm);
+    $nomeNorm = trim((string)$nomeNorm, '_');
+
+    $baseNames = array_filter([
+        $seguradoraId > 0 ? 'seguradora_' . $seguradoraId : null,
+        $seguradoraId > 0 ? 'logo_seguradora_' . $seguradoraId : null,
+        $nomeNorm !== '' ? $nomeNorm : null,
+        $nomeNorm !== '' ? 'logo_' . $nomeNorm : null,
+    ]);
+    $exts = ['png', 'jpg', 'jpeg', 'webp', 'svg'];
+
+    foreach ($baseNames as $baseName) {
+        foreach ($exts as $ext) {
+            $candidate = $baseName . '.' . $ext;
+            $imgFile = __DIR__ . '/../img/' . $candidate;
+            if (is_file($imgFile)) {
+                return $BASE_URL . 'img/' . $candidate;
+            }
+            $uploadFile = __DIR__ . '/../uploads/' . $candidate;
+            if (is_file($uploadFile)) {
+                return $BASE_URL . 'uploads/' . $candidate;
+            }
+        }
+    }
+
+    return null;
+};
+if ($isSeguradoraRole || !empty($_SESSION['fk_seguradora_user'])) {
+    $seguradoraId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+    if ($seguradoraId <= 0 && !empty($sessionIdUsuario)) {
+        try {
+            $stmtUserSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtUserSeg->bindValue(':id', (int)$sessionIdUsuario, PDO::PARAM_INT);
+            $stmtUserSeg->execute();
+            $seguradoraId = (int)($stmtUserSeg->fetchColumn() ?: 0);
+            if ($seguradoraId > 0) {
+                $_SESSION['fk_seguradora_user'] = $seguradoraId;
+            }
+        } catch (Throwable $e) {
+            $seguradoraId = 0;
+        }
+    }
+
+    if ($seguradoraId > 0) {
+        try {
+            $stmtSeg = $conn->prepare("SELECT seguradora_seg, logo_seg FROM tb_seguradora WHERE id_seguradora = :id LIMIT 1");
+            $stmtSeg->bindValue(':id', $seguradoraId, PDO::PARAM_INT);
+            $stmtSeg->execute();
+            $seguradoraHeader = $stmtSeg->fetch(PDO::FETCH_ASSOC) ?: null;
+
+            if (is_array($seguradoraHeader)) {
+                $logoSeg = trim((string)($seguradoraHeader['logo_seg'] ?? ''));
+                $seguradoraHeaderNome = trim((string)($seguradoraHeader['seguradora_seg'] ?? ''));
+                $seguradoraHeaderLogoUrl = $resolveSeguradoraLogoUrl($logoSeg, $seguradoraId, $seguradoraHeaderNome);
+            }
+        } catch (Throwable $e) {
+            $seguradoraHeaderLogoUrl = null;
+            $seguradoraHeaderNome = null;
+        }
+    }
+}
 
 $chatUnreadCount = 0;
 $chatAssistantLink = $BASE_URL . 'show_chat.php';
@@ -89,7 +193,8 @@ if (!empty($sessionIdUsuario)) {
     <link href="<?= $BASE_URL ?>css/legendas.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/styleMenu.css?v=<?= @filemtime(__DIR__ . '/../css/styleMenu.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/style_show_internacao.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/table_style.css?v=<?= @filemtime(__DIR__ . '/../css/table_style.css') ?>" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/table_style.css" rel="stylesheet">
+    <script defer src="<?= $BASE_URL ?>js/lista_header_sort.js"></script>
 
     <!-- ======= APENAS DESIGN (logos alinhados e simétricos) ======= -->
     <style>
@@ -123,6 +228,63 @@ if (!empty($sessionIdUsuario)) {
             }
         }
 
+        .navbar .navbar-brand .logo-conex {
+            height: 24px !important;
+            max-width: 105px;
+        }
+
+        @media (max-width: 1199.98px) {
+            .navbar .navbar-brand .logo-conex {
+                height: 22px !important;
+                max-width: 96px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .navbar .navbar-brand .logo-conex {
+                height: 20px !important;
+                max-width: 88px;
+            }
+        }
+
+        .navbar .navbar-brand .brand-divider {
+            width: 1px;
+            height: 34px;
+            background: rgba(94, 35, 99, 0.35);
+        }
+
+        .navbar .navbar-brand .logo-seguradora {
+            height: 56px;
+            width: auto;
+            max-width: 220px;
+            object-fit: contain;
+            display: block;
+        }
+
+        @media (max-width: 1199.98px) {
+            .navbar .navbar-brand .logo-seguradora {
+                height: 48px;
+                max-width: 180px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .navbar .navbar-brand .brand-divider {
+                height: 30px;
+            }
+
+            .navbar .navbar-brand .logo-seguradora {
+                height: 38px;
+                max-width: 130px;
+            }
+        }
+
+        #navbarGestorListas {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
 
         .header-actions {
             margin-left: auto !important;
@@ -186,6 +348,39 @@ if (!empty($sessionIdUsuario)) {
             color: #5c5c5c;
         }
 
+        @media (max-width: 991.98px) {
+            #navbarScroll {
+                max-height: calc(100vh - 140px);
+                overflow-y: auto;
+                padding-bottom: 8px;
+            }
+
+            .navbar-nav.navbar-nav-scroll {
+                --bs-scroll-height: none !important;
+                max-height: none !important;
+                overflow: visible !important;
+                width: 100%;
+                align-items: flex-start !important;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding: 0 12px 10px;
+                margin-top: 6px;
+            }
+
+            .header-actions #global-patient-search {
+                min-width: 240px;
+                flex: 1 0 auto;
+            }
+
+            .header-zoom-actions {
+                display: none !important;
+            }
+        }
+
         @media (max-width: 575.98px) {
             .header-actions {
                 width: 100%;
@@ -211,69 +406,76 @@ if (!empty($sessionIdUsuario)) {
             </div>
             <div class="container-fluid">
                 <a class="navbar-brand" href="index.php" style="gap:12px;">
-                    <img src="<?= $BASE_URL ?>img/LogoFullCare.png" class="logo-novo" style="max-width: 100%;
-                        height: auto;
-                        width: auto\9;
-                        max-height: 100px;
-                        min-height: 50px;" alt="FullCare">
+                    <img src="<?= $BASE_URL ?>img/LogoFullCare.png" class="logo-novo" width="224" height="56"
+                        style="max-width:100%;height:auto;" alt="FullCare">
+                    <?php if (!empty($seguradoraHeaderLogoUrl)): ?>
+                    <span class="brand-divider" aria-hidden="true"></span>
+                    <img src="<?= htmlspecialchars($seguradoraHeaderLogoUrl, ENT_QUOTES, 'UTF-8') ?>"
+                        class="logo-seguradora"
+                        alt="<?= htmlspecialchars($seguradoraHeaderNome ?: 'Seguradora', ENT_QUOTES, 'UTF-8') ?>">
+                    <?php endif; ?>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false"
-                    aria-label="Alternar navegação">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+                    aria-controls="navbarScroll" aria-expanded="false" aria-label="Alternar navegação">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarScroll">
                     <ul class="nav-tabs navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll align-items-center"
-                        style="--bs-scroll-height: 80px;">
+                        style="--bs-scroll-height: 75vh;">
                         <!-- Ícone de mensagem -->
 
                         <?php if ($sessionNivel > 0) { ?>
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                        class="bi bi-stack edit-icon"></i>
-                                    Menu
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-                                    <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard"><i
-                                                class="bi bi-speedometer2"
-                                                style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
-                                            Dashboard</a></li>
-                                    <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
-                                                style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
-                                            Manual</a></li>
-                                    <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/performance-equipes"><i
-                                                class="bi bi-trophy"
-                                                style="font-size: 1rem;margin-right:5px; color:#7c3aed;"></i>
-                                            Performance equipes</a></li>
-                                    <li><a class="dropdown-item" href="<?= $BASE_URL ?>SolicitacaoCustomizacao.php">
-                                            <i class="bi bi-file-earmark-text"
-                                                style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
-                                            Solicitação de Customização
-                                        </a></li>
-                                    <?php if ($isDiretoria) { ?>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>SolicitacaoCustomizacaoList.php">
-                                                <i class="bi bi-clipboard-check"
-                                                    style="font-size: 1rem;margin-right:5px; color: #0d6efd;"></i>
-                                                Solicitações (Lista)
+                            <?php if ($canSeeFullMenu) { ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="bi bi-stack edit-icon"></i>
+                                        Menu
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard"><i
+                                                    class="bi bi-speedometer2"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                                Dashboard</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard_operacional.php"><i
+                                                    class="bi bi-activity"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i>
+                                                Dashboard operacional</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                                Manual</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>SolicitacaoCustomizacao.php">
+                                                <i class="bi bi-file-earmark-text"
+                                                    style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>
+                                                Solicitação de Customização
                                             </a></li>
-                                    <?php } ?>
-                                    <?php if ($sessionNivel > 3) { ?>
-                                        <li class="nav-item">
-                                            <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">
-                                                <i class="bi bi-shield-lock"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(21, 56, 210);"></i>
-                                                Permissões
-                                            </a>
-                                        </li>
-                                    <?php }; ?>
-                                <?php }; ?>
-                                </ul>
-                            </li>
+                                        <?php if ($isDiretoria) { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>SolicitacaoCustomizacaoList.php">
+                                                    <i class="bi bi-clipboard-check"
+                                                        style="font-size: 1rem;margin-right:5px; color: #0d6efd;"></i>
+                                                    Solicitações (Lista)
+                                                </a></li>
+                                        <?php } ?>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/performance-equipes"><i
+                                                    class="bi bi-trophy"
+                                                    style="font-size: 1rem;margin-right:5px; color:#7c3aed;"></i>
+                                                Performance equipes</a></li>
+                                        <?php if ($sessionNivel > 3) { ?>
+                                            <li class="nav-item">
+                                                <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">
+                                                    <i class="bi bi-shield-lock"
+                                                        style="font-size: 1rem;margin-right:5px; color: rgb(21, 56, 210);"></i>
+                                                    Permissões
+                                                </a>
+                                            </li>
+                                        <?php } ?>
+                                    </ul>
+                                </li>
+                            <?php } ?>
 
-                            <?php if ($sessionNivel > 3) { ?>
+                            <?php if ($canSeeFullMenu && $sessionNivel > 3) { ?>
                                 <li id="drop1" class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="<?= $BASE_URL ?>pacientes"
                                         id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown"
@@ -297,7 +499,7 @@ if (!empty($sessionIdUsuario)) {
                                 </li>
 
                             <?php }; ?>
-                            <?php if ($sessionNivel > 3) { ?>
+                            <?php if ($canSeeFullMenu && $sessionNivel > 3) { ?>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
@@ -317,19 +519,11 @@ if (!empty($sessionIdUsuario)) {
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>seguradoras"><span
                                                     class=" bi bi-heart-pulse"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(178, 156, 55);"></span>
-                                                Seguradora</a></li>
+                                                Seguradoras</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>estipulantes"><i
                                                     class="bi bi-building"
                                                     style="font-size:  1rem;margin-right:5px; color: rgb(213, 12, 155);"></i>
-                                                Estipulante</a></li>
-                                        <li>
-
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_acomodacao.php"><i
-                                                    class=" bi bi-clipboard-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(145, 156, 55);"></i>
-                                                Acomodação</a></li>
+                                                Estipulantes</a></li>
                                         <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_patologia.php"><span
                                             class=" bi bi-virus"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(178, 155, 155);"></span>
@@ -341,7 +535,7 @@ if (!empty($sessionIdUsuario)) {
                                     </ul>
                                 </li>
                             <?php }; ?>
-                            <?php if ($sessionNivel >= 3) { ?>
+                            <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
@@ -363,23 +557,6 @@ if (!empty($sessionIdUsuario)) {
                                             <hr class="dropdown-divider">
                                         </li>
 
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista"> <i
-                                                    class="bi bi-calendar2-date"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
-
-                                                Internação</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/uti"> <i
-                                                    class="bi bi-clipboard-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
-                                                Internação UTI</a>
-                                        </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
-                                                    class="bi bi-postcard-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
-                                                Gestão</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
                                         <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_internacao_uti_alta.php"><span
                                             id="boot-icon3" class="bi bi-box-arrow-left"
                                             style="font-size: 1rem; margin-right:5px; color: rgb(167, 25, 55);"></span>
@@ -397,7 +574,7 @@ if (!empty($sessionIdUsuario)) {
                                     </ul>
                                 </li>
                             <?php }; ?>
-                            <?php if ($sessionNivel >= 3): ?>
+                            <?php if ($canSeeFullMenu && $sessionNivel >= 3): ?>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="dropdownContasRah" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -423,7 +600,7 @@ if (!empty($sessionIdUsuario)) {
                                 </li>
                             <?php endif; ?>
 
-                            <?php if ($sessionNivel >= 3) { ?>
+                            <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
@@ -434,9 +611,6 @@ if (!empty($sessionIdUsuario)) {
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
 
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
-                                                Censo</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista"> <i
                                                     class="bi bi-calendar2-date"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
@@ -446,29 +620,47 @@ if (!empty($sessionIdUsuario)) {
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
                                                 Internação UTI</a>
                                         </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
-                                                    class="bi bi-postcard-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
-                                                Gestão</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>listas/altas"><i
                                                     class="bi bi-clipboard-check"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(9,132,227);"></i>
                                                 Lista de altas</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
+                                                Censo</a></li>
+                                    </ul>
+                                </li>
+                            <?php }; ?>
+                            <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
+                                            class="fa-solid fa-file-invoice edit-icon"></i>
+                                        Gestão
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
+                                                    class="bi bi-postcard-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
+                                                Gestão Assistencial</a></li>
+                                        <?php if ($isDiretoria) { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/logs-usuarios"><i
+                                                        class="bi bi-journal-code"
+                                                        style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                    Logs por Usuário</a></li>
+                                        <?php } ?>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/ciclo"><i
                                                     class="bi bi-postcard-heart"
                                                     style="font-size:  1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
                                                 Rota do Paciente</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
-                                                    class="bi bi-postcard-heart"
-                                                    style="font-size:  1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
-                                                Lista de Visitas</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/sem-senha"><i
                                                     class="bi bi-shield-exclamation"
                                                     style="font-size:  1rem;margin-right:5px; color:#d63384;"></i>
                                                 Internações sem senha</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_pendencias_operacionais.php"><i
+                                                    class="bi bi-exclamation-diamond"
+                                                    style="font-size:  1rem;margin-right:5px; color:#fd7e14;"></i>
+                                                Pendências operacionais</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes"><i
                                                     class="bi bi-currency-dollar"
                                                     style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
@@ -484,19 +676,13 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-list-check"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(20, 120, 90);"></i>
                                                 Fila de Tarefas</a></li>
-
-                                    </ul>
-                                </li>
-                            <?php }; ?>
-                            <?php if ($sessionNivel >= 3) { ?>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                            class="fa-solid fa-file-invoice edit-icon"></i>
-                                        Faturamento
-                                    </a>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_prorrogacao_pendente.php"><i
+                                                    class="bi bi-hourglass-split"
+                                                    style="font-size: 1rem;margin-right:5px; color: rgb(180, 120, 20);"></i>
+                                                Prorrogação Pendente</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
                                                     class="bi bi-list-check"
                                                     style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
@@ -504,23 +690,11 @@ if (!empty($sessionIdUsuario)) {
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_visitas.php"><i
                                                     class="bi bi-clipboard-check"
                                                     style="font-size: 1rem;margin-right:5px; color:#0a4fa3;"></i>
-                                                Faturamento Visitas</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_mensal.php"><i
-                                                    class="bi bi-calendar-range"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0a6840;"></i>
-                                                Faturamento Mensal Visitas</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_mensal_contas.php"><i
-                                                    class="bi bi-calendar3"
-                                                    style="font-size: 1rem;margin-right:5px; color:#b35400;"></i>
-                                                Faturamento Mensal Contas</a></li>
-                                        <!-- <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_fin.php"><i
-                                            class="bi bi-card-checklist"
-                                            style="font-size: 1rem;margin-right:5px; color:rgb(28, 118, 175);"></i>
-                                        Contas</a></li> -->
+                                                Faturamento Mensal</a></li>
                                     </ul>
                                 </li>
                             <?php }; ?>
-                            <?php if ($sessionNivel >= 3) { ?>
+                            <?php if ($canSeeBiMenu) { ?>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -568,6 +742,10 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-person-exclamation"
                                                     style="font-size: 1rem;margin-right:5px; color:#ffd36e;"></i>
                                                 Segmentação de Risco</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/risco-prevencao-matriz"><i
+                                                    class="bi bi-shield-exclamation"
+                                                    style="font-size: 1rem;margin-right:5px; color:#ff7b7b;"></i>
+                                                Risco &amp; Prevenção</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-volume-custo"><i
                                                     class="bi bi-bar-chart-line"
                                                     style="font-size: 1rem;margin-right:5px; color:#72d2ff;"></i>
@@ -579,7 +757,7 @@ if (!empty($sessionIdUsuario)) {
                                     </ul>
                                 </li>
                             <?php }; ?>
-                            <?php if ($sessionNivel > 0) { ?>
+                            <?php if ($canSeeInteligenciaMenu) { ?>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -644,9 +822,53 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-pencil-square"
                                                     style="font-size: 1rem;margin-right:5px; color:#fb923c;"></i>
                                                 Assistente de Textos</a></li>
+                                        <?php if ($isDiretoria) { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/logs-usuarios"><i
+                                                        class="bi bi-journal-code"
+                                                        style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                    Logs por Usuário</a></li>
+                                        <?php } ?>
                                     </ul>
                                 </li>
-                            <?php }; ?>
+                            <?php } ?>
+                            <?php if ($canSeeHubMenu) { ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= $BASE_URL ?>pacientes">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;"
+                                            class="bi bi-person-badge edit-icon"></i>
+                                        HUB de Pacientes
+                                    </a>
+                                </li>
+                            <?php } ?>
+                            <?php if ($canSeeGestorListas) { ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarGestorListas" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;"
+                                            class="bi bi-list edit-icon"></i>
+                                        Lista
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarGestorListas">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>menu_app.php">
+                                                <i class="bi bi-grid-1x2-fill"
+                                                    style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
+                                                Dashboard Operacional</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista">
+                                                <i class="bi bi-clipboard-data"
+                                                    style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
+                                                Internacao</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao">
+                                                <i class="bi bi-postcard-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
+                                                Gestao Assistencial</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>listas/altas">
+                                                <i class="bi bi-clipboard-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
+                                                Altas</a></li>
+                                    </ul>
+                                </li>
+                            <?php } ?>
+                        <?php } ?>
                             <!-- <?php if ($_SESSION['nivel'] >= 2) { ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
@@ -782,7 +1004,11 @@ if (!empty($sessionIdUsuario)) {
                 </div>
             </div>
         </nav>
-        <?php include_once(__DIR__ . '/bi_topbar.php'); ?>
+        <?php
+        if (empty($hideBIMenu ?? false)) {
+            include_once(__DIR__ . '/bi_topbar.php');
+        }
+        ?>
 
         <!-- notification message -->
         <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start(); ?>
@@ -974,6 +1200,9 @@ if (!empty($sessionIdUsuario)) {
                             }
                             return;
                         }
+                        if (payload && payload.success === false) {
+                            throw new Error(payload.message || 'Não foi possível salvar o formulário.');
+                        }
                         if (payload && payload.html) {
                             const temp = document.createElement('div');
                             temp.innerHTML = payload.html;
@@ -984,8 +1213,9 @@ if (!empty($sessionIdUsuario)) {
                         }
                         throw new Error('Resposta inesperada');
                     })
-                    .catch(() => {
-                        container.innerHTML = '<div class="p-4 text-danger">Erro ao processar o formulário.</div>';
+                    .catch((err) => {
+                        const msg = (err && err.message) ? err.message : 'Erro ao processar o formulário.';
+                        container.innerHTML = '<div class="p-4 text-danger">' + msg + '</div>';
                     })
                     .finally(() => {
                         if (submitBtn) submitBtn.disabled = false;
@@ -1006,6 +1236,9 @@ if (!empty($sessionIdUsuario)) {
         } catch (_) {}
 
         setupModalForms(target, modalEl);
+        if (typeof window.initPacienteHomonimoCheck === 'function') {
+            window.initPacienteHomonimoCheck(target);
+        }
     }
 
     if (typeof window.openModalPac !== 'function') {
@@ -1119,7 +1352,6 @@ if (!empty($sessionIdUsuario)) {
                 q
             })
             .done(res => {
-                console.log('[BUSCA OK]', res);
                 renderResults(res);
             })
             .fail((jqXHR, textStatus, errorThrown) => {
@@ -1331,6 +1563,10 @@ if (!empty($sessionIdUsuario)) {
         if (window.$ && $.fn.selectpicker) {
             $('.selectpicker', form).each(function() {
                 try {
+                    var id = this.id || '';
+                    if (id === 'hospital_selected' || id === 'fk_paciente_int') {
+                        return;
+                    }
                     $(this).selectpicker('refresh');
                 } catch (_) {}
             });

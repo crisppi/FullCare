@@ -26,21 +26,122 @@ include_once("dao/altaDao.php");
 
 include_once("models/pagination.php");
 
+if (!function_exists('listaAltaGetParam')) {
+    function listaAltaGetParam(string $longKey, $default = null)
+    {
+        static $shortToLong = [
+            'hosp' => 'pesquisa_nome',
+            'pac'  => 'pesquisa_pac',
+            'mat'  => 'pesquisa_matricula',
+            'it'   => 'pesqInternado',
+            'pp'   => 'limite',
+            'ord'  => 'ordenar',
+            'di'   => 'data_alta',
+            'df'   => 'data_alta_max',
+            'pg'   => 'pag',
+            'blc'  => 'bl',
+        ];
+        static $longToShort = null;
+        if ($longToShort === null) {
+            $longToShort = array_flip($shortToLong);
+        }
+        $value = $_GET[$longKey] ?? null;
+        if ($value === null && isset($longToShort[$longKey])) {
+            $value = $_GET[$longToShort[$longKey]] ?? null;
+        }
+        if ($value === null || $value === '') {
+            return $default;
+        }
+        return $value;
+    }
+}
+
+if (!function_exists('listaAltaCompactParams')) {
+    function listaAltaCompactParams(array $params): array
+    {
+        $defaults = ['pesqInternado' => 's', 'limite' => '10'];
+        $longToShort = [
+            'pesquisa_nome'      => 'hosp',
+            'pesquisa_pac'       => 'pac',
+            'pesquisa_matricula' => 'mat',
+            'pesqInternado'      => 'it',
+            'limite'             => 'pp',
+            'ordenar'            => 'ord',
+            'data_alta'          => 'di',
+            'data_alta_max'      => 'df',
+            'pag'                => 'pg',
+            'bl'                 => 'blc',
+        ];
+
+        $clean = [];
+        foreach ($params as $key => $value) {
+            if ($value === null || $value === '' || $value === false) continue;
+            $value = (string)$value;
+            if (isset($defaults[$key]) && $defaults[$key] === $value) continue;
+            $clean[$key] = $value;
+        }
+        if (empty($clean['data_alta'])) unset($clean['data_alta_max']);
+        unset($clean['bl']);
+
+        $compact = [];
+        foreach ($clean as $key => $value) {
+            $compact[$longToShort[$key] ?? $key] = $value;
+        }
+        return $compact;
+    }
+}
+
 $somenteListaAltas = isset($somenteListaAltas) ? (bool)$somenteListaAltas : false;
+
+$normCargoAccess = static function ($txt): string {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $ascii !== false ? $ascii : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$isSeguradoraRole = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
+$seguradoraUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+if ($isSeguradoraRole && $seguradoraUserId <= 0) {
+    try {
+        $uid = (int)($_SESSION['id_usuario'] ?? 0);
+        if ($uid > 0) {
+            $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
+            $stmtSeg->execute();
+            $seguradoraUserId = (int)($stmtSeg->fetchColumn() ?: 0);
+            if ($seguradoraUserId > 0) {
+                $_SESSION['fk_seguradora_user'] = $seguradoraUserId;
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('[LIST_ALTA][SEGURADORA] ' . $e->getMessage());
+    }
+}
+$seguradoraUserNome = '';
+if ($isSeguradoraRole && $seguradoraUserId > 0) {
+    try {
+        $stmtSegNome = $conn->prepare("SELECT seguradora_seg FROM tb_seguradora WHERE id_seguradora = :id LIMIT 1");
+        $stmtSegNome->bindValue(':id', $seguradoraUserId, PDO::PARAM_INT);
+        $stmtSegNome->execute();
+        $seguradoraUserNome = (string)($stmtSegNome->fetchColumn() ?: '');
+    } catch (Throwable $e) {
+        $seguradoraUserNome = '';
+    }
+}
 
 $altaDao    = new altaDAO($conn, $BASE_URL);
 $internacao = new internacaoDAO($conn, $BASE_URL);
 
 /* ===================== FILTROS VIA GET ===================== */
 
-$pesquisa_nome   = filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
-$pesquisa_pac    = filter_input(INPUT_GET, 'pesquisa_pac',   FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
-$pesquisa_matricula = filter_input(INPUT_GET, 'pesquisa_matricula', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
-$pesqInternado   = filter_input(INPUT_GET, 'pesqInternado',  FILTER_SANITIZE_SPECIAL_CHARS) ?: 's';
-$limite          = filter_input(INPUT_GET, 'limite', FILTER_VALIDATE_INT) ?: 10;
-$ordenar         = filter_input(INPUT_GET, 'ordenar', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
-$data_alta       = filter_input(INPUT_GET, 'data_alta', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
-$data_alta_max   = filter_input(INPUT_GET, 'data_alta_max', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
+$pesquisa_nome   = (string)listaAltaGetParam('pesquisa_nome', '');
+$pesquisa_pac    = (string)listaAltaGetParam('pesquisa_pac', '');
+$pesquisa_matricula = (string)listaAltaGetParam('pesquisa_matricula', '');
+$pesqInternado   = (string)listaAltaGetParam('pesqInternado', 's');
+$limite          = (int)listaAltaGetParam('limite', 10);
+$ordenar         = (string)listaAltaGetParam('ordenar', '');
+$data_alta       = (string)listaAltaGetParam('data_alta', '');
+$data_alta_max   = (string)listaAltaGetParam('data_alta_max', '');
 
 if ($data_alta && !$data_alta_max) {
     $data_alta_max = date('Y-m-d');
@@ -69,6 +170,9 @@ if (strlen(trim((string)$data_alta)) > 0) {
     $fim = $data_alta_max ?: $data_alta;
     $condicoes[] = 'alta.data_alta_alt BETWEEN "' . $ini . '" AND "' . $fim . '"';
 }
+if ($isSeguradoraRole) {
+    $condicoes[] = $seguradoraUserId > 0 ? ('pa.fk_seguradora_pac = ' . $seguradoraUserId) : '1=0';
+}
 
 $condicoes = array_filter($condicoes);
 $where     = implode(' AND ', $condicoes);
@@ -79,7 +183,11 @@ $order = $ordenar ?: 'id_internacao DESC';
 $qtdIntItens1 = $altaDao->findAltaWhere($where, $order, null);
 $qtdIntItens  = is_countable($qtdIntItens1) ? count($qtdIntItens1) : 0;
 
-$obPagination = new pagination($qtdIntItens, $_GET['pag'] ?? 1, $limite ?? 10);
+$paginaAtualParam = (int)listaAltaGetParam('pag', 1);
+if ($paginaAtualParam < 1) {
+    $paginaAtualParam = 1;
+}
+$obPagination = new pagination($qtdIntItens, $paginaAtualParam, $limite ?? 10);
 $obLimite     = $obPagination->getLimit();
 
 $query = $altaDao->findAltaWhere($where, $order, $obLimite ?: null);
@@ -88,13 +196,12 @@ if ($qtdIntItens > $limite) {
     $paginas     = $obPagination->getPages();
     $total_pages = count($paginas);
 
-    function paginasAtuais($var)
-    {
-        $blocoAtual = isset($_GET['bl']) ? (int)$_GET['bl'] : 0;
+    $paginasAtuais = function ($var) use ($paginaAtualParam) {
+        $blocoAtual = (int)listaAltaGetParam('bl', (int)floor(($paginaAtualParam - 1) / 5) * 5);
         return $var['bloco'] == (($blocoAtual) / 5) + 1;
-    }
+    };
 
-    $block_pages         = array_filter($paginas, "paginasAtuais");
+    $block_pages         = array_filter($paginas, $paginasAtuais);
     $first_page_in_block = $block_pages ? reset($block_pages)["pg"] : 1;
     $last_page_in_block  = $block_pages ? end($block_pages)["pg"]   : 1;
     $first_block         = $paginas ? reset($paginas)["bloco"]      : 1;
@@ -120,11 +227,7 @@ $paginationParams = [
 
 $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_URL, $somenteListaAltas) {
     $params = $paginationParams;
-    $params['bl'] = $bloco;
-
-    $params = array_filter($params, function($value) {
-        return $value !== null && $value !== '' && $value !== false;
-    });
+    $params = listaAltaCompactParams($params);
 
     $pathBase = $somenteListaAltas ? 'listas/altas' : 'internacoes/reverter-alta';
     $pagina = max(1, (int)$pagina);
@@ -187,6 +290,19 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
         font-size: 0.82rem;
         vertical-align: middle;
     }
+    .scope-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 8px 16px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: .82rem;
+        font-weight: 700;
+        background: #f3edff;
+        border: 1px solid #d6c5f7;
+        color: #5e2363;
+    }
 </style>
 
 <div class="container-fluid form_container" id="main-container" style="margin-top:-25px;">
@@ -204,6 +320,11 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
     <hr>
 
     <div class="complete-table">
+        <?php if ($isSeguradoraRole): ?>
+            <div class="scope-badge">
+                Escopo: Seguradora <?= htmlspecialchars($seguradoraUserNome !== '' ? $seguradoraUserNome : ('#' . $seguradoraUserId), ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
         <div id="navbarToggleExternalContent" class="table-filters">
             <div>
                 <form action="" id="select-internacao-form" method="GET">
@@ -266,11 +387,15 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                                 value="<?= htmlspecialchars((string)$data_alta_max) ?>">
                         </div>
 
-                        <div class="col-sm-1" style="padding:2px !important">
-                            <button type="submit" class="btn btn-primary"
+                        <div class="col-sm-1 d-flex align-items-start gap-2" style="padding:2px !important">
+                            <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
                                 style="background-color:#5e2363;width:42px;height:32px;margin-top:7px;border-color:#5e2363">
                                 <span class="material-icons" style="margin-left:-3px;margin-top:-2px;">search</span>
                             </button>
+                            <a class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon" style="margin-top:7px;"
+                                href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/' . ($somenteListaAltas ? 'listas/altas' : 'internacoes/reverter-alta'), ENT_QUOTES, 'UTF-8') ?>">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -290,6 +415,7 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                             <th scope="col" width="14%">Paciente</th>
                             <th scope="col" width="7%">Tipo Alta</th>
                             <th scope="col" width="8%">Data Alta</th>
+                            <th scope="col" width="6%">Ações</th>
                             <?php if (!$somenteListaAltas): ?>
                             <th scope="col" width="4%">Remover</th>
                             <?php endif; ?>
@@ -316,6 +442,13 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                                 <td scope="row">
                                     <?= htmlspecialchars(date('d/m/Y', strtotime((string)$intern["data_alta_alt"]))) ?>
                                 </td>
+                                <td scope="row">
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/show_internacao.php?id_internacao=' . (int)$intern["fk_id_int_alt"], ENT_QUOTES, 'UTF-8') ?>"
+                                       title="Visualizar internação">
+                                        <i class="fa-solid fa-eye me-1"></i> Ver
+                                    </a>
+                                </td>
                                 <?php if (!$somenteListaAltas): ?>
                                 <td>
                                     <input type="checkbox" class="ckAlta" value="<?= (int)$intern['id_alta'] ?>">
@@ -326,8 +459,8 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
 
                         <?php if ($qtdIntItens == 0): ?>
                             <tr>
-                                <td colspan="7" scope="row" class="col-id" style="font-size:15px">
-                                    Não foram encontrados registros
+                                <td colspan="<?= !$somenteListaAltas ? 8 : 7 ?>" scope="row" class="col-id" style="font-size:15px">
+                                    Sem registros para os filtros aplicados.<?= $isSeguradoraRole ? ' Você está visualizando somente dados da sua seguradora.' : '' ?>
                                 </td>
                             </tr>
                         <?php endif ?>
@@ -344,8 +477,8 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                         <?php if (($total_pages ?? 1) > 1): ?>
                             <ul class="pagination">
                                 <?php
-                                $blocoAtual  = isset($_GET['bl']) ? (int)$_GET['bl'] : 0;
-                                $paginaAtual = isset($_GET['pag']) ? (int)$_GET['pag'] : 1;
+                                $blocoAtual  = (int)listaAltaGetParam('bl', (int)floor(($paginaAtualParam - 1) / 5) * 5);
+                                $paginaAtual = $paginaAtualParam;
                                 ?>
                                 <?php if ($current_block > $first_block): ?>
                                     <li class="page-item">
@@ -361,7 +494,7 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                                 <?php endif; ?>
 
                                 <?php for ($i = $first_page_in_block; $i <= $last_page_in_block; $i++): ?>
-                                    <li class="page-item <?= ($_GET['pag'] ?? 1) == $i ? "active" : "" ?>">
+                                    <li class="page-item <?= $paginaAtualParam == $i ? "active" : "" ?>">
                                         <a class="page-link" href="<?= $buildListaAltaLink($i, $blocoAtual) ?>">
                                             <?= $i ?>
                                         </a>
@@ -554,10 +687,96 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
 <script>
     const SOMENTE_LISTA_ALTAS = <?= $somenteListaAltas ? 'true' : 'false' ?>;
     (function($) {
+        var altaAliasLongToShort = {
+            pesquisa_nome: 'hosp',
+            pesquisa_pac: 'pac',
+            pesquisa_matricula: 'mat',
+            pesqInternado: 'it',
+            limite: 'pp',
+            ordenar: 'ord',
+            data_alta: 'di',
+            data_alta_max: 'df',
+            pag: 'pg',
+            bl: 'blc'
+        };
+        var altaAliasShortToLong = {};
+        Object.keys(altaAliasLongToShort).forEach(function(k) {
+            altaAliasShortToLong[altaAliasLongToShort[k]] = k;
+        });
+        var altaDefaults = {
+            pesqInternado: 's',
+            limite: '10'
+        };
+
+        function compactAltaQuery(input) {
+            var source = new URLSearchParams(typeof input === 'string' ? input : (input || ''));
+            var normalized = {};
+            source.forEach(function(v, k) {
+                normalized[altaAliasShortToLong[k] || k] = v;
+            });
+            if (!normalized.data_alta) {
+                delete normalized.data_alta_max;
+            }
+            delete normalized.bl;
+
+            var out = new URLSearchParams();
+            Object.keys(normalized).forEach(function(longKey) {
+                var value = String(normalized[longKey] || '').trim();
+                if (!value) return;
+                if (altaDefaults[longKey] !== undefined && altaDefaults[longKey] === value) return;
+                out.set(altaAliasLongToShort[longKey] || longKey, value);
+            });
+            return out.toString();
+        }
+
         function showMsg(title, body) {
             $('#modalMsgTitle').text(title || 'Aviso');
             $('#modalMsgBody').html(body || '');
             new bootstrap.Modal(document.getElementById('modalMsg')).show();
+        }
+
+        function renderAltaTable(responseHtml) {
+            var temp = document.createElement('div');
+            temp.innerHTML = responseHtml;
+            var tableContent = temp.querySelector('#table-content');
+            if (!tableContent) {
+                return false;
+            }
+            $('#table-content').html(tableContent.innerHTML);
+            return true;
+        }
+
+        function loadAltaList(url, dataPayload) {
+            var requestUrl = url || window.location.pathname;
+            $.ajax({
+                url: requestUrl,
+                type: 'GET',
+                data: dataPayload || null,
+                success: function(response) {
+                    if (!renderAltaTable(response)) {
+                        return;
+                    }
+
+                    if (dataPayload) {
+                        var qs = typeof dataPayload === 'string' ? dataPayload : $.param(dataPayload);
+                        var compactQs = compactAltaQuery(qs);
+                        var targetUrl = requestUrl + (compactQs ? (requestUrl.indexOf('?') === -1 ? '?' : '&') + compactQs : '');
+                        window.history.replaceState({}, '', targetUrl);
+                    } else if (url) {
+                        try {
+                            var parsed = new URL(url, window.location.origin);
+                            var compactFromUrl = compactAltaQuery(parsed.search);
+                            var compactUrl = parsed.pathname + (compactFromUrl ? '?' + compactFromUrl : '');
+                            window.history.replaceState({}, '', compactUrl);
+                        } catch (e) {
+                            window.history.replaceState({}, '', url);
+                        }
+                    }
+                },
+                error: function() {
+                    showMsg('Erro', 'Ocorreu um erro ao atualizar a listagem.');
+                }
+            });
         }
 
         // Abre modal de campos ao clicar em Exportar Excel
@@ -636,22 +855,18 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
             .on('submit.alta', '#select-internacao-form', function(e) {
                 e.preventDefault();
                 var $form = $(this);
-                $.ajax({
-                    url: $form.attr('action') || 'list_internacao_alta.php',
-                    type: $form.attr('method') || 'GET',
-                    data: $form.serialize(),
-                    success: function(response) {
-                        var temp = document.createElement('div');
-                        temp.innerHTML = response;
-                        var tableContent = temp.querySelector('#table-content');
-                        if (tableContent) {
-                            $('#table-content').html(tableContent.innerHTML);
-                        }
-                    },
-                    error: function() {
-                        showMsg('Erro', 'Ocorreu um erro ao enviar o formulário.');
-                    }
-                });
+                loadAltaList($form.attr('action') || window.location.pathname, $form.serialize());
+            });
+
+        $(document)
+            .off('click.alta', '#table-content .pagination a.page-link, #table-content .sort-icons a')
+            .on('click.alta', '#table-content .pagination a.page-link, #table-content .sort-icons a', function(e) {
+                var href = $(this).attr('href');
+                if (!href || href === '#') {
+                    return;
+                }
+                e.preventDefault();
+                loadAltaList(href, null);
             });
 
         if (!SOMENTE_LISTA_ALTAS) {

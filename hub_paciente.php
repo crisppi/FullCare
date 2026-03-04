@@ -17,11 +17,46 @@ require_once("app/services/ReadmissionRiskService.php");
 include_once("models/internacao.php");      // se existir
 include_once("dao/internacaoDao.php");      // o seu DAO
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+  session_start();
+}
+$normCargoAccess = function ($txt) {
+  $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+  $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+  $txt = $c !== false ? $c : $txt;
+  return preg_replace('/[^a-z]/', '', $txt);
+};
+$isGestorSeguradora = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
+if ($isGestorSeguradora && empty($_SESSION['fk_seguradora_user'])) {
+  try {
+    $uid = (int)($_SESSION['id_usuario'] ?? 0);
+    if ($uid > 0) {
+      $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+      $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
+      $stmtSeg->execute();
+      $sid = (int)($stmtSeg->fetchColumn() ?: 0);
+      if ($sid > 0) $_SESSION['fk_seguradora_user'] = $sid;
+    }
+  } catch (Throwable $e) {
+    error_log('[HUB_PAC][SEGURADORA] ' . $e->getMessage());
+  }
+}
+
 $internacaoDao = new internacaoDAO($conn, $BASE_URL);  // ajuste o nome da classe se diferente
 // DAOs
 $pacienteDao = new pacienteDAO($conn, $BASE_URL);
 $seguradoraDao = new seguradoraDAO($conn, $BASE_URL);
 $estipulanteDao = new estipulanteDAO($conn, $BASE_URL);
+
+// Debug opcional de timing (?debug_timing=1)
+$debugTiming = filter_input(INPUT_GET, 'debug_timing');
+$hubT0 = microtime(true);
+$hubLog = function (string $label) use ($debugTiming, $hubT0) {
+  if ($debugTiming) {
+    $elapsed = (int) round((microtime(true) - $hubT0) * 1000);
+    error_log("hub_paciente timing: {$label} ({$elapsed} ms)");
+  }
+};
 
 // GET
 $id_paciente = filter_input(INPUT_GET, "id_paciente");
@@ -30,7 +65,22 @@ if (!$id_paciente) {
   include_once("templates/footer.php");
   exit;
 }
-$internacoes = $internacaoDao->listByPaciente((int)$id_paciente); // já vem com senha_int
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+$rahAfterSave = $_SESSION['rah_after_save'] ?? null;
+if ($rahAfterSave && ((int)($rahAfterSave['patient_id'] ?? 0) !== (int)$id_paciente)) {
+    $rahAfterSave = null;
+}
+if ($rahAfterSave) {
+    unset($_SESSION['rah_after_save']);
+}
+$preloadThreshold = 50;
+$totalInternacoes = $internacaoDao->countByPaciente((int)$id_paciente);
+$hubLog('countByPaciente');
+$preloadEnabled = $totalInternacoes <= $preloadThreshold;
+$internacoes = $preloadEnabled
+  ? $internacaoDao->listByPaciente((int)$id_paciente, $totalInternacoes ?: 1, 0)
+  : null; // se não preload, AJAX assume
+$hubLog('listByPaciente');
 
 // Dados do paciente
 $paciente = $pacienteDao->findById($id_paciente); // seu findById retorna array-like com $paciente['0'][campo]
@@ -40,6 +90,15 @@ if (!$paciente || !isset($paciente['0'])) {
   exit;
 }
 $p = $paciente['0'];
+if ($isGestorSeguradora) {
+  $segUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+  $segPacId = (int)($p['fk_seguradora_pac'] ?? 0);
+  if (!$segUserId || $segUserId !== $segPacId) {
+    echo "<div class='container mt-4'><div class='alert alert-danger'>Acesso negado para este paciente.</div></div>";
+    include_once("templates/footer.php");
+    exit;
+  }
+}
 
 // Helpers de formatação (iguais aos seus)
 function formatCpf($cpf)
@@ -198,7 +257,23 @@ if ($nome_str) {
 }
 
 $riskOverview = ['available' => false];
+$cargoSessaoPaciente = trim((string)($_SESSION['cargo'] ?? ''));
+$cargoNorm = (string)@iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $cargoSessaoPaciente);
+$cargoNorm = mb_strtolower($cargoNorm !== false ? $cargoNorm : $cargoSessaoPaciente, 'UTF-8');
+$cargoNorm = preg_replace('/[^a-z]/', '', $cargoNorm);
+$allowedCargos = [
+  'medauditor', 'medico', 'medicoauditor', 'medicoauditoria', 'doctor',
+  'enfauditor', 'enfermeiroauditor', 'enfermeiro', 'enfermeirora',
+  'diretor', 'diretoria', 'administrador', 'admin', 'board'
+];
+$showClinicalGroups = $cargoNorm !== '' && in_array($cargoNorm, $allowedCargos, true);
 $riskInternacaoId = null;
+// Tenta limitar tempo das consultas (quando suportado pelo MySQL/MariaDB)
+try {
+  $conn->exec("SET SESSION MAX_EXECUTION_TIME=5000");
+} catch (Throwable $e) {
+  // ignora se o servidor não suportar
+}
 try {
   $stmtLast = $conn->prepare("
       SELECT id_internacao
@@ -214,6 +289,7 @@ try {
     $riskService = new ReadmissionRiskService($conn);
     $riskOverview = $riskService->scoreInternacao($riskInternacaoId);
     $riskOverview['internacao_referencia'] = $riskInternacaoId;
+    $hubLog('scoreInternacao');
   } else {
     $riskOverview = [
       'available' => false,
@@ -253,6 +329,7 @@ try {
     ");
   $stmtResumo->bindValue(':pac', (int)$id_paciente, PDO::PARAM_INT);
   $stmtResumo->execute();
+  $hubLog('indicadoresResumo');
   $rowResumo = $stmtResumo->fetch(PDO::FETCH_ASSOC) ?: [];
   $indicadoresPaciente['total_internacoes'] = (int)($rowResumo['total_int'] ?? 0);
   $indicadoresPaciente['media_permanencia'] = round((float)($rowResumo['media_dias'] ?? 0), 1);
@@ -267,24 +344,42 @@ try {
     ");
   $stmtEventos->bindValue(':pac', (int)$id_paciente, PDO::PARAM_INT);
   $stmtEventos->execute();
-$indicadoresPaciente['eventos_adversos'] = (int)$stmtEventos->fetchColumn();
+  $hubLog('indicadoresEventos');
+  $indicadoresPaciente['eventos_adversos'] = (int)$stmtEventos->fetchColumn();
 
   $stmtAnt = $conn->prepare("
       SELECT COUNT(*) FROM tb_intern_antec WHERE fk_id_paciente = :pac
     ");
   $stmtAnt->bindValue(':pac', (int)$id_paciente, PDO::PARAM_INT);
   $stmtAnt->execute();
+  $hubLog('indicadoresAntecedentes');
   $indicadoresPaciente['antecedentes'] = (int)$stmtAnt->fetchColumn();
 } catch (Throwable $e) {
   // Mantém valores padrão silenciosamente
 }
 
-if (empty($riskOverview['available'])) {
+if (!isset($riskOverview) || empty($riskOverview['available'])) {
   $fallback = fallbackRiskFromIndicadores($p, $indicadoresPaciente);
   if ($fallback) {
     $riskOverview = $fallback;
+  } else {
+    $riskOverview = ['risk_level' => 'baixo', 'probability' => 0, 'threshold' => 0.55, 'available' => false];
   }
 }
+
+$riskLevel = strtolower((string)($riskOverview['risk_level'] ?? 'baixo'));
+$riskColor = [
+  'alto' => ['bg' => '#ffe0e3', 'border' => '#c9184a', 'text' => '#5a071d'],
+  'moderado' => ['bg' => '#fff5d6', 'border' => '#f0a500', 'text' => '#6a4900'],
+  'baixo' => ['bg' => '#e6fff4', 'border' => '#0f8f5d', 'text' => '#065238']
+];
+$complexMap = [
+  'alto' => ['label' => 'Alta complexidade', 'prioridade' => 'Visita prioritária (<24h)'],
+  'moderado' => ['label' => 'Complexidade intermediária', 'prioridade' => 'Reforçar visita / contato'],
+  'baixo' => ['label' => 'Baixa complexidade', 'prioridade' => 'Rotina usual']
+];
+
+$effectiveLevel = isset($riskColor[$riskLevel]) ? $riskLevel : 'baixo';
 ?>
 <!-- Você já tem Bootstrap do header.php. Aqui só estrutura da página -->
 
@@ -332,9 +427,9 @@ if (empty($riskOverview['available'])) {
           </div>
           <?php if (!empty($riskOverview['available'])): ?>
             <?php
-              $badgePalette = $riskColor[$riskLevel ?: 'baixo'];
-              $badgeInfo = $complexMap[$riskLevel ?: 'baixo'];
-            ?>
+        $badgePalette = $riskColor[$effectiveLevel];
+        $badgeInfo = $complexMap[$effectiveLevel];
+      ?>
             <div class="mt-2">
               <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:.8rem;font-weight:600;background:<?= $badgePalette['bg'] ?>;color:<?= $badgePalette['text'] ?>;border:1px solid <?= $badgePalette['border'] ?>;">
                 <i class="fa-solid fa-bolt"></i>
@@ -344,49 +439,33 @@ if (empty($riskOverview['available'])) {
           <?php endif; ?>
         </div>
       </div>
-      <div class="d-flex flex-column text-end">
-        <div class="small text-secondary">CPF</div>
-        <div class="fw-semibold"><?= htmlspecialchars($cpf_fmt ?: '—') ?></div>
-        <div class="small text-secondary mt-2">Contato</div>
-        <div><?= htmlspecialchars($tel2_fmt ?: $tel1_fmt ?: '—') ?></div>
-        <div class="small text-secondary mt-2">Endereço</div>
-        <div class="text-truncate" style="max-width:420px;" title="<?= htmlspecialchars($endereco_fmt) ?>">
-          <?= htmlspecialchars($endereco_fmt) ?>
-        </div>
-      </div>
+      <div class="d-flex flex-column text-end"></div>
   </div>
 </div>
 
 <?php
-$riskLevel = strtolower((string)($riskOverview['risk_level'] ?? ''));
-$riskColor = [
-  'alto' => ['bg' => '#ffe0e3', 'border' => '#c9184a', 'text' => '#5a071d'],
-  'moderado' => ['bg' => '#fff5d6', 'border' => '#f0a500', 'text' => '#6a4900'],
-  'baixo' => ['bg' => '#e6fff4', 'border' => '#0f8f5d', 'text' => '#065238']
-];
-$palette = $riskColor[$riskLevel ?: 'baixo'];
+$palette = $riskColor[$effectiveLevel];
 $probPct = number_format((float)($riskOverview['probability'] ?? 0) * 100, 1, ',', '.');
 $thresholdPct = number_format((float)($riskOverview['threshold'] ?? 0.55) * 100, 0);
 $ultimaInternFmt = $indicadoresPaciente['ultima_internacao']
   ? formatDateBr($indicadoresPaciente['ultima_internacao'])
   : '—';
-$complexMap = [
-  'alto' => ['label' => 'Alta complexidade', 'prioridade' => 'Visita prioritária (<24h)'],
-  'moderado' => ['label' => 'Complexidade intermediária', 'prioridade' => 'Reforçar visita / contato'],
-  'baixo' => ['label' => 'Baixa complexidade', 'prioridade' => 'Rotina usual']
-];
-$complexInfo = $complexMap[$riskLevel ?: 'baixo'];
+$complexInfo = $complexMap[$effectiveLevel];
 ?>
 
-<div class="row g-3 mb-3">
-  <div class="col-12 col-lg-5">
-    <div class="card shadow-sm h-100" style="border-radius:16px;border:2px solid <?= $palette['border'] ?>;background:<?= $palette['bg'] ?>;color:<?= $palette['text'] ?>;">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <small class="text-uppercase fw-semibold" style="letter-spacing:.08em;color:<?= $palette['text'] ?>;">Indicador de readmissão</small>
+<?php if ($showClinicalGroups): ?>
+<div class="row g-2 mb-2">
+  <div class="col-12 col-lg-7">
+    <div class="card shadow-sm h-100 hub-compact-card hub-compact-card--primary" style="border-radius:16px;color:<?= $palette['text'] ?>;">
+      <div class="card-body d-flex flex-column h-100 hub-compact-primary-body">
+        <div class="row g-2 flex-grow-1 align-items-start">
+          <div class="col-12 col-md-6 hub-compact-left">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <small class="text-uppercase fw-semibold" style="letter-spacing:.08em;color:<?= $palette['text'] ?>;">Indicador de readmissão</small>
+              <i class="fa-solid fa-chart-line" style="font-size:1.2rem;"></i>
+            </div>
             <?php if (!empty($riskOverview['available'])): ?>
-              <div style="font-size:2.6rem;font-weight:700;line-height:1;"><?= $probPct ?>%</div>
+              <div class="hub-compact-big"><?= $probPct ?>%</div>
               <div class="small">
                 Nível <?= strtoupper($riskLevel ?: 'BAIXO') ?> • limiar <?= $thresholdPct ?>%
               </div>
@@ -394,67 +473,71 @@ $complexInfo = $complexMap[$riskLevel ?: 'baixo'];
               <div class="small">
                 Ref. internação <?= $refIntern ? '#' . (int)$refIntern : '—' ?>
               </div>
-              <div class="mt-2">
-                <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-weight:600;background:rgba(255,255,255,.55);color:<?= $palette['text'] ?>;border:1px solid rgba(0,0,0,.05);">
-                  <i class="fa-solid fa-triangle-exclamation"></i>
-                  <span><?= $complexInfo['label'] ?> · <?= $complexInfo['prioridade'] ?></span>
-                </span>
-              </div>
             <?php else: ?>
               <div class="small mt-2"><?= htmlspecialchars($riskOverview['message'] ?? 'Sem dados suficientes.', ENT_QUOTES, 'UTF-8') ?></div>
             <?php endif; ?>
           </div>
-          <i class="fa-solid fa-chart-line" style="font-size:1.8rem;"></i>
+          <div class="col-12 col-md-6">
+            <?php if (!empty($riskOverview['available'])): ?>
+              <div class="small mb-1 text-dark" style="opacity:.85;">
+                <?= htmlspecialchars($riskOverview['explanation'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+              </div>
+              <?php if (!empty($riskOverview['recommendations']) && is_array($riskOverview['recommendations'])): ?>
+                <ul class="small mb-0 ps-3 hub-compact-recos">
+                  <?php foreach (array_slice($riskOverview['recommendations'], 0, 3) as $rec): ?>
+                    <li><?= htmlspecialchars($rec, ENT_QUOTES, 'UTF-8') ?></li>
+                  <?php endforeach; ?>
+                </ul>
+              <?php endif; ?>
+            <?php endif; ?>
+          </div>
         </div>
         <?php if (!empty($riskOverview['available'])): ?>
-          <div class="small mb-2 text-dark" style="opacity:.85;">
-            <?= htmlspecialchars($riskOverview['explanation'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+          <div class="hub-compact-badge-bottom">
+            <span class="badge-compact" style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;font-weight:600;background:rgba(255,255,255,.55);color:<?= $palette['text'] ?>;border:1px solid rgba(0,0,0,.05);">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span><?= $complexInfo['label'] ?> · <?= $complexInfo['prioridade'] ?></span>
+            </span>
           </div>
-          <?php if (!empty($riskOverview['recommendations']) && is_array($riskOverview['recommendations'])): ?>
-            <ul class="small mb-0 ps-3">
-              <?php foreach (array_slice($riskOverview['recommendations'], 0, 3) as $rec): ?>
-                <li><?= htmlspecialchars($rec, ENT_QUOTES, 'UTF-8') ?></li>
-              <?php endforeach; ?>
-            </ul>
-          <?php endif; ?>
         <?php endif; ?>
       </div>
     </div>
   </div>
-  <div class="col-12 col-lg-7">
-    <div class="card shadow-sm h-100" style="border-radius:16px;">
-      <div class="card-body">
+  <div class="col-12 col-lg-5">
+    <div class="card shadow-sm h-100 hub-compact-card hub-compact-card--neutral" style="border-radius:16px;">
+      <div class="card-body hub-compact-right">
         <small class="text-uppercase text-muted fw-semibold" style="letter-spacing:.08em;">Indicadores clínicos</small>
-        <div class="row mt-2 gy-3 text-secondary fw-semibold">
+        <div class="row mt-1 gy-1 text-secondary fw-semibold">
           <div class="col-sm-6 col-xl-4">
             <div class="small text-muted">Total de internações</div>
-            <div style="font-size:1.4rem;"><?= (int)$indicadoresPaciente['total_internacoes'] ?></div>
+            <div class="hub-compact-metric"><?= (int)$indicadoresPaciente['total_internacoes'] ?></div>
           </div>
           <div class="col-sm-6 col-xl-4">
             <div class="small text-muted">Média de permanência</div>
-            <div style="font-size:1.4rem;"><?= number_format($indicadoresPaciente['media_permanencia'], 1, ',', '.') ?> dias</div>
+            <div class="hub-compact-metric"><?= number_format($indicadoresPaciente['media_permanencia'], 1, ',', '.') ?> dias</div>
           </div>
           <div class="col-sm-6 col-xl-4">
             <div class="small text-muted">Longa permanência (&ge;20d)</div>
-            <div style="font-size:1.4rem;"><?= (int)$indicadoresPaciente['long_stay'] ?></div>
+            <div class="hub-compact-metric"><?= (int)$indicadoresPaciente['long_stay'] ?></div>
           </div>
           <div class="col-sm-6 col-xl-4">
             <div class="small text-muted">Eventos adversos</div>
-            <div style="font-size:1.4rem;"><?= (int)$indicadoresPaciente['eventos_adversos'] ?></div>
+            <div class="hub-compact-metric"><?= (int)$indicadoresPaciente['eventos_adversos'] ?></div>
           </div>
           <div class="col-sm-6 col-xl-4">
             <div class="small text-muted">Antecedentes registrados</div>
-            <div style="font-size:1.4rem;"><?= (int)$indicadoresPaciente['antecedentes'] ?></div>
+            <div class="hub-compact-metric"><?= (int)$indicadoresPaciente['antecedentes'] ?></div>
           </div>
           <div class="col-sm-6 col-xl-4">
             <div class="small text-muted">Última internação</div>
-            <div style="font-size:1.4rem;"><?= htmlspecialchars($ultimaInternFmt) ?></div>
+            <div class="hub-compact-metric"><?= htmlspecialchars($ultimaInternFmt) ?></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+<?php endif; ?>
 
   <!-- Abas -->
   <div class="card shadow-sm" style="border-radius:14px;">
@@ -493,10 +576,11 @@ $complexInfo = $complexMap[$riskLevel ?: 'baixo'];
                 <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
                 <input id="buscaInternacoes" type="text" class="form-control" placeholder="Filtrar...">
               </div>
-              <a class="btn btn-sm btn-primary"
-                href="<?= $BASE_URL ?>cad_internacao.php?id_paciente=<?= (int)$p['id_paciente'] ?>">
-                <i class="fa-solid fa-plus me-1"></i> Nova Internação
-              </a>
+              <?php if (!$isGestorSeguradora) { ?>
+                <a class="btn btn-sm btn-primary" href="<?= $BASE_URL ?>cad_internacao.php?id_paciente=<?= (int)$p['id_paciente'] ?>">
+                  <i class="fa-solid fa-plus me-1"></i> Nova Internação
+                </a>
+              <?php } ?>
             </div>
           </div>
 
@@ -538,8 +622,10 @@ $complexInfo = $complexMap[$riskLevel ?: 'baixo'];
         <div class="tab-pane fade" id="tab-antecedentes" role="tabpanel">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="mb-0">Antecedentes e condições</h6>
-            <button class="btn btn-outline-secondary btn-sm"><i
-                class="fa-solid fa-plus me-2"></i>Novo</button>
+            <?php if (!$isGestorSeguradora) { ?>
+              <button class="btn btn-outline-secondary btn-sm"><i
+                  class="fa-solid fa-plus me-2"></i>Novo</button>
+            <?php } ?>
           </div>
           <div id="chipsAntecedentes" class="d-flex flex-wrap gap-2">
             <!-- chips com antecedentes (ex.: HAS, DM2, etc.) -->
@@ -628,6 +714,17 @@ $complexInfo = $complexMap[$riskLevel ?: 'baixo'];
 
 </div>
 
+<script>
+  (function() {
+    try {
+      window.addEventListener('load', function() {
+      });
+      setTimeout(function() {
+      }, 3000);
+    } catch (e) {}
+  })();
+</script>
+
 <style>
   :root {
     --brand: #5e2363;
@@ -673,6 +770,134 @@ $complexInfo = $complexMap[$riskLevel ?: 'baixo'];
     border-radius: 999px;
     background: linear-gradient(180deg, var(--brand), #c997d2);
     opacity: .85;
+  }
+
+  .hub-compact-card .card-body {
+    padding: 8px 8px 4px;
+  }
+
+  .hub-compact-card--primary .card-body {
+    padding: 10px 10px 2px;
+  }
+
+  .hub-compact-primary-body {
+    justify-content: flex-start;
+  }
+
+  .hub-compact-left .small {
+    line-height: 1.45;
+  }
+
+  .hub-compact-left .hub-compact-big {
+    margin-bottom: .15rem;
+  }
+
+  .hub-compact-card--primary .card-body {
+    padding-bottom: 0;
+  }
+
+  .hub-compact-card .hub-compact-big {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .hub-compact-card .hub-compact-metric {
+    font-size: .8rem;
+    line-height: 1.1;
+  }
+
+  .hub-compact-card .small {
+    font-size: .6rem;
+    line-height: 1.1;
+  }
+
+  .hub-compact-card ul {
+    margin-bottom: 0;
+    padding-left: 1rem;
+  }
+
+  .hub-compact-card li {
+    margin-bottom: 0;
+  }
+
+  .hub-compact-recos {
+    line-height: 1.1;
+  }
+
+  .hub-compact-card .mb-2 {
+    margin-bottom: .35rem !important;
+  }
+
+  .hub-compact-card .mt-2 {
+    margin-top: .2rem !important;
+  }
+
+  .hub-compact-card--neutral {
+    background: linear-gradient(180deg, #ffffff 0%, #f6f2fb 100%);
+    border: 2px solid #d8c3e9;
+  }
+
+  .hub-compact-card--primary {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(220, 236, 255, 0.55) 100%);
+    border: 2px solid rgba(46, 126, 223, 0.35);
+  }
+
+  .hub-compact-card--primary .card-body {
+    padding-bottom: 1px;
+  }
+
+  .hub-compact-card--primary .mt-2 {
+    margin-top: .1rem !important;
+  }
+
+  .hub-compact-card .row {
+    margin-bottom: 0;
+  }
+
+  .hub-compact-card [class*="mb-"] {
+    margin-bottom: .25rem !important;
+  }
+
+  .hub-compact-card .card-body > :last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .hub-compact-card .card-body > .row {
+    margin-bottom: 0 !important;
+  }
+
+  .hub-compact-card .badge-compact {
+    padding: 2px 8px;
+    font-size: .7rem;
+  }
+
+  .hub-compact-badge-wrap {
+    margin-bottom: .1rem !important;
+    line-height: 1;
+  }
+
+  .hub-compact-card--primary .hub-compact-badge-wrap {
+    margin-bottom: .15rem !important;
+  }
+
+  .hub-compact-badge-bottom {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    padding-top: .2rem;
+  }
+
+  .hub-compact-right {
+    padding-top: 26px;
+  }
+
+  .hub-compact-card--primary .hub-compact-recos {
+    line-height: 1.6;
+  }
+
+  .hub-compact-card--primary .hub-compact-recos li {
+    margin-bottom: 2px;
   }
 
   .contas-summary .summary-card .card-body {
@@ -994,20 +1219,67 @@ $complexInfo = $complexMap[$riskLevel ?: 'baixo'];
 </script>
 <script src="<?= $BASE_URL ?>js/hub_paciente.js?v=<?= filemtime('js/hub_paciente.js') ?>"></script>
 
-
-<?php
-// Carrega as internações (precisa vir com 'senha_int' do DAO)
-$preloadedInt = $internacaoDao->listByPaciente((int)$id_paciente);
-?>
 <script>
   // Diz qual campo é a senha e injeta os dados pro JS
   window.HUB_SENHA_FIELD = 'senha_int';
-  window.PRELOADED_INT = <?= json_encode($preloadedInt, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+  window.PRELOADED_INT = <?= $preloadEnabled ? json_encode($internacoes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : 'null' ?>;
+  window.PRELOAD_ENABLED = <?= $preloadEnabled ? 'true' : 'false' ?>;
+  window.PRELOAD_THRESHOLD = <?= (int)$preloadThreshold ?>;
 
   // (mantém o que você já tinha)
   window.BASE_URL = '<?= rtrim($BASE_URL, '/') . '/' ?>';
   window.PACIENTE_ID = <?= (int) $id_paciente ?>;
 </script>
-<script src="<?= rtrim($BASE_URL, '/') ?>/js/pages/hub_paciente.js?v=<?= time() ?>"></script>
 
+<?php if ($rahAfterSave && !empty($rahAfterSave['accounts_url'])): ?>
+<div class="modal fade" id="rahContinueModal" tabindex="-1" aria-labelledby="rahContinueTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rahContinueTitle">Continuar lançando?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja seguir lançando contas ou visitas para este paciente?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="rahModalClose" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Permanecer no hub
+                </button>
+                <button type="button" id="rahModalAccounts" class="btn btn-primary">
+                    Ir para contas
+                </button>
+                <?php if (!empty($rahAfterSave['visits_url'])): ?>
+                    <button type="button" id="rahModalVisits" class="btn btn-outline-primary">
+                        Ir para visitas
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var modalEl = document.getElementById('rahContinueModal');
+        if (!modalEl) return;
+        if (!(window.bootstrap && typeof window.bootstrap.Modal === 'function')) {
+            console.warn('[hub_paciente] bootstrap.Modal indisponível; pulando modal');
+            return;
+        }
+        var modal = new bootstrap.Modal(modalEl, {backdrop: 'static', keyboard: false});
+        modal.show();
+        document.getElementById('rahModalAccounts').addEventListener('click', function () {
+            window.location.href = <?= json_encode($rahAfterSave['accounts_url'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        });
+        document.getElementById('rahModalClose').addEventListener('click', function () {
+            modal.hide();
+        });
+        <?php if (!empty($rahAfterSave['visits_url'])): ?>
+        document.getElementById('rahModalVisits').addEventListener('click', function () {
+            window.location.href = <?= json_encode($rahAfterSave['visits_url'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        });
+        <?php endif; ?>
+    });
+</script>
+<?php endif; ?>
 <?php include_once("templates/footer.php"); ?>

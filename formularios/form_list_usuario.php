@@ -6,6 +6,10 @@ include_once("dao/usuarioDao.php");
 include_once("templates/header.php");
 include_once("array_dados.php");
 
+// Debug simples por querystring (?debug=1)
+$debug = isset($_GET['debug']) && $_GET['debug'] == '1';
+$__t0 = microtime(true);
+
 //Instanciando a classe
 $usuarioDAO = new UserDAO($conn, $BASE_URL);
 $QtdTotalUser = new UserDAO($conn, $BASE_URL);
@@ -13,6 +17,7 @@ $QtdTotalUser = new UserDAO($conn, $BASE_URL);
 // METODO DE BUSCA DE PAGINACAO
 $usuario = filter_input(INPUT_GET, 'pesquisa_nome');
 $pesquisa_nome = filter_input(INPUT_GET, 'pesquisa_nome');
+$busca = $pesquisa_nome ?? '';
 $cargo = filter_input(INPUT_GET, 'cargo');
 $depto = filter_input(INPUT_GET, 'depto');
 $buscaAtivo = filter_input(INPUT_GET, 'ativo_user');
@@ -33,16 +38,17 @@ $condicoes = array_filter($condicoes);
 // REMOVE POSICOES VAZIAS DO FILTRO
 $where = implode(' AND ', $condicoes);
 // print_r($condicoes);
-$qtdUserItens1 = $QtdTotalUser->selectAllUsuario($where, $order, $obLimite);
+$qtdIntItens = (int) $QtdTotalUser->countUsuario($where);
 
 $order = $ordenar;
-$qtdIntItens = count($qtdUserItens1);
 // PAGINACAO
 $obPagination = new pagination($qtdIntItens, $_GET['pag'] ?? 1, $limite ?? 10);
 $obLimite = $obPagination->getLimit();
 
 // PREENCHIMENTO DO FORMULARIO COM QUERY
 $query = $usuarioDAO->selectAllUsuario($where, $order, $obLimite);
+
+$__t1 = microtime(true);
 
 // PAGINACAO
 $paginacao = '';
@@ -74,6 +80,17 @@ if ($qtdIntItens > $limite) {
 
 <!--tabela evento-->
 <div class="container-fluid form_container" style="margin-top:-5px;">
+    <?php if ($debug): ?>
+        <div class="alert alert-warning" style="font-size:0.9rem;">
+            <strong>DEBUG list_usuario</strong><br>
+            where: <?= htmlspecialchars($where, ENT_QUOTES, 'UTF-8') ?><br>
+            order: <?= htmlspecialchars((string)$order, ENT_QUOTES, 'UTF-8') ?><br>
+            limit: <?= htmlspecialchars((string)$obLimite, ENT_QUOTES, 'UTF-8') ?><br>
+            total: <?= (int)$qtdIntItens ?><br>
+            query_count: <?= is_array($query) ? count($query) : 0 ?><br>
+            tempo: <?= number_format((($__t1 ?? microtime(true)) - $__t0), 4, '.', '') ?>s
+        </div>
+    <?php endif; ?>
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="./scripts/cadastro/general.js"></script>
@@ -141,12 +158,16 @@ if ($qtdIntItens > $limite) {
 
                             </select>
                         </div>
-                        <div class="col-sm-1" style="padding:2px !important" style="margin:0px 0px 20px 0px">
-                            <button type="submit" class="btn btn-primary"
-                                style="background-color:#5e2363;width:42px;height:32px;margin-top:7px;border-color:#5e2363"><span
-                                    class="material-icons" style="margin-left:-3px;margin-top:-2px;">
-                                    search
-                                </span></button>
+                        <div class="col-sm-2" style="padding:2px !important">
+                            <div class="filtro-acoes">
+                                <button type="submit" class="btn btn-primary btn-filtro-buscar" title="Buscar">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                                <button type="button" id="btnLimparFiltro" class="btn btn-light btn-filtro-limpar"
+                                    title="Limpar filtros" aria-label="Limpar filtros">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -158,24 +179,25 @@ if ($qtdIntItens > $limite) {
                 <!-- <div> -->
                 <!-- <h6 class="page-title">Relação de usuários</h6> -->
                 <!-- </div> -->
-                <table class="table table-sm table-striped table-hover table-condensed">
-                    <thead>
-                        <tr>
-                            <th scope="col">Id</th>
-                            <th scope="col">Usuário</th>
-                            <th scope="col">CPF</th>
-                            <th scope="col">Endereço</th>
-                            <th scope="col">Cargo</th>
-                            <th scope="col">Depto</th>
-                            <th scope="col">Nível</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Telefone</th>
-                            <th scope="col">Ativo</th>
-                            <th scope="col" width="8%">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
+                <div class="table-responsive table-responsive-page">
+                    <table class="table table-sm table-striped table-hover table-condensed">
+                        <thead>
+                            <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Usuário</th>
+                                <th scope="col">CPF</th>
+                                <th scope="col">Endereço</th>
+                                <th scope="col">Cargo</th>
+                                <th scope="col">Depto</th>
+                                <th scope="col">Nível</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Telefone</th>
+                                <th scope="col">Ativo</th>
+                                <th scope="col" width="8%">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
 
                         foreach ($query as $usuario):
                             extract($usuario);
@@ -267,9 +289,10 @@ if ($qtdIntItens > $limite) {
                                 </div>
                             </td>
                         </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
                 <!-- salvar variavel qtdIntItens no PHP para passar para JS -->
                 <div style="text-align:right">
                     <input type="hidden" id="qtd" value="<?php echo $qtdIntItens ?>">
@@ -306,15 +329,15 @@ if ($qtdIntItens > $limite) {
                                 ?>
                             <?php if ($current_block > $first_block): ?>
                             <li class="page-item">
-                                <a class="page-link" id="blocoNovo" href="#"
-                                    onclick="loadContent('list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
+                                <a class="page-link" id="blocoNovo"
+                                    href="list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&cargo=<?php print $cargo ?>&depto=<?php print $depto ?>&ativo_user=<?php print $buscaAtivo ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>">
                                     <i class="fa-solid fa-angles-left"></i></a>
                             </li>
                             <?php endif; ?>
                             <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                             <li class="page-item">
-                                <a class="page-link" href="#"
-                                    onclick="loadContent('list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual - 1 ?>&bl=<?php print $blocoAtual - 5 ?>')">
+                                <a class="page-link"
+                                    href="list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&cargo=<?php print $cargo ?>&depto=<?php print $depto ?>&ativo_user=<?php print $buscaAtivo ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual - 1 ?>&bl=<?php print $blocoAtual - 5 ?>">
                                     <i class="fa-solid fa-angle-left"></i> </a>
                             </li>
                             <?php endif; ?>
@@ -322,8 +345,8 @@ if ($qtdIntItens > $limite) {
                             <?php for ($i = $first_page_in_block; $i <= $last_page_in_block; $i++): ?>
                             <li class="page-item <?php print ($_GET['pag'] ?? 1) == $i ? "active" : "" ?>">
 
-                                <a class="page-link" href="#"
-                                    onclick="loadContent('list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $i ?>&bl=<?php print $blocoAtual ?>')">
+                                <a class="page-link"
+                                    href="list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&cargo=<?php print $cargo ?>&depto=<?php print $depto ?>&ativo_user=<?php print $buscaAtivo ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $i ?>&bl=<?php print $blocoAtual ?>">
                                     <?php echo $i; ?>
                                 </a>
                             </li>
@@ -331,15 +354,15 @@ if ($qtdIntItens > $limite) {
 
                             <?php if ($current_block < $last_block): ?>
                             <li class="page-item">
-                                <a class="page-link" id="blocoNovo" href="#"
-                                    onclick="loadContent('list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual + 1 ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
+                                <a class="page-link" id="blocoNovo"
+                                    href="list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&cargo=<?php print $cargo ?>&depto=<?php print $depto ?>&ativo_user=<?php print $buscaAtivo ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual + 1 ?>&bl=<?php print $blocoAtual + 5 ?>"><i
                                         class="fa-solid fa-angle-right"></i></a>
                             </li>
                             <?php endif; ?>
                             <?php if ($current_block < $last_block): ?>
                             <li class="page-item">
-                                <a class="page-link" id="blocoNovo" href="#"
-                                    onclick="loadContent('internacoes/lista?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print count($paginas) ?>&bl=<?php print ($last_block - 1) * 5 ?>')"><i
+                                <a class="page-link" id="blocoNovo"
+                                    href="list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&cargo=<?php print $cargo ?>&depto=<?php print $depto ?>&ativo_user=<?php print $buscaAtivo ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print count($paginas) ?>&bl=<?php print ($last_block - 1) * 5 ?>"><i
                                         class="fa-solid fa-angles-right"></i></a>
                             </li>
                             <?php endif; ?>
@@ -390,6 +413,16 @@ $(document).ready(function() {
     });
 });
 
+$(document).ready(function() {
+    $('#btnLimparFiltro').on('click', function() {
+        const $form = $('#form_pesquisa');
+        $form[0].reset();
+        $form.find('input[type="text"]').val('');
+        $form.find('select').prop('selectedIndex', 0);
+        window.location.href = 'list_usuario.php';
+    });
+});
+
 
 function resetSenha(id_user, evt) {
     if (evt && typeof evt.preventDefault === 'function') {
@@ -414,7 +447,6 @@ function resetSenha(id_user, evt) {
         type: 'POST',
         data: formData,
         success: function(response) {
-            console.log("Sucesso:", response);
 
             $('#responseMessage').html('Senha resetada com sucesso.');
         },
@@ -426,11 +458,7 @@ function resetSenha(id_user, evt) {
 }
 
 
-$(document).ready(function() {
-    loadContent(
-        'list_usuario.php?pesquisa_nome=<?php print $pesquisa_nome ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>'
-    );
-});
+// carregamento inicial já vem do servidor, não precisa de AJAX aqui
 </script>
 <style>
 .modal-backdrop {
@@ -446,6 +474,55 @@ $(document).ready(function() {
 .modal-header {
     color: white;
     background: #35bae1;
+}
+
+.table-responsive-page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.complete-table {
+    width: 100%;
+}
+
+.filtro-acoes {
+    margin-top: 7px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-filtro-buscar,
+.btn-filtro-limpar {
+    width: 42px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-filtro-buscar {
+    background-color: #5e2363;
+    border-color: #5e2363;
+}
+
+.btn-filtro-limpar {
+    color: #5e2363;
+    border: 1px solid #aeb7c2;
+    background-color: #f3f5f7;
+    box-shadow: 0 2px 6px rgba(30, 41, 59, 0.2);
+}
+
+.btn-filtro-limpar:hover {
+    color: #ffffff !important;
+    border-color: #5e2363 !important;
+    background-color: #5e2363 !important;
+    box-shadow: 0 3px 8px rgba(30, 41, 59, 0.28);
+}
+
+.btn-filtro-limpar:hover i {
+    color: #ffffff !important;
 }
 </style>
 <script src="./js/input-estilo.js"></script>

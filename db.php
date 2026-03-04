@@ -1,10 +1,10 @@
 <?php
 // Conexão principal (mydb_accert_ho - Hostinger)
 
-$host4 = "2.59.150.2";
-$user4 = "u650318666_diretoria10";
-$pass4 = "FullCare@BD2025!";
-$dbname4 = "u650318666_mydb_accert_ho";
+$host1 = "srv953.hstgr.io";
+$user1 = "u650318666_diretoria10";
+$pass1 = "FullCare@BD2025!";
+$dbname1 = "u650318666_mydb_accert_ho";
 
 // Conexão alternativa 1 (mydb_accert_new - UOLHOST)
 $host2 = "mydb-accert-new.mysql.uhserver.com";
@@ -18,23 +18,16 @@ $user3 = "diretoria2";
 $pass3 = "Guga@0401";
 $dbname3 = "mydb_accert";
 
-// Conexão alternativa 3 (Cloud SQL público)
-$host1 = "35.199.123.232";
-$user1 = "id-mysql-fullcare"; // atualize com o usuário do Cloud SQL
-$pass1 = "CB*hND.46`an46$~"; // atualize com a senha do Cloud SQL
-$dbname1 = "fullcare"; // atualize com o nome do banco de dados dentro do Cloud SQL
-
 $charset = "utf8";
 $port = 3306;
 $fonte_conexao = "";
-$dbConnectionStart = microtime(true);
 
 try {
     // Tentativa com a conexão principal (Hostinger)
     $conn = new PDO("mysql:host=$host1;dbname=$dbname1;charset=$charset", $user1, $pass1);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    $fonte_conexao = "Conexao 1 ($dbname1)";
+    $fonte_conexao = "Hostinger ($dbname1)";
 } catch (Exception $e1) {
     try {
         // Tentativa com a alternativa 1 (UOLHOST NEW)
@@ -50,21 +43,11 @@ try {
             $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $fonte_conexao = "UOLHOST Fallback ($dbname3)";
         } catch (Exception $e3) {
-            try {
-                // Tentativa com a alternativa 3 (Cloud SQL público)
-                $conn = new PDO("mysql:host=$host4;dbname=$dbname4;charset=$charset", $user4, $pass4);
-                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-                $fonte_conexao = "Cloud SQL Público ($dbname4)";
-            } catch (Exception $e4) {
-                header("Location: sem_conexao.html");
-                exit("❌ Falha nas conexões com os bancos de dados.");
-            }
+            header("Location: sem_conexao.html");
+            exit("❌ Falha nas conexões com os bancos de dados.");
         }
     }
 }
-
-$dbConnectionDurationMs = (int) round((microtime(true) - $dbConnectionStart) * 1000, 0);
 
 try {
     $userId = $_SESSION['id_usuario'] ?? null;

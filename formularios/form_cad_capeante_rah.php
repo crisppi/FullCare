@@ -217,6 +217,10 @@ if ($internacaoParaEvento > 0) {
     }
 }
 
+if (!empty($rahFormFieldOverrides) && is_array($rahFormFieldOverrides)) {
+    $row = array_merge($row, $rahFormFieldOverrides);
+}
+
 $nextAutoDate = '';
 if ($type === 'create' && !empty($prevParcialRow['data_final_capeante']) && $prevParcialRow['data_final_capeante'] !== '0000-00-00') {
     $ts = strtotime($prevParcialRow['data_final_capeante'] . ' +1 day');
@@ -450,14 +454,20 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                     <input type="date" class="form-control" name="data_final_capeante"
                         value="<?= $h($fv('data_final_capeante')) ?>">
                 </div>
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-2 col-md-4">
                     <label class="form-label">Valor Apresentado</label>
                     <input type="text" class="form-control dinheiro" id="inp_val_apr" name="valor_apresentado_capeante"
                         value="<?= is_numeric($fv('valor_apresentado_capeante')) ? number_format((float)$fv('valor_apresentado_capeante'), 2, ',', '.') : '' ?>"
                         placeholder="R$ 0,00">
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <label class="form-label">Valor Final</label>
+                <div class="col-lg-2 col-md-4">
+                    <label class="form-label">Glosa Total</label>
+                    <input type="text" class="form-control dinheiro" id="inp_val_glosa" name="valor_glosa_total"
+                        value="<?= is_numeric($fv('valor_glosa_total')) ? number_format((float)$fv('valor_glosa_total'), 2, ',', '.') : '' ?>"
+                        placeholder="R$ 0,00" readonly>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label class="form-label">Valor Liberado</label>
                     <input type="text" class="form-control dinheiro" id="inp_val_fin" name="valor_final_capeante"
                         value="<?= is_numeric($fv('valor_final_capeante')) ? number_format((float)$fv('valor_final_capeante'), 2, ',', '.') : '' ?>"
                         placeholder="R$ 0,00">
@@ -616,7 +626,10 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     <div class="block" data-group="diarias">
         <!-- TÍTULO / TOGGLER -->
         <h5>
-            Diárias
+            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#grp-diarias" aria-expanded="false" aria-controls="grp-diarias">
+                Diárias
+            </button>
         </h5>
 
         <!-- CONTEÚDO COLAPSÁVEL (tuss-grid + totais) -->
@@ -760,9 +773,15 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
 
     <!-- SETOR: APTO / ENFERMARIA -->
     <div class="block apto" data-group="apto">
-        <h5>Apto / Enfermaria</h5>
+        <h5>
+            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#grp-apto" aria-expanded="false" aria-controls="grp-apto">
+                Apto / Enfermaria
+            </button>
+        </h5>
 
-        <div class="tuss-grid">
+        <div id="grp-apto" class="collapse">
+            <div class="tuss-grid">
             <div class="tg-head tg-col-desc">Descrição</div>
             <div class="tg-head tg-col-qtd">Qtd.</div>
             <div class="tg-head tg-col-cob">Cobrado</div>
@@ -897,14 +916,21 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                     value="R$ 0,00">
             </div>
         </div>
+        </div>
     </div>
 
 
     <!-- SETOR: UTI -->
     <div class="block uti" data-group="uti">
-        <h5>UTI</h5>
+        <h5>
+            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#grp-uti" aria-expanded="false" aria-controls="grp-uti">
+                UTI
+            </button>
+        </h5>
 
-        <div class="tuss-grid">
+        <div id="grp-uti" class="collapse">
+            <div class="tuss-grid">
             <div class="tg-head tg-col-desc">Descrição</div>
             <div class="tg-head tg-col-qtd">Qtd.</div>
             <div class="tg-head tg-col-cob">Cobrado</div>
@@ -1039,13 +1065,20 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                     value="R$ 0,00">
             </div>
         </div>
+        </div>
     </div>
 
     <!-- SETOR: CENTRO CIRÚRGICO -->
     <div class="block cc" data-group="cc">
-        <h5>Centro Cirúrgico</h5>
+        <h5>
+            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#grp-cc" aria-expanded="false" aria-controls="grp-cc">
+                Centro Cirúrgico
+            </button>
+        </h5>
 
-        <div class="tuss-grid">
+        <div id="grp-cc" class="collapse">
+            <div class="tuss-grid">
             <div class="tg-head tg-col-desc">Descrição</div>
             <div class="tg-head tg-col-qtd">Qtd.</div>
             <div class="tg-head tg-col-cob">Cobrado</div>
@@ -1180,12 +1213,19 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                     value="R$ 0,00">
             </div>
         </div>
+        </div>
     </div>
     <!-- SETOR: OUTROS -->
     <div class="block" data-group="outros">
-        <h5>Outros</h5>
+        <h5>
+            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#grp-outros" aria-expanded="false" aria-controls="grp-outros">
+                Outros
+            </button>
+        </h5>
 
-        <div class="tuss-grid">
+        <div id="grp-outros" class="collapse">
+            <div class="tuss-grid">
             <div class="tg-head tg-col-desc">Descrição</div>
             <div class="tg-head tg-col-qtd">Qtd.</div>
             <div class="tg-head tg-col-cob">Cobrado</div>
@@ -1237,6 +1277,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                 <input type="text" name="outros_total_liberado" class="form-control dinheiro grp-total-liberado"
                     readonly value="R$ 0,00">
             </div>
+        </div>
         </div>
     </div>
 
@@ -1354,6 +1395,24 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
             </div>
         </div>
     </div>
+
+    <!-- Modal de período conflitante -->
+    <div class="modal fade" id="modalPeriodoConflito" tabindex="-1" aria-labelledby="modalPeriodoConflitoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPeriodoConflitoLabel">Período inválido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Período em conflito com capeantes anteriores.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
 
 <style>
@@ -1386,7 +1445,10 @@ $listaParciaisData = base64_encode(json_encode($parciaisLista ?? [], JSON_UNESCA
 ?>
 <div id="prevParcialData"
     data-prev-parcial="<?= htmlspecialchars($prevParcialData, ENT_QUOTES, 'UTF-8') ?>"
-    data-parciais="<?= htmlspecialchars($listaParciaisData, ENT_QUOTES, 'UTF-8') ?>">
+    data-parciais="<?= htmlspecialchars($listaParciaisData, ENT_QUOTES, 'UTF-8') ?>"
+    data-capeante-id="<?= (int)$id_capeante ?>">
+</div>
+</div>
 </div>
 
 <!-- Vendors -->
@@ -1433,6 +1495,47 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Falha ao decodificar lista de parciais', err);
         }
     }
+
+    var currentCapeanteId = null;
+    if (prevDataHolder && prevDataHolder.dataset.capeanteId) {
+        var parsedCapeanteId = Number(prevDataHolder.dataset.capeanteId);
+        if (!Number.isNaN(parsedCapeanteId) && parsedCapeanteId > 0) {
+            currentCapeanteId = parsedCapeanteId;
+        }
+    }
+    var modalPeriodoConflito = document.getElementById('modalPeriodoConflito');
+    var modalPeriodoConflitoInstance = modalPeriodoConflito && window.bootstrap
+        ? bootstrap.Modal.getOrCreateInstance(modalPeriodoConflito)
+        : null;
+    var periodoConflitoAtivo = false;
+    var periodosAnteriores = [];
+
+    function parseValidDateYMD(value) {
+        if (!value || value === '0000-00-00') return null;
+        var normalized = value.replace(/-/g, '/');
+        var parsed = new Date(normalized);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function rebuildPeriodos() {
+        periodosAnteriores = [];
+        if (!Array.isArray(listaParciais) || !listaParciais.length) return;
+        periodosAnteriores = listaParciais.map(function (item) {
+            var inicio = parseValidDateYMD(item.data_inicial_capeante);
+            if (!inicio) return null;
+            var fim = parseValidDateYMD(item.data_final_capeante) || inicio;
+            if (!fim) return null;
+            return {
+                id: item.id_capeante ? Number(item.id_capeante) : null,
+                start: inicio,
+                end: fim
+            };
+        }).filter(function (item) {
+            return item !== null;
+        });
+    }
+
+    rebuildPeriodos();
 
     function formatCurrencyBR(value) {
         var num = Number(value);
@@ -1556,6 +1659,54 @@ document.addEventListener('DOMContentLoaded', function () {
     var inputIni = document.querySelector('input[name="data_inicial_capeante"]');
     var inputFim = document.querySelector('input[name="data_final_capeante"]');
     var alertPeriodo = document.getElementById('alertPeriodo');
+
+    function resetPeriodosCampos() {
+        if (inputIni) inputIni.value = '';
+        if (inputFim) inputFim.value = '';
+        if (alertPeriodo) alertPeriodo.classList.add('d-none');
+    }
+
+    function abrirModalPeriodoConflito() {
+        if (modalPeriodoConflitoInstance) {
+            periodoConflitoAtivo = true;
+            modalPeriodoConflitoInstance.show();
+        } else {
+            alert('Período em conflito com capeantes anteriores.');
+            resetPeriodosCampos();
+        }
+    }
+
+    function hasPeriodoConflito(iniValue, fimValue) {
+        if (!iniValue || !fimValue || !Array.isArray(periodosAnteriores) || !periodosAnteriores.length) return false;
+        var inicio = parseValidDateYMD(iniValue);
+        var fim = parseValidDateYMD(fimValue) || inicio;
+        if (!inicio || !fim || fim < inicio) return false;
+        for (var i = 0; i < periodosAnteriores.length; i++) {
+            var periodo = periodosAnteriores[i];
+            if (currentCapeanteId && periodo.id && Number(periodo.id) === currentCapeanteId) continue;
+            if (inicio <= periodo.end && periodo.start <= fim) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function verificarPeriodoConflito(iniValue, fimValue) {
+        if (periodoConflitoAtivo) return;
+        if (!parcialSelect || parcialSelect.value !== 's') return;
+        if (hasPeriodoConflito(iniValue, fimValue)) {
+            abrirModalPeriodoConflito();
+        }
+    }
+
+    if (modalPeriodoConflito) {
+        modalPeriodoConflito.addEventListener('hidden.bs.modal', function () {
+            if (!periodoConflitoAtivo) return;
+            periodoConflitoAtivo = false;
+            resetPeriodosCampos();
+        });
+    }
+
     function validarPeriodo() {
         if (!inputIni || !inputFim || !alertPeriodo) return;
         var ini = inputIni.value;
@@ -1568,6 +1719,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 5000);
         } else {
             alertPeriodo.classList.add('d-none');
+            verificarPeriodoConflito(ini, fim);
         }
     }
     if (inputIni) inputIni.addEventListener('change', validarPeriodo);

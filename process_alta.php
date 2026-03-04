@@ -1,5 +1,28 @@
 <?php
 
+if (!defined("FLOW_LOGGER_AUTO_V1")) {
+    define("FLOW_LOGGER_AUTO_V1", 1);
+    @require_once(__DIR__ . "/utils/flow_logger.php");
+    if (function_exists("flowLogStart") && function_exists("flowLog")) {
+        $__flowCtxAuto = flowLogStart(basename(__FILE__, ".php"), [
+            "type" => $_POST["type"] ?? $_GET["type"] ?? null,
+            "method" => $_SERVER["REQUEST_METHOD"] ?? null,
+        ]);
+        register_shutdown_function(function () use ($__flowCtxAuto) {
+            $err = error_get_last();
+            if ($err && in_array(($err["type"] ?? 0), [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+                flowLog($__flowCtxAuto, "shutdown.fatal", "ERROR", [
+                    "message" => $err["message"] ?? null,
+                    "file" => $err["file"] ?? null,
+                    "line" => $err["line"] ?? null,
+                ]);
+            }
+            flowLog($__flowCtxAuto, "request.finish", "INFO");
+        });
+    }
+}
+
+
 include_once("globals.php");
 include_once("db.php");
 
@@ -21,6 +44,8 @@ $userDao = new UserDAO($conn, $BASE_URL);
 $internacaoDao = new internacaoDAO($conn, $BASE_URL);
 $utiDao = new utiDao($conn, $BASE_URL);
 $altaDao = new altaDAO($conn, $BASE_URL);
+
+Gate::enforceAction($conn, $BASE_URL, 'discharge', 'Você não tem permissão para dar alta.');
 
 // Resgata o tipo do formulário
 $type = filter_input(INPUT_POST, "type");

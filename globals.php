@@ -1,9 +1,4 @@
 <?php
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_reporting', E_ALL);
-ini_set('error_log', __DIR__ . '/logs/php-error.log');
-
 // ==========================================================
 // globals.php — Bootstrap comum do app (Hostinger/AMPPS)
 // Compatível com PHP < 8 (inclui polyfills)
@@ -102,6 +97,31 @@ require_once __DIR__ . '/db.php';   // aqui dentro você cria $conn (PDO)
 // ------------------ 6) Guard (autorização) -----------------
 require_once __DIR__ . '/authz.php';
 
+if (!function_exists('enforce_authenticated_session')) {
+    function enforce_authenticated_session(string $BASE_URL): void
+    {
+        $idUser = (int)($_SESSION['id_usuario'] ?? 0);
+        $ativo  = strtolower((string)($_SESSION['ativo'] ?? ''));
+        $isAuth = $idUser > 0 && $ativo === 's';
+        if ($isAuth) return;
+
+        $accept = strtolower($_SERVER['HTTP_ACCEPT'] ?? '');
+        $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower((string)$_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+            || str_contains($accept, 'application/json')
+            || str_contains(strtolower($_SERVER['CONTENT_TYPE'] ?? ''), 'application/json');
+
+        if ($isAjax) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'Não autenticado.'], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        header('Location: ' . rtrim($BASE_URL, '/') . '/index.php', true, 303);
+        exit;
+    }
+}
+
 // Métodos que alteram estado
 $__method     = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 $__scriptBase = strtolower(basename($_SERVER['SCRIPT_NAME'] ?? ''));
@@ -113,18 +133,40 @@ $__guardSkip = [
     'index.php',         // tela de login
     'index_novo.php',    // sua tela de login nova
     'nova_senha.php',    // troca de senha inicial
+    'process_recuperar_senha.php',
+    'process_redefinir_senha.php',
+    'process_reset_senha.php',
     // acrescente aqui quaisquer webhooks ou callbacks públicos, se existirem
 ];
+
+// Qualquer endpoint process_* (exceto os públicos acima) exige sessão válida,
+// inclusive em GET, para bloquear execução por link direto sem autenticação.
+if (str_starts_with($__scriptBase, 'process_') && !in_array($__scriptBase, $__guardSkip, true)) {
+    enforce_authenticated_session($BASE_URL);
+}
 
 // Só aplica o Gate em métodos mutantes e quando o script NÃO está na whitelist
 if (in_array($__method, ['POST', 'PUT', 'PATCH', 'DELETE'], true) && !in_array($__scriptBase, $__guardSkip, true)) {
     Gate::autoEnforce($conn, $BASE_URL);
 }
 
-require_once __DIR__ . '/app/schemaEnsurer.php';
-ensure_visita_timer_column($conn);
-ensure_internacao_timer_column($conn);
-ensure_internacao_forecast_columns($conn);
+// Em páginas públicas de login, evita checagens/DDL de schema para acelerar carregamento.
+$__schemaSkip = [
+    'index.php',
+    'index_novo.php',
+    'check_login.php',
+];
+if (!in_array($__scriptBase, $__schemaSkip, true)) {
+    require_once __DIR__ . '/app/schemaEnsurer.php';
+    ensure_visita_timer_column($conn);
+    ensure_internacao_timer_column($conn);
+    ensure_internacao_forecast_columns($conn);
+    ensure_schema_version_table($conn);
+    ensure_password_reset_table($conn);
+    ensure_operational_list_indexes($conn);
+    ensure_hospital_related_tables($conn);
+}
+require_once __DIR__ . '/app/version.php';
 
 // ------------------ 7) Helpers globais (opcional) ----------
 

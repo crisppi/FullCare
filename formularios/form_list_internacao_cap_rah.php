@@ -25,6 +25,16 @@
 
     include_once("models/pagination.php");
 
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    $rahAfterSave = $_SESSION['rah_after_save'] ?? null;
+    $rahAfterSaveRedirect = null;
+    if ($rahAfterSave) {
+        $rahAfterSaveRedirect = $rahAfterSave['redirect_list'] ?? null;
+        unset($_SESSION['rah_after_save']);
+    }
+
     if (!function_exists('formatDateBrSafe')) {
         function formatDateBrSafe(?string $date): string
         {
@@ -217,14 +227,40 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
 
     $mapOrder = [
         'id_internacao' => 'ac.id_internacao',
+        'id_internacao_desc' => 'ac.id_internacao DESC',
         'id_capeante_desc' => 'ca.id_capeante DESC',
         'id_capeante' => 'ca.id_capeante',
         'senha_int' => 'ac.senha_int',
+        'senha_int_desc' => 'ac.senha_int DESC',
         'nome_pac' => 'pa.nome_pac',
+        'nome_pac_desc' => 'pa.nome_pac DESC',
         'nome_hosp' => 'ho.nome_hosp',
+        'nome_hosp_desc' => 'ho.nome_hosp DESC',
         'data_intern_int' => 'ac.data_intern_int',
+        'data_intern_int_desc' => 'ac.data_intern_int DESC',
     ];
     $order = $mapOrder[$ordenar] ?? 'ca.id_capeante DESC';
+
+    $rahCurrentSort = $ordenar ?: 'id_capeante_desc';
+    $rahCurrentSortField = preg_replace('/_desc$/', '', $rahCurrentSort);
+    $rahCurrentSortDir = (substr($rahCurrentSort, -5) === '_desc') ? 'desc' : 'asc';
+    $rahBuildSortUrl = function (string $field) use ($rahCurrentSortField, $rahCurrentSortDir, $rahFormAction, $rahPaginationBaseParams): string {
+        $isCurrentField = ($rahCurrentSortField === $field);
+        $nextDir = ($isCurrentField && $rahCurrentSortDir === 'asc') ? 'desc' : 'asc';
+        $nextSort = ($nextDir === 'desc') ? ($field . '_desc') : $field;
+
+        return buildRahPaginationUrl($rahFormAction, $rahPaginationBaseParams, [
+            'ordenar' => $nextSort,
+            'pag' => 1,
+            'bl' => 0,
+        ]);
+    };
+    $rahSortIcon = function (string $field) use ($rahCurrentSortField, $rahCurrentSortDir): string {
+        if ($rahCurrentSortField !== $field) {
+            return '↕';
+        }
+        return $rahCurrentSortDir === 'asc' ? '↑' : '↓';
+    };
     $obPagination   = new pagination($qtdIntItens, $_GET['pag'] ?? 1, $limite ?? 10);
     $obLimite       = $obPagination->getLimit();
 
@@ -319,17 +355,30 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                     <div class="form-group row">
                         <!-- SELECT de Hospital (sem duplicidade) -->
                         <div class="form-group col-sm-3" style="padding:2px !important;padding-left:16px !important;">
-                            <select class="form-control form-control-sm"
-                                style="margin-top:7px; font-size:.8em; color:#878787" name="id_hosp" id="id_hosp">
-                                <option value=""><?= $isDiretor ? 'Todos os Hospitais' : 'Selecione o Hospital' ?>
-                                </option>
+                            <?php
+                                $hospitalSelecionadoNome = '';
+                                foreach ($hospitals as $h) {
+                                    if ((string)$id_hosp === (string)($h['id_hospital'] ?? '')) {
+                                        $hospitalSelecionadoNome = (string)($h['nome_hosp'] ?? '');
+                                        break;
+                                    }
+                                }
+                            ?>
+                            <input type="hidden" name="id_hosp" id="id_hosp" value="<?= htmlspecialchars((string)$id_hosp, ENT_QUOTES, 'UTF-8') ?>">
+                            <input class="form-control form-control-sm"
+                                style="margin-top:7px; font-size:.8em; color:#878787"
+                                type="text"
+                                id="id_hosp_nome"
+                                list="rahHospitaisList"
+                                placeholder="<?= $isDiretor ? 'Todos os Hospitais' : 'Selecione o Hospital' ?>"
+                                value="<?= htmlspecialchars($hospitalSelecionadoNome, ENT_QUOTES, 'UTF-8') ?>">
+                            <datalist id="rahHospitaisList">
                                 <?php foreach ($hospitals as $h): ?>
-                                <option value="<?= (int)$h['id_hospital'] ?>"
-                                    <?= ((string)$id_hosp === (string)$h['id_hospital']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars((string)$h['nome_hosp']) ?>
-                                </option>
+                                    <option
+                                        data-id="<?= (int)$h['id_hospital'] ?>"
+                                        value="<?= htmlspecialchars((string)$h['nome_hosp'], ENT_QUOTES, 'UTF-8') ?>"></option>
                                 <?php endforeach; ?>
-                            </select>
+                            </datalist>
                         </div>
 
                         <div class="form-group col-sm-2" style="padding:2px !important">
@@ -374,7 +423,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                         </div>
                     </div>
 
-                    <div class="form-group row" style="margin-top:-20px">
+                    <div class="form-group row" style="margin-top:-20px; margin-bottom:14px;">
                         <div class="form-group col-sm-1" style="padding:2px !important;padding-left:16px !important;">
                             <select class="form-control form-control-sm"
                                 style="margin-top:7px;font-size:.8em; color:#878787" id="ordenar" name="ordenar">
@@ -441,15 +490,49 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                 placeholder="Data Internação Max"
                                 value="<?= htmlspecialchars((string)$data_intern_int_max) ?>">
                         </div>
-                        <div class="form-group col-sm-1" style="padding:2px !important">
-                            <button type="submit" class="btn btn-primary"
+                        <div class="form-group col-sm-1 d-flex align-items-start gap-2" style="padding:2px !important">
+                            <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
                                 style="background-color:#5e2363;width:42px;height:32px;margin-top:7px;border-color:#5e2363">
                                 <span class="material-icons" style="margin-left:-3px;margin-top:-2px;">search</span>
                             </button>
+                            <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/' . ltrim((string)$rahFormAction, '/'), ENT_QUOTES, 'UTF-8') ?>"
+                                id="btnRahClearFiltersIcon"
+                                class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon"
+                                style="margin-top:7px;" title="Limpar filtros" aria-label="Limpar filtros">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
                         </div>
                     </div>
                 </form>
             </div>
+
+            <style>
+            .cap-rah-dropdown .dropdown-item,
+            .cap-rah-dropdown .dropdown-item span {
+                text-transform: none !important;
+                font-weight: 400 !important;
+            }
+
+            .rah-sort-link {
+                color: inherit;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .rah-sort-link:hover,
+            .rah-sort-link:focus {
+                color: inherit;
+                text-decoration: none;
+                opacity: .9;
+            }
+
+            .rah-sort-icon {
+                font-size: .85em;
+                opacity: .95;
+            }
+            </style>
 
             <div>
                 <div id="table-content">
@@ -457,12 +540,42 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                     <table class="table table-sm table-striped  table-hover table-condensed">
                         <thead>
                             <tr>
-                                <th scope="col" style="width:4%">Reg Int</th>
-                                <th scope="col" style="width:6%">Capeante</th>
-                                <th scope="col" style="width:12%">Hospital</th>
-                                <th scope="col" style="width:16%">Paciente</th>
-                                <th scope="col" style="width:10%">Senha</th>
-                                <th scope="col" style="width:8%">Data internação</th>
+                                <th scope="col" style="width:4%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('id_internacao'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('id_internacao'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Reg Int</span><span class="rah-sort-icon"><?= $rahSortIcon('id_internacao') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:6%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('id_capeante'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('id_capeante'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Capeante</span><span class="rah-sort-icon"><?= $rahSortIcon('id_capeante') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:12%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('nome_hosp'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('nome_hosp'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Hospital</span><span class="rah-sort-icon"><?= $rahSortIcon('nome_hosp') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:16%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('nome_pac'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('nome_pac'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Paciente</span><span class="rah-sort-icon"><?= $rahSortIcon('nome_pac') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:10%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('senha_int'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('senha_int'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Senha</span><span class="rah-sort-icon"><?= $rahSortIcon('senha_int') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:8%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('data_intern_int'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('data_intern_int'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Data internação</span><span class="rah-sort-icon"><?= $rahSortIcon('data_intern_int') ?></span>
+                                    </a>
+                                </th>
                                 <th scope="col" style="width:8%">Data fechamento</th>
                                 <th scope="col" style="width:8%">Data digitação</th>
                                 <th scope="col" style="width:6%;">Cap Encer</th>
@@ -491,16 +604,68 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                                 style="font-size:1.1rem;color:green;font-weight:800;"></span></span>
                                         <?php } ?>
                                 </td>
+                                <?php
+                                    $capeanteEncerrado = strtolower((string)($intern['encerrado_cap'] ?? 'n')) === 's';
+                                    $pdfPreviewUrl = $BASE_URL . 'export_capeante_rah_pdf.php?id_capeante=' . $intern['id_capeante'] . '&download=0';
+                                    $pdfDownloadUrl = $BASE_URL . 'export_capeante_rah_pdf.php?id_capeante=' . $intern['id_capeante'] . '&download=1';
+                                    $rahEditUrl = $BASE_URL . 'edit_capeante_rah.php?id_capeante=' . $intern['id_capeante'];
+                                ?>
                                 <td class="action">
-                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                    <div class="d-flex flex-column gap-1 align-items-center">
                                         <a class="btn btn-outline-primary btn-sm" href="#"
-                                            onclick="edit('<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>')">
+                                            onclick="edit('<?= $BASE_URL ?>edit_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>')">
                                             Editar RAH
                                         </a>
-                                        <a class="btn btn-outline-secondary btn-sm" target="_blank"
-                                            href="<?= $BASE_URL ?>export_capeante_rah_pdf.php?id_capeante=<?= $intern['id_capeante'] ?>&download=0">
-                                            Ver RAH PDF
-                                        </a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                                                id="contasDropdown<?= $intern['id_capeante'] ?>_<?= $intern['id_internacao'] ?>"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-stack me-1"></i>
+                                                Contas
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end cap-rah-dropdown" aria-labelledby="contasDropdown<?= $intern['id_capeante'] ?>_<?= $intern['id_internacao'] ?>">
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" href="<?= htmlspecialchars($rahEditUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        onclick="edit('<?= htmlspecialchars($rahEditUrl, ENT_QUOTES, 'UTF-8') ?>'); return false;">
+                                                        <i class="bi bi-pencil-square me-1" style="color:#5e2363;"></i>
+                                                        <span style="color:#5e2363; font-weight:400; text-transform:none;">Editar RAH</span>
+                                                    </a>
+                                                </li>
+                                                <?php if ($capeanteEncerrado): ?>
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" target="_blank" rel="noopener"
+                                                        href="<?= htmlspecialchars($pdfPreviewUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        style="color:#0d6efd !important; font-weight:400 !important; text-transform:none;">
+                                                        <i class="bi bi-eye me-1" style="color:#0d6efd;"></i>
+                                                        <span style="color:#0d6efd !important; font-weight:400 !important; text-transform:none;">Ver RAH</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" target="_blank" rel="noopener"
+                                                        href="<?= htmlspecialchars($pdfDownloadUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        style="color:#198754 !important; font-weight:400 !important; text-transform:none;">
+                                                        <i class="bi bi-printer-fill me-1" style="color:#198754;"></i>
+                                                        <span style="color:#198754 !important; font-weight:400 !important; text-transform:none;">Imprimir PDF</span>
+                                                    </a>
+                                                </li>
+                                                <?php else: ?>
+                                                <li>
+                                                    <span class="dropdown-item disabled text-muted fw-normal"
+                                                        style="color:#6c757d !important; font-weight:400 !important; text-transform:none;">
+                                                        <i class="bi bi-eye me-1" style="color:#6c757d;"></i>
+                                                        <span style="color:#6c757d !important; font-weight:400 !important; text-transform:none;">Ver RAH</span>
+                                                    </span>
+                                                </li>
+                                                <li>
+                                                    <span class="dropdown-item disabled text-muted fw-normal"
+                                                        style="color:#6c757d !important; font-weight:400 !important; text-transform:none;">
+                                                        <i class="bi bi-printer-fill me-1" style="color:#6c757d;"></i>
+                                                        <span style="color:#6c757d !important; font-weight:400 !important; text-transform:none;">Imprimir PDF</span>
+                                                    </span>
+                                                </li>
+                                                <?php endif; ?>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -519,12 +684,42 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                     <table class="table table-sm table-striped  table-hover table-condensed">
                         <thead>
                             <tr>
-                                <th scope="col" style="width:4%">Reg Int</th>
-                                <th scope="col" style="width:6%">Capeante</th>
-                                <th scope="col" style="width:12%">Hospital</th>
-                                <th scope="col" style="width:16%">Paciente</th>
-                                <th scope="col" style="width:10%">Senha</th>
-                                <th scope="col" style="width:8%">Data internação</th>
+                                <th scope="col" style="width:4%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('id_internacao'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('id_internacao'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Reg Int</span><span class="rah-sort-icon"><?= $rahSortIcon('id_internacao') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:6%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('id_capeante'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('id_capeante'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Capeante</span><span class="rah-sort-icon"><?= $rahSortIcon('id_capeante') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:12%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('nome_hosp'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('nome_hosp'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Hospital</span><span class="rah-sort-icon"><?= $rahSortIcon('nome_hosp') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:16%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('nome_pac'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('nome_pac'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Paciente</span><span class="rah-sort-icon"><?= $rahSortIcon('nome_pac') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:10%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('senha_int'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('senha_int'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Senha</span><span class="rah-sort-icon"><?= $rahSortIcon('senha_int') ?></span>
+                                    </a>
+                                </th>
+                                <th scope="col" style="width:8%">
+                                    <a class="rah-sort-link" href="<?= htmlspecialchars($rahBuildSortUrl('data_intern_int'), ENT_QUOTES, 'UTF-8') ?>"
+                                        onclick="return paginateRah('<?= htmlspecialchars($rahBuildSortUrl('data_intern_int'), ENT_QUOTES, 'UTF-8') ?>');">
+                                        <span>Data internação</span><span class="rah-sort-icon"><?= $rahSortIcon('data_intern_int') ?></span>
+                                    </a>
+                                </th>
                                 <th scope="col" style="width:8%;">Data fechamento</th>
                                 <th scope="col" style="width:8%;">Data digitação</th>
                                 <th scope="col" style="width:6%;">Cap Encer</th>
@@ -560,49 +755,105 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                     <td scope="row"><?= $intern["parcial_num"]; ?></td>
                                 <?php endif; ?>
 
-                                <td class="action">
-                                    <?php if ($isSenhasContext): ?>
-                                        <div class="d-flex flex-wrap gap-1">
+                                <?php
+                                    $capeanteEncerrado = strtolower((string)($intern['encerrado_cap'] ?? 'n')) === 's';
+                                    $pdfPreviewUrl = $BASE_URL . 'export_capeante_rah_pdf.php?id_capeante=' . $intern['id_capeante'] . '&download=0';
+                                    $pdfDownloadUrl = $BASE_URL . 'export_capeante_rah_pdf.php?id_capeante=' . $intern['id_capeante'] . '&download=1';
+                                    $dropdownId = 'contasDropdownRah' . $intern['id_capeante'] . '_' . $intern['id_internacao'];
+                                    $rahEditUrl = $BASE_URL . 'edit_capeante_rah.php?id_capeante=' . $intern['id_capeante'];
+                                ?>
+                                <td class="action text-center">
+                                    <div class="d-flex flex-column align-items-center gap-2">
+                                        <?php if ($isSenhasContext): ?>
                                             <a class="btn btn-outline-primary btn-sm"
                                                 href="#"
-                                                onclick="edit('<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>')">
+                                                onclick="edit('<?= $BASE_URL ?>edit_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>')">
                                                 Editar RAH
                                             </a>
-                                            <a class="btn btn-outline-secondary btn-sm" target="_blank"
-                                                href="<?= $BASE_URL ?>export_capeante_rah_pdf.php?id_capeante=<?= $intern['id_capeante'] ?>&download=0">
-                                                Ver RAH PDF
-                                            </a>
-                                        </div>
-                                    <?php else: ?>
-                                        <?php if (($intern['encerrado_cap'] ?? 'n') !== "s"): ?>
-                                            <?php if (($intern['em_auditoria_cap'] ?? 'n') === "s"): ?>
-                                            <a class="legenda-em-auditoria" href="<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>">
-                                                <i class="bi bi-file-text"
-                                                    style="color:#db5a0f;font-size:1.1em;margin:0 5px"></i>
-                                                <span style="color:#db5a0f;">Analisar</span>
-                                            </a>
-                                            <?php else: ?>
-                                            <a class="legenda-iniciar" href="<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>">
-                                                <i class="bi bi-file-text"
-                                                    style="color:rgb(25,78,255);font-size:1.1em;font-weight:bold;margin:0 5px"></i>
-                                                <span>Rah -</span>
-                                            </a>
-                                            <?php endif; ?>
                                         <?php else: ?>
-                                        <span class="legenda-encerrado" style="cursor:not-allowed;">
-                                            <i class="bi"
-                                                style="color:black;text-decoration:none;font-size:1.1em;font-weight:bold;margin:0 5px">
-                                                Encerrado</i>
-                                        </span>
+                                            <div class="d-flex flex-wrap align-items-center gap-3 justify-content-center">
+                                                <?php if (($intern['encerrado_cap'] ?? 'n') !== "s"): ?>
+                                                    <?php if (($intern['em_auditoria_cap'] ?? 'n') === "s"): ?>
+                                                        <a class="legenda-em-auditoria" href="<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>">
+                                                            <i class="bi bi-file-text"
+                                                                style="color:#db5a0f;font-size:1.1em;margin:0 5px"></i>
+                                                            <span style="color:#db5a0f;">Analisar</span>
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <a class="legenda-iniciar" href="<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>">
+                                                            <i class="bi bi-file-text"
+                                                                style="color:rgb(25,78,255);font-size:1.1em;font-weight:bold;margin:0 5px"></i>
+                                                            <span>Iniciar</span>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    <span class="legenda-encerrado" style="cursor:not-allowed;">
+                                                        <i class="bi"
+                                                            style="color:black;text-decoration:none;font-size:1.1em;font-weight:bold;margin:0 5px">
+                                                            Encerrado</i>
+                                                    </span>
+                                                <?php endif; ?>
+
+                                                <a class="legenda-parcial"
+                                                    href="<?= $BASE_URL ?>cad_capeante_rah.php?id_internacao=<?= $intern["id_internacao"] ?>&type=create&nova_parcial=1">
+                                                    <i class="legenda-parcial bi bi-file-text"
+                                                        style="color:green;text-decoration:none;font-size:10px;font-weight:bold;margin:0 5px">
+                                                        Criar Parcial</i>
+                                                </a>
+                                            </div>
                                         <?php endif; ?>
 
-                                        <a class="legenda-parcial"
-                                            href="<?= $BASE_URL ?>cad_capeante_rah.php?id_internacao=<?= $intern["id_internacao"] ?>&type=create&nova_parcial=1">
-                                            <i class="legenda-parcial bi bi-file-text"
-                                                style="color:green;text-decoration:none;font-size:10px;font-weight:bold;margin:0 5px">
-                                                Parcial</i>
-                                        </a>
-                                    <?php endif; ?>
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                                                id="<?= htmlspecialchars($dropdownId, ENT_QUOTES, 'UTF-8') ?>"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-stack me-1"></i>
+                                                Contas
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end cap-rah-dropdown" aria-labelledby="<?= htmlspecialchars($dropdownId, ENT_QUOTES, 'UTF-8') ?>">
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" href="<?= htmlspecialchars($rahEditUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        onclick="edit('<?= htmlspecialchars($rahEditUrl, ENT_QUOTES, 'UTF-8') ?>'); return false;">
+                                                        <i class="bi bi-pencil-square me-1" style="color:#5e2363;"></i>
+                                                        <span style="color:#5e2363; font-weight:400; text-transform:none;">Editar RAH</span>
+                                                    </a>
+                                                </li>
+                                                <?php if ($capeanteEncerrado): ?>
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" target="_blank" rel="noopener"
+                                                        href="<?= htmlspecialchars($pdfPreviewUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        style="color:#0d6efd !important; font-weight:400 !important;">
+                                                        <i class="bi bi-eye me-1" style="color:#0d6efd;"></i>
+                                                        <span style="color:#0d6efd !important; font-weight:400 !important;">Ver RAH</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" target="_blank" rel="noopener"
+                                                        href="<?= htmlspecialchars($pdfDownloadUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        style="color:#198754 !important; font-weight:400 !important;">
+                                                        <i class="bi bi-printer-fill me-1" style="color:#198754;"></i>
+                                                        <span style="color:#198754 !important; font-weight:400 !important;">Imprimir PDF</span>
+                                                    </a>
+                                                </li>
+                                                <?php else: ?>
+                                                <li>
+                                                    <span class="dropdown-item disabled text-muted fw-normal"
+                                                        style="color:#6c757d !important; font-weight:400 !important;">
+                                                        <i class="bi bi-eye me-1" style="color:#6c757d;"></i>
+                                                        <span style="color:#6c757d !important; font-weight:400 !important;">Ver RAH</span>
+                                                    </span>
+                                                </li>
+                                                <li>
+                                                    <span class="dropdown-item disabled text-muted fw-normal"
+                                                        style="color:#6c757d !important; font-weight:400 !important;">
+                                                        <i class="bi bi-printer-fill me-1" style="color:#6c757d;"></i>
+                                                        <span style="color:#6c757d !important; font-weight:400 !important;">Imprimir PDF</span>
+                                                    </span>
+                                                </li>
+                                                <?php endif; ?>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -707,7 +958,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                         <div class="table-counter">
                             <p
                                 style="font-size:1em;font-weight:600;font-family:var(--bs-font-sans-serif);text-align:right;margin:0;">
-                                <?php echo "Total: " . (int)$__render_count ?>
+                                <?php echo "Total: " . (int)$qtdIntItens ?>
                             </p>
                         </div>
                     </div>
@@ -743,6 +994,63 @@ $(document).ready(function() {
             }
         });
     });
+
+    $('#btnRahClearFiltersIcon').on('click', function(e) {
+        e.preventDefault();
+        var $form = $('#select-internacao-form');
+        if (!$form.length) return;
+
+        // Limpa filtros para reaproveitar o submit AJAX já existente.
+        [
+            'id_hosp',
+            'id_hosp_nome',
+            'pesquisa_pac',
+            'pesquisa_matricula',
+            'senha_int',
+            'lote',
+            'idcapeante',
+            'ordenar',
+            'senha_fin',
+            'encerrado_cap',
+            'conta_parada',
+            'data_intern_int',
+            'data_intern_int_max'
+        ].forEach(function(name) {
+            var $field = $form.find('[name="' + name + '"]');
+            if ($field.length) $field.val('');
+        });
+
+        var $limite = $form.find('[name="limite"]');
+        if ($limite.length) $limite.val('10');
+
+        $form.trigger('submit');
+    });
+
+    function syncHospitalIdFromName() {
+        var $nome = $('#id_hosp_nome');
+        var $id = $('#id_hosp');
+        if (!$nome.length || !$id.length) return;
+
+        var typed = ($nome.val() || '').trim().toLowerCase();
+        if (!typed) {
+            $id.val('');
+            return;
+        }
+
+        var matchedId = '';
+        $('#rahHospitaisList option').each(function() {
+            var optVal = String($(this).attr('value') || '').trim().toLowerCase();
+            if (optVal === typed) {
+                matchedId = $(this).data('id') || '';
+                return false;
+            }
+        });
+
+        $id.val(matchedId ? String(matchedId) : '');
+    }
+
+    $('#id_hosp_nome').on('input change blur', syncHospitalIdFromName);
+    $('#select-internacao-form').on('submit', syncHospitalIdFromName);
 });
 
 // Carregamento inicial
@@ -774,6 +1082,50 @@ if (typeof window.paginateRah !== 'function') {
 }
     </script>
 
+    <?php if ($rahAfterSave && !empty($rahAfterSave['patient_id'])):
+        $hubUrl = htmlspecialchars(rtrim($BASE_URL, '/') . '/hub_paciente/paciente' . (int)$rahAfterSave['patient_id'], ENT_QUOTES);
+        $listUrl = htmlspecialchars($rahAfterSaveRedirect ?? $BASE_URL . 'internacoes/rah', ENT_QUOTES);
+    ?>
+    <div class="modal fade" id="rahAfterSaveModal" tabindex="-1" aria-labelledby="rahAfterSaveLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rahAfterSaveLabel">Dar sequência</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Deseja continuar lançando contas para este paciente?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="rahAfterSaveNo">Ir para lista de contas</button>
+                    <button type="button" class="btn btn-primary" id="rahAfterSaveYes">Ir para o hub do paciente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalEl = document.getElementById('rahAfterSaveModal');
+            if (!modalEl) return;
+            const modal = new bootstrap.Modal(modalEl);
+            let redirectToList = true;
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                if (redirectToList) {
+                    window.location.href = '<?= $listUrl ?>';
+                }
+            });
+            modal.show();
+            document.getElementById('rahAfterSaveYes').addEventListener('click', function () {
+                redirectToList = false;
+                window.location.href = '<?= $hubUrl ?>';
+            });
+            document.getElementById('rahAfterSaveNo').addEventListener('click', function () {
+                redirectToList = true;
+                modal.hide();
+            });
+        });
+    </script>
+    <?php endif; ?>
     <script src="./js/input-estilo.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"

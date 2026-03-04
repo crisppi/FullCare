@@ -1,5 +1,4 @@
 <?php
-
 /**
  * process_rah.php (refeito)
  * - Regras de negócio das flags calculadas no backend (fonte da verdade)
@@ -8,6 +7,28 @@
  */
 
 declare(strict_types=1);
+
+if (!defined("FLOW_LOGGER_AUTO_V1")) {
+    define("FLOW_LOGGER_AUTO_V1", 1);
+    @require_once(__DIR__ . "/utils/flow_logger.php");
+    if (function_exists("flowLogStart") && function_exists("flowLog")) {
+        $__flowCtxAuto = flowLogStart(basename(__FILE__, ".php"), [
+            "type" => $_POST["type"] ?? $_GET["type"] ?? null,
+            "method" => $_SERVER["REQUEST_METHOD"] ?? null,
+        ]);
+        register_shutdown_function(function () use ($__flowCtxAuto) {
+            $err = error_get_last();
+            if ($err && in_array(($err["type"] ?? 0), [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+                flowLog($__flowCtxAuto, "shutdown.fatal", "ERROR", [
+                    "message" => $err["message"] ?? null,
+                    "file" => $err["file"] ?? null,
+                    "line" => $err["line"] ?? null,
+                ]);
+            }
+            flowLog($__flowCtxAuto, "request.finish", "INFO");
+        });
+    }
+}
 
 require_once "globals.php";
 require_once "db.php";
@@ -489,6 +510,39 @@ if ($type === 'create') {
 /* Log final de totais */
 error_log("[RAH] Capeante ID {$id_capeante} | Cobrado={$total_cobrado} | Glosado={$total_glosado} | Liberado={$total_liberado}");
 
+/* ---------- Preparar sessão e URLs pós-salvar ---------- */
+$patientId = null;
+$patientName = null;
+$hubUrl = null;
+if ($fk_internacao) {
+    try {
+        $stmtPac = $conn->prepare("SELECT fk_paciente_int FROM tb_internacao WHERE id_internacao = :id LIMIT 1");
+        $stmtPac->bindValue(':id', (int)$fk_internacao, PDO::PARAM_INT);
+        $stmtPac->execute();
+        $patientId = (int)$stmtPac->fetchColumn();
+        if ($patientId > 0) {
+            $hubUrl = rtrim($BASE_URL, '/') . '/hub_paciente/paciente' . $patientId;
+            $stmtName = $conn->prepare("SELECT nome_pac FROM tb_paciente WHERE id_paciente = :id LIMIT 1");
+            $stmtName->bindValue(':id', $patientId, PDO::PARAM_INT);
+            $stmtName->execute();
+            $patientName = $stmtName->fetchColumn();
+        }
+    } catch (Throwable $e) {
+        $hubUrl = null;
+    }
+}
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+if ($patientId) {
+    $_SESSION['rah_after_save'] = [
+        'patient_id' => $patientId,
+        'patient_name' => $patientName ? (string)$patientName : '',
+        'accounts_url' => $BASE_URL . 'internacoes/rah?pesquisa_pac=' . rawurlencode($patientName ?? ''),
+        'visits_url' => $fk_internacao ? $BASE_URL . 'cad_visita.php?id_internacao=' . $fk_internacao : null,
+    ];
+}
+
 /* ============================================================
  * Persistência dos grupos AP / UTI / CC / DIÁRIAS / OUTROS
  * - Somente valores (sem FKs de profissionais)
@@ -642,6 +696,9 @@ if (!empty($id_capeante)) {
     );
 }
 
-/* Redireciona de volta */
-header("Location: " . $BASE_URL . "internacoes/rah");
+if ($hubUrl) {
+    header("Location: " . $hubUrl);
+} else {
+    header("Location: " . $BASE_URL . "internacoes/rah");
+}
 exit;

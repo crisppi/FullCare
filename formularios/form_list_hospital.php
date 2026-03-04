@@ -48,6 +48,28 @@
 
     $totalcasos = ceil($qtdIntItens / 5);
 
+    $hospitalPaginationBaseParams = [
+        'pesquisa_nome' => $pesquisa_nome,
+        'limite_pag'    => $limite,
+        'ordenar'       => $ordenar,
+    ];
+
+    if (!function_exists('buildHospitalPaginationUrl')) {
+        function buildHospitalPaginationUrl(array $baseParams, array $override = []): string
+        {
+            $params = array_merge($baseParams, $override);
+            $params = array_filter($params, static function ($value) {
+                return $value !== null && $value !== '';
+            });
+
+            $query = http_build_query($params);
+            global $BASE_URL;
+            $baseUrl = rtrim($BASE_URL, '/') . '/hospitais';
+
+            return $query ? $baseUrl . '?' . $query : $baseUrl;
+        }
+    }
+
     // PAGINACAO
     if ($qtdIntItens > $limite) {
         $paginacao = '';
@@ -76,11 +98,11 @@
         <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
             <h4 class="page-title">Hospitais</h4>
             <div style="margin-left: auto;">
-                <button onclick="openModal('cad_hospital.php')" data-bs-toggle="modal" data-bs-target="#myModal"
+                <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/cad_hospital.php', ENT_QUOTES, 'UTF-8') ?>"
                     class="btn btn-success styled"
                     style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
                     <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Novo Hospital
-                </button>
+                </a>
             </div>
         </div>
 
@@ -119,11 +141,17 @@
                             </select>
                         </div>
                         <div class="form-group col-sm-1" style="padding:2px !important" style="margin:0px 0px 20px 0px">
-                            <button type="submit" class="btn btn-primary"
+                            <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
                                 style="background-color:#5e2363;width:42px;height:32px;margin-top:7px;border-color:#5e2363"><span
                                     class="material-icons" style="margin-left:-3px;margin-top:-2px;">
                                     search
                                 </span></button>
+                        </div>
+                        <div class="form-group col-sm-2" style="padding:2px !important">
+                            <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais', ENT_QUOTES, 'UTF-8') ?>"
+                                class="btn btn-outline-secondary btn-sm btn-filtro-limpar" style="margin-top:7px;">
+                                Limpar filtros
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -172,19 +200,26 @@
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                             <li>
-                                                <button class="btn btn-default" style="font-size: .9rem;"
+                                                <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospital_acomodacoes.php?id_hospital=' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>">
+                                                    <i class="fa-solid fa-bed"
+                                                        style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>Acomodações
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <button class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     onclick="openModal('<?= $BASE_URL ?>show_hospital.php?id_hospital=<?= $id_hospital ?>')"
                                                     data-bs-toggle="modal" data-bs-target="#myModal"><i
                                                         class="fas fa-eye"
                                                         style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>Ver</button>
                                             </li>
                                             <li>
-                                                <button class="btn btn-default" style="font-size: .9rem;"
-                                                    onclick="openModal('<?= $BASE_URL ?>edit_hospital.php?id_hospital=<?= $id_hospital ?>')"
-                                                    data-bs-toggle="modal" data-bs-target="#myModal"><i
-                                                        style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
+                                                <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/edit_hospital.php?id_hospital=' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>">
+                                                    <i style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
                                                         name="type" value="edite"
-                                                        class="far fa-edit edit-icon"></i>Editar</button>
+                                                        class="far fa-edit edit-icon"></i>Editar
+                                                </a>
                                             </li>
 
                                         </ul>
@@ -233,41 +268,71 @@
                                     $paginaAtual = isset($_GET['pag']) ? $_GET['pag'] : 1;
                                     ?>
                                 <?php if ($current_block > $first_block): ?>
+                                <?php
+                                        $firstPageUrl = buildHospitalPaginationUrl($hospitalPaginationBaseParams, [
+                                            'pag' => 1,
+                                            'bl'  => 0
+                                        ]);
+                                        ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('hospitais?pesquisa_nome=<?php print $pesquisa_nome ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
+                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($firstPageUrl) ?>"
+                                        onclick="return paginateHospitais('<?= htmlspecialchars($firstPageUrl, ENT_QUOTES) ?>');">
                                         <i class="fa-solid fa-angles-left"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
+                                <?php
+                                        $prevPageUrl = buildHospitalPaginationUrl($hospitalPaginationBaseParams, [
+                                            'pag' => max(1, $paginaAtual - 1),
+                                            'bl'  => max(0, $blocoAtual - 5)
+                                        ]);
+                                        ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="#"
-                                        onclick="loadContent('hospitais?pesquisa_nome=<?php print $pesquisa_nome ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual - 1 ?>&bl=<?php print $blocoAtual - 5 ?>')">
+                                    <a class="page-link" href="<?= htmlspecialchars($prevPageUrl) ?>"
+                                        onclick="return paginateHospitais('<?= htmlspecialchars($prevPageUrl, ENT_QUOTES) ?>');">
                                         <i class="fa-solid fa-angle-left"></i> </a>
                                 </li>
                                 <?php endif; ?>
 
                                 <?php for ($i = $first_page_in_block; $i <= $last_page_in_block; $i++): ?>
+                                <?php
+                                        $pageUrl = buildHospitalPaginationUrl($hospitalPaginationBaseParams, [
+                                            'pag' => $i,
+                                            'bl'  => $blocoAtual
+                                        ]);
+                                        ?>
                                 <li class="page-item <?php print ($_GET['pag'] ?? 1) == $i ? "active" : "" ?>">
 
-                                    <a class="page-link" href="#"
-                                        onclick="loadContent('hospitais?pesquisa_nome=<?php print $pesquisa_nome ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $i ?>&bl=<?php print $blocoAtual ?>')">
+                                    <a class="page-link" href="<?= htmlspecialchars($pageUrl) ?>"
+                                        onclick="return paginateHospitais('<?= htmlspecialchars($pageUrl, ENT_QUOTES) ?>');">
                                         <?php echo $i; ?>
                                     </a>
                                 </li>
                                 <?php endfor; ?>
 
                                 <?php if ($current_block < $last_block): ?>
+                                <?php
+                                        $nextPageUrl = buildHospitalPaginationUrl($hospitalPaginationBaseParams, [
+                                            'pag' => min($total_pages, $paginaAtual + 1),
+                                            'bl'  => $blocoAtual + 5
+                                        ]);
+                                        ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('hospitais?pesquisa_nome=<?php print $pesquisa_nome ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual + 1 ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
+                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($nextPageUrl) ?>"
+                                        onclick="return paginateHospitais('<?= htmlspecialchars($nextPageUrl, ENT_QUOTES) ?>');"><i
                                             class="fa-solid fa-angle-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block < $last_block): ?>
+                                <?php
+                                        $lastPageUrl = buildHospitalPaginationUrl($hospitalPaginationBaseParams, [
+                                            'pag' => count($paginas),
+                                            'bl'  => ($last_block - 1) * 5
+                                        ]);
+                                        ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('hospitais?pesquisa_nome=<?php print $pesquisa_nome ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print count($paginas) ?>&bl=<?php print ($last_block - 1) * 5 ?>')"><i
+                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($lastPageUrl) ?>"
+                                        onclick="return paginateHospitais('<?= htmlspecialchars($lastPageUrl, ENT_QUOTES) ?>');"><i
                                             class="fa-solid fa-angles-right"></i></a>
                                 </li>
                                 <?php endif; ?>
@@ -317,10 +382,29 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    loadContent(
-        'hospitais?pesquisa_nome=<?php print $pesquisa_nome ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>'
-    );
+    var initialHospUrl = '<?= htmlspecialchars(buildHospitalPaginationUrl(
+        $hospitalPaginationBaseParams,
+        [
+            'pag' => $_GET['pag'] ?? 1,
+            'bl'  => $_GET['bl'] ?? 0
+        ]
+    ), ENT_QUOTES) ?>';
+    if (typeof loadContent === 'function') {
+        loadContent(initialHospUrl);
+    }
 });
+</script>
+<script>
+if (typeof window.paginateHospitais !== 'function') {
+    window.paginateHospitais = function(url) {
+        if (typeof loadContent === 'function') {
+            loadContent(url);
+            return false;
+        }
+        window.location.href = url;
+        return false;
+    };
+}
 </script>
 
 <style>

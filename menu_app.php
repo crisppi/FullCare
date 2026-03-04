@@ -1,7 +1,5 @@
 <?php
 // DEBUG TEMPORÁRIO (REMOVER APÓS TESTE)
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
 ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
@@ -32,44 +30,128 @@ require_once __DIR__ . '/app/services/PermanenciaForecastService.php';
 // ENTRADAS E SESSÃO
 // -----------------------------
 $hospital_selecionado = isset($_POST['hospital_id']) ? (int)$_POST['hospital_id'] : 0;
+if (isset($_POST['clear_hospital']) && (int)$_POST['clear_hospital'] === 1) {
+    $hospital_selecionado = 0;
+}
 $id_usuario_sessao    = isset($_SESSION['id_usuario']) ? (int)$_SESSION['id_usuario'] : 0;
 $nivel_sessao         = isset($_SESSION['nivel']) ? (int)$_SESSION['nivel'] : 99;
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+$normCargoAccess = static function ($txt): string {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $ascii !== false ? $ascii : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$isSeguradoraRole = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
+$seguradoraUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+if ($isSeguradoraRole && $seguradoraUserId <= 0) {
+    try {
+        $uid = (int)($_SESSION['id_usuario'] ?? 0);
+        if ($uid > 0) {
+            $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
+            $stmtSeg->execute();
+            $seguradoraUserId = (int)($stmtSeg->fetchColumn() ?: 0);
+            if ($seguradoraUserId > 0) {
+                $_SESSION['fk_seguradora_user'] = $seguradoraUserId;
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('[DASH_MENU][SEGURADORA] ' . $e->getMessage());
+    }
+}
+$seguradoraUserNome = '';
+if ($isSeguradoraRole && $seguradoraUserId > 0) {
+    try {
+        $stmtSegNome = $conn->prepare("SELECT seguradora_seg FROM tb_seguradora WHERE id_seguradora = :id LIMIT 1");
+        $stmtSegNome->bindValue(':id', $seguradoraUserId, PDO::PARAM_INT);
+        $stmtSegNome->execute();
+        $seguradoraUserNome = (string)($stmtSegNome->fetchColumn() ?: '');
+    } catch (Throwable $e) {
+        $seguradoraUserNome = '';
+    }
+}
+
+$seguradoraCondAc = null;
+$seguradoraCondI  = null;
+if ($isSeguradoraRole) {
+    if ($seguradoraUserId > 0) {
+        $seguradoraCondAc = "EXISTS (SELECT 1 FROM tb_paciente pa_s WHERE pa_s.id_paciente = ac.fk_paciente_int AND pa_s.fk_seguradora_pac = {$seguradoraUserId})";
+        $seguradoraCondI  = "EXISTS (SELECT 1 FROM tb_paciente pa_s WHERE pa_s.id_paciente = i.fk_paciente_int AND pa_s.fk_seguradora_pac = {$seguradoraUserId})";
+    } else {
+        $seguradoraCondAc = "1=0";
+        $seguradoraCondI  = "1=0";
+    }
+}
+
+function dashCacheGet(string $key, int $ttl)
+{
+    $cache = $_SESSION['dash_menu_cache'] ?? [];
+    if (!isset($cache[$key])) return null;
+    $item = $cache[$key];
+    if (!is_array($item) || !isset($item['ts'])) return null;
+    if ((time() - (int)$item['ts']) > $ttl) return null;
+    return $item['data'] ?? null;
+}
+
+function dashCacheSet(string $key, $data): void
+{
+    if (!isset($_SESSION['dash_menu_cache'])) $_SESSION['dash_menu_cache'] = [];
+    $_SESSION['dash_menu_cache'][$key] = [
+        'ts' => time(),
+        'data' => $data,
+    ];
+}
+
+$cacheBase = 'dash_menu_' . $hospital_selecionado . '_' . $id_usuario_sessao . '_' . $nivel_sessao . '_' . ($isSeguradoraRole ? 'seg' : 'geral') . '_' . $seguradoraUserId;
 
 // -----------------------------
 // CONDIÇÕES / WHEREs
 // -----------------------------
 $condicoes = [
     $hospital_selecionado ? "ac.fk_hospital_int = {$hospital_selecionado}" : null,
-    ($id_usuario_sessao && $nivel_sessao <= 3) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null
+    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null,
+    $seguradoraCondAc
 ];
 
 $condicoes_vis = [
     $hospital_selecionado ? "ac.fk_hospital_int = {$hospital_selecionado}" : null,
     "ac.internado_int = 's'",
-    "(vi.id_visita = (SELECT MAX(vi2.id_visita) FROM tb_visita vi2 WHERE vi2.fk_internacao_vis = ac.id_internacao) OR vi.id_visita IS NULL)"
+    "(vi.id_visita = (SELECT MAX(vi2.id_visita) FROM tb_visita vi2 WHERE vi2.fk_internacao_vis = ac.id_internacao) OR vi.id_visita IS NULL)",
+    $seguradoraCondAc
 ];
 
 $condicoes_hospital = [
-    "DATEDIFF(CURRENT_DATE(), data_intern_int) > longa_permanencia_seg",
+    "DATEDIFF(CURRENT_DATE(), i.data_intern_int) > COALESCE(s.longa_permanencia_seg, 0)",
     $hospital_selecionado ? "i.fk_hospital_int = {$hospital_selecionado}" : null,
-    ($id_usuario_sessao && $nivel_sessao <= 3) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null,
+    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null,
     "i.internado_int = 's'",
-    ($id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hos.fk_hospital_user FROM tb_hospitalUser hos WHERE hos.fk_usuario_hosp = {$id_usuario_sessao})" : null
+    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
+    $seguradoraCondI
 ];
 
 $condicoes_contas = [
     "c.conta_parada_cap = 's'",
     $hospital_selecionado ? "i.fk_hospital_int = {$hospital_selecionado}" : null,
-    ($id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hos.fk_hospital_user FROM tb_hospitalUser hos WHERE hos.fk_usuario_hosp = {$id_usuario_sessao})" : null
+    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
+    $seguradoraCondI
 ];
 
 $condicoes_gerais = [
     $hospital_selecionado ? "i.fk_hospital_int = {$hospital_selecionado}" : null,
-    ($id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hos.fk_hospital_user FROM tb_hospitalUser hos WHERE hos.fk_usuario_hosp = {$id_usuario_sessao})" : null
+    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
+    $seguradoraCondI
 ];
 
 $condicoes_gerais_reint = [
-    $hospital_selecionado ? "ac.fk_hospital_int = {$hospital_selecionado}" : null
+    $hospital_selecionado ? "ac.fk_hospital_int = {$hospital_selecionado}" : null,
+    ($isSeguradoraRole
+        ? ($seguradoraUserId > 0 ? "pa.fk_seguradora_pac = {$seguradoraUserId}" : "1=0")
+        : null)
 ];
 
 $condicoes               = array_filter($condicoes);
@@ -99,12 +181,35 @@ $forecastService  = new PermanenciaForecastService($conn);
 $forecastSummary  = ['updated' => 0, 'skipped' => 0, 'model' => 'permanencia-lite-v1'];
 $forecastRows     = [];
 try {
-    $forecastSummary = $forecastService->refreshActiveForecasts($hospital_selecionado ?: null);
-    $forecastRows    = $forecastService->fetchDashboardRows(
-        $hospital_selecionado ?: null,
-        $id_usuario_sessao ?: null,
-        $nivel_sessao ?? null
-    );
+    $refreshKey = $cacheBase . '_forecast_refresh_ts';
+    $lastRefresh = dashCacheGet($refreshKey, 3600);
+    $shouldRefresh = !$lastRefresh || (time() - (int)$lastRefresh) > 600;
+    if ($shouldRefresh) {
+        $forecastSummary = $forecastService->refreshActiveForecasts($hospital_selecionado ?: null);
+        dashCacheSet($refreshKey, time());
+        dashCacheSet($cacheBase . '_forecast_summary', $forecastSummary);
+    } else {
+        $cachedSummary = dashCacheGet($cacheBase . '_forecast_summary', 3600);
+        if (is_array($cachedSummary)) $forecastSummary = $cachedSummary;
+    }
+
+    $forecastRows = dashCacheGet($cacheBase . '_forecast_rows', 120);
+    if (!is_array($forecastRows)) {
+        $forecastRows = $forecastService->fetchDashboardRows(
+            $hospital_selecionado ?: null,
+            $id_usuario_sessao ?: null,
+            $isSeguradoraRole ? null : ($nivel_sessao ?? null),
+            8,
+            ($isSeguradoraRole && $seguradoraUserId > 0) ? $seguradoraUserId : null
+        );
+        if (!is_array($forecastRows)) {
+            $forecastRows = [];
+        }
+        dashCacheSet($cacheBase . '_forecast_rows', $forecastRows);
+    }
+    if (!is_array($forecastRows)) {
+        $forecastRows = [];
+    }
 } catch (Throwable $e) {
     error_log('[ForecastService] ' . $e->getMessage());
 }
@@ -112,7 +217,7 @@ try {
 // -----------------------------
 // LISTA DE HOSPITAIS POR PERFIL
 // -----------------------------
-if ($nivel_sessao > 3) {
+if ($isSeguradoraRole || $nivel_sessao > 3) {
     $dados_hospital = $hospital->findGeral();
 } else {
     $dados_hospital = $hospitalUser->joinHospitalUser($id_usuario_sessao);
@@ -178,14 +283,54 @@ $hospital_name = (!empty($filtered_hospital) && !empty($filtered_hospital[0]['no
 // -----------------------------
 // BUSCAS
 // -----------------------------
-$dados_internacoes_geral   = $Internacao_geral->selectAllInternacaoList($where);
-$dados_internacoes_uti     = $Internacao_geral->QtdInternacao("ac.internado_int = 's' AND ut.id_uti IS NOT NULL");
-$dados_internacoes_visitas = $Internacao_geral->selectInternVisLastWhere($where_vis);
+$dados_internacoes_geral = dashCacheGet($cacheBase . '_internacoes_geral', 60);
+if (!is_array($dados_internacoes_geral)) {
+    $dados_internacoes_geral = $Internacao_geral->selectAllInternacaoList($where);
+    dashCacheSet($cacheBase . '_internacoes_geral', $dados_internacoes_geral);
+}
+
+$dados_internacoes_uti = dashCacheGet($cacheBase . '_internacoes_uti', 60);
+if (!is_array($dados_internacoes_uti)) {
+    $utiWhereParts = ["ac.internado_int = 's'", "ut.id_uti IS NOT NULL"];
+    if ($hospital_selecionado) $utiWhereParts[] = "ac.fk_hospital_int = {$hospital_selecionado}";
+    if ($seguradoraCondAc) $utiWhereParts[] = $seguradoraCondAc;
+    $dados_internacoes_uti = $Internacao_geral->QtdInternacao(implode(' AND ', $utiWhereParts));
+    dashCacheSet($cacheBase . '_internacoes_uti', $dados_internacoes_uti);
+}
+
+$dados_internacoes_visitas = dashCacheGet($cacheBase . '_internacoes_visitas', 60);
+if (!is_array($dados_internacoes_visitas)) {
+    $dados_internacoes_visitas = $Internacao_geral->selectInternVisLastWhere($where_vis);
+    dashCacheSet($cacheBase . '_internacoes_visitas', $dados_internacoes_visitas);
+}
+
+$ultimaVisitaPorInternacao = [];
+foreach ((array)$dados_internacoes_visitas as $vis) {
+    $id = (int)($vis['id_internacao'] ?? $vis['fk_internacao_vis'] ?? 0);
+    $dataVisita = $vis['data_visita_vis'] ?? null;
+    if ($id <= 0 || empty($dataVisita)) {
+        continue;
+    }
+    $ts = strtotime($dataVisita);
+    if ($ts === false) {
+        continue;
+    }
+    if (!isset($ultimaVisitaPorInternacao[$id]) || $ts > $ultimaVisitaPorInternacao[$id]['ts']) {
+        $ultimaVisitaPorInternacao[$id] = [
+            'data' => $dataVisita,
+            'ts' => $ts,
+        ];
+    }
+}
 
 // Capeante (concatenação corrigida)
 $capFilter  = "ca.em_auditoria_cap IS NULL";
 $where_cap  = trim($where) !== '' ? ($where . " AND " . $capFilter) : $capFilter;
-$dados_capeante = $Internacao_geral->selectAllInternacaoCapList($where_cap);
+$dados_capeante = dashCacheGet($cacheBase . '_capeante', 60);
+if (!is_array($dados_capeante)) {
+    $dados_capeante = $Internacao_geral->selectAllInternacaoCapList($where_cap);
+    dashCacheSet($cacheBase . '_capeante', $dados_capeante);
+}
 
 // -----------------------------
 // FILTROS AUXILIARES
@@ -212,18 +357,43 @@ function filterVisitasAtrasadas($value)
     };
     $dtVisita = $toDate($value['data_visita_vis'] ?? null);
     $dtIntern = $toDate($value['data_visita_int'] ?? null);
+    $limiteDias = (int)($value['dias_visita_seg'] ?? 0);
+    if ($limiteDias <= 0) {
+        $limiteDias = 10;
+    }
 
     if ($dtVisita instanceof DateTime) {
         $dias = ($dtVisita > $hoje) ? 0 : $dtVisita->diff($hoje)->days;
-        return $dias > 10;
+        return $dias > $limiteDias;
     }
     if ($dtIntern instanceof DateTime) {
         $dias = ($dtIntern > $hoje) ? 0 : $dtIntern->diff($hoje)->days;
-        return $dias > 10;
+        return $dias > $limiteDias;
     }
     return false;
 }
 $dados_visitas_atraso = array_filter((array)$dados_internacoes_visitas, 'filterVisitasAtrasadas');
+
+function diasDesdeData($data)
+{
+    if (empty($data)) {
+        return null;
+    }
+    $dt = DateTime::createFromFormat('Y-m-d', $data);
+    if (!($dt instanceof DateTime)) {
+        $ts = strtotime($data);
+        if ($ts === false) {
+            return null;
+        }
+        $dt = new DateTime();
+        $dt->setTimestamp($ts);
+    }
+    $hoje = new DateTime('today');
+    if ($dt > $hoje) {
+        return 0;
+    }
+    return $dt->diff($hoje)->days;
+}
 
 // Ordena por data e pega os 8 mais recentes
 usort($dados_visitas_atraso, function ($a, $b) {
@@ -232,12 +402,25 @@ usort($dados_visitas_atraso, function ($a, $b) {
 $dados_visitas_atraso_list = array_slice($dados_visitas_atraso, -8);
 
 // Indicadores
-$drg_acima          = $indicadores->getDrgAcima($where_gerais);
-$perc_uti           = $indicadores->getUtiPerc($where_gerais);
+$drg_acima = dashCacheGet($cacheBase . '_drg_acima', 60);
+if (!is_array($drg_acima)) {
+    $drg_acima = $indicadores->getDrgAcima($where_gerais);
+    dashCacheSet($cacheBase . '_drg_acima', $drg_acima);
+}
+
+$perc_uti = dashCacheGet($cacheBase . '_perc_uti', 60);
+if (!is_array($perc_uti)) {
+    $perc_uti = $indicadores->getUtiPerc($where_gerais);
+    dashCacheSet($cacheBase . '_perc_uti', $perc_uti);
+}
 
 // Longa permanência
-$longa_perm         = $indicadores->getLongaPermanencia($where_hospital);
-$longa_perm_list    = $indicadores->getLongaPermanencia($where_hospital);
+$longa_perm = dashCacheGet($cacheBase . '_longa_perm', 60);
+if (!is_array($longa_perm)) {
+    $longa_perm = $indicadores->getLongaPermanencia($where_hospital);
+    dashCacheSet($cacheBase . '_longa_perm', $longa_perm);
+}
+$longa_perm_list = $longa_perm;
 if (!empty($longa_perm_list)) {
     usort($longa_perm_list, function ($a, $b) {
         return strcmp($a['data_intern_int'] ?? '', $b['data_intern_int'] ?? '');
@@ -248,16 +431,32 @@ if (!empty($longa_perm_list)) {
 }
 
 // Contas paradas
-$contas_paradas     = $indicadores->getContasParadas($where_contas);
+$contas_paradas = dashCacheGet($cacheBase . '_contas_paradas', 60);
+if (!is_array($contas_paradas)) {
+    $contas_paradas = $indicadores->getContasParadas($where_contas);
+    dashCacheSet($cacheBase . '_contas_paradas', $contas_paradas);
+}
 
 // UTI não pertinente
-$uti_nao_pertinente = $indicadores->getUtiPertinente($where_gerais);
+$uti_nao_pertinente = dashCacheGet($cacheBase . '_uti_nao_pertinente', 60);
+if (!is_array($uti_nao_pertinente)) {
+    $uti_nao_pertinente = $indicadores->getUtiPertinente($where_gerais);
+    dashCacheSet($cacheBase . '_uti_nao_pertinente', $uti_nao_pertinente);
+}
 
 // Score baixo
-$score_baixo        = $indicadores->getScoreBaixo($where_gerais);
+$score_baixo = dashCacheGet($cacheBase . '_score_baixo', 60);
+if (!is_array($score_baixo)) {
+    $score_baixo = $indicadores->getScoreBaixo($where_gerais);
+    dashCacheSet($cacheBase . '_score_baixo', $score_baixo);
+}
 
 // Reinternações
-$reinternacaohosp    = $Internacao_geral->reinternacaoNova($where_gerais_reint);
+$reinternacaohosp = dashCacheGet($cacheBase . '_reinternacao', 60);
+if (!is_array($reinternacaohosp)) {
+    $reinternacaohosp = $Internacao_geral->reinternacaoNova($where_gerais_reint);
+    dashCacheSet($cacheBase . '_reinternacao', $reinternacaohosp);
+}
 $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 0;
 ?>
 
@@ -297,10 +496,14 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
 
 <style>
 .grid-container {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.kpi-grid-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(3, minmax(210px, 1fr));
+    gap: 12px;
     width: 100%;
 }
 
@@ -310,23 +513,50 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: #3c2750;
-    font-size: 1.4em;
-    border-radius: 16px;
-    background: linear-gradient(150deg, #fbf8ff, #efe7ff);
-    height: 120px;
-    box-shadow: 0 12px 20px rgba(53, 25, 64, 0.12);
-    border: 1px solid rgba(64, 38, 84, 0.08);
+    color: #3f2a59;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 12% 110%, rgba(90, 197, 255, 0.16), transparent 55%),
+        linear-gradient(145deg, #f5f0ff, #ece6f7);
+    min-height: 120px;
+    box-shadow: 0 8px 18px rgba(39, 24, 58, 0.10);
+    border: 1px solid rgba(134, 155, 204, 0.22);
     overflow: hidden;
-    padding: 6px 0;
+    padding: 10px 0;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.grid-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 24px rgba(39, 24, 58, 0.14);
+}
+
+.grid-item-filter {
+    width: 100%;
+}
+
+.grid-item-kpi.kpi-neutral {
+    border-left: 4px solid #6d49ab;
+}
+
+.grid-item-kpi.kpi-info {
+    border-left: 4px solid #2b8dc2;
+}
+
+.grid-item-kpi.kpi-warning {
+    border-left: 4px solid #d19a2a;
+}
+
+.grid-item-kpi.kpi-critical {
+    border-left: 4px solid #c64c64;
 }
 
 .grid-item::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top left, rgba(111, 68, 138, 0.18), transparent 55%);
-    opacity: 0.7;
+    background: radial-gradient(circle at top left, rgba(122, 89, 170, 0.16), transparent 58%);
+    opacity: 0.65;
     pointer-events: none;
 }
 
@@ -336,75 +566,160 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
     top: 0;
     left: 0;
     right: 0;
-    height: 5px;
-    background: linear-gradient(90deg, #8a5ab0, #5ad1f0);
-    opacity: 0.7;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(150, 129, 214, 0.95), rgba(120, 210, 245, 0.95));
+    opacity: 0.9;
 }
 
 .title-item {
     position: absolute;
-    top: 14px;
-    left: 18px;
-    font-size: 0.8em;
-    color: #311b49;
+    top: 10px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    min-height: 40px;
+    width: calc(100% - 28px);
+    text-align: left;
+    line-height: 1.2;
+    font-size: 0.92rem;
+    color: #34204f;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: .04em;
+    letter-spacing: .02em;
+    white-space: normal;
+    text-shadow: none;
+}
+
+.title-item i {
+    flex: 0 0 auto;
 }
 
 .icon-item {
     position: absolute;
-    bottom: 12px;
-    left: 18px;
-    font-size: 1.1em;
-    color: #fff;
-    background: linear-gradient(145deg, #784c9d, #52336e);
+    bottom: 14px;
+    left: 16px;
+    font-size: .95rem;
+    color: #ffffff;
+    background: linear-gradient(145deg, #8354ba, #5e3a8a);
     border-radius: 50%;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 14px rgba(61, 32, 88, 0.25);
+    box-shadow: 0 6px 12px rgba(46, 28, 70, 0.18);
+    opacity: .9;
 }
 
 .badge-item {
     position: absolute;
-    bottom: 14px;
+    bottom: 12px;
     right: 16px;
-    min-width: 110px;
-    color: #432654 !important;
-    background-color: #ffffff !important;
-    padding: 6px 12px;
+    min-width: clamp(92px, 20vw, 124px);
+    max-width: calc(100% - 84px);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-weight: 800;
+    color: #452b63 !important;
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 255, 0.78)) !important;
+    padding: 6px clamp(10px, 1.6vw, 14px);
     border-radius: 999px;
-    font-size: 0.92em;
+    font-size: clamp(1rem, 1.25vw, 1.32rem);
     text-align: center;
-    border: 1px solid rgba(64, 38, 84, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(142, 161, 199, 0.28);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 1400px) {
+    .title-item {
+        font-size: 0.75em;
+    }
+}
+
+@media (max-width: 980px) {
+    .badge-item {
+        min-width: clamp(82px, 24vw, 102px);
+        min-height: 42px;
+        font-size: clamp(0.9rem, 2.8vw, 1.08rem);
+    }
+}
+
+@media (max-width: 1200px) {
+    .kpi-grid-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 860px) {
+    .kpi-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .grid-item {
+        height: 118px;
+    }
+}
+
+@media (max-width: 520px) {
+    .kpi-grid-container {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .grid-item {
+        height: 116px;
+    }
+}
+
+/* Forca alinhamento dos cards do topo, mesmo com CSS global carregado depois */
+.grid-container .grid-item .title-item {
+    left: 14px !important;
+    right: 14px !important;
+    width: calc(100% - 28px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+}
+
+.grid-container .grid-item .badge-item {
+    min-height: 46px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 1 !important;
 }
 
 .badge-item.badge-neutral {
-    background-color: #f4edf8 !important;
-    color: #432654 !important;
-    border-color: rgba(77, 33, 109, 0.2);
+    color: #452b63 !important;
 }
 
 .badge-item.badge-info {
-    background-color: #e4f3fb !important;
-    color: #125f85 !important;
-    border-color: rgba(17, 95, 133, 0.2);
+    color: #0d6695 !important;
+    border-color: rgba(78, 169, 218, 0.35);
 }
 
 .badge-item.badge-warning {
-    background-color: #fff4d7 !important;
-    color: #9b6500 !important;
-    border-color: rgba(201, 145, 40, 0.35);
+    color: #996200 !important;
+    border-color: rgba(216, 172, 93, 0.45);
 }
 
 .badge-item.badge-critical {
-    background-color: #ffe6eb !important;
-    color: #a2203b !important;
-    border-color: rgba(185, 64, 95, 0.35);
+    color: #ad2944 !important;
+    border-color: rgba(200, 92, 116, 0.42);
 }
 
 .select-item {
@@ -421,7 +736,7 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
 .select-shell {
     display: flex;
     align-items: center;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.93);
     border-radius: 18px;
     border: 1px solid rgba(118, 77, 150, 0.35);
     box-shadow: 0 8px 18px rgba(27, 10, 36, 0.12), inset 0 2px 0 rgba(255, 255, 255, 0.9);
@@ -439,8 +754,8 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
     width: 44px;
     height: 44px;
     border-radius: 14px;
-    background: linear-gradient(135deg, #6b3d7d, #50245f);
-    box-shadow: 0 8px 12px rgba(38, 17, 49, 0.25);
+    background: linear-gradient(135deg, #6f40bc, #2f4fcb);
+    box-shadow: 0 8px 14px rgba(14, 24, 74, 0.36);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -469,17 +784,43 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
 }
 
 .select-hospital option {
-    color: #432654;
-    background: #fff;
+    color: #3b1d4a;
+    background: #f7f1ff;
+}
+
+.select-hospital option:checked,
+.select-hospital option:focus {
+    background: #6b3d7d;
+    color: #fff;
 }
 
 .header_div {
-    height: 40px;
-    background: linear-gradient(135deg, #7a3a80, #5a296a);
-    color: white;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-    text-align: center;
+    background: linear-gradient(135deg, #5a2f78, #a06bd4);
+    color: #fff;
+    border-radius: 32px;
+    padding: 18px 26px;
+    box-shadow: 0 25px 50px rgba(24, 0, 30, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 8px 0 4px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.scope-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: #f3edff;
+    border: 1px solid #d6c5f7;
+    color: #5e2363;
 }
 </style>
 
@@ -487,8 +828,13 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
 
 <div id='main-container'>
     <div class="container-fluid" style="margin-top:6px">
+        <?php if ($isSeguradoraRole): ?>
+            <div class="scope-badge">
+                Escopo: Seguradora <?= htmlspecialchars($seguradoraUserNome !== '' ? $seguradoraUserNome : ('#' . $seguradoraUserId), ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
         <div class="grid-container">
-            <div class="grid-item">
+            <div class="grid-item grid-item-filter">
                 <div class="title-item"><i class="fa-solid fa-hospital"></i> Filtrar Hospital</div>
                 <form id="filter-status-form" method="POST">
                     <div class="select-item">
@@ -511,64 +857,91 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
                                 <button type="submit" class="btn button-item">
                                     <span class="material-icons">search</span>
                                 </button>
+                                <button type="submit" name="clear_hospital" value="1" class="btn button-item" title="Limpar filtro hospital">
+                                    <span class="material-icons">close</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
+        </div>
 
-            <div class="grid-item">
+        <div class="kpi-grid-container">
+            <div class="grid-item grid-item-kpi kpi-neutral">
                 <div class="title-item"><i class="fa-solid fa-bed"></i> Total Internados</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-neutral"><?= count($dados_internacoes) ?></div>
             </div>
 
-            <div class="grid-item">
+            <div class="grid-item grid-item-kpi kpi-warning">
                 <div class="title-item"><i class="fa-solid fa-clock"></i> Longa Permanência</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-warning"><?= !empty($longa_perm) ? count($longa_perm) : 0 ?></div>
             </div>
 
-            <div class="grid-item">
+            <div class="grid-item grid-item-kpi kpi-warning">
                 <div class="title-item"><i class="fa-solid fa-bars-progress"></i> Reinternações &lt; 2 dias</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-warning"><?= $total_reinternacoes ?? 0 ?></div>
             </div>
 
-            <div class="grid-item">
+            <div class="grid-item grid-item-kpi kpi-warning">
                 <div class="title-item"><i class="fa-solid fa-calendar"></i> Visitas em Atraso</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-warning"><?= count($dados_visitas_atraso) ?></div>
             </div>
 
-            <div class="grid-item">
+            <div class="grid-item grid-item-kpi kpi-critical">
                 <div class="title-item"><i class="fa-solid fa-stethoscope"></i> Acima meta DRG</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-critical"><?= $drg_acima[0] ?? 0 ?></div>
             </div>
 
-            <div class="grid-item">
+            <div class="grid-item grid-item-kpi kpi-info">
                 <div class="title-item"><i class="fa-solid fa-dollar-sign"></i> Contas em Auditoria</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-info"><?= is_array($dados_capeante) ? count($dados_capeante) : 0 ?></div>
             </div>
 
-            <div class="grid-item">
+            <div class="grid-item grid-item-kpi kpi-critical">
                 <div class="title-item"><i class="fa-solid fa-circle-stop"></i> Contas Paradas</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-critical"><?= $contas_paradas[0] ?? 0 ?></div>
             </div>
 
-            <div class="grid-item">
+            <div class="grid-item grid-item-kpi kpi-info">
                 <div class="title-item"><i class="fa-solid fa-percent"></i> Porcentagem em UTI</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-info"><?= $perc_uti[0] ?? "0.00%" ?></div>
             </div>
 
-            <div class="grid-item">
+            <div class="grid-item grid-item-kpi kpi-critical">
                 <div class="title-item"><i class="fa-solid fa-heart"></i> UTI Não Pertinente</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
                 <div class="badge-item badge-critical"><?= $uti_nao_pertinente[0] ?? 0 ?></div>
+            </div>
+        </div>
+    </div>
+
+    <div class=" container-fluid">
+        <div class="row m-t-25">
+            <div class="col-12">
+                <div class="header_div">
+                    <span>Visitas em atraso</span>
+                </div>
+                <div id="dash-visitas-atraso" class="dash-table-loading">
+                    Carregando...
+                </div>
+            </div>
+
+            <div class="col-12" style="margin-top:20px;">
+                <div class="header_div">
+                    <span>Pacientes de longa permanência</span>
+                </div>
+                <div id="dash-longa-perm" class="dash-table-loading">
+                    Carregando...
+                </div>
             </div>
         </div>
     </div>
@@ -599,7 +972,7 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($forecastRows as $prev): ?>
+                        <?php foreach ((array)$forecastRows as $prev): ?>
                         <?php
                             $diasAtuais = (int)($prev['dias_internado'] ?? 0);
                             $prevTotal = isset($prev['forecast_total_days']) ? (float)$prev['forecast_total_days'] : null;
@@ -676,120 +1049,14 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
                             <td><?= $confTexto ?></td>
                         </tr>
                         <?php endforeach; ?>
-                        <?php if (count($forecastRows) === 0): ?>
+                        <?php if (count((array)$forecastRows) === 0): ?>
                         <tr>
                             <td colspan="7" class="text-center" style="font-size:15px;">
-                                Nenhuma previsão disponível ainda. Assim que tivermos histórico suficiente,
-                                exibiremos os casos prioritários aqui.
+                                Sem registros para os filtros aplicados.
+                                <?= $isSeguradoraRole ? ' Você está visualizando somente dados da sua seguradora.' : '' ?>
                             </td>
                         </tr>
                         <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class=" container-fluid">
-        <div class="row m-t-25">
-            <div class="col-sm-6 col-lg-6">
-                <div class="header_div">
-                    <spam>Visitas em atraso</spam>
-                    <i style="color:white; margin-left:10px;margin-top:10px;float:left"
-                        class="fa-solid fa-right-to-bracket"></i>
-                </div>
-                <table style="margin-top:10px;" class="table table-sm table-striped table-hover table-condensed">
-                    <thead style="background: linear-gradient(135deg, #7a3a80, #5a296a);">
-                        <tr>
-                            <th scope="col" style="width:3%">Hospital</th>
-                            <th scope="col" style="width:3%">Paciente</th>
-                            <th scope="col" style="width:3%">Ultima Visita</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($dados_visitas_atraso_list as $intern): ?>
-                        <?php
-                            if (!empty($intern["data_visita_vis"])) {
-                                $date = new DateTime($intern["data_visita_vis"]);
-                                $formattedDate = $date->format('d/m/Y');
-                            } else {
-                                $formattedDate = "Sem visita";
-                            }
-                            ?>
-                        <tr style="font-size:15px">
-                            <td scope="row">
-                                <?= htmlspecialchars($intern["nome_hosp"] ?? '', ENT_QUOTES, 'UTF-8') ?>
-                            </td>
-                            <td scope="row">
-                                <a
-                                    href="<?= $BASE_URL ?>cad_visita.php?id_internacao=<?= (int)($intern["id_internacao"] ?? 0) ?>">
-                                    <i class="bi bi-box-arrow-in-right fw-bold"
-                                        style="margin-right:8px; font-size:1.2em;"></i>
-                                </a>
-                                <?= htmlspecialchars($intern["nome_pac"] ?? '', ENT_QUOTES, 'UTF-8') ?>
-                            </td>
-                            <td scope="row"><?= $formattedDate ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-
-                        <?php if (count($dados_visitas_atraso_list) == 0): ?>
-                        <tr>
-                            <td colspan="3" scope="row" class="col-id" style='font-size:15px'>
-                                Não foram encontrados registros
-                            </td>
-                        </tr>
-                        <?php endif ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="col-sm-6 col-lg-6">
-                <div class="header_div">
-                    <spam>Pacientes de longa permanência</spam>
-                    <i style="color:white; margin-left:10px;margin-top:10px;float:left"
-                        class="fa-solid fa-right-to-bracket"></i>
-                </div>
-                <table style="margin-top:10px;" class="table table-sm table-striped table-hover table-condensed">
-                    <thead style="background: linear-gradient(135deg, #7a3a80, #5a296a);">
-                        <tr>
-                            <th scope="col" style="width:3%">Hospital</th>
-                            <th scope="col" style="width:3%">Paciente</th>
-                            <th scope="col" style="width:3%">Data Internação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($longa_perm_list as $intern): ?>
-                        <?php
-                            if (!empty($intern["data_intern_int"])) {
-                                $date = new DateTime($intern["data_intern_int"]);
-                                $formattedDate = $date->format('d/m/Y');
-                            } else {
-                                $formattedDate = "Sem visita";
-                            }
-                            ?>
-                        <tr style="font-size:15px">
-                            <td scope="row">
-                                <?= htmlspecialchars($intern["nome_hosp"] ?? '', ENT_QUOTES, 'UTF-8') ?>
-                            </td>
-                            <td scope="row">
-                                <a
-                                    href="<?= $BASE_URL ?>show_internacao.php?id_internacao=<?= (int)($intern["id_internacao"] ?? 0) ?>">
-                                    <i class="bi bi-box-arrow-right"
-                                        style="color:green; margin-right:8px; font-size:1.2em;"></i>
-                                </a>
-                                <?= htmlspecialchars($intern["nome_pac"] ?? '', ENT_QUOTES, 'UTF-8') ?>
-                            </td>
-                            <td scope="row"><?= $formattedDate ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-
-                        <?php if (count($longa_perm_list) == 0): ?>
-                        <tr>
-                            <td colspan="3" scope="row" class="col-id" style='font-size:15px'>
-                                Não foram encontrados registros
-                            </td>
-                        </tr>
-                        <?php endif ?>
                     </tbody>
                 </table>
             </div>
@@ -888,7 +1155,6 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
             });
         }
     } catch (error) {
-        console.log(error);
     }
 
     toastr.options = {
@@ -917,6 +1183,95 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
         selectElement.addEventListener('blur', function() {
             selectElement.classList.remove('open');
         });
+
+        function parseDashValue(value, type) {
+            const text = (value || '').trim();
+            if (type === 'number') {
+                const num = parseFloat(text.replace(/[^\d.-]/g, ''));
+                return Number.isFinite(num) ? num : -Infinity;
+            }
+            if (type === 'date') {
+                const parts = text.split('/');
+                if (parts.length === 3) {
+                    return Number(parts[2] + parts[1].padStart(2, '0') + parts[0].padStart(2, '0'));
+                }
+                return -Infinity;
+            }
+            return text.toLowerCase();
+        }
+
+        function sortDashTable(table, colIndex, dir, type) {
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort(function(a, b) {
+                const aCell = a.children[colIndex];
+                const bCell = b.children[colIndex];
+                const aVal = parseDashValue(aCell ? aCell.textContent : '', type);
+                const bVal = parseDashValue(bCell ? bCell.textContent : '', type);
+                if (type === 'text') {
+                    return dir === 'asc' ? aVal.localeCompare(bVal, 'pt-BR') : bVal.localeCompare(aVal, 'pt-BR');
+                }
+                return dir === 'asc' ? (aVal - bVal) : (bVal - aVal);
+            });
+            rows.forEach(function(row) {
+                tbody.appendChild(row);
+            });
+        }
+
+        document.addEventListener('click', function(event) {
+            const link = event.target.closest('.dash-sortable .sort-icons a');
+            if (!link) return;
+            event.preventDefault();
+            const th = link.closest('th');
+            const table = link.closest('table');
+            if (!th || !table) return;
+            const dir = link.getAttribute('data-dir') || 'asc';
+            const type = th.getAttribute('data-sort-type') || 'text';
+            const colIndex = th.cellIndex;
+
+            table.querySelectorAll('.sort-icons a').forEach(function(a) {
+                a.classList.remove('active');
+            });
+            link.classList.add('active');
+
+            sortDashTable(table, colIndex, dir, type);
+        });
+
+        function loadDashTables() {
+            const visitasEl = document.getElementById('dash-visitas-atraso');
+            const longaEl = document.getElementById('dash-longa-perm');
+            if (!visitasEl || !longaEl) return;
+
+            const formData = new URLSearchParams();
+            const hospVal = selectElement ? selectElement.value : '';
+            if (hospVal) formData.append('hospital_id', hospVal);
+
+            fetch('<?= $BASE_URL ?>ajax/dashboard_tabelas.php?_ts=' + Date.now(), {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            })
+            .then(function(res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.text();
+            })
+            .then(function(html) {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                const visitasContent = temp.querySelector('#dash-visitas-atraso-content');
+                const longaContent = temp.querySelector('#dash-longa-perm-content');
+                visitasEl.innerHTML = visitasContent ? visitasContent.innerHTML : '<div style="padding:10px">Não foi possível carregar.</div>';
+                longaEl.innerHTML = longaContent ? longaContent.innerHTML : '<div style="padding:10px">Não foi possível carregar.</div>';
+            })
+            .catch(function() {
+                visitasEl.innerHTML = '<div style="padding:10px">Erro ao carregar.</div>';
+                longaEl.innerHTML = '<div style="padding:10px">Erro ao carregar.</div>';
+            });
+        }
+
+        loadDashTables();
     });
     </script>
 </div>
@@ -962,6 +1317,65 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
 canvas {
     width: 100%;
     border: none;
+}
+
+.dash-table-loading {
+    margin-top: 10px;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-weight: 600;
+    background: #f8f7fb;
+    border-radius: 10px;
+    border: 1px dashed rgba(94, 35, 99, 0.2);
+}
+
+.dash-table-scroll {
+    margin-top: 10px;
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.dash-table-scroll table {
+    width: 100%;
+}
+
+.dash-table-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: linear-gradient(135deg, #7a3a80, #5a296a);
+}
+
+.th-sortable {
+    white-space: nowrap;
+}
+
+.th-sortable .sort-icons {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.th-sortable .sort-icons a {
+    text-decoration: none;
+    font-size: 0.75rem;
+    color: #ffffff;
+    margin-left: 2px;
+    opacity: 0.7;
+}
+
+.th-sortable .sort-icons a.active {
+    color: #ffd966;
+    opacity: 1;
+    font-weight: bold;
 }
 </style>
 

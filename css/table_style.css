@@ -1,74 +1,62 @@
 /* Aplicando bordas arredondadas à tabela */
-.table,
-table {
+.table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(18, 29, 52, 0.08);
+    /* overflow: hidden; */
 }
 
 .table th,
-.table td,
-table th,
-table td {
-    padding: 12px 14px;
-    border-bottom: 1px solid #ececec;
-}
-
-.table thead,
-table thead {
-    text-align: left;
-}
-
-.table thead,
-table thead {
-    background: linear-gradient(135deg, #722975, #5c3dc4, #3557d8, #2da1ff);
-    border-bottom: none;
-}
-
-.table thead th,
-table thead th {
-    background: transparent;
-    color: #ffffff;
+.table td {
+    padding: 6px;
+    border-bottom: 1px solid #ededf3;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    font-size: 0.75rem;
-    border-bottom: none;
 }
 
-.table thead tr th:first-child,
-table thead tr th:first-child {
-    border-top-left-radius: 14px;
+.table thead th {
+    text-align: center;
 }
 
-.table thead tr th:last-child,
-table thead tr th:last-child {
-    border-top-right-radius: 14px;
+.table thead {
+    background: linear-gradient(90deg, #4f0f41 0%, #5e2363 40%, #5e3b92 60%, #35bae1 100%);
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transform: translateZ(0);
 }
 
-.table tbody tr:nth-child(odd),
-table tbody tr:nth-child(odd) {
-    background: #f7f7fb;
+.table thead th span {
+    text-transform: uppercase;
 }
 
-.table tbody tr:nth-child(even),
-table tbody tr:nth-child(even) {
-    background: #ffffff;
+.table thead th.js-sortable-header {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    padding-right: 20px;
 }
 
-.table tbody tr:hover,
-table tbody tr:hover {
-    background: #eceaf7;
-    transition: background 0.2s ease;
+.table thead th .js-sort-indicator {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.72rem;
+    line-height: 1;
+    opacity: 0.75;
 }
+
+.table thead th.js-sort-active-asc .js-sort-indicator,
+.table thead th.js-sort-active-desc .js-sort-indicator {
+    opacity: 1;
+    color: #ffe082;
+}
+
 
 .complete-table {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    background: #f8f9fa !important;
+    /* Sombras opcionais */
+    background:#f8f9fa!important;
     border-radius: 10px;
 }
 
@@ -82,4 +70,85 @@ table tbody tr:hover {
 
 .table-new-btn {
     margin-left: 10px;
+}
+
+/* Melhora legibilidade com listras suaves e destaque ao passar o mouse */
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+.table tbody tr:nth-child(even) {
+    background: #e7e3ef;
+}
+
+.table tbody tr td {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: #e6eefc;
+}
+
+/* Botao/link de limpar filtros: borda mais visivel e sombra suave */
+.btn-filtro-limpar {
+    color: #5e2363;
+    background-color: #f3f5f7;
+    border: 1px solid #aeb7c2;
+    box-shadow: 0 2px 6px rgba(30, 41, 59, 0.2);
+}
+
+.btn-filtro-limpar:hover,
+.btn-filtro-limpar:focus {
+    color: #ffffff !important;
+    background-color: #5e2363 !important;
+    border-color: #5e2363 !important;
+    box-shadow: 0 3px 8px rgba(30, 41, 59, 0.28);
+}
+
+.btn-filtro-limpar:hover i,
+.btn-filtro-limpar:focus i {
+    color: #ffffff !important;
+}
+
+.btn-filtro-limpar-icon {
+    width: 42px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* Botao de buscar (filtro): inversao no hover */
+.btn-filtro-buscar {
+    color: #ffffff !important;
+    background-color: #5e2363 !important;
+    border-color: #5e2363 !important;
+}
+
+.btn-filtro-buscar i,
+.btn-filtro-buscar .material-icons {
+    color: #ffffff !important;
+}
+
+.btn-filtro-buscar:hover,
+.btn-filtro-buscar:focus {
+    color: #5e2363 !important;
+    background-color: #ffffff !important;
+    border-color: #5e2363 !important;
+}
+
+.btn-filtro-buscar:hover i,
+.btn-filtro-buscar:focus i,
+.btn-filtro-buscar:hover .material-icons,
+.btn-filtro-buscar:focus .material-icons {
+    color: #5e2363 !important;
 }

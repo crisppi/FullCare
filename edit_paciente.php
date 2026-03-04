@@ -3,9 +3,6 @@ include_once("check_logado.php");
 include_once("templates/header.php");
 include_once("models/message.php");
 
-include_once("models/pacital.php");
-include_once("dao/pacitalDao.php");
-
 include_once("models/seguradora.php");
 include_once("dao/seguradoraDao.php");
 
@@ -17,9 +14,31 @@ include_once("dao/pacienteDao.php");
 
 $seguradoraDao = new seguradoraDAO($conn, $BASE_URL);
 $seguradoras = $seguradoraDao->findAll();
+// Evita nomes duplicados no select (mantem o registro mais recente: ORDER BY id DESC)
+$seguradorasSelect = [];
+$seguradorasSeen = [];
+foreach ($seguradoras as $seguradoraItem) {
+    $nomeKey = strtolower(trim((string) ($seguradoraItem['seguradora_seg'] ?? '')));
+    if ($nomeKey === '' || isset($seguradorasSeen[$nomeKey])) {
+        continue;
+    }
+    $seguradorasSeen[$nomeKey] = true;
+    $seguradorasSelect[] = $seguradoraItem;
+}
 
 $estipulanteDao = new estipulanteDAO($conn, $BASE_URL);
 $estipulantes = $estipulanteDao->findAll();
+// Evita nomes duplicados no select (mantem o registro mais recente: ORDER BY id DESC)
+$estipulantesSelect = [];
+$estipulantesSeen = [];
+foreach ($estipulantes as $estipulanteItem) {
+    $nomeKey = strtolower(trim((string) ($estipulanteItem['nome_est'] ?? '')));
+    if ($nomeKey === '' || isset($estipulantesSeen[$nomeKey])) {
+        continue;
+    }
+    $estipulantesSeen[$nomeKey] = true;
+    $estipulantesSelect[] = $estipulanteItem;
+}
 
 $user = new Paciente();
 $pacienteDao = new pacienteDAO($conn, $BASE_URL);
@@ -81,15 +100,114 @@ $telefone02_pac = !empty($paciente['0']['telefone02_pac']) ? formatPhone($pacien
 <!-- Incluindo o Font Awesome para os ícones -->
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="css/ocultar.css"></script>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/form_cad_internacao.css">
+<style>
+    #main-container.internacao-page {
+        margin: 2px 0 0 !important;
+        padding-inline: 5px !important;
+        padding-top: 0 !important;
+        width: auto !important;
+        max-width: 100% !important;
+        overflow-x: hidden;
+    }
 
-<div class="container-fluid fundo_tela_cadastros" id="main-container">
-    <div class="progress mb-4">
-        <div class="progress-bar bg-success" role="progressbar" id="progressBar" style="width:100%;" aria-valuenow="100"
-            aria-valuemin="0" aria-valuemax="100">Dados do Paciente</div>
+    #main-container.internacao-page .internacao-page__hero {
+        margin: 0 0 6px !important;
+    }
+
+    #main-container.internacao-page .hero-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    #main-container.internacao-page .hero-back-btn {
+        border-radius: 999px;
+        border: 1px solid #d9c3f4;
+        color: #5e2363;
+        padding: 7px 14px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: .85rem;
+        background: #f4ecfb;
+    }
+
+    #main-container.internacao-page .hero-back-btn:hover {
+        color: #4a1b4e;
+        background: #eadcf8;
+    }
+
+    #main-container.internacao-page .internacao-card__eyebrow {
+        font-weight: 700 !important;
+    }
+
+    #multi-step-form .form-control {
+        min-height: 42px;
+        border-radius: 8px;
+    }
+
+    #multi-step-form select.form-control {
+        height: 42px;
+    }
+
+    .confirm-delete-modal .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #cfd4dc;
+    }
+
+    .confirm-delete-modal .modal-header {
+        background: #8b95a5;
+        color: #fff !important;
+        border-bottom: 0;
+        padding: 10px 14px;
+    }
+
+    .confirm-delete-modal .modal-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+        color: #ffffff !important;
+    }
+
+    .confirm-delete-modal .close {
+        color: #fff;
+        opacity: .9;
+        text-shadow: none;
+    }
+
+    .confirm-delete-modal .close:hover {
+        color: #fff;
+        opacity: 1;
+    }
+
+    .confirm-delete-modal .modal-body {
+        padding: 14px;
+    }
+
+    .confirm-delete-modal .modal-footer {
+        border-top: 1px solid #e8ebf0;
+    }
+</style>
+
+<div class="internacao-page" id="main-container">
+    <div class="internacao-page__hero">
+        <div><h1>Editar paciente</h1></div>
+        <div class="hero-actions">
+            <a class="hero-back-btn" href="<?= htmlspecialchars($BASE_URL . 'pacientes', ENT_QUOTES, 'UTF-8') ?>">Voltar para lista</a>
+            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
+        </div>
     </div>
+    <div class="internacao-page__content">
 
     <form action="<?= $BASE_URL ?>process_paciente.php" id="multi-step-form" method="POST" enctype="multipart/form-data"
-        class="needs-validation">
+        class="needs-validation visible">
+        <div class="internacao-card internacao-card--general">
+            <div class="internacao-card__header">
+                <div><p class="internacao-card__eyebrow">Dados do paciente</p></div>
+            </div>
+            <div class="internacao-card__body">
 
         <input type="hidden" name="type" value="update">
         <input type="hidden" name="id_paciente" value="<?= $paciente['0']['id_paciente'] ?>">
@@ -215,7 +333,8 @@ $telefone02_pac = !empty($paciente['0']['telefone02_pac']) ? formatPhone($pacien
                         <option value="<?= $paciente['0']['fk_seguradora_pac'] ?>" selected>
                             <?= $paciente['0']['seguradora_seg'] ?>
                         </option>
-                        <?php foreach ($seguradoras as $seguradora): ?>
+                        <?php foreach ($seguradorasSelect as $seguradora): ?>
+                            <?php if ((string) $seguradora['id_seguradora'] === (string) $paciente['0']['fk_seguradora_pac']) continue; ?>
                             <option value="<?= $seguradora['id_seguradora'] ?>"><?= $seguradora['seguradora_seg'] ?>
                             </option>
                         <?php endforeach; ?>
@@ -227,8 +346,9 @@ $telefone02_pac = !empty($paciente['0']['telefone02_pac']) ? formatPhone($pacien
                         <option value="<?= $paciente['0']['fk_estipulante_pac'] ?>" selected>
                             <?= $paciente['0']['nome_est'] ?>
                         </option>
-                        <?php foreach ($estipulantes as $estipulantes): ?>
-                            <option value="<?= $estipulantes['id_estipulante'] ?>"><?= $estipulantes['nome_est'] ?>
+                        <?php foreach ($estipulantesSelect as $estipulanteItem): ?>
+                            <?php if ((string) $estipulanteItem['id_estipulante'] === (string) $paciente['0']['fk_estipulante_pac']) continue; ?>
+                            <option value="<?= $estipulanteItem['id_estipulante'] ?>"><?= $estipulanteItem['nome_est'] ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -241,47 +361,11 @@ $telefone02_pac = !empty($paciente['0']['telefone02_pac']) ? formatPhone($pacien
                     name="obs_pac"><?= $paciente['0']['obs_pac'] ?></textarea>
             </div>
             <hr>
-            <div class="d-flex justify-content-between align-items-center">
-                <!-- <button type="button" class="btn btn-primary" onclick="nextStep(2)">
-                    Próximo <i class="fas fa-arrow-right"></i>
-                </button> -->
-                <button type="submit" class="btn btn-success" name="finalizar_etapa1" id="finalizar_etapa1">
-                    <i class="fas fa-check"></i> Atualizar
-                </button>
-
-                <!-- Div de confirmação, oculta inicialmente -->
-                <div id="confirm-delete-div" style="font-weight: bold" class="oculto">
-
-                    <div class="d-flex flex-column align-items-center px-3 my-3"
-                        style="background-color: #f1f1f1; border-radius: 10px; border: 1px solid #ddd; display: none;">
-
-                        <!-- Texto centralizado acima dos botões -->
-                        <p style="font-weight: bold;" class="mb-2 text-center">Confirma Deletar?</p>
-
-                        <!-- Botões de confirmação e cancelamento -->
-                        <div class="d-flex justify-content-center mb-3">
-                            <button type="button" class="btn btn-success mx-2" onclick="confirmAction()">
-                                Sim <i class="fas fa-check"></i>
-                            </button>
-
-                            <button type="button" class="btn btn-danger mx-2" onclick="hideConfirmDelete()">
-                                Não <i class="fas fa-ban"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="button" class="btn btn-danger" onclick="showConfirmDelete()">
-                    Deletar <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-
-
         </div>
 
         <!-- Step 2: Informações de Endereço -->
-        <div id="step-2" class="step" style="display:none;">
+        <div id="step-2" class="step">
+            <p class="internacao-card__eyebrow mb-3">Dados de endereço</p>
             <div class="row">
                 <div class="form-group col-md-3 mb-3">
                     <label for="cep_pac">CEP</label>
@@ -334,16 +418,11 @@ $telefone02_pac = !empty($paciente['0']['telefone02_pac']) ? formatPhone($pacien
                     value="<?= $paciente['0']['complemento_pac'] ?>">
             </div>
             <hr>
-            <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </button>
-            <button type="button" class="btn btn-primary" onclick="nextStep(3)">
-                Próximo <i class="fas fa-arrow-right"></i>
-            </button>
         </div>
 
         <!-- Step 3: Informações de Contato -->
-        <div id="step-3" class="step" style="display:none;">
+        <div id="step-3" class="step">
+            <p class="internacao-card__eyebrow mb-3">Dados de contato</p>
             <div class="row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="email01_pac">Email Principal</label>
@@ -378,35 +457,70 @@ $telefone02_pac = !empty($paciente['0']['telefone02_pac']) ? formatPhone($pacien
 
 
             <hr>
-            <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </button>
-            <button type="submit" class="btn btn-success">
-                <i class="fas fa-check"></i> Atualizar
-            </button>
+            <div class="d-flex align-items-center gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check"></i> Atualizar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="showConfirmDelete()">
+                    Deletar <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="display:none;">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar exclusão</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Fechar" onclick="hideConfirmDelete()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Este registro será deletado. Deseja continuar?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-dismiss="modal" onclick="hideConfirmDelete()">Não</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmAction()">Sim, deletar</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script>
-            // Função para mostrar a div de confirmação
-            function showConfirmDelete() {
-                const confirmDiv = document.getElementById("confirm-delete-div");
-                if (confirmDiv) {
-                    confirmDiv.style.display = "flex";
-                }
+        function showConfirmDelete() {
+            const modalEl = document.getElementById("modalConfirmDelete");
+            if (!modalEl) return;
+            modalEl.style.display = "block";
+            modalEl.classList.add("show");
+            modalEl.removeAttribute("aria-hidden");
+            modalEl.setAttribute("aria-modal", "true");
+            modalEl.setAttribute("role", "dialog");
+            document.body.classList.add("modal-open");
+            if (!document.getElementById("confirm-delete-backdrop")) {
+                const backdrop = document.createElement("div");
+                backdrop.id = "confirm-delete-backdrop";
+                backdrop.className = "modal-backdrop fade show";
+                backdrop.onclick = hideConfirmDelete;
+                document.body.appendChild(backdrop);
+            }
             }
 
-            // Função para ocultar a div de confirmação
             function hideConfirmDelete() {
-                const confirmDiv = document.getElementById("confirm-delete-div");
-                if (confirmDiv) {
-                    confirmDiv.style.display = "none";
-                }
+                const modalEl = document.getElementById("modalConfirmDelete");
+                if (!modalEl) return;
+                modalEl.classList.remove("show");
+                modalEl.style.display = "none";
+                modalEl.setAttribute("aria-hidden", "true");
+                modalEl.removeAttribute("aria-modal");
+                document.body.classList.remove("modal-open");
+                const backdrop = document.getElementById("confirm-delete-backdrop");
+                if (backdrop) backdrop.remove();
             }
 
             // Função para confirmar a exclusão
             function confirmAction() {
-                hideConfirmDelete(); // Oculta a div de confirmação
-
+                hideConfirmDelete();
                 // Inicia o processo de exclusão
                 const form = document.getElementById("multi-step-form");
                 form.action = "<?= $BASE_URL ?>process_paciente.php";
@@ -429,7 +543,10 @@ $telefone02_pac = !empty($paciente['0']['telefone02_pac']) ? formatPhone($pacien
             }
         </script>
 
+            </div>
+        </div>
     </form>
+    </div>
 </div>
 
 <script>

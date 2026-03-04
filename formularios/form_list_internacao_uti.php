@@ -21,6 +21,65 @@ include_once("dao/utiDao.php");
 
 include_once("models/pagination.php");
 
+if (!function_exists('listaUtiGetParam')) {
+    function listaUtiGetParam(string $longKey, $default = null)
+    {
+        static $shortToLong = [
+            'hosp' => 'pesquisa_nome',
+            'pac'  => 'pesquisa_pac',
+            'mat'  => 'pesquisa_matricula',
+            'it'   => 'pesqInternado',
+            'pp'   => 'limite_pag',
+            'di'   => 'data_intern_int',
+            'sf'   => 'sort_field',
+            'sd'   => 'sort_dir',
+            'pg'   => 'pag',
+            'blc'  => 'bl',
+        ];
+        static $longToShort = null;
+        if ($longToShort === null) $longToShort = array_flip($shortToLong);
+        $value = $_GET[$longKey] ?? null;
+        if ($value === null && isset($longToShort[$longKey])) {
+            $value = $_GET[$longToShort[$longKey]] ?? null;
+        }
+        if ($value === null || $value === '') return $default;
+        return $value;
+    }
+}
+
+if (!function_exists('listaUtiCompactParams')) {
+    function listaUtiCompactParams(array $params): array
+    {
+        $defaults = ['pesqInternado' => 's', 'limite_pag' => '10', 'sort_dir' => 'desc'];
+        $longToShort = [
+            'pesquisa_nome' => 'hosp',
+            'pesquisa_pac' => 'pac',
+            'pesquisa_matricula' => 'mat',
+            'pesqInternado' => 'it',
+            'limite_pag' => 'pp',
+            'data_intern_int' => 'di',
+            'sort_field' => 'sf',
+            'sort_dir' => 'sd',
+            'pag' => 'pg',
+            'bl' => 'blc',
+        ];
+        $clean = [];
+        foreach ($params as $k => $v) {
+            if ($v === null || $v === '' || $v === false) continue;
+            $v = (string)$v;
+            if (isset($defaults[$k]) && $defaults[$k] === $v) continue;
+            $clean[$k] = $v;
+        }
+        if (empty($clean['sort_field'])) unset($clean['sort_dir']);
+        unset($clean['bl']);
+        $compact = [];
+        foreach ($clean as $k => $v) {
+            $compact[$longToShort[$k] ?? $k] = $v;
+        }
+        return $compact;
+    }
+}
+
 $where = null;
 $internacao_geral = new internacaoDAO($conn, $BASE_URL);
 $internacaos = $internacao_geral->findGeral($where, $limite, $inicio);
@@ -38,6 +97,8 @@ $internacao = new internacaoDAO($conn, $BASE_URL);
 $order = null;
 $obLimite = null;
 $uti = new utiDAO($conn, $BASE_URL);
+$sortField = trim((string)listaUtiGetParam('sort_field', ''));
+$sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
 
 ?>
 
@@ -49,14 +110,36 @@ $uti = new utiDAO($conn, $BASE_URL);
         <div id="navbarToggleExternalContent" class="table-filters">
             <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
             <div class="row">
-                <form action="" id="select-internacao-form" method="GET">
-                    <?php $pesquisa_nome = filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS);
-                    $pesqInternado = filter_input(INPUT_GET, 'pesqInternado', FILTER_SANITIZE_SPECIAL_CHARS);
-                    $limite_pag = filter_input(INPUT_GET, 'limite_pag');
-                    $pesquisa_pac = filter_input(INPUT_GET, 'pesquisa_pac', FILTER_SANITIZE_SPECIAL_CHARS);
-                    $pesquisa_matricula = filter_input(INPUT_GET, 'pesquisa_matricula', FILTER_SANITIZE_SPECIAL_CHARS);
-                    $ordenar = filter_input(INPUT_GET, 'ordenar');
+                <form action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/uti', ENT_QUOTES, 'UTF-8') ?>" id="select-internacao-form" method="GET">
+                    <?php $pesquisa_nome = (string)listaUtiGetParam('pesquisa_nome', '');
+                    $pesqInternado = (string)listaUtiGetParam('pesqInternado', 's');
+                    $limite_pag = (int)listaUtiGetParam('limite_pag', 10);
+                    $pesquisa_pac = (string)listaUtiGetParam('pesquisa_pac', '');
+                    $pesquisa_matricula = (string)listaUtiGetParam('pesquisa_matricula', '');
+                    $ordenar = (string)listaUtiGetParam('ordenar', '');
                     ?>
+                    <style>
+                    .th-sortable {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.35rem;
+                    }
+
+                    .th-sortable .sort-icons a {
+                        text-decoration: none;
+                        font-size: 0.85rem;
+                        color: #ffffff;
+                        margin-left: 2px;
+                        opacity: 0.9;
+                        font-weight: 700;
+                    }
+
+                    .th-sortable .sort-icons a.active {
+                        color: #ffd966;
+                        opacity: 1;
+                        font-weight: bold;
+                    }
+                    </style>
                     <div class="row">
                         <div class="col-sm-3" style="padding:2px !important;padding-left:16px !important;">
                             <!-- <label>Pesquisa por Hospital</label> -->
@@ -87,44 +170,33 @@ $uti = new utiDAO($conn, $BASE_URL);
                         </div>
                         <div class="col-sm-1" style="padding:2px !important">
                             <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="limite"
-                                name="limite">
+                                name="limite_pag">
                                 <option value="">Reg por página</option>
-                                <option value="5" <?= $limite == '5' ? 'selected' : null ?>>Reg por pág = 5
+                                <option value="5" <?= $limite_pag == '5' ? 'selected' : null ?>>Reg por pág = 5
                                 </option>
-                                <option value="10" <?= $limite == '10' ? 'selected' : null ?>>Reg por pág = 10
+                                <option value="10" <?= $limite_pag == '10' ? 'selected' : null ?>>Reg por pág = 10
                                 </option>
-                                <option value="20" <?= $limite == '20' ? 'selected' : null ?>>Reg por pág = 20
+                                <option value="20" <?= $limite_pag == '20' ? 'selected' : null ?>>Reg por pág = 20
                                 </option>
-                                <option value="50" <?= $limite == '50' ? 'selected' : null ?>>Reg por pág = 50
+                                <option value="50" <?= $limite_pag == '50' ? 'selected' : null ?>>Reg por pág = 50
                                 </option>
                             </select>
                         </div>
-                        <div class="col-sm-2" style="padding:2px !important">
-                            <!-- <label>Classificar</label> -->
-                            <select class="form-control sm-3 form-control-sm" id="ordenar" name="ordenar"
-                                style="margin-top:7px">
-                                <option value="">Classificar por</option>
-                                <option value="nome_pac" <?= $ordenar == 'nome_pac' ? 'selected' : null ?>>Paciente
-                                </option>
-                                <option value="nome_hosp" <?= $ordenar == 'nome_hosp' ? 'selected' : null ?>>Hospital
-                                </option>
-                                <option value="id_internacao" <?= $ordenar == 'id_internacao' ? 'selected' : null ?>>
-                                    Internação
-                                </option>
-                                <option value="data_intern_int"
-                                    <?= $ordenar == 'data_intern_int' ? 'selected' : null ?>>
-                                    Data
-                                    Internação</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-1" style="padding:2px !important" style="margin:0px 0px 20px 0px">
-                            <button type="submit" class="btn btn-primary"
+                        <div class="col-sm-1 d-flex align-items-start gap-2" style="padding:2px !important">
+                            <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
                                 style="background-color:#5e2363;width:42px;height:32px;margin-top:7px;border-color:#5e2363"><span
                                     class="material-icons" style="margin-left:-3px;margin-top:-2px;">
                                     search
                                 </span></button>
+                            <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/uti', ENT_QUOTES, 'UTF-8') ?>"
+                                class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon"
+                                style="margin-top:7px;" title="Limpar filtros" aria-label="Limpar filtros">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
                         </div>
                     </div>
+                    <input type="hidden" name="sort_field" value="<?= htmlspecialchars((string)$sortField) ?>">
+                    <input type="hidden" name="sort_dir" value="<?= htmlspecialchars((string)$sortDir) ?>">
                 </form>
             </div>
         </div>
@@ -141,13 +213,13 @@ $uti = new utiDAO($conn, $BASE_URL);
         //Instanciando a classe
         $QtdTotalIntUTI = new utiDAO($conn, $BASE_URL);
         // METODO DE BUSCA DE PAGINACAO
-        $pesquisa_nome = filter_input(INPUT_GET, 'pesquisa_nome');
-        $pesqInternado = filter_input(INPUT_GET, 'pesqInternado');
-        $limite_pag = filter_input(INPUT_GET, 'limite_pag') ? filter_input(INPUT_GET, 'limite_pag') : 10;
-        $pesquisa_pac = filter_input(INPUT_GET, 'pesquisa_pac');
-        $pesquisa_matricula = filter_input(INPUT_GET, 'pesquisa_matricula');
-        $data_intern_int = filter_input(INPUT_GET, 'data_intern_int') ?: null;
-        $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar') : '';
+        $pesquisa_nome = (string)listaUtiGetParam('pesquisa_nome', '');
+        $pesqInternado = (string)listaUtiGetParam('pesqInternado', '');
+        $limite_pag = (int)listaUtiGetParam('limite_pag', 10);
+        $pesquisa_pac = (string)listaUtiGetParam('pesquisa_pac', '');
+        $pesquisa_matricula = (string)listaUtiGetParam('pesquisa_matricula', '');
+        $data_intern_int = listaUtiGetParam('data_intern_int') ?: null;
+        $ordenar = (string)listaUtiGetParam('ordenar', '');
         $uti_internacao = 's';
         $uti_internado = 's';
         // $buscaAtivo = in_array($buscaAtivo, ['s', 'n']) ?: "";
@@ -165,16 +237,31 @@ $uti = new utiDAO($conn, $BASE_URL);
         $condicoes = array_filter($condicoes);
         // REMOVE POSICOES VAZIAS DO FILTRO
         $where = implode(' AND ', $condicoes);
-        $order = $ordenar ?: 'id_internacao DESC';
+        $sortableColumns = [
+            'id_internacao'      => 'ac.id_internacao',
+            'nome_hosp'          => 'ho.nome_hosp',
+            'nome_pac'           => 'pa.nome_pac',
+            'data_intern_int'    => 'ac.data_intern_int',
+            'data_internacao_uti'=> 'uti.data_internacao_uti'
+        ];
+        if ($sortField && isset($sortableColumns[$sortField])) {
+            $order = $sortableColumns[$sortField] . ' ' . strtoupper($sortDir);
+        } else {
+            $order = 'ac.id_internacao DESC';
+        }
         // QUANTIDADE InternacaoS
         $qtdIntItens1 = $uti->selectAllUTI($where, $order, $obLimite);
         // print_r($qtdIntItens1);
         $qtdIntItens = count($qtdIntItens1);
         // PAGINACAO
         $qtdIntItens = count($qtdIntItens1);
-        $totalcasos = ceil($qtdIntItens / $limite);
+        $totalcasos = ceil($qtdIntItens / $limite_pag);
 
-        $obPagination = new pagination($qtdIntItens, $_GET['pag'] ?? 1, $limite_pag);
+        $paginaAtualParam = (int)listaUtiGetParam('pag', 1);
+        if ($paginaAtualParam < 1) {
+            $paginaAtualParam = 1;
+        }
+        $obPagination = new pagination($qtdIntItens, $paginaAtualParam, $limite_pag);
 
         $obLimite = $obPagination->getLimit();
 
@@ -182,25 +269,44 @@ $uti = new utiDAO($conn, $BASE_URL);
         $query = $uti->selectAllUTI($where, $order, $obLimite);
 
         // PAGINACAO
-        if ($qtdIntItens > $limite) {
+        if ($qtdIntItens > $limite_pag) {
             $paginacao = '';
             $paginas = $obPagination->getPages();
             $pagina = 1;
             $total_pages = count($paginas);
 
-            // FUNCAO PARA CONTROLE DO NUMERO DE PAGINAS, UTILIZANDO A QUANTIDADE DE PAGINAS CALCULADAS NA VARIAVEL PAGINAS PELE METODO getPages
-
-            function paginasAtuais($var)
-            {
-                $blocoAtual = isset($_GET['bl']) ? $_GET['bl'] : 0;
+            // CONTROLE DO BLOCO ATUAL DA PAGINACAO
+            $blocoAtual = (int)listaUtiGetParam('bl', (int)floor(($paginaAtualParam - 1) / 5) * 5);
+            $block_pages = array_filter($paginas, function ($var) use ($blocoAtual) {
                 return $var['bloco'] == (($blocoAtual) / 5) + 1;
-            }
-            $block_pages = array_filter($paginas, "paginasAtuais"); // REFERENCIA FUNCAO CRIADA ACIMA
+            });
             $first_page_in_block = reset($block_pages)["pg"];
             $last_page_in_block = end($block_pages)["pg"];
             $first_block = reset($paginas)["bloco"];
             $last_block = end($paginas)["bloco"];
             $current_block = reset($block_pages)["bloco"];
+        }
+        $paginationBaseParams = [
+            'pesquisa_nome'      => $pesquisa_nome,
+            'pesquisa_pac'       => $pesquisa_pac,
+            'pesquisa_matricula' => $pesquisa_matricula,
+            'pesqInternado'      => $pesqInternado,
+            'limite_pag'         => $limite_pag,
+            'data_intern_int'    => $data_intern_int,
+            'sort_field'         => $sortField,
+            'sort_dir'           => $sortDir,
+        ];
+
+        if (!function_exists('buildInternacaoUtiPaginationUrl')) {
+            function buildInternacaoUtiPaginationUrl(array $baseParams, array $override = []): string
+            {
+                $params = array_merge($baseParams, $override);
+                $compact = listaUtiCompactParams($params);
+                $query = http_build_query($compact);
+                global $BASE_URL;
+                $baseUrl = rtrim($BASE_URL, '/') . '/internacoes/uti';
+                return $query ? $baseUrl . '?' . $query : $baseUrl;
+            }
         }
         ?>
 
@@ -211,11 +317,33 @@ $uti = new utiDAO($conn, $BASE_URL);
                 <table class="table table-sm table-striped table-hover table-condensed">
                     <thead>
                         <tr>
-                            <th scope="col" width="4%">Id-Int</th>
+                            <?php
+                            $sortableHeaders = [
+                                'id_internacao'   => ['label' => 'Id-Int',   'style' => 'width:4%'],
+                                'nome_hosp'       => ['label' => 'Hospital', 'style' => 'width:15%'],
+                                'nome_pac'        => ['label' => 'Paciente', 'style' => 'width:15%'],
+                                'data_intern_int' => ['label' => 'Data internação', 'style' => 'width:8%'],
+                                'data_internacao_uti' => ['label' => 'Data internação UTI', 'style' => 'width:8%'],
+                            ];
+                            foreach ($sortableHeaders as $key => $meta):
+                                $ascActive = ($sortField === $key && $sortDir === 'asc');
+                                $descActive = ($sortField === $key && $sortDir === 'desc');
+                                $ascUrl = buildInternacaoUtiPaginationUrl($paginationBaseParams, ['sort_field' => $key, 'sort_dir' => 'asc', 'pag' => 1]);
+                                $descUrl = buildInternacaoUtiPaginationUrl($paginationBaseParams, ['sort_field' => $key, 'sort_dir' => 'desc', 'pag' => 1]);
+                            ?>
+                            <th scope="col" style="<?= $meta['style'] ?>" class="text-center">
+                                <div class="th-sortable justify-content-center">
+                                    <span><?= htmlspecialchars($meta['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="sort-icons">
+                                        <a href="<?= htmlspecialchars($ascUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                            class="<?= $ascActive ? 'active' : '' ?>" title="Ordenar crescente">↑</a>
+                                        <a href="<?= htmlspecialchars($descUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                            class="<?= $descActive ? 'active' : '' ?>" title="Ordenar decrescente">↓</a>
+                                    </span>
+                                </div>
+                            </th>
+                            <?php endforeach; ?>
                             <th scope="col" width="4%">Internado</th>
-                            <th scope="col" width="15%">Hospital</th>
-                            <th scope="col" width="15%">Paciente</th>
-                            <th scope="col" width="8%">Data internação</th>
                             <th scope="col" width="4%">Ações</th>
                         </tr>
                     </thead>
@@ -229,13 +357,6 @@ $uti = new utiDAO($conn, $BASE_URL);
                                 <?= $intern["id_internacao"] ?>
                             </td>
                             <td scope="row" class="nome-coluna-table">
-                                <?php if ($intern["internado_int"] == "s") {
-                                        echo "Sim";
-                                    } else {
-                                        echo "Não";
-                                    }; ?>
-                            </td>
-                            <td scope="row" class="nome-coluna-table">
                                 <?= $intern["nome_hosp"] ?>
                             </td>
                             <td scope="row">
@@ -243,6 +364,12 @@ $uti = new utiDAO($conn, $BASE_URL);
                             </td>
                             <td scope="row">
                                 <?= date('d/m/Y', strtotime($intern["data_intern_int"])) ?>
+                            </td>
+                            <td scope="row">
+                                <?= !empty($intern["data_internacao_uti"]) ? date('d/m/Y', strtotime($intern["data_internacao_uti"])) : "--" ?>
+                            </td>
+                            <td scope="row" class="nome-coluna-table">
+                                <?= $intern["internado_int"] == "s" ? "Sim" : "Não" ?>
                             </td>
                             <td class="action">
                                 <div class="dropdown">
@@ -311,29 +438,29 @@ $uti = new utiDAO($conn, $BASE_URL);
                         <?php if ($total_pages ?? 1 > 1): ?>
                         <ul class="pagination">
                             <?php
-                                $blocoAtual = isset($_GET['bl']) ? $_GET['bl'] : 0;
-                                $paginaAtual = isset($_GET['pag']) ? $_GET['pag'] : 1;
+                                $blocoAtual = (int)listaUtiGetParam('bl', (int)floor(($paginaAtualParam - 1) / 5) * 5);
+                                $paginaAtual = $paginaAtualParam;
                                 ?>
                             <?php if ($current_block > $first_block): ?>
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
-                                    onclick="loadContent('list_internacao_uti.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
+                                    onclick="loadUtiContent('<?= htmlspecialchars(buildInternacaoUtiPaginationUrl($paginationBaseParams, ['pag' => 1]), ENT_QUOTES, 'UTF-8') ?>')">
                                     <i class="fa-solid fa-angles-left"></i></a>
                             </li>
                             <?php endif; ?>
                             <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                             <li class="page-item">
                                 <a class="page-link" href="#"
-                                    onclick="loadContent('list_internacao_uti.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual - 1 ?>&bl=<?php print $blocoAtual - 5 ?>')">
+                                    onclick="loadUtiContent('<?= htmlspecialchars(buildInternacaoUtiPaginationUrl($paginationBaseParams, ['pag' => max(1, $paginaAtual - 1)]), ENT_QUOTES, 'UTF-8') ?>')">
                                     <i class="fa-solid fa-angle-left"></i> </a>
                             </li>
                             <?php endif; ?>
 
                             <?php for ($i = $first_page_in_block; $i <= $last_page_in_block; $i++): ?>
-                            <li class="page-item <?php print ($_GET['pag'] ?? 1) == $i ? "active" : "" ?>">
+                            <li class="page-item <?php print $paginaAtualParam == $i ? "active" : "" ?>">
 
                                 <a class="page-link" href="#"
-                                    onclick="loadContent('list_internacao_uti.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $i ?>&bl=<?php print $blocoAtual ?>')">
+                                    onclick="loadUtiContent('<?= htmlspecialchars(buildInternacaoUtiPaginationUrl($paginationBaseParams, ['pag' => $i]), ENT_QUOTES, 'UTF-8') ?>')">
                                     <?php echo $i; ?>
                                 </a>
                             </li>
@@ -342,14 +469,14 @@ $uti = new utiDAO($conn, $BASE_URL);
                             <?php if ($current_block < $last_block): ?>
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
-                                    onclick="loadContent('list_internacao_uti.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual + 1 ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
+                                    onclick="loadUtiContent('<?= htmlspecialchars(buildInternacaoUtiPaginationUrl($paginationBaseParams, ['pag' => min($total_pages, $paginaAtual + 1)]), ENT_QUOTES, 'UTF-8') ?>')"><i
                                         class="fa-solid fa-angle-right"></i></a>
                             </li>
                             <?php endif; ?>
                             <?php if ($current_block < $last_block): ?>
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
-                                    onclick="loadContent('list_internacao_uti.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print count($paginas) ?>&bl=<?php print ($last_block - 1) * 5 ?>')"><i
+                                    onclick="loadUtiContent('<?= htmlspecialchars(buildInternacaoUtiPaginationUrl($paginationBaseParams, ['pag' => count($paginas)]), ENT_QUOTES, 'UTF-8') ?>')"><i
                                         class="fa-solid fa-angles-right"></i></a>
                             </li>
                             <?php endif; ?>
@@ -371,56 +498,104 @@ $uti = new utiDAO($conn, $BASE_URL);
 </div>
 
 <script>
-// ajax para submit do formulario de pesquisa
-$(document).ready(function() {
-    $('#select-internacao-form').submit(function(e) {
-        e.preventDefault(); // Impede o comportamento padrão de enviar o formulário
-        console.log("teste")
-        var formData = $(this).serialize(); // Serializa os dados do formulário
-
-        $.ajax({
-            url: $(this).attr('action'), // URL do formulário
-            type: $(this).attr('method'), // Método do formulário (POST)
-            data: formData, // Dados serializados do formulário
-            success: function(response) {
-                // Crie um elemento temporário para armazenar a resposta HTML
-                var tempElement = document.createElement('div');
-                tempElement.innerHTML = response;
-
-                // Encontre o elemento com o ID "table-content" dentro do elemento temporário
-                var tableContent = tempElement.querySelector('#table-content');
-                $('#table-content').html(tableContent);
-            },
-            error: function() {
-                $('#responseMessage').html('Ocorreu um erro ao enviar o formulário.');
-            }
-        });
-    });
+var utiAliasLongToShort = {
+    pesquisa_nome: 'hosp',
+    pesquisa_pac: 'pac',
+    pesquisa_matricula: 'mat',
+    pesqInternado: 'it',
+    limite_pag: 'pp',
+    data_intern_int: 'di',
+    sort_field: 'sf',
+    sort_dir: 'sd',
+    pag: 'pg',
+    bl: 'blc'
+};
+var utiAliasShortToLong = {};
+Object.keys(utiAliasLongToShort).forEach(function(k) {
+    utiAliasShortToLong[utiAliasLongToShort[k]] = k;
 });
-// ajax para navegacao 
-function loadContent(url) {
+function compactUtiQuery(input) {
+    var source = new URLSearchParams(typeof input === 'string' ? input : (input || ''));
+    var normalized = {};
+    source.forEach(function(v, k) {
+        normalized[utiAliasShortToLong[k] || k] = v;
+    });
+    delete normalized.bl;
+    if (!normalized.sort_field) {
+        delete normalized.sort_dir;
+    }
+    var defaults = { pesqInternado: 's', limite_pag: '10', sort_dir: 'desc' };
+    var out = new URLSearchParams();
+    Object.keys(normalized).forEach(function(longKey) {
+        var value = String(normalized[longKey] || '').trim();
+        if (!value) return;
+        if (defaults[longKey] !== undefined && defaults[longKey] === value) return;
+        out.set(utiAliasLongToShort[longKey] || longKey, value);
+    });
+    return out.toString();
+}
+
+function renderUtiTableContent(responseHtml) {
+    var tempElement = document.createElement('div');
+    tempElement.innerHTML = responseHtml;
+    var tableContent = tempElement.querySelector('#table-content');
+    if (!tableContent) {
+        return false;
+    }
+    $('#table-content').html(tableContent.innerHTML);
+    return true;
+}
+
+// ajax para navegacao
+function loadUtiContent(url, dataPayload) {
+    var requestUrl = url || ($('#select-internacao-form').attr('action') || 'internacoes/uti');
     $.ajax({
-        url: url,
+        url: requestUrl,
         type: 'GET',
+        data: dataPayload || null,
         dataType: 'html',
         success: function(data) {
-            // Crie um elemento temporário para armazenar a resposta HTML
-            var tempElement = document.createElement('div');
-            tempElement.innerHTML = data;
+            var updated = renderUtiTableContent(data);
+            if (!updated) {
+                return;
+            }
 
-            // Encontre o elemento com o ID "table-content" dentro do elemento temporário
-            var tableContent = tempElement.querySelector('#table-content');
-            $('#table-content').html(tableContent);
+            if (dataPayload) {
+                var qs = typeof dataPayload === 'string' ? dataPayload : $.param(dataPayload);
+                var compactQs = compactUtiQuery(qs);
+                var targetUrl = requestUrl + (compactQs ? (requestUrl.indexOf('?') === -1 ? '?' : '&') + compactQs : '');
+                window.history.replaceState({}, '', targetUrl);
+            } else if (url) {
+                try {
+                    var parsed = new URL(requestUrl, window.location.origin);
+                    var compactFromUrl = compactUtiQuery(parsed.search);
+                    window.history.replaceState({}, '', parsed.pathname + (compactFromUrl ? '?' + compactFromUrl : ''));
+                } catch (e) {
+                    window.history.replaceState({}, '', requestUrl);
+                }
+            }
         },
         error: function() {
-            console.log('Error loading content');
+            $('#responseMessage').html('Ocorreu um erro ao atualizar a listagem.');
         }
     });
 }
+
+// ajax para submit do formulario de pesquisa
 $(document).ready(function() {
-    loadContent(
-        'list_internacao_uti.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>'
-    );
+    $('#select-internacao-form').on('submit', function(e) {
+        e.preventDefault();
+        loadUtiContent($(this).attr('action') || 'internacoes/uti', $(this).serialize());
+    });
+});
+
+$(document).on('click', '#table-content .pagination a.page-link, #table-content .sort-icons a', function(e) {
+    var href = $(this).attr('href');
+    if (!href || href === '#') {
+        return;
+    }
+    e.preventDefault();
+    loadUtiContent(href);
 });
 </script>
 

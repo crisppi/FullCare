@@ -1,7 +1,5 @@
     <?php
 
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);   // para alguns módulos
     error_reporting(E_ALL);
 
     include_once("check_logado.php");
@@ -205,16 +203,45 @@
 
     $tuss_int = new tussDAO($conn, $BASE_URL);
 
-$id_internacao = filter_input(INPUT_GET, 'id_internacao') ? filter_input(INPUT_GET, 'id_internacao') : 1;
+    $id_internacao = filter_input(INPUT_GET, 'id_internacao') ? filter_input(INPUT_GET, 'id_internacao') : 1;
 
-$intern = $internacaoDao->findByIdArray($id_internacao)[0];
-$dataLancamentoAtual = '';
-if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !== '0000-00-00 00:00:00') {
-    $tsLanc = strtotime($intern['data_lancamento_int']);
-    if ($tsLanc) {
-        $dataLancamentoAtual = date('Y-m-d\TH:i', $tsLanc);
+    $intern = $internacaoDao->findByIdArray($id_internacao)[0];
+    $altaAtual = [
+        'data_alta_alt' => '',
+        'tipo_alta_alt' => ''
+    ];
+    try {
+        $stmtAltaAtual = $conn->prepare("
+            SELECT data_alta_alt, tipo_alta_alt
+            FROM tb_alta
+            WHERE fk_id_int_alt = :id
+            ORDER BY id_alta DESC
+            LIMIT 1
+        ");
+        $stmtAltaAtual->bindValue(':id', (int) $id_internacao, PDO::PARAM_INT);
+        $stmtAltaAtual->execute();
+        $altaRow = $stmtAltaAtual->fetch(PDO::FETCH_ASSOC) ?: [];
+        if (!empty($altaRow)) {
+            $altaAtual['data_alta_alt'] = (string) ($altaRow['data_alta_alt'] ?? '');
+            $altaAtual['tipo_alta_alt'] = (string) ($altaRow['tipo_alta_alt'] ?? '');
+        }
+    } catch (Throwable $e) {
+        $altaAtual = ['data_alta_alt' => '', 'tipo_alta_alt' => ''];
     }
-}
+    $altaDataHoraValue = '';
+    if (!empty($altaAtual['data_alta_alt']) && $altaAtual['data_alta_alt'] !== '0000-00-00 00:00:00') {
+        $tsAlta = strtotime($altaAtual['data_alta_alt']);
+        if ($tsAlta) {
+            $altaDataHoraValue = date('Y-m-d\TH:i', $tsAlta);
+        }
+    }
+    $dataLancamentoAtual = '';
+    if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !== '0000-00-00 00:00:00') {
+        $tsLanc = strtotime($intern['data_lancamento_int']);
+        if ($tsLanc) {
+            $dataLancamentoAtual = date('Y-m-d\TH:i', $tsLanc);
+        }
+    }
     $int_paciente = $pacienteDao->findById($intern['fk_paciente_int']);
     $int_patologia = $patologiaDao->findById($intern['fk_patologia_int']);
     $int_antecedente = $patologiaDao->findById($intern['fk_patologia2']);
@@ -229,24 +256,18 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
     ?>
 
 
-    <div class="row card" style="background-color: #f6f6f7ff; margin-top:-35px">
-        <div class="form-group row">
-            <h4 class="text-center w-100" style="
-                margin: 10px;
-                background-color: #5e2363;
-                color: #fff;
-                padding: 10px 0;
-                border-radius: 0.25rem;
-            ">Editar internação</h4>
-            <hr class="w-100 margin-top: 20px mb-4">
-
-            <!-- <hr class="w-100 margin-top: 20px mb-4"> -->
-            <!-- </div> -->
-            <form class="visible" action="process_internacao_editar.php" id="myForm" method="POST"
-                enctype="multipart/form-data">
-                <div style="text-align: right;">
-                    <p style="font-size: .6em; color:red; margin-top: -20px;">* Campos Obrigatórios</p>
-                </div>
+    <div class="internacao-page">
+        <div class="internacao-page__hero">
+            <div>
+                <h1>Editar internação</h1>
+            </div>
+            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
+        </div>
+        <div class="internacao-page__content">
+            <div class="internacao-card internacao-card--general">
+                <div class="internacao-card__body">
+                    <form class="visible" action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/process_internacao_editar.php', ENT_QUOTES, 'UTF-8') ?>" id="myForm" method="POST"
+                        enctype="multipart/form-data">
                 <!-- ID da internação (necessário no update) -->
                 <input type="hidden" id="id_internacao" name="id_internacao" value="<?= $intern['id_internacao'] ?>">
 
@@ -304,12 +325,8 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                     <div class="form-group col-sm-2 mb-2">
                         <label class="control-label" for="data_lancamento_int">Data lançamento</label>
                         <input type="datetime-local" class="form-control form-control-sm" id="data_lancamento_int"
-<<<<<<< Updated upstream
-                            name="data_lancamento_int" value="<?= $dataLancamentoAtual ?>" readonly>
-=======
                             name="data_lancamento_int" value="<?= $dataLancamentoAtual ?>" readonly tabindex="-1"
                             onfocus="this.blur();" onkeydown="return false;" style="cursor:not-allowed;">
->>>>>>> Stashed changes
                     </div>
                 </div>
 
@@ -356,17 +373,38 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                         </select>
                     </div>
 
+                    <div class="form-group col-sm-2 mb-2" id="div-data-alta" style="display:none">
+                        <label class="control-label" for="data_alta_alt">Data/Hora Alta</label>
+                        <input type="datetime-local" class="form-control form-control-sm" id="data_alta_alt"
+                            name="data_alta_alt" value="<?= htmlspecialchars($altaDataHoraValue) ?>" step="60">
+                    </div>
+
+                    <div class="form-group col-sm-2 mb-2" id="div-motivo-alta" style="display:none">
+                        <label class="control-label" for="tipo_alta_alt">Motivo Alta</label>
+                        <select class="form-control form-control-sm" id="tipo_alta_alt" name="tipo_alta_alt">
+                            <option value="">Selecione o motivo da alta</option>
+                            <?php
+                            $dados_alta = is_array($dados_alta ?? null) ? $dados_alta : [];
+                            sort($dados_alta, SORT_ASC);
+                            foreach ($dados_alta as $alta): ?>
+                                <option value="<?= htmlspecialchars($alta); ?>" <?= ($altaAtual['tipo_alta_alt'] ?? '') === $alta ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($alta); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                     <div class="form-group col-sm-2 mb-2">
                         <label class="control-label" for="acomodacao_int">Acomodação</label>
                         <select class="form-control-sm form-control" id="acomodacao_int" name="acomodacao_int">
-                            <option value="">Selecione</option>
+                            <option value=""></option>
                             <?php
                             sort($dados_acomodacao, SORT_ASC);
                             foreach ($dados_acomodacao as $acomd) {
                                 // Verifica se o valor da acomodação corresponde ao valor vindo do banco
                                 $selected = ($acomd == $intern['acomodacao_int']) ? 'selected' : '';
                             ?>
-                            <option value="<?= $acomd; ?>" <?= $selected; ?>><?= $acomd; ?></option>
+                                <option value="<?= $acomd; ?>" <?= $selected; ?>><?= $acomd; ?></option>
                             <?php } ?>
                         </select>
                     </div>
@@ -380,7 +418,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                             <?php
                             sort($dados_especialidade, SORT_ASC);
                             foreach ($dados_especialidade as $especial) {
-                                echo '<option value="' . htmlspecialchars($especial) . '"></option>';
+                                echo '<option value="' . htmlspecialchars($especial ?? '') . '"></option>';
                             }
                             ?>
                         </datalist>
@@ -402,7 +440,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                         <label class="control-label" for="modo_internacao_int">Modo Admissão</label>
                         <select class="form-control-sm form-control" id="modo_internacao_int"
                             name="modo_internacao_int">
-                            <option value="">Selecione</option>
+                            <option value=""></option>
                             <option value="Clínica"
                                 <?php if ($intern['modo_internacao_int'] == 'Clínica') echo 'selected'; ?>>
                                 Clínica</option>
@@ -424,7 +462,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                     <div class="form-group col-sm-2 mb-2">
                         <label class="control-label" for="tipo_admissao_int">Tipo Internação</label>
                         <select class="form-control-sm form-control" id="tipo_admissao_int" name="tipo_admissao_int">
-                            <option value="">Selecione</option>
+                            <option value=""></option>
                             <option value="Eletiva"
                                 <?php if ($intern['tipo_admissao_int'] == 'Eletiva') echo 'selected'; ?>>
                                 Eletiva</option>
@@ -437,13 +475,13 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                         <label class="control-label" for="fk_cid_int">CID</label>
                         <select class="form-control selectpicker show-tick" data-size="5" id="fk_cid_int"
                             name="fk_cid_int" data-live-search="true">
-                            <option value="">Selecione o CID</option>
+                            <option value="">Cid</option>
 
                             <?php foreach ($cids as $cid): ?>
-                            <?php $idCid = (int)$cid['id_cid']; ?>
-                            <option value="<?= $idCid ?>" <?= ($cidSelecionado == $idCid) ? 'selected' : '' ?>>
-                                <?= $cid['cat'] . " - " . $cid["descricao"] ?>
-                            </option>
+                                <?php $idCid = (int)$cid['id_cid']; ?>
+                                <option value="<?= $idCid ?>" <?= ($cidSelecionado == $idCid) ? 'selected' : '' ?>>
+                                    <?= $cid['cat'] . " - " . $cid["descricao"] ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -451,24 +489,24 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                         <label class="control-label" for="grupo_patologia_int">Grupo Patologia</label>
                         <select class="form-control-sm form-control" id="grupo_patologia_int"
                             name="grupo_patologia_int">
-                            <option value="">Selecione</option>
+                            <option value=""></option>
                             <?php foreach ($dados_grupo_pat as $grupo): ?>
-                            <option value="<?= $grupo ?>"
-                                <?= ($grupo == $intern['grupo_patologia_int']) ? 'selected' : ''; ?>>
-                                <?= $grupo ?>
-                            </option>
+                                <option value="<?= $grupo ?>"
+                                    <?= ($grupo == $intern['grupo_patologia_int']) ? 'selected' : ''; ?>>
+                                    <?= $grupo ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group col-sm-2 mb-2">
                         <label class="control-label" for="origem_int">Origem</label>
                         <select class="form-control-sm form-control" id="origem_int" name="origem_int">
-                            <option value="">Selecione</option>
+                            <option value=""></option>
                             <?php foreach ($origem as $origens): ?>
-                            <option value="<?= $origens ?>"
-                                <?= ($origens == $intern['origem_int']) ? 'selected' : ''; ?>>
-                                <?= $origens ?>
-                            </option>
+                                <option value="<?= $origens ?>"
+                                    <?= ($origens == $intern['origem_int']) ? 'selected' : ''; ?>>
+                                    <?= $origens ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -485,7 +523,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                             Internação
                             pertinente?</label>
                         <select class="form-control-sm form-control" id="int_pertinente_int" name="int_pertinente_int">
-                            <option value="">Selecione</option>
+                            <option value=""></option>
                             <option value="s" <?= ($intern['int_pertinente_int'] == 's') ? 'selected' : ''; ?>>Sim
                             </option>
                             <option value="n" <?= ($intern['int_pertinente_int'] == 'n') ? 'selected' : ''; ?>>Não
@@ -528,7 +566,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                         <label for="acoes_int">Ações da Auditoria</label>
                         <textarea id="acoes_int" name="acoes_int" rows="2" maxlength="5000" class="form-control"
                             style="resize:none" onclick="aumentarText('acoes_int')"
-                            onblur="reduzirText('acoes_int', 2)"><?= htmlspecialchars($intern['acoes_int']); ?></textarea>
+                            onblur="reduzirText('acoes_int', 2)"><?= htmlspecialchars($intern['acoes_int'] ?? ''); ?></textarea>
                     </div>
 
 
@@ -537,7 +575,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                         <textarea type="textarea" style="resize:none" maxlength="5000" rows="2"
                             onclick="aumentarText('programacao_int')" onblur="reduzirText('programacao_int', 2)"
                             class="form-control" id="programacao_int"
-                            name="programacao_int"><?= htmlspecialchars($intern['programacao_int']); ?></textarea>
+                            name="programacao_int"><?= htmlspecialchars($intern['programacao_int'] ?? ''); ?></textarea>
                     </div>
 
                     <div><br></div>
@@ -548,7 +586,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                     <input type="hidden" class="form-control" id="select_detalhes" name="select_detalhes" value="n">
 
                     <?php if (!empty($detalhesDaInt[0]['id_detalhes'])): ?>
-                    <input type="hidden" name="id_detalhes" value="<?= $detalhesDaInt[0]['id_detalhes'] ?>">
+                        <input type="hidden" name="id_detalhes" value="<?= $detalhesDaInt[0]['id_detalhes'] ?>">
                     <?php endif; ?>
                     <input type="hidden" name="fk_int_det" value="<?= $intern['id_internacao'] ?>">
                     <div>
@@ -597,10 +635,10 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                                 <option value="">Selecione</option>
 
                                 <?php foreach ($tipos_dieta as $tipo): ?>
-                                <option value="<?= htmlspecialchars($tipo) ?>"
-                                    <?= $tipo === $dietaSelecionada ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($tipo) ?>
-                                </option>
+                                    <option value="<?= htmlspecialchars($tipo ?? '') ?>"
+                                        <?= $tipo === $dietaSelecionada ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($tipo ?? '') ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -614,10 +652,10 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                             <select class="form-control-sm form-control" id="nivel_consc_det" name="nivel_consc_det">
                                 <option value="">Selecione</option>
                                 <?php foreach ($opcoes_nivel_consc as $opcao): ?>
-                                <option value="<?= htmlspecialchars($opcao) ?>"
-                                    <?= $opcao === $nivelConsc ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($opcao) ?>
-                                </option>
+                                    <option value="<?= htmlspecialchars($opcao ?? '') ?>"
+                                        <?= $opcao === $nivelConsc ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($opcao ?? '') ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -630,10 +668,10 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                             <select class="form-control-sm form-control" id="oxig_det" name="oxig_det">
                                 <option value="">Selecione</option>
                                 <?php foreach ($opcoes_oxigenio as $opcao): ?>
-                                <option value="<?= htmlspecialchars($opcao) ?>"
-                                    <?= $opcao === $oxigenio ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($opcao) ?>
-                                </option>
+                                    <option value="<?= htmlspecialchars($opcao ?? '') ?>"
+                                        <?= $opcao === $oxigenio ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($opcao ?? '') ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -645,7 +683,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                         <div id="div-oxig" class="form-group col-sm-1">
                             <label class="control-label" for="oxig_uso_det">Lts O2</label>
                             <input class="form-control-sm form-control" type="text" name="oxig_uso_det"
-                                id="oxig_uso_det" value="<?= htmlspecialchars($oxigenioUso) ?>">
+                                id="oxig_uso_det" value="<?= htmlspecialchars($oxigenioUso ?? '') ?>">
                         </div>
 
                         <style>
@@ -915,7 +953,7 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#collapseGestao" aria-expanded="false" aria-controls="collapseGestao">
                                 <i class="fa-solid fa-wallet me-2"></i>
-                                <span>Editar Gestão</span>
+                                <span>Editar Gestão Assistencial</span>
                             </button>
                         </h2>
                         <div id="collapseGestao" class="accordion-collapse collapse" aria-labelledby="headingGestao">
@@ -960,10 +998,12 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
 
 
                 <br>
-                <button type="submit" class="btn btn-success"><i style="font-size: 1rem;margin-right:5px;" value="edit"
+                <button type="submit" class="btn btn-success btn-submit-standard"><i style="font-size: 1rem;margin-right:5px;" value="edit"
                         class="fa-solid fa-check edit-icon"></i>Atualizar</button>
 
-            </form>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- <div class="row">
@@ -976,30 +1016,54 @@ if (!empty($intern['data_lancamento_int']) && $intern['data_lancamento_int'] !==
         </div> -->
 
 
-        </form>
     </div>
 
     <script>
-// Função para aumentar o tamanho do campo de texto do relatório de auditoria
-function aumentarText(textareaId) {
-    document.getElementById(textareaId).rows = 20;
-}
+        // Função para aumentar o tamanho do campo de texto do relatório de auditoria
+        function aumentarText(textareaId) {
+            document.getElementById(textareaId).rows = 20;
+        }
 
-function reduzirText(textareaId, originalRows) {
-    document.getElementById(textareaId).rows = originalRows;
-}
+        function reduzirText(textareaId, originalRows) {
+            document.getElementById(textareaId).rows = originalRows;
+        }
+        // Abre accordion de prorrogações/TUSS quando solicitado via hash ou querystring
+        document.addEventListener('DOMContentLoaded', function() {
+            var params = new URLSearchParams(window.location.search);
+            var target = null;
+            if (window.location.hash === '#collapseProrrog' || params.get('section') === 'prorrog') {
+                target = 'collapseProrrog';
+            } else if (window.location.hash === '#collapseTuss' || params.get('section') === 'tuss') {
+                target = 'collapseTuss';
+            } else if (window.location.hash === '#collapseNegoc' || params.get('section') === 'negoc') {
+                target = 'collapseNegoc';
+            }
+            if (!target) return;
+            var collapseEl = document.getElementById(target);
+            if (!collapseEl) return;
+            try {
+                var bs = bootstrap.Collapse.getOrCreateInstance(collapseEl, {
+                    toggle: false
+                });
+                bs.show();
+            } catch (e) {
+                collapseEl.classList.add('show');
+            }
+            var btn = document.querySelector('[data-bs-target="#' + target + '"]');
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+        });
     </script>
     <script>
-$(document).ready(function() {
-    // Verifica se a função existe antes de chamar
-    if (typeof $.fn.selectpicker === 'function') {
-        $('.selectpicker').selectpicker();
-        // Listener para quando carregar
-        $('.selectpicker').on('loaded.bs.select', function() {
-            $('.bs-searchbox input').attr('placeholder', 'Digite para pesquisar...');
+        $(document).ready(function() {
+            // Verifica se a função existe antes de chamar
+            if (typeof $.fn.selectpicker === 'function') {
+                $('.selectpicker').selectpicker();
+                // Listener para quando carregar
+                $('.selectpicker').on('loaded.bs.select', function() {
+                    $('.bs-searchbox input').attr('placeholder', 'Digite para pesquisar...');
+                });
+            }
         });
-    }
-});
     </script>
 
     <!-- <script src="js/scriptDataInt.js"></script> -->
@@ -1007,331 +1071,426 @@ $(document).ready(function() {
     <script src="js/select_internacao.js"></script>
 
     <script>
-// mostrar div de uti caso alterar acaomodacao int para UTI
-document.getElementById("acomodacao_int").addEventListener("change", function() {
-    var divUti = document.querySelector("#container-uti");
-    if (this.value === "UTI") {
-        divUti.style.display = "block";
-    } else {
-        divUti.style.display = "none";
-    }
-});
-let pacienteStatus = null; // Variável global para armazenar o status do paciente
-
-function teste() {
-    event.preventDefault(); //prevent default action 
-    let post_url = "check_internacao.php"; //get form action url
-    let request_method = "POST"; //get form GET/POST method
-    var paciente = document.querySelector("#fk_paciente_int").value;
-    $.ajax({
-        url: post_url,
-        type: request_method,
-        data: {
-            id_paciente: paciente
-        },
-        success: function(result) {
-
-            var alert_div = document.getElementById('alert_intern');
-            if (result == 1) {
-                alert_div.style.display = "block";
+        // mostrar div de uti caso alterar acaomodacao int para UTI
+        document.getElementById("acomodacao_int").addEventListener("change", function() {
+            var divUti = document.querySelector("#container-uti");
+            if (this.value === "UTI") {
+                divUti.style.display = "block";
             } else {
-                alert_div.style.display = "none";
-
+                divUti.style.display = "none";
             }
-        }
-    })
-}
+        });
+        let pacienteStatus = null; // Variável global para armazenar o status do paciente
 
-var dialogResult = false;
+        function teste() {
+            event.preventDefault(); //prevent default action 
+            let post_url = "check_internacao.php"; //get form action url
+            let request_method = "POST"; //get form GET/POST method
+            var paciente = document.querySelector("#fk_paciente_int").value;
+            $.ajax({
+                url: post_url,
+                type: request_method,
+                data: {
+                    id_paciente: paciente
+                },
+                success: function(result) {
 
+                    var alert_div = document.getElementById('alert_intern');
+                    if (result == 1) {
+                        alert_div.style.display = "block";
+                    } else {
+                        alert_div.style.display = "none";
 
-document.getElementById("data_intern_int").addEventListener("blur", function() {
-    const input = this;
-    const dataInternacao = new Date(input.value);
-    const dataHoje = new Date();
-    const erroDiv = document.getElementById("erro-data-internacao");
-
-    erroDiv.style.display = "none";
-    erroDiv.textContent = "";
-
-    if (!input.value) return;
-
-    const dataFormatadaHoje = dataHoje.toISOString().split("T")[0];
-    const dataFormatadaInput = input.value;
-
-    // Caso a data seja futura
-    if (dataFormatadaInput > dataFormatadaHoje) {
-        erroDiv.textContent = "A data da internação não pode ser maior que a data atual.";
-        erroDiv.style.display = "block";
-        input.value = "";
-
-        setTimeout(() => {
-            erroDiv.style.display = "none";
-            erroDiv.textContent = "";
-        }, 5000);
-        return;
-    }
-
-    // Verifica se a data está mais de 30 dias no passado
-    const diffEmMilissegundos = dataHoje - dataInternacao;
-    const diffDias = diffEmMilissegundos / (1000 * 60 * 60 * 24);
-
-    if (diffDias > 30) {
-        erroDiv.textContent = "Deseja prorrogar acima de 30 dias?";
-        erroDiv.style.display = "block";
-
-        setTimeout(() => {
-            erroDiv.style.display = "none";
-            erroDiv.textContent = "";
-        }, 7000);
-    }
-});
-    </script>
-
-    <script>
-$(document).ready(function() {
-    // Evento de mudança para o hospital selecionado
-    $('#hospital_selected').on('change', function() {
-
-        const id_hospital = $(this).val(); // Captura o ID do hospital selecionado
-
-        if (!id_hospital) {
-            return;
-        }
-
-        // Solicitação AJAX para buscar dados filtrados
-        fetchAcomodacoes(id_hospital);
-    });
-
-    // Função para realizar a requisição AJAX e preencher os selects
-    function fetchAcomodacoes(id_hospital) {
-        $.ajax({
-            url: 'process_acomodacao.php', // Endereço do script no servidor
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                id_hospital
-            }, // Dados enviados ao servidor
-            beforeSend: function() {
-
-            },
-            success: function(response) {
-
-                if (response.status === 'success') {
-                    const acomodacoes = response.acomodacoes;
-
-                    // Atualiza os selects "troca_de" e "troca_para"
-                    populateSelects(acomodacoes);
-                } else {
-                    console.error("Erro recebido do servidor:", response.message);
+                    }
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("Erro na requisição AJAX:", error);
-                console.error("Status:", status);
-                console.error("Resposta completa:", xhr.responseText);
-            },
-        });
-    }
-
-
-    // Função para popular os selects "troca_de" e "troca_para" com as acomodações recebidas
-    function populateSelects(acomodacoes) {
-        let options = '<option value="">Selecione a Acomodação</option>';
-        acomodacoes.forEach(ac => {
-            options +=
-                `<option value="${ac.id_acomodacao}-${ac.acomodacao_aco}" data-valor="${ac.valor_aco}">${ac.acomodacao_aco}</option>`;
-        });
-
-        // Atualiza os selects com as novas opções
-        $('select[name="troca_de"]').html(options);
-        $('select[name="troca_para"]').html(options);
-
-        // Limpa os campos relacionados
-        $('input[name="saving"]').val('');
-        $('input[name="qtd"]').val('');
-        $('input[name="saving_show"]').val('').css('color', '');
-    }
-
-    // Função para calcular savings ao alterar os selects ou a quantidade
-    $(document).on('change keyup',
-        'select[name="troca_de"], select[name="troca_para"], input[name="qtd"]',
-        function() {
-            calculateSavings($(this).closest('.negotiation-field-container'));
-        });
-
-    function carregarValoresTroca(container) {
-        // Pega os valores selecionados dos selects
-        const trocaDeOption = container.find('select[name="troca_de"] option:selected');
-        const trocaParaOption = container.find('select[name="troca_para"] option:selected');
-
-        // Extrai os valores do atributo 'data-valor'
-        const trocaDe = parseFloat(trocaDeOption.data('valor')) || 0;
-        const trocaPara = parseFloat(trocaParaOption.data('valor')) || 0;
-
-        // Carrega os valores nos inputs correspondentes
-        container.find('input[name="troca_de"]').val(trocaDe);
-        container.find('input[name="troca_para"]').val(trocaPara);
-
-    }
-
-    // Função para calcular e atualizar os campos de savings
-    function calculateSavings(container) {
-        // Pega os selects selecionados
-        const trocaDeOption = container.find('select[name="troca_de"] option:selected');
-        const trocaParaOption = container.find('select[name="troca_para"] option:selected');
-        const quantidadeInput = container.find('input[name="qtd"]');
-
-        // Extraímos o valor correto do atributo 'data-valor'
-        const trocaDeValor = parseFloat(trocaDeOption.attr('data-valor')) || 0;
-        const trocaParaValor = parseFloat(trocaParaOption.attr('data-valor')) || 0;
-        const quantidade = parseInt(quantidadeInput.val(), 10) || 0;
-
-        // Se algum valor estiver inválido, apenas limpamos o campo e saímos
-        if (isNaN(trocaDeValor) || isNaN(trocaParaValor) || isNaN(quantidade)) {
-            container.find('input[name="saving"]').val('');
-            container.find('input[name="saving_show"]').val('').css('color', '');
-            return;
+            })
         }
 
-        // Cálculo correto do saving
-        const saving = (trocaDeValor - trocaParaValor) * quantidade;
-
-        // Atualiza os campos de saving com o formato correto
-        container.find('input[name="saving"]').val(saving.toFixed(2));
-        container.find('input[name="saving_show"]').val(
-            saving >= 0 ? `R$ ${saving.toFixed(2)}` : `-R$ ${Math.abs(saving).toFixed(2)}`
-        ).css('color', saving >= 0 ? 'green' : 'red');
-    }
-
-});
+        var dialogResult = false;
 
 
+        document.getElementById("data_intern_int").addEventListener("blur", function() {
+            const input = this;
+            const dataInternacao = new Date(input.value);
+            const dataHoje = new Date();
+            const erroDiv = document.getElementById("erro-data-internacao");
 
+            erroDiv.style.display = "none";
+            erroDiv.textContent = "";
 
-// Exibe o container apenas quando select_prorrog for "s"
-document.addEventListener("DOMContentLoaded", function() {
-    const selectProrrog = document.getElementById("select_prorrog");
-    const containerProrrog = document.getElementById("container-prorrog");
+            if (!input.value) return;
 
-    if (selectProrrog) {
-        selectProrrog.addEventListener("change", function() {
-            if (this.value === "s") {
-                containerProrrog.style.display = "block";
-            } else {
-                containerProrrog.style.display = "none";
+            const dataFormatadaHoje = dataHoje.toISOString().split("T")[0];
+            const dataFormatadaInput = input.value;
+
+            // Caso a data seja futura
+            if (dataFormatadaInput > dataFormatadaHoje) {
+                erroDiv.textContent = "A data da internação não pode ser maior que a data atual.";
+                erroDiv.style.display = "block";
+                input.value = "";
+
+                setTimeout(() => {
+                    erroDiv.style.display = "none";
+                    erroDiv.textContent = "";
+                }, 5000);
+                return;
+            }
+
+            // Verifica se a data está mais de 30 dias no passado
+            const diffEmMilissegundos = dataHoje - dataInternacao;
+            const diffDias = diffEmMilissegundos / (1000 * 60 * 60 * 24);
+
+            if (diffDias > 30) {
+                erroDiv.textContent = "Deseja prorrogar acima de 30 dias?";
+                erroDiv.style.display = "block";
+
+                setTimeout(() => {
+                    erroDiv.style.display = "none";
+                    erroDiv.textContent = "";
+                }, 7000);
             }
         });
-
-        // Verifica o valor inicial
-        if (selectProrrog.value === "s") {
-            containerProrrog.style.display = "block";
-        } else {
-            containerProrrog.style.display = "none";
-        }
-    }
-});
     </script>
 
     <script>
-document.getElementById("data_visita_int").addEventListener("change", function() {
-    const dataInternacao = new Date(document.getElementById("data_intern_int").value);
-    const dataVisita = new Date(this.value);
-    const hoje = new Date();
-    const seteDiasDepois = new Date();
-    seteDiasDepois.setDate(hoje.getDate() + 7);
+        $(document).ready(function() {
+            // Evento de mudança para o hospital selecionado
+            $('#hospital_selected').on('change', function() {
 
-    const errorMessage = document.getElementById("error-message");
+                const id_hospital = $(this).val(); // Captura o ID do hospital selecionado
 
-    // Reseta a mensagem de erro
-    errorMessage.style.display = "none";
-    errorMessage.textContent = "";
+                if (!id_hospital) {
+                    return;
+                }
 
-    // Validações
-    if (dataVisita < dataInternacao) {
-        errorMessage.textContent = "A data da visita não pode ser menor que a data de internação.";
-        errorMessage.style.display = "block";
-    } else if (dataVisita > seteDiasDepois) {
-        errorMessage.textContent = "A data da visita não pode ser maior que 7 dias da data atual.";
-        errorMessage.style.display = "block";
-    }
-});
+                // Solicitação AJAX para buscar dados filtrados
+                fetchAcomodacoes(id_hospital);
+            });
 
-// internacao pertinente
-document.getElementById("tipo_admissao_int").addEventListener("change", function() {
-    const tipoAdmissao = this.value;
-    const divPertinente = document.getElementById("div_int_pertinente_int");
-    const divRelPertinente = document.getElementById("div_rel_pertinente_int");
+            // Função para realizar a requisição AJAX e preencher os selects
+            function fetchAcomodacoes(id_hospital) {
+                $.ajax({
+                    url: 'process_acomodacao.php', // Endereço do script no servidor
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        id_hospital
+                    }, // Dados enviados ao servidor
+                    beforeSend: function() {
 
-    // Resetando a visibilidade
-    divPertinente.style.display = "none";
-    divRelPertinente.style.display = "none";
+                    },
+                    success: function(response) {
 
-    if (tipoAdmissao === "Urgência") {
-        divPertinente.style.display = "block";
+                        if (response.status === 'success') {
+                            const acomodacoes = response.acomodacoes;
 
-        document.getElementById("int_pertinente_int").addEventListener("change", function() {
-            const intPertinente = this.value;
+                            // Atualiza os selects "troca_de" e "troca_para"
+                            populateSelects(acomodacoes);
+                        } else {
+                            console.error("Erro recebido do servidor:", response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Erro na requisição AJAX:", error);
+                        console.error("Status:", status);
+                        console.error("Resposta completa:", xhr.responseText);
+                    },
+                });
+            }
 
-            if (intPertinente === "n") {
-                divRelPertinente.style.display = "block";
-            } else {
-                divRelPertinente.style.display = "none";
+
+            // Função para popular os selects "troca_de" e "troca_para" com as acomodações recebidas
+            function populateSelects(acomodacoes) {
+                let options = '<option value="">Selecione a Acomodação</option>';
+                acomodacoes.forEach(ac => {
+                    options +=
+                        `<option value="${ac.id_acomodacao}-${ac.acomodacao_aco}" data-valor="${ac.valor_aco}">${ac.acomodacao_aco}</option>`;
+                });
+
+                // Atualiza os selects com as novas opções
+                $('select[name="troca_de"]').html(options);
+                $('select[name="troca_para"]').html(options);
+
+                // Limpa os campos relacionados
+                $('input[name="saving"]').val('');
+                $('input[name="qtd"]').val('');
+                $('input[name="saving_show"]').val('').css('color', '');
+            }
+
+            // Função para calcular savings ao alterar os selects ou a quantidade
+            $(document).on('change keyup',
+                'select[name="troca_de"], select[name="troca_para"], input[name="qtd"]',
+                function() {
+                    calculateSavings($(this).closest('.negotiation-field-container'));
+                });
+
+            function carregarValoresTroca(container) {
+                // Pega os valores selecionados dos selects
+                const trocaDeOption = container.find('select[name="troca_de"] option:selected');
+                const trocaParaOption = container.find('select[name="troca_para"] option:selected');
+
+                // Extrai os valores do atributo 'data-valor'
+                const trocaDe = parseFloat(trocaDeOption.data('valor')) || 0;
+                const trocaPara = parseFloat(trocaParaOption.data('valor')) || 0;
+
+                // Carrega os valores nos inputs correspondentes
+                container.find('input[name="troca_de"]').val(trocaDe);
+                container.find('input[name="troca_para"]').val(trocaPara);
+
+            }
+
+            // Função para calcular e atualizar os campos de savings
+            function calculateSavings(container) {
+                // Pega os selects selecionados
+                const trocaDeOption = container.find('select[name="troca_de"] option:selected');
+                const trocaParaOption = container.find('select[name="troca_para"] option:selected');
+                const quantidadeInput = container.find('input[name="qtd"]');
+
+                // Extraímos o valor correto do atributo 'data-valor'
+                const trocaDeValor = parseFloat(trocaDeOption.attr('data-valor')) || 0;
+                const trocaParaValor = parseFloat(trocaParaOption.attr('data-valor')) || 0;
+                const quantidade = parseInt(quantidadeInput.val(), 10) || 0;
+
+                // Se algum valor estiver inválido, apenas limpamos o campo e saímos
+                if (isNaN(trocaDeValor) || isNaN(trocaParaValor) || isNaN(quantidade)) {
+                    container.find('input[name="saving"]').val('');
+                    container.find('input[name="saving_show"]').val('').css('color', '');
+                    return;
+                }
+
+                // Cálculo correto do saving
+                const saving = (trocaDeValor - trocaParaValor) * quantidade;
+
+                // Atualiza os campos de saving com o formato correto
+                container.find('input[name="saving"]').val(saving.toFixed(2));
+                container.find('input[name="saving_show"]').val(
+                    saving >= 0 ? `R$ ${saving.toFixed(2)}` : `-R$ ${Math.abs(saving).toFixed(2)}`
+                ).css('color', saving >= 0 ? 'green' : 'red');
+            }
+
+        });
+
+
+
+
+        // Exibe o container apenas quando select_prorrog for "s"
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectProrrog = document.getElementById("select_prorrog");
+            const containerProrrog = document.getElementById("container-prorrog");
+
+            if (selectProrrog) {
+                selectProrrog.addEventListener("change", function() {
+                    if (this.value === "s") {
+                        containerProrrog.style.display = "block";
+                    } else {
+                        containerProrrog.style.display = "none";
+                    }
+                });
+
+                // Verifica o valor inicial
+                if (selectProrrog.value === "s") {
+                    containerProrrog.style.display = "block";
+                } else {
+                    containerProrrog.style.display = "none";
+                }
             }
         });
-    }
-});
 
-document.querySelector("form").addEventListener("submit", function(event) {
-    generateNegotiationsJSON(); // Gera o JSON antes do envio
+        // Mostrar/ocultar Data/Hora Alta e Motivo Alta conforme "Internado"
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectInternado = document.getElementById("internado_int");
+            const divDataAlta = document.getElementById("div-data-alta");
+            const divMotivoAlta = document.getElementById("div-motivo-alta");
+            const dataAltaInput = document.getElementById("data_alta_alt");
+            const motivoAltaInput = document.getElementById("tipo_alta_alt");
+            if (!selectInternado || !divDataAlta || !divMotivoAlta) return;
 
-    // Remove os campos individuais antes de enviar o formulário
-    const inputsToDisable = document.querySelectorAll(
-        'input[name="troca_de"], input[name="troca_para"], input[name="qtd"], input[name="saving"]'
-    );
-    inputsToDisable.forEach((input) => input.disabled = true);
-});
+            function toggleDataAlta() {
+                if (selectInternado.value === "s") {
+                    divDataAlta.style.display = "none";
+                    divMotivoAlta.style.display = "none";
+                    if (dataAltaInput) dataAltaInput.value = "";
+                    if (motivoAltaInput) motivoAltaInput.value = "";
+                } else {
+                    divDataAlta.style.display = "block";
+                    divMotivoAlta.style.display = "block";
+                }
+            }
+
+            toggleDataAlta();
+            selectInternado.addEventListener("change", toggleDataAlta);
+        });
+    </script>
+
+    <script>
+        document.getElementById("data_visita_int").addEventListener("change", function() {
+            const dataInternacao = new Date(document.getElementById("data_intern_int").value);
+            const dataVisita = new Date(this.value);
+            const hoje = new Date();
+            const seteDiasDepois = new Date();
+            seteDiasDepois.setDate(hoje.getDate() + 7);
+
+            const errorMessage = document.getElementById("error-message");
+
+            // Reseta a mensagem de erro
+            errorMessage.style.display = "none";
+            errorMessage.textContent = "";
+
+            // Validações
+            if (dataVisita < dataInternacao) {
+                errorMessage.textContent = "A data da visita não pode ser menor que a data de internação.";
+                errorMessage.style.display = "block";
+            } else if (dataVisita > seteDiasDepois) {
+                errorMessage.textContent = "A data da visita não pode ser maior que 7 dias da data atual.";
+                errorMessage.style.display = "block";
+            }
+        });
+
+        // internacao pertinente
+        document.getElementById("tipo_admissao_int").addEventListener("change", function() {
+            const tipoAdmissao = this.value;
+            const divPertinente = document.getElementById("div_int_pertinente_int");
+            const divRelPertinente = document.getElementById("div_rel_pertinente_int");
+
+            // Resetando a visibilidade
+            divPertinente.style.display = "none";
+            divRelPertinente.style.display = "none";
+
+            if (tipoAdmissao === "Urgência") {
+                divPertinente.style.display = "block";
+
+                document.getElementById("int_pertinente_int").addEventListener("change", function() {
+                    const intPertinente = this.value;
+
+                    if (intPertinente === "n") {
+                        divRelPertinente.style.display = "block";
+                    } else {
+                        divRelPertinente.style.display = "none";
+                    }
+                });
+            }
+        });
+
+        const formPrincipal = document.getElementById("myForm");
+        formPrincipal?.addEventListener("submit", function(event) {
+            generateNegotiationsJSON(); // Gera o JSON antes do envio
+
+            // Remove os campos individuais antes de enviar o formulário
+            const inputsToDisable = document.querySelectorAll(
+                'input[name="troca_de"], input[name="troca_para"], input[name="qtd"], input[name="saving"]'
+            );
+            inputsToDisable.forEach((input) => input.disabled = true);
+        });
 
 
-//criar o json de antecedentes
-document.getElementById('fk_patologia2').addEventListener('change', function() {
-    const selectedOptions = Array.from(this.selectedOptions).map(option => parseInt(option.value,
-        10)); // Converte os valores para inteiros
-    const fkPaciente = parseInt(document.getElementById('fk_paciente_int').value,
-        10); // Garante que fkPaciente é inteiro
-    const fkInternacao = parseInt(document.getElementById('id_internacao').value,
-        10); // Garante que fkInternacao é inteiro
+        //criar o json de antecedentes
+        document.getElementById('fk_patologia2').addEventListener('change', function() {
+            const selectedOptions = Array.from(this.selectedOptions).map(option => parseInt(option.value,
+                10)); // Converte os valores para inteiros
+            const fkPaciente = parseInt(document.getElementById('fk_paciente_int').value,
+                10); // Garante que fkPaciente é inteiro
+            const fkInternacao = parseInt(document.getElementById('id_internacao').value,
+                10); // Garante que fkInternacao é inteiro
 
-    const jsonAntecedentes = selectedOptions.map(idAntecedente => ({
-        fk_id_paciente: fkPaciente,
-        fk_internacao_ant_int: fkInternacao + 1, // Soma 1 ao valor de fkInternacao
-        intern_antec_ant_int: idAntecedente // Certifica que idAntecedente é um número inteiro
-    }));
+            const jsonAntecedentes = selectedOptions.map(idAntecedente => ({
+                fk_id_paciente: fkPaciente,
+                fk_internacao_ant_int: fkInternacao + 1, // Soma 1 ao valor de fkInternacao
+                intern_antec_ant_int: idAntecedente // Certifica que idAntecedente é um número inteiro
+            }));
 
-    // Atualiza o campo hidden com o JSON gerado
-    document.getElementById('json-antec').value = JSON.stringify(jsonAntecedentes);
-});
+            // Atualiza o campo hidden com o JSON gerado
+            document.getElementById('json-antec').value = JSON.stringify(jsonAntecedentes);
+        });
     </script>
 
     <style>
-/* coloca no seu <head> ou no final do CSS carregado */
-.accordion .accordion-button {
-    background-color: #5e2363;
-    color: #fff;
-}
+        /* coloca no seu <head> ou no final do CSS carregado */
+        .accordion .accordion-button {
+            background-color: #5e2363;
+            color: #fff;
+        }
 
-.accordion .accordion-button:not(.collapsed) {
-    background-color: #5e2363;
-    color: #fff;
-}
+        .accordion .accordion-button:not(.collapsed) {
+            background-color: #5e2363;
+            color: #fff;
+        }
 
-/* inverte a cor do ícone gerado pelo ::after */
-.accordion .accordion-button::after {
-    filter: brightness(0) invert(1);
-}
+        /* inverte a cor do ícone gerado pelo ::after */
+        .accordion .accordion-button::after {
+            filter: brightness(0) invert(1);
+        }
 
-/* remove o foco escuro padrão */
-.accordion .accordion-button:focus {
-    box-shadow: none;
-}
+        /* remove o foco escuro padrão */
+        .accordion .accordion-button:focus {
+            box-shadow: none;
+        }
+
+        .internacao-page {
+            width: 100%;
+            margin: -26px 0 0;
+            padding: 0;
+            background: #fff;
+        }
+
+        .internacao-page__hero {
+            background: linear-gradient(135deg, #5a2f78, #a06bd4);
+            color: #fff;
+            border-radius: 32px;
+            padding: 18px 26px;
+            box-shadow: 0 25px 50px rgba(24, 0, 30, 0.35);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 24px;
+            margin: -12px 0 4px;
+        }
+
+        .internacao-page__hero h1 {
+            margin: 0 0 6px;
+            font-size: 1.6rem;
+            letter-spacing: .02em;
+            color: #fff;
+        }
+
+        .internacao-page__tag {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: .8rem;
+        }
+
+        .internacao-page__content {
+            margin-top: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .internacao-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.9));
+            border-radius: 28px;
+            padding: 18px 10px;
+            border: 1px solid #ece6f2;
+            box-shadow: 0 20px 50px rgba(94, 35, 99, 0.08);
+            margin: 0;
+            width: 100%;
+        }
+
+        .internacao-card__body {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .internacao-card--general {
+            border-color: #c7aedc;
+            background: #fff;
+        }
+
+        #accordionInternacao .accordion-item,
+        #accordionInternacao .accordion-body {
+            background: #f5f5f9;
+            border-color: #ebe1f5;
+        }
     </style>

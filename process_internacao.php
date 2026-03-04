@@ -1,6 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once("globals.php");
@@ -43,13 +41,14 @@ require_once("dao/internacaoAntecedenteDao.php");
 
 require_once("models/alta.php");
 require_once("dao/altaDao.php");
+require_once("utils/flow_logger.php");
 
 if (!function_exists('normalizeDateTimeInput')) {
-    function normalizeDateTimeInput($value)
-    {
-        if ($value === null) return null;
-        $value = trim((string)$value);
-        if ($value === '') return null;
+function normalizeDateTimeInput($value)
+{
+    if ($value === null) return null;
+    $value = trim((string)$value);
+    if ($value === '') return null;
         $formats = [
             ['fmt' => 'Y-m-d\\TH:i:s', 'has_time' => true],
             ['fmt' => 'Y-m-d\\TH:i',   'has_time' => true],
@@ -74,9 +73,24 @@ if (!function_exists('normalizeDateTimeInput')) {
     }
 }
 
-// Depurar dados enviados via POST
-error_log("Dados recebidos para salvar internação:");
-error_log(print_r($_POST, true));
+if (!function_exists('limitInputLength')) {
+    function limitInputLength($value, int $length)
+    {
+        if ($value === null) {
+            return null;
+        }
+        $value = (string)$value;
+        return substr($value, 0, $length);
+    }
+}
+
+if (!function_exists('internacaoCreateDebugLog')) {
+    function internacaoCreateDebugLog(string $message): void
+    {
+        $line = '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL;
+        @file_put_contents(__DIR__ . '/logs/process_internacao_create.debug.log', $line, FILE_APPEND);
+    }
+}
 
 $internAntecedenteDao = new InternacaoAntecedenteDAO($conn, $BASE_URL);
 $userDao = new UserDAO($conn, $BASE_URL);
@@ -98,11 +112,38 @@ $id_internacao = filter_input(INPUT_POST, "id_internacao");
 $type = filter_input(INPUT_POST, "type");
 $typeGes = filter_input(INPUT_POST, "typeGes");
 
+$flowCtx = flowLogStart('process_internacao', [
+    'type' => $type,
+    'typeGes' => $typeGes,
+    'id_internacao' => $id_internacao,
+    'fk_hospital_int' => $_POST['fk_hospital_int'] ?? null,
+    'fk_paciente_int' => $_POST['fk_paciente_int'] ?? null,
+    'fk_usuario_int' => $_POST['fk_usuario_int'] ?? null
+]);
+
 // CREATE
 if ($type === "create") {
+    flowLog($flowCtx, 'create.start', 'INFO', [
+        'select_gestao' => $_POST['select_gestao'] ?? null,
+        'select_uti' => $_POST['select_uti'] ?? null,
+        'select_prorrog' => $_POST['select_prorrog'] ?? null,
+        'select_negoc' => $_POST['select_negoc'] ?? null
+    ]);
+
+    internacaoCreateDebugLog(
+        'START type=create'
+        . ' select_gestao=' . (string)($_POST['select_gestao'] ?? '')
+        . ' evento_adverso_ges=' . (string)($_POST['evento_adverso_ges'] ?? '')
+        . ' tipo_evento=' . (string)($_POST['tipo_evento_adverso_gest'] ?? '')
+    );
 
     // Receber os dados dos inputs
     $fk_hospital_int = filter_input(INPUT_POST, "fk_hospital_int");
+    if (!$fk_hospital_int) {
+        flowLog($flowCtx, 'create.validation', 'WARN', ['error' => 'hospital_required']);
+        echo "hospital_required";
+        exit;
+    }
     $fk_paciente_int = filter_input(INPUT_POST, "fk_paciente_int");
     $fk_patologia_int = filter_input(INPUT_POST, "fk_patologia_int") ?: 1;
     $fk_cid_int = filter_input(INPUT_POST, "fk_cid_int") ?: 1;
@@ -115,11 +156,15 @@ if ($type === "create") {
         $antecedentes = json_decode($jsonAntec, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log("Erro na decodificação do JSON: " . json_last_error_msg());
+            flowLog($flowCtx, 'create.antecedentes', 'WARN', [
+                'error' => 'json_decode_error',
+                'json_error' => json_last_error_msg()
+            ]);
         } else {
-            error_log("JSON recebido: " . $jsonAntec);
+            flowLog($flowCtx, 'create.antecedentes', 'INFO', ['json_status' => 'ok']);
         }
     } else {
-        error_log("Nenhum JSON foi recebido.");
+        flowLog($flowCtx, 'create.antecedentes', 'INFO', ['json_status' => 'empty']);
     }
 
     $internado_int = filter_input(INPUT_POST, "internado_int");
@@ -136,22 +181,24 @@ if ($type === "create") {
     $acomodacao_int = filter_input(INPUT_POST, "acomodacao_int");
 
     $acoes_int = filter_input(INPUT_POST, "acoes_int");
-    $acoes_int = substr($acoes_int, 0, 5000);
+    $acoes_int = limitInputLength($acoes_int, 5000);
 
     $rel_int = filter_input(INPUT_POST, "rel_int") ?: null;
-    $rel_int = substr($rel_int, 0, 5000);
+    $rel_int = limitInputLength($rel_int, 5000);
 
     $programacao_int = filter_input(INPUT_POST, "programacao_int");
-    $programacao_int = substr($programacao_int, 0, 5000);
+    $programacao_int = limitInputLength($programacao_int, 5000);
     $timer_int_raw = filter_input(INPUT_POST, "timer_int", FILTER_VALIDATE_INT);
     $timer_int = ($timer_int_raw !== false && $timer_int_raw !== null) ? max(0, $timer_int_raw) : null;
 
     $senha_int = filter_input(INPUT_POST, "senha_int");
     if ($senha_int && $internacaoDao->senhaExists($senha_int, $id_internacao)) {
+        flowLog($flowCtx, 'create.validation', 'WARN', ['error' => 'senha_duplicada_edicao']);
         echo "senha_duplicada";
         exit;
     }
     if ($senha_int && $internacaoDao->senhaExists($senha_int)) {
+        flowLog($flowCtx, 'create.validation', 'WARN', ['error' => 'senha_duplicada']);
         echo "senha_duplicada";
         exit;
     }
@@ -190,9 +237,9 @@ if ($type === "create") {
     $oxigenio_hiperbarica_det = filter_input(INPUT_POST, "oxigenio_hiperbarica_det");
     $hemoderivados_det = filter_input(INPUT_POST, "hemoderivados_det");
     $dialise_det = filter_input(INPUT_POST, "dialise_det");
-    $exames_det = substr($exames_det, 0, 5000);
+    $exames_det = limitInputLength($exames_det, 5000);
     $oportunidades_det = filter_input(INPUT_POST, "oportunidades_det");
-    $oportunidades_det = substr($oportunidades_det, 0, 5000);
+    $oportunidades_det = limitInputLength($oportunidades_det, 5000);
     $tqt_det = filter_input(INPUT_POST, "tqt_det");
     $svd_det = filter_input(INPUT_POST, "svd_det");
     $gtt_det = filter_input(INPUT_POST, "gtt_det");
@@ -209,35 +256,38 @@ if ($type === "create") {
     $select_gestao = filter_input(INPUT_POST, "select_gestao");
     $fk_internacao_ges = filter_input(INPUT_POST, "fk_internacao_ges");
     $fk_visita_ges = filter_input(INPUT_POST, "fk_visita_ges");
-    $alto_custo_ges = filter_input(INPUT_POST, "alto_custo_ges");
+    $alto_custo_ges = filter_input(INPUT_POST, "alto_custo_ges") ?: 'n';
     $rel_alto_custo_ges = filter_input(INPUT_POST, "rel_alto_custo_ges");
     $rel_alto_custo_ges = str_replace(['*', '#', 'drop', 'select', 'delete'], '', $rel_alto_custo_ges);
     $rel_alto_custo_ges = str_replace(['*', '#'], '', $rel_alto_custo_ges);
-    $rel_alto_custo_ges = substr($rel_alto_custo_ges, 0, 5000);
-    $opme_ges = filter_input(INPUT_POST, "opme_ges");
+    $rel_alto_custo_ges = limitInputLength($rel_alto_custo_ges, 5000);
+    $opme_ges = filter_input(INPUT_POST, "opme_ges") ?: 'n';
     $rel_opme_ges = filter_input(INPUT_POST, "rel_opme_ges");
-    $home_care_ges = filter_input(INPUT_POST, "home_care_ges");
+    $home_care_ges = filter_input(INPUT_POST, "home_care_ges") ?: 'n';
     $rel_home_care_ges = filter_input(INPUT_POST, "rel_home_care_ges");
-    $desospitalizacao_ges = filter_input(INPUT_POST, "desospitalizacao_ges");
+    $desospitalizacao_ges = filter_input(INPUT_POST, "desospitalizacao_ges") ?: 'n';
     $rel_desospitalizacao_ges = filter_input(INPUT_POST, "rel_desospitalizacao_ges");
     $fk_user_ges = filter_input(INPUT_POST, "fk_user_ges");
-    $evento_adverso_ges = filter_input(INPUT_POST, "evento_adverso_ges");
+    $evento_adverso_ges = filter_input(INPUT_POST, "evento_adverso_ges") ?: 'n';
     $rel_evento_adverso_ges = filter_input(INPUT_POST, "rel_evento_adverso_ges");
     $tipo_evento_adverso_gest = filter_input(INPUT_POST, "tipo_evento_adverso_gest");
-    $evento_sinalizado_ges = filter_input(INPUT_POST, "evento_sinalizado_ges");
-    $evento_discutido_ges = filter_input(INPUT_POST, "evento_discutido_ges");
+    $evento_sinalizado_ges = filter_input(INPUT_POST, "evento_sinalizado_ges") ?: 'n';
+    $evento_discutido_ges = filter_input(INPUT_POST, "evento_discutido_ges") ?: 'n';
     $evento_retorno_qual_hosp_ges = filter_input(INPUT_POST, "evento_retorno_qual_hosp_ges");
     $evento_classificado_hospital_ges = filter_input(INPUT_POST, "evento_classificado_hospital_ges");
-    $evento_negociado_ges = filter_input(INPUT_POST, "evento_negociado_ges");
+    $evento_negociado_ges = filter_input(INPUT_POST, "evento_negociado_ges") ?: 'n';
     $evento_valor_negoc_ges = filter_input(INPUT_POST, "evento_valor_negoc_ges");
     $evento_data_ges = filter_input(INPUT_POST, "evento_data_ges");
-    $evento_encerrar_ges = filter_input(INPUT_POST, "evento_encerrar_ges");
-    $evento_prorrogar_ges = filter_input(INPUT_POST, "evento_prorrogar_ges");
-    $evento_impacto_financ_ges = filter_input(INPUT_POST, "evento_impacto_financ_ges");
-    $evento_prolongou_internacao_ges = filter_input(INPUT_POST, "evento_prolongou_internacao_ges");
-    $evento_concluido_ges = filter_input(INPUT_POST, "evento_concluido_ges");
+    $evento_encerrar_ges = filter_input(INPUT_POST, "evento_encerrar_ges") ?: 'n';
+    $evento_prorrogar_ges = filter_input(INPUT_POST, "evento_prorrogar_ges") ?: 'n';
+    $evento_impacto_financ_ges = filter_input(INPUT_POST, "evento_impacto_financ_ges") ?: 'n';
+    $evento_prolongou_internacao_ges = filter_input(INPUT_POST, "evento_prolongou_internacao_ges") ?: 'n';
+    $evento_concluido_ges = filter_input(INPUT_POST, "evento_concluido_ges") ?: 'n';
     $evento_classificacao_ges = filter_input(INPUT_POST, "evento_classificacao_ges");
-    $evento_fech_ges = filter_input(INPUT_POST, "evento_fech_ges");
+    $evento_fech_ges = filter_input(INPUT_POST, "evento_fech_ges") ?: 'n';
+    if ($evento_encerrar_ges === 's' || $evento_fech_ges === 's') {
+        Gate::enforceAction($conn, $BASE_URL, 'close_management', 'Você não tem permissão para fechar gestão.');
+    }
 
     $select_uti = filter_input(INPUT_POST, "select_uti");
     $fk_internacao_uti = filter_input(INPUT_POST, "fk_internacao_uti");
@@ -347,24 +397,34 @@ if ($type === "create") {
 
     $idInternacaoAtiva = $internacaoDao->checkInternAtiva($internacao->fk_paciente_int);
     if ($idInternacaoAtiva && !$isRetroativa) {
+        flowLog($flowCtx, 'create.validation', 'WARN', [
+            'error' => 'paciente_internado',
+            'id_internacao_ativa' => $idInternacaoAtiva
+        ]);
         echo "paciente_internado";
         exit;
     }
     if ($isRetroativa && $internado_int !== 'n') {
+        flowLog($flowCtx, 'create.validation', 'WARN', ['error' => 'retroativa_sem_alta']);
         echo "retroativa_sem_alta";
         exit;
     }
 
-    error_log("Salvando internação com os seguintes dados: " . print_r($internacao, true));
     $lastIntern = $internacaoDao->create($internacao);
     if ($lastIntern) {
-        error_log("Internação salva com sucesso. Último ID: " . $internacaoDao->findLastId()['0']['id_intern']);
+        flowLog($flowCtx, 'create.internacao.persist', 'INFO', ['status' => 'ok']);
     } else {
         error_log("Erro ao salvar internação.");
+        flowLog($flowCtx, 'create.internacao.persist', 'ERROR', ['status' => 'failed']);
     }
 
-    // SEMPRE usar o $lastId para os filhos
-    $lastId = $internacaoDao->findLastId()['0']['id_intern']; // <— base para todas as FKs
+    // Usa o último ID da própria conexão para evitar erro de concorrência.
+    $lastId = (int)$conn->lastInsertId();
+    if ($lastId <= 0) {
+        $lastId = (int)($internacaoDao->findLastId()['0']['id_intern'] ?? 0);
+    }
+    flowLog($flowCtx, 'create.internacao.id', 'INFO', ['id_internacao_novo' => $lastId]);
+    internacaoCreateDebugLog('CREATE internacao ok id=' . $lastId);
 
     // Alta automática se internado = 'n'
     if ($internado_int === 'n') {
@@ -422,7 +482,8 @@ if ($type === "create") {
         $visita->oportunidades_enf = '';
         $visita->exames_enf = 'Sem exames relevantes no período';
         $visita->programacao_enf = $programacao_int ?: '';
-        $visitaDao->create($visita);
+        $visitaCriadaId = (int)$visitaDao->create($visita);
+        internacaoCreateDebugLog('VISITA create ok id_int=' . $lastId . ' id_visita=' . $visitaCriadaId);
 
         // Antecedentes (se existirem)
         if (!empty($jsonAntec)) {
@@ -479,11 +540,27 @@ if ($type === "create") {
         }
 
         // GESTÃO
-        if ($select_gestao == "s") {
+        $selectGestaoPost = (string)($_POST['select_gestao'] ?? $select_gestao ?? '');
+        $eventoAdversoPost = strtolower(trim((string)($_POST['evento_adverso_ges'] ?? $evento_adverso_ges ?? 'n')));
+        $tipoEventoAdversoPost = trim((string)($_POST['tipo_evento_adverso_gest'] ?? $tipo_evento_adverso_gest ?? ''));
+        $relEventoAdversoPost = trim((string)($_POST['rel_evento_adverso_ges'] ?? $rel_evento_adverso_ges ?? ''));
+        $deveSalvarGestao = (
+            $selectGestaoPost === "s"
+            || $eventoAdversoPost === "s"
+            || $tipoEventoAdversoPost !== ''
+            || $relEventoAdversoPost !== ''
+        );
+        if ($deveSalvarGestao) {
             $gestao = new gestao();
+            $fkVisitaGestao = null;
+            if (!empty($fk_visita_ges)) {
+                $fkVisitaGestao = (int)$fk_visita_ges;
+            } elseif (!empty($visitaCriadaId)) {
+                $fkVisitaGestao = (int)$visitaCriadaId;
+            }
             $gestao->fk_internacao_ges = $lastId; // [FK:$lastId]
             $gestao->alto_custo_ges = $alto_custo_ges;
-            $gestao->fk_visita_ges = $fk_visita_ges;
+            $gestao->fk_visita_ges = $fkVisitaGestao;
             $gestao->rel_alto_custo_ges = $rel_alto_custo_ges;
             $gestao->opme_ges = $opme_ges;
             $gestao->rel_opme_ges = $rel_opme_ges;
@@ -491,9 +568,14 @@ if ($type === "create") {
             $gestao->rel_home_care_ges = $rel_home_care_ges;
             $gestao->desospitalizacao_ges = $desospitalizacao_ges;
             $gestao->rel_desospitalizacao_ges = $rel_desospitalizacao_ges;
-            $gestao->evento_adverso_ges = $evento_adverso_ges;
-            $gestao->rel_evento_adverso_ges = $rel_evento_adverso_ges;
-            $gestao->tipo_evento_adverso_gest = $tipo_evento_adverso_gest;
+            $gestao->evento_adverso_ges = $eventoAdversoPost;
+            $gestao->rel_evento_adverso_ges = $relEventoAdversoPost;
+            $gestao->tipo_evento_adverso_gest = $tipoEventoAdversoPost;
+            $gestao->evento_sinalizado_ges = $evento_sinalizado_ges ?: 'n';
+            $gestao->evento_discutido_ges = $evento_discutido_ges ?: 'n';
+            $gestao->evento_negociado_ges = $evento_negociado_ges ?: 'n';
+            $gestao->evento_valor_negoc_ges = $evento_valor_negoc_ges;
+            $gestao->evento_prorrogar_ges = $evento_prorrogar_ges ?: 'n';
             $gestao->evento_retorno_qual_hosp_ges = $evento_retorno_qual_hosp_ges;
             $gestao->evento_classificado_hospital_ges = $evento_classificado_hospital_ges;
             $gestao->evento_data_ges = $evento_data_ges;
@@ -503,8 +585,38 @@ if ($type === "create") {
             $gestao->evento_concluido_ges = $evento_concluido_ges;
             $gestao->evento_classificacao_ges = $evento_classificacao_ges;
             $gestao->evento_fech_ges = $evento_fech_ges;
-            $gestao->fk_user_ges = $fk_user_ges;
-            $gestaoDao->create($gestao);
+            $gestao->fk_user_ges = $fk_user_ges ?: $fk_usuario_int;
+            internacaoCreateDebugLog(
+                'GESTAO create try id_int=' . $lastId
+                . ' fk_visita=' . (string)$gestao->fk_visita_ges
+                . ' fk_user=' . (string)$gestao->fk_user_ges
+                . ' select=' . $selectGestaoPost
+                . ' evento=' . $eventoAdversoPost
+            );
+            $gestaoCriada = $gestaoDao->create($gestao);
+            if ($gestaoCriada) {
+                internacaoCreateDebugLog(
+                    'GESTAO create ok id_int=' . $lastId
+                    . ' evento=' . (string)$gestao->evento_adverso_ges
+                    . ' tipo=' . (string)$gestao->tipo_evento_adverso_gest
+                );
+            } else {
+                internacaoCreateDebugLog(
+                    'GESTAO create FAIL id_int=' . $lastId
+                    . ' select=' . $selectGestaoPost
+                    . ' evento=' . $eventoAdversoPost
+                    . ' tipo=' . $tipoEventoAdversoPost
+                    . ' fk_visita=' . (string)$gestao->fk_visita_ges
+                    . ' fk_user=' . (string)$gestao->fk_user_ges
+                );
+            }
+        } else {
+            internacaoCreateDebugLog(
+                'GESTAO skip id_int=' . $lastId
+                . ' select=' . $selectGestaoPost
+                . ' evento=' . $eventoAdversoPost
+                . ' tipo=' . $tipoEventoAdversoPost
+            );
         }
 
         // UTI
@@ -536,7 +648,6 @@ if ($type === "create") {
         }
 
         // NEGOCIAÇÃO
-        error_log("[DEBUG] select_negoc=" . ($select_negoc ?? "NULO"));
         if ($select_negoc === "s") {
             $negociacoesJSON = $_POST['negociacoes_json'] ?? '[]';
             $negociacoesArray = json_decode($negociacoesJSON, true);
@@ -625,13 +736,24 @@ if ($type === "create") {
             }
         }
 
+        flowLog($flowCtx, 'create.finish', 'INFO', [
+            'status' => 'ok',
+            'id_internacao' => $lastId
+        ]);
+        internacaoCreateDebugLog('END ok id=' . $lastId);
         echo "lancado internacao";
     }
 
 // UPDATE
 if ($type == "update") {
+    flowLog($flowCtx, 'update.start', 'INFO');
     // Receber os dados dos inputs
     $fk_hospital_int = filter_input(INPUT_POST, "fk_hospital_int");
+    if (!$fk_hospital_int) {
+        flowLog($flowCtx, 'update.validation', 'WARN', ['error' => 'hospital_required']);
+        echo "hospital_required";
+        exit;
+    }
     $fk_paciente_int = filter_input(INPUT_POST, "fk_paciente_int");
     $fk_patologia_int = filter_input(INPUT_POST, "fk_patologia_int") ?: 1;
     $fk_cid_int = filter_input(INPUT_POST, "fk_cid_int") ?: 1;
@@ -646,13 +768,13 @@ if ($type == "update") {
     $crm_int = filter_input(INPUT_POST, "crm_int");
     $acomodacao_int = filter_input(INPUT_POST, "acomodacao_int");
     $acoes_int = filter_input(INPUT_POST, "acoes_int");
-    $acoes_int = substr($acoes_int, 0, 5000);
+    $acoes_int = limitInputLength($acoes_int, 5000);
 
     $rel_int = filter_input(INPUT_POST, "rel_int");
-    $rel_int = substr($rel_int, 0, 5000);
+    $rel_int = limitInputLength($rel_int, 5000);
 
     $programacao_int = filter_input(INPUT_POST, "programacao_int");
-    $programacao_int = substr($programacao_int, 0, 5000);
+    $programacao_int = limitInputLength($programacao_int, 5000);
 
     $senha_int = filter_input(INPUT_POST, "senha_int");
     $usuario_create_int = filter_input(INPUT_POST, "usuario_create_int");
@@ -834,5 +956,11 @@ if ($type == "update") {
         $tussDao->create($tuss);
     }
 
+    flowLog($flowCtx, 'update.finish', 'INFO', [
+        'status' => 'redirect',
+        'location' => 'internacoes/lista',
+        'type' => 'update',
+        'id_internacao' => $id_internacao
+    ]);
     header("location:internacoes/lista");
 }

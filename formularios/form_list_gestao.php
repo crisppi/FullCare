@@ -19,6 +19,45 @@ include_once("dao/gestaoDao.php");
 
 include_once("models/pagination.php");
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+$normCargoAccess = static function ($txt): string {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $ascii !== false ? $ascii : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$isSeguradoraRole = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
+$seguradoraUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+if ($isSeguradoraRole && $seguradoraUserId <= 0) {
+    try {
+        $uid = (int)($_SESSION['id_usuario'] ?? 0);
+        if ($uid > 0) {
+            $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
+            $stmtSeg->execute();
+            $seguradoraUserId = (int)($stmtSeg->fetchColumn() ?: 0);
+            if ($seguradoraUserId > 0) {
+                $_SESSION['fk_seguradora_user'] = $seguradoraUserId;
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('[LIST_GESTAO][SEGURADORA] ' . $e->getMessage());
+    }
+}
+$seguradoraUserNome = '';
+if ($isSeguradoraRole && $seguradoraUserId > 0) {
+    try {
+        $stmtSegNome = $conn->prepare("SELECT seguradora_seg FROM tb_seguradora WHERE id_seguradora = :id LIMIT 1");
+        $stmtSegNome->bindValue(':id', $seguradoraUserId, PDO::PARAM_INT);
+        $stmtSegNome->execute();
+        $seguradoraUserNome = (string)($stmtSegNome->fetchColumn() ?: '');
+    } catch (Throwable $e) {
+        $seguradoraUserNome = '';
+    }
+}
+
 //inicializacao de variaveis
 
 $order = null;
@@ -53,7 +92,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
 <!-- FORMULARIO DE PESQUISAS -->
 <div class="container-fluid form_container" id='main-container' style="margin-top:12px;">
     <script src="./js/ajaxNav.js"></script>
-    <h4 class="page-title">Gestão</h4>
+    <h4 class="page-title">Gestão Assistencial</h4>
     <hr>
     <style>
     .gestao-filter-bar {
@@ -71,20 +110,41 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
         min-width: 200px;
     }
     .gestao-filter-bar .filter-item.compact {
-        min-width: 120px;
+        flex: 0 0 120px;
+        width: 120px;
+        max-width: 120px;
     }
     @media (max-width: 1199px) {
         .gestao-filter-bar {
             flex-wrap: wrap;
         }
     }
+    .scope-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 8px 0;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: .82rem;
+        font-weight: 700;
+        background: #f3edff;
+        border: 1px solid #d6c5f7;
+        color: #5e2363;
+    }
     </style>
     <div class="complete-table">
+        <?php if ($isSeguradoraRole): ?>
+            <div class="scope-badge">
+                Escopo: Seguradora <?= htmlspecialchars($seguradoraUserNome !== '' ? $seguradoraUserNome : ('#' . $seguradoraUserId), ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
         <div id="navbarToggleExternalContent" class="table-filters">
 
             <form action="" id="select-internacao-form" method="GET">
                 <?php $pesquisa_nome = filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIAL_CHARS);
                 $pesqGestao = filter_input(INPUT_GET, 'pesqGestao');
+                $pesqInternado = filter_input(INPUT_GET, 'pesqInternado', FILTER_SANITIZE_SPECIAL_CHARS) ?: '';
                 $limite_pag = filter_input(INPUT_GET, 'limite_pag') ?? 10;
                 $pesquisa_pac = filter_input(INPUT_GET, 'pesquisa_pac', FILTER_SANITIZE_SPECIAL_CHARS);
                 $pesquisa_matricula = filter_input(INPUT_GET, 'pesquisa_matricula', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -100,8 +160,8 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                             <option value="">Selecione a Gestão</option>
                             <option value="home_care" <?= $pesqGestao == 'home_care' ? 'selected' : null ?>>Home care
                             </option>
-                            <option value="desospitalizacao" <?= $pesqGestao == 'n' ? 'selected' : null ?>>
-                                Desospitalização</option>0fdr2bnt
+                            <option value="desospitalizacao" <?= $pesqGestao == 'desospitalizacao' ? 'selected' : null ?>>
+                                Desospitalização</option>
                             <option value="opme" <?= $pesqGestao == 'opme' ? 'selected' : null ?>>Opme</option>
                             <option value="alto" <?= $pesqGestao == 'alto' ? 'selected' : null ?>>Alto custo</option>
                         </select>
@@ -171,6 +231,10 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                             style="background-color:#5e2363;margin-top:7px;border-color:#5e2363">
                             <span class="material-icons" style="font-size:1rem;vertical-align:middle;">search</span>
                         </button>
+                    </div>
+                    <div class="filter-item compact" style="min-width:130px">
+                        <a href="<?= htmlspecialchars($BASE_URL . 'list_gestao.php', ENT_QUOTES, 'UTF-8') ?>"
+                            class="btn btn-outline-secondary w-100 btn-filtro-limpar" style="margin-top:7px;">Limpar filtros</a>
                     </div>
                 </div>
             </form>
@@ -251,6 +315,9 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                 strlen($gestaoHome) ? 'home_care_ges = "' . $gestaoHome . '"' : NULL,
                 strlen($auditor) ? 'hos.fk_usuario_hosp = "' . $auditor . '"' : NULL,
                 strlen($data_intern_int) ? 'data_intern_int BETWEEN "' . $data_intern_int . '" AND "' . $data_intern_int_max . '"' : NULL,
+                $isSeguradoraRole
+                    ? ($seguradoraUserId > 0 ? 'pa.fk_seguradora_pac = ' . $seguradoraUserId : '1=0')
+                    : null,
 
 
             ];
@@ -319,6 +386,10 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                         </thead>
                         <tbody>
                             <?php
+                            $isYesFlag = static function ($value): bool {
+                                $v = mb_strtolower(trim((string)$value), 'UTF-8');
+                                return in_array($v, ['s', 'sim', '1', 'true', 'y', 'yes'], true);
+                            };
                             foreach ($query as $intern):
                                 extract($query);
                             ?>
@@ -346,9 +417,9 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                     <?= date('d/m/Y', strtotime($intern["data_intern_int"])) ?>
                                 </td>
                                 <td scope="row">
-                                    <?php if ($intern["home_care_ges"] == "s") { ?>
+                                    <?php if ($isYesFlag($intern["home_care_ges"] ?? null)) { ?>
                                     <a
-                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= $gestaos['0']["id_gestao"] ?>"><i
+                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= (int)$intern["id_gestao"] ?>"><i
                                             style="color:red; font-size:1.4em" class="bi bi-house-door">
                                         </i></a>
                                     <?php } else {
@@ -356,9 +427,9 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                         }; ?>
                                 </td>
                                 <td scope="row">
-                                    <?php if ($intern["desospitalizacao_ges"] == "s") { ?>
+                                    <?php if ($isYesFlag($intern["desospitalizacao_ges"] ?? null)) { ?>
                                     <a
-                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= $gestaos['0']["id_gestao"] ?>"><i
+                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= (int)$intern["id_gestao"] ?>"><i
                                             style="color:orange; font-size:1.5em" class="bi bi-house-up">
                                         </i></a>
                                     <?php } else {
@@ -366,9 +437,9 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                         }; ?>
                                 </td>
                                 <td scope="row">
-                                    <?php if ($intern["opme_ges"] == "s") { ?>
+                                    <?php if ($isYesFlag($intern["opme_ges"] ?? null)) { ?>
                                     <a
-                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= $gestaos['0']["id_gestao"] ?>"><i
+                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= (int)$intern["id_gestao"] ?>"><i
                                             style="color:gray; font-size:1.4em" class="fas fa-procedures">
                                         </i></a>
                                     <?php } else {
@@ -376,9 +447,9 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                         }; ?>
                                 </td>
                                 <td scope="row">
-                                    <?php if ($intern["alto_custo_ges"] == "s") { ?>
+                                    <?php if ($isYesFlag($intern["alto_custo_ges"] ?? null)) { ?>
                                     <a
-                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= $gestaos['0']["id_gestao"] ?>"><i
+                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= (int)$intern["id_gestao"] ?>"><i
                                             style="color:green; font-size:1.4em" class="fas fa-dollar-sign">
                                         </i></a>
                                     <?php } else {
@@ -386,9 +457,9 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                         }; ?>
                                 </td>
                                 <td scope="row">
-                                    <?php if ($intern["evento_adverso_ges"] == "s") { ?>
+                                    <?php if ($isYesFlag($intern["evento_adverso_ges"] ?? null)) { ?>
                                     <a
-                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= $gestaos['0']["id_gestao"] ?>"><i
+                                        href="<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= (int)$intern["id_gestao"] ?>"><i
                                             style="color:blue; font-size:1.4em" class="bi bi-shield-exclamation">
                                         </i></a>
                                     <?php
@@ -418,7 +489,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                             <?php if ($qtdIntItens == 0): ?>
                             <tr>
                                 <td colspan="12" scope="row" class="col-id" style='font-size:15px'>
-                                    Não foram encontrados registros
+                                    Sem registros para os filtros aplicados.<?= $isSeguradoraRole ? ' Você está visualizando somente dados da sua seguradora.' : '' ?>
                                 </td>
                             </tr>
 
@@ -433,12 +504,6 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
 
                     <!-- paginacao que aparece abaixo da tabela -->
                     <div style="display: flex;margin-top:20px">
-                        <div class="table-new-btn">
-                            <a class="btn btn-success styled"
-                                style="background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none"
-                                href="internacoes/nova"><i class="fa-solid fa-plus" style='font-size: 1rem;'></i>Nova
-                                internação</a>
-                        </div>
 
                         <!-- Modal para abrir tela de cadastro -->
                         <div class="modal fade" id="myModal">

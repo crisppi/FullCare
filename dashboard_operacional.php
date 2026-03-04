@@ -17,43 +17,118 @@ function dashFetchCount(PDO $conn, string $sql): int
     }
 }
 
-$internacoesAtivas = dashFetchCount(
-    $conn,
-    "SELECT COUNT(*) FROM tb_internacao WHERE internado_int = 's'"
-);
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
-$contasAuditoria = dashFetchCount(
-    $conn,
-    "SELECT COUNT(*) FROM tb_capeante WHERE COALESCE(encerrado_cap,'n') <> 's'"
-);
+$normCargoAccess = static function ($txt): string {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $ascii !== false ? $ascii : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$isGestorSeguradora = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
+$seguradoraUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+if ($isGestorSeguradora && $seguradoraUserId <= 0) {
+    try {
+        $uid = (int)($_SESSION['id_usuario'] ?? 0);
+        if ($uid > 0) {
+            $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
+            $stmtSeg->execute();
+            $seguradoraUserId = (int)($stmtSeg->fetchColumn() ?: 0);
+            if ($seguradoraUserId > 0) {
+                $_SESSION['fk_seguradora_user'] = $seguradoraUserId;
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('[DASHBOARD_360][SEGURADORA] ' . $e->getMessage());
+    }
+}
+$seguradoraFiltroPac = $isGestorSeguradora
+    ? ($seguradoraUserId > 0 ? ' AND p.fk_seguradora_pac = ' . $seguradoraUserId : ' AND 1=0')
+    : '';
 
-$visitasAtrasadas = dashFetchCount(
-    $conn,
-    "SELECT COUNT(*)
-       FROM tb_visita
-      WHERE DATE(IFNULL(data_visita_vis, DATE(data_lancamento_vis))) < CURDATE()
-        AND (data_lancamento_vis IS NULL OR data_lancamento_vis = '0000-00-00 00:00:00')"
-);
+function dashCacheGet(string $key, int $ttl)
+{
+    $cache = $_SESSION['dash_oper_cache'] ?? [];
+    if (!isset($cache[$key])) return null;
+    $item = $cache[$key];
+    if (!is_array($item) || !isset($item['ts'])) return null;
+    if ((time() - (int)$item['ts']) > $ttl) return null;
+    return $item['data'] ?? null;
+}
 
-$negociacoesPendentes = dashFetchCount(
-    $conn,
-    "SELECT COUNT(*) FROM tb_negociacao WHERE data_fim_neg IS NULL OR data_fim_neg = '0000-00-00'"
-);
+function dashCacheSet(string $key, $data): void
+{
+    if (!isset($_SESSION['dash_oper_cache'])) $_SESSION['dash_oper_cache'] = [];
+    $_SESSION['dash_oper_cache'][$key] = [
+        'ts' => time(),
+        'data' => $data,
+    ];
+}
 
-$eventosCriticos = dashFetchCount(
-    $conn,
-    "SELECT COUNT(*)
-       FROM tb_gestao
-      WHERE evento_adverso_ges = 's'
-        AND (evento_encerrar_ges IS NULL OR evento_encerrar_ges <> 's')"
-);
+$cacheScope = $isGestorSeguradora ? 'seg_' . $seguradoraUserId : 'geral';
+$counts = dashCacheGet('counts_' . $cacheScope, 60);
+if (!is_array($counts)) {
+    $counts = [
+        'internacoesAtivas' => dashFetchCount(
+            $conn,
+            "SELECT COUNT(*)
+               FROM tb_internacao i
+               JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+              WHERE i.internado_int = 's'{$seguradoraFiltroPac}"
+        ),
+        'contasAuditoria' => dashFetchCount(
+            $conn,
+            "SELECT COUNT(*)
+               FROM tb_capeante c
+               JOIN tb_internacao i ON i.id_internacao = c.fk_int_capeante
+               JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+              WHERE COALESCE(c.encerrado_cap,'n') <> 's'{$seguradoraFiltroPac}"
+        ),
+        'visitasAtrasadas' => dashFetchCount(
+            $conn,
+            "SELECT COUNT(*)
+               FROM tb_visita v
+               JOIN tb_internacao i ON i.id_internacao = v.fk_internacao_vis
+               JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+              WHERE DATE(IFNULL(v.data_visita_vis, DATE(v.data_lancamento_vis))) < CURDATE()
+                AND (v.data_lancamento_vis IS NULL OR v.data_lancamento_vis = '0000-00-00 00:00:00'){$seguradoraFiltroPac}"
+        ),
+        'negociacoesPendentes' => dashFetchCount(
+            $conn,
+            "SELECT COUNT(*)
+               FROM tb_negociacao n
+               JOIN tb_internacao i ON i.id_internacao = n.fk_id_int
+               JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+              WHERE (n.data_fim_neg IS NULL OR n.data_fim_neg = '0000-00-00'){$seguradoraFiltroPac}"
+        ),
+        'eventosCriticos' => dashFetchCount(
+            $conn,
+            "SELECT COUNT(*)
+               FROM tb_gestao g
+               JOIN tb_internacao i ON i.id_internacao = g.fk_internacao_ges
+               JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+              WHERE g.evento_adverso_ges = 's'
+                AND (g.evento_encerrar_ges IS NULL OR g.evento_encerrar_ges <> 's'){$seguradoraFiltroPac}"
+        ),
+    ];
+    dashCacheSet('counts_' . $cacheScope, $counts);
+}
+
+$internacoesAtivas = (int)($counts['internacoesAtivas'] ?? 0);
+$contasAuditoria = (int)($counts['contasAuditoria'] ?? 0);
+$visitasAtrasadas = (int)($counts['visitasAtrasadas'] ?? 0);
+$negociacoesPendentes = (int)($counts['negociacoesPendentes'] ?? 0);
+$eventosCriticos = (int)($counts['eventosCriticos'] ?? 0);
 
 $cards = [
     [
         'label' => 'Internações ativas',
         'value' => $internacoesAtivas,
         'icon'  => 'bi-hospital',
-        'color' => '#2563eb',
+        'variant' => 'kpi-card-v2-1',
         'link'  => 'internacoes/lista',
         'desc'  => 'Pacientes internados em acompanhamento.'
     ],
@@ -61,7 +136,7 @@ $cards = [
         'label' => 'Contas em auditoria',
         'value' => $contasAuditoria,
         'icon'  => 'bi-journal-text',
-        'color' => '#7c3aed',
+        'variant' => 'kpi-card-v2-2',
         'link'  => 'list_internacao_cap_rah.php',
         'desc'  => 'Capeantes ainda sem encerramento.'
     ],
@@ -69,7 +144,7 @@ $cards = [
         'label' => 'Visitas atrasadas',
         'value' => $visitasAtrasadas,
         'icon'  => 'bi-calendar-x',
-        'color' => '#dc2626',
+        'variant' => 'kpi-card-v2-3',
         'link'  => 'lista_visitas.php?sort_field=data_visita&sort_dir=asc',
         'desc'  => 'Visitas sem lançamento atualizado.'
     ],
@@ -77,7 +152,7 @@ $cards = [
         'label' => 'Negociações pendentes',
         'value' => $negociacoesPendentes,
         'icon'  => 'bi-arrow-repeat',
-        'color' => '#ea580c',
+        'variant' => 'kpi-card-v2-4',
         'link'  => 'manual_negociacoes.html',
         'desc'  => 'Registros sem data de conclusão.'
     ],
@@ -85,15 +160,17 @@ $cards = [
         'label' => 'Eventos críticos',
         'value' => $eventosCriticos,
         'icon'  => 'bi-exclamation-octagon',
-        'color' => '#b91c1c',
+        'variant' => 'kpi-card-v2-5',
         'link'  => 'manual_eventos.html',
         'desc'  => 'Eventos adversos ainda abertos.'
     ],
 ];
 
-$prioridades = [];
-try {
-    $sqlScore = "
+$prioridades = dashCacheGet('prioridades_' . $cacheScope, 60);
+if (!is_array($prioridades)) {
+    $prioridades = [];
+    try {
+        $sqlScore = "
         SELECT
             i.id_internacao,
             p.nome_pac,
@@ -106,34 +183,38 @@ try {
         JOIN tb_hospital  h ON h.id_hospital   = i.fk_hospital_int
         LEFT JOIN tb_capeante c ON c.fk_int_capeante = i.id_internacao
         LEFT JOIN tb_gestao   g ON g.fk_internacao_ges = i.id_internacao
-        WHERE i.internado_int = 's'
+        WHERE i.internado_int = 's'{$seguradoraFiltroPac}
         GROUP BY i.id_internacao
         ORDER BY i.data_intern_int ASC
         LIMIT 30";
-    $stmtScore = $conn->prepare($sqlScore);
-    $stmtScore->execute();
-    $rows = $stmtScore->fetchAll(PDO::FETCH_ASSOC);
+        $stmtScore = $conn->prepare($sqlScore);
+        $stmtScore->execute();
+        $rows = $stmtScore->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($rows as $row) {
-        $dias     = max(0, (int)($row['dias_internado'] ?? 0));
-        $valorApr = (float)($row['valor_apresentado'] ?? 0);
-        $eventos  = max(0, (int)($row['eventos_abertos'] ?? 0));
+        foreach ($rows as $row) {
+            $dias     = max(0, (int)($row['dias_internado'] ?? 0));
+            $valorApr = (float)($row['valor_apresentado'] ?? 0);
+            $eventos  = max(0, (int)($row['eventos_abertos'] ?? 0));
 
-        $score = round(($dias * 1.2) + ($valorApr / 1000) + ($eventos * 5), 1);
-        $row['score'] = $score;
-        $row['valor_apresentado'] = $valorApr;
-        $prioridades[] = $row;
+            $score = round(($dias * 1.2) + ($valorApr / 1000) + ($eventos * 5), 1);
+            $row['score'] = $score;
+            $row['valor_apresentado'] = $valorApr;
+            $prioridades[] = $row;
+        }
+
+        usort($prioridades, function ($a, $b) {
+            return $b['score'] <=> $a['score'];
+        });
+        $prioridades = array_slice($prioridades, 0, 8);
+        dashCacheSet('prioridades_' . $cacheScope, $prioridades);
+    } catch (Throwable $e) {
+        error_log('[DASHBOARD_360][SCORE] ' . $e->getMessage());
+        $prioridades = [];
     }
-
-    usort($prioridades, function ($a, $b) {
-        return $b['score'] <=> $a['score'];
-    });
-    $prioridades = array_slice($prioridades, 0, 8);
-} catch (Throwable $e) {
-    error_log('[DASHBOARD_360][SCORE] ' . $e->getMessage());
-    $prioridades = [];
 }
 ?>
+
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260213b">
 
 <style>
 .dashboard-wrapper {
@@ -163,63 +244,35 @@ try {
 }
 .dash-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 22px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
 }
 .dash-card {
-    border-radius: 18px;
-    padding: 20px;
-    background: #fff;
-    border: 1px solid rgba(93, 35, 99, .08);
-    box-shadow: 0 10px 20px rgba(20, 11, 29, .08);
-    transition: transform .15s ease, box-shadow .15s ease;
-    display: flex;
-    flex-direction: column;
     text-decoration: none;
-    color: inherit;
-}
-.dash-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 28px rgba(20, 11, 29, .15);
-}
-.dash-card .dash-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    margin-bottom: 12px;
-    font-size: 1.2rem;
-}
-.dash-card h3 {
-    font-size: .95rem;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 700;
-    margin: 0;
-    color: #4b3d59;
 }
 .dash-card .dash-value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin: 10px 0;
-    color: #1f1034;
+    margin-top: 0;
+    font-size: clamp(1.5rem, 2.2vw, 2.1rem);
+    line-height: 1.05;
 }
-.dash-card p {
+.dash-card .dash-desc {
     margin: 0;
-    color: #5a5565;
-    font-size: .9rem;
+    color: rgba(228, 241, 255, 0.85);
+    font-size: .86rem;
+    min-height: 2.3em;
 }
-.dash-card span {
-    margin-top: auto;
-    font-size: .85rem;
-    color: #5e2363;
-    font-weight: 600;
+.dash-card .dash-link {
+    margin-top: 2px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    font-size: .85rem;
+    color: #cfe8ff;
+    font-weight: 600;
+}
+.bi-kpi.kpi-card-v2.kpi-card-v2-5 {
+    background: linear-gradient(140deg, rgba(112, 31, 31, 0.96), rgba(205, 53, 53, 0.9));
+    border-color: rgba(255, 168, 168, 0.46);
 }
 .dash-table-card {
     margin-top: 40px;
@@ -274,7 +327,22 @@ try {
 .badge-score.mid { background: linear-gradient(120deg, #f97316, #ef4444); }
 .badge-score.high { background: linear-gradient(120deg, #be185d, #7e22ce); }
 @media (max-width: 768px) {
-    .dash-card .dash-value { font-size: 2rem; }
+    .dash-card .dash-value { font-size: clamp(1.2rem, 6vw, 2rem); }
+}
+@media (max-width: 1320px) {
+    .dash-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+@media (max-width: 860px) {
+    .dash-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 640px) {
+    .dash-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 
@@ -286,14 +354,14 @@ try {
 
     <div class="dash-grid">
         <?php foreach ($cards as $card): ?>
-        <a class="dash-card" href="<?= $BASE_URL . $card['link'] ?>">
-            <div class="dash-icon" style="background: <?= $card['color'] ?>;">
-                <i class="bi <?= $card['icon'] ?>"></i>
+        <a class="dash-card bi-kpi kpi-card-v2 <?= htmlspecialchars($card['variant']) ?>" href="<?= $BASE_URL . $card['link'] ?>">
+            <div class="kpi-card-v2-head">
+                <span class="kpi-card-v2-icon"><i class="bi <?= $card['icon'] ?>"></i></span>
+                <small><?= htmlspecialchars($card['label']) ?></small>
             </div>
-            <h3><?= htmlspecialchars($card['label']) ?></h3>
-            <div class="dash-value"><?= number_format($card['value'], 0, ',', '.') ?></div>
-            <p><?= htmlspecialchars($card['desc']) ?></p>
-            <span>Ver detalhes <i class="bi bi-arrow-right-short"></i></span>
+            <strong class="dash-value"><?= number_format($card['value'], 0, ',', '.') ?></strong>
+            <p class="dash-desc"><?= htmlspecialchars($card['desc']) ?></p>
+            <span class="dash-link">Ver detalhes <i class="bi bi-arrow-right-short"></i></span>
         </a>
         <?php endforeach; ?>
     </div>

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+<?php $currentAppVersion = app_latest_version($conn); ?>
 <html lang="en">
+<?php $assetBase = rtrim($BASE_URL, '/'); ?>
 
 <head>
     <meta charset="UTF-8" />
@@ -18,9 +20,24 @@
         align-items: center;
         min-height: 100vh;
         font-family: Arial, sans-serif;
-        background: linear-gradient(45deg, #5e2363 50%, #5bd9f3 50%);
+        background-image: linear-gradient(135deg, rgba(247, 244, 255, 0.55) 0%, rgba(226, 243, 255, 0.55) 60%, rgba(212, 240, 255, 0.55) 100%);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        position: relative;
         opacity: 0;
         animation: fadeIn .3s ease-in forwards;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: url("<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/17450.jpg") center / cover no-repeat;
+        opacity: 0.25;
+        z-index: -1;
+        pointer-events: none;
     }
 
     @keyframes fadeIn {
@@ -36,32 +53,35 @@
     .login-container {
         display: flex;
         border-radius: 10px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, .2);
         overflow: visible;
         width: 990px;
         max-width: 95vw;
+        align-items: center;
     }
 
     /* ===============================
        Bloco Azul (formulário)
     =============================== */
     .login-form {
-        padding: 40px;
+        padding: 12px 22px 16px;
         border-top-left-radius: 10px;
         border-bottom-left-radius: 10px;
-        width: 60%;
-        background: linear-gradient(to bottom right, rgba(53, 186, 225, .8), rgba(91, 217, 243, .9));
+        width: 42%;
+        height: 400px;
+        min-height: 0;
+        background: linear-gradient(160deg, #2d63a6, #92bee2);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, .2);
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         position: relative;
     }
 
     .login-form-logo {
         width: 100%;
-        max-width: 320px;
-        margin-bottom: 20px;
+        max-width: 256px;
+        margin-bottom: 12px;
         display: block;
     }
 
@@ -81,7 +101,7 @@
         border: none;
         border-bottom: 2px solid #fff;
         background: transparent;
-        font-size: 16px;
+        font-size: 13px;
         outline: none;
     }
 
@@ -92,21 +112,22 @@
         color: rgba(255, 255, 255, .7);
         pointer-events: none;
         transition: all .3s ease;
+        font-size: 13px;
     }
 
     .input-container input:focus+label,
     .input-container input:not(:placeholder-shown)+label {
         top: -20px;
-        font-size: 12px;
+        font-size: 11px;
         color: #fff;
     }
 
     .login-btn {
         width: 100%;
         padding: 15px;
-        background: rgba(91, 217, 243, .1);
+        background: rgba(255, 255, 255, 0.15);
         color: #fff;
-        border: 2px solid #fff;
+        border: 2px solid rgba(255, 255, 255, 0.6);
         cursor: pointer;
         font-size: 18px;
         border-radius: 30px;
@@ -131,32 +152,51 @@
         text-decoration: none;
     }
 
+    .login-links {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        margin: -6px 0 10px;
+    }
+
+    .login-links a {
+        font-size: 12px;
+        color: #f3f7ff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .login-links a:hover {
+        text-decoration: underline;
+    }
+
     /* ===============================
        Bloco Lilás (lado direito)
     =============================== */
     .side-panel {
-        padding: 40px;
-        background: #421849;
+        padding: 22px;
+        background: linear-gradient(160deg, #4b2f70, #612f7d 80%);
         color: #fff;
-        width: 40%;
-        min-height: 570px;
+        width: 58%;
+        max-height: 500px;
+        min-height: 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
         border-radius: 10px;
-        margin-top: -20px;
-        margin-bottom: -50px;
+        margin-top: 0;
+        margin-bottom: -20px;
         text-align: center;
         position: relative;
     }
 
     .side-panel-content {
-        margin-top: 70px;
+        margin-top: 22px;
     }
 
     .side-panel img.monitor-image {
-        width: 100%;
+        width: 70%;
         height: auto;
         object-fit: contain;
     }
@@ -184,28 +224,59 @@
         border-radius: 5px;
     }
 
-    /* Conex logo removido do painel lateral. */
+    .side-panel::before {
+        content: "SISTEMA FULLCARE";
+        position: absolute;
+        top: 18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        color: #E9EDF2;
+        opacity: .95;
+        text-transform: uppercase;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, .10);
+        pointer-events: none;
+        white-space: nowrap;
+    }
 
     /* ===============================
        Mensagem de erro (flutuante)
     =============================== */
     .error-message {
         position: fixed;
-        bottom: 20px;
+        bottom: 24px;
         left: 50%;
         transform: translateX(-50%);
-        width: 80%;
-        max-width: 450px;
-        padding: 15px;
-        background: rgba(53, 186, 225, .8);
-        border-left: 5px solid red;
-        border-radius: 5px;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
+        width: min(92vw, 560px);
+        padding: 12px 14px;
+        background: rgba(156, 28, 28, 0.92);
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-left: 5px solid #ffb3b3;
+        border-radius: 10px;
+        text-align: left;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .22);
         color: #fff;
-        font-size: 17px;
-        animation: fadeIn .5s ease-in-out;
+        font-size: 15px;
+        line-height: 1.4;
+        animation: fadeIn .3s ease-in-out;
         z-index: 1000;
+    }
+
+    .error-message strong {
+        display: block;
+        font-size: 13px;
+        letter-spacing: .03em;
+        margin-bottom: 2px;
+        opacity: .9;
+        text-transform: uppercase;
+    }
+
+    .error-message.hide {
+        opacity: 0;
+        transform: translate(-50%, 12px);
+        transition: opacity .35s ease, transform .35s ease;
     }
 
     /* ===============================
@@ -238,10 +309,12 @@
         .side-panel {
             width: 100%;
             border-radius: 0;
+            height: auto;
         }
 
-        .login-form {
-            padding: 32px 24px;
+    .login-form {
+            padding: 16px 20px 18px;
+            min-height: 0;
         }
 
         .side-panel {
@@ -256,21 +329,77 @@
     }
 
     @media (max-width: 600px) {
-        .side-panel {
+    .side-panel {
             display: none;
         }
 
+        body {
+            min-height: 600px;
+            align-items: flex-start;
+        }
+
+        .login-container {
+            align-items: flex-start;
+            height: 600px;
+        }
+
         .login-form {
-            padding: 28px 20px;
+            padding: 6px 10px 6px;
+            min-height: 0;
+            height: 600px;
+            max-height: 600px;
         }
 
         .login-form-logo {
-            max-width: 240px;
-            margin-bottom: 16px;
+            max-width: 150px;
+            margin-bottom: 3px;
         }
 
         .form-content {
             width: 100%;
+        }
+
+        .input-container {
+            margin: 4px 0;
+        }
+
+        .input-container input {
+            padding: 4px 0 !important;
+            font-size: 11px !important;
+        }
+
+        .input-container label {
+            font-size: 11px;
+        }
+
+        .input-container input:focus+label,
+        .input-container input:not(:placeholder-shown)+label {
+            top: -13px;
+            font-size: 9px;
+        }
+
+        .login-btn {
+            padding: 6px;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+    }
+
+    .login-footer {
+        position: fixed;
+        bottom: 12px;
+        right: 24px;
+        color: rgba(255, 255, 255, .85);
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        pointer-events: none;
+    }
+
+    @media (max-width: 900px) {
+        .login-footer {
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
         }
     }
     </style>
@@ -279,9 +408,9 @@
 <body>
     <div class="login-container">
         <div class="login-form">
-            <img src="img/logo_branco.svg" alt="Login Form Logo" class="login-form-logo" />
+            <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/logo_branco.svg" alt="Login Form Logo" class="login-form-logo" />
             <div class="form-content">
-                <form action="check_login.php" method="post" autocomplete="off">
+                <form action="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/check_login.php" method="post" autocomplete="off">
                     <div class="input-container">
                         <input type="email" name="email_login" autocomplete="off" id="email_login" required
                             style="border-radius:10px; border:1px solid #ccc; padding:10px; font-size:14px; width:100%; box-sizing:border-box; background-color: rgba(255,255,255,.6);" />
@@ -294,27 +423,37 @@
                         <label for="senha_login">Senha</label>
                     </div>
 
+                    <div class="login-links">
+                        <a href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/esqueci_senha.php">Esqueci minha senha</a>
+                    </div>
+
                     <input type="submit" value="Login" class="login-btn" />
                 </form>
 
                 <!-- Error message -->
-                <?php if (isset($_SESSION['mensagem']) && $_SESSION['mensagem'] != "") { ?>
+                <?php if (isset($_SESSION['login_error']) && $_SESSION['login_error'] !== "") { ?>
                 <div class="error-message">
-                    <p><?php echo $_SESSION['mensagem']; ?></p>
+                    <strong>Falha no login</strong>
+                    <div><?= htmlspecialchars((string)$_SESSION['login_error'], ENT_QUOTES, 'UTF-8') ?></div>
                 </div>
+                <?php unset($_SESSION['login_error']); ?>
                 <?php } ?>
             </div>
         </div>
 
         <div class="side-panel">
             <div class="side-panel-content">
-                <img src="img/notebook_full.svg" alt="Exciting News Image" class="monitor-image" />
+                <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/notebook_full.svg" alt="Exciting News Image" class="monitor-image" />
                 <h3>Novidades!</h3>
                 <p>Decisões melhores começam com dados claros. Veja internações e contas evoluindo em tempo real.
 
                     Mais visão, menos suposição: indicadores que conectam cuidado e eficiência.</p>
             </div>
         </div>
+    </div>
+
+    <div class="login-footer">
+        Versão <?= htmlspecialchars($currentAppVersion) ?>
     </div>
 
     <script>
@@ -336,6 +475,15 @@
             this.reset();
         }, 100);
     });
+
+    // fechar alerta automaticamente em ~6 segundos
+    const loginError = document.querySelector(".error-message");
+    if (loginError) {
+        setTimeout(() => {
+            loginError.classList.add("hide");
+            setTimeout(() => loginError.remove(), 400);
+        }, 6000);
+    }
     </script>
 </body>
 

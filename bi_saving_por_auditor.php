@@ -13,155 +13,189 @@ function e($v)
 
 $anoInput = filter_input(INPUT_GET, 'ano', FILTER_VALIDATE_INT);
 $ano = ($anoInput !== null && $anoInput !== false) ? (int)$anoInput : null;
-$mes = (int)(filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT) ?: 0);
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
-$pesquisaPaciente = trim((string)(filter_input(INPUT_GET, 'pesquisa_paciente', FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
-$pacienteId = filter_input(INPUT_GET, 'paciente_id', FILTER_VALIDATE_INT) ?: null;
-$pesquisaSeguradora = trim((string)(filter_input(INPUT_GET, 'pesquisa_seguradora', FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
-$seguradoraId = filter_input(INPUT_GET, 'seguradora_id', FILTER_VALIDATE_INT) ?: null;
+$auditorId = filter_input(INPUT_GET, 'auditor_id', FILTER_VALIDATE_INT) ?: null;
 
-$hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
-    ->fetchAll(PDO::FETCH_ASSOC);
+$hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")->fetchAll(PDO::FETCH_ASSOC);
+$auditores = $conn->query("SELECT id_usuario, usuario_user FROM tb_user ORDER BY usuario_user")->fetchAll(PDO::FETCH_ASSOC);
+$auditorOptions = array_column($auditores, 'usuario_user', 'id_usuario');
 
 if ($ano === null && !filter_has_var(INPUT_GET, 'ano')) {
-    $stmtAno = $conn->query("
-        SELECT MAX(YEAR(data_inicio_neg)) AS ano
-        FROM tb_negociacao
-        WHERE data_inicio_neg IS NOT NULL
-          AND data_inicio_neg <> '0000-00-00'
-    ");
+    $stmtAno = $conn->query("SELECT MAX(YEAR(data_inicio_neg)) AS ano FROM tb_negociacao WHERE data_inicio_neg IS NOT NULL AND data_inicio_neg <> '0000-00-00'");
     $anoDb = $stmtAno->fetch(PDO::FETCH_ASSOC) ?: [];
     $ano = (int)($anoDb['ano'] ?? date('Y'));
 }
 
-$where = "YEAR(ng.data_inicio_neg) = :ano";
+$where = "ng.data_inicio_neg IS NOT NULL
+    AND ng.data_inicio_neg <> '0000-00-00'
+    AND ng.saving IS NOT NULL
+    AND YEAR(ng.data_inicio_neg) = :ano";
 $params = [':ano' => $ano];
-if ($mes > 0) {
-    $where .= " AND MONTH(ng.data_inicio_neg) = :mes";
-    $params[':mes'] = $mes;
-}
+
 if ($hospitalId) {
     $where .= " AND i.fk_hospital_int = :hospital_id";
     $params[':hospital_id'] = $hospitalId;
 }
+if ($auditorId) {
+    $where .= " AND ng.fk_usuario_neg = :auditor_id";
+    $params[':auditor_id'] = $auditorId;
+}
 
-$patientJoin = "
-    LEFT JOIN tb_paciente pa ON pa.id_paciente = i.fk_paciente_int
-    LEFT JOIN tb_seguradora sg ON sg.id_seguradora = pa.fk_seguradora_pac
+$sqlTotals = "
+    SELECT
+        SUM(ng.saving) AS total_saving,
+        COUNT(*) AS total_registros,
+        AVG(ng.saving) AS avg_saving
+    FROM tb_negociacao ng
+    INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
+    WHERE {$where}
 ";
 
-if ($pacienteId) {
-    $where .= " AND pa.id_paciente = :paciente_id";
-    $params[':paciente_id'] = $pacienteId;
-} elseif ($pesquisaPaciente !== '') {
-    $where .= " AND (
-        pa.nome_pac LIKE :like_pesquisa_paciente
-        OR pa.matricula_pac LIKE :like_pesquisa_paciente
-        OR pa.cpf_pac LIKE :like_pesquisa_paciente
-    )";
-    $params[':like_pesquisa_paciente'] = "%{$pesquisaPaciente}%";
+$stmt = $conn->prepare($sqlTotals);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_INT);
 }
+$stmt->execute();
+$totals = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-if ($seguradoraId) {
-    $where .= " AND sg.id_seguradora = :seguradora_id";
-    $params[':seguradora_id'] = $seguradoraId;
-} elseif ($pesquisaSeguradora !== '') {
-    $where .= " AND sg.seguradora_seg LIKE :like_seguradora";
-    $params[':like_seguradora'] = "%{$pesquisaSeguradora}%";
-}
+$totalSaving = (float)($totals['total_saving'] ?? 0);
+$totalRegistros = (int)($totals['total_registros'] ?? 0);
+$mediaSaving = (float)($totals['avg_saving'] ?? 0);
 
-$bindParams = function (PDOStatement $stmt, array $params) {
-    foreach ($params as $key => $value) {
-        $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
-        $stmt->bindValue($key, $value, $paramType);
-    }
-};
-
-$sqlSummary = "
+$sqlAuditorResumo = "
     SELECT
+        ng.fk_usuario_neg AS auditor_id,
+        COALESCE(u.usuario_user, 'Sem auditor') AS auditor,
         SUM(ng.saving) AS total_saving,
         COUNT(*) AS total_registros
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    {$patientJoin}
-    WHERE {$where}
-";
-$stmt = $conn->prepare($sqlSummary);
-$bindParams($stmt, $params);
-$stmt->execute();
-$summary = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-$totalSaving = (float)($summary['total_saving'] ?? 0);
-$totalRegistros = (int)($summary['total_registros'] ?? 0);
-
-$sqlAuditor = "
-    SELECT
-        COALESCE(u.usuario_user, 'Sem auditor') AS auditor,
-        SUM(ng.saving) AS total_saving,
-        COUNT(*) AS total_registros,
-        AVG(ng.saving) AS media_saving
-    FROM tb_negociacao ng
-    INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    {$patientJoin}
     LEFT JOIN tb_user u ON u.id_usuario = ng.fk_usuario_neg
     WHERE {$where}
-    GROUP BY auditor
+    GROUP BY auditor_id, auditor
     ORDER BY total_saving DESC
-    LIMIT 12
+    LIMIT 20
 ";
-$stmt = $conn->prepare($sqlAuditor);
-$bindParams($stmt, $params);
+
+$stmt = $conn->prepare($sqlAuditorResumo);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+}
 $stmt->execute();
-$auditorRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$auditorResumo = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+$selectedAuditorLabel = $auditorId ? ($auditorOptions[$auditorId] ?? 'Auditor selecionado') : 'Todos os auditores';
+
+$timelineAuditores = [];
+$seen = [];
+if ($auditorId) {
+    $timelineAuditores[] = [
+        'id' => $auditorId,
+        'label' => $selectedAuditorLabel,
+    ];
+    $seen[$auditorId] = true;
+}
+foreach ($auditorResumo as $row) {
+    if (count($timelineAuditores) >= 4) {
+        break;
+    }
+    $auditorKey = (int)($row['auditor_id'] ?? 0);
+    if ($auditorKey <= 0 || isset($seen[$auditorKey])) {
+        continue;
+    }
+    $timelineAuditores[] = [
+        'id' => $auditorKey,
+        'label' => $row['auditor'] ?: ($auditorOptions[$auditorKey] ?? 'Sem auditor'),
+    ];
+    $seen[$auditorKey] = true;
+}
 
 $sqlMonthly = "
     SELECT
-        DATE_FORMAT(ng.data_inicio_neg, '%Y-%m') AS mes,
+        MONTH(ng.data_inicio_neg) AS mes,
+        ng.fk_usuario_neg AS auditor_id,
         SUM(ng.saving) AS total_saving
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    {$patientJoin}
     WHERE {$where}
-    GROUP BY mes
-    ORDER BY mes ASC
+    GROUP BY mes, auditor_id
+    ORDER BY mes, auditor_id
 ";
+
 $stmt = $conn->prepare($sqlMonthly);
-$bindParams($stmt, $params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+}
 $stmt->execute();
 $monthlyRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-$months = array_map(fn($r) => $r['mes'], $monthlyRows);
-$mensalSaving = array_map(fn($r) => (float)$r['total_saving'], $monthlyRows);
-$auditorLabels = array_map(fn($r) => $r['auditor'] ?: 'Sem auditor', $auditorRows);
-$auditorSaving = array_map(fn($r) => (float)$r['total_saving'], $auditorRows);
-
-function fmtMoney($value)
-{
-    return 'R$ ' . number_format((float)$value, 2, ',', '.');
+$monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+$lineMonthlyByAuditor = [];
+foreach ($timelineAuditores as $auditor) {
+    $lineMonthlyByAuditor[$auditor['id']] = array_fill(1, 12, 0.0);
+}
+$totalMonthly = array_fill(1, 12, 0.0);
+foreach ($monthlyRows as $row) {
+    $mes = (int)($row['mes'] ?? 0);
+    if ($mes < 1 || $mes > 12) {
+        continue;
+    }
+    $auditorKey = (int)($row['auditor_id'] ?? 0);
+    $valor = (float)($row['total_saving'] ?? 0);
+    $totalMonthly[$mes] += $valor;
+    if (isset($lineMonthlyByAuditor[$auditorKey])) {
+        $lineMonthlyByAuditor[$auditorKey][$mes] = $valor;
+    }
 }
 
-function fmtInt($value)
-{
-    return number_format((int)$value, 0, ',', '.');
+$lineDatasets = [];
+if (array_sum($totalMonthly) > 0) {
+    $lineDatasets[] = [
+        'label' => 'Total saving',
+        'data' => array_values($totalMonthly),
+        'borderColor' => 'rgba(18, 65, 134, 0.85)',
+        'backgroundColor' => 'rgba(18, 65, 134, 0.08)',
+        'borderWidth' => 2,
+        'tension' => 0.35,
+        'pointRadius' => 2,
+        'fill' => true,
+    ];
 }
 
+$lineColors = [
+    'rgba(72, 154, 255, 0.8)',
+    'rgba(255, 161, 64, 0.8)',
+    'rgba(255, 99, 132, 0.8)',
+    'rgba(0, 200, 150, 0.8)',
+];
+$colorIndex = 0;
+foreach ($timelineAuditores as $auditor) {
+    $audProducts = $lineMonthlyByAuditor[$auditor['id']] ?? array_fill(1, 12, 0.0);
+    $lineDatasets[] = [
+        'label' => $auditor['label'],
+        'data' => array_values($audProducts),
+        'borderColor' => $lineColors[$colorIndex % count($lineColors)],
+        'backgroundColor' => 'rgba(0, 0, 0, 0)',
+        'borderWidth' => 2,
+        'pointRadius' => 3,
+        'tension' => 0.3,
+        'fill' => false,
+    ];
+    $colorIndex++;
+}
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260111">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260111"></script>
-<script src="<?= $BASE_URL ?>js/bi-saving-filters.js?v=20260111"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260110"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
-        <div>
-            <h1 class="bi-title">Saving por Auditor</h1>
-            <div class="text-muted">Comparativo de savings registrados por cada auditor.</div>
-        </div>
+        <h1 class="bi-title">Audit Saving</h1>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
-                <i class="bi bi-grid-3x3-gap"></i>
-            </a>
+            <span class="text-muted small">Filtro: <?= e($selectedAuditorLabel) ?> <?= e($hospitalId ? '| Hospital ID ' . $hospitalId : '') ?></span>
+            <a class="bi-btn bi-btn-secondary" href="<?= $BASE_URL ?>bi/saving" title="Dashboard Saving">Saving</a>
         </div>
     </div>
 
@@ -169,15 +203,6 @@ function fmtInt($value)
         <div class="bi-filter">
             <label>Ano</label>
             <input type="number" name="ano" value="<?= e($ano) ?>">
-        </div>
-        <div class="bi-filter">
-            <label>Mês</label>
-            <select name="mes">
-                <option value="0">Todos</option>
-                <?php for ($m = 1; $m <= 12; $m++): ?>
-                    <option value="<?= $m ?>" <?= $mes === $m ? 'selected' : '' ?>><?= $m ?></option>
-                <?php endfor; ?>
-            </select>
         </div>
         <div class="bi-filter">
             <label>Hospital</label>
@@ -191,28 +216,15 @@ function fmtInt($value)
             </select>
         </div>
         <div class="bi-filter">
-            <label>Pesquisa por nome ou matrícula ou CPF</label>
-            <input type="text"
-                   name="pesquisa_paciente"
-                   id="pesquisa_paciente_input"
-                   list="pacienteSuggestions"
-                   placeholder="Pesquisa por nome ou matrícula ou CPF"
-                   value="<?= e($pesquisaPaciente) ?>"
-                   autocomplete="off">
-            <input type="hidden" name="paciente_id" id="pesquisa_paciente_id" value="<?= e($pacienteId) ?>">
-            <datalist id="pacienteSuggestions"></datalist>
-        </div>
-        <div class="bi-filter">
-            <label>Pesquisa por seguradora</label>
-            <input type="text"
-                   name="pesquisa_seguradora"
-                   id="pesquisa_seguradora_input"
-                   list="seguradoraSuggestions"
-                   placeholder="Pesquisa por seguradora"
-                   value="<?= e($pesquisaSeguradora) ?>"
-                   autocomplete="off">
-            <input type="hidden" name="seguradora_id" id="seguradora_id" value="<?= e($seguradoraId) ?>">
-            <datalist id="seguradoraSuggestions"></datalist>
+            <label>Auditor</label>
+            <select name="auditor_id">
+                <option value="">Todos</option>
+                <?php foreach ($auditores as $a): ?>
+                    <option value="<?= (int)$a['id_usuario'] ?>" <?= $auditorId == $a['id_usuario'] ? 'selected' : '' ?>>
+                        <?= e($a['usuario_user']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
         <div class="bi-actions">
             <button class="bi-btn" type="submit">Aplicar</button>
@@ -223,111 +235,87 @@ function fmtInt($value)
         <div class="bi-kpis">
             <div class="bi-kpi">
                 <small>Total saving</small>
-                <strong><?= fmtMoney($totalSaving) ?></strong>
+                <strong>R$ <?= number_format($totalSaving, 2, ',', '.') ?></strong>
             </div>
             <div class="bi-kpi">
-                <small>Registros</small>
-                <strong><?= fmtInt($totalRegistros) ?></strong>
+                <small>Quantidade de negociações</small>
+                <strong><?= $totalRegistros ?></strong>
+            </div>
+            <div class="bi-kpi">
+                <small>Ticket médio</small>
+                <strong>R$ <?= number_format($mediaSaving, 2, ',', '.') ?></strong>
             </div>
         </div>
     </div>
 
     <div class="bi-panel">
-        <h3>Evolução mensal do saving</h3>
-        <div class="bi-chart">
-            <canvas id="chartSavingMensalAuditor"></canvas>
-        </div>
-    </div>
-
-    <div class="bi-panel">
-        <h3>Saving agregado por auditor</h3>
-        <div class="bi-chart">
-            <canvas id="chartSavingPorAuditor"></canvas>
-        </div>
-    </div>
-
-    <div class="bi-panel">
-        <h3>Top auditors</h3>
-        <div class="table-responsive">
-            <table class="bi-table">
-                <thead>
-                    <tr>
-                        <th>Auditor</th>
-                        <th>Saving (R$)</th>
-                        <th>Registros</th>
-                        <th>Média</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!$auditorRows): ?>
+        <h3>Resumo por auditor</h3>
+        <?php if (!empty($auditorResumo)): ?>
+            <div class="bi-table-wrapper">
+                <table class="bi-table">
+                    <thead>
                         <tr>
-                            <td colspan="4" class="bi-empty">Sem dados com os filtros atuais.</td>
+                            <th>#</th>
+                            <th>Auditor</th>
+                            <th class="text-end">Saving (R$)</th>
+                            <th class="text-end">Negociações</th>
+                            <th class="text-end">% do total</th>
                         </tr>
-                    <?php else: ?>
-                        <?php foreach ($auditorRows as $row): ?>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($auditorResumo as $index => $row):
+                            $valor = (float)($row['total_saving'] ?? 0);
+                            $quantidade = (int)($row['total_registros'] ?? 0);
+                            $participacao = $totalSaving > 0 ? ($valor / $totalSaving) * 100 : 0;
+                        ?>
                             <tr>
-                                <td><?= e($row['auditor']) ?></td>
-                                <td><?= fmtMoney((float)($row['total_saving'] ?? 0)) ?></td>
-                                <td><?= fmtInt((int)($row['total_registros'] ?? 0)) ?></td>
-                                <td><?= fmtMoney((float)($row['media_saving'] ?? 0)) ?></td>
+                                <td><?= $index + 1 ?></td>
+                                <td><?= e($row['auditor'] ?: 'Sem auditor') ?></td>
+                                <td class="text-end">R$ <?= number_format($valor, 2, ',', '.') ?></td>
+                                <td class="text-end"><?= $quantidade ?></td>
+                                <td class="text-end"><?= number_format($participacao, 2, ',', '.') ?>%</td>
                             </tr>
                         <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="text-muted">Nenhum registro encontrado para o filtro aplicado.</div>
+        <?php endif; ?>
+    </div>
+
+    <div class="bi-panel">
+        <h3>Evolução mensal <?= $auditorId ? 'de ' . e($selectedAuditorLabel) : 'do saving' ?></h3>
+        <?php if (!empty($lineDatasets)): ?>
+            <div class="bi-chart" style="min-height:320px;">
+                <canvas id="chartSavingTimeline"></canvas>
+            </div>
+        <?php else: ?>
+            <div class="text-muted">Sem dados suficientes para gerar o gráfico.</div>
+        <?php endif; ?>
     </div>
 </div>
 
 <script>
-    const labelsAuditor = <?= json_encode($auditorLabels) ?>;
-    const savingPerAuditor = <?= json_encode($auditorSaving) ?>;
-    const mensalLabels = <?= json_encode($months) ?>;
-    const mensalSaving = <?= json_encode($mensalSaving) ?>;
+const timelineMonths = <?= json_encode(array_values($monthNames)) ?>;
+const lineChartDatasets = <?= json_encode($lineDatasets, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
-    function barChart(ctx, labels, data, color) {
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [{
-                    data,
-                    backgroundColor: color,
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: window.biChartScales ? window.biChartScales() : undefined,
-                legend: { display: false },
-            },
-        });
-    }
+function lineChart(ctx, labels, datasets) {
+    return new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: window.biChartScales ? window.biChartScales() : undefined,
+        }
+    });
+}
 
-    function lineChart(ctx, labels, data, color) {
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [{
-                    label: 'Saving (R$)',
-                    data,
-                    borderColor: color,
-                    backgroundColor: 'rgba(0,0,0,0)',
-                    fill: false,
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: window.biChartScales ? window.biChartScales() : undefined,
-                legend: { display: false },
-            },
-        });
-    }
-
-    barChart(document.getElementById('chartSavingPorAuditor'), labelsAuditor, savingPerAuditor, 'rgba(122, 180, 255, 0.7)');
-    lineChart(document.getElementById('chartSavingMensalAuditor'), mensalLabels, mensalSaving, 'rgba(85, 209, 194, 0.9)');
+const timelineCanvas = document.getElementById('chartSavingTimeline');
+if (timelineCanvas && lineChartDatasets.length) {
+    lineChart(timelineCanvas, timelineMonths, lineChartDatasets);
+}
 </script>
 
 <?php require_once("templates/footer.php"); ?>

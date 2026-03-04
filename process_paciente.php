@@ -1,5 +1,28 @@
 <?php
 
+if (!defined("FLOW_LOGGER_AUTO_V1")) {
+    define("FLOW_LOGGER_AUTO_V1", 1);
+    @require_once(__DIR__ . "/utils/flow_logger.php");
+    if (function_exists("flowLogStart") && function_exists("flowLog")) {
+        $__flowCtxAuto = flowLogStart(basename(__FILE__, ".php"), [
+            "type" => $_POST["type"] ?? $_GET["type"] ?? null,
+            "method" => $_SERVER["REQUEST_METHOD"] ?? null,
+        ]);
+        register_shutdown_function(function () use ($__flowCtxAuto) {
+            $err = error_get_last();
+            if ($err && in_array(($err["type"] ?? 0), [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+                flowLog($__flowCtxAuto, "shutdown.fatal", "ERROR", [
+                    "message" => $err["message"] ?? null,
+                    "file" => $err["file"] ?? null,
+                    "line" => $err["line"] ?? null,
+                ]);
+            }
+            flowLog($__flowCtxAuto, "request.finish", "INFO");
+        });
+    }
+}
+
+
 require_once("globals.php");
 require_once("db.php");
 require_once("models/paciente.php");
@@ -23,6 +46,15 @@ if ($type === "create") {
     // Receber os dados dos inputs
     $nome_pac = filter_input(INPUT_POST, "nome_pac", FILTER_SANITIZE_SPECIAL_CHARS);
     $nome_pac = strtoupper($nome_pac);
+    $nomePacNormalizado = preg_replace('/\s+/', ' ', trim((string)$nome_pac));
+    $nomeTokens = array_values(array_filter(explode(' ', $nomePacNormalizado), function ($t) {
+        return mb_strlen(trim((string)$t), 'UTF-8') >= 3;
+    }));
+    if (count($nomeTokens) > 4) {
+        $nomeTokens = array_slice($nomeTokens, 0, 4);
+    }
+    $confirmarHomonimo = filter_input(INPUT_POST, "confirmar_homonimo_pac");
+    $confirmarHomonimo = in_array(strtolower((string)$confirmarHomonimo), ['1', 's', 'sim', 'true'], true);
     $nome_social_pac = filter_input(INPUT_POST, "nome_social_pac", FILTER_SANITIZE_SPECIAL_CHARS);
     $nome_social_pac = strtoupper($nome_social_pac);
     $endereco_pac = filter_input(INPUT_POST, "endereco_pac", FILTER_SANITIZE_SPECIAL_CHARS);
@@ -112,6 +144,50 @@ if ($type === "create") {
     $paciente = new Paciente();
     // Validação mínima de dados4
     if (3 < 4) {
+        if (!$confirmarHomonimo) {
+            $nomeLike = '%' . str_replace(' ', '%', $nomePacNormalizado) . '%';
+            $tokenClause = '';
+            if (!empty($nomeTokens)) {
+                $tokenParts = [];
+                foreach ($nomeTokens as $idx => $tk) {
+                    $tokenParts[] = "UPPER(nome_pac) LIKE UPPER(:tk{$idx})";
+                }
+                $tokenClause = '(' . implode(' AND ', $tokenParts) . ')';
+            }
+
+            $whereNome = "(UPPER(TRIM(nome_pac)) = UPPER(TRIM(:nome)) OR UPPER(nome_pac) LIKE UPPER(:nome_like))";
+            if ($tokenClause !== '') {
+                $whereNome = '(' . $whereNome . ' OR ' . $tokenClause . ')';
+            }
+
+            $stmtDupNome = $conn->prepare("
+                SELECT id_paciente, nome_pac, matricula_pac, cpf_pac, data_nasc_pac
+                  FROM tb_paciente
+                 WHERE {$whereNome}
+                   AND IFNULL(deletado_pac, 'n') <> 's'
+                 LIMIT 1
+            ");
+            $stmtDupNome->bindValue(':nome', $nomePacNormalizado);
+            $stmtDupNome->bindValue(':nome_like', $nomeLike);
+            foreach ($nomeTokens as $idx => $tk) {
+                $stmtDupNome->bindValue(":tk{$idx}", '%' . $tk . '%');
+            }
+            $stmtDupNome->execute();
+            $dupNome = $stmtDupNome->fetch(PDO::FETCH_ASSOC);
+            if ($dupNome) {
+                if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'success' => false,
+                        'code' => 'nome_duplicado',
+                        'message' => 'Paciente com nome já cadastrado. Confirme homônimo para continuar.'
+                    ]);
+                    exit;
+                }
+                $message->setMessage("Já existe paciente com esse nome. Confirme se é homônimo antes de cadastrar.", "error", "back");
+                exit;
+            }
+        }
 
         $paciente->nome_pac = $nome_pac;
         $paciente->nome_social_pac = $nome_social_pac;

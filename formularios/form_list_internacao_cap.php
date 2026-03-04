@@ -115,23 +115,54 @@ if (!$isDiretor && empty($id_hosp) && count($hospitals) === 1) {
 // =====================================================================
 // WHERE (filtro principal) – prefixos corretos
 // =====================================================================
-$condicoes = [
-    strlen((string) $id_hosp) ? 'ho.id_hospital = ' . (int) $id_hosp : NULL,
+$condicoes = [];
+$whereParams = [];
 
-    strlen($pesquisa_nome) ? 'ho.nome_hosp LIKE "%' . $pesquisa_nome . '%"' : NULL,
-    strlen($pesquisa_pac) ? 'pa.nome_pac  LIKE "%' . $pesquisa_pac . '%"' : NULL,
-    strlen($pesquisa_matricula) ? 'pa.matricula_pac LIKE "%' . $pesquisa_matricula . '%"' : NULL,
-    strlen($lote) ? 'ca.lote_cap = "' . $lote . '"' : NULL,
-    strlen($idcapeante) ? 'ca.id_capeante LIKE "%' . $idcapeante . '%"' : NULL,
-
-    strlen($senha_fin) ? 'ca.senha_finalizada = "' . $senha_fin . '"' : NULL,
-    ($conta_parada === 's' || $conta_parada === 'n') ? 'ca.conta_parada_cap = "' . $conta_parada . '"' : NULL,
-    strlen($senha_int) ? 'ac.senha_int LIKE "%' . $senha_int . '%"' : NULL,
-    strlen($data_intern_int) ? 'ac.data_intern_int BETWEEN "' . $data_intern_int . '" AND "' . $data_intern_int_max . '"' : NULL,
-
-    (!$isDiretor && strlen((string) $userId)) ? 'hos.fk_usuario_hosp = "' . $userId . '"' : NULL
-];
-$condicoes = array_filter($condicoes);
+if (strlen((string)$id_hosp)) {
+    $condicoes[] = 'ho.id_hospital = :id_hosp';
+    $whereParams[':id_hosp'] = (int)$id_hosp;
+}
+if (strlen($pesquisa_nome)) {
+    $condicoes[] = 'ho.nome_hosp LIKE :pesquisa_nome';
+    $whereParams[':pesquisa_nome'] = '%' . $pesquisa_nome . '%';
+}
+if (strlen($pesquisa_pac)) {
+    $condicoes[] = 'pa.nome_pac LIKE :pesquisa_pac';
+    $whereParams[':pesquisa_pac'] = '%' . $pesquisa_pac . '%';
+}
+if (strlen($pesquisa_matricula)) {
+    $condicoes[] = 'pa.matricula_pac LIKE :pesquisa_matricula';
+    $whereParams[':pesquisa_matricula'] = '%' . $pesquisa_matricula . '%';
+}
+if (strlen($lote)) {
+    $condicoes[] = 'ca.lote_cap = :lote';
+    $whereParams[':lote'] = $lote;
+}
+if (strlen($idcapeante)) {
+    $condicoes[] = 'ca.id_capeante LIKE :idcapeante';
+    $whereParams[':idcapeante'] = '%' . $idcapeante . '%';
+}
+if (strlen($senha_fin)) {
+    $condicoes[] = 'ca.senha_finalizada = :senha_fin';
+    $whereParams[':senha_fin'] = $senha_fin;
+}
+if ($conta_parada === 's' || $conta_parada === 'n') {
+    $condicoes[] = 'ca.conta_parada_cap = :conta_parada';
+    $whereParams[':conta_parada'] = $conta_parada;
+}
+if (strlen($senha_int)) {
+    $condicoes[] = 'ac.senha_int LIKE :senha_int';
+    $whereParams[':senha_int'] = '%' . $senha_int . '%';
+}
+if (strlen((string)$data_intern_int)) {
+    $condicoes[] = 'ac.data_intern_int BETWEEN :data_intern_int AND :data_intern_int_max';
+    $whereParams[':data_intern_int'] = (string)$data_intern_int;
+    $whereParams[':data_intern_int_max'] = (string)$data_intern_int_max;
+}
+if (!$isDiretor && strlen((string)$userId)) {
+    $condicoes[] = 'hos.fk_usuario_hosp = :user_id';
+    $whereParams[':user_id'] = (int)$userId;
+}
 
 switch ($status_conta) {
     case 'encerrado':
@@ -165,7 +196,12 @@ $sqlTotal = "
     LEFT JOIN tb_capeante AS ca   ON ac.id_internacao     = ca.fk_int_capeante
     " . (strlen($where) ? 'WHERE ' . $where : '') . "
 ";
-$rowTotal = $conn->query($sqlTotal)->fetch(PDO::FETCH_ASSOC);
+$stmtTotal = $conn->prepare($sqlTotal);
+foreach ($whereParams as $key => $value) {
+    $stmtTotal->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+}
+$stmtTotal->execute();
+$rowTotal = $stmtTotal->fetch(PDO::FETCH_ASSOC);
 $qtdIntItens = (int) ($rowTotal['total'] ?? 0);
 
 // =====================================================================
@@ -212,7 +248,16 @@ $sqlList = "
         ca.parada_motivo_cap,
         ca.lote_cap,
         ca.encerrado_cap,
-        ca.em_auditoria_cap
+        ca.em_auditoria_cap,
+        CASE
+            WHEN EXISTS (
+                SELECT 1
+                FROM tb_gestao ge
+                WHERE ge.fk_internacao_ges = ac.id_internacao
+                  AND LOWER(COALESCE(ge.evento_adverso_ges, '')) = 's'
+            ) THEN 1
+            ELSE 0
+        END AS alerta_evento_adverso_cap
     FROM tb_internacao ac
     LEFT JOIN tb_capeante    ca  ON ac.id_internacao     = ca.fk_int_capeante
     LEFT JOIN tb_hospital    ho  ON ac.fk_hospital_int   = ho.id_hospital
@@ -224,7 +269,12 @@ $sqlList = "
     ORDER BY $orderBy
     LIMIT $limitSql
 ";
-$query = $conn->query($sqlList)->fetchAll(PDO::FETCH_ASSOC);
+$stmtList = $conn->prepare($sqlList);
+foreach ($whereParams as $key => $value) {
+    $stmtList->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+}
+$stmtList->execute();
+$query = $stmtList->fetchAll(PDO::FETCH_ASSOC);
 
 // =====================================================================
 // URL base de paginação (corrigido 'ordenar' e data_intern_int)
@@ -340,7 +390,7 @@ if ($havePages) {
 
                 </div>
 
-                <div class="form-group row" style="margin-top:-15px">
+                <div class="form-group row" style="margin-top:-15px; margin-bottom:14px;">
                     <div class="form-group col-sm-2" style="padding-left:16px !important;">
                         <select class="form-control form-control-sm"
                             style="margin-top:7px;font-size:.8em; color:#878787" id="ordenar" name="ordenar">
@@ -427,6 +477,7 @@ if ($havePages) {
                             <th scope="col" style="width:4%;">Adm</th>
                             <th scope="col" style="width:4%;">Parcial</th>
                             <th scope="col" style="width:3%;">Final</th>
+                            <th scope="col" style="width:3%;">EA</th>
                             <th scope="col" style="width:3%;">Aberto</th>
                             <th scope="col" style="width:6%;">Cap Encer</th>
                             <th scope="col" style="width:6%;">Em Audit</th>
@@ -469,6 +520,14 @@ if ($havePages) {
                                     <?php } ?>
                                 </td>
                                 <td scope="row">
+                                    <?php if ((int)($intern["alerta_evento_adverso_cap"] ?? 0) === 1) { ?>
+                                        <a title="Conta com evento adverso">
+                                            <span class="bi bi-exclamation-triangle-fill"
+                                                style="font-size:1.1rem;font-weight:800;color:#c62828;"></span>
+                                        </a>
+                                    <?php } ?>
+                                </td>
+                                <td scope="row">
                                     <?php if (($intern["aberto_cap"] ?? 'n') === "s") { ?>
                                         <a class="legenda-aberto"><span class="bi bi-book"
                                                 style="font-size:1.1rem;color:blue;font-weight:800"></span></a>
@@ -487,44 +546,105 @@ if ($havePages) {
                                     <?php } ?>
                                 </td>
 
-                                <td class="action">
-                                    <?php if (($intern['encerrado_cap'] ?? 'n') !== "s"): ?>
-                                        <?php if (($intern['em_auditoria_cap'] ?? 'n') === "s"): ?>
-                                            <a class="legenda-em-auditoria"
-                                                href="<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>">
-                                                <i class="bi bi-file-text" style="color:#db5a0f;font-size:1.1em;margin:0 5px"></i>
-                                                <span style="color:#db5a0f;">Analisar</span>
-                                            </a>
-                                        <?php else: ?>
-                                            <a class="legenda-iniciar"
-                                                href="<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>">
-                                                <i class="bi bi-file-text"
-                                                    style="color:rgb(25,78,255);font-size:1.1em;font-weight:bold;margin:0 5px"></i>
-                                                <span>Iniciar</span>
-                                            </a>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <a class="legenda-encerrado" href="#"
-                                            onclick="return openCapeantePdf(<?= (int)$intern['id_capeante']; ?>);">
-                                            <i class="bi"
-                                                style="color:black;text-decoration:none;font-size:1.1em;font-weight:bold;margin:0 5px">
-                                                Encerrado</i>
-                                        </a>
-                                    <?php endif; ?>
+                                <?php
+                                    $capeanteEncerrado = strtolower((string)($intern['encerrado_cap'] ?? 'n')) === 's';
+                                    $pdfPreviewUrl = $BASE_URL . 'export_capeante_rah_pdf.php?id_capeante=' . $intern['id_capeante'] . '&download=0';
+                                    $pdfDownloadUrl = $BASE_URL . 'export_capeante_rah_pdf.php?id_capeante=' . $intern['id_capeante'] . '&download=1';
+                                    $rahEditUrl = $BASE_URL . 'cad_capeante_rah.php?id_capeante=' . $intern['id_capeante'];
+                                ?>
+                                <td class="action text-center">
+                                    <div class="d-flex flex-column align-items-center gap-2">
+                                        <div class="d-flex flex-wrap align-items-center gap-3 justify-content-center">
+                                            <?php if (($intern['encerrado_cap'] ?? 'n') !== "s"): ?>
+                                                <?php if (($intern['em_auditoria_cap'] ?? 'n') === "s"): ?>
+                                                    <a class="legenda-em-auditoria"
+                                                        href="<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>">
+                                                        <i class="bi bi-file-text" style="color:#db5a0f;font-size:1.1em;margin:0 5px"></i>
+                                                        <span style="color:#db5a0f;">Analisar</span>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <a class="legenda-iniciar"
+                                                        href="<?= $BASE_URL ?>cad_capeante_rah.php?id_capeante=<?= $intern['id_capeante'] ?>">
+                                                        <i class="bi bi-file-text"
+                                                            style="color:rgb(25,78,255);font-size:1.1em;font-weight:bold;margin:0 5px"></i>
+                                                        <span>Iniciar</span>
+                                                    </a>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="legenda-encerrado" style="cursor:default;">
+                                                    <i class="bi"
+                                                        style="color:black;text-decoration:none;font-size:1.1em;font-weight:bold;margin:0 5px">
+                                                        Encerrado</i>
+                                                </span>
+                                            <?php endif; ?>
 
-                                    <a class="legenda-parcial"
-                                        href="<?= $BASE_URL ?>cad_capeante_rah.php?id_internacao=<?= $intern["id_internacao"] ?>&type=create">
-                                        <i class="legenda-parcial bi bi-file-text"
-                                            style="color:green;text-decoration:none;font-size:10px;font-weight:bold;margin:0 5px">
-                                            Parcial</i>
-                                    </a>
+                                            <a class="legenda-parcial"
+                                                href="<?= $BASE_URL ?>cad_capeante_rah.php?id_internacao=<?= $intern["id_internacao"] ?>&type=create">
+                                                <i class="legenda-parcial bi bi-file-text"
+                                                    style="color:green;text-decoration:none;font-size:10px;font-weight:bold;margin:0 5px">
+                                                    Criar Parcial</i>
+                                            </a>
+                                        </div>
+
+                                        <div class="dropdown">
+                                            <?php $dropdownId = 'contasDropdown' . $intern['id_capeante'] . '_' . $intern['id_internacao']; ?>
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                                                id="<?= htmlspecialchars($dropdownId, ENT_QUOTES, 'UTF-8') ?>"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-stack me-1"></i>
+                                                Contas
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="<?= htmlspecialchars($dropdownId, ENT_QUOTES, 'UTF-8') ?>">
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" href="<?= htmlspecialchars($rahEditUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        onclick="edit('<?= htmlspecialchars($rahEditUrl, ENT_QUOTES, 'UTF-8') ?>'); return false;">
+                                                        <i class="bi bi-pencil-square me-1" style="color:#5e2363;"></i>
+                                                        <span style="color:#5e2363; font-weight:400;">Editar RAH</span>
+                                                    </a>
+                                                </li>
+                                                <?php if ($capeanteEncerrado): ?>
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" target="_blank" rel="noopener"
+                                                        href="<?= htmlspecialchars($pdfPreviewUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        style="color:#0d6efd !important; font-weight:400 !important;">
+                                                        <i class="bi bi-eye me-1" style="color:#0d6efd;"></i>
+                                                        <span style="color:#0d6efd !important; font-weight:400 !important;">Ver RAH</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item fw-normal" target="_blank" rel="noopener"
+                                                        href="<?= htmlspecialchars($pdfDownloadUrl, ENT_QUOTES, 'UTF-8') ?>"
+                                                        style="color:#198754 !important; font-weight:400 !important;">
+                                                        <i class="bi bi-printer-fill me-1" style="color:#198754;"></i>
+                                                        <span style="color:#198754 !important; font-weight:400 !important;">Imprimir PDF</span>
+                                                    </a>
+                                                </li>
+                                                <?php else: ?>
+                                                <li>
+                                                    <span class="dropdown-item disabled text-muted fw-normal"
+                                                        style="color:#6c757d !important; font-weight:400 !important;">
+                                                        <i class="bi bi-eye me-1" style="color:#6c757d;"></i>
+                                                        <span style="color:#6c757d !important; font-weight:400 !important;">Ver RAH</span>
+                                                    </span>
+                                                </li>
+                                                <li>
+                                                    <span class="dropdown-item disabled text-muted fw-normal"
+                                                        style="color:#6c757d !important; font-weight:400 !important;">
+                                                        <i class="bi bi-printer-fill me-1" style="color:#6c757d;"></i>
+                                                        <span style="color:#6c757d !important; font-weight:400 !important;">Imprimir PDF</span>
+                                                    </span>
+                                                </li>
+                                                <?php endif; ?>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
 
                         <?php if ($qtdIntItens == 0): ?>
                             <tr>
-                                <td colspan="15" scope="row" class="col-id" style='font-size:15px'>
+                                <td colspan="16" scope="row" class="col-id" style='font-size:15px'>
                                     Não foram encontrados registros
                                 </td>
                             </tr>

@@ -20,6 +20,34 @@ $tipoInternação = trim((string)(filter_input(INPUT_GET, 'tipo_internacao') ?? 
 $modoAdmissão = trim((string)(filter_input(INPUT_GET, 'modo_admissao') ?? ''));
 $uti = trim((string)(filter_input(INPUT_GET, 'uti') ?? ''));
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+$normCargoAccess = static function ($txt): string {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $ascii !== false ? $ascii : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$isSeguradoraRole = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
+$seguradoraUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+if ($isSeguradoraRole && $seguradoraUserId <= 0) {
+    try {
+        $uid = (int)($_SESSION['id_usuario'] ?? 0);
+        if ($uid > 0) {
+            $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
+            $stmtSeg->execute();
+            $seguradoraUserId = (int)($stmtSeg->fetchColumn() ?: 0);
+            if ($seguradoraUserId > 0) {
+                $_SESSION['fk_seguradora_user'] = $seguradoraUserId;
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('[INDICADORES][SEGURADORA] ' . $e->getMessage());
+    }
+}
+
 $hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
     ->fetchAll(PDO::FETCH_ASSOC);
 $tiposInt = $conn->query("SELECT DISTINCT tipo_admissao_int FROM tb_internacao WHERE tipo_admissao_int IS NOT NULL AND tipo_admissao_int <> '' ORDER BY tipo_admissao_int")
@@ -48,6 +76,10 @@ if ($modoAdmissão !== '') {
     $where .= " AND i.modo_internacao_int = :modo";
     $params[':modo'] = $modoAdmissão;
 }
+if ($isSeguradoraRole) {
+    $where .= " AND pa.fk_seguradora_pac = :seguradora_id";
+    $params[':seguradora_id'] = $seguradoraUserId > 0 ? $seguradoraUserId : -1;
+}
 
 $utiJoin = "LEFT JOIN (SELECT DISTINCT fk_internacao_uti FROM tb_uti) ut ON ut.fk_internacao_uti = i.id_internacao";
 if ($uti === 's') {
@@ -59,6 +91,7 @@ if ($uti === 'n') {
 
 $sqlBase = "
     FROM tb_internacao i
+    LEFT JOIN tb_paciente pa ON pa.id_paciente = i.fk_paciente_int
     {$utiJoin}
     LEFT JOIN (
         SELECT fk_id_int_alt, MAX(data_alta_alt) AS data_alta_alt
@@ -94,6 +127,7 @@ $sqlFlags = "
         SUM(CASE WHEN g.alto_custo_ges = 's' THEN 1 ELSE 0 END) AS alto_custo
     FROM tb_gestao g
     JOIN tb_internacao i ON i.id_internacao = g.fk_internacao_ges
+    LEFT JOIN tb_paciente pa ON pa.id_paciente = i.fk_paciente_int
     {$utiJoin}
     WHERE {$where}
 ";
@@ -123,8 +157,66 @@ $idxObitos = $totalInternações > 0 ? ($obitos / $totalInternações) * 100 : 0
 <script src="diversos/chartjs/Chart.min.js"></script>
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260110"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
+<style>
+    .bi-indicadores-page .bi-kpis.kpi-auditor-v2 {
+        gap: 12px;
+    }
 
-<div class="bi-wrapper bi-theme">
+    .bi-indicadores-page .bi-kpi.kpi-card-v2 {
+        min-height: 126px;
+        border-width: 1px;
+        box-shadow: 0 8px 18px rgba(36, 53, 92, 0.14);
+    }
+
+    .bi-indicadores-page .bi-kpi.kpi-card-v2 .kpi-card-v2-head small,
+    .bi-indicadores-page .bi-kpi.kpi-card-v2 strong {
+        color: #ffffff;
+    }
+
+    .bi-indicadores-page .bi-kpi.kpi-card-v2 .kpi-card-v2-icon {
+        background: rgba(255, 255, 255, 0.16);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #d7f2ff;
+    }
+
+    .bi-indicadores-page .bi-kpi.kpi-card-v2 .kpi-trend {
+        color: rgba(240, 247, 255, 0.92);
+    }
+
+    .bi-indicadores-page .bi-kpi.kpi-card-v2.kpi-card-v2-1 {
+        background: linear-gradient(135deg, #1f4f8f 0%, #2e77bd 100%);
+        border-color: #5e9fdd;
+    }
+
+    .bi-indicadores-page .bi-kpi.kpi-card-v2.kpi-card-v2-2 {
+        background: linear-gradient(135deg, #4a2f9b 0%, #6d4ec2 100%);
+        border-color: #8c74d8;
+    }
+
+    .bi-indicadores-page .bi-kpi.kpi-card-v2.kpi-card-v2-3 {
+        background: linear-gradient(135deg, #1d6f83 0%, #2a9dad 100%);
+        border-color: #61becb;
+    }
+
+    .bi-indicadores-page .bi-kpi.kpi-card-v2.kpi-card-v2-4 {
+        background: linear-gradient(135deg, #7a2f7e 0%, #a1489b 100%);
+        border-color: #c270bc;
+    }
+
+    @media (max-width: 1100px) {
+        .bi-indicadores-page .bi-kpis.kpi-auditor-v2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        .bi-indicadores-page .bi-kpis.kpi-auditor-v2 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="bi-wrapper bi-theme bi-auditor-page bi-indicadores-page">
     <div class="bi-header">
         <h1 class="bi-title">Dashboard Indicadores</h1>
         <div class="bi-header-actions">
@@ -199,43 +291,133 @@ $idxObitos = $totalInternações > 0 ? ($obitos / $totalInternações) * 100 : 0
     </form>
 
     <div class="bi-panel" style="margin-top:16px;">
-        <div class="bi-kpis kpi-compact">
-            <div class="bi-kpi kpi-berry kpi-compact"><small>Internações</small><strong><?= $totalInternações ?></strong></div>
-            <div class="bi-kpi kpi-teal kpi-compact"><small>Diárias</small><strong><?= $totalDiárias ?></strong></div>
-            <div class="bi-kpi kpi-indigo kpi-compact"><small>MP</small><strong><?= number_format($mp, 1, ',', '.') ?></strong></div>
-            <div class="bi-kpi kpi-rose kpi-compact"><small>Maior permanencia</small><strong><?= $maiorPermanencia ?></strong></div>
+        <div class="bi-kpis kpi-auditor-v2">
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-1">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-hospital"></i></span>
+                    <small>Internações</small>
+                </div>
+                <strong><?= number_format($totalInternações, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-dash-circle"></i>
+                    <span>No período</span>
+                </div>
+            </div>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-2">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-moon-stars"></i></span>
+                    <small>Diárias</small>
+                </div>
+                <strong><?= number_format($totalDiárias, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-dash-circle"></i>
+                    <span>No período</span>
+                </div>
+            </div>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-3">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-activity"></i></span>
+                    <small>MP</small>
+                </div>
+                <strong><?= number_format($mp, 1, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-dash-circle"></i>
+                    <span>No período</span>
+                </div>
+            </div>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-4">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-stopwatch"></i></span>
+                    <small>Maior permanência</small>
+                </div>
+                <strong><?= number_format($maiorPermanencia, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-dash-circle"></i>
+                    <span>No período</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="bi-panel" style="margin-top:16px;">
         <h3>Indicadores de performance</h3>
-        <div class="bi-kpis" style="margin-top:12px;">
-            <div class="bi-kpi kpi-berry"><small>Internações</small><strong><?= $totalInternações ?></strong></div>
-            <div class="bi-kpi kpi-berry"><small>Internados</small><strong><?= $internados ?></strong></div>
-            <div class="bi-kpi kpi-teal with-badge">
-                <small>Evento adverso</small>
-                <strong><?= $eventoAdverso ?></strong>
-                <span class="bi-kpi-badge"><?= fmtPct($idxEventoAdverso) ?></span>
+        <div class="bi-kpis kpi-auditor-v2" style="margin-top:12px;">
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-1">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-hospital"></i></span>
+                    <small>Internações</small>
+                </div>
+                <strong><?= number_format($totalInternações, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-pie-chart"></i>
+                    <span>Base de cálculo</span>
+                </div>
             </div>
-            <div class="bi-kpi kpi-teal with-badge">
-                <small>Home care</small>
-                <strong><?= $homeCare ?></strong>
-                <span class="bi-kpi-badge"><?= fmtPct($idxHomeCare) ?></span>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-2">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-person-check"></i></span>
+                    <small>Internados</small>
+                </div>
+                <strong><?= number_format($internados, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-pie-chart"></i>
+                    <span>Base de cálculo</span>
+                </div>
             </div>
-            <div class="bi-kpi kpi-indigo with-badge">
-                <small>OPME</small>
-                <strong><?= $opme ?></strong>
-                <span class="bi-kpi-badge"><?= fmtPct($idxOpme) ?></span>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-3">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-exclamation-triangle"></i></span>
+                    <small>Evento adverso</small>
+                </div>
+                <strong><?= number_format($eventoAdverso, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-percent"></i>
+                    <span><?= fmtPct($idxEventoAdverso) ?></span>
+                </div>
             </div>
-            <div class="bi-kpi kpi-indigo with-badge">
-                <small>Alto custo</small>
-                <strong><?= $altoCusto ?></strong>
-                <span class="bi-kpi-badge"><?= fmtPct($idxAltoCusto) ?></span>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-4">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-house-heart"></i></span>
+                    <small>Home care</small>
+                </div>
+                <strong><?= number_format($homeCare, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-percent"></i>
+                    <span><?= fmtPct($idxHomeCare) ?></span>
+                </div>
             </div>
-            <div class="bi-kpi kpi-steel with-badge">
-                <small>Óbitos</small>
-                <strong><?= $obitos ?></strong>
-                <span class="bi-kpi-badge"><?= fmtPct($idxObitos) ?></span>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-1">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-gear"></i></span>
+                    <small>OPME</small>
+                </div>
+                <strong><?= number_format($opme, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-percent"></i>
+                    <span><?= fmtPct($idxOpme) ?></span>
+                </div>
+            </div>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-2">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-cash-stack"></i></span>
+                    <small>Alto custo</small>
+                </div>
+                <strong><?= number_format($altoCusto, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-percent"></i>
+                    <span><?= fmtPct($idxAltoCusto) ?></span>
+                </div>
+            </div>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-4">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-heartbreak"></i></span>
+                    <small>Óbitos</small>
+                </div>
+                <strong><?= number_format($obitos, 0, ',', '.') ?></strong>
+                <div class="kpi-trend kpi-trend-neutral">
+                    <i class="bi bi-percent"></i>
+                    <span><?= fmtPct($idxObitos) ?></span>
+                </div>
             </div>
         </div>
     </div>

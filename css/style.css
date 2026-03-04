@@ -2,7 +2,8 @@
     --select-border: #777;
     --select-focus: blue;
     --select-arrow: var(--select-border);
-    --app-zoom: 0.8;
+    --app-zoom: 0.9;
+    --header-offset: 100px;
 }
 
 * {
@@ -17,8 +18,8 @@
 /* Certifique-se de que o corpo da página tenha padding suficiente */
 
 body {
-    padding-top: 100px;
-    zoom: 80%;
+    padding-top: var(--header-offset);
+    zoom: 90%;
 
     /* Ajuste este valor de acordo com a altura real do seu header */
 }
@@ -58,9 +59,6 @@ body {
     background: rgba(0, 0, 0, 0.5);
 }
 
-.full-height {
-    min-height: 100vh;
-}
 
 select {
     color: gray;
@@ -87,10 +85,6 @@ h6 {
 }
 
 
-#cabecalho-pesquisa {
-    margin: 5px 0 10px 20px;
-    color: red;
-}
 
 label {
     font-weight: 600;
@@ -106,11 +100,6 @@ p {
     color: #0F5132;
 }
 
-.img-cover {
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-}
 
 .input {
     margin-bottom: 10px;
@@ -146,24 +135,6 @@ p {
 }
 
 
-.font_nome_form input[type="text"] {
-    font-size: .80em;
-    border: 0;
-    background: #f1f1f1;
-}
-
-.font_nome_form input[type="number"] {
-    font-size: .80em;
-    border: 0;
-}
-
-.data-entrada {
-    background-color: rgb(240, 232, 232);
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2);
-    font-size: .8em;
-    font-weight: normal;
-    margin-left: 5px;
-}
 
 .oculto {
     display: none;
@@ -173,47 +144,6 @@ p {
     display: yes;
 }
 
-.editForm {
-    font-size: medium;
-    font-weight: 700;
-}
-
-.rodape {
-    border-width: 1px;
-    width: 100%;
-    height: 170px;
-    background-color: rgb(236, 237, 237);
-    justify-content: center;
-}
-
-.rodape h4 {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: white;
-}
-
-.rodape nav ul li {
-    margin-top: 5px;
-    font-size: 1em;
-    padding-top: 1px;
-    font-style: bold;
-}
-
-.rodape-central {
-    width: 100%;
-    height: 30px;
-    color: rgb(10, 10, 10);
-    text-align: center;
-    clear: both;
-    font-size: 18px;
-    margin-bottom: 20px;
-    padding: 5px;
-    background-color: rgb(231, 230, 230);
-}
-
-.rodape-central h2 {
-    font-size: 15px;
-}
 
 #back-link-container {
     display: block;
@@ -246,7 +176,7 @@ p {
 }
 
 .table td {
-    font-size: 11px;
+    font-size: 13px;
     vertical-align: middle !important;
 }
 
@@ -324,10 +254,6 @@ p {
     color: aliceblue;
 }
 
-.msg-container {
-    background-color: aliceblue;
-    padding: 15px;
-}
 
 .msg {
     width: 60%;
@@ -357,37 +283,6 @@ p {
     border-color: #BADBCC;
 }
 
-.mensagem-apg {
-    height: 30px;
-    width: 400px;
-    justify-content: center;
-    text-align: center;
-    background-color: #f5979c;
-    color: aliceblue;
-}
-
-.mensagem-apg p {
-    color: aliceblue;
-}
-
-.mensagem-apg-container {
-    background-color: aliceblue;
-    padding: 15px;
-}
-
-.mensagem-apg {
-    width: 60%;
-    margin: 0 auto;
-    padding: 10px;
-    border: solid 1px #000;
-    text-align: center;
-}
-
-.mensagem-apg.error {
-    color: #842029;
-    background-color: #F8D7DA;
-    border-color: #F5C2C7;
-}
 
 .msg.success {
     color: #0F5132;
@@ -409,27 +304,6 @@ p {
     font-size: 0.8em;
 }
 
-.btn-nav {
-    border: 0;
-    width: 120px;
-    color: rgb(9, 8, 8);
-    text-shadow: 2px 2px 3px rgb(250, 248, 248);
-    margin: 0 auto 10px;
-    line-height: 2.0;
-    padding: 3px 5px;
-    font-size: 1rem;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 10px;
-    transition: 1.0s all;
-    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6), inset -2px -2px 3px rgba(0, 0, 0, .6);
-}
-
-.btn-nav:hover {
-    transform: scale(1.07);
-    border-color: black;
-    color: rgb(217, 147, 7);
-}
 
 .btn-int-niveis {
     border: 0;
@@ -492,13 +366,15 @@ p {
 }
 
 .form_container {
-    margin-top: 60px;
+    margin-top: 8px;
 }
 
-.selectForm {
-    font-size: .8em;
-    color: #878787;
+@media (max-width: 991.98px) {
+    .form_container {
+        margin-top: 8px !important;
+    }
 }
+
 
 [data-tooltip] {
     position: relative;
@@ -657,63 +533,6 @@ p {
 
 
 
-/* Estilo base para o tooltip */
-.tooltip-custom {
-    cursor: pointer;
-    position: relative;
-}
-
-.tooltip-custom .tooltip-text {
-    visibility: hidden;
-    background-color: #f9f9f9;
-    /* Fundo claro */
-    color: #333;
-    /* Texto escuro */
-    text-align: left;
-    padding: 12px 15px;
-    border-radius: 8px;
-    font-size: 1.2em;
-    /* Fonte maior */
-    font-weight: 500;
-    line-height: 1.5;
-    /* Melhor espaçamento entre linhas */
-    position: absolute;
-    bottom: 125%;
-    /* Posição acima do elemento */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    white-space: normal;
-    /* Permite quebra de linha */
-    width: 300px;
-    /* Largura fixa */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    /* Sombra leve */
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-}
-
-/* Exibe o tooltip ao passar o mouse */
-.tooltip-custom:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-    transform: translateX(-50%) translateY(-5px);
-    /* Move o tooltip suavemente */
-}
-
-/* Seta abaixo do tooltip */
-.tooltip-custom .tooltip-text::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    /* Seta na base do tooltip */
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 8px;
-    border-style: solid;
-    border-color: #f9f9f9 transparent transparent transparent;
-    /* Fundo da seta */
-}
 
 input[type="date"] {
     height: 32px !important;
@@ -769,64 +588,19 @@ select {
     /* aumenta o tamanho da seta */
 }
 
-#mensagemSucesso {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 250px;
-    background-color: #d4edda;
-    /* verde claro */
-    color: #000;
-    /* texto preto */
-    border: 1px solid #28a745;
-    /* mesma cor que estava antes */
-    padding: 10px 15px;
-    border-radius: 6px;
-    text-align: center;
-    font-weight: bold;
-    z-index: 9999;
-}
 
-/* Select fechado: fundo roxo e texto branco */
+/* Select fechado: fundo lilás */
 .select-purple,
 .select-purple:focus {
     background-color: #5e2363 !important;
     color: #fff !important;
-    border: 2px solid #5e2363 !important;
+    border: 1px solid #5e2363 !important;
 }
 
-/* Dropdown das opções (funciona no Firefox, não no Chrome!) */
+/* Dropdown das opções (funciona no Firefox e em navegadores compatíveis) */
 .select-purple option {
     background-color: #5e2363 !important;
     color: #fff !important;
-}
-
-.section-header-with-bar {
-    background: linear-gradient(120deg, #5e2363, #8a37a7);
-    border-radius: 14px;
-    padding: 12px 18px;
-    margin-bottom: 16px;
-    position: relative;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.section-header-with-bar h4,
-.section-header-with-bar .adicional-card__title {
-    color: #fff;
-    margin: 0;
-}
-
-.section-header-with-bar::after {
-    content: "";
-    position: absolute;
-    right: 10px;
-    bottom: -10px;
-    width: 60px;
-    height: 5px;
-    border-radius: 4px;
-    background: rgba(0, 0, 0, 0.2);
 }
 
 /* Botão "fantasma" no padrão da marca */
@@ -917,18 +691,6 @@ select {
 
 /* --- FORÇAR LARGURA TOTAL NESTA PÁGINA --- */
 
-/* Se o form estiver dentro de .container/.container-* do Bootstrap,
-     expande só esta página sem afetar as demais */
-.container:has(#form-capeante-rah),
-.container-sm:has(#form-capeante-rah),
-.container-md:has(#form-capeante-rah),
-.container-lg:has(#form-capeante-rah),
-.container-xl:has(#form-capeante-rah),
-.container-xxl:has(#form-capeante-rah) {
-    max-width: 100% !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
 
 /* O próprio form passa a ocupar a tela toda */
 form#form-capeante-rah {
@@ -1050,4 +812,170 @@ input:invalid {
 
 .assist-popover-link:hover {
     text-decoration: underline;
+}
+
+.input-lg-fullcare {
+    min-height: 42px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+}
+
+/* Padrao para botoes principais de acao (Cadastrar/Atualizar) */
+.btn-submit-standard {
+    min-width: 180px;
+    min-height: 56px;
+    padding: 12px 22px;
+    font-size: 1.08rem;
+    font-weight: 700;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+.btn-submit-standard:hover,
+.btn-submit-standard:focus {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+    color: #fff !important;
+}
+
+@media (max-width: 576px) {
+    .btn-submit-standard {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+/* Componentes padrao para listagens (filtros + dropdown de acoes) */
+.fc-list-filters {
+    overflow-x: auto;
+}
+
+.fc-list-filters-line {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.fc-list-filters-line .fc-filter-item {
+    padding: 2px !important;
+    margin: 0;
+}
+
+.fc-list-filters-line .w-hospital,
+.fc-list-filters-line .w-paciente,
+.fc-list-filters-line .w-seguradora {
+    flex: 1 1 220px;
+    min-width: 180px;
+}
+
+.fc-list-filters-line .w-short {
+    flex: 0 0 120px;
+    min-width: 110px;
+}
+
+.fc-list-filters-line .w-select {
+    flex: 0 0 140px;
+    min-width: 130px;
+}
+
+.fc-list-filters-line .w-limit {
+    flex: 0 0 90px;
+    min-width: 80px;
+}
+
+.fc-list-filters-line .w-date {
+    flex: 0 0 150px;
+    min-width: 140px;
+}
+
+.fc-list-filters-line .w-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+@media (max-width: 1200px) {
+    .fc-list-filters-line {
+        flex-wrap: wrap;
+    }
+}
+
+.fc-list-action .dropdown-menu {
+    padding: 8px 0;
+    min-width: 190px;
+    left: auto;
+    right: 0;
+}
+
+.fc-list-action .dropdown-menu li {
+    margin: 0;
+}
+
+.fc-list-action .dropdown-menu .btn-default {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: #3a3a3a;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 6px 16px;
+}
+
+.fc-list-action .dropdown-menu .btn-default:hover {
+    background-color: #f4f4f4;
+}
+
+.fc-list-action .dropdown-menu .btn-default i {
+    margin: 0;
+    min-width: 18px;
+    font-weight: 700;
+}
+
+@media (min-width: 992px) {
+    .fc-list-action .dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+
+    .fc-list-action .dropdown:hover > .dropdown-toggle {
+        color: #401742 !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .complete-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .complete-table table {
+        min-width: 900px;
+    }
+
+    .list-header-row {
+        flex-wrap: wrap !important;
+        gap: 8px;
+    }
+
+    .list-header-row .list-action-slot {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+
+    .list-header-row .list-action-slot .btn {
+        width: 100%;
+        max-width: none;
+    }
 }

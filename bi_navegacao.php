@@ -91,6 +91,14 @@ $navGroups = [
         ],
     ],
     [
+        'title' => 'Faturamento',
+        'key' => 'faturamento',
+        'items' => [
+            ['label' => 'Visitas', 'href' => 'bi/faturamento-visitas'],
+            ['label' => 'Consolidado', 'href' => 'bi/faturamento-consolidado'],
+        ],
+    ],
+    [
         'title' => 'Controle de Gastos',
         'key' => 'gastos',
         'items' => [
@@ -177,9 +185,7 @@ $navGroups = [
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi-navegacao.css?v=20260110">
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260110"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme', 'bi-navegacao'));
-</script>
+<script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme', 'bi-navegacao'));</script>
 
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
@@ -192,19 +198,25 @@ $navGroups = [
         </div>
     </div>
 
-    <div class="bi-nav-panel">
-        <?php foreach ($navGroups as $group): ?>
-            <section class="bi-nav-row" data-theme="<?= e($group['key']) ?>">
-                <div class="bi-nav-row-label"><?= e($group['title']) ?></div>
-                <div class="bi-nav-row-links">
-                    <?php foreach ($group['items'] as $link): ?>
-                        <a class="bi-chip" href="<?= $BASE_URL . e($link['href']) ?>">
-                            <?= e($link['label']) ?>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-        <?php endforeach; ?>
+    <div class="bi-panel">
+        <div class="bi-nav-groups-grid">
+            <?php foreach ($navGroups as $idx => $group): ?>
+                <?php $isOpen = $idx < 4; ?>
+                <details class="bi-nav-group" data-theme="<?= e($group['key']) ?>" <?= $isOpen ? 'open' : '' ?>>
+                    <summary class="bi-nav-group-summary">
+                        <span class="bi-nav-group-title"><?= e($group['title']) ?></span>
+                        <span class="bi-nav-group-count"><?= count($group['items']) ?></span>
+                    </summary>
+                    <div class="bi-nav-grid">
+                        <?php foreach ($group['items'] as $link): ?>
+                            <a class="bi-nav-card" href="<?= $BASE_URL . e($link['href']) ?>">
+                                <?= e($link['label']) ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </details>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 

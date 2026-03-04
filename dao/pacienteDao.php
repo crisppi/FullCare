@@ -544,6 +544,18 @@ class PacienteDAO implements PacienteDAOInterface
             'pa.nome_pac DESC',
             'nome_pac',
             'nome_pac DESC',
+            'pa.matricula_pac',
+            'pa.matricula_pac DESC',
+            'matricula_pac',
+            'matricula_pac DESC',
+            'pa.cpf_pac',
+            'pa.cpf_pac DESC',
+            'cpf_pac',
+            'cpf_pac DESC',
+            'pa.cidade_pac',
+            'pa.cidade_pac DESC',
+            'cidade_pac',
+            'cidade_pac DESC',
             'se.seguradora_seg',
             'se.seguradora_seg DESC',
             'seguradora_seg',
@@ -657,7 +669,6 @@ class PacienteDAO implements PacienteDAOInterface
             pa.id_paciente,
             pa.nome_pac,
             pa.matricula_pac,
-            pa.cpf_pac,
             pa.data_nasc_pac,
             (
                 SELECT i2.senha_int
@@ -669,13 +680,12 @@ class PacienteDAO implements PacienteDAOInterface
         FROM tb_paciente pa
         WHERE
             pa.deletado_pac <> 's' AND (
-                    pa.nome_pac LIKE :like_nome
-                    OR pa.cpf_pac LIKE :like_cpf
-                    OR CONCAT(
-                        pa.matricula_pac,
-                        CASE WHEN pa.recem_nascido_pac = 's' THEN 'RN' ELSE '' END,
-                        IFNULL(pa.numero_rn_pac, '')
-                    ) LIKE :like_matricula
+                pa.nome_pac LIKE :like_nome
+                OR CONCAT(
+                    pa.matricula_pac,
+                    CASE WHEN pa.recem_nascido_pac = 's' THEN 'RN' ELSE '' END,
+                    IFNULL(pa.numero_rn_pac, '')
+                ) LIKE :like_matricula
                 OR EXISTS (
                     SELECT 1
                     FROM tb_internacao i
@@ -690,7 +700,6 @@ class PacienteDAO implements PacienteDAOInterface
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':like_nome', $like, PDO::PARAM_STR);
         $stmt->bindValue(':like_matricula', $like, PDO::PARAM_STR);
-        $stmt->bindValue(':like_cpf', $like, PDO::PARAM_STR);
         $stmt->bindValue(':like_senha', $like, PDO::PARAM_STR);
         $stmt->execute();
 

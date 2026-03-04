@@ -16,10 +16,6 @@ $ano = ($anoInput !== null && $anoInput !== false) ? (int)$anoInput : null;
 $mes = (int)(filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT) ?: 0);
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 $auditorId = filter_input(INPUT_GET, 'auditor_id', FILTER_VALIDATE_INT) ?: null;
-$pesquisaPaciente = trim((string)(filter_input(INPUT_GET, 'pesquisa_paciente', FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
-$pacienteId = filter_input(INPUT_GET, 'paciente_id', FILTER_VALIDATE_INT) ?: null;
-$pesquisaSeguradora = trim((string)(filter_input(INPUT_GET, 'pesquisa_seguradora', FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
-$seguradoraId = filter_input(INPUT_GET, 'seguradora_id', FILTER_VALIDATE_INT) ?: null;
 
 $hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
     ->fetchAll(PDO::FETCH_ASSOC);
@@ -52,49 +48,18 @@ if ($auditorId) {
     $params[':auditor_id'] = $auditorId;
 }
 
-$patientJoin = "
-    LEFT JOIN tb_paciente pa ON pa.id_paciente = i.fk_paciente_int
-    LEFT JOIN tb_seguradora sg ON sg.id_seguradora = pa.fk_seguradora_pac
-";
-
-if ($pacienteId) {
-    $where .= " AND pa.id_paciente = :paciente_id";
-    $params[':paciente_id'] = $pacienteId;
-} elseif ($pesquisaPaciente !== '') {
-    $where .= " AND (
-        pa.nome_pac LIKE :like_pesquisa_paciente
-        OR pa.matricula_pac LIKE :like_pesquisa_paciente
-        OR pa.cpf_pac LIKE :like_pesquisa_paciente
-    )";
-    $params[':like_pesquisa_paciente'] = "%{$pesquisaPaciente}%";
-}
-
-if ($seguradoraId) {
-    $where .= " AND sg.id_seguradora = :seguradora_id";
-    $params[':seguradora_id'] = $seguradoraId;
-} elseif ($pesquisaSeguradora !== '') {
-    $where .= " AND sg.seguradora_seg LIKE :like_seguradora";
-    $params[':like_seguradora'] = "%{$pesquisaSeguradora}%";
-}
-
-$bindParams = function (PDOStatement $stmt, array $params) {
-    foreach ($params as $key => $value) {
-        $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
-        $stmt->bindValue($key, $value, $paramType);
-    }
-};
-
 $sqlTot = "
     SELECT
         SUM(ng.saving) AS total_saving,
         COUNT(*) AS total_registros
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    {$patientJoin}
     WHERE {$where}
 ";
 $stmt = $conn->prepare($sqlTot);
-$bindParams($stmt, $params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+}
 $stmt->execute();
 $tot = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 $totalSaving = (float)($tot['total_saving'] ?? 0);
@@ -107,7 +72,6 @@ $sqlAuditor = "
         COUNT(*) AS total_registros
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    {$patientJoin}
     LEFT JOIN tb_user u ON u.id_usuario = ng.fk_usuario_neg
     WHERE {$where}
     GROUP BY auditor
@@ -115,7 +79,9 @@ $sqlAuditor = "
     LIMIT 12
 ";
 $stmt = $conn->prepare($sqlAuditor);
-$bindParams($stmt, $params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+}
 $stmt->execute();
 $auditorRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -126,15 +92,46 @@ $sqlTipo = "
         COUNT(*) AS total_registros
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    {$patientJoin}
     WHERE {$where}
     GROUP BY tipo
     ORDER BY total_saving DESC
 ";
 $stmt = $conn->prepare($sqlTipo);
-$bindParams($stmt, $params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+}
 $stmt->execute();
 $tipoRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+$sqlMensal = "
+    SELECT
+        MONTH(ng.data_inicio_neg) AS mes,
+        SUM(ng.saving) AS total_saving
+    FROM tb_negociacao ng
+    INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
+    WHERE {$where}
+    GROUP BY mes
+    ORDER BY mes
+";
+
+$stmt = $conn->prepare($sqlMensal);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+}
+$stmt->execute();
+$mensalRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+$monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+$labelsMes = [];
+$savingMensal = [];
+foreach ($mensalRows as $row) {
+    $mes = (int)($row['mes'] ?? 0);
+    if ($mes < 1 || $mes > 12) {
+        continue;
+    }
+    $labelsMes[] = $monthNames[$mes - 1] ?? (string)$mes;
+    $savingMensal[] = (float)($row['total_saving'] ?? 0);
+}
 
 $labelsAud = array_map(fn($r) => $r['auditor'] ?: 'Sem auditor', $auditorRows);
 $savingAud = array_map(fn($r) => (float)$r['total_saving'], $auditorRows);
@@ -143,30 +140,11 @@ $countAud = array_map(fn($r) => (int)$r['total_registros'], $auditorRows);
 $labelsTipo = array_map(fn($r) => $r['tipo'] ?: 'Sem tipo', $tipoRows);
 $savingTipo = array_map(fn($r) => (float)$r['total_saving'], $tipoRows);
 $countTipo = array_map(fn($r) => (int)$r['total_registros'], $tipoRows);
-
-$sqlMensal = "
-    SELECT
-        DATE_FORMAT(ng.data_inicio_neg, '%Y-%m') AS mes,
-        SUM(ng.saving) AS total_saving
-    FROM tb_negociacao ng
-    INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    {$patientJoin}
-    WHERE {$where}
-    GROUP BY mes
-    ORDER BY mes ASC
-";
-$stmt = $conn->prepare($sqlMensal);
-$bindParams($stmt, $params);
-$stmt->execute();
-$mensalRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-$mensalLabels = array_map(fn($r) => $r['mes'], $mensalRows);
-$mensalSaving = array_map(fn($r) => (float)$r['total_saving'], $mensalRows);
 ?>
 
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">
 <script src="diversos/chartjs/Chart.min.js"></script>
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260110"></script>
-<script src="<?= $BASE_URL ?>js/bi-saving-filters.js?v=20260111"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">
@@ -213,30 +191,6 @@ $mensalSaving = array_map(fn($r) => (float)$r['total_saving'], $mensalRows);
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="bi-filter">
-            <label>Pesquisa por nome ou matrícula ou CPF</label>
-            <input type="text"
-                   name="pesquisa_paciente"
-                   id="pesquisa_paciente_input"
-                   list="pacienteSuggestions"
-                   placeholder="Pesquisa por nome ou matrícula ou CPF"
-                   value="<?= e($pesquisaPaciente) ?>"
-                   autocomplete="off">
-            <input type="hidden" name="paciente_id" id="pesquisa_paciente_id" value="<?= e($pacienteId) ?>">
-            <datalist id="pacienteSuggestions"></datalist>
-        </div>
-        <div class="bi-filter">
-            <label>Pesquisa por seguradora</label>
-            <input type="text"
-                   name="pesquisa_seguradora"
-                   id="pesquisa_seguradora_input"
-                   list="seguradoraSuggestions"
-                   placeholder="Pesquisa por seguradora"
-                   value="<?= e($pesquisaSeguradora) ?>"
-                   autocomplete="off">
-            <input type="hidden" name="seguradora_id" id="seguradora_id" value="<?= e($seguradoraId) ?>">
-            <datalist id="seguradoraSuggestions"></datalist>
-        </div>
         <div class="bi-actions">
             <button class="bi-btn" type="submit">Aplicar</button>
         </div>
@@ -252,13 +206,6 @@ $mensalSaving = array_map(fn($r) => (float)$r['total_saving'], $mensalRows);
                 <small>Qtde de saving</small>
                 <strong><?= $totalRegistros ?></strong>
             </div>
-        </div>
-    </div>
-
-    <div class="bi-panel">
-        <h3>Evolução mensal do saving</h3>
-        <div class="bi-chart">
-            <canvas id="chartSavingMensal"></canvas>
         </div>
     </div>
 
@@ -286,6 +233,12 @@ $mensalSaving = array_map(fn($r) => (float)$r['total_saving'], $mensalRows);
             <canvas id="chartTipoSavingQtd"></canvas>
         </div>
     </div>
+    <div class="bi-panel">
+        <h3>Evolução mensal do saving</h3>
+        <div class="bi-chart">
+            <canvas id="chartSavingEvolucao"></canvas>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -295,8 +248,8 @@ const countAud = <?= json_encode($countAud) ?>;
 const labelsTipo = <?= json_encode($labelsTipo) ?>;
 const savingTipo = <?= json_encode($savingTipo) ?>;
 const countTipo = <?= json_encode($countTipo) ?>;
-const mensalLabels = <?= json_encode($mensalLabels) ?>;
-const mensalSaving = <?= json_encode($mensalSaving) ?>;
+const labelsMes = <?= json_encode($labelsMes) ?>;
+const savingMensal = <?= json_encode($savingMensal) ?>;
 
 function barChart(ctx, labels, data, color) {
     return new Chart(ctx, {
@@ -320,15 +273,18 @@ function lineChart(ctx, labels, data, color) {
                 data,
                 borderColor: color,
                 backgroundColor: 'rgba(0, 0, 0, 0)',
-                fill: false,
-            }],
+                borderWidth: 2,
+                pointBackgroundColor: color,
+                pointRadius: 3,
+                tension: 0.35,
+                fill: false
+            }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: window.biChartScales ? window.biChartScales() : undefined,
-            legend: { display: false },
-        },
+            scales: window.biChartScales ? window.biChartScales() : undefined
+        }
     });
 }
 
@@ -336,7 +292,7 @@ barChart(document.getElementById('chartSavingAuditor'), labelsAud, savingAud, 'r
 barChart(document.getElementById('chartQtdeAuditor'), labelsAud, countAud, 'rgba(208, 113, 176, 0.7)');
 barChart(document.getElementById('chartTipoSavingValor'), labelsTipo, savingTipo, 'rgba(121, 199, 255, 0.7)');
 barChart(document.getElementById('chartTipoSavingQtd'), labelsTipo, countTipo, 'rgba(111, 223, 194, 0.7)');
-lineChart(document.getElementById('chartSavingMensal'), mensalLabels, mensalSaving, 'rgba(76, 175, 80, 0.9)');
+lineChart(document.getElementById('chartSavingEvolucao'), labelsMes, savingMensal, 'rgba(255, 205, 86, 0.85)');
 </script>
 
 <?php require_once("templates/footer.php"); ?>

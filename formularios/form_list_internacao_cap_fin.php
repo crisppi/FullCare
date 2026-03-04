@@ -164,12 +164,17 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
                         name="data_intern_int_max" placeholder="Data Internação Max"
                         value="<?= $data_intern_int_max ?>">
                 </div>
-                <div class="form-group col-sm-1" style="padding:2px !important" style="margin:0px 0px 20px 0px">
-                    <button type="submit" class="btn btn-primary"
+                <div class="form-group col-sm-1 d-flex align-items-start gap-2" style="padding:2px !important">
+                    <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
                         style="background-color:#5e2363;width:42px;height:32px;border-color:#5e2363"><span
                             class="material-icons" style="margin-left:-3px;margin-top:-2px;">
                             search
                         </span></button>
+                    <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/list_internacao_cap_fin.php', ENT_QUOTES, 'UTF-8') ?>"
+                        class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon"
+                        title="Limpar filtros" aria-label="Limpar filtros">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
                 </div>
         </form>
     </div>
@@ -276,6 +281,7 @@ if ($qtdIntItens > $limite) {
                     <th scope="col" style="width:23%">Senha</th>
                     <th scope="col" style="width:12%">Data internação</th>
                     <th scope="col" style="width:4%">Final</th>
+                    <th scope="col" style="width:4%">EA</th>
                     <th scope="col" style="width:13%">Ações</th>
                 </tr>
             </thead>
@@ -311,6 +317,13 @@ if ($qtdIntItens > $limite) {
                             style="font-size: 1.1rem; font-weight:800; color: rgb(255, 25, 55);"></span>
                         <?php }; ?>
                     </td>
+                    <td scope="row">
+                        <?php if ((int)($intern["alerta_evento_adverso_cap"] ?? 0) === 1) { ?>
+                        <span class="bi bi-exclamation-triangle-fill"
+                            style="font-size: 1.1rem; font-weight:800; color:#c62828;"
+                            title="Conta com evento adverso"></span>
+                        <?php } ?>
+                    </td>
                     <td class="action">
                         <div class="dropdown">
                             <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown" role="button"
@@ -345,7 +358,7 @@ if ($qtdIntItens > $limite) {
                 <?php endforeach; ?>
                 <?php if ($qtdIntItens == 0) : ?>
                 <tr>
-                    <td colspan="11" scope="row" class="col-id" style='font-size:15px'>
+                    <td colspan="12" scope="row" class="col-id" style='font-size:15px'>
                         Não foram encontrados registros
                     </td>
                 </tr>
@@ -456,7 +469,6 @@ function loadContent(url) {
             $('#table-content').html(tableContent);
         },
         error: function() {
-            console.log('Error loading content');
         }
     });
 }

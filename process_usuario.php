@@ -1,5 +1,28 @@
 <?php
 
+if (!defined("FLOW_LOGGER_AUTO_V1")) {
+    define("FLOW_LOGGER_AUTO_V1", 1);
+    @require_once(__DIR__ . "/utils/flow_logger.php");
+    if (function_exists("flowLogStart") && function_exists("flowLog")) {
+        $__flowCtxAuto = flowLogStart(basename(__FILE__, ".php"), [
+            "type" => $_POST["type"] ?? $_GET["type"] ?? null,
+            "method" => $_SERVER["REQUEST_METHOD"] ?? null,
+        ]);
+        register_shutdown_function(function () use ($__flowCtxAuto) {
+            $err = error_get_last();
+            if ($err && in_array(($err["type"] ?? 0), [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+                flowLog($__flowCtxAuto, "shutdown.fatal", "ERROR", [
+                    "message" => $err["message"] ?? null,
+                    "file" => $err["file"] ?? null,
+                    "line" => $err["line"] ?? null,
+                ]);
+            }
+            flowLog($__flowCtxAuto, "request.finish", "INFO");
+        });
+    }
+}
+
+
 require_once("globals.php");
 require_once("db.php");
 require_once("models/message.php");
@@ -7,6 +30,38 @@ require_once("dao/usuarioDao.php");
 
 $message = new Message($BASE_URL);
 $userDao = new UserDAO($conn, $BASE_URL);
+
+function normalizeCargoLabel(?string $cargo): string
+{
+    $cargo = mb_strtolower(trim((string)$cargo), 'UTF-8');
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $cargo);
+    $cargo = $ascii !== false ? $ascii : $cargo;
+    return preg_replace('/[^a-z]/', '', $cargo);
+}
+
+function isGestorSeguradoraCargo(?string $cargo): bool
+{
+    $norm = normalizeCargoLabel($cargo);
+    return strpos($norm, 'gestorseguradora') === 0;
+}
+
+function getSeguradoraNomeById(PDO $conn, ?int $seguradoraId): ?string
+{
+    $id = (int)($seguradoraId ?? 0);
+    if ($id <= 0) {
+        return null;
+    }
+
+    try {
+        $stmt = $conn->prepare("SELECT seguradora_seg FROM tb_seguradora WHERE id_seguradora = :id LIMIT 1");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $nome = trim((string)($stmt->fetchColumn() ?: ''));
+        return $nome !== '' ? $nome : null;
+    } catch (Throwable $e) {
+        return null;
+    }
+}
 
 // Resgata o tipo do formulário
 $type = filter_input(INPUT_POST, "type");
@@ -85,6 +140,18 @@ if ($type === "create") {
         $cargo_user = filter_input(INPUT_POST, "cargo_user");
         $obs_user = filter_input(INPUT_POST, "obs_user");
         $senha_default_user = filter_input(INPUT_POST, "senha_default_user");
+        $fk_seguradora_user = filter_input(INPUT_POST, "fk_seguradora_user", FILTER_VALIDATE_INT);
+        if (isGestorSeguradoraCargo($cargo_user)) {
+            $segNome = getSeguradoraNomeById($conn, $fk_seguradora_user);
+            if ($segNome) {
+                $cargo_user = 'Gestor Seguradora - ' . $segNome;
+            } else {
+                $cargo_user = 'Gestor Seguradora';
+                $fk_seguradora_user = null;
+            }
+        } else {
+            $fk_seguradora_user = null;
+        }
 
         // $hash_user = password_hash(filter_input(INPUT_POST, "senha_user"), PASSWORD_DEFAULT);
         // $senha_user = filter_input(INPUT_POST, "senha_user");
@@ -133,6 +200,7 @@ if ($type === "create") {
             $usuario->cargo_user = $cargo_user;
             $usuario->obs_user = $obs_user;
             $usuario->foto_usuario = $foto_usuario;
+            $usuario->fk_seguradora_user = $fk_seguradora_user;
 
             $userDao->create($usuario);
             header("location:list_usuario.php");
@@ -208,6 +276,18 @@ if ($type === "create") {
         $depto_user = filter_input(INPUT_POST, "depto_user");
         $vinculo_user = filter_input(INPUT_POST, "vinculo_user");
         $nivel_user = filter_input(INPUT_POST, "nivel_user");
+        $fk_seguradora_user = filter_input(INPUT_POST, "fk_seguradora_user", FILTER_VALIDATE_INT);
+        if (isGestorSeguradoraCargo($cargo_user)) {
+            $segNome = getSeguradoraNomeById($conn, $fk_seguradora_user);
+            if ($segNome) {
+                $cargo_user = 'Gestor Seguradora - ' . $segNome;
+            } else {
+                $cargo_user = 'Gestor Seguradora';
+                $fk_seguradora_user = null;
+            }
+        } else {
+            $fk_seguradora_user = null;
+        }
 
         $hash_user = password_hash(filter_input(INPUT_POST, "senha_user"), PASSWORD_DEFAULT);
         $senha_user = password_hash($hash_user, PASSWORD_DEFAULT);
@@ -267,6 +347,7 @@ if ($type === "create") {
         $usuarioData->obs_user = $obs_user;
 
         $usuarioData->foto_usuario = $foto_usuario;
+        $usuarioData->fk_seguradora_user = $fk_seguradora_user;
 
         $usuarioDao->update($usuarioData);
 

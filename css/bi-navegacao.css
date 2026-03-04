@@ -1,253 +1,220 @@
-body.bi-theme {
-    background: #eef0ff;
-}
-
-.bi-wrapper {
+.bi-navegacao {
+    background: #edf1f7;
     min-height: 100vh;
-    padding: 32px 60px 48px;
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(180deg, #fdfdff 0%, #eef0ff 100%);
 }
 
-.bi-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 26px;
-}
-
-.bi-title {
-    font-size: 1rem;
-    letter-spacing: 0.6rem;
-    font-weight: 600;
-    color: #0f162d;
-    text-transform: uppercase;
+.bi-navegacao .bi-wrapper {
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 24px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
     margin: 0;
-}
-
-.bi-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.bi-btn {
-    font-size: 0.85rem;
-    padding: 10px 22px;
-    border-radius: 999px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-}
-
-.bi-btn.bi-btn-secondary {
-    background: #fff;
-    color: #2b2d4f;
-    border: 1px solid rgba(89, 93, 143, 0.25);
-    box-shadow: 0 10px 25px rgba(19, 21, 48, 0.12);
-}
-
-.bi-nav-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #2b2d4f;
-    text-decoration: none;
-    font-size: 1.2rem;
-    border: 1px solid rgba(27, 33, 54, 0.1);
-    box-shadow: 0 14px 30px rgba(27, 33, 54, 0.15);
-}
-
-.bi-nav-panel {
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    box-shadow: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5px;
-}
-
-.bi-nav-row {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 8px;
-    align-items: center;
-    padding: 4px 0;
-    border-bottom: 1px solid #f1f4fe;
-    --theme-start: #4f6aff;
-    --theme-end: #643cff;
-}
-
-.bi-nav-row:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.bi-nav-row-label {
-    background: linear-gradient(135deg, var(--theme-start), var(--theme-end));
-    color: #fff;
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 0.4rem;
-    padding: 8px 18px;
-    border-radius: 999px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 230px;
     width: 100%;
-    box-sizing: border-box;
-    white-space: nowrap;
+    max-width: none;
+    min-height: calc(100vh - 18px);
 }
 
-.bi-nav-row-links {
+.bi-navegacao .bi-panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.bi-navegacao .bi-title {
+    font-size: 1rem;
+    color: #263b61;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.bi-navegacao .bi-nav-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.bi-navegacao .bi-nav-group {
+    margin: 0;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(110, 124, 156, 0.18);
+    background: linear-gradient(145deg, #f9fbff, #f2f5fa);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.bi-navegacao .bi-nav-group-summary {
+    list-style: none;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
     gap: 8px;
+    cursor: pointer;
 }
 
-.bi-chip {
-    position: relative;
+.bi-navegacao .bi-nav-group-summary::-webkit-details-marker {
+    display: none;
+}
+
+.bi-navegacao .bi-nav-group-title {
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    flex: 1 1 auto;
+}
+
+.bi-navegacao .bi-nav-group-count {
+    flex: 0 0 auto;
+    min-width: 36px;
+    height: 30px;
+    border-radius: 999px;
     display: inline-flex;
     align-items: center;
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid #eceef7;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #2a3752;
+    border: 1px solid rgba(106, 120, 152, 0.25);
     background: #fff;
-    color: #26254f;
+}
+
+.bi-navegacao .bi-nav-grid {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.bi-navegacao .bi-nav-card {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(132, 149, 182, 0.1);
+    background: #fff;
+    color: #1b2339;
+    font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
-    font-size: 0.85rem;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
 }
 
-.bi-chip::before {
-    content: "";
-    position: absolute;
-    left: -9px;
-    top: 8px;
-    bottom: 8px;
-    width: 6px;
-    border-radius: 999px;
-    background: linear-gradient(180deg, var(--theme-start), var(--theme-end));
+.bi-navegacao .bi-nav-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(94, 35, 99, 0.2);
+    box-shadow: 0 8px 16px rgba(18, 28, 54, 0.1);
 }
 
-.bi-chip:hover,
-.bi-chip:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(24, 27, 70, 0.15);
+.bi-navegacao .bi-nav-group[data-theme="resumo"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #3a499d, #2360c9);
 }
 
-.bi-chip:active {
-    transform: translateY(0);
+.bi-navegacao .bi-nav-group[data-theme="clinico"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #0d7f96, #00a6b7);
 }
 
-.bi-nav-row[data-theme="resumo"] {
-    --theme-start: #1a57ff;
-    --theme-end: #6633ff;
+.bi-navegacao .bi-nav-group[data-theme="auditoria"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #5f5af6, #3d47ff);
 }
 
-.bi-nav-row[data-theme="clinico"] {
-    --theme-start: #0a9cff;
-    --theme-end: #0aa18d;
+.bi-navegacao .bi-nav-group[data-theme="operacional"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #23a5ad, #0b5e5b);
 }
 
-.bi-nav-row[data-theme="auditoria"] {
-    --theme-start: #6946ff;
-    --theme-end: #3a56f9;
+.bi-navegacao .bi-nav-group[data-theme="rede"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #4372d6, #2354b4);
 }
 
-.bi-nav-row[data-theme="operacional"] {
-    --theme-start: #0b9e7b;
-    --theme-end: #16c6e5;
+.bi-navegacao .bi-nav-group[data-theme="financeiro"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #1f8b67, #0c5a40);
 }
 
-.bi-nav-row[data-theme="rede"] {
-    --theme-start: #2564ff;
-    --theme-end: #29a6ff;
+.bi-navegacao .bi-nav-group[data-theme="faturamento"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #6d7899, #4a587d);
 }
 
-.bi-nav-row[data-theme="financeiro"] {
-    --theme-start: #157f5c;
-    --theme-end: #1abf8b;
+.bi-navegacao .bi-nav-group[data-theme="gastos"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #d6882e, #ad5b18);
 }
 
-.bi-nav-row[data-theme="gastos"] {
-    --theme-start: #cd6f18;
-    --theme-end: #ff9c34;
+.bi-navegacao .bi-nav-group[data-theme="anomalias"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #c63f54, #8d1c29);
 }
 
-.bi-nav-row[data-theme="anomalias"] {
-    --theme-start: #c51f1f;
-    --theme-end: #e23d49;
+.bi-navegacao .bi-nav-group[data-theme="conformidade"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #7c63d6, #5d3fc0);
 }
 
-.bi-nav-row[data-theme="conformidade"] {
-    --theme-start: #6d3aff;
-    --theme-end: #9575ff;
+.bi-navegacao .bi-nav-group[data-theme="risco"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #e27b3e, #b64b1e);
 }
 
-.bi-nav-row[data-theme="risco"] {
-    --theme-start: #dc5230;
-    --theme-end: #ff7a43;
+.bi-navegacao .bi-nav-group[data-theme="prevencao"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #e65d6c, #a1333d);
 }
 
-.bi-nav-row[data-theme="prevencao"] {
-    --theme-start: #dc3f52;
-    --theme-end: #fb5d4a;
+.bi-navegacao .bi-nav-group[data-theme="negociacao"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #365bc7, #1a2e88);
 }
 
-.bi-nav-row[data-theme="negociacao"] {
-    --theme-start: #1b78ff;
-    --theme-end: #43c5ff;
+.bi-navegacao .bi-nav-group[data-theme="qualidade"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #1d9a87, #0c6a53);
 }
 
-.bi-nav-row[data-theme="qualidade"] {
-    --theme-start: #1174b6;
-    --theme-end: #15b28c;
+.bi-navegacao .bi-nav-group[data-theme="inteligencia"] .bi-nav-group-title {
+    background: linear-gradient(135deg, #5b6ce2, #313c99);
 }
 
-.bi-nav-row[data-theme="inteligencia"] {
-    --theme-start: #2f4aff;
-    --theme-end: #3f9bff;
+.bi-navegacao .bi-nav-group[data-theme="resumo"] .bi-nav-card { border-left: 3px solid #492b6e; }
+.bi-navegacao .bi-nav-group[data-theme="clinico"] .bi-nav-card { border-left: 3px solid #1c4ab7; }
+.bi-navegacao .bi-nav-group[data-theme="auditoria"] .bi-nav-card { border-left: 3px solid #5633ff; }
+.bi-navegacao .bi-nav-group[data-theme="operacional"] .bi-nav-card { border-left: 3px solid #0ba19f; }
+.bi-navegacao .bi-nav-group[data-theme="rede"] .bi-nav-card { border-left: 3px solid #2051a9; }
+.bi-navegacao .bi-nav-group[data-theme="financeiro"] .bi-nav-card { border-left: 3px solid #0f6e50; }
+.bi-navegacao .bi-nav-group[data-theme="faturamento"] .bi-nav-card { border-left: 3px solid #5c698f; }
+.bi-navegacao .bi-nav-group[data-theme="gastos"] .bi-nav-card { border-left: 3px solid #c7872f; }
+.bi-navegacao .bi-nav-group[data-theme="anomalias"] .bi-nav-card { border-left: 3px solid #b02e41; }
+.bi-navegacao .bi-nav-group[data-theme="conformidade"] .bi-nav-card { border-left: 3px solid #6c4cd6; }
+.bi-navegacao .bi-nav-group[data-theme="risco"] .bi-nav-card { border-left: 3px solid #df6b34; }
+.bi-navegacao .bi-nav-group[data-theme="prevencao"] .bi-nav-card { border-left: 3px solid #e95569; }
+.bi-navegacao .bi-nav-group[data-theme="negociacao"] .bi-nav-card { border-left: 3px solid #3c61ab; }
+.bi-navegacao .bi-nav-group[data-theme="qualidade"] .bi-nav-card { border-left: 3px solid #1d997e; }
+.bi-navegacao .bi-nav-group[data-theme="inteligencia"] .bi-nav-card { border-left: 3px solid #525fe3; }
+
+.bi-navegacao .bi-btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(36, 55, 90, 0.24);
+    color: #1f3356;
 }
 
-@media (max-width: 1024px) {
-    .bi-wrapper {
-        padding: 24px 28px;
-    }
-
-    .bi-nav-row {
+@media (max-width: 1200px) {
+    .bi-navegacao .bi-nav-groups-grid {
         grid-template-columns: 1fr;
     }
-
-    .bi-nav-row-label {
-        justify-content: flex-start;
-    }
 }
 
-@media (max-width: 600px) {
-    .bi-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
+@media (max-width: 768px) {
+    .bi-navegacao .bi-wrapper {
+        border-radius: 16px;
+        padding: 14px;
     }
 
-    .bi-nav-panel {
-        padding: 24px;
+    .bi-navegacao .bi-title {
+        letter-spacing: 0.15em;
+        font-size: 0.9rem;
     }
 
-    .bi-chip {
-        font-size: 0.8rem;
-        padding: 8px 16px;
+    .bi-navegacao .bi-nav-grid {
+        grid-template-columns: 1fr;
     }
 }

@@ -721,6 +721,7 @@ class internacaoDAO implements internacaoDAOInterface
         ac.internado_int,
         pa.id_paciente,
         pa.nome_pac,
+        s.seguradora_seg,
         ho.id_hospital, 
         ho.nome_hosp
 
@@ -731,6 +732,9 @@ class internacaoDAO implements internacaoDAOInterface
 
         left join tb_paciente as pa on
         ac.fk_paciente_int = pa.id_paciente
+
+        left join tb_seguradora as s on
+        pa.fk_seguradora_pac = s.id_seguradora
 
         WHERE nome_hosp LIKE '$where' AND internado_int = '$ativo' LIMIT $inicio, $limite");
 
@@ -1213,16 +1217,28 @@ class internacaoDAO implements internacaoDAOInterface
         return $QtdTotalInt;
     }
     // MODELO DE FILTRO COM SELECT ATUAL COM FILTROS E PAGINACAO
-    public function selectAllInternacaoList($where = null, $order = null, $limit = null)
+    public function selectAllInternacaoList($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
         $where = strlen($where) ? 'WHERE ' . $where : '';
         $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        if ($limit !== null && $limit !== '') {
+            $limitParts = array_map('trim', explode(',', (string)$limit));
+            if (count($limitParts) === 2) {
+                $offset = max(0, (int)$limitParts[0]);
+                $qty = max(0, (int)$limitParts[1]);
+                $limit = "LIMIT {$offset}, {$qty}";
+            } else {
+                $qty = max(0, (int)$limitParts[0]);
+                $limit = "LIMIT {$qty}";
+            }
+        } else {
+            $limit = '';
+        }
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT 
+        $sql = 'SELECT 
         ac.id_internacao, 
         ac.acoes_int, 
         ac.data_intern_int,
@@ -1250,6 +1266,7 @@ class internacaoDAO implements internacaoDAOInterface
         ac.senha_int,
         pa.id_paciente,
         pa.nome_pac,
+        s.seguradora_seg,
         ho.id_hospital, 
         ut.fk_internacao_uti,
         ut.internacao_uti,
@@ -1297,6 +1314,9 @@ class internacaoDAO implements internacaoDAOInterface
             LEFT JOIN tb_paciente AS pa ON
             ac.fk_paciente_int = pa.id_paciente 
 
+            LEFT JOIN tb_seguradora AS s ON
+            pa.fk_seguradora_pac = s.id_seguradora
+
             LEFT join tb_visita as vi on
             ac.id_internacao = vi.fk_internacao_vis
     
@@ -1306,8 +1326,13 @@ class internacaoDAO implements internacaoDAOInterface
             LEFT JOIN tb_intern_antec AS an on
             ac.id_internacao = fK_internacao_ant_int
             
-             ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
+             ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit;
 
+        $query = $this->conn->prepare($sql);
+        foreach ($params as $key => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $query->bindValue($key, $value, $paramType);
+        }
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -1424,14 +1449,25 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \\ ********
     // ********* MODELO DE FILTRO COM SELECT ATUAL COM FILTROS E PAGINACAO CAPEANTE ********
     // ********* \\ ********
-    public function selectAllInternacaoCap($where = null, $order = null, $limit = null)
+    public function selectAllInternacaoCap($where = null, $order = null, $limit = null, array $params = [])
     {
         $where = ($where !== null && $where !== '') ? 'WHERE ' . $where : '';
         $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        if ($limit !== null && $limit !== '') {
+            $limitParts = array_map('trim', explode(',', (string)$limit));
+            if (count($limitParts) === 2) {
+                $offset = max(0, (int)$limitParts[0]);
+                $qty = max(0, (int)$limitParts[1]);
+                $limit = "LIMIT {$offset}, {$qty}";
+            } else {
+                $qty = max(0, (int)$limitParts[0]);
+                $limit = "LIMIT {$qty}";
+            }
+        } else {
+            $limit = '';
+        }
 
-        $query = $this->conn->query(
-            'SELECT 
+        $sql = 'SELECT 
     ac.id_internacao, 
     ac.acoes_int, 
     ac.data_intern_int,
@@ -1528,9 +1564,13 @@ class internacaoDAO implements internacaoDAOInterface
         LEFT JOIN tb_paciente AS pa ON ac.fk_paciente_int = pa.id_paciente 
         LEFT JOIN tb_capeante AS ca ON ac.id_internacao = ca.fk_int_capeante 
         
-        ' . $where . ' ' . $order . ' ' . $limit
-        );
+        ' . $where . ' ' . $order . ' ' . $limit;
 
+        $query = $this->conn->prepare($sql);
+        foreach ($params as $key => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $query->bindValue($key, $value, $paramType);
+        }
         $query->execute();
         return $query->fetchAll();
     }
@@ -1824,7 +1864,8 @@ class internacaoDAO implements internacaoDAOInterface
         ca.parada_motivo_cap,
         ca.lote_cap,
         ca.data_fech_capeante,
-        ca.data_digit_capeante
+        ca.data_digit_capeante,
+        MAX(CASE WHEN LOWER(COALESCE(ge.evento_adverso_ges, \'\')) = \'s\' THEN 1 ELSE 0 END) AS alerta_evento_adverso_cap
 
         FROM tb_internacao ac 
 
@@ -1845,6 +1886,9 @@ class internacaoDAO implements internacaoDAOInterface
 
             left join tb_capeante as ca on
             ac.id_internacao = ca.fk_int_capeante 
+            
+            LEFT JOIN tb_gestao AS ge ON
+            ge.fk_internacao_ges = ac.id_internacao
 
             
 
@@ -2401,7 +2445,9 @@ class internacaoDAO implements internacaoDAOInterface
                 vi.visita_no_vis,
                 vi.data_visita_vis,
                 pa.nome_pac,
-                hos.nome_hosp
+                hos.nome_hosp,
+                s.dias_visita_seg,
+                s.seguradora_seg
                 
                 FROM tb_internacao ac 
 
@@ -2412,7 +2458,10 @@ class internacaoDAO implements internacaoDAOInterface
                 ac.fk_hospital_int = hos.id_hospital
 
                 inner join tb_paciente as pa on
-                ac.fk_paciente_int = pa.id_paciente " . $where
+                ac.fk_paciente_int = pa.id_paciente
+
+                left join tb_seguradora as s on
+                pa.fk_seguradora_pac = s.id_seguradora " . $where
         );
 
         $query->execute();
