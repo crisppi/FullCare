@@ -116,10 +116,16 @@ try {
     }
 
     $smtpHost = getenv('SMTP_HOST') ?: 'smtps.uhserver.com';
-    $smtpUser = getenv('SMTP_USER') ?: 'diretoriaexecutiva@accertconsult.com.br';
-    $smtpPass = getenv('SMTP_PASS') ?: 'Accert@1206';
+    $smtpUser = getenv('SMTP_USER') ?: '';
+    $smtpPass = getenv('SMTP_PASS') ?: '';
     $smtpFrom = getenv('SMTP_FROM') ?: $smtpUser;
     $smtpName = getenv('SMTP_NAME') ?: 'FullCare';
+    $smtpPort = (int)(getenv('SMTP_PORT') ?: 465);
+    $smtpSecure = getenv('SMTP_SECURE') ?: 'ssl';
+
+    if ($smtpUser === '' || $smtpPass === '') {
+        throw new RuntimeException('SMTP_USER/SMTP_PASS nao configurados.');
+    }
 
     $mail = new PHPMailer(true);
     $mail->CharSet = 'UTF-8';
@@ -129,8 +135,8 @@ try {
     $mail->SMTPAuth = true;
     $mail->Username = $smtpUser;
     $mail->Password = $smtpPass;
-    $mail->SMTPSecure = 'ssl';
-    $mail->Port = 465;
+    $mail->SMTPSecure = $smtpSecure;
+    $mail->Port = $smtpPort > 0 ? $smtpPort : 465;
 
     $mail->setFrom($smtpFrom, $smtpName);
     $mail->addAddress($email, $user['usuario_user'] ?? '');

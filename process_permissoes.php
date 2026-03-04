@@ -75,6 +75,7 @@ try {
     $dao->bulkUpdate($perm);
     echo json_encode(['status' => 'ok']);
 } catch (Throwable $e) {
+    error_log('[PERMISSOES] ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => 'Erro ao salvar permissões.']);
 }

@@ -791,7 +791,7 @@ class internacaoDAO implements internacaoDAOInterface
 
     public function findByHospital($pesquisa_hosp, $limite, $inicio)
     {
-        $stmt = $this->conn->query("SELECT 
+        $sql = "SELECT 
         ac.id_internacao, 
         ac.acoes_int, 
         ac.data_intern_int,
@@ -823,11 +823,15 @@ class internacaoDAO implements internacaoDAOInterface
         iNNER JOIN tb_hospital as ho On  
         ac.fk_hospital_int = ho.id_hospital
 
-        left join tb_paciente as pa on
+        LEFT JOIN tb_paciente as pa on
         ac.fk_paciente_int = pa.id_paciente
 
-        WHERE nome_hosp like '%" . $pesquisa_hosp . "%' LIMIT $inicio, $limite");
-
+        WHERE nome_hosp LIKE :pesquisa_hosp
+        LIMIT :inicio, :limite";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':pesquisa_hosp', '%' . (string)$pesquisa_hosp . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':inicio', (int)$inicio, PDO::PARAM_INT);
+        $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
         $stmt->execute();
 
         $internacao = $stmt->fetchAll();
@@ -837,7 +841,7 @@ class internacaoDAO implements internacaoDAOInterface
     // public 2 -> selecao de internados
     public function findByInternado($ativo, $limite, $inicio)
     {
-        $stmt = $this->conn->query("SELECT 
+        $sql = "SELECT 
         ac.id_internacao, 
         ac.acoes_int, 
         ac.data_intern_int,
@@ -870,11 +874,15 @@ class internacaoDAO implements internacaoDAOInterface
         iNNER JOIN tb_hospital as ho On  
         ac.fk_hospital_int = ho.id_hospital
 
-        left join tb_paciente as pa on
+        LEFT JOIN tb_paciente as pa on
         ac.fk_paciente_int = pa.id_paciente
 
-        WHERE internado_int = '$ativo' LIMIT $inicio, $limite");
-
+        WHERE internado_int = :ativo
+        LIMIT :inicio, :limite";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':ativo', (string)$ativo, PDO::PARAM_STR);
+        $stmt->bindValue(':inicio', (int)$inicio, PDO::PARAM_INT);
+        $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
         $stmt->execute();
 
         $internacao = $stmt->fetchAll();
@@ -887,8 +895,7 @@ class internacaoDAO implements internacaoDAOInterface
     // public 4 -> selecao sem filtros
     public function findByAll($limite, $inicio)
     {
-        $internacao = [];
-        $stmt = $this->conn->query("SELECT ac.id_internacao, 
+        $sql = "SELECT ac.id_internacao, 
         ac.acoes_int,  
         ac.internado_int, 
         ac.fk_patologia_int, 
@@ -918,13 +925,14 @@ class internacaoDAO implements internacaoDAOInterface
         iNNER JOIN tb_hospital as ho On  
         ac.fk_hospital_int = ho.id_hospital
 
-        left join tb_paciente as pa on
-        ac.fk_paciente_int = pa.id_paciente ORDER BY id_internacao DESC limit $inicio, $limite");
-
+        LEFT JOIN tb_paciente as pa on
+        ac.fk_paciente_int = pa.id_paciente ORDER BY id_internacao DESC LIMIT :inicio, :limite";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':inicio', (int)$inicio, PDO::PARAM_INT);
+        $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
         $stmt->execute();
 
-        $internacao = $stmt->fetchAll();
-        return $internacao;
+        return $stmt->fetchAll();
     }
     public function findTotal()
     {
@@ -3098,8 +3106,9 @@ ORDER BY
 
         return $reinternacao;
     }
-    public function reinternacaoNova($where_gerais_reint)
+    public function reinternacaoNova($where_gerais_reint, $diasLimite = 2)
     {
+        $diasLimite = max(1, (int)$diasLimite);
         $where_gerais_reint = strlen($where_gerais_reint) ? ' AND ' . $where_gerais_reint : '';
 
         $stmt = $this->conn->query(
@@ -3125,7 +3134,7 @@ INNER JOIN
 INNER JOIN 
     tb_alta al_anterior ON ac_anterior.id_internacao = al_anterior.fk_id_int_alt
 WHERE 
-    DATEDIFF(ac.data_intern_int, al_anterior.data_alta_alt) <= 2
+    DATEDIFF(ac.data_intern_int, al_anterior.data_alta_alt) <= ' . $diasLimite . '
     AND al_anterior.data_alta_alt IS NOT NULL
     AND ac.data_intern_int > al_anterior.data_alta_alt'
                 . $where_gerais_reint

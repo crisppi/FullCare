@@ -10,6 +10,12 @@ require_once 'db.php';
 require_once 'models/internacao.php';
 require_once 'dao/internacaoDao.php';
 
+if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
+    exit;
+}
+
 $response = ['success' => true, 'hasActive' => false];
 
 try {
@@ -58,6 +64,5 @@ try {
     echo json_encode([
         'success' => false,
         'error'   => 'Erro interno',
-        'detail'  => $e->getMessage(),
     ]);
 }

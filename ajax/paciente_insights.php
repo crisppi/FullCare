@@ -11,6 +11,12 @@ require_once 'db.php';
 require_once 'models/internacao.php';
 require_once 'dao/internacaoDao.php';
 
+if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
+    exit;
+}
+
 try {
     $pacienteId = filter_input(INPUT_GET, 'id_paciente', FILTER_VALIDATE_INT);
     if (!$pacienteId) {
@@ -47,6 +53,5 @@ try {
     echo json_encode([
         'success' => false,
         'error'   => 'Erro ao recuperar dados do paciente',
-        'detail'  => $e->getMessage()
     ]);
 }

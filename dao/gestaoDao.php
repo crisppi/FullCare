@@ -87,13 +87,12 @@ class gestaoDAO implements gestaoDAOInterface
     // mostrar acomocacao por id_gestao
     public function joingestaoHospitalshow($id_gestao)
     {
-        $stmt = $this->conn->query("SELECT ac.id_gestao, ac.fk_hospital, ac.valor_aco, ac.gestao_aco, ho.id_hospital, ho.nome_hosp
-         FROM tb_gestao ac          
-         iNNER JOIN tb_hospital as ho On  
+        $stmt = $this->conn->prepare("SELECT ac.id_gestao, ac.fk_hospital, ac.valor_aco, ac.gestao_aco, ho.id_hospital, ho.nome_hosp
+         FROM tb_gestao ac
+         iNNER JOIN tb_hospital as ho On
          ac.fk_hospital = ho.id_hospital
-         where id_gestao = $id_gestao   
-         ");
-
+         where id_gestao = :id_gestao");
+        $stmt->bindValue(':id_gestao', (int)$id_gestao, PDO::PARAM_INT);
         $stmt->execute();
 
         $gestao = $stmt->fetch();

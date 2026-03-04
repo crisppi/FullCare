@@ -1,4 +1,5 @@
 <?php
+define('SKIP_HEADER', true);
 include_once("check_logado.php");
 
 require_once("globals.php");
@@ -11,6 +12,7 @@ require_once("dao/acomodacaoDao.php");
 //$message = new Message($BASE_URL);
 $userDao = new UserDAO($conn, $BASE_URL);
 $acomodacaoDao = new acomodacaoDAO($conn, $BASE_URL);
+Gate::enforceAction($conn, $BASE_URL, 'delete', 'Você não tem permissão para excluir acomodação.');
 //$acomodacao = new Paciente();
 // Resgata o tipo do formulário
 

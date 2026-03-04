@@ -9,6 +9,12 @@ chdir($ROOT);
 require_once 'globals.php';
 require_once 'db.php';
 
+if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
+    exit;
+}
+
 try {
     $hospitalId = filter_input(INPUT_GET, 'id_hospital', FILTER_VALIDATE_INT);
     if (!$hospitalId) {
@@ -126,6 +132,5 @@ try {
     echo json_encode([
         'success' => false,
         'error'   => 'Erro ao recuperar insights',
-        'detail'  => $e->getMessage()
     ]);
 }

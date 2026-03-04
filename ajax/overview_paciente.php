@@ -15,6 +15,12 @@ require_once 'dao/internacaoDao.php';
 require_once 'models/visita.php';
 require_once 'dao/visitaDao.php';
 
+if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
+  http_response_code(401);
+  echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
+  exit;
+}
+
 try {
   $pacId = filter_input(INPUT_GET, 'id_paciente', FILTER_VALIDATE_INT);
   if (!$pacId) {
@@ -90,6 +96,5 @@ try {
   echo json_encode([
     'success' => false,
     'error'   => 'Erro interno',
-    'detail'  => $e->getMessage()
   ]);
 }

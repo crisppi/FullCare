@@ -722,6 +722,7 @@ if ($type === "update") {
 // DELETE (no seu fluxo vinha por GET id_visita)
 // ----------------------------------------------------------------------
 if ($type === "delete") {
+    Gate::enforceAction($conn, $BASE_URL, 'delete', 'Você não tem permissão para excluir visita.');
     flowLog($flowCtx, 'delete.legacy.start', 'INFO');
 
     try {

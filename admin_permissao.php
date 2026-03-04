@@ -11,17 +11,23 @@ include_once __DIR__ . '/dao/usuarioDao.php';
    SESSÃO E GUARDA DE ACESSO
    ========================= */
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    $cookiePath = rtrim((string)parse_url($BASE_URL, PHP_URL_PATH), '/');
+    if ($cookiePath === '') {
+        $cookiePath = '/';
+    }
     session_set_cookie_params([
         'lifetime' => 0,
-        'path'     => '/FullConex',
+        'path'     => $cookiePath,
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
     session_start();
 }
 
-/* DEV OPCIONAL: admin quick */
-if (isset($_GET['dev_admin']) && $_GET['dev_admin'] === '1') {
+/* DEV OPCIONAL: admin quick (desabilitado por padrao) */
+$allowDebugTools = (getenv('APP_DEBUG_TOOLS') === '1');
+$isLocalRequest = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
+if ($allowDebugTools && $isLocalRequest && isset($_GET['dev_admin']) && $_GET['dev_admin'] === '1') {
     $_SESSION['id_usuario'] = 1;
     $_SESSION['ativo']      = 's';
     $_SESSION['cargo']      = 'Diretoria';
@@ -30,8 +36,8 @@ if (isset($_GET['dev_admin']) && $_GET['dev_admin'] === '1') {
     exit;
 }
 
-/* DEBUG OPCIONAL */
-if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+/* DEBUG OPCIONAL (somente local + flag explicita) */
+if ($allowDebugTools && $isLocalRequest && isset($_GET['debug']) && $_GET['debug'] === '1') {
     header('Content-Type: text/plain; charset=utf-8');
     echo "Arquivo: " . ($_SERVER['SCRIPT_FILENAME'] ?? '') . "\n";
     echo "URL: " . ($_SERVER['REQUEST_URI'] ?? '') . "\n\n";
@@ -45,7 +51,7 @@ if (isset($_GET['debug']) && $_GET['debug'] === '1') {
 
 /* Guard de login */
 if (empty($_SESSION['id_usuario'])) {
-    $next = urlencode($_SERVER['REQUEST_URI'] ?? '/FullConex/admin_permissao.php');
+    $next = urlencode($_SERVER['REQUEST_URI'] ?? '/admin_permissao.php');
     header("Location: {$BASE_URL}index.php?next={$next}");
     exit;
 }

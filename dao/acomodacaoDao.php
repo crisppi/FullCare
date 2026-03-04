@@ -249,16 +249,10 @@ class acomodacaoDAO implements acomodacaoDAOInterface
 
     public function findGeralByHospital($id_hospital)
     {
-
-        $acomodacao = [];
-
-        $stmt = $this->conn->query("SELECT * FROM tb_acomodacao WHERE fk_hospital = $id_hospital ORDER BY id_acomodacao DESC");
-
+        $stmt = $this->conn->prepare("SELECT * FROM tb_acomodacao WHERE fk_hospital = :id_hospital ORDER BY id_acomodacao DESC");
+        $stmt->bindValue(':id_hospital', (int)$id_hospital, PDO::PARAM_INT);
         $stmt->execute();
-
-        $acomodacao = $stmt->fetchAll();
-
-        return $acomodacao;
+        return $stmt->fetchAll();
     }
 
 
@@ -311,20 +305,20 @@ class acomodacaoDAO implements acomodacaoDAOInterface
 
     public function calcularSaving($de, $para, $qtd)
     {
-        $saving = null;
-
-        $stmt = $this->conn->query("SELECT (max(de) - max(para)) * $qtd FROM (
-            SELECT 
-            CASE WHEN id_acomodacao = $de THEN valor_aco END AS de,
-            CASE WHEN id_acomodacao = $para THEN valor_aco END AS para
-            FROM tb_acomodacao 
-            WHERE id_acomodacao IN($de,$para)
-            ) AS valores;");
-
+        $sql = "SELECT (MAX(de) - MAX(para)) * :qtd AS saving FROM (
+            SELECT
+                CASE WHEN id_acomodacao = :de THEN valor_aco END AS de,
+                CASE WHEN id_acomodacao = :para THEN valor_aco END AS para
+            FROM tb_acomodacao
+            WHERE id_acomodacao IN (:de_in, :para_in)
+        ) AS valores";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':qtd', (float)$qtd);
+        $stmt->bindValue(':de', (int)$de, PDO::PARAM_INT);
+        $stmt->bindValue(':para', (int)$para, PDO::PARAM_INT);
+        $stmt->bindValue(':de_in', (int)$de, PDO::PARAM_INT);
+        $stmt->bindValue(':para_in', (int)$para, PDO::PARAM_INT);
         $stmt->execute();
-
-        $saving = $stmt->fetch();
-
-        return $saving;
+        return $stmt->fetch();
     }
 }

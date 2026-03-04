@@ -26,18 +26,18 @@ class indicadoresDAO
         return ($where !== null && trim($where) !== '') ? ' AND ' . $where : '';
     }
 
-    /** Retorna ex.: ['0' => '12.34%', 'perc' => '12.34%'] */
+    /** Retorna ex.: ['perc' => '12.34%'] */
     public function getUtiPerc($where)
     {
-        // Fórmula robusta: internados em UTI / internados totais * 100
-        // Evita divisão por zero com NULLIF; TRUNCATE para 2 casas e concatena '%'
+        // Fórmula: internações com UTI / total de internações * 100.
+        // Usa DISTINCT para não duplicar internações com múltiplos registros em tb_uti.
         $sql = "
             SELECT CONCAT(
                 TRUNCATE(
                     (
-                        SUM(CASE WHEN i.internado_int = 's' AND uti.fk_internacao_uti IS NOT NULL THEN 1 ELSE 0 END)
+                        COUNT(DISTINCT CASE WHEN i.internado_int = 's' AND uti.fk_internacao_uti IS NOT NULL THEN i.id_internacao END)
                         /
-                        NULLIF(SUM(CASE WHEN i.internado_int = 's' THEN 1 ELSE 0 END), 0)
+                        NULLIF(COUNT(DISTINCT CASE WHEN i.internado_int = 's' THEN i.id_internacao END), 0)
                     ) * 100
                 , 2),
                 '%'
@@ -94,6 +94,23 @@ class indicadoresDAO
         $longa = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return $longa ?: [];
+    }
+
+    /** Retorna total de internações ativas com permanência acima de X dias */
+    public function countLongaPermanenciaByDays($where, int $dias): int
+    {
+        $dias = max(0, (int)$dias);
+        $sql = "
+            SELECT COUNT(DISTINCT i.id_internacao) AS total
+            FROM tb_internacao i
+            WHERE i.internado_int = 's'
+              AND DATEDIFF(CURRENT_DATE(), i.data_intern_int) > :dias
+        " . $this->andWhere($where);
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':dias', $dias, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int)($stmt->fetchColumn() ?: 0);
     }
 
     /** Retorna ['0' => total] – evita 'WHERE ' pendurado */

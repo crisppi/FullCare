@@ -6,6 +6,11 @@ include_once("dao/usuarioDao.php");
 include_once("templates/header.php");
 include_once("array_dados.php");
 
+if (empty($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = bin2hex(random_bytes(16));
+}
+$csrfToken = (string)$_SESSION['csrf'];
+
 // Debug simples por querystring (?debug=1)
 $debug = isset($_GET['debug']) && $_GET['debug'] == '1';
 $__t0 = microtime(true);
@@ -438,17 +443,25 @@ function resetSenha(id_user, evt) {
 
     // Dados a serem enviados para o backend
     const formData = {
-        id: id_user
+        id: id_user,
+        csrf: <?= json_encode($csrfToken) ?>
     };
 
     // Faz a requisição AJAX
     $.ajax({
         url: '<?= $BASE_URL ?>process_reset_senha.php',
         type: 'POST',
+        dataType: 'json',
         data: formData,
         success: function(response) {
-
-            $('#responseMessage').html('Senha resetada com sucesso.');
+            if (response && response.success) {
+                const temp = response.temporary_password ?
+                    `<br><strong>Senha temporária:</strong> ${response.temporary_password}` : '';
+                $('#responseMessage').html(`Senha resetada com sucesso.${temp}`);
+                return;
+            }
+            $('#responseMessage').html((response && response.message) ?
+                response.message : 'Falha ao resetar senha.');
         },
         error: function(xhr, status, error) {
             console.error("Erro:", error);

@@ -430,6 +430,23 @@ if (!empty($longa_perm_list)) {
     $longa_perm_list = [];
 }
 
+// Longa permanência por janela (dias de internação)
+$longa_perm_10 = dashCacheGet($cacheBase . '_longa_perm_10', 60);
+if (!is_int($longa_perm_10)) {
+    $longa_perm_10 = $indicadores->countLongaPermanenciaByDays($where_gerais, 10);
+    dashCacheSet($cacheBase . '_longa_perm_10', $longa_perm_10);
+}
+$longa_perm_15 = dashCacheGet($cacheBase . '_longa_perm_15', 60);
+if (!is_int($longa_perm_15)) {
+    $longa_perm_15 = $indicadores->countLongaPermanenciaByDays($where_gerais, 15);
+    dashCacheSet($cacheBase . '_longa_perm_15', $longa_perm_15);
+}
+$longa_perm_30 = dashCacheGet($cacheBase . '_longa_perm_30', 60);
+if (!is_int($longa_perm_30)) {
+    $longa_perm_30 = $indicadores->countLongaPermanenciaByDays($where_gerais, 30);
+    dashCacheSet($cacheBase . '_longa_perm_30', $longa_perm_30);
+}
+
 // Contas paradas
 $contas_paradas = dashCacheGet($cacheBase . '_contas_paradas', 60);
 if (!is_array($contas_paradas)) {
@@ -451,13 +468,27 @@ if (!is_array($score_baixo)) {
     dashCacheSet($cacheBase . '_score_baixo', $score_baixo);
 }
 
-// Reinternações
-$reinternacaohosp = dashCacheGet($cacheBase . '_reinternacao', 60);
-if (!is_array($reinternacaohosp)) {
-    $reinternacaohosp = $Internacao_geral->reinternacaoNova($where_gerais_reint);
-    dashCacheSet($cacheBase . '_reinternacao', $reinternacaohosp);
+// Reinternações por janela
+$reinternacao_5 = dashCacheGet($cacheBase . '_reinternacao_5', 60);
+if (!is_array($reinternacao_5)) {
+    $reinternacao_5 = $Internacao_geral->reinternacaoNova($where_gerais_reint, 5);
+    dashCacheSet($cacheBase . '_reinternacao_5', $reinternacao_5);
 }
-$total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 0;
+$total_reinternacoes_5 = is_array($reinternacao_5) ? count($reinternacao_5) : 0;
+
+$reinternacao_10 = dashCacheGet($cacheBase . '_reinternacao_10', 60);
+if (!is_array($reinternacao_10)) {
+    $reinternacao_10 = $Internacao_geral->reinternacaoNova($where_gerais_reint, 10);
+    dashCacheSet($cacheBase . '_reinternacao_10', $reinternacao_10);
+}
+$total_reinternacoes_10 = is_array($reinternacao_10) ? count($reinternacao_10) : 0;
+
+$reinternacao_30 = dashCacheGet($cacheBase . '_reinternacao_30', 60);
+if (!is_array($reinternacao_30)) {
+    $reinternacao_30 = $Internacao_geral->reinternacaoNova($where_gerais_reint, 30);
+    dashCacheSet($cacheBase . '_reinternacao_30', $reinternacao_30);
+}
+$total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) : 0;
 ?>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -722,6 +753,96 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
     border-color: rgba(200, 92, 116, 0.42);
 }
 
+.reint-mini-group {
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+}
+
+.reint-mini-btn {
+    min-width: 92px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid rgba(216, 172, 93, 0.45);
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(248, 249, 255, 0.78));
+    color: #996200;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 10px;
+    font-weight: 700;
+    font-size: 0.74rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.reint-mini-btn b {
+    font-size: 1.1rem;
+}
+
+.reint-mini-btn .txt {
+    display: inline-block;
+    opacity: .9;
+    text-align: center;
+}
+
+.reint-helper {
+    position: absolute;
+    top: 46px;
+    left: 14px;
+    right: 14px;
+    font-size: .72rem;
+    color: #6a5a84;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.kpi-helper {
+    position: absolute;
+    top: 46px;
+    left: 14px;
+    right: 14px;
+    font-size: .72rem;
+    color: #6a5a84;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.longa-mini-group {
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+}
+
+.longa-mini-btn {
+    min-width: 92px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid rgba(216, 172, 93, 0.45);
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(248, 249, 255, 0.78));
+    color: #996200;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 10px;
+    font-weight: 700;
+    font-size: 0.74rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.longa-mini-btn b {
+    font-size: 1.1rem;
+}
+
 .select-item {
     position: absolute;
     bottom: 18px;
@@ -877,13 +998,23 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
             <div class="grid-item grid-item-kpi kpi-warning">
                 <div class="title-item"><i class="fa-solid fa-clock"></i> Longa Permanência</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
-                <div class="badge-item badge-warning"><?= !empty($longa_perm) ? count($longa_perm) : 0 ?></div>
+                <div class="kpi-helper">Dias de internação</div>
+                <div class="longa-mini-group">
+                    <span class="longa-mini-btn">&gt;10d <b><?= (int)$longa_perm_10 ?></b></span>
+                    <span class="longa-mini-btn">&gt;15d <b><?= (int)$longa_perm_15 ?></b></span>
+                    <span class="longa-mini-btn">&gt;30d <b><?= (int)$longa_perm_30 ?></b></span>
+                </div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-warning">
-                <div class="title-item"><i class="fa-solid fa-bars-progress"></i> Reinternações &lt; 2 dias</div>
+                <div class="title-item"><i class="fa-solid fa-bars-progress"></i> Reinternações</div>
+                <div class="reint-helper">Tempo entre alta e nova internação</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
-                <div class="badge-item badge-warning"><?= $total_reinternacoes ?? 0 ?></div>
+                <div class="reint-mini-group">
+                    <span class="reint-mini-btn"><span class="txt">até 5d</span><b><?= $total_reinternacoes_5 ?? 0 ?></b></span>
+                    <span class="reint-mini-btn"><span class="txt">até 10d</span><b><?= $total_reinternacoes_10 ?? 0 ?></b></span>
+                    <span class="reint-mini-btn"><span class="txt">até 30d</span><b><?= $total_reinternacoes_30 ?? 0 ?></b></span>
+                </div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-warning">
@@ -912,8 +1043,9 @@ $total_reinternacoes = is_array($reinternacaohosp) ? count($reinternacaohosp) : 
 
             <div class="grid-item grid-item-kpi kpi-info">
                 <div class="title-item"><i class="fa-solid fa-percent"></i> Porcentagem em UTI</div>
+                <div class="kpi-helper">Internações UTI / total de internações</div>
                 <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
-                <div class="badge-item badge-info"><?= $perc_uti[0] ?? "0.00%" ?></div>
+                <div class="badge-item badge-info"><?= $perc_uti['perc'] ?? "0.00%" ?></div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-critical">

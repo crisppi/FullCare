@@ -1,4 +1,5 @@
 <?php
+define('SKIP_HEADER', true);
 include_once("check_logado.php");
 
 require_once("globals.php");
@@ -9,6 +10,7 @@ require_once("dao/hospitalUserDao.php");
 
 $userDao = new UserDAO($conn, $BASE_URL);
 $hospitalUserDao = new hospitalUserDAO($conn, $BASE_URL);
+Gate::enforceAction($conn, $BASE_URL, 'delete', 'Você não tem permissão para excluir vínculo hospital-usuário.');
 
 $type = "delete";
 //$type = filter_input(INPUT_POST, "type");

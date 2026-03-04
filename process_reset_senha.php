@@ -27,18 +27,59 @@ require_once("db.php");
 require_once("dao/usuarioDao.php");
 
 try {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    header('Content-Type: application/json; charset=utf-8');
+
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['success' => false, 'message' => 'Método não permitido.']);
+        exit;
+    }
+
+    $idSessao = (int)($_SESSION['id_usuario'] ?? 0);
+    $ativo = strtolower((string)($_SESSION['ativo'] ?? ''));
+    $cargo = (string)($_SESSION['cargo'] ?? '');
+    $nivel = (string)($_SESSION['nivel'] ?? '');
+
+    $norm = static function ($txt): string {
+        $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+        $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+        $txt = $ascii !== false ? $ascii : $txt;
+        return preg_replace('/[^a-z]/', '', $txt);
+    };
+
+    $isDiretoria = in_array($norm($cargo), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+        || in_array($norm($nivel), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+        || ((int)$nivel === -1);
+
+    if ($idSessao <= 0 || $ativo !== 's' || !$isDiretoria) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
+        exit;
+    }
+
+    $csrf = (string)filter_input(INPUT_POST, 'csrf', FILTER_UNSAFE_RAW);
+    if ($csrf === '' || empty($_SESSION['csrf']) || !hash_equals((string)$_SESSION['csrf'], $csrf)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'CSRF inválido.']);
+        exit;
+    }
+
     // Inicializa o DAO de usuário
     $usuarioDAO = new UserDAO($conn, $BASE_URL);
 
     // Obtém o ID do usuário via POST
-    $id_user = filter_input(INPUT_POST, "id", FILTER_SANITIZE_NUMBER_INT);
+    $id_user = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
 
     if (!$id_user) {
         throw new Exception("ID do usuário inválido ou não fornecido.");
     }
 
-    // Gera a senha padrão
-    $senha_user = password_hash("1234", PASSWORD_DEFAULT);
+    // Gera senha temporária aleatória forte (não previsível)
+    $tempPassword = substr(str_replace(['+', '/', '='], '', base64_encode(random_bytes(12))), 0, 12);
+    $senha_user = password_hash($tempPassword, PASSWORD_DEFAULT);
 
     // Busca o usuário pelo ID
     $usuario = $usuarioDAO->findById_user($id_user);
@@ -53,15 +94,19 @@ try {
 
     $usuarioDAO->update($usuario);
 
-    echo '1';
+    echo json_encode([
+        'success' => true,
+        'message' => 'Senha resetada com sucesso.',
+        'temporary_password' => $tempPassword,
+    ], JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
     // Log de erro
     error_log("Erro ao processar a requisição: " . $e->getMessage());
 
     // Retorno de erro para o cliente
+    http_response_code(500);
     echo json_encode([
         "success" => false,
         "message" => "Ocorreu um erro: " . $e->getMessage()
     ]);
-    http_response_code(500);
 }

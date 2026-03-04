@@ -50,54 +50,26 @@ if ($type === "create") {
 
     // Receber os dados dos inputs
     $imagemSegImg = filter_input(INPUT_POST, "imagemSegImg");
+    $pasta_temp = $_FILES['imagem']['tmp_name'] ?? '';
+    $arquivoOrig = (string)($_FILES['imagem']['name'] ?? '');
 
-    echo "<pre>";
-    // print_r($_POST);
-    print_r($_FILES);
-    print_r($_FILES['imagem']);
+    if (!is_uploaded_file($pasta_temp)) {
+        http_response_code(400);
+        exit('Upload inválido');
+    }
 
+    $ext = strtolower(pathinfo($arquivoOrig, PATHINFO_EXTENSION));
+    $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($ext, $allowedExt, true)) {
+        http_response_code(400);
+        exit('Extensão de arquivo não permitida');
+    }
 
-    // echo "</pre>";
-
-    // $type_SegImg = $_FILES['logo_seg']['type'];
-    // $size_SegImg = $_FILES['logo_seg']['size'];
-    $pasta_temp = $_FILES['imagem']['tmp_name'];
-    $arquivo = $_FILES['imagem']['name'];
-
-    // // $dataImg = base64_encode($_FILES[]);
-    // echo "<pre>";
-    // print_r($_FILES);
-    // echo "</pre>";
-    // print_r($size_SegImg);
-    // print_r($type_SegImg);
-    print_r($arquivo);
-    // print_r($tmp_name);
-    // print_r($conteudo);
-    // print_r($dataImg);
-    // exit;
-
-
-    // // print_r($_FILES['logo_seg']['tmp_name']);
-    $conteudo = file_get_contents($_FILES["imagem"]["tmp_name"]);
+    $arquivo = bin2hex(random_bytes(8)) . '.' . $ext;
+    $conteudo = file_get_contents($pasta_temp);
     $dataImg = base64_encode($conteudo);
-    // echo $dataImg;
-
-    // $conteudo = $dataImg;
-    // // echo $conteudo;
-    // // salvar a imagem na pasta upload
     $pasta = "uploads";
     move_uploaded_file($pasta_temp, $pasta . "/" . $arquivo);
-
-    // $fk_seguradora_img = null;
-
-    // if ($pasta_temp != "none") {
-    //     $fp = fopen($pasta_temp, "r");
-    //     $conteudo = fread($fp, $size_SegImg);
-    //     $conteudo = addslashes($conteudo);
-    //     fclose($fp);
-    // }
-
-    // exit;
 
     $imagem = new imagem();
 

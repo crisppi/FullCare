@@ -38,13 +38,12 @@ class negociacaoDAO implements negociacaoDAOInterface
     }
     public function joinnegociacaoHospitalshow($id_negociacao)
     {
-        $stmt = $this->conn->query("SELECT ac.id_negociacao, ac.fk_hospital, ac.valor_aco, ac.negociacao_aco, ho.id_hospital, ho.nome_hosp
-         FROM tb_negociacao ac          
-         iNNER JOIN tb_hospital as ho On  
+        $stmt = $this->conn->prepare("SELECT ac.id_negociacao, ac.fk_hospital, ac.valor_aco, ac.negociacao_aco, ho.id_hospital, ho.nome_hosp
+         FROM tb_negociacao ac
+         iNNER JOIN tb_hospital as ho On
          ac.fk_hospital = ho.id_hospital
-         where id_negociacao = $id_negociacao   
-         ");
-
+         where id_negociacao = :id_negociacao");
+        $stmt->bindValue(':id_negociacao', (int)$id_negociacao, PDO::PARAM_INT);
         $stmt->execute();
 
         $negociacao = $stmt->fetch();

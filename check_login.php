@@ -70,10 +70,12 @@ if (!is_array($user)) {
 }
 
 if (count($user) === 0) {
+    error_log('[LOGIN][FAIL][USER_NOT_FOUND] email=' . $email_login . ' fonte=' . ($fonte_conexao ?? 'n/a'));
     $failLogin('E-mail ou senha inválidos. Verifique os dados e tente novamente.');
 }
 
 if (($user['ativo_user'] ?? 'n') !== 's') {
+    error_log('[LOGIN][FAIL][INACTIVE] email=' . $email_login . ' user_id=' . (int)($user['id_usuario'] ?? 0) . ' fonte=' . ($fonte_conexao ?? 'n/a'));
     $failLogin('Seu usuário está inativo. Entre em contato com o administrador.');
 }
 
@@ -84,6 +86,7 @@ $senhaValida = $senhaUser !== '' && (
 );
 
 if (!$senhaValida) {
+    error_log('[LOGIN][FAIL][INVALID_PASSWORD] email=' . $email_login . ' user_id=' . (int)($user['id_usuario'] ?? 0) . ' fonte=' . ($fonte_conexao ?? 'n/a'));
     $failLogin('E-mail ou senha inválidos. Verifique os dados e tente novamente.');
 }
 

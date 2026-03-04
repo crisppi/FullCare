@@ -63,6 +63,14 @@ $isHttps = $httpsForwarded
 $SCHEME = $isHttps ? 'https' : 'http';
 $HOST   = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
+// ------------------ 2.1) Security headers -------------------
+if (!headers_sent()) {
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+}
+
 // ------------------ 3) BASE_URL estável --------------------
 $BASE_URL = $SCHEME . '://' . $HOST . rtrim($APP_BASE_PATH, '/') . '/'; // sempre termina com '/'
 
@@ -135,7 +143,6 @@ $__guardSkip = [
     'nova_senha.php',    // troca de senha inicial
     'process_recuperar_senha.php',
     'process_redefinir_senha.php',
-    'process_reset_senha.php',
     // acrescente aqui quaisquer webhooks ou callbacks públicos, se existirem
 ];
 
