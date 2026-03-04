@@ -56,6 +56,55 @@ if (!function_exists('db_load_env_file')) {
     }
 }
 
+if (!function_exists('db_try_local_profile')) {
+    function db_try_local_profile(): ?array
+    {
+        $hosts = ['127.0.0.1', 'localhost'];
+        $ports = [3306];
+        $users = ['root'];
+        $passes = ['', 'root', 'mysql'];
+        $dbNames = array_values(array_unique(array_filter([
+            db_env_value('DB_NAME_LOCAL'),
+            db_env_value('DB_NAME'),
+            'fullcare',
+            'mydb_accert',
+            'mydb_accert_new',
+            'u650318666_mydb_accert_ho',
+            'u650318666_mydb_accerthos',
+        ])));
+
+        foreach ($hosts as $host) {
+            foreach ($ports as $port) {
+                foreach ($users as $user) {
+                    foreach ($passes as $pass) {
+                        try {
+                            $pdo = new PDO("mysql:host={$host};port={$port};charset=utf8mb4", $user, $pass);
+                            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                            $exists = array_flip($pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_COLUMN, 0) ?: []);
+                            foreach ($dbNames as $dbName) {
+                                if (isset($exists[$dbName])) {
+                                    return [
+                                        'host' => $host,
+                                        'name' => $dbName,
+                                        'user' => $user,
+                                        'pass' => $pass,
+                                        'port' => $port,
+                                        'charset' => 'utf8mb4',
+                                        'label' => 'AutoLocal',
+                                    ];
+                                }
+                            }
+                        } catch (Throwable $e) {
+                            // segue tentando outras combinacoes locais
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+}
+
 // Carrega .env local sem sobrescrever variaveis ja exportadas no ambiente.
 db_load_env_file(__DIR__ . '/.env');
 
@@ -85,9 +134,14 @@ foreach (['', '_2', '_3'] as $suffix) {
 }
 
 if (!$profiles) {
-    error_log('[DB] Nenhum profile DB configurado. Defina DB_HOST/DB_NAME/DB_USER/DB_PASS (e opcionais _2/_3).');
-    header("Location: sem_conexao.html");
-    exit("Falha na conexao com banco: configuracao ausente.");
+    $autoLocal = db_try_local_profile();
+    if ($autoLocal) {
+        $profiles[] = $autoLocal;
+    } else {
+        error_log('[DB] Nenhum profile DB configurado. Defina DB_HOST/DB_NAME/DB_USER/DB_PASS (e opcionais _2/_3).');
+        header("Location: sem_conexao.html");
+        exit("Falha na conexao com banco: configuracao ausente.");
+    }
 }
 
 $conn = null;
