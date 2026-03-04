@@ -3,7 +3,7 @@
     --select-focus: blue;
     --select-arrow: var(--select-border);
     --app-zoom: 0.9;
-    --header-offset: 100px;
+    --header-offset: 112px;
 }
 
 * {

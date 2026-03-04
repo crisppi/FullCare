@@ -214,9 +214,9 @@
     }
     ?>
 
-    <div class="container-fluid form_container" id="main-container" style="margin-top:-5px;">
+    <div class="container-fluid form_container" id="main-container" style="margin-top:8px;">
         <div class="d-flex justify-content-between align-items-center list-header-row" style="margin-bottom: 0;">
-            <h4 class="page-title" style="margin-top:-10px;line-height: 1.5;">Pacientes</h4>
+            <h4 class="page-title" style="margin-top:0;line-height: 1.5;">Pacientes</h4>
             <div class="list-action-slot" style="margin-left: auto;">
                 <a href="<?= htmlspecialchars($BASE_URL . 'cad_paciente.php', ENT_QUOTES, 'UTF-8') ?>"
                     class="btn btn-success styled"

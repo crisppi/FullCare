@@ -491,7 +491,6 @@ if (!is_array($reinternacao_30)) {
 $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) : 0;
 ?>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <!DOCTYPE html>

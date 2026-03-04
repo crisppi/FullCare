@@ -8,7 +8,8 @@
         if (!header) return;
 
         var rect = header.getBoundingClientRect();
-        var height = Math.max(0, Math.ceil(rect.height));
+        // Reserva extra para a barra superior colorida e pequenas variações de zoom/render.
+        var height = Math.max(0, Math.ceil(rect.height) + 10);
 
         document.documentElement.style.setProperty('--header-offset', height + 'px');
     }

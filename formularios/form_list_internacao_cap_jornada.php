@@ -432,7 +432,7 @@ th.th-acoes {
 }
 </style>
 
-<div class="container-fluid" style="margin-top:-5px;">
+<div class="container-fluid form_container" style="margin-top:8px;">
     <h4 class="page-title m-0 mb-3" style="color:#3A3A3A;">Capeantes - Jornada da Conta</h4>
 
     <form action="<?= htmlspecialchars($actionUrl) ?>" id="filtros-form" method="GET">
