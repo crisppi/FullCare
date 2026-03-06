@@ -71,6 +71,45 @@ class gestaoDAO implements gestaoDAOInterface
         return 'LIMIT ' . $limit;
     }
 
+    private function buildWhereAndParams(?string $where, array $params = []): array
+    {
+        $raw = trim((string)$where);
+        if ($raw === '') {
+            return ['', $params];
+        }
+        if (preg_match('/(;|--|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b)/i', $raw)) {
+            throw new InvalidArgumentException('Filtro WHERE inválido.');
+        }
+
+        $idx = 0;
+        $sql = preg_replace_callback('/\'([^\']*)\'|"([^"]*)"/', function ($m) use (&$params, &$idx) {
+            $key = ':w_' . $idx++;
+            $params[$key] = isset($m[1]) && $m[1] !== '' ? $m[1] : ($m[2] ?? '');
+            return $key;
+        }, $raw);
+
+        return ['WHERE ' . $sql, $params];
+    }
+
+    private function bindParams(PDOStatement $stmt, array $params): void
+    {
+        foreach ($params as $key => $value) {
+            if (is_int($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_INT);
+                continue;
+            }
+            if (is_bool($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_BOOL);
+                continue;
+            }
+            if ($value === null) {
+                $stmt->bindValue($key, null, PDO::PARAM_NULL);
+                continue;
+            }
+            $stmt->bindValue($key, (string)$value, PDO::PARAM_STR);
+        }
+    }
+
     public function buildgestao($data)
     {
         $gestao = new gestao();
@@ -550,9 +589,9 @@ class gestaoDAO implements gestaoDAOInterface
 
 
     // METODO PESQUISA UTI NOVA QUERY COMPLETA
-    public function selectAllGestao($where = null, $order = null, $limit = null)
+    public function selectAllGestao($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
 
@@ -605,16 +644,17 @@ class gestaoDAO implements gestaoDAOInterface
             INNER JOIN tb_paciente AS pa ON
             ac.fk_paciente_int = pa.id_paciente ' . $where . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $uti = $query->fetchAll();
 
         return $uti;
     }
-    public function QtdGestao($where = null, $order = null, $limite = null)
+    public function QtdGestao($where = null, $order = null, $limite = null, array $params = [])
     {
         $hospital = [];
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limite = $this->safeLimit($limite);
 
@@ -667,6 +707,7 @@ class gestaoDAO implements gestaoDAOInterface
             INNER JOIN tb_paciente AS pa ON
             ac.fk_paciente_int = pa.id_paciente ' . $where . ' ' . $order . ' ' . $limite);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalAnt = $stmt->fetch();
@@ -674,9 +715,9 @@ class gestaoDAO implements gestaoDAOInterface
         return $QtdTotalAnt;
     }
     // METODO PESQUISA UTI NOVA QUERY COMPLETA
-    public function selectAllGestaoLis($where = null, $order = null, $limit = null)
+    public function selectAllGestaoLis($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
 
@@ -743,16 +784,17 @@ class gestaoDAO implements gestaoDAOInterface
             INNER JOIN tb_paciente AS pa ON
             ac.fk_paciente_int = pa.id_paciente ' . $where . ' ' . $group . '' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $uti = $query->fetchAll();
 
         return $uti;
     }
-    public function QtdGestaoLis($where = null, $order = null, $limite = null)
+    public function QtdGestaoLis($where = null, $order = null, $limite = null, array $params = [])
     {
         $hospital = [];
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limite = $this->safeLimit($limite);
 
@@ -817,6 +859,7 @@ class gestaoDAO implements gestaoDAOInterface
             INNER JOIN tb_paciente AS pa ON
             ac.fk_paciente_int = pa.id_paciente ' . $where . ' ' . $order . ' ' . $limite);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalAnt = $stmt->fetch();

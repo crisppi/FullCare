@@ -10,11 +10,6 @@ include_once("models/pagination.php");
 
 $negociacaoDao = new negociacaoDAO($conn, $BASE_URL);
 
-function esc_like(string $value): string
-{
-    return addslashes(trim($value));
-}
-
 $pesquisa_hosp  = trim((string)(filter_input(INPUT_GET, 'pesquisa_hosp',  FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
 $pesquisa_pac   = trim((string)(filter_input(INPUT_GET, 'pesquisa_pac',   FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
 $tipo_neg       = trim((string)(filter_input(INPUT_GET, 'tipo_neg',       FILTER_SANITIZE_SPECIAL_CHARS) ?: ''));
@@ -29,31 +24,38 @@ if ($data_ini && !$data_fim) {
     $data_fim = $data_ini;
 }
 
-$condicoes = ['(ng.deletado_neg IS NULL OR ng.deletado_neg != "s")'];
+$condicoes = ['(ng.deletado_neg IS NULL OR ng.deletado_neg != :deletado_neg)'];
+$whereParams = [':deletado_neg' => 's'];
 
 if ($pesquisa_hosp !== '') {
-    $condicoes[] = 'ho.nome_hosp LIKE "%' . esc_like($pesquisa_hosp) . '%"';
+    $condicoes[] = 'ho.nome_hosp LIKE :pesquisa_hosp';
+    $whereParams[':pesquisa_hosp'] = '%' . $pesquisa_hosp . '%';
 }
 if ($pesquisa_pac !== '') {
-    $condicoes[] = 'pa.nome_pac LIKE "%' . esc_like($pesquisa_pac) . '%"';
+    $condicoes[] = 'pa.nome_pac LIKE :pesquisa_pac';
+    $whereParams[':pesquisa_pac'] = '%' . $pesquisa_pac . '%';
 }
 if ($tipo_neg !== '') {
-    $condicoes[] = 'ng.tipo_negociacao = "' . esc_like($tipo_neg) . '"';
+    $condicoes[] = 'ng.tipo_negociacao = :tipo_neg';
+    $whereParams[':tipo_neg'] = $tipo_neg;
 }
 if ($data_ini !== '') {
     $ini = $data_ini;
     $fim = $data_fim ?: $data_ini;
-    $condicoes[] = 'DATE(ng.data_inicio_neg) BETWEEN "' . esc_like($ini) . '" AND "' . esc_like($fim) . '"';
+    $condicoes[] = 'DATE(ng.data_inicio_neg) BETWEEN :data_ini AND :data_fim';
+    $whereParams[':data_ini'] = $ini;
+    $whereParams[':data_fim'] = $fim;
 }
 if ($saving_min !== '' && is_numeric($saving_min)) {
-    $condicoes[] = 'ng.saving >= ' . (float)$saving_min;
+    $condicoes[] = 'ng.saving >= :saving_min';
+    $whereParams[':saving_min'] = (float)$saving_min;
 }
 
 $where = implode(' AND ', $condicoes);
 
-$totalItens = $negociacaoDao->countNegociacoesDetalhes($where);
+$totalItens = $negociacaoDao->countNegociacoesDetalhes($where, $whereParams);
 $paginationObj = new pagination($totalItens, $pagAtual, $limite);
-$listaNegociacoes = $negociacaoDao->selectNegociacoesDetalhes($where, $ordenar, $paginationObj->getLimit());
+$listaNegociacoes = $negociacaoDao->selectNegociacoesDetalhes($where, $ordenar, $paginationObj->getLimit(), $whereParams);
 $totalPages = max(1, (int)ceil($totalItens / $limite));
 
 $paginationParams = [

@@ -123,14 +123,16 @@
     $gestaoDao = new gestaoDAO($conn, $BASE_URL);
 
     //Instanciar o metodo internacao   
-    $condicoes = [
-        strlen($id_gestao) ? 'ge.id_gestao LIKE "%' . $id_gestao . '%"' : null,
-
-    ];
+    $whereParams = [];
+    $condicoes = [];
+    if (strlen((string)$id_gestao)) {
+        $condicoes[] = 'ge.id_gestao LIKE :id_gestao';
+        $whereParams[':id_gestao'] = '%' . (string)$id_gestao . '%';
+    }
     $condicoes = array_filter($condicoes);
     // REMOVE POSICOES VAZIAS DO FILTRO
     $where = implode(' AND ', $condicoes);
-    $gestao = $gestaoDao->selectAllGestaoLis($where, $order, $obLimite);
+    $gestao = $gestaoDao->selectAllGestaoLis($where, $order, $obLimite, $whereParams);
     // print_r($gestao);
 
     ?>

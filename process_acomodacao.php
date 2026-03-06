@@ -164,12 +164,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_hospital'])) {
     $id_hospital = filter_var($_POST['id_hospital'], FILTER_VALIDATE_INT);
 
     if ($id_hospital) {
-        // Defina a condição para o WHERE
-        $where = 'ho.id_hospital = ' . $id_hospital;
+        // Condição parametrizada para evitar concatenação de valor em SQL
+        $where = 'ho.id_hospital = :id_hospital';
+        $whereParams = [':id_hospital' => (int)$id_hospital];
 
         // Obtenha as acomodações
         $acomodacaoDao = new AcomodacaoDAO($conn, $BASE_URL);
-        $acomodacoes = $acomodacaoDao->selectAllacomodacao($where);
+        $acomodacoes = $acomodacaoDao->selectAllacomodacao($where, null, null, $whereParams);
 
         if ($acomodacoes) {
             echo json_encode(['status' => 'success', 'acomodacoes' => $acomodacoes]);

@@ -24,31 +24,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-/* DEV OPCIONAL: admin quick (desabilitado por padrao) */
-$allowDebugTools = (getenv('APP_DEBUG_TOOLS') === '1');
-$isLocalRequest = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
-if ($allowDebugTools && $isLocalRequest && isset($_GET['dev_admin']) && $_GET['dev_admin'] === '1') {
-    $_SESSION['id_usuario'] = 1;
-    $_SESSION['ativo']      = 's';
-    $_SESSION['cargo']      = 'Diretoria';
-    $_SESSION['nivel']      = 5;
-    header("Location: {$BASE_URL}admin_permissao.php");
-    exit;
-}
-
-/* DEBUG OPCIONAL (somente local + flag explicita) */
-if ($allowDebugTools && $isLocalRequest && isset($_GET['debug']) && $_GET['debug'] === '1') {
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Arquivo: " . ($_SERVER['SCRIPT_FILENAME'] ?? '') . "\n";
-    echo "URL: " . ($_SERVER['REQUEST_URI'] ?? '') . "\n\n";
-    $keys = ['id_usuario', 'ativo', 'cargo', 'nivel', 'email_user', 'usuario_user'];
-    foreach ($keys as $k) {
-        $v = $_SESSION[$k] ?? null;
-        echo $k . ' = ' . var_export($v, true) . "\n";
-    }
-    exit;
-}
-
 /* Guard de login */
 if (empty($_SESSION['id_usuario'])) {
     $next = urlencode($_SERVER['REQUEST_URI'] ?? '/admin_permissao.php');

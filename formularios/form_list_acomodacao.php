@@ -17,17 +17,23 @@ $limite = filter_input(INPUT_GET, 'limite') ? filter_input(INPUT_GET, 'limite') 
 $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar') : '';
 // $buscaAtivo = in_array($buscaAtivo, ['s', 'n']) ?: "";
 
-$condicoes = [
-    strlen($pesquisa_nome) ? 'acomodacao_aco LIKE "%' . $pesquisa_nome . '%"' : null,
-    strlen($pesquisa_hosp) ? 'ho.nome_hosp LIKE "%' . $pesquisa_hosp . '%"' : null,
-    // strlen($buscaAtivo) ? 'ativo_aco = "' . $buscaAtivo . '"' : null
-];
+$whereParams = [];
+$condicoes = [];
+if (strlen((string)$pesquisa_nome)) {
+    $condicoes[] = 'acomodacao_aco LIKE :pesquisa_nome';
+    $whereParams[':pesquisa_nome'] = '%' . (string)$pesquisa_nome . '%';
+}
+if (strlen((string)$pesquisa_hosp)) {
+    $condicoes[] = 'ho.nome_hosp LIKE :pesquisa_hosp';
+    $whereParams[':pesquisa_hosp'] = '%' . (string)$pesquisa_hosp . '%';
+}
+// if (strlen((string)$buscaAtivo)) { ... }
 $condicoes = array_filter($condicoes);
 
 // REMOVE POSICOES VAZIAS DO FILTRO
 $where = implode(' AND ', $condicoes);
 $order = $ordenar ?: 'id_acomodacao DESC';
-$qtdAcoItens1 = $QtdTotalaco->selectAllacomodacao($where, $order, $obLimite ?? null);
+$qtdAcoItens1 = $QtdTotalaco->selectAllacomodacao($where, $order, $obLimite ?? null, $whereParams);
 $qtdIntItens = count($qtdAcoItens1); // total de registros
 
 // PAGINACAO
@@ -35,7 +41,7 @@ $obPagination = new pagination($qtdIntItens, $_GET['pag'] ?? 1, $limite ?? 10);
 $obLimite = $obPagination->getLimit();
 
 // PREENCHIMENTO DO FORMULARIO COM QUERY
-$query = $acomodacao->selectAllacomodacao($where, $order, $limite);
+$query = $acomodacao->selectAllacomodacao($where, $order, $limite, $whereParams);
 
 $totalcasos = ceil($qtdIntItens / 5);
 
@@ -121,7 +127,7 @@ $totalcasos = ceil($qtdIntItens / 5);
 
             // PREENCHIMENTO DO FORMULARIO COM QUERY
 
-            $query = $acomodacao->selectAllacomodacao($where, $order, $obLimite);
+            $query = $acomodacao->selectAllacomodacao($where, $order, $obLimite, $whereParams);
 
             // PAGINACAO
             $paginacao = '';

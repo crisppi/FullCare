@@ -97,26 +97,57 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
     <style>
     .gestao-filter-bar {
         display: flex;
-        gap: 10px;
+        gap: 6px;
         flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 8px;
+        overflow-x: hidden;
+        padding-bottom: 6px;
+        width: 100%;
     }
     .gestao-filter-bar .filter-item {
-        flex: 0 0 auto;
-        min-width: 140px;
+        flex: 1 1 0;
+        min-width: 0;
     }
     .gestao-filter-bar .filter-item.wide {
-        min-width: 200px;
+        flex: 1.15 1 0;
     }
     .gestao-filter-bar .filter-item.compact {
-        flex: 0 0 120px;
-        width: 120px;
-        max-width: 120px;
+        flex: .7 1 0;
+        min-width: 96px;
+    }
+    .gestao-filter-bar .filter-item.search-btn {
+        flex: 0 0 84px;
+        min-width: 84px;
+    }
+    .gestao-filter-bar .filter-item.clear-btn {
+        flex: 0 0 122px;
+        min-width: 122px;
+    }
+    .gestao-filter-bar .form-control,
+    .gestao-filter-bar .btn {
+        height: 40px !important;
+        min-height: 40px;
+        margin-top: 7px !important;
+        font-size: .95rem;
+    }
+    .gestao-filter-bar .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        padding: 0 12px;
     }
     @media (max-width: 1199px) {
         .gestao-filter-bar {
             flex-wrap: wrap;
+            overflow-x: visible;
+        }
+        .gestao-filter-bar .filter-item,
+        .gestao-filter-bar .filter-item.wide,
+        .gestao-filter-bar .filter-item.compact,
+        .gestao-filter-bar .filter-item.search-btn,
+        .gestao-filter-bar .filter-item.clear-btn {
+            flex: 1 1 220px;
+            min-width: 180px;
         }
     }
     .scope-badge {
@@ -148,15 +179,14 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                 $limite_pag = filter_input(INPUT_GET, 'limite_pag') ?? 10;
                 $pesquisa_pac = filter_input(INPUT_GET, 'pesquisa_pac', FILTER_SANITIZE_SPECIAL_CHARS);
                 $pesquisa_matricula = filter_input(INPUT_GET, 'pesquisa_matricula', FILTER_SANITIZE_SPECIAL_CHARS);
-                $ordenar = filter_input(INPUT_GET, 'ordenar');
                 $data_intern_int = filter_input(INPUT_GET, 'data_intern_int') ?: null;
                 $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
                 ?>
 
-                <div class="gestao-filter-bar" style="padding-left:16px;">
+                <div class="gestao-filter-bar">
                     <div class="filter-item wide">
                         <select class="form-control mb-2 form-control-sm" id="pesqGestao" name="pesqGestao"
-                            style="margin-top:7px;font-size:.8em; color:#878787">
+                            style="font-size:.8em; color:#878787">
                             <option value="">Selecione a Gestão</option>
                             <option value="home_care" <?= $pesqGestao == 'home_care' ? 'selected' : null ?>>Home care
                             </option>
@@ -167,27 +197,27 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                         </select>
                     </div>
                     <div class="filter-item wide">
-                        <input style="margin-top:7px;font-size:.8em; color:#878787" class="form-control form-control-sm"
+                        <input style="font-size:.8em; color:#878787" class="form-control form-control-sm"
                             type="text" name="pesquisa_nome" placeholder="Selecione o Hospital"
                             value="<?= $pesquisa_nome ?>">
                     </div>
                     <div class="filter-item wide">
-                        <input style="margin-top:7px;font-size:.8em; color:#878787" class="form-control form-control-sm"
+                        <input style="font-size:.8em; color:#878787" class="form-control form-control-sm"
                             type="text" name="pesquisa_pac" placeholder="Selecione o Paciente"
                             value="<?= $pesquisa_pac ?>">
                     </div>
                     <div class="filter-item wide">
-                        <input style="margin-top:7px;font-size:.8em; color:#878787" class="form-control form-control-sm"
+                        <input style="font-size:.8em; color:#878787" class="form-control form-control-sm"
                             type="text" name="pesquisa_matricula" placeholder="Matrícula"
                             value="<?= htmlspecialchars((string)$pesquisa_matricula) ?>">
                     </div>
                     <div class="filter-item compact">
-                        <input style="margin-top:7px;font-size:.8em; color:#878787" class="form-control form-control-sm"
+                        <input style="font-size:.8em; color:#878787" class="form-control form-control-sm"
                             type="text" name="senha_int" placeholder="Senha" value="<?= $senha_int ?>">
                     </div>
                     <div class="filter-item compact">
                         <select class="form-control form-control-sm placeholder"
-                            style="margin-top:7px;font-size:.8em; color:#878787" id="pesqInternado"
+                            style="font-size:.8em; color:#878787" id="pesqInternado"
                             name="pesqInternado">
                             <option value="">Internados</option>
                             <option value="s" <?= $pesqInternado == 's' ? 'selected' : null ?>>Sim</option>
@@ -195,7 +225,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                         </select>
                     </div>
                     <div class="filter-item compact">
-                        <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="limite"
+                        <select class="form-control mb-3 form-control-sm" id="limite"
                             name="limite">
                             <option value="">Registros</option>
                             <option value="5" <?= $limite == '5' ? 'selected' : null ?>>5</option>
@@ -205,36 +235,24 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                         </select>
                     </div>
                     <div class="filter-item compact">
-                        <select style="margin-top:7px;font-size:.8em; color:#878787"
-                            class="form-control mb-3 form-control-sm" id="ordenar" name="ordenar">
-                            <option value="">Classificar</option>
-                            <option value="id_internacao" <?= $ordenar == 'id_internacao' ? 'selected' : null ?>>
-                                Internação</option>
-                            <option value="nome_pac" <?= $ordenar == 'nome_pac' ? 'selected' : null ?>>Paciente
-                            </option>
-                            <option value="nome_hosp" <?= $ordenar == 'nome_hosp' ? 'selected' : null ?>>Hospital
-                            </option>
-                        </select>
-                    </div>
-                    <div class="filter-item compact">
                         <input class="form-control form-control-sm" type="date"
-                            style="margin-top:7px;font-size:.8em; color:#878787" name="data_intern_int"
+                            style="font-size:.8em; color:#878787" name="data_intern_int"
                             placeholder="Data Internação Min" value="<?= $data_intern_int ?>">
                     </div>
                     <div class="filter-item compact">
                         <input class="form-control form-control-sm" type="date"
-                            style="margin-top:7px;font-size:.8em; color:#878787" name="data_intern_int_max"
+                            style="font-size:.8em; color:#878787" name="data_intern_int_max"
                             placeholder="Data Internação Max" value="<?= $data_intern_int_max ?>">
                     </div>
-                    <div class="filter-item compact" style="min-width:90px">
+                    <div class="filter-item search-btn">
                         <button type="submit" class="btn btn-primary w-100"
-                            style="background-color:#5e2363;margin-top:7px;border-color:#5e2363">
+                            style="background-color:#5e2363;border-color:#5e2363">
                             <span class="material-icons" style="font-size:1rem;vertical-align:middle;">search</span>
                         </button>
                     </div>
-                    <div class="filter-item compact" style="min-width:130px">
+                    <div class="filter-item clear-btn">
                         <a href="<?= htmlspecialchars($BASE_URL . 'list_gestao.php', ENT_QUOTES, 'UTF-8') ?>"
-                            class="btn btn-outline-secondary w-100 btn-filtro-limpar" style="margin-top:7px;">Limpar filtros</a>
+                            class="btn btn-outline-secondary w-100 btn-filtro-limpar">Limpar filtros</a>
                     </div>
                 </div>
             </form>
@@ -303,31 +321,68 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                 $data_intern_int_max = date('Y-m-d'); // Formato de data compatível com SQL
             }
 
-            $condicoes = [
-                strlen($pesquisa_nome) ? 'ho.nome_hosp LIKE "%' . $pesquisa_nome . '%"' : null,
-                strlen($pesquisa_pac) ? 'pa.nome_pac LIKE "%' . $pesquisa_pac . '%"' : null,
-                strlen($pesquisa_matricula) ? 'pa.matricula_pac LIKE "%' . $pesquisa_matricula . '%"' : null,
-                strlen($senha_int) ? 'senha_int LIKE "%' . $senha_int . '%"' : null,
-                strlen($pesqInternado) ? 'internado_int = "' . $pesqInternado . '"' : NULL,
-                strlen($gestaoAlto) ? 'alto_custo_ges = "' . $gestaoAlto . '"' : NULL,
-                strlen($gestaoOPME) ? 'opme_ges = "' . $gestaoOPME . '"' : NULL,
-                strlen($gestaoDesop) ? 'desospitalizacao_ges = "' . $gestaoDesop . '"' : NULL,
-                strlen($gestaoHome) ? 'home_care_ges = "' . $gestaoHome . '"' : NULL,
-                strlen($auditor) ? 'hos.fk_usuario_hosp = "' . $auditor . '"' : NULL,
-                strlen($data_intern_int) ? 'data_intern_int BETWEEN "' . $data_intern_int . '" AND "' . $data_intern_int_max . '"' : NULL,
-                $isSeguradoraRole
-                    ? ($seguradoraUserId > 0 ? 'pa.fk_seguradora_pac = ' . $seguradoraUserId : '1=0')
-                    : null,
-
-
-            ];
+            $whereParams = [];
+            $condicoes = [];
+            if (strlen((string)$pesquisa_nome)) {
+                $condicoes[] = 'ho.nome_hosp LIKE :pesquisa_nome';
+                $whereParams[':pesquisa_nome'] = '%' . (string)$pesquisa_nome . '%';
+            }
+            if (strlen((string)$pesquisa_pac)) {
+                $condicoes[] = 'pa.nome_pac LIKE :pesquisa_pac';
+                $whereParams[':pesquisa_pac'] = '%' . (string)$pesquisa_pac . '%';
+            }
+            if (strlen((string)$pesquisa_matricula)) {
+                $condicoes[] = 'pa.matricula_pac LIKE :pesquisa_matricula';
+                $whereParams[':pesquisa_matricula'] = '%' . (string)$pesquisa_matricula . '%';
+            }
+            if (strlen((string)$senha_int)) {
+                $condicoes[] = 'senha_int LIKE :senha_int';
+                $whereParams[':senha_int'] = '%' . (string)$senha_int . '%';
+            }
+            if (strlen((string)$pesqInternado)) {
+                $condicoes[] = 'internado_int = :pesq_internado';
+                $whereParams[':pesq_internado'] = (string)$pesqInternado;
+            }
+            if (strlen((string)$gestaoAlto)) {
+                $condicoes[] = 'alto_custo_ges = :gestao_alto';
+                $whereParams[':gestao_alto'] = (string)$gestaoAlto;
+            }
+            if (strlen((string)$gestaoOPME)) {
+                $condicoes[] = 'opme_ges = :gestao_opme';
+                $whereParams[':gestao_opme'] = (string)$gestaoOPME;
+            }
+            if (strlen((string)$gestaoDesop)) {
+                $condicoes[] = 'desospitalizacao_ges = :gestao_desop';
+                $whereParams[':gestao_desop'] = (string)$gestaoDesop;
+            }
+            if (strlen((string)$gestaoHome)) {
+                $condicoes[] = 'home_care_ges = :gestao_home';
+                $whereParams[':gestao_home'] = (string)$gestaoHome;
+            }
+            if (strlen((string)$auditor)) {
+                $condicoes[] = 'hos.fk_usuario_hosp = :auditor';
+                $whereParams[':auditor'] = (int)$auditor;
+            }
+            if (strlen((string)$data_intern_int)) {
+                $condicoes[] = 'data_intern_int BETWEEN :data_int_ini AND :data_int_fim';
+                $whereParams[':data_int_ini'] = (string)$data_intern_int;
+                $whereParams[':data_int_fim'] = (string)$data_intern_int_max;
+            }
+            if ($isSeguradoraRole) {
+                if ($seguradoraUserId > 0) {
+                    $condicoes[] = 'pa.fk_seguradora_pac = :seguradora_id';
+                    $whereParams[':seguradora_id'] = (int)$seguradoraUserId;
+                } else {
+                    $condicoes[] = '1=0';
+                }
+            }
 
             $condicoes = array_filter($condicoes);
             // REMOVE POSICOES VAZIAS DO FILTRO
             $where = implode(' AND ', $condicoes);
-            $order = $ordenar ?: 'id_internacao DESC';
+            $order = 'id_internacao DESC';
 
-            $qtdGesItens1 = $QtdTotalGes->selectAllGestaoLis($where, $order, $obLimite);
+            $qtdGesItens1 = $QtdTotalGes->selectAllGestaoLis($where, $order, $obLimite, $whereParams);
 
             $qtdIntItens = count($qtdGesItens1); // total de registros
             $totalcasos = ceil($qtdIntItens / $limite);
@@ -339,7 +394,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
             $obLimite = $obPagination->getLimit();
             $paginacao = '';
             $paginas = $obPagination->getPages();
-            $query = $gestaoDao->selectAllGestaoLis($where, $order, $obLimite);
+            $query = $gestaoDao->selectAllGestaoLis($where, $order, $obLimite, $whereParams);
             // PAGINACAO
             if ($qtdIntItens > $limite) {
                 $paginacao = '';
@@ -535,14 +590,14 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                 <?php if ($current_block > $first_block): ?>
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&ordenar=<?php echo $ordenar; ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
+                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
                                         <i class="fa-solid fa-angles-left"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                                 <li class="page-item">
                                     <a class="page-link" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&limite_pag=<?php echo $limite_pag; ?>&ordenar=<?php echo $ordenar; ?>&pag=<?php print $paginaAtual - 1 ?>&bl=<?php print $blocoAtual - 5 ?>')">
+                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php print $paginaAtual - 1 ?>&bl=<?php print $blocoAtual - 5 ?>')">
                                         <i class="fa-solid fa-angle-left"></i> </a>
                                 </li>
                                 <?php endif; ?>
@@ -551,7 +606,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                 <li class="page-item <?php print ($_GET['pag'] ?? 1) == $i ? "active" : "" ?>">
 
                                     <a class="page-link" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&ordenar=<?php echo $ordenar; ?>&pag=<?php echo $i; ?>&bl=<?php echo $blocoAtual; ?>')">
+                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php echo $i; ?>&bl=<?php echo $blocoAtual; ?>')">
                                         <?php echo $i; ?>
                                     </a>
                                 </li>
@@ -560,14 +615,14 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                 <?php if ($current_block < $last_block): ?>
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&ordenar=<?php echo $ordenar; ?>&pag=<?php echo $i; ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
+                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php echo $i; ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
                                             class="fa-solid fa-angle-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block < $last_block): ?>
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&ordenar=<?php echo $ordenar; ?>&pag=<?php print count($paginas) ?>&bl=<?php print ($last_block - 1) * 5 ?>')"><i
+                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php print count($paginas) ?>&bl=<?php print ($last_block - 1) * 5 ?>')"><i
                                             class="fa-solid fa-angles-right"></i></a>
                                 </li>
                                 <?php endif; ?>
@@ -605,6 +660,9 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                     // Encontre o elemento com o ID "table-content" dentro do elemento temporário
                     var tableContent = tempElement.querySelector('#table-content');
                     $('#table-content').html(tableContent);
+                    if (typeof window.applyHeaderSortOnListPages === 'function') {
+                        window.applyHeaderSortOnListPages();
+                    }
                 },
                 error: function() {
                     $('#responseMessage').html('Ocorreu um erro ao enviar o formulário.');
@@ -615,7 +673,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
 
     $(document).ready(function() {
         loadContent(
-            'list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&senha_int=<?php echo $senha_int; ?>&limite_pag=<?php echo $limite_pag; ?>&ordenar=<?php echo $ordenar; ?>&pag=<?php echo 1; ?>&bl=<?php echo 0 ?>'
+            'list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&senha_int=<?php echo $senha_int; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php echo 1; ?>&bl=<?php echo 0 ?>'
         );
     });
     </script>

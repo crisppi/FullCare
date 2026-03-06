@@ -65,6 +65,45 @@ class acomodacaoDAO implements acomodacaoDAOInterface
         return 'LIMIT ' . $limit;
     }
 
+    private function buildWhereAndParams(?string $where, array $params = []): array
+    {
+        $raw = trim((string)$where);
+        if ($raw === '') {
+            return ['', $params];
+        }
+        if (preg_match('/(;|--|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b)/i', $raw)) {
+            throw new InvalidArgumentException('Filtro WHERE inválido.');
+        }
+
+        $idx = 0;
+        $sql = preg_replace_callback('/\'([^\']*)\'|"([^"]*)"/', function ($m) use (&$params, &$idx) {
+            $key = ':w_' . $idx++;
+            $params[$key] = isset($m[1]) && $m[1] !== '' ? $m[1] : ($m[2] ?? '');
+            return $key;
+        }, $raw);
+
+        return ['WHERE ' . $sql, $params];
+    }
+
+    private function bindParams(PDOStatement $stmt, array $params): void
+    {
+        foreach ($params as $key => $value) {
+            if (is_int($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_INT);
+                continue;
+            }
+            if (is_bool($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_BOOL);
+                continue;
+            }
+            if ($value === null) {
+                $stmt->bindValue($key, null, PDO::PARAM_NULL);
+                continue;
+            }
+            $stmt->bindValue($key, (string)$value, PDO::PARAM_STR);
+        }
+    }
+
     public function buildacomodacao($acomodacao)
     {
         $acomod = new acomodacao();
@@ -302,9 +341,9 @@ class acomodacaoDAO implements acomodacaoDAOInterface
 
     // MODELO DE FILTRO COM SELECT ATUAL COM FILTROS E PAGINACAO
 
-    public function selectAllacomodacao($where = null, $order = null, $limit = null)
+    public function selectAllacomodacao($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
 
@@ -321,6 +360,7 @@ class acomodacaoDAO implements acomodacaoDAOInterface
         iNNER JOIN tb_hospital as ho On  
         ac.fk_hospital = ho.id_hospital ' . $where . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $acomodacao = $query->fetchAll();
@@ -328,15 +368,16 @@ class acomodacaoDAO implements acomodacaoDAOInterface
         return $acomodacao;
     }
 
-    public function QtdAcomodacao($where = null, $order = null, $limite = null)
+    public function QtdAcomodacao($where = null, $order = null, $limite = null, array $params = [])
     {
         $hospital = [];
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limite = $this->safeLimit($limite);
 
         $stmt = $this->conn->prepare('SELECT * ,COUNT(id_acomodacao) as qtd FROM tb_acomodacao ' . $where . ' ' . $order . ' ' . $limite);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalAnt = $stmt->fetch();

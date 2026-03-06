@@ -64,6 +64,45 @@ class negociacaoDAO implements negociacaoDAOInterface
         return 'LIMIT ' . $limit;
     }
 
+    private function buildWhereAndParams(?string $where, array $params = []): array
+    {
+        $raw = trim((string)$where);
+        if ($raw === '') {
+            return ['', $params];
+        }
+        if (preg_match('/(;|--|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b)/i', $raw)) {
+            throw new InvalidArgumentException('Filtro WHERE inválido.');
+        }
+
+        $idx = 0;
+        $sql = preg_replace_callback('/\'([^\']*)\'|"([^"]*)"/', function ($m) use (&$params, &$idx) {
+            $key = ':w_' . $idx++;
+            $params[$key] = isset($m[1]) && $m[1] !== '' ? $m[1] : ($m[2] ?? '');
+            return $key;
+        }, $raw);
+
+        return ['WHERE ' . $sql, $params];
+    }
+
+    private function bindParams(PDOStatement $stmt, array $params): void
+    {
+        foreach ($params as $key => $value) {
+            if (is_int($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_INT);
+                continue;
+            }
+            if (is_bool($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_BOOL);
+                continue;
+            }
+            if ($value === null) {
+                $stmt->bindValue($key, null, PDO::PARAM_NULL);
+                continue;
+            }
+            $stmt->bindValue($key, (string)$value, PDO::PARAM_STR);
+        }
+    }
+
     public function buildNegociacao($data)
     {
         $negociacao = new Negociacao();
@@ -378,9 +417,9 @@ class negociacaoDAO implements negociacaoDAOInterface
     }
 
     // dao/negociacaoDao.php
-    public function selectAllnegociacao($where = null, $order = null, $limit = null)
+    public function selectAllnegociacao($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
 
@@ -406,13 +445,14 @@ class negociacaoDAO implements negociacaoDAOInterface
     ";
 
         $stmt = $this->conn->prepare($sql);
+        $this->bindParams($stmt, $params);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function selectNegociacoesDetalhes($where = null, $order = null, $limit = null)
+    public function selectNegociacoesDetalhes($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = trim((string)$order) !== '' ? $this->safeOrder($order) : 'ORDER BY ng.data_inicio_neg DESC';
         $limit = $this->safeLimit($limit);
 
@@ -448,13 +488,14 @@ class negociacaoDAO implements negociacaoDAOInterface
         ";
 
         $stmt = $this->conn->prepare($sql);
+        $this->bindParams($stmt, $params);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function countNegociacoesDetalhes($where = null)
+    public function countNegociacoesDetalhes($where = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
 
         $sql = "
             SELECT COUNT(*) AS total
@@ -466,6 +507,7 @@ class negociacaoDAO implements negociacaoDAOInterface
         ";
 
         $stmt = $this->conn->prepare($sql);
+        $this->bindParams($stmt, $params);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return (int) ($row['total'] ?? 0);
@@ -487,12 +529,13 @@ class negociacaoDAO implements negociacaoDAOInterface
     public function Qtdnegociacao($where = null, $order = null, $limite = null)
     {
         $negociacao = [];
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where);
         $order = $this->safeOrder($order);
         $limite = $this->safeLimit($limite);
 
         $stmt = $this->conn->prepare('SELECT * ,COUNT(id_negociacao) as qtd FROM tb_negociacao ' . $where . ' ' . $order . ' ' . $limite);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalEst = $stmt->fetch();
