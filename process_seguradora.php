@@ -101,35 +101,70 @@ function insertSeguradoraRelatedRows(PDO $conn, int $idSeguradora, array $endere
     }
 }
 
+function storeSeguradoraLogo(array $file, string $targetDir, int $maxBytes = 2097152): ?string
+{
+    $error = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($error === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+    if ($error !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Falha no upload do logo.');
+    }
+
+    $tmp = (string)($file['tmp_name'] ?? '');
+    $originalName = (string)($file['name'] ?? '');
+    $size = (int)($file['size'] ?? 0);
+    if ($size <= 0 || $size > $maxBytes) {
+        throw new RuntimeException('Logo inválido ou maior que 2MB.');
+    }
+    if (!is_uploaded_file($tmp)) {
+        throw new RuntimeException('Arquivo de upload inválido.');
+    }
+
+    $ext = strtolower((string)pathinfo($originalName, PATHINFO_EXTENSION));
+    $allowed = [
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml',
+    ];
+    if (!isset($allowed[$ext])) {
+        throw new RuntimeException('Extensão do logo não permitida.');
+    }
+
+    if ($ext !== 'svg') {
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = (string)$finfo->file($tmp);
+        if ($mime !== $allowed[$ext]) {
+            throw new RuntimeException('Tipo MIME do logo inválido.');
+        }
+    }
+
+    if (!is_dir($targetDir) && !mkdir($targetDir, 0775, true) && !is_dir($targetDir)) {
+        throw new RuntimeException('Não foi possível preparar diretório de upload.');
+    }
+
+    $safeName = bin2hex(random_bytes(16)) . '.' . $ext;
+    if (!move_uploaded_file($tmp, rtrim($targetDir, '/') . '/' . $safeName)) {
+        throw new RuntimeException('Não foi possível salvar o logo enviado.');
+    }
+
+    return $safeName;
+}
+
 $type = filter_input(INPUT_POST, "type");
 $typeDel = filter_input(INPUT_POST, "typeDel");
 
 if ($type === "create") {
-
-    $tipo = ($_FILES['logo_seg']['type']);
-    $tamanho_perm = 1024 * 1024 * 2;
-    $size = $_FILES['logo_seg']['size'];
-
-    $erros = "";
-
-    if (($_FILES['logo_seg']['size']) > $tamanho_perm) {
-        // codigo de erro caso arquivo maior que permitido
-    } else {
-        // condicao caso arquivo permitido
-        $arquivo = ($_FILES['logo_seg']['name']);
-        $temp_arq = ($_FILES['logo_seg']['tmp_name']);
-        $pasta = "uploads";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
-
-        // Resgata dados da imagem
-        $tipo = ($_FILES['logo_seg']['type']);
-        $arquivo = ($_FILES['logo_seg']['name']);
-        $temp_arq = ($_FILES['logo_seg']['tmp_name']);
-        $size = ($_FILES['logo_seg']['size']);
-        $pasta = "uploads";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
+    $arquivo = null;
+    try {
+        $arquivo = storeSeguradoraLogo($_FILES['logo_seg'] ?? [], __DIR__ . '/uploads');
+    } catch (Throwable $e) {
+        $message->setMessage($e->getMessage(), "error", "back");
+        exit;
+    }
 
         // Receber os dados dos inputs
         $seguradora_seg = filter_input(INPUT_POST, "seguradora_seg", FILTER_SANITIZE_SPECIAL_CHARS);
@@ -171,8 +206,7 @@ if ($type === "create") {
         $dias_visita_uti_seg = filter_input(INPUT_POST, "dias_visita_uti_seg", FILTER_SANITIZE_SPECIAL_CHARS);
         $longa_permanencia_seg = filter_input(INPUT_POST, "longa_permanencia_seg", FILTER_SANITIZE_SPECIAL_CHARS);
 
-        $logo_segArray = filter_input(INPUT_POST, "logo_seg");
-        $logo_seg = $arquivo;
+        $logo_seg = (string)($arquivo ?? '');
 
         $seguradora = new seguradora();
 
@@ -260,24 +294,14 @@ if ($type === "create") {
             insertSeguradoraRelatedRows($conn, $idNovo, $enderecos, $telefones, $contatos);
             header("Location: " . $BASE_URL . "seguradoras");
         }
-    }
 } else if ($type === "update") {
-
-    $tipo = ($_FILES['logo_seg']['type']);
-    $tamanho_perm = 1024 * 1024 * 1;
-    $size = $_FILES['logo_seg']['size'];
-
-    $erros = "";
-
-    if (($_FILES['logo_seg']['size']) > $tamanho_perm) {
-        // codigo de erro caso arquivo maior que permitido
-    } else {
-
-        $arquivo = ($_FILES['logo_seg']['name']);
-        $temp_arq = ($_FILES['logo_seg']['tmp_name']);
-        $pasta = "uploads";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
+    $arquivo = null;
+    try {
+        $arquivo = storeSeguradoraLogo($_FILES['logo_seg'] ?? [], __DIR__ . '/uploads');
+    } catch (Throwable $e) {
+        $message->setMessage($e->getMessage(), "error", "back");
+        exit;
+    }
 
         // Receber os dados dos inputs
         $id_seguradora = filter_input(INPUT_POST, "id_seguradora");
@@ -329,9 +353,8 @@ if ($type === "create") {
         $deletado_seg = filter_input(INPUT_POST, "deletado_seg");
 
         $coord_rh_seg = filter_input(INPUT_POST, "coord_rh_seg", FILTER_SANITIZE_SPECIAL_CHARS);
-        $logo_seg = $arquivo;
-
         $seguradoraData = $seguradoraDao->findById($id_seguradora);
+        $logo_seg = $arquivo !== null ? $arquivo : (string)($seguradoraData->logo_seg ?? '');
 
         $seguradoraData->id_seguradora = $id_seguradora;
         $seguradoraData->seguradora_seg = $seguradora_seg;
@@ -423,7 +446,6 @@ if ($type === "create") {
 
         header("Location: " . $BASE_URL . "seguradoras");
         exit;
-    }
 }
 
 if ($type === "delete") {

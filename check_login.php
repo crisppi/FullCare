@@ -81,8 +81,7 @@ if (($user['ativo_user'] ?? 'n') !== 's') {
 
 $senhaUser = (string)($user['senha_user'] ?? '');
 $senhaValida = $senhaUser !== '' && (
-    password_verify($senha_login, $senhaUser) ||
-    hash_equals($senhaUser, $senha_login)
+    password_verify($senha_login, $senhaUser)
 );
 
 if (!$senhaValida) {

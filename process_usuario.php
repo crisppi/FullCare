@@ -63,36 +63,69 @@ function getSeguradoraNomeById(PDO $conn, ?int $seguradoraId): ?string
     }
 }
 
+function storeUsuarioImage(array $file, string $targetDir, int $maxBytes = 2097152): ?string
+{
+    $error = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($error === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+    if ($error !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Falha no upload da imagem.');
+    }
+
+    $tmp = (string)($file['tmp_name'] ?? '');
+    $originalName = (string)($file['name'] ?? '');
+    $size = (int)($file['size'] ?? 0);
+    if ($size <= 0 || $size > $maxBytes) {
+        throw new RuntimeException('Imagem inválida ou maior que 2MB.');
+    }
+    if (!is_uploaded_file($tmp)) {
+        throw new RuntimeException('Arquivo de upload inválido.');
+    }
+
+    $ext = strtolower((string)pathinfo($originalName, PATHINFO_EXTENSION));
+    $allowed = [
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        'gif' => 'image/gif',
+    ];
+    if (!isset($allowed[$ext])) {
+        throw new RuntimeException('Extensão de imagem não permitida.');
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = (string)$finfo->file($tmp);
+    if ($mime !== $allowed[$ext]) {
+        throw new RuntimeException('Tipo MIME da imagem inválido.');
+    }
+
+    if (!is_dir($targetDir) && !mkdir($targetDir, 0775, true) && !is_dir($targetDir)) {
+        throw new RuntimeException('Não foi possível preparar diretório de upload.');
+    }
+
+    $safeName = bin2hex(random_bytes(16)) . '.' . $ext;
+    if (!move_uploaded_file($tmp, rtrim($targetDir, '/') . '/' . $safeName)) {
+        throw new RuntimeException('Não foi possível salvar a imagem enviada.');
+    }
+
+    return $safeName;
+}
+
 // Resgata o tipo do formulário
 $type = filter_input(INPUT_POST, "type");
 
 // Resgata dados do usuário
 
 if ($type === "create") {
-    $tipo = ($_FILES['foto_usuario']['type']);
-    $tamanho_perm = 1024 * 1024 * 2;
-    $size = $_FILES['foto_usuario']['size'];
-
-    $erros = "";
-
-    if (($_FILES['foto_usuario']['size']) > $tamanho_perm) {
-        // codigo de erro caso arquivo maior que permitido
-    } else {
-        // condicao caso arquivo permitido
-        $arquivo = ($_FILES['foto_usuario']['name']);
-        $temp_arq = ($_FILES['foto_usuario']['tmp_name']);
-        $pasta = "uploads/usuarios";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
-
-        // Resgata dados da imagem
-        $tipo = ($_FILES['foto_usuario']['type']);
-        $arquivo = ($_FILES['foto_usuario']['name']);
-        $temp_arq = ($_FILES['foto_usuario']['tmp_name']);
-        $size = ($_FILES['foto_usuario']['size']);
-        $pasta = "uploads/usuarios";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
+    $arquivo = null;
+    try {
+        $arquivo = storeUsuarioImage($_FILES['foto_usuario'] ?? [], __DIR__ . '/uploads/usuarios');
+    } catch (Throwable $e) {
+        $message->setMessage($e->getMessage(), "error", "back");
+        exit;
+    }
         // Receber os dados dos inputs
         $usuario_user = filter_input(INPUT_POST, "usuario_user");
         $login_user = filter_input(INPUT_POST, "login_user");
@@ -157,8 +190,7 @@ if ($type === "create") {
         // $senha_user = filter_input(INPUT_POST, "senha_user");
         $senha_user = password_hash(filter_input(INPUT_POST, "senha_user"), PASSWORD_DEFAULT);
 
-        $foto_usuarioArray = filter_input(INPUT_POST, "foto_usuario");
-        $foto_usuario = $arquivo;
+        $foto_usuario = (string)($arquivo ?? '');
         $usuario = new Usuario();
 
         // Validação mínima de dados
@@ -208,32 +240,14 @@ if ($type === "create") {
 
             //$message->setMessage("Você precisa adicionar pelo menos: nome do useriente!", "error", "back");
         }
-    }
 } else if ($type === "update") {
-    $tipo = ($_FILES['foto_usuario']['type']);
-    $tamanho_perm = 1024 * 1024 * 2;
-    $size = $_FILES['foto_usuario']['size'];
-
-    $erros = "";
-
-    if (($_FILES['foto_usuario']['size']) > $tamanho_perm) {
-        // codigo de erro caso arquivo maior que permitido
-    } else {
-        // condicao caso arquivo permitido
-        $arquivo = ($_FILES['foto_usuario']['name']);
-        $temp_arq = ($_FILES['foto_usuario']['tmp_name']);
-        $pasta = "uploads/usuarios";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
-
-        // Resgata dados da imagem
-        $tipo = ($_FILES['foto_usuario']['type']);
-        $arquivo = ($_FILES['foto_usuario']['name']);
-        $temp_arq = ($_FILES['foto_usuario']['tmp_name']);
-        $size = ($_FILES['foto_usuario']['size']);
-        $pasta = "uploads/usuarios";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
+    $arquivo = null;
+    try {
+        $arquivo = storeUsuarioImage($_FILES['foto_usuario'] ?? [], __DIR__ . '/uploads/usuarios');
+    } catch (Throwable $e) {
+        $message->setMessage($e->getMessage(), "error", "back");
+        exit;
+    }
         $usuarioDao = new userDAO($conn, $BASE_URL);
 
         // Receber os dados dos inputs
@@ -301,10 +315,8 @@ if ($type === "create") {
 
         $obs_user = filter_input(INPUT_POST, "obs_user");
 
-        $foto_usuarioArray = filter_input(INPUT_POST, "foto_usuario");
-        $foto_usuario = $arquivo;
-
         $usuarioData = $usuarioDao->findById_user($id_usuario);
+        $foto_usuario = $arquivo !== null ? $arquivo : (string)($usuarioData->foto_usuario ?? '');
 
         $usuarioData->id_usuario = $id_usuario;
         $usuarioData->usuario_user = $usuario_user;
@@ -352,7 +364,6 @@ if ($type === "create") {
         $usuarioDao->update($usuarioData);
 
         header("location:list_usuario.php");
-    }
 }
 // atualizacao de senha default //
 if ($type === "update-senha") {

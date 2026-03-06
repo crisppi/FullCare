@@ -4,7 +4,7 @@ if (defined('FULLCARE_FOOTER_RENDERED')) {
 }
 define('FULLCARE_FOOTER_RENDERED', true);
 
-$footerVersion = '1.3.2';
+$footerVersion = '1.3.6';
 $footerYear = date('Y');
 ?>
 <footer id="myFooterSimple" aria-label="Rodapé FullCare">

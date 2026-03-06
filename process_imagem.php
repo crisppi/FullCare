@@ -58,11 +58,30 @@ if ($type === "create") {
         exit('Upload inválido');
     }
 
+    $size = (int)($_FILES['imagem']['size'] ?? 0);
+    if ($size <= 0 || $size > 2 * 1024 * 1024) {
+        http_response_code(400);
+        exit('Arquivo inválido ou maior que 2MB');
+    }
+
     $ext = strtolower(pathinfo($arquivoOrig, PATHINFO_EXTENSION));
-    $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-    if (!in_array($ext, $allowedExt, true)) {
+    $allowed = [
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+    ];
+    if (!isset($allowed[$ext])) {
         http_response_code(400);
         exit('Extensão de arquivo não permitida');
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = (string)$finfo->file($pasta_temp);
+    if ($mime !== $allowed[$ext]) {
+        http_response_code(400);
+        exit('Tipo MIME de arquivo não permitido');
     }
 
     $arquivo = bin2hex(random_bytes(8)) . '.' . $ext;
