@@ -636,6 +636,13 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
         color: white;
         background: #35bae1;
     }
+
+    @media (min-width: 992px) {
+        #table-content td.action .dropdown:hover>.dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+    }
     </style>
     <script src="./js/input-estilo.js"></script>
 

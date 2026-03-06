@@ -1,4 +1,9 @@
 <?php
+if (defined('FULLCARE_FOOTER_RENDERED')) {
+    return;
+}
+define('FULLCARE_FOOTER_RENDERED', true);
+
 $footerVersion = '1.3.2';
 $footerYear = date('Y');
 ?>

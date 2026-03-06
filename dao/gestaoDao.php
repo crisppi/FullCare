@@ -27,6 +27,50 @@ class gestaoDAO implements gestaoDAOInterface
         @file_put_contents(__DIR__ . '/../logs/process_internacao_create.debug.log', $line, FILE_APPEND);
     }
 
+    private function safeWhere(?string $where): string
+    {
+        $where = trim((string)$where);
+        if ($where === '') {
+            return '';
+        }
+        if (preg_match('/(;|--|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b)/i', $where)) {
+            throw new InvalidArgumentException('Filtro WHERE inválido.');
+        }
+        return 'WHERE ' . $where;
+    }
+
+    private function safeOrder(?string $order): string
+    {
+        $order = trim((string)$order);
+        if ($order === '') {
+            return '';
+        }
+        $parts = array_map('trim', explode(',', $order));
+        $clean = [];
+        foreach ($parts as $part) {
+            if ($part === '') {
+                continue;
+            }
+            if (!preg_match('/^[a-zA-Z0-9_\\.]+(\\s+(ASC|DESC))?$/i', $part)) {
+                throw new InvalidArgumentException('Ordenação inválida.');
+            }
+            $clean[] = $part;
+        }
+        return $clean ? 'ORDER BY ' . implode(', ', $clean) : '';
+    }
+
+    private function safeLimit(?string $limit): string
+    {
+        $limit = trim((string)$limit);
+        if ($limit === '') {
+            return '';
+        }
+        if (!preg_match('/^\\d+(\\s*,\\s*\\d+)?$/', $limit)) {
+            throw new InvalidArgumentException('Limite inválido.');
+        }
+        return 'LIMIT ' . $limit;
+    }
+
     public function buildgestao($data)
     {
         $gestao = new gestao();
@@ -508,13 +552,12 @@ class gestaoDAO implements gestaoDAOInterface
     // METODO PESQUISA UTI NOVA QUERY COMPLETA
     public function selectAllGestao($where = null, $order = null, $limit = null)
     {
-        //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT 
+        $query = $this->conn->prepare('SELECT 
         ge.id_gestao,
         ge.fk_internacao_ges,
         ge.home_care_ges,
@@ -571,12 +614,11 @@ class gestaoDAO implements gestaoDAOInterface
     public function QtdGestao($where = null, $order = null, $limite = null)
     {
         $hospital = [];
-        //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limite = $this->safeLimit($limite);
 
-        $stmt = $this->conn->query('SELECT 
+        $stmt = $this->conn->prepare('SELECT 
         ge.id_gestao,
         ge.fk_internacao_ges,
         ge.home_care_ges,
@@ -634,16 +676,15 @@ class gestaoDAO implements gestaoDAOInterface
     // METODO PESQUISA UTI NOVA QUERY COMPLETA
     public function selectAllGestaoLis($where = null, $order = null, $limit = null)
     {
-        //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
 
         $group = ' GROUP BY ge.id_gestao ';
 
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT 
+        $query = $this->conn->prepare('SELECT 
         ge.id_gestao,
         ge.fk_internacao_ges,
         ge.home_care_ges,
@@ -711,12 +752,11 @@ class gestaoDAO implements gestaoDAOInterface
     public function QtdGestaoLis($where = null, $order = null, $limite = null)
     {
         $hospital = [];
-        //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limite = $this->safeLimit($limite);
 
-        $stmt = $this->conn->query('SELECT
+        $stmt = $this->conn->prepare('SELECT
                 COUNT(id_gestao) as qtd,
  
         ge.id_gestao,

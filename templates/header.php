@@ -160,7 +160,8 @@ if (!empty($sessionIdUsuario)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FullCare</title>
     <base href="<?= $BASE_URL ?>">
-    <link rel="shortcut icon" type="image/x-icon" href="<?= $BASE_URL ?>img/full-ico.ico">
+    <link rel="icon" type="image/x-icon" href="<?= $BASE_URL ?>img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/../img/full-ico.ico') ?>">
+    <link rel="shortcut icon" type="image/x-icon" href="<?= $BASE_URL ?>img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/../img/full-ico.ico') ?>">
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 

@@ -85,6 +85,62 @@ class internacaoDAO implements internacaoDAOInterface
         return $this->hasTimerColumn;
     }
 
+    private function sanitizeSqlFragment(?string $fragment): string
+    {
+        $fragment = trim((string)$fragment);
+        if ($fragment === '') {
+            return '';
+        }
+        if (preg_match('/(;|--|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b)/i', $fragment)) {
+            throw new InvalidArgumentException('Fragmento SQL invalido.');
+        }
+        return $fragment;
+    }
+
+    private function safeWhere(?string $where): string
+    {
+        $where = $this->sanitizeSqlFragment($where);
+        return $where !== '' ? 'WHERE ' . $where : '';
+    }
+
+    private function safeWhereWithAnd(?string $where): string
+    {
+        $where = $this->sanitizeSqlFragment($where);
+        return $where !== '' ? ' AND ' . $where : '';
+    }
+
+    private function safeOrder(?string $order): string
+    {
+        $order = trim((string)$order);
+        if ($order === '') {
+            return '';
+        }
+        $parts = array_map('trim', explode(',', $order));
+        $clean = [];
+        foreach ($parts as $part) {
+            if ($part === '') {
+                continue;
+            }
+            if (!preg_match('/^[a-zA-Z0-9_\\.]+(\\s+(ASC|DESC))?$/i', $part)) {
+                throw new InvalidArgumentException('Ordenacao invalida.');
+            }
+            $clean[] = $part;
+        }
+        return $clean ? 'ORDER BY ' . implode(', ', $clean) : '';
+    }
+
+    private function safeLimit(?string $limit): string
+    {
+        $limit = trim((string)$limit);
+        if ($limit === '') {
+            return '';
+        }
+        if (!preg_match('/^\\d+(\\s*,\\s*\\d+)?$/', $limit)) {
+            throw new InvalidArgumentException('Limite invalido.');
+        }
+        return 'LIMIT ' . $limit;
+    }
+
     public function buildinternacao($data)
     {
         $internacao = new internacao();
@@ -545,7 +601,7 @@ class internacaoDAO implements internacaoDAOInterface
 
         $internacao = [];
 
-        $stmt = $this->conn->query("SELECT ac.id_internacao, 
+        $stmt = $this->conn->prepare("SELECT ac.id_internacao, 
         ac.acoes_int,  
         ac.internado_int, 
         ac.fk_patologia_int, 
@@ -584,7 +640,8 @@ class internacaoDAO implements internacaoDAOInterface
         left join tb_acomodacao as ad on
         ho.id_hospital = ad.fk_hospital
 
-        WHERE id_internacao = $lastInternacao");
+        WHERE id_internacao = :id_internacao");
+        $stmt->bindValue(':id_internacao', (int)$lastInternacao, PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -605,7 +662,7 @@ class internacaoDAO implements internacaoDAOInterface
     }
     public function joininternacaoHospitalshow($id_visita)
     {
-        $stmt = $this->conn->query("SELECT 
+        $sql = "SELECT 
             ac.id_internacao, 
             ac.acoes_int, 
             ac.data_intern_int,
@@ -684,9 +741,12 @@ class internacaoDAO implements internacaoDAOInterface
            left join tb_paciente as pa on
            ac.fk_paciente_int = pa.id_paciente
 
-        WHERE vi.id_visita = '.$id_visita.'
+        WHERE vi.id_visita = :id_visita
          
-         ");
+         ";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':id_visita', (int)$id_visita, PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -696,7 +756,7 @@ class internacaoDAO implements internacaoDAOInterface
     public function findInternByInternado($where, $ativo, $limite, $inicio)
     {
 
-        $stmt = $this->conn->query("SELECT 
+        $sql = "SELECT 
         ac.id_internacao, 
         ac.acoes_int, 
         ac.data_intern_int,
@@ -736,7 +796,14 @@ class internacaoDAO implements internacaoDAOInterface
         left join tb_seguradora as s on
         pa.fk_seguradora_pac = s.id_seguradora
 
-        WHERE nome_hosp LIKE '$where' AND internado_int = '$ativo' LIMIT $inicio, $limite");
+        WHERE nome_hosp LIKE :where_hosp AND internado_int = :ativo
+        LIMIT :inicio, :limite";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':where_hosp', (string)$where, PDO::PARAM_STR);
+        $stmt->bindValue(':ativo', (string)$ativo, PDO::PARAM_STR);
+        $stmt->bindValue(':inicio', max(0, (int)$inicio), PDO::PARAM_INT);
+        $stmt->bindValue(':limite', max(0, (int)$limite), PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -950,9 +1017,9 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacao($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
@@ -1055,10 +1122,10 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacaoCountVis($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
 
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
@@ -1158,9 +1225,9 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd, 
@@ -1228,8 +1295,8 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacaoList($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
         if ($limit !== null && $limit !== '') {
             $limitParts = array_map('trim', explode(',', (string)$limit));
             if (count($limitParts) === 2) {
@@ -1352,9 +1419,9 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
         $group = ' GROUP BY ac.id_internacao ';
 
@@ -1412,7 +1479,7 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
+        $where = $this->safeWhere($where);
 
         $stmt = $this->conn->query('SELECT 
             ac.id_internacao,
@@ -1459,8 +1526,8 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \\ ********
     public function selectAllInternacaoCap($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = ($where !== null && $where !== '') ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
         if ($limit !== null && $limit !== '') {
             $limitParts = array_map('trim', explode(',', (string)$limit));
             if (count($limitParts) === 2) {
@@ -1590,9 +1657,9 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \\ ********
     public function selectAllInternacaoNewCap($where = null, $order = null, $limit = null)
     {
-        $where = ($where !== null && $where !== '') ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
 
         $query = $this->conn->query(
             'SELECT 
@@ -1705,9 +1772,9 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd, 
@@ -1818,9 +1885,9 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacaoCapList($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ca.id_capeante ';
 
         //MONTA A QUERY
@@ -1915,9 +1982,9 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ca.fk_int_capeante ';
 
         $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd, 
@@ -2040,10 +2107,10 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacaoVis($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
 
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $limit = $this->safeLimit($limit);
 
         $group = ' GROUP BY ac.id_internacao ';
 
@@ -2115,7 +2182,7 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $id_internacao2 = strlen($id_internacao2) ? 'WHERE ' . $id_internacao2 : '';
+        $id_internacao2 = $this->safeWhere($id_internacao2);
         $group = ' GROUP BY vi.fk_internacao_vis ';
 
         //MONTA A QUERY
@@ -2161,7 +2228,7 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $wherevisitaCargo = strlen($wherevisitaCargo) ? 'WHERE ' . $wherevisitaCargo : '';
+        $wherevisitaCargo = $this->safeWhere($wherevisitaCargo);
 
         //MONTA A QUERY
         $query = $this->conn->query(
@@ -2206,7 +2273,7 @@ class internacaoDAO implements internacaoDAOInterface
         $internacao = [];
         //DADOS DA QUERY
 
-        $query = $this->conn->query(
+        $query = $this->conn->prepare(
             "SELECT
                 count(vi.fk_internacao_vis) as num_visitas,
                 ac.id_internacao, 
@@ -2236,8 +2303,9 @@ class internacaoDAO implements internacaoDAOInterface
             LEFT JOIN tb_user AS se ON  
                 se.id_usuario = hos.fk_usuario_hosp
             
-            WHERE fk_internacao_vis = $id_internacao2 "
+            WHERE fk_internacao_vis = :id_internacao2 "
         );
+        $query->bindValue(':id_internacao2', (int)$id_internacao2, PDO::PARAM_INT);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -2249,7 +2317,7 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $wherevisita = strlen($wherevisita) ? 'WHERE ' . $wherevisita : '';
+        $wherevisita = $this->safeWhere($wherevisita);
 
         $query = $this->conn->query(
             "SELECT
@@ -2292,7 +2360,7 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $wherevisita = strlen($wherevisita) ? 'WHERE ' . $wherevisita : '';
+        $wherevisita = $this->safeWhere($wherevisita);
 
         $query = $this->conn->query(
             "SELECT
@@ -2339,9 +2407,9 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
 
@@ -2442,7 +2510,7 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectInternVisLastWhere($where = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
+        $where = $this->safeWhere($where);
         //MONTA A QUERY
         $query = $this->conn->query(
             "SELECT
@@ -2486,9 +2554,9 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacaoPato($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
@@ -2570,9 +2638,9 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacaoPatoList($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
@@ -2655,9 +2723,9 @@ class internacaoDAO implements internacaoDAOInterface
     public function QtdInternacaoPatoList($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
@@ -2732,7 +2800,7 @@ class internacaoDAO implements internacaoDAOInterface
     {
 
         //MONTA A QUERY
-        $query = $this->conn->query(
+        $query = $this->conn->prepare(
             "SELECT
     ac.id_internacao, 
     ac.data_visita_int,
@@ -2746,9 +2814,10 @@ class internacaoDAO implements internacaoDAOInterface
         inner join tb_visita as vi on
         ac.id_internacao = vi.fk_internacao_vis
 
-        WHERE fk_internacao_vis = $id_internacao order by id_visita DESC LIMIT 1"
+        WHERE fk_internacao_vis = :id_internacao order by id_visita DESC LIMIT 1"
 
         );
+        $query->bindValue(':id_internacao', (int)$id_internacao, PDO::PARAM_INT);
 
         $query->execute();
 
@@ -2761,9 +2830,9 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
 
@@ -2835,9 +2904,9 @@ class internacaoDAO implements internacaoDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd,
@@ -3066,11 +3135,14 @@ class internacaoDAO implements internacaoDAOInterface
     public function reinternacao($where = null, $order = null, $limit = null)
     {
 
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhereWithAnd($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
+        if ($order === '') {
+            $order = 'ORDER BY pa.nome_pac, ac.data_intern_int';
+        }
 
-        $stmt = $this->conn->query('SELECT 
+        $stmt = $this->conn->prepare('SELECT 
     ac.id_internacao AS id_internacao_atual, 
     ac.fk_hospital_int,
     pa.nome_pac,
@@ -3094,9 +3166,7 @@ INNER JOIN
 WHERE 
     DATEDIFF(ac.data_intern_int, al_anterior.data_alta_alt) <= 2
     AND al_anterior.data_alta_alt IS NOT NULL
-    AND ac.data_intern_int > al_anterior.data_alta_alt -- Internação ocorre após a alta anterior
-ORDER BY 
-    pa.nome_pac, ac.data_intern_int;
+    AND ac.data_intern_int > al_anterior.data_alta_alt
         
         ' . $where . '  ' . $order . ' ' . $limit);
 
@@ -3109,7 +3179,7 @@ ORDER BY
     public function reinternacaoNova($where_gerais_reint, $diasLimite = 2)
     {
         $diasLimite = max(1, (int)$diasLimite);
-        $where_gerais_reint = strlen($where_gerais_reint) ? ' AND ' . $where_gerais_reint : '';
+        $where_gerais_reint = $this->safeWhereWithAnd($where_gerais_reint);
 
         $stmt = $this->conn->query(
             'SELECT 
@@ -3149,9 +3219,9 @@ WHERE
 
     public function selectInternacaoCapTimeline($where = null, $order = null, $limit = null)
     {
-        $where = ($where !== null && $where !== '') ? 'WHERE ' . $where : '';
-        $order = ($order !== null && $order !== '') ? 'ORDER BY ' . $order : '';
-        $limit = ($limit !== null && $limit !== '') ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
         /*
          * Subconsulta cap agrega por fk_int_capeante:
          * - faturada_flag = 's' se existir QUALQUER conta faturada
@@ -3243,6 +3313,10 @@ WHERE
      */
     public function selectAllProrrogacao($where = '', $ordenar = 'p.prorrog1_ini_pror ASC', $limit = null)
     {
+        $whereSql = $this->safeWhere($where);
+        $orderSql = $this->safeOrder($ordenar);
+        $limitSql = $this->safeLimit((string)$limit);
+
         // >>>>>>>>> ÚNICA ALTERAÇÃO: substituir arrow function por closure compatível <<<<<<<<
         $pick = function ($table, $cands) {
             foreach ($cands as $c) {
@@ -3328,14 +3402,9 @@ WHERE
         $joinHospital
     ";
 
-        if ($where)
-            $sql .= " WHERE $where";
-        if ($ordenar)
-            $sql .= " ORDER BY $ordenar";
-        if ($limit !== null) {
-            $limit = (int) $limit;
-            $sql .= " LIMIT $limit";
-        }
+        if ($whereSql) $sql .= " $whereSql";
+        if ($orderSql) $sql .= " $orderSql";
+        if ($limitSql) $sql .= " $limitSql";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
@@ -3463,6 +3532,7 @@ WHERE
     ";
 
         if (!empty($where)) {
+            $where = $this->sanitizeSqlFragment($where);
             $sql .= " AND ($where) ";
         }
 

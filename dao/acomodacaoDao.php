@@ -21,6 +21,50 @@ class acomodacaoDAO implements acomodacaoDAOInterface
         $this->message = new Message($url);
     }
 
+    private function safeWhere(?string $where): string
+    {
+        $where = trim((string)$where);
+        if ($where === '') {
+            return '';
+        }
+        if (preg_match('/(;|--|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b)/i', $where)) {
+            throw new InvalidArgumentException('Filtro WHERE inválido.');
+        }
+        return 'WHERE ' . $where;
+    }
+
+    private function safeOrder(?string $order): string
+    {
+        $order = trim((string)$order);
+        if ($order === '') {
+            return '';
+        }
+        $parts = array_map('trim', explode(',', $order));
+        $clean = [];
+        foreach ($parts as $part) {
+            if ($part === '') {
+                continue;
+            }
+            if (!preg_match('/^[a-zA-Z0-9_\\.]+(\\s+(ASC|DESC))?$/i', $part)) {
+                throw new InvalidArgumentException('Ordenação inválida.');
+            }
+            $clean[] = $part;
+        }
+        return $clean ? 'ORDER BY ' . implode(', ', $clean) : '';
+    }
+
+    private function safeLimit(?string $limit): string
+    {
+        $limit = trim((string)$limit);
+        if ($limit === '') {
+            return '';
+        }
+        if (!preg_match('/^\\d+(\\s*,\\s*\\d+)?$/', $limit)) {
+            throw new InvalidArgumentException('Limite inválido.');
+        }
+        return 'LIMIT ' . $limit;
+    }
+
     public function buildacomodacao($acomodacao)
     {
         $acomod = new acomodacao();
@@ -55,12 +99,12 @@ class acomodacaoDAO implements acomodacaoDAOInterface
     public function joinAcomodacaoHospitalshow($id_acomodacao)
 
     {
-        $stmt = $this->conn->query("SELECT ac.id_acomodacao, ac.data_contrato_aco, ac.fk_hospital, ac.valor_aco, ac.acomodacao_aco, ho.id_hospital, ho.nome_hosp
+        $stmt = $this->conn->prepare("SELECT ac.id_acomodacao, ac.data_contrato_aco, ac.fk_hospital, ac.valor_aco, ac.acomodacao_aco, ho.id_hospital, ho.nome_hosp
          FROM tb_acomodacao ac          
          iNNER JOIN tb_hospital as ho On  
          ac.fk_hospital = ho.id_hospital
-         where id_acomodacao = $id_acomodacao   
-         ");
+         where id_acomodacao = :id_acomodacao");
+        $stmt->bindValue(':id_acomodacao', (int)$id_acomodacao, PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -126,9 +170,8 @@ class acomodacaoDAO implements acomodacaoDAOInterface
     {
         $acomodacao = [];
         $stmt = $this->conn->prepare("SELECT * FROM tb_acomodacao
-                                    WHERE id_acomodacao = $id_acomodacao");
-
-        $stmt->bindParam(":id_acomodacao", $id_acomodacao);
+                                    WHERE id_acomodacao = :id_acomodacao");
+        $stmt->bindValue(":id_acomodacao", (int)$id_acomodacao, PDO::PARAM_INT);
         $stmt->execute();
 
         $data = $stmt->fetch();
@@ -261,13 +304,12 @@ class acomodacaoDAO implements acomodacaoDAOInterface
 
     public function selectAllacomodacao($where = null, $order = null, $limit = null)
     {
-        //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT 
+        $query = $this->conn->prepare('SELECT 
         ac.id_acomodacao,  
         ac.acomodacao_aco, 
         ac.valor_aco, 
@@ -289,12 +331,11 @@ class acomodacaoDAO implements acomodacaoDAOInterface
     public function QtdAcomodacao($where = null, $order = null, $limite = null)
     {
         $hospital = [];
-        //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limite = $this->safeLimit($limite);
 
-        $stmt = $this->conn->query('SELECT * ,COUNT(id_acomodacao) as qtd FROM tb_acomodacao ' . $where . ' ' . $order . ' ' . $limite);
+        $stmt = $this->conn->prepare('SELECT * ,COUNT(id_acomodacao) as qtd FROM tb_acomodacao ' . $where . ' ' . $order . ' ' . $limite);
 
         $stmt->execute();
 

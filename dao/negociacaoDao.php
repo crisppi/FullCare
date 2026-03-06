@@ -20,6 +20,50 @@ class negociacaoDAO implements negociacaoDAOInterface
         $this->message = new Message($url);
     }
 
+    private function safeWhere(?string $where): string
+    {
+        $where = trim((string)$where);
+        if ($where === '') {
+            return '';
+        }
+        if (preg_match('/(;|--|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b)/i', $where)) {
+            throw new InvalidArgumentException('Filtro WHERE inválido.');
+        }
+        return 'WHERE ' . $where;
+    }
+
+    private function safeOrder(?string $order): string
+    {
+        $order = trim((string)$order);
+        if ($order === '') {
+            return '';
+        }
+        $parts = array_map('trim', explode(',', $order));
+        $clean = [];
+        foreach ($parts as $part) {
+            if ($part === '') {
+                continue;
+            }
+            if (!preg_match('/^[a-zA-Z0-9_\\.]+(\\s+(ASC|DESC))?$/i', $part)) {
+                throw new InvalidArgumentException('Ordenação inválida.');
+            }
+            $clean[] = $part;
+        }
+        return $clean ? 'ORDER BY ' . implode(', ', $clean) : '';
+    }
+
+    private function safeLimit(?string $limit): string
+    {
+        $limit = trim((string)$limit);
+        if ($limit === '') {
+            return '';
+        }
+        if (!preg_match('/^\\d+(\\s*,\\s*\\d+)?$/', $limit)) {
+            throw new InvalidArgumentException('Limite inválido.');
+        }
+        return 'LIMIT ' . $limit;
+    }
+
     public function buildNegociacao($data)
     {
         $negociacao = new Negociacao();
@@ -235,7 +279,7 @@ class negociacaoDAO implements negociacaoDAOInterface
 
         $negociacao = [];
 
-        $stmt = $this->conn->query("SELECT 
+        $stmt = $this->conn->prepare("SELECT 
         ng.id_negociacao,
         ng.fk_id_int, 
         ng.qtd_1, 
@@ -275,7 +319,8 @@ class negociacaoDAO implements negociacaoDAOInterface
             INNER JOIN tb_acomodacao AS ad ON  
             ho.id_hospital = ad.fk_hospital
             
-            WHERE ac.id_internacao = $lastId ");
+            WHERE ac.id_internacao = :last_id ");
+        $stmt->bindValue(':last_id', (int)$lastId, PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -335,9 +380,9 @@ class negociacaoDAO implements negociacaoDAOInterface
     // dao/negociacaoDao.php
     public function selectAllnegociacao($where = null, $order = null, $limit = null)
     {
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limit = $this->safeLimit($limit);
 
     $sql = "
         SELECT
@@ -360,15 +405,16 @@ class negociacaoDAO implements negociacaoDAOInterface
         $limit
     ";
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function selectNegociacoesDetalhes($where = null, $order = null, $limit = null)
     {
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : 'ORDER BY ng.data_inicio_neg DESC';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = $this->safeWhere($where);
+        $order = trim((string)$order) !== '' ? $this->safeOrder($order) : 'ORDER BY ng.data_inicio_neg DESC';
+        $limit = $this->safeLimit($limit);
 
         $sql = "
             SELECT
@@ -401,13 +447,14 @@ class negociacaoDAO implements negociacaoDAOInterface
             $limit
         ";
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function countNegociacoesDetalhes($where = null)
     {
-        $where = strlen($where) ? 'WHERE ' . $where : '';
+        $where = $this->safeWhere($where);
 
         $sql = "
             SELECT COUNT(*) AS total
@@ -418,7 +465,8 @@ class negociacaoDAO implements negociacaoDAOInterface
             $where
         ";
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return (int) ($row['total'] ?? 0);
     }
@@ -439,12 +487,11 @@ class negociacaoDAO implements negociacaoDAOInterface
     public function Qtdnegociacao($where = null, $order = null, $limite = null)
     {
         $negociacao = [];
-        //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $where = $this->safeWhere($where);
+        $order = $this->safeOrder($order);
+        $limite = $this->safeLimit($limite);
 
-        $stmt = $this->conn->query('SELECT * ,COUNT(id_negociacao) as qtd FROM tb_negociacao ' . $where . ' ' . $order . ' ' . $limite);
+        $stmt = $this->conn->prepare('SELECT * ,COUNT(id_negociacao) as qtd FROM tb_negociacao ' . $where . ' ' . $order . ' ' . $limite);
 
         $stmt->execute();
 
