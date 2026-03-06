@@ -141,6 +141,59 @@ class internacaoDAO implements internacaoDAOInterface
         return 'LIMIT ' . $limit;
     }
 
+    private function buildWhereAndParams(?string $where, array $params = []): array
+    {
+        $raw = $this->sanitizeSqlFragment($where);
+        if ($raw === '') {
+            return ['', $params];
+        }
+
+        $idx = 0;
+        $sql = preg_replace_callback('/\'([^\']*)\'|"([^"]*)"/', function ($m) use (&$params, &$idx) {
+            $key = ':w_' . $idx++;
+            $params[$key] = isset($m[1]) && $m[1] !== '' ? $m[1] : ($m[2] ?? '');
+            return $key;
+        }, $raw);
+
+        return ['WHERE ' . $sql, $params];
+    }
+
+    private function buildWhereWithAndAndParams(?string $where, array $params = []): array
+    {
+        $raw = $this->sanitizeSqlFragment($where);
+        if ($raw === '') {
+            return ['', $params];
+        }
+
+        $idx = 0;
+        $sql = preg_replace_callback('/\'([^\']*)\'|"([^"]*)"/', function ($m) use (&$params, &$idx) {
+            $key = ':w_' . $idx++;
+            $params[$key] = isset($m[1]) && $m[1] !== '' ? $m[1] : ($m[2] ?? '');
+            return $key;
+        }, $raw);
+
+        return [' AND ' . $sql, $params];
+    }
+
+    private function bindParams(PDOStatement $stmt, array $params): void
+    {
+        foreach ($params as $key => $value) {
+            if (is_int($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_INT);
+                continue;
+            }
+            if (is_bool($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_BOOL);
+                continue;
+            }
+            if ($value === null) {
+                $stmt->bindValue($key, null, PDO::PARAM_NULL);
+                continue;
+            }
+            $stmt->bindValue($key, (string)$value, PDO::PARAM_STR);
+        }
+    }
+
     public function buildinternacao($data)
     {
         $internacao = new internacao();
@@ -1014,16 +1067,16 @@ class internacaoDAO implements internacaoDAOInterface
     }
 
     // MODELO DE FILTRO COM SELECT ATUAL COM FILTROS E PAGINACAO
-    public function selectAllInternacao($where = null, $order = null, $limit = null)
+    public function selectAllInternacao($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT 
+        $query = $this->conn->prepare('SELECT 
         ac.id_internacao, 
         ac.acoes_int, 
         ac.data_intern_int,
@@ -1112,6 +1165,7 @@ class internacaoDAO implements internacaoDAOInterface
 
             . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -1119,17 +1173,17 @@ class internacaoDAO implements internacaoDAOInterface
         return $hospital;
     }
 
-    public function selectAllInternacaoCountVis($where = null, $order = null, $limit = null)
+    public function selectAllInternacaoCountVis($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
 
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT 
+        $query = $this->conn->prepare('SELECT 
             ac.id_internacao, 
             ac.acoes_int, 
             ac.data_intern_int, 
@@ -1214,6 +1268,7 @@ class internacaoDAO implements internacaoDAOInterface
 
             ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -1221,16 +1276,16 @@ class internacaoDAO implements internacaoDAOInterface
         return $hospital;
     }
 
-    public function QtdInternacao($where = null, $order = null, $limit = null)
+    public function QtdInternacao($where = null, $order = null, $limit = null, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
-        $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd, 
+        $stmt = $this->conn->prepare('SELECT COUNT(id_internacao) as qtd, 
         ho.id_hospital, 
         ac.id_internacao, 
         ac.acoes_int, 
@@ -1285,6 +1340,7 @@ class internacaoDAO implements internacaoDAOInterface
 
             ' . $where . '  ' . $order . ' ' . $limit);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalInt = $stmt->fetch();
@@ -1295,7 +1351,7 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacaoList($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         if ($limit !== null && $limit !== '') {
             $limitParts = array_map('trim', explode(',', (string)$limit));
@@ -1404,10 +1460,7 @@ class internacaoDAO implements internacaoDAOInterface
              ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit;
 
         $query = $this->conn->prepare($sql);
-        foreach ($params as $key => $value) {
-            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
-            $query->bindValue($key, $value, $paramType);
-        }
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -1415,17 +1468,17 @@ class internacaoDAO implements internacaoDAOInterface
         return $hospital;
     }
 
-    public function QtdInternacaoList($where = null, $order = null, $limit = null)
+    public function QtdInternacaoList($where = null, $order = null, $limit = null, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
         $group = ' GROUP BY ac.id_internacao ';
 
-        $stmt = $this->conn->query('SELECT COUNT(ac.id_internacao) as qtd, 
+        $stmt = $this->conn->prepare('SELECT COUNT(ac.id_internacao) as qtd, 
         ac.id_internacao, 
         ac.data_intern_int, 
         ac.data_visita_int, 
@@ -1467,6 +1520,7 @@ class internacaoDAO implements internacaoDAOInterface
     
             ' . $where);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalInt = $stmt->fetch();
@@ -1475,13 +1529,13 @@ class internacaoDAO implements internacaoDAOInterface
     }
 
 
-    public function PreditivoIntPatologAntec($where = null)
+    public function PreditivoIntPatologAntec($where = null, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
 
-        $stmt = $this->conn->query('SELECT 
+        $stmt = $this->conn->prepare('SELECT 
             ac.id_internacao,
             ac.fk_patologia_int AS patologia,
             FLOOR(DATEDIFF(CURDATE(), pa.data_nasc_pac) / 365 / 5) * 5 AS faixa_etaria,
@@ -1511,7 +1565,7 @@ class internacaoDAO implements internacaoDAOInterface
             an.id_intern_antec; 
         ');
 
-
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $Preditivos = $stmt->fetch();
@@ -1526,7 +1580,7 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \\ ********
     public function selectAllInternacaoCap($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         if ($limit !== null && $limit !== '') {
             $limitParts = array_map('trim', explode(',', (string)$limit));
@@ -1642,10 +1696,7 @@ class internacaoDAO implements internacaoDAOInterface
         ' . $where . ' ' . $order . ' ' . $limit;
 
         $query = $this->conn->prepare($sql);
-        foreach ($params as $key => $value) {
-            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
-            $query->bindValue($key, $value, $paramType);
-        }
+        $this->bindParams($query, $params);
         $query->execute();
         return $query->fetchAll();
     }
@@ -1655,13 +1706,13 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \\ ********
     // ********* MODELO PARA CRIACAO DE CAPEANTE PARCIAL ********
     // ********* \\ ********
-    public function selectAllInternacaoNewCap($where = null, $order = null, $limit = null)
+    public function selectAllInternacaoNewCap($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
 
-        $query = $this->conn->query(
+        $query = $this->conn->prepare(
             'SELECT 
     ac.id_internacao, 
     ac.acoes_int, 
@@ -1763,21 +1814,22 @@ class internacaoDAO implements internacaoDAOInterface
         ' . $where . ' ' . $order . ' ' . $limit
         );
 
+        $this->bindParams($query, $params);
         $query->execute();
         return $query->fetchAll();
     }
 
 
-    public function QtdInternacaoCap($where = null, $order = null, $limit = null)
+    public function QtdInternacaoCap($where = null, $order = null, $limit = null, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
-        $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd, 
+        $stmt = $this->conn->prepare('SELECT COUNT(id_internacao) as qtd, 
         ac.id_internacao, 
         ac.acoes_int, 
         ac.data_intern_int, 
@@ -1873,6 +1925,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         ' . $where . '  ' . $order . ' ' . $limit);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalInt = $stmt->fetch();
@@ -1882,16 +1935,16 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \\ ********
     // ********* MODELO DE FILTRO COM SELECT ATUAL COM FILTROS E PAGINACAO CAPEANTE ********
     // ********* \\ ********
-    public function selectAllInternacaoCapList($where = null, $order = null, $limit = null)
+    public function selectAllInternacaoCapList($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ca.id_capeante ';
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT 
+        $query = $this->conn->prepare('SELECT 
         ac.id_internacao, 
         ac.acoes_int, 
         ac.data_intern_int, 
@@ -1970,6 +2023,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -1978,16 +2032,16 @@ class internacaoDAO implements internacaoDAOInterface
     }
 
 
-    public function QtdInternacaoCapList($where = null, $order = null, $limit = null)
+    public function QtdInternacaoCapList($where = null, $order = null, $limit = null, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ca.fk_int_capeante ';
 
-        $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd, 
+        $stmt = $this->conn->prepare('SELECT COUNT(id_internacao) as qtd, 
         ho.id_hospital, 
         ac.id_internacao, 
         ac.acoes_int, 
@@ -2059,6 +2113,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         ' . $where . '  ' . $group . '' . $order . ' ' . $limit);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalInt = $stmt->fetch();
@@ -2104,10 +2159,10 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \     VISITA    \ ********
     // ********* MODELO DE FILTRO COM SELECT ATUAL COM FILTROS E PAGINACAO VISITA ********
     // ********* \                \ ********
-    public function selectAllInternacaoVis($where = null, $order = null, $limit = null)
+    public function selectAllInternacaoVis($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
 
         $limit = $this->safeLimit($limit);
@@ -2115,7 +2170,7 @@ class internacaoDAO implements internacaoDAOInterface
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT    
+        $query = $this->conn->prepare('SELECT    
     ac.id_internacao, 
     ac.acoes_int, 
     ac.data_intern_int, 
@@ -2168,6 +2223,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -2180,58 +2236,44 @@ class internacaoDAO implements internacaoDAOInterface
 
     public function selectInternVis($id_internacao2)
     {
-        $internacao = [];
-        //DADOS DA QUERY
-        $id_internacao2 = $this->safeWhere($id_internacao2);
-        $group = ' GROUP BY vi.fk_internacao_vis ';
-
-        //MONTA A QUERY
-        $query = $this->conn->query(
+        $query = $this->conn->prepare(
             "SELECT
-            count(vi.fk_internacao_vis) as num_visitas,
-            ac.id_internacao, 
-            ac.data_visita_int,
-            ac.fk_hospital_int,
-            vi.id_visita,
-            vi.fk_internacao_vis,
-            vi.visita_no_vis,
-            vi.data_visita_vis,
-            ho.id_hospital,
-            hos.fk_hospital_user,
-            hos.fk_usuario_hosp,
-            se.id_usuario,
-            se.cargo_user
-            
-        FROM tb_internacao ac 
-        
-        INNER JOIN tb_visita AS vi ON
-            ac.id_internacao = vi.fk_internacao_vis
-                
-        LEFT JOIN tb_hospital AS ho ON  
-            ac.fk_hospital_int = ho.id_hospital
-        
-        LEFT JOIN tb_hospitalUser AS hos ON
-            hos.fk_hospital_user = ho.id_hospital
-        
-        LEFT JOIN tb_user AS se ON  
-            se.id_usuario = hos.fk_usuario_hosp
-        
-            ' . $id_internacao2 . '  ' . $group .'"
+                COUNT(vi.fk_internacao_vis) AS num_visitas,
+                ac.id_internacao, 
+                ac.data_visita_int,
+                ac.fk_hospital_int,
+                vi.id_visita,
+                vi.fk_internacao_vis,
+                vi.visita_no_vis,
+                vi.data_visita_vis,
+                ho.id_hospital,
+                hos.fk_hospital_user,
+                hos.fk_usuario_hosp,
+                se.id_usuario,
+                se.cargo_user
+            FROM tb_internacao ac 
+            INNER JOIN tb_visita AS vi ON ac.id_internacao = vi.fk_internacao_vis
+            LEFT JOIN tb_hospital AS ho ON ac.fk_hospital_int = ho.id_hospital
+            LEFT JOIN tb_hospitalUser AS hos ON hos.fk_hospital_user = ho.id_hospital
+            LEFT JOIN tb_user AS se ON se.id_usuario = hos.fk_usuario_hosp
+            WHERE vi.fk_internacao_vis = :id_internacao
+            GROUP BY vi.fk_internacao_vis"
         );
+        $query->bindValue(':id_internacao', (int)$id_internacao2, PDO::PARAM_INT);
         $query->execute();
 
         $visitas = $query->fetchAll();
 
         return $visitas;
     }
-    public function selectInternVisCargo($wherevisitaCargo)
+    public function selectInternVisCargo($wherevisitaCargo, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $wherevisitaCargo = $this->safeWhere($wherevisitaCargo);
+        [$wherevisitaCargo, $params] = $this->buildWhereAndParams($wherevisitaCargo, $params);
 
         //MONTA A QUERY
-        $query = $this->conn->query(
+        $query = $this->conn->prepare(
             "SELECT
             ac.id_internacao, 
             ac.data_visita_int,
@@ -2262,6 +2304,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         $wherevisitaCargo"
         );
+        $this->bindParams($query, $params);
         $query->execute();
 
         $visitas = $query->fetchAll();
@@ -2313,13 +2356,13 @@ class internacaoDAO implements internacaoDAOInterface
         return $hospital;
     }
 
-    public function selectInternVisitaCargo($wherevisita)
+    public function selectInternVisitaCargo($wherevisita, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $wherevisita = $this->safeWhere($wherevisita);
+        [$wherevisita, $params] = $this->buildWhereAndParams($wherevisita, $params);
 
-        $query = $this->conn->query(
+        $query = $this->conn->prepare(
             "SELECT
                 ac.id_internacao, 
                 ac.data_visita_int,
@@ -2350,19 +2393,20 @@ class internacaoDAO implements internacaoDAOInterface
             
                 $wherevisita"
         );
+        $this->bindParams($query, $params);
         $query->execute();
 
         $visita = $query->fetchAll();
 
         return $visita;
     }
-    public function selectInternVisitaCargoMax($wherevisita)
+    public function selectInternVisitaCargoMax($wherevisita, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $wherevisita = $this->safeWhere($wherevisita);
+        [$wherevisita, $params] = $this->buildWhereAndParams($wherevisita, $params);
 
-        $query = $this->conn->query(
+        $query = $this->conn->prepare(
             "SELECT
                 ac.id_internacao, 
                 ac.data_visita_int,
@@ -2396,6 +2440,7 @@ class internacaoDAO implements internacaoDAOInterface
                     FROM tb_visita
                     WHERE fk_internacao_vis = 24"
         );
+        $this->bindParams($query, $params);
         $query->execute();
 
         $visitaMax = $query->fetchAll();
@@ -2403,17 +2448,17 @@ class internacaoDAO implements internacaoDAOInterface
         return $visitaMax;
     }
 
-    public function QtdInternacaoVis($where = null, $order = null, $limit = null)
+    public function QtdInternacaoVis($where = null, $order = null, $limit = null, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
 
-        $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd, 
+        $stmt = $this->conn->prepare('SELECT COUNT(id_internacao) as qtd, 
         ho.id_hospital, 
         ac.id_internacao, 
         ac.acoes_int, 
@@ -2464,6 +2509,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalInt = $stmt->fetch();
@@ -2507,12 +2553,12 @@ class internacaoDAO implements internacaoDAOInterface
         return $hospital;
     }
 
-    public function selectInternVisLastWhere($where = null)
+    public function selectInternVisLastWhere($where = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         //MONTA A QUERY
-        $query = $this->conn->query(
+        $query = $this->conn->prepare(
             "SELECT
                 ac.id_internacao, 
                 ac.data_visita_int,
@@ -2540,6 +2586,7 @@ class internacaoDAO implements internacaoDAOInterface
                 pa.fk_seguradora_pac = s.id_seguradora " . $where
         );
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -2551,16 +2598,16 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \     PATOLOGIA    \ ********
     // ********* MODELO DE FILTRO COM SELECT ATUAL COM FILTROS E PAGINACAO POR PATOLOGIA ********
     // ********* \                   \ ********
-    public function selectAllInternacaoPato($where = null, $order = null, $limit = null)
+    public function selectAllInternacaoPato($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT    
+        $query = $this->conn->prepare('SELECT    
     ac.id_internacao, 
     ac.acoes_int, 
     ac.data_intern_int, 
@@ -2626,6 +2673,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -2635,16 +2683,16 @@ class internacaoDAO implements internacaoDAOInterface
     // ********* \     PATOLOGIA    \ ********
     // ********* MODELO DE FILTRO COM SELECT ATUAL COM FILTROS E PAGINACAO POR PATOLOGIA ********
     // ********* \                   \ ********
-    public function selectAllInternacaoPatoList($where = null, $order = null, $limit = null)
+    public function selectAllInternacaoPatoList($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT    
+        $query = $this->conn->prepare('SELECT    
     ac.id_internacao, 
     ac.acoes_int, 
     ac.data_intern_int, 
@@ -2712,6 +2760,7 @@ class internacaoDAO implements internacaoDAOInterface
             
         ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -2720,16 +2769,16 @@ class internacaoDAO implements internacaoDAOInterface
     }
 
 
-    public function QtdInternacaoPatoList($where = null, $order = null, $limit = null)
+    public function QtdInternacaoPatoList($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
         //MONTA A QUERY
-        $query = $this->conn->query('SELECT COUNT(id_internacao) as qtd,   
+        $query = $this->conn->prepare('SELECT COUNT(id_internacao) as qtd,   
         ac.id_internacao, 
         ac.acoes_int, 
         ac.data_intern_int, 
@@ -2790,6 +2839,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($query, $params);
         $query->execute();
 
         $hospital = $query->fetchAll();
@@ -2826,17 +2876,17 @@ class internacaoDAO implements internacaoDAOInterface
         return $hospital;
     }
 
-    public function QtdInternacaoPato($where = null, $order = null, $limit = null)
+    public function QtdInternacaoPato($where = null, $order = null, $limit = null, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
 
-        $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd, 
+        $stmt = $this->conn->prepare('SELECT COUNT(id_internacao) as qtd, 
         ho.id_hospital, 
         ac.id_internacao, 
         ac.acoes_int, 
@@ -2893,6 +2943,7 @@ class internacaoDAO implements internacaoDAOInterface
         
         ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalInt = $stmt->fetch();
@@ -2900,22 +2951,23 @@ class internacaoDAO implements internacaoDAOInterface
         return $QtdTotalInt;
     }
 
-    public function QtdInternacaoListPag($where = null, $order = null, $limit = null)
+    public function QtdInternacaoListPag($where = null, $order = null, $limit = null, array $params = [])
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
 
-        $stmt = $this->conn->query('SELECT COUNT(id_internacao) as qtd,
+        $stmt = $this->conn->prepare('SELECT COUNT(id_internacao) as qtd,
         ac.id_internacao
     
         FROM tb_internacao ac 
 
             ' . $where . '' . $order . ' ' . $limit);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $QtdTotalInt = $stmt->fetch();
@@ -3132,10 +3184,10 @@ class internacaoDAO implements internacaoDAOInterface
     }
 
 
-    public function reinternacao($where = null, $order = null, $limit = null)
+    public function reinternacao($where = null, $order = null, $limit = null, array $params = [])
     {
 
-        $where = $this->safeWhereWithAnd($where);
+        [$where, $params] = $this->buildWhereWithAndAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         if ($order === '') {
@@ -3170,18 +3222,19 @@ WHERE
         
         ' . $where . '  ' . $order . ' ' . $limit);
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $reinternacao = $stmt->fetch();
 
         return $reinternacao;
     }
-    public function reinternacaoNova($where_gerais_reint, $diasLimite = 2)
+    public function reinternacaoNova($where_gerais_reint, $diasLimite = 2, array $params = [])
     {
         $diasLimite = max(1, (int)$diasLimite);
-        $where_gerais_reint = $this->safeWhereWithAnd($where_gerais_reint);
+        [$where_gerais_reint, $params] = $this->buildWhereWithAndAndParams($where_gerais_reint, $params);
 
-        $stmt = $this->conn->query(
+        $stmt = $this->conn->prepare(
             'SELECT 
     ac.id_internacao AS id_internacao_atual, 
     ac.fk_hospital_int,
@@ -3210,6 +3263,7 @@ WHERE
                 . $where_gerais_reint
         );
 
+        $this->bindParams($stmt, $params);
         $stmt->execute();
 
         $reinternacao = $stmt->fetchall();
@@ -3217,9 +3271,9 @@ WHERE
         return $reinternacao;
     }
 
-    public function selectInternacaoCapTimeline($where = null, $order = null, $limit = null)
+    public function selectInternacaoCapTimeline($where = null, $order = null, $limit = null, array $params = [])
     {
-        $where = $this->safeWhere($where);
+        [$where, $params] = $this->buildWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         /*
@@ -3268,7 +3322,8 @@ WHERE
     $limit
     ";
 
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $this->bindParams($stmt, $params);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -3311,9 +3366,9 @@ WHERE
      * $ordenar Ex.: "i.id_internacao ASC" | "p.prorrog1_ini_pror ASC" (sem ORDER BY)
      * $limit   Ex.: "0,20"
      */
-    public function selectAllProrrogacao($where = '', $ordenar = 'p.prorrog1_ini_pror ASC', $limit = null)
+    public function selectAllProrrogacao($where = '', $ordenar = 'p.prorrog1_ini_pror ASC', $limit = null, array $params = [])
     {
-        $whereSql = $this->safeWhere($where);
+        [$whereSql, $params] = $this->buildWhereAndParams($where, $params);
         $orderSql = $this->safeOrder($ordenar);
         $limitSql = $this->safeLimit((string)$limit);
 
@@ -3407,6 +3462,7 @@ WHERE
         if ($limitSql) $sql .= " $limitSql";
 
         $stmt = $this->conn->prepare($sql);
+        $this->bindParams($stmt, $params);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
