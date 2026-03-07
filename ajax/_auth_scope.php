@@ -70,7 +70,7 @@ function ajax_user_context(PDO $conn): array
 function ajax_starts_with_any(string $value, array $prefixes): bool
 {
     foreach ($prefixes as $prefix) {
-        if ($prefix !== '' && str_starts_with($value, $prefix)) {
+        if ($prefix !== '' && strpos($value, $prefix) === 0) {
             return true;
         }
     }

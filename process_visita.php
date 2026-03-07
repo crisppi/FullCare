@@ -3,8 +3,8 @@
 // process_visita.php  (refatorado, sem alterar métodos existentes)
 // ======================================================================
 
-// --- Debug opcional na tela: use ?debug=1 para ver erros/prints ---
-$__DEBUG = isset($_GET['debug']) && $_GET['debug'] == '1';
+// Debug local opcional (somente quando APP_DEBUG=1 no ambiente)
+$__DEBUG = in_array(strtolower((string)getenv('APP_DEBUG')), ['1', 'true', 'on', 'yes'], true);
 if ($__DEBUG) {
     error_reporting(E_ALL);
 }
@@ -731,57 +731,6 @@ if ($type === "update") {
             exit;
         }
         $message->setMessage("Erro ao atualizar.", "error", "back");
-        exit;
-    }
-}
-
-// ----------------------------------------------------------------------
-// DELETE legado (mantido por compatibilidade)
-// ----------------------------------------------------------------------
-if ($type === "delete") {
-    Gate::enforceAction($conn, $BASE_URL, 'delete', 'Você não tem permissão para excluir visita.');
-    flowLog($flowCtx, 'delete.legacy.start', 'INFO');
-
-    try {
-        $id_visita = toIntOrNull($_POST['id_visita'] ?? null);
-
-        if (!$id_visita) {
-            if ($__DEBUG) {
-                dbg("DELETE: id_visita inválido");
-                exit;
-            }
-            $message->setMessage("Informações inválidas!", "error", "index.php");
-            exit;
-        }
-
-        $visita = $visitaDao->findById($id_visita);
-        if ($visita) {
-            $visitaDao->destroy($id_visita);
-            flowLog($flowCtx, 'delete.legacy.finish', 'INFO', ['id_visita' => $id_visita]);
-
-            if ($__DEBUG) {
-                dbg("DELETE ok", $id_visita);
-                exit;
-            }
-
-            include_once('list_visita.php');
-            exit;
-        } else {
-            if ($__DEBUG) {
-                dbg("DELETE: visita não encontrada");
-                exit;
-            }
-            $message->setMessage("Informações inválidas!", "error", "index.php");
-            exit;
-        }
-    } catch (Throwable $e) {
-        flowLog($flowCtx, 'delete.legacy.error', 'ERROR', ['error' => $e->getMessage()]);
-        error_log("DELETE visita erro: " . $e->getMessage());
-        if ($__DEBUG) {
-            dbg("DELETE EXCEPTION", $e->getMessage());
-            exit;
-        }
-        $message->setMessage("Erro ao excluir.", "error", "back");
         exit;
     }
 }
