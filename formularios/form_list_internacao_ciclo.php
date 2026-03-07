@@ -185,18 +185,29 @@ $paginaAtual   = (int)(filter_input(INPUT_GET, 'pag') ?: 1);
 // WHERE (aliases: ho, pa, i, p)
 // ---------------------
 $cond = [];
+$whereParams = [];
 
 $idUsuarioSessao = (int)($_SESSION['id_usuario'] ?? 0);
 $cargoSessaoNorm = norm((string)($_SESSION['cargo'] ?? ''));
 $isMedicoSessao = (strpos($cargoSessaoNorm, 'medico') === 0) || (strpos($cargoSessaoNorm, 'med') === 0);
 
 if ($isMedicoSessao && $idUsuarioSessao > 0) {
-    $cond[] = 'i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = ' . $idUsuarioSessao . ')';
+    $cond[] = 'i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = :id_usuario_sessao)';
+    $whereParams[':id_usuario_sessao'] = $idUsuarioSessao;
 }
 
-if ($pesquisa_nome !== '') $cond[] = 'ho.nome_hosp LIKE "%' . addslashes($pesquisa_nome) . '%"';
-if ($pesquisa_pac  !== '') $cond[] = 'pa.nome_pac  LIKE "%' . addslashes($pesquisa_pac)  . '%"';
-if ($id_internacao > 0)    $cond[] = 'p.fk_internacao_pror = ' . (int)$id_internacao;
+if ($pesquisa_nome !== '') {
+    $cond[] = 'ho.nome_hosp LIKE :pesquisa_nome';
+    $whereParams[':pesquisa_nome'] = '%' . $pesquisa_nome . '%';
+}
+if ($pesquisa_pac  !== '') {
+    $cond[] = 'pa.nome_pac LIKE :pesquisa_pac';
+    $whereParams[':pesquisa_pac'] = '%' . $pesquisa_pac . '%';
+}
+if ($id_internacao > 0) {
+    $cond[] = 'p.fk_internacao_pror = :id_internacao';
+    $whereParams[':id_internacao'] = (int)$id_internacao;
+}
 
 $where = implode(' AND ', $cond);
 
@@ -222,7 +233,7 @@ $ordenarSql = ($map[$col] ?? 'i.id_internacao') . ' ' . $dir;
 // ---------------------
 // BUSCA via DAO
 // ---------------------
-$linhas = $internacaoDAO->selectAllProrrogacao($where, $ordenarSql, null);
+$linhas = $internacaoDAO->selectAllProrrogacao($where, $ordenarSql, null, $whereParams);
 
 // Converte e consolida
 $porInternacao = consolidarCiclosPorInternacao($linhas);

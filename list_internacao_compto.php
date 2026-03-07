@@ -92,17 +92,24 @@ include_once("models/pagination.php");
         $buscaAtivo = filter_input(INPUT_GET, 'ativo_hos');
         // $buscaAtivo = in_array($buscaAtivo, ['s', 'n']) ?: "";
 
+        $whereParams = [];
         $condicoes = [
-            strlen($busca) ? 'nome_hosp LIKE "%' . $busca . '%"' : null,
-            strlen($buscaAtivo) ? 'ativo_hos = "' . $buscaAtivo . '"' : null
+            strlen((string)$busca) ? 'ho.nome_hosp LIKE :busca_hosp' : null,
+            strlen((string)$buscaAtivo) ? 'ho.ativo_hos = :ativo_hos' : null
         ];
+        if (strlen((string)$busca)) {
+            $whereParams[':busca_hosp'] = '%' . $busca . '%';
+        }
+        if (strlen((string)$buscaAtivo)) {
+            $whereParams[':ativo_hos'] = $buscaAtivo;
+        }
         $condicoes = array_filter($condicoes);
 
         // REMOVE POSICOES VAZIAS DO FILTRO
         $where = implode(' AND ', $condicoes);
 
         // QUANTIDADE InternacaoS
-        $qtdIntItens1 = $QtdTotalInt->QtdInternacao($where);
+        $qtdIntItens1 = $QtdTotalInt->QtdInternacao($where, null, null, $whereParams);
 
         $qtdIntItens = ($qtdIntItens1['0']);
 
@@ -112,7 +119,7 @@ include_once("models/pagination.php");
 
         // PREENCHIMENTO DO FORMULARIO COM QUERY
         $order = 'id_internacao';
-        $query = $Internacao->selectAllInternacao($where, $order, $obLimite);
+        $query = $Internacao->selectAllInternacao($where, $order, $obLimite, $whereParams);
 
         // GETS 
         unset($_GET['pag']);

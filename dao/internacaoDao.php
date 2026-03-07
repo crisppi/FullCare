@@ -14,18 +14,40 @@ class internacaoDAO implements internacaoDAOInterface
     private $hasHoraAltaColumn = null;
     private $hasDataLancamentoColumn = null;
     private $hasTimerColumn = null;
+    private $runtimeDdlEnabled = false;
 
     public function __construct(PDO $conn, $url)
     {
         $this->conn = $conn;
         $this->url = $url;
         $this->message = new Message($url);
-        $this->ensureDataLancamentoColumn();
-        if (function_exists('ensure_internacao_timer_column')) {
-            ensure_internacao_timer_column($this->conn);
-            $this->hasTimerColumn = true;
+        $this->runtimeDdlEnabled = defined('FULLCARE_ALLOW_RUNTIME_DDL')
+            ? ((bool) constant('FULLCARE_ALLOW_RUNTIME_DDL') === true)
+            : false;
+
+        if ($this->runtimeDdlEnabled) {
+            $this->ensureDataLancamentoColumn();
+            if (function_exists('ensure_internacao_timer_column')) {
+                ensure_internacao_timer_column($this->conn);
+                $this->hasTimerColumn = true;
+            } else {
+                $this->ensureTimerColumnFallback();
+            }
         } else {
-            $this->ensureTimerColumnFallback();
+            $this->hasDataLancamentoColumn = $this->internacaoHasColumn('data_lancamento_int');
+            $this->hasTimerColumn = $this->internacaoHasColumn('timer_int');
+        }
+    }
+
+    private function internacaoHasColumn(string $column): bool
+    {
+        try {
+            $stmt = $this->conn->prepare("SHOW COLUMNS FROM tb_internacao LIKE :column");
+            $stmt->bindValue(':column', $column, PDO::PARAM_STR);
+            $stmt->execute();
+            return (bool)$stmt->fetch();
+        } catch (Throwable $th) {
+            return false;
         }
     }
 
@@ -91,8 +113,11 @@ class internacaoDAO implements internacaoDAOInterface
         if ($fragment === '') {
             return '';
         }
-        if (preg_match('/(;|--|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b)/i', $fragment)) {
+        if (preg_match('/(;|--|#|\/\*|\*\/|\bUNION\b|\bSLEEP\b|\bBENCHMARK\b|\bINTO\s+OUTFILE\b|\bLOAD_FILE\b|\bINFORMATION_SCHEMA\b)/i', $fragment)) {
             throw new InvalidArgumentException('Fragmento SQL invalido.');
+        }
+        if (strlen($fragment) > 4000) {
+            throw new InvalidArgumentException('Fragmento SQL muito grande.');
         }
         return $fragment;
     }
@@ -138,7 +163,15 @@ class internacaoDAO implements internacaoDAOInterface
         if (!preg_match('/^\\d+(\\s*,\\s*\\d+)?$/', $limit)) {
             throw new InvalidArgumentException('Limite invalido.');
         }
-        return 'LIMIT ' . $limit;
+        $parts = array_map('trim', explode(',', $limit));
+        $maxRows = 5000;
+        if (count($parts) === 2) {
+            $offset = max(0, (int)$parts[0]);
+            $rows = max(0, min($maxRows, (int)$parts[1]));
+            return 'LIMIT ' . $offset . ', ' . $rows;
+        }
+        $rows = max(0, min($maxRows, (int)$parts[0]));
+        return 'LIMIT ' . $rows;
     }
 
     private function buildWhereAndParams(?string $where, array $params = []): array
@@ -158,6 +191,21 @@ class internacaoDAO implements internacaoDAOInterface
         return ['WHERE ' . $sql, $params];
     }
 
+    private function buildStrictWhereAndParams(?string $where, array $params = []): array
+    {
+        $raw = $this->sanitizeSqlFragment($where);
+        if ($raw === '') {
+            return ['', $params];
+        }
+        $idx = 0;
+        $sql = preg_replace_callback('/\'([^\']*)\'|"([^"]*)"/', function ($m) use (&$params, &$idx) {
+            $key = ':sw_' . $idx++;
+            $params[$key] = isset($m[1]) && $m[1] !== '' ? $m[1] : ($m[2] ?? '');
+            return $key;
+        }, $raw);
+        return ['WHERE ' . $sql, $params];
+    }
+
     private function buildWhereWithAndAndParams(?string $where, array $params = []): array
     {
         $raw = $this->sanitizeSqlFragment($where);
@@ -172,6 +220,21 @@ class internacaoDAO implements internacaoDAOInterface
             return $key;
         }, $raw);
 
+        return [' AND ' . $sql, $params];
+    }
+
+    private function buildStrictWhereWithAndAndParams(?string $where, array $params = []): array
+    {
+        $raw = $this->sanitizeSqlFragment($where);
+        if ($raw === '') {
+            return ['', $params];
+        }
+        $idx = 0;
+        $sql = preg_replace_callback('/\'([^\']*)\'|"([^"]*)"/', function ($m) use (&$params, &$idx) {
+            $key = ':sa_' . $idx++;
+            $params[$key] = isset($m[1]) && $m[1] !== '' ? $m[1] : ($m[2] ?? '');
+            return $key;
+        }, $raw);
         return [' AND ' . $sql, $params];
     }
 
@@ -1070,7 +1133,7 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacao($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        [$where, $params] = $this->buildWhereAndParams($where, $params);
+        [$where, $params] = $this->buildStrictWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         $limit = $this->safeLimit($limit);
         $group = ' GROUP BY ac.id_internacao ';
@@ -1351,7 +1414,7 @@ class internacaoDAO implements internacaoDAOInterface
     public function selectAllInternacaoList($where = null, $order = null, $limit = null, array $params = [])
     {
         //DADOS DA QUERY
-        [$where, $params] = $this->buildWhereAndParams($where, $params);
+        [$where, $params] = $this->buildStrictWhereAndParams($where, $params);
         $order = $this->safeOrder($order);
         if ($limit !== null && $limit !== '') {
             $limitParts = array_map('trim', explode(',', (string)$limit));
@@ -2405,6 +2468,10 @@ class internacaoDAO implements internacaoDAOInterface
         $internacao = [];
         //DADOS DA QUERY
         [$wherevisita, $params] = $this->buildWhereAndParams($wherevisita, $params);
+        $wherevisita = trim($wherevisita);
+        if ($wherevisita === '') {
+            $wherevisita = 'WHERE 1=1';
+        }
 
         $query = $this->conn->prepare(
             "SELECT
@@ -2436,9 +2503,10 @@ class internacaoDAO implements internacaoDAOInterface
                 se.id_usuario = hos.fk_usuario_hosp
             
                 $wherevisita AND vi.id_visita = (
-                    SELECT MAX(id_visita)
-                    FROM tb_visita
-                    WHERE fk_internacao_vis = 24"
+                    SELECT MAX(v2.id_visita)
+                    FROM tb_visita v2
+                    WHERE v2.fk_internacao_vis = ac.id_internacao
+                )"
         );
         $this->bindParams($query, $params);
         $query->execute();
@@ -3072,7 +3140,7 @@ class internacaoDAO implements internacaoDAOInterface
         // Prepare SQL statement
         $stmt = $this->conn->prepare("
         INSERT INTO tb_internacao_arquivo (id_internacao, nome_arquivo, arquivo)
-        VALUES (:id_internacao, :nome_arquivo, ':arquivo')
+        VALUES (:id_internacao, :nome_arquivo, :arquivo)
     ");
 
         // Bind parameters;
@@ -3232,7 +3300,7 @@ WHERE
     public function reinternacaoNova($where_gerais_reint, $diasLimite = 2, array $params = [])
     {
         $diasLimite = max(1, (int)$diasLimite);
-        [$where_gerais_reint, $params] = $this->buildWhereWithAndAndParams($where_gerais_reint, $params);
+        [$where_gerais_reint, $params] = $this->buildStrictWhereWithAndAndParams($where_gerais_reint, $params);
 
         $stmt = $this->conn->prepare(
             'SELECT 
@@ -3266,7 +3334,7 @@ WHERE
         $this->bindParams($stmt, $params);
         $stmt->execute();
 
-        $reinternacao = $stmt->fetchall();
+        $reinternacao = $stmt->fetchAll();
 
         return $reinternacao;
     }
@@ -3368,7 +3436,7 @@ WHERE
      */
     public function selectAllProrrogacao($where = '', $ordenar = 'p.prorrog1_ini_pror ASC', $limit = null, array $params = [])
     {
-        [$whereSql, $params] = $this->buildWhereAndParams($where, $params);
+        [$whereSql, $params] = $this->buildStrictWhereAndParams($where, $params);
         $orderSql = $this->safeOrder($ordenar);
         $limitSql = $this->safeLimit((string)$limit);
 
@@ -3468,6 +3536,8 @@ WHERE
     }
     public function selectAllInternacaoCap2($where = null, $order = null, $limit = null)
     {
+        [$whereSql, $params] = $this->buildStrictWhereWithAndAndParams($where, []);
+
         // helper para somar VARCHAR(20) monetário "1.234,56"
         $C = function (string $col) {
             return "CAST(REPLACE(REPLACE(IFNULL($col,''), '.', ''), ',', '.') AS DECIMAL(14,2))";
@@ -3587,10 +3657,7 @@ WHERE
         WHERE 1=1
     ";
 
-        if (!empty($where)) {
-            $where = $this->sanitizeSqlFragment($where);
-            $sql .= " AND ($where) ";
-        }
+        $sql .= " $whereSql ";
 
         // ordenação segura
         $allowedOrder = [
@@ -3618,12 +3685,13 @@ WHERE
             if ($clean) $sql .= " ORDER BY " . implode(', ', $clean);
         }
 
-        if (!empty($limit)) {
-            if (preg_match('/^\s*\d+\s*(,\s*\d+\s*)?$/', $limit)) $sql .= " LIMIT $limit";
-            else $sql .= " LIMIT " . (int)$limit;
+        $limitSql = $this->safeLimit((string)$limit);
+        if ($limitSql !== '') {
+            $sql .= ' ' . $limitSql;
         }
 
         $stmt = $this->conn->prepare($sql);
+        $this->bindParams($stmt, $params);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

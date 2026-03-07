@@ -224,7 +224,9 @@ $internacaoDao = new internacaoDao($conn, $BASE_URL);
 $visitas = $visitaDao->joinVisitaInternacao($id);
 
 // 2) Internação
-$internacoes = $internacaoDao->selectAllInternacao('id_internacao = ' . $id);
+$internacoes = $internacaoDao->selectAllInternacao('ac.id_internacao = :id_internacao', null, null, [
+    ':id_internacao' => (int)$id
+]);
 if (empty($internacoes)) {
     die("Nenhuma internação encontrada para o ID informado.");
 }

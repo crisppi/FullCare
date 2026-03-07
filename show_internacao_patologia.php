@@ -34,16 +34,9 @@
     $obLimite = 1;
     $internacaoDao = new internacaoDAO($conn, $BASE_URL);
 
-    //Instanciar o metodo internacao   
-    $condicoes = [
-        strlen($id_internacao) ? 'ac.id_internacao LIKE "%' . $id_internacao . '%"' : null,
-
-    ];
-
-    $condicoes = array_filter($condicoes);
-    // REMOVE POSICOES VAZIAS DO FILTRO
-    $where = implode(' AND ', $condicoes);
-    $internacao = $internacaoDao->selectAllInternacao($where, $order, $obLimite);
+    $where = ctype_digit((string)$id_internacao) ? 'ac.id_internacao = :id_internacao' : '';
+    $whereParams = ctype_digit((string)$id_internacao) ? [':id_internacao' => (int)$id_internacao] : [];
+    $internacao = $internacaoDao->selectAllInternacao($where, $order, $obLimite, $whereParams);
 
     ?>
     <div id="main-container">

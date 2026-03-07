@@ -101,17 +101,18 @@ if (($cargo == "Med_auditor") || ($cargo == "Enf_Auditor")) {
 };
 $condicoesvisita = [
     // strlen($cargo) ? ' se.cargo_user = " ' . $cargo . ' " '  : null,
-    strlen($id_internacao) ? ' ac.id_internacao = ' . $id_internacao : null
+    strlen($id_internacao) ? 'ac.id_internacao = :id_internacao' : null
 ];
 
 $condicoesvisita = array_filter($condicoesvisita);
 // REMOVE POSICOES VAZIAS DO FILTRO
 $wherevisita = implode(' AND ', $condicoesvisita);
+$wherevisitaParams = strlen($id_internacao) ? [':id_internacao' => (int)$id_internacao] : [];
 
 $ultimoReg = $visitaMax['0']['id_visita'];
 
 $contarVis = 0; //contar numero de visitas por internacao 
-$queryVis = $internacaoDAO->selectAllInternacaoCountVis($wherevisita);
+$queryVis = $internacaoDAO->selectAllInternacaoCountVis($wherevisita, null, null, $wherevisitaParams);
 $contarVis = $queryVis[0]['numero_de_id_visita'];
 ?>
 

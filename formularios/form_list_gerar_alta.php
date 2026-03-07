@@ -23,22 +23,26 @@ $limite        = filter_input(INPUT_GET, 'limite', FILTER_VALIDATE_INT) ?: 10;
 $ordenar       = filter_input(INPUT_GET, 'ordenar', FILTER_SANITIZE_SPECIAL_CHARS) ?: 'data_intern_int DESC';
 $pagAtual      = filter_input(INPUT_GET, 'pag', FILTER_VALIDATE_INT) ?: 1;
 
-$condicoes = ['ac.internado_int = "s"'];
+$whereParams = [':internado_int' => 's'];
+$condicoes = ['ac.internado_int = :internado_int'];
 if ($pesquisa_hosp !== '') {
-    $condicoes[] = 'ho.nome_hosp LIKE "%' . $pesquisa_hosp . '%"';
+    $condicoes[] = 'ho.nome_hosp LIKE :pesquisa_hosp';
+    $whereParams[':pesquisa_hosp'] = '%' . $pesquisa_hosp . '%';
 }
 if ($pesquisa_pac !== '') {
-    $condicoes[] = 'pa.nome_pac LIKE "%' . $pesquisa_pac . '%"';
+    $condicoes[] = 'pa.nome_pac LIKE :pesquisa_pac';
+    $whereParams[':pesquisa_pac'] = '%' . $pesquisa_pac . '%';
 }
 if ($pesquisa_matricula !== '') {
-    $condicoes[] = 'pa.matricula_pac LIKE "%' . $pesquisa_matricula . '%"';
+    $condicoes[] = 'pa.matricula_pac LIKE :pesquisa_matricula';
+    $whereParams[':pesquisa_matricula'] = '%' . $pesquisa_matricula . '%';
 }
 $where = implode(' AND ', $condicoes);
 
-$dadosTotais = $internacaoDao->selectAllInternacaoList($where, $ordenar, null);
+$dadosTotais = $internacaoDao->selectAllInternacaoList($where, $ordenar, null, $whereParams);
 $qtdItens = is_array($dadosTotais) ? count($dadosTotais) : 0;
 $paginationObj = new pagination($qtdItens, $pagAtual, $limite);
-$lista = $internacaoDao->selectAllInternacaoList($where, $ordenar, $paginationObj->getLimit());
+$lista = $internacaoDao->selectAllInternacaoList($where, $ordenar, $paginationObj->getLimit(), $whereParams);
 $totalPages = $qtdItens > 0 ? (int)ceil($qtdItens / $limite) : 1;
 
 $dadosAlta = $dados_alta ?? [];

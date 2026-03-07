@@ -71,14 +71,6 @@ function getCamposSelecionados(): array
 }
 
 /**
- * Pequena proteção de string (para montar o WHERE com LIKE)
- */
-function escLike($str)
-{
-    return addslashes(trim((string)$str));
-}
-
-/**
  * Converte data YYYY-MM-DD para DateTime (ou null)
  */
 function parseDateOrNull(?string $date): ?DateTime
@@ -127,49 +119,51 @@ $limiteExport = 1000000;
 // -----------------------------------------------------
 
 $condicoes = [];
+$whereParams = [];
 
 // Nome do hospital
 if (strlen(trim($pesquisa_nome)) > 0) {
-    $buscaEsc = escLike($pesquisa_nome);
-    $condicoes[] = '(nome_hosp LIKE "%' . $buscaEsc . '%")';
+    $condicoes[] = '(ho.nome_hosp LIKE :pesquisa_nome)';
+    $whereParams[':pesquisa_nome'] = '%' . trim((string)$pesquisa_nome) . '%';
 }
 
 // Senha de internação
 if (strlen(trim($senha_int)) > 0) {
-    $senhaEsc = escLike($senha_int);
-    $condicoes[] = '(senha_int LIKE "%' . $senhaEsc . '%")';
+    $condicoes[] = '(ac.senha_int LIKE :senha_int)';
+    $whereParams[':senha_int'] = '%' . trim((string)$senha_int) . '%';
 }
 
 // Outro identificador (ajuste se usar prontuário/doc específicos)
 if (strlen(trim($pesquisa_pac)) > 0) {
-    $pacEsc = escLike($pesquisa_pac);
-    $condicoes[] = '(nome_pac LIKE "%' . $pacEsc . '%")';
+    $condicoes[] = '(pa.nome_pac LIKE :pesquisa_pac)';
+    $whereParams[':pesquisa_pac'] = '%' . trim((string)$pesquisa_pac) . '%';
 }
 
 if (strlen(trim($pesquisa_matricula)) > 0) {
-    $matEsc = escLike($pesquisa_matricula);
-    $condicoes[] = '(matricula_pac LIKE "%' . $matEsc . '%")';
+    $condicoes[] = '(pa.matricula_pac LIKE :pesquisa_matricula)';
+    $whereParams[':pesquisa_matricula'] = '%' . trim((string)$pesquisa_matricula) . '%';
 }
 
 if (strlen(trim($pesquisa_seguradora)) > 0) {
-    $segEsc = escLike($pesquisa_seguradora);
-    $condicoes[] = '(seguradora_seg LIKE "%' . $segEsc . '%")';
+    $condicoes[] = '(s.seguradora_seg LIKE :pesquisa_seguradora)';
+    $whereParams[':pesquisa_seguradora'] = '%' . trim((string)$pesquisa_seguradora) . '%';
 }
 
 // Só internados
 if ($pesqInternado === 's') {
-    $condicoes[] = "internado_int = 's'";
+    $condicoes[] = "ac.internado_int = :internado_int";
+    $whereParams[':internado_int'] = 's';
 }
 
 // Intervalo de datas de internação
 if (!empty($data_intern_int)) {
-    $dataIniEsc = escLike($data_intern_int);
-    $condicoes[] = 'data_intern_int >= "' . $dataIniEsc . '"';
+    $condicoes[] = 'ac.data_intern_int >= :data_intern_int_min';
+    $whereParams[':data_intern_int_min'] = trim((string)$data_intern_int);
 }
 
 if (!empty($data_intern_int_max)) {
-    $dataFimEsc = escLike($data_intern_int_max);
-    $condicoes[] = 'data_intern_int <= "' . $dataFimEsc . '"';
+    $condicoes[] = 'ac.data_intern_int <= :data_intern_int_max';
+    $whereParams[':data_intern_int_max'] = trim((string)$data_intern_int_max);
 }
 
 if (in_array((string)$sem_senha, ['1', 'true', 'on'], true)) {
@@ -219,7 +213,7 @@ if ($sortField !== '') {
 $internacaoDao = new internacaoDao($conn, $BASE_URL);
 
 try {
-    $registros = $internacaoDao->selectAllInternacao($where, $order, $limiteExport);
+    $registros = $internacaoDao->selectAllInternacao($where, $order, $limiteExport, $whereParams);
 } catch (Throwable $e) {
 
     if ($DEBUG) {

@@ -1,21 +1,16 @@
 <?php
 include_once("array_dados.php");
-$id_internacao = filter_input(INPUT_GET, 'id_internacao') ?: null;
+$id_internacao = (int)(filter_input(INPUT_GET, 'id_internacao', FILTER_SANITIZE_NUMBER_INT) ?: 0);
 
 $a = ($findMaxGesInt[0]);
 $ultimoReg = ($a["ultimoReg"]);
 $ultimoReg = $ultimoReg + 1;
 
-$condicoes = [
-    strlen($id_internacao) ? 'id_internacao = "' . $id_internacao . '"' : NULL,
-
-];
-$condicoes = array_filter($condicoes);
-// REMOVE POSICOES VAZIAS DO FILTRO
-$where = implode(' AND ', $condicoes);
+$where = $id_internacao > 0 ? 'ac.id_internacao = :id_internacao' : '';
+$whereParams = $id_internacao > 0 ? [':id_internacao' => $id_internacao] : [];
 $order = $obLimite = null;
 // PREENCHIMENTO DO FORMULARIO COM QUERY
-$query = $internacaoDao->selectAllInternacao($where, $order, $obLimite);
+$query = $internacaoDao->selectAllInternacao($where, $order, $obLimite, $whereParams);
 
 extract($query);
 ?>

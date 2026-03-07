@@ -262,7 +262,9 @@ $internacaoDao = new internacaoDao($conn, $BASE_URL);
 $visitaList = [];
 if ($rangeMode) {
     $idInternacao = (int)$idInternacaoOverride;
-    $internacoes = $internacaoDao->selectAllInternacao('id_internacao = ' . $idInternacao);
+    $internacoes = $internacaoDao->selectAllInternacao('ac.id_internacao = :id_internacao', null, null, [
+        ':id_internacao' => (int)$idInternacao
+    ]);
     $internacao = $internacoes[0] ?? [];
     if (!$internacao) {
         $internacao = ['id_internacao' => $idInternacao];
@@ -295,7 +297,9 @@ if ($rangeMode) {
     if (!$idInternacao) {
         die("Internação relacionada não encontrada.");
     }
-    $internacoes = $internacaoDao->selectAllInternacao('id_internacao = ' . (int) $idInternacao);
+    $internacoes = $internacaoDao->selectAllInternacao('ac.id_internacao = :id_internacao', null, null, [
+        ':id_internacao' => (int)$idInternacao
+    ]);
     $internacao = $internacoes[0] ?? $visita;
     $visitaList = [$visita];
 }

@@ -16,11 +16,13 @@ $internacaoDao = new internacaoDAO($conn, $BASE_URL);
 $utiDao = new utiDAO($conn, $BASE_URL);
 
 // Receber id do usuário
-$id_internacao = filter_input(INPUT_GET, "id_internacao");
+$id_internacao = (int)filter_input(INPUT_GET, "id_internacao", FILTER_SANITIZE_NUMBER_INT);
 $internacao = $internacaoDao->findById($id_internacao);
 
 $internacao_geral = new internacaoDAO($conn, $BASE_URL);
-$internacao = $internacaoDao->selectAllInternacao($id_internacao);
+$internacao = $internacaoDao->selectAllInternacao('ac.id_internacao = :id_internacao', null, null, [
+    ':id_internacao' => $id_internacao
+]);
 extract($internacao);
 // print_r($internacao);
 // exit;

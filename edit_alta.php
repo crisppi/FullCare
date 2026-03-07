@@ -13,19 +13,15 @@ $userDao = new UserDAO($conn, $BASE_URL);
 $internacaoDao = new internacaoDAO($conn, $BASE_URL);
 
 // Receber id do usuário
-$id_internacao = filter_input(INPUT_GET, "id_internacao");
+$id_internacao = (int)filter_input(INPUT_GET, "id_internacao", FILTER_SANITIZE_NUMBER_INT);
 $internacao = $internacaoDao->findById($id_internacao);
 
 $Internacao_geral = new internacaoDAO($conn, $BASE_URL);
 $order = null;
 $limite = null;
-$condicoes = [
-    strlen($id_internacao) ? 'id_internacao = "' . $id_internacao . '"' : NULL,
-];
-$condicoes = array_filter($condicoes);
-// REMOVE POSICOES VAZIAS DO FILTRO
-$where = implode(' AND ', $condicoes);
-$internacao = $internacaoDao->selectAllInternacao($where, $order, $limite);
+$where = $id_internacao > 0 ? 'ac.id_internacao = :id_internacao' : '';
+$whereParams = $id_internacao > 0 ? [':id_internacao' => $id_internacao] : [];
+$internacao = $internacaoDao->selectAllInternacao($where, $order, $limite, $whereParams);
 extract($internacao);
 
 $dataAtual = date('Y-m-d');

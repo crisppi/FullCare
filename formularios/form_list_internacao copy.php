@@ -167,22 +167,31 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
         }
         $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar') : 1;
 
+        $whereParams = [];
         $condicoes = [
-            strlen($pesquisa_nome) ? 'ho.nome_hosp LIKE "%' . $pesquisa_nome . '%"' : null,
-            strlen($pesquisa_pac) ? 'pa.nome_pac LIKE "%' . $pesquisa_pac . '%"' : null,
-            strlen($pesqInternado) ? 'internado_int = "' . $pesqInternado . '"' : NULL,
-            strlen($data_intern_int) ? 'data_intern_int BETWEEN "' . $data_intern_int . '" AND "' . $data_intern_int_max . '"' : NULL,
-            // strlen($senha_int) ? 'senha_int = "' . $senha_int . '"' : NULL,
-            strlen($senha_int) ? 'senha_int LIKE "%' . $senha_int . '%"' : null,
-            strlen($auditor) ? 'hos.fk_usuario_hosp = "' . $auditor . '"' : NULL,
+            strlen((string)$pesquisa_nome) ? 'ho.nome_hosp LIKE :pesquisa_nome' : null,
+            strlen((string)$pesquisa_pac) ? 'pa.nome_pac LIKE :pesquisa_pac' : null,
+            strlen((string)$pesqInternado) ? 'ac.internado_int = :pesq_internado' : null,
+            strlen((string)$data_intern_int) ? 'ac.data_intern_int BETWEEN :data_intern_int AND :data_intern_int_max' : null,
+            strlen((string)$senha_int) ? 'ac.senha_int LIKE :senha_int' : null,
+            strlen((string)$auditor) ? 'hos.fk_usuario_hosp = :auditor' : null,
         ];
+        if (strlen((string)$pesquisa_nome)) $whereParams[':pesquisa_nome'] = '%' . $pesquisa_nome . '%';
+        if (strlen((string)$pesquisa_pac)) $whereParams[':pesquisa_pac'] = '%' . $pesquisa_pac . '%';
+        if (strlen((string)$pesqInternado)) $whereParams[':pesq_internado'] = $pesqInternado;
+        if (strlen((string)$data_intern_int)) {
+            $whereParams[':data_intern_int'] = $data_intern_int;
+            $whereParams[':data_intern_int_max'] = $data_intern_int_max;
+        }
+        if (strlen((string)$senha_int)) $whereParams[':senha_int'] = '%' . $senha_int . '%';
+        if (strlen((string)$auditor)) $whereParams[':auditor'] = (int)$auditor;
 
         $condicoes = array_filter($condicoes);
 
         // REMOVE POSICOES VAZIAS DO FILTRO
         $where = implode(' AND ', $condicoes);
         // QUANTIDADE Internacao
-        $qtdIntItens1 = $QtdTotalInt->selectAllInternacaoList($where, $order, $obLimite);
+        $qtdIntItens1 = $QtdTotalInt->selectAllInternacaoList($where, $order, $obLimite, $whereParams);
 
         $qtdIntItens = count($qtdIntItens1);
         $totalcasos = ceil($qtdIntItens / $limite);
@@ -195,7 +204,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
         $obLimite = $obPagination->getLimit();
 
         // PREENCHIMENTO DO FORMULARIO COM QUERY
-        $query = $internacao->selectAllInternacaoList($where, $order, $obLimite);
+        $query = $internacao->selectAllInternacaoList($where, $order, $obLimite, $whereParams);
         // $visitas = $visitaDao->joinVisitaInternacao($where);
 
         $contarVis = 0;
