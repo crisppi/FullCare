@@ -9,11 +9,7 @@ require_once 'globals.php';
 require_once 'db.php';
 require_once __DIR__ . '/_auth_scope.php';
 
-if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
-    exit;
-}
+ajax_require_active_session();
 
 $senha = isset($_GET['senha']) ? trim((string) $_GET['senha']) : '';
 $ignore = filter_input(INPUT_GET, 'ignore', FILTER_VALIDATE_INT);

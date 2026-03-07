@@ -9,18 +9,16 @@ chdir($ROOT);
 
 require_once 'globals.php';
 require_once 'db.php';
+require_once 'ajax/_auth_scope.php';
 require_once 'models/message.php';
 // Você tem um DAO de prorrogação, mas aqui vou usar SQL direto para não alterar o DAO.
 require_once 'models/prorrogacao.php';
 require_once 'dao/prorrogacaoDao.php';
 
-if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
-    exit;
-}
+ajax_require_active_session();
 
 try {
+    $ctx = ajax_user_context($conn);
     $pacId = filter_input(INPUT_GET, 'id_paciente', FILTER_VALIDATE_INT);
     $page = max(1, (int) ($_GET['page'] ?? 1));
     $limit = min(50, max(1, (int) ($_GET['limit'] ?? 10)));
@@ -32,15 +30,25 @@ try {
         exit;
     }
 
+    if (!ajax_assert_patient_access($conn, $ctx, (int)$pacId)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'acesso_negado']);
+        exit;
+    }
+
+    $scopeParams = [];
+    $scopeSql = ajax_scope_clause_for_internacao($ctx, 'ac', $scopeParams, 'prp');
+
     // Total de prorrogações do paciente
     $sqlCount = "
         SELECT COUNT(*) AS total
         FROM tb_prorrogacao pr
         INNER JOIN tb_internacao ac ON ac.id_internacao = pr.fk_internacao_pror
         WHERE ac.fk_paciente_int = :pacId
+          {$scopeSql}
     ";
     $stc = $conn->prepare($sqlCount);
-    $stc->bindValue(':pacId', $pacId, PDO::PARAM_INT);
+    ajax_bind_params($stc, array_merge([':pacId' => (int)$pacId], $scopeParams));
     $stc->execute();
     $total = (int) ($stc->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
 
@@ -60,13 +68,16 @@ try {
         INNER JOIN tb_internacao ac ON ac.id_internacao = pr.fk_internacao_pror
         LEFT JOIN tb_hospital ho ON ho.id_hospital = ac.fk_hospital_int
         WHERE ac.fk_paciente_int = :pacId
+          {$scopeSql}
         ORDER BY pr.prorrog1_ini_pror DESC, pr.id_prorrogacao DESC
         LIMIT :limit OFFSET :offset
     ";
     $stl = $conn->prepare($sql);
-    $stl->bindValue(':pacId', $pacId, PDO::PARAM_INT);
-    $stl->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stl->bindValue(':offset', $offset, PDO::PARAM_INT);
+    ajax_bind_params($stl, array_merge([
+        ':pacId' => (int)$pacId,
+        ':limit' => (int)$limit,
+        ':offset' => (int)$offset,
+    ], $scopeParams));
     $stl->execute();
     $rows = $stl->fetchAll(PDO::FETCH_ASSOC) ?: [];
 

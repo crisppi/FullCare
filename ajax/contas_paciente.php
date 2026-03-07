@@ -9,6 +9,7 @@ chdir($ROOT);
 
 require_once 'globals.php';
 require_once 'db.php';
+require_once 'ajax/_auth_scope.php';
 require_once 'models/message.php';
 
 // IMPORTANTE: carregue o model ANTES do DAO, pq o seu DAO usa require_once("./models/...") relativo
@@ -16,11 +17,8 @@ require_once 'models/capeante.php';
 require_once 'dao/capeanteDao.php';
 
 try {
-    if (!isset($_SESSION['id_usuario'])) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'não autorizado']);
-        exit;
-    }
+    ajax_require_active_session();
+    $ctx = ajax_user_context($conn);
 
     $pacId = filter_input(INPUT_GET, 'id_paciente', FILTER_VALIDATE_INT);
     $page  = max(1, (int)($_GET['page'] ?? 1));
@@ -33,7 +31,15 @@ try {
         exit;
     }
 
+    if (!ajax_assert_patient_access($conn, $ctx, (int)$pacId)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'acesso_negado']);
+        exit;
+    }
+
     $dao = new capeanteDAO($conn, $BASE_URL);
+    $scopeParams = [];
+    $scopeSql = ajax_scope_clause_for_internacao($ctx, 'ac', $scopeParams, 'cpp');
 
     // --------- TOTAL (COUNT) ----------
     // Contamos quantos capeantes existem para internações do paciente
@@ -42,8 +48,9 @@ try {
         FROM tb_capeante ca
         JOIN tb_internacao ac ON ca.fk_int_capeante = ac.id_internacao
         WHERE ac.fk_paciente_int = :pac
+          {$scopeSql}
     ");
-    $stmtCount->bindValue(':pac', $pacId, PDO::PARAM_INT);
+    ajax_bind_params($stmtCount, array_merge([':pac' => (int)$pacId], $scopeParams));
     $stmtCount->execute();
     $total = (int)($stmtCount->fetchColumn() ?: 0);
 
@@ -84,8 +91,9 @@ try {
             )
         ) AS al ON al.fk_id_int_alt = ac.id_internacao
         WHERE ac.fk_paciente_int = :pac
+          {$scopeSql}
     ");
-    $stmtSum->bindValue(':pac', $pacId, PDO::PARAM_INT);
+    ajax_bind_params($stmtSum, array_merge([':pac' => (int)$pacId], $scopeParams));
     $stmtSum->execute();
     $summary = $stmtSum->fetch(PDO::FETCH_ASSOC) ?: [];
     if ($summary) {
@@ -100,7 +108,7 @@ try {
 
     // --------- LISTA (paginada) ----------
     // usando seu selectAllcapeante(where, order, limit) — ATENÇÃO: ele concatena strings, então garanta ints
-    $where = "ac.fk_paciente_int = " . (int)$pacId;
+    $where = "ac.fk_paciente_int = " . (int)$pacId . ajax_user_scope_literal($ctx, 'ac');
     $order = "ca.id_capeante DESC";
     $limitSql = $offset . ", " . $limit;
 

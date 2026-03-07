@@ -5,11 +5,7 @@ require_once(__DIR__ . '/_auth_scope.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
-    exit;
-}
+ajax_require_active_session();
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     http_response_code(405);

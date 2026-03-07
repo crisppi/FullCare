@@ -11,11 +11,7 @@ require_once 'models/internacao.php';
 require_once 'dao/internacaoDao.php';
 require_once __DIR__ . '/_auth_scope.php';
 
-if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
-    exit;
-}
+ajax_require_active_session();
 
 $response = ['success' => true, 'hasActive' => false];
 

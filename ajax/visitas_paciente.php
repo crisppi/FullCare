@@ -6,11 +6,7 @@ require_once __DIR__ . '/../globals.php';
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/_auth_scope.php';
 
-if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
-  http_response_code(401);
-  echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
-  exit;
-}
+ajax_require_active_session();
 
 try {
   $ctx = ajax_user_context($conn);

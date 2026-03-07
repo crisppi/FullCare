@@ -2,6 +2,7 @@
 define('SKIP_HEADER', true);
 chdir(__DIR__ . '/..');
 require_once(__DIR__ . '/../globals.php');
+require_once(__DIR__ . '/_auth_scope.php');
 include_once(__DIR__ . '/../check_logado.php');
 include_once(__DIR__ . '/../models/internacao.php');
 include_once(__DIR__ . '/../dao/internacaoDao.php');
@@ -10,51 +11,38 @@ include_once(__DIR__ . '/../dao/indicadoresDao.php');
 header('Content-Type: text/html; charset=utf-8');
 
 try {
+ajax_require_active_session();
+$ctx = ajax_user_context($conn);
+$scopeMode = ajax_scope_mode($ctx);
 
 $hospital_selecionado = (int)(filter_input(INPUT_POST, 'hospital_id', FILTER_SANITIZE_NUMBER_INT)
     ?: filter_input(INPUT_GET, 'hospital_id', FILTER_SANITIZE_NUMBER_INT));
-$id_usuario_sessao    = (int)($_SESSION['id_usuario'] ?? 0);
-$nivel_sessao         = (int)($_SESSION['nivel'] ?? 99);
-$normCargoAccess = static function ($txt): string {
-    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
-    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
-    $txt = $ascii !== false ? $ascii : $txt;
-    return preg_replace('/[^a-z]/', '', $txt);
-};
-$isSeguradoraRole = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
-$seguradoraUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
-if ($isSeguradoraRole && $seguradoraUserId <= 0) {
-    try {
-        $uid = (int)($_SESSION['id_usuario'] ?? 0);
-        if ($uid > 0) {
-            $stmtSeg = $conn->prepare("SELECT fk_seguradora_user FROM tb_user WHERE id_usuario = :id LIMIT 1");
-            $stmtSeg->bindValue(':id', $uid, PDO::PARAM_INT);
-            $stmtSeg->execute();
-            $seguradoraUserId = (int)($stmtSeg->fetchColumn() ?: 0);
-            if ($seguradoraUserId > 0) {
-                $_SESSION['fk_seguradora_user'] = $seguradoraUserId;
-            }
-        }
-    } catch (Throwable $e) {
-        error_log('[DASH_TABELAS][SEGURADORA] ' . $e->getMessage());
-    }
+$id_usuario_sessao    = (int)($ctx['user_id'] ?? 0);
+$seguradoraUserId     = (int)($ctx['seguradora_id'] ?? 0);
+
+if ($hospital_selecionado > 0 && !ajax_assert_hospital_access($conn, $ctx, $hospital_selecionado)) {
+    $hospital_selecionado = -1;
 }
 
 $condicoes_vis = [
     $hospital_selecionado ? "ac.fk_hospital_int = {$hospital_selecionado}" : null,
     "ac.internado_int = 's'",
     "(vi.id_visita = (SELECT MAX(vi2.id_visita) FROM tb_visita vi2 WHERE vi2.fk_internacao_vis = ac.id_internacao) OR vi.id_visita IS NULL)",
-    $isSeguradoraRole
+    $scopeMode === 'seguradora'
         ? ($seguradoraUserId > 0 ? "pa.fk_seguradora_pac = {$seguradoraUserId}" : '1=0')
-        : null
+        : null,
+    $scopeMode === 'hospital' && $id_usuario_sessao > 0
+        ? "ac.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})"
+        : null,
 ];
 $condicoes_hospital = [
     "DATEDIFF(CURRENT_DATE(), i.data_intern_int) > COALESCE(s.longa_permanencia_seg, 0)",
     $hospital_selecionado ? "i.fk_hospital_int = {$hospital_selecionado}" : null,
-    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null,
     "i.internado_int = 's'",
-    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
-    $isSeguradoraRole
+    $scopeMode === 'hospital' && $id_usuario_sessao > 0
+        ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})"
+        : null,
+    $scopeMode === 'seguradora'
         ? ($seguradoraUserId > 0 ? "p.fk_seguradora_pac = {$seguradoraUserId}" : '1=0')
         : null
 ];

@@ -8,14 +8,12 @@ chdir($ROOT);
 
 require_once 'globals.php';
 require_once 'db.php';
+require_once 'ajax/_auth_scope.php';
 
-if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
-    exit;
-}
+ajax_require_active_session();
 
 try {
+    $ctx = ajax_user_context($conn);
     $hospitalId = filter_input(INPUT_GET, 'id_hospital', FILTER_VALIDATE_INT);
     if (!$hospitalId) {
         http_response_code(400);
@@ -23,6 +21,12 @@ try {
             'success' => false,
             'error'   => 'id_hospital obrigatório'
         ]);
+        exit;
+    }
+
+    if (!ajax_assert_hospital_access($conn, $ctx, (int)$hospitalId)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'acesso_negado']);
         exit;
     }
 

@@ -1,5 +1,14 @@
 <?php
 
+function ajax_require_active_session(): void
+{
+    if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'error' => 'nao_autenticado']);
+        exit;
+    }
+}
+
 function ajax_normalize_role(?string $value): string
 {
     $txt = mb_strtolower(trim((string)$value), 'UTF-8');
@@ -188,4 +197,97 @@ function ajax_bind_params(PDOStatement $stmt, array $params): void
         }
         $stmt->bindValue($key, (string)$value, PDO::PARAM_STR);
     }
+}
+
+function ajax_user_scope_literal(array $ctx, string $alias = 'ac'): string
+{
+    $mode = ajax_scope_mode($ctx);
+    if ($mode === 'full') {
+        return '';
+    }
+
+    if ($mode === 'seguradora') {
+        $segId = (int)($ctx['seguradora_id'] ?? 0);
+        if ($segId <= 0) {
+            return ' AND 1=0 ';
+        }
+        return " AND EXISTS (
+            SELECT 1
+              FROM tb_paciente pa_scope
+             WHERE pa_scope.id_paciente = {$alias}.fk_paciente_int
+               AND pa_scope.fk_seguradora_pac = {$segId}
+        ) ";
+    }
+
+    $uid = (int)($ctx['user_id'] ?? 0);
+    if ($uid <= 0) {
+        return ' AND 1=0 ';
+    }
+    return " AND EXISTS (
+        SELECT 1
+          FROM tb_hospitalUser hu_scope
+         WHERE hu_scope.fk_hospital_user = {$alias}.fk_hospital_int
+           AND hu_scope.fk_usuario_hosp = {$uid}
+    ) ";
+}
+
+function ajax_assert_patient_access(PDO $conn, array $ctx, int $patientId): bool
+{
+    if ($patientId <= 0) {
+        return false;
+    }
+
+    $params = [':id' => $patientId];
+    $scope = ajax_scope_clause_for_paciente($ctx, 'pa', $params, 'guardp');
+    $sql = "SELECT pa.id_paciente
+              FROM tb_paciente pa
+             WHERE pa.id_paciente = :id {$scope}
+             LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    ajax_bind_params($stmt, $params);
+    $stmt->execute();
+    return (bool)$stmt->fetchColumn();
+}
+
+function ajax_assert_hospital_access(PDO $conn, array $ctx, int $hospitalId): bool
+{
+    if ($hospitalId <= 0) {
+        return false;
+    }
+
+    $mode = ajax_scope_mode($ctx);
+    if ($mode === 'full') {
+        return true;
+    }
+
+    if ($mode === 'hospital') {
+        $uid = (int)($ctx['user_id'] ?? 0);
+        if ($uid <= 0) {
+            return false;
+        }
+        $stmt = $conn->prepare("SELECT 1
+                                  FROM tb_hospitalUser hu
+                                 WHERE hu.fk_hospital_user = :hid
+                                   AND hu.fk_usuario_hosp = :uid
+                                 LIMIT 1");
+        $stmt->bindValue(':hid', $hospitalId, PDO::PARAM_INT);
+        $stmt->bindValue(':uid', $uid, PDO::PARAM_INT);
+        $stmt->execute();
+        return (bool)$stmt->fetchColumn();
+    }
+
+    $segId = (int)($ctx['seguradora_id'] ?? 0);
+    if ($segId <= 0) {
+        return false;
+    }
+    $stmt = $conn->prepare("SELECT 1
+                              FROM tb_internacao ac
+                              JOIN tb_paciente pa ON pa.id_paciente = ac.fk_paciente_int
+                             WHERE ac.fk_hospital_int = :hid
+                               AND pa.fk_seguradora_pac = :seg
+                             LIMIT 1");
+    $stmt->bindValue(':hid', $hospitalId, PDO::PARAM_INT);
+    $stmt->bindValue(':seg', $segId, PDO::PARAM_INT);
+    $stmt->execute();
+    return (bool)$stmt->fetchColumn();
 }
