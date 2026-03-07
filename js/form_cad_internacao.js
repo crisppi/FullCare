@@ -1229,10 +1229,14 @@ $("#myForm").submit(function(event) {
                     "#container-prorrog",
                     "#container-uti",
                     "#container-negoc",
-                    "#div-detalhado"
+                    "#div-detalhado",
+                    "#detalhes-card-wrapper"
                 ];
                 containers.forEach((container) => {
-                    document.querySelector(container).style.display = "none";
+                    const el = document.querySelector(container);
+                    if (el) {
+                        el.style.display = "none";
+                    }
                 });
 
                 // 7. Restaura a borda dos selects após o reset (exceto o de hospitais)
@@ -1365,15 +1369,21 @@ document.addEventListener('DOMContentLoaded', function() {
 // Relatório Detalhado
 (function() {
     const selectDet = document.getElementById('relatorio-detalhado');
+    const wrapperDet = document.getElementById('detalhes-card-wrapper');
     const divDet = document.getElementById('div-detalhado');
+    const hiddenDet = document.getElementById('select_detalhes');
 
     if (!selectDet || !divDet) return;
 
     function aplicar() {
         if (selectDet.value === 's') {
+            if (wrapperDet) wrapperDet.style.display = 'block';
             divDet.style.display = 'block';
+            if (hiddenDet) hiddenDet.value = 's';
         } else {
             divDet.style.display = 'none';
+            if (wrapperDet) wrapperDet.style.display = 'none';
+            if (hiddenDet) hiddenDet.value = 'n';
         }
     }
 
