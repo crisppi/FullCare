@@ -381,6 +381,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
             // REMOVE POSICOES VAZIAS DO FILTRO
             $where = implode(' AND ', $condicoes);
             $order = 'id_internacao DESC';
+            $gestaoListBaseUrl = rtrim((string)$BASE_URL, '/') . '/gestao';
 
             $qtdGesItens1 = $QtdTotalGes->selectAllGestaoLis($where, $order, $obLimite, $whereParams);
 
@@ -589,15 +590,15 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                     ?>
                                 <?php if ($current_block > $first_block): ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
+                                    <a class="page-link ajax-link" id="blocoNovo"
+                                        href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=1&bl=0', ENT_QUOTES, 'UTF-8') ?>">
                                         <i class="fa-solid fa-angles-left"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php print $paginaAtual - 1 ?>&bl=<?php print $blocoAtual - 5 ?>')">
+                                    <a class="page-link ajax-link"
+                                        href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=' . urlencode((string)($paginaAtual - 1)) . '&bl=' . urlencode((string)($blocoAtual - 5)), ENT_QUOTES, 'UTF-8') ?>">
                                         <i class="fa-solid fa-angle-left"></i> </a>
                                 </li>
                                 <?php endif; ?>
@@ -605,8 +606,8 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                 <?php for ($i = $first_page_in_block; $i <= $last_page_in_block; $i++): ?>
                                 <li class="page-item <?php print ($_GET['pag'] ?? 1) == $i ? "active" : "" ?>">
 
-                                    <a class="page-link" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php echo $i; ?>&bl=<?php echo $blocoAtual; ?>')">
+                                    <a class="page-link ajax-link"
+                                        href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=' . urlencode((string)$i) . '&bl=' . urlencode((string)$blocoAtual), ENT_QUOTES, 'UTF-8') ?>">
                                         <?php echo $i; ?>
                                     </a>
                                 </li>
@@ -614,15 +615,15 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
 
                                 <?php if ($current_block < $last_block): ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php echo $i; ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
+                                    <a class="page-link ajax-link" id="blocoNovo"
+                                        href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=' . urlencode((string)$i) . '&bl=' . urlencode((string)($blocoAtual + 5)), ENT_QUOTES, 'UTF-8') ?>"><i
                                             class="fa-solid fa-angle-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block < $last_block): ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="#"
-                                        onclick="loadContent('list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php echo $senha_int; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php print count($paginas) ?>&bl=<?php print ($last_block - 1) * 5 ?>')"><i
+                                    <a class="page-link ajax-link" id="blocoNovo"
+                                        href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=' . urlencode((string)count($paginas)) . '&bl=' . urlencode((string)(($last_block - 1) * 5)), ENT_QUOTES, 'UTF-8') ?>"><i
                                             class="fa-solid fa-angles-right"></i></a>
                                 </li>
                                 <?php endif; ?>
@@ -659,7 +660,11 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
 
                     // Encontre o elemento com o ID "table-content" dentro do elemento temporário
                     var tableContent = tempElement.querySelector('#table-content');
-                    $('#table-content').html(tableContent);
+                    if (tableContent) {
+                        $('#table-content').html(tableContent.innerHTML);
+                    } else {
+                        $('#table-content').html(response);
+                    }
                     if (typeof window.applyHeaderSortOnListPages === 'function') {
                         window.applyHeaderSortOnListPages();
                     }
@@ -671,10 +676,10 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
         });
     });
 
-    $(document).ready(function() {
-        loadContent(
-            'list_gestao.php?pesqGestao=<?php echo $pesqGestao; ?>&pesquisa_nome=<?php echo $pesquisa_nome; ?>&pesquisa_pac=<?php echo $pesquisa_pac; ?>&senha_int=<?php echo $senha_int; ?>&limite_pag=<?php echo $limite_pag; ?>&pag=<?php echo 1; ?>&bl=<?php echo 0 ?>'
-        );
+    $(document).on('click', '#table-content a.ajax-link', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        if (url) loadContent(url);
     });
     </script>
 

@@ -102,8 +102,49 @@ $limite              = max(1, $limite);
 $paginaAtual         = (int)(filter_input(INPUT_GET, 'pag') ?: 1);
 $paginaAtual         = max(1, $paginaAtual);
 
+$normRole = static function ($txt): string {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $ascii !== false ? $ascii : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$startsWithAny = static function (string $value, array $prefixes): bool {
+    foreach ($prefixes as $prefix) {
+        if ($prefix !== '' && strpos($value, $prefix) === 0) {
+            return true;
+        }
+    }
+    return false;
+};
+
+$idUsuarioSessao = (int)($_SESSION['id_usuario'] ?? 0);
+$cargoNormSessao = $normRole($_SESSION['cargo'] ?? '');
+$nivelSessao = (int)($_SESSION['nivel'] ?? 99);
+$isDiretoriaSessao = in_array($cargoNormSessao, ['diretoria', 'diretor', 'board'], true)
+    || (strpos($cargoNormSessao, 'diretor') !== false)
+    || (strpos($cargoNormSessao, 'diretoria') !== false)
+    || ($nivelSessao === -1);
+$isPerfilOperacional = $startsWithAny($cargoNormSessao, [
+    'medico',
+    'med',
+    'enfermeiro',
+    'enf',
+    'secretaria',
+    'administrativo',
+    'adm'
+]);
+
 $whereParts = [];
 $params = [];
+
+if ($isPerfilOperacional && !$isDiretoriaSessao) {
+    if ($idUsuarioSessao > 0) {
+        $whereParts[] = 'i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = :scope_user)';
+        $params[':scope_user'] = $idUsuarioSessao;
+    } else {
+        $whereParts[] = '1=0';
+    }
+}
 
 if ($pesquisa_nome !== '') {
     $whereParts[] = 'ho.nome_hosp LIKE :hospital';

@@ -185,6 +185,15 @@ $paginaAtual   = (int)(filter_input(INPUT_GET, 'pag') ?: 1);
 // WHERE (aliases: ho, pa, i, p)
 // ---------------------
 $cond = [];
+
+$idUsuarioSessao = (int)($_SESSION['id_usuario'] ?? 0);
+$cargoSessaoNorm = norm((string)($_SESSION['cargo'] ?? ''));
+$isMedicoSessao = (strpos($cargoSessaoNorm, 'medico') === 0) || (strpos($cargoSessaoNorm, 'med') === 0);
+
+if ($isMedicoSessao && $idUsuarioSessao > 0) {
+    $cond[] = 'i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = ' . $idUsuarioSessao . ')';
+}
+
 if ($pesquisa_nome !== '') $cond[] = 'ho.nome_hosp LIKE "%' . addslashes($pesquisa_nome) . '%"';
 if ($pesquisa_pac  !== '') $cond[] = 'pa.nome_pac  LIKE "%' . addslashes($pesquisa_pac)  . '%"';
 if ($id_internacao > 0)    $cond[] = 'p.fk_internacao_pror = ' . (int)$id_internacao;

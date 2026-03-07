@@ -3,6 +3,7 @@
 include_once("globals.php");
 include_once("db.php");
 require_once(__DIR__ . "/../app/security/bi_access.php");
+require_once(__DIR__ . "/../app/security/inteligencia_access.php");
 date_default_timezone_set('America/Sao_Paulo');
 header("Content-type: text/html; charset=utf-8");
 
@@ -20,6 +21,14 @@ $normAccess = function ($txt) {
     $txt = $c !== false ? $c : $txt;
     return preg_replace('/[^a-z]/', '', $txt);
 };
+$startsWithAnyAccess = function (string $value, array $prefixes): bool {
+    foreach ($prefixes as $prefix) {
+        if ($prefix !== '' && strpos($value, $prefix) === 0) {
+            return true;
+        }
+    }
+    return false;
+};
 $normCargoAccess = $normAccess($_SESSION['cargo'] ?? '');
 $isBiHubOnly = function_exists('fullcare_is_gestor_seguradora')
     ? fullcare_is_gestor_seguradora()
@@ -27,7 +36,7 @@ $isBiHubOnly = function_exists('fullcare_is_gestor_seguradora')
 $isSeguradoraRole = (strpos($normCargoAccess, 'seguradora') !== false);
 $canSeeFullMenu = ($sessionNivel > 0) && !$isBiHubOnly;
 $canSeeBiMenu = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_access() : false;
-$canSeeInteligenciaMenu = ($sessionNivel > 0);
+$canSeeInteligenciaMenu = false;
 $canSeeHubMenu = $isBiHubOnly;
 $canSeeInternadosMenu = $isBiHubOnly;
 $canSeeGestorListas = $isBiHubOnly;
@@ -37,6 +46,8 @@ $isDiretoria = in_array($normCargoAccess, ['diretoria', 'diretor', 'administrado
     || (strpos($normCargoAccess, 'diretoria') !== false)
     || in_array($normNivelAccess, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
     || ($sessionNivel === -1);
+$canSeeInteligenciaMenu = $isDiretoria;
+$isPerfilMedicoMenu = $startsWithAnyAccess($normCargoAccess, ['medico', 'med']);
 $seguradoraHeaderLogoUrl = null;
 $seguradoraHeaderNome = null;
 $resolveSeguradoraLogoUrl = static function (string $logoSeg, int $seguradoraId, string $seguradoraNome) use ($BASE_URL): ?string {
@@ -661,18 +672,20 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-shield-exclamation"
                                                     style="font-size:  1rem;margin-right:5px; color:#d63384;"></i>
                                                 Internações sem senha</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_pendencias_operacionais.php"><i
-                                                    class="bi bi-exclamation-diamond"
-                                                    style="font-size:  1rem;margin-right:5px; color:#fd7e14;"></i>
-                                                Pendências operacionais</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes"><i
-                                                    class="bi bi-currency-dollar"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
-                                                Negociações</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes/graficos"><i
-                                                    class="bi bi-bar-chart"
-                                                    style="font-size: 1rem;margin-right:5px; color:#20c997;"></i>
-                                                Gráfico Negociações</a></li>
+                                        <?php if (!$isPerfilMedicoMenu) { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_pendencias_operacionais.php"><i
+                                                        class="bi bi-exclamation-diamond"
+                                                        style="font-size:  1rem;margin-right:5px; color:#fd7e14;"></i>
+                                                    Pendências operacionais</a></li>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes"><i
+                                                        class="bi bi-currency-dollar"
+                                                        style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                    Negociações</a></li>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes/graficos"><i
+                                                        class="bi bi-bar-chart"
+                                                        style="font-size: 1rem;margin-right:5px; color:#20c997;"></i>
+                                                    Gráfico Negociações</a></li>
+                                        <?php } ?>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
@@ -684,17 +697,19 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-hourglass-split"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(180, 120, 20);"></i>
                                                 Prorrogação Pendente</a></li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
-                                                    class="bi bi-list-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
-                                                Lista Visitas</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_visitas.php"><i
-                                                    class="bi bi-clipboard-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0a4fa3;"></i>
-                                                Faturamento Mensal</a></li>
+                                        <?php if (!$isPerfilMedicoMenu) { ?>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
+                                                        class="bi bi-list-check"
+                                                        style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
+                                                    Lista Visitas</a></li>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_visitas.php"><i
+                                                        class="bi bi-clipboard-check"
+                                                        style="font-size: 1rem;margin-right:5px; color:#0a4fa3;"></i>
+                                                    Faturamento Mensal</a></li>
+                                        <?php } ?>
                                     </ul>
                                 </li>
                             <?php }; ?>

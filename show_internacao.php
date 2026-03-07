@@ -1021,7 +1021,8 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                             </div>
 
                             <?php if ($visitas_recent_exibicao_count > 0): ?>
-                                <div class="ux-recent-wrap mt-4">
+                                <div class="ux-recent-wrap card shadow-sm mt-4" style="border:1px solid #dbe5f1;border-left:5px solid #1d8fe1;border-radius:16px;background:linear-gradient(180deg,#fbfcff 0%,#f4f8ff 100%);box-shadow:0 8px 24px rgba(17,24,39,.06);">
+                                    <div class="card-body">
                                     <div class="ux-recent-header">
                                         <h6 class="ux-recent-title mb-0">
                                             <i class="fa-solid fa-layer-group me-2"></i>
@@ -1053,36 +1054,38 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                         </form>
                                     </div>
 
-                                    <div class="d-flex flex-column gap-3">
+                                    <div class="d-flex flex-column gap-3 mt-3">
                                         <?php foreach ($visitas_recent_exibicao as $recent):
                                             $recentDate = $recent['_date'] ? date('d/m/Y', strtotime($recent['_date'])) : '—';
                                             $recentText = trim((string)($recent['_text'] ?? ''));
                                             $recentAud  = trim((string)($recent['_auditor'] ?? ''));
                                             $recentId   = $recent['_id'] ?? ($recent['_raw']['id_visita'] ?? null);
                                         ?>
-                                            <div class="ux-recent-item">
-                                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                                    <div class="ux-recent-item-title">
-                                                        Relatório da visita:
-                                                        <span class="ux-recent-date-chip"><?= e($recentDate) ?></span>
+                                            <div class="ux-recent-item" style="border:1px solid #e3e6ee;border-left:4px solid #1d8fe1;border-radius:14px;background:#fff;box-shadow:0 4px 16px rgba(17,24,39,.04);padding:16px 18px;">
+                                                <div class="ux-recent-meta">
+                                                    <div class="ux-recent-meta-block">
+                                                        <span class="ux-recent-meta-label">Data da visita</span>
+                                                        <span class="ux-recent-date-chip" style="display:inline-block;width:fit-content;padding:3px 11px;border-radius:999px;background:#e7f3ff;color:#0f4f8e;font-weight:700;"><?= e($recentDate) ?></span>
+                                                    </div>
+                                                    <div class="ux-recent-meta-block">
+                                                        <span class="ux-recent-meta-label">Profissional</span>
+                                                        <span class="ux-recent-meta-value"><?= e($recentAud !== '' ? $recentAud : '-') ?></span>
                                                     </div>
                                                     <?php if ($recentId): ?>
-                                                        <span class="badge bg-secondary-subtle text-secondary-emphasis">ID <?= e($recentId) ?></span>
+                                                        <div class="ux-recent-meta-block">
+                                                            <span class="ux-recent-meta-label">ID</span>
+                                                            <span class="ux-recent-meta-id" style="display:inline-flex;align-items:center;width:fit-content;padding:2px 10px;border-radius:999px;border:1px solid #d8e5f2;background:#f8fbff;color:#2d4059;font-size:.82rem;font-weight:700;">#<?= e($recentId) ?></span>
+                                                        </div>
                                                     <?php endif; ?>
                                                 </div>
 
-                                                <?php if ($recentAud): ?>
-                                                    <div class="ux-recent-auditor mt-2">
-                                                        <i class="fa-solid fa-user-doctor me-1"></i><?= e($recentAud) ?>
-                                                    </div>
-                                                <?php endif; ?>
-
-                                                <div class="ux-recent-evolucao mt-3">
-                                                    <div class="small text-muted text-uppercase mb-1">Evolução</div>
+                                                <div class="ux-recent-evolucao mt-3" style="border:1px solid #e7e9f0;border-radius:10px;background:#fdfefe;padding:12px 14px;line-height:1.55;">
+                                                    <div class="small text-muted text-uppercase mb-2">Relatório / Evolução</div>
                                                     <p class="mb-0"><?= nl2br(e($recentText !== '' ? $recentText : '-')) ?></p>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
+                                    </div>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -1121,32 +1124,31 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="ult-vis-header text-uppercase small fw-semibold text-muted mb-3">
-                                                <div>Data da visita</div>
-                                                <div>Evolução</div>
-                                                <div>Profissional</div>
-                                            </div>
                                             <div class="visita-list">
                                                 <?php foreach ($visitas_recent_exibicao as $vis):
                                                     $d = $vis['_date'] ? date('d/m/Y', strtotime($vis['_date'])) : '-';
                                                     $relatorio = trim((string)($vis['_text'] ?? ''));
                                                     $idVis = $vis['_id'] ?? ($vis['_raw']['id_visita'] ?? null);
                                                 ?>
-                                                    <div class="visita-item rounded-4 shadow-sm mb-3 p-3" style="border:1px solid #e0e3ea;background:#f9f9fb;">
-                                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                                            <div class="text-secondary fw-semibold">
-                                                                Relatório da visita: <span class="text-dark"><?= e($d) ?></span>
+                                                    <div class="visita-item rounded-4 shadow-sm mb-3 p-3" style="border:1px solid #e0e3ea;border-left:4px solid #1d8fe1;background:#f9f9fb;">
+                                                        <div class="ux-recent-meta">
+                                                            <div class="ux-recent-meta-block">
+                                                                <span class="ux-recent-meta-label">Data da visita</span>
+                                                                <span class="ux-recent-date-chip" style="display:inline-block;width:fit-content;padding:3px 11px;border-radius:999px;background:#e7f3ff;color:#0f4f8e;font-weight:700;"><?= e($d) ?></span>
+                                                            </div>
+                                                            <div class="ux-recent-meta-block">
+                                                                <span class="ux-recent-meta-label">Profissional</span>
+                                                                <span class="ux-recent-meta-value"><?= e($vis['_auditor'] ?: '-') ?></span>
                                                             </div>
                                                             <?php if ($idVis): ?>
-                                                                <span class="badge bg-secondary-subtle text-secondary-emphasis">ID <?= e($idVis) ?></span>
+                                                                <div class="ux-recent-meta-block">
+                                                                    <span class="ux-recent-meta-label">ID</span>
+                                                                    <span class="ux-recent-meta-id" style="display:inline-flex;align-items:center;width:fit-content;padding:2px 10px;border-radius:999px;border:1px solid #d8e5f2;background:#f8fbff;color:#2d4059;font-size:.82rem;font-weight:700;">#<?= e($idVis) ?></span>
+                                                                </div>
                                                             <?php endif; ?>
                                                         </div>
-                                                        <div class="mt-2">
-                                                            <span class="small text-muted">Profissional:</span>
-                                                            <strong><?= e($vis['_auditor'] ?: '-') ?></strong>
-                                                        </div>
                                                         <div class="mt-3 p-3 rounded bg-white border" style="border-color:#e0e3ea;">
-                                                            <span class="small text-muted d-block mb-1">Evolução</span>
+                                                            <span class="small text-muted d-block mb-2 text-uppercase">Relatório / Evolução</span>
                                                             <p class="mb-0"><?= nl2br(e($relatorio !== '' ? $relatorio : '-')) ?></p>
                                                         </div>
                                                     </div>
@@ -2051,9 +2053,10 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
     }
 
     .ux-recent-wrap {
-        border: 1px solid #e2e5ec;
+        border: 1px solid #dbe5f1;
+        border-left: 5px solid #1d8fe1;
         border-radius: 16px;
-        background: linear-gradient(180deg, #fbfcff 0%, #f7f8fc 100%);
+        background: linear-gradient(180deg, #fbfcff 0%, #f4f8ff 100%);
         box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
         padding: 14px 16px;
     }
@@ -2077,37 +2080,71 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
 
     .ux-recent-item {
         border: 1px solid #e3e6ee;
+        border-left: 4px solid #1d8fe1;
         border-radius: 14px;
         background: #fff;
         box-shadow: 0 4px 16px rgba(17, 24, 39, 0.04);
-        padding: 14px 16px;
+        padding: 16px 18px;
     }
 
-    .ux-recent-item-title {
-        color: #6b7280;
+    .ux-recent-meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+        gap: 8px 12px;
+        align-items: start;
+    }
+
+    .ux-recent-meta-block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .ux-recent-meta-label {
+        font-size: .72rem;
+        line-height: 1;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #8a94a6;
+        font-weight: 700;
+    }
+
+    .ux-recent-meta-value {
+        color: #3f4756;
         font-weight: 600;
+        line-height: 1.25;
+    }
+
+    .ux-recent-meta-id {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 2px 10px;
+        border-radius: 999px;
+        border: 1px solid #e5e7eb;
+        background: #f8fafc;
+        color: #4b5563;
+        font-size: .82rem;
+        font-weight: 700;
     }
 
     .ux-recent-date-chip {
         display: inline-block;
-        margin-left: 4px;
-        padding: 2px 10px;
+        width: fit-content;
+        padding: 3px 11px;
         border-radius: 999px;
         background: #f2e8f7;
         color: #4b1c50;
         font-weight: 700;
     }
 
-    .ux-recent-auditor {
-        font-size: .92rem;
-        color: #667085;
-    }
-
     .ux-recent-evolucao {
         border: 1px solid #e7e9f0;
         border-radius: 10px;
-        background: #f8fafc;
+        background: #fdfefe;
         padding: 12px 14px;
+        line-height: 1.55;
     }
 
     .btn-ultimas-visitas {
@@ -2166,13 +2203,6 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
         padding: 1.5rem 1.75rem
     }
 
-    .modal-ultimas-visitas .ult-vis-header {
-        display: grid;
-        grid-template-columns: 140px 1fr 220px;
-        gap: 12px;
-        letter-spacing: .08em
-    }
-
     .visita-list {
         display: flex;
         flex-direction: column;
@@ -2191,13 +2221,16 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
         .ux-summary-strip {
             grid-template-columns: repeat(2, minmax(140px, 1fr));
         }
-        .modal-ultimas-visitas .ult-vis-header {
-            display: none
+        .ux-recent-meta {
+            grid-template-columns: repeat(2, minmax(140px, 1fr));
         }
     }
 
     @media (max-width: 576px) {
         .ux-summary-strip {
+            grid-template-columns: 1fr;
+        }
+        .ux-recent-meta {
             grid-template-columns: 1fr;
         }
         .ux-actions-sticky {
