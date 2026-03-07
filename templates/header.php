@@ -2,6 +2,7 @@
 
 include_once("globals.php");
 include_once("db.php");
+require_once(__DIR__ . "/../app/security/bi_access.php");
 date_default_timezone_set('America/Sao_Paulo');
 header("Content-type: text/html; charset=utf-8");
 
@@ -20,10 +21,12 @@ $normAccess = function ($txt) {
     return preg_replace('/[^a-z]/', '', $txt);
 };
 $normCargoAccess = $normAccess($_SESSION['cargo'] ?? '');
-$isBiHubOnly = (strpos($normCargoAccess, 'gestorseguradora') === 0);
+$isBiHubOnly = function_exists('fullcare_is_gestor_seguradora')
+    ? fullcare_is_gestor_seguradora()
+    : (strpos($normCargoAccess, 'gestorseguradora') === 0);
 $isSeguradoraRole = (strpos($normCargoAccess, 'seguradora') !== false);
 $canSeeFullMenu = ($sessionNivel > 0) && !$isBiHubOnly;
-$canSeeBiMenu = ($sessionNivel >= 3) || $isBiHubOnly;
+$canSeeBiMenu = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_access() : false;
 $canSeeInteligenciaMenu = ($sessionNivel > 0);
 $canSeeHubMenu = $isBiHubOnly;
 $canSeeInternadosMenu = $isBiHubOnly;

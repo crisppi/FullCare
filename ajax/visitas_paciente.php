@@ -4,6 +4,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../globals.php';
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/_auth_scope.php';
 
 if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
   http_response_code(401);
@@ -12,6 +13,7 @@ if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? 
 }
 
 try {
+  $ctx = ajax_user_context($conn);
   $pacId = filter_input(INPUT_GET, 'id_paciente', FILTER_VALIDATE_INT);
   $page  = max(1, (int)($_GET['page'] ?? 1));
   $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
@@ -23,6 +25,9 @@ try {
     exit;
   }
 
+  $scopeParams = [];
+  $scopeSql = ajax_scope_clause_for_internacao($ctx, 'ac', $scopeParams, 'vp');
+
   // Total de visitas do paciente (somente não retificadas)
   $sqlTotal = "
     SELECT COUNT(*) AS total
@@ -30,9 +35,10 @@ try {
     JOIN tb_internacao ac ON ac.id_internacao = vi.fk_internacao_vis
     WHERE ac.fk_paciente_int = :pacId
       AND (vi.retificado IS NULL OR vi.retificado = 0)
+      {$scopeSql}
   ";
   $st = $conn->prepare($sqlTotal);
-  $st->bindValue(':pacId', $pacId, PDO::PARAM_INT);
+  ajax_bind_params($st, array_merge([':pacId' => (int)$pacId], $scopeParams));
   $st->execute();
   $total = (int)($st->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
 
@@ -58,14 +64,17 @@ try {
     LEFT JOIN tb_hospital ho ON ho.id_hospital = ac.fk_hospital_int
     WHERE ac.fk_paciente_int = :pacId
       AND (vi.retificado IS NULL OR vi.retificado = 0)
+      {$scopeSql}
     ORDER BY vi.data_visita_vis DESC, vi.id_visita DESC
     LIMIT :limit OFFSET :offset
   ";
 
   $stmt = $conn->prepare($sql);
-  $stmt->bindValue(':pacId', $pacId, PDO::PARAM_INT);
-  $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-  $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+  ajax_bind_params($stmt, array_merge([
+    ':pacId' => (int)$pacId,
+    ':limit' => (int)$limit,
+    ':offset' => (int)$offset,
+  ], $scopeParams));
   $stmt->execute();
 
   $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);

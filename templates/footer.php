@@ -3,9 +3,11 @@ if (defined('FULLCARE_FOOTER_RENDERED')) {
     return;
 }
 define('FULLCARE_FOOTER_RENDERED', true);
+require_once(__DIR__ . '/../app/security/bi_access.php');
 
 $footerVersion = '1.3.6';
 $footerYear = date('Y');
+$canSeeBiLink = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_access() : false;
 ?>
 <footer id="myFooterSimple" aria-label="Rodapé FullCare">
     <div class="footer-simple-inner">
@@ -22,7 +24,9 @@ $footerYear = date('Y');
                 <a href="<?= $BASE_URL ?>inicio">Início</a>
                 <a href="<?= $BASE_URL ?>internacoes/lista">Internações</a>
                 <a href="<?= $BASE_URL ?>visitas/lista">Visitas</a>
-                <a href="<?= $BASE_URL ?>bi/navegacao">BI</a>
+                <?php if ($canSeeBiLink) { ?>
+                    <a href="<?= $BASE_URL ?>bi/navegacao">BI</a>
+                <?php } ?>
             </nav>
 
             <div class="footer-simple-meta">

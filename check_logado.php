@@ -4,6 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once(__DIR__ . "/app/security/bi_access.php");
+
 if (empty($_SESSION['email_user']) && empty($_SESSION['id_usuario'])) {
     header('location:index.php');
     exit;
@@ -17,6 +19,10 @@ if ($ativo !== 's') {
     exit;
 } else {
 };
+
+if (function_exists('fullcare_enforce_bi_access')) {
+    fullcare_enforce_bi_access();
+}
 
 require_once(__DIR__ . "/utils/flow_logger.php");
 if (function_exists('flowLog')) {

@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../globals.php');
 require_once(__DIR__ . '/../db.php');
+require_once(__DIR__ . '/_auth_scope.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -42,6 +43,7 @@ function formatCpf($cpf)
 }
 
 try {
+    $ctx = ajax_user_context($conn);
     $nomeLike = '%' . str_replace(' ', '%', $nome) . '%';
     $tokenClause = '';
     if (!empty($tokens)) {
@@ -57,19 +59,27 @@ try {
         $whereNome = '(' . $whereNome . ' OR ' . $tokenClause . ')';
     }
 
+    $scopeParams = [];
+    $scopeSql = ajax_scope_clause_for_paciente($ctx, 'pa', $scopeParams, 'cpn');
+
     $sql = "SELECT pa.id_paciente, pa.nome_pac, pa.matricula_pac, pa.cpf_pac, pa.data_nasc_pac, se.seguradora_seg
               FROM tb_paciente pa
          LEFT JOIN tb_seguradora se ON se.id_seguradora = pa.fk_seguradora_pac
              WHERE {$whereNome}
                AND IFNULL(pa.deletado_pac, 'n') <> 's'
+               {$scopeSql}
           ORDER BY pa.id_paciente DESC
              LIMIT 15";
     $stmt = $conn->prepare($sql);
-    $stmt->bindValue(':nome', $nome);
-    $stmt->bindValue(':nome_like', $nomeLike);
+    $params = [
+        ':nome' => $nome,
+        ':nome_like' => $nomeLike,
+    ];
     foreach ($tokens as $idx => $tk) {
-        $stmt->bindValue(":tk{$idx}", '%' . $tk . '%');
+        $params[":tk{$idx}"] = '%' . $tk . '%';
     }
+    $params = array_merge($params, $scopeParams);
+    ajax_bind_params($stmt, $params);
     $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 

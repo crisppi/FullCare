@@ -51,26 +51,168 @@ class HospitalDAO implements HospitalDAOInterface
         return $hospital;
     }
 
+    private function normalizeRole($txt)
+    {
+        $txt = trim((string)$txt);
+        if ($txt === '') {
+            return '';
+        }
+        if (function_exists('iconv')) {
+            $conv = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+            if ($conv !== false) {
+                $txt = $conv;
+            }
+        }
+        $txt = strtolower($txt);
+        return preg_replace('/[^a-z]/', '', $txt);
+    }
+
+    private function startsWithAny($value, array $prefixes)
+    {
+        foreach ($prefixes as $prefix) {
+            if ($prefix !== '' && strpos($value, $prefix) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function getScopeContext()
+    {
+        $userId = (int)($_SESSION['id_usuario'] ?? 0);
+        $nivel = (int)($_SESSION['nivel'] ?? 99);
+        $cargoNorm = $this->normalizeRole($_SESSION['cargo'] ?? '');
+        $seguradoraId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
+
+        $isDiretoria = in_array($cargoNorm, ['diretoria', 'diretor', 'board'], true)
+            || (strpos($cargoNorm, 'diretor') !== false)
+            || (strpos($cargoNorm, 'diretoria') !== false)
+            || ($nivel === -1);
+
+        $isSystemAdmin = in_array($cargoNorm, [
+            'adminsistema',
+            'administradordesistema',
+            'superadmin',
+            'root',
+            'tiadmin'
+        ], true);
+
+        $isSeguradoraRole = (strpos($cargoNorm, 'seguradora') !== false)
+            || (strpos($cargoNorm, 'planosaude') !== false)
+            || ($cargoNorm === 'gestorplanosaude');
+
+        return [
+            'user_id' => $userId,
+            'cargo_norm' => $cargoNorm,
+            'seguradora_id' => $seguradoraId,
+            'is_diretoria' => $isDiretoria,
+            'is_system_admin' => $isSystemAdmin,
+            'is_seguradora' => $isSeguradoraRole || ($seguradoraId > 0),
+        ];
+    }
+
+    private function resolveScopeMode(array $ctx)
+    {
+        if (!empty($ctx['is_diretoria']) || !empty($ctx['is_system_admin'])) {
+            return 'full';
+        }
+        if (!empty($ctx['is_seguradora'])) {
+            return 'seguradora';
+        }
+
+        $cargo = (string)($ctx['cargo_norm'] ?? '');
+        $hospitalScopedPrefixes = [
+            'medico',
+            'med',
+            'enfermeiro',
+            'enf',
+            'secretaria',
+            'administrativo',
+            'adm',
+            'auditor'
+        ];
+        if ($this->startsWithAny($cargo, $hospitalScopedPrefixes)) {
+            return 'hospital';
+        }
+        return 'hospital';
+    }
+
+    private function buildHospitalScopeFilter($hospitalExpr = 'tb_hospital.id_hospital')
+    {
+        $ctx = $this->getScopeContext();
+        $mode = $this->resolveScopeMode($ctx);
+
+        if ($mode === 'full') {
+            return ['sql' => '', 'params' => []];
+        }
+
+        if ($mode === 'seguradora') {
+            $seguradoraId = (int)($ctx['seguradora_id'] ?? 0);
+            if ($seguradoraId <= 0) {
+                return ['sql' => '1=0', 'params' => []];
+            }
+            return [
+                'sql' => "EXISTS (
+                    SELECT 1
+                      FROM internacao i_scope
+                      JOIN paciente p_scope ON p_scope.id_paciente = i_scope.fk_paciente_int
+                     WHERE i_scope.fk_hospital_int = {$hospitalExpr}
+                       AND p_scope.fk_seguradora_pac = :scope_seguradora
+                )",
+                'params' => [':scope_seguradora' => $seguradoraId]
+            ];
+        }
+
+        $userId = (int)($ctx['user_id'] ?? 0);
+        if ($userId <= 0) {
+            return ['sql' => '1=0', 'params' => []];
+        }
+
+        return [
+            'sql' => "EXISTS (
+                SELECT 1
+                  FROM tb_hospitalUser hu_scope
+                 WHERE hu_scope.fk_hospital_user = {$hospitalExpr}
+                   AND hu_scope.fk_usuario_hosp = :scope_user
+            )",
+            'params' => [':scope_user' => $userId]
+        ];
+    }
+
+    private function bindNamedParams(PDOStatement $stmt, array $params)
+    {
+        foreach ($params as $name => $value) {
+            $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue($name, $value, $type);
+        }
+    }
+
     /* ================== READS (arrays associativos) ================== */
 
     public function findAll()
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM tb_hospital
-            WHERE id_hospital > 1
-            ORDER BY id_hospital DESC
-        ");
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
+        $conds = ["id_hospital > 1"];
+        if ($scope['sql'] !== '') {
+            $conds[] = $scope['sql'];
+        }
+        $sql = "SELECT * FROM tb_hospital WHERE " . implode(' AND ', $conds) . " ORDER BY id_hospital DESC";
+        $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function findByHosp($pesquisa_nome)
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM tb_hospital
-            WHERE nome_hosp LIKE :nome_hosp
-            ORDER BY nome_hosp ASC
-        ");
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
+        $conds = ["nome_hosp LIKE :nome_hosp"];
+        if ($scope['sql'] !== '') {
+            $conds[] = $scope['sql'];
+        }
+        $sql = "SELECT * FROM tb_hospital WHERE " . implode(' AND ', $conds) . " ORDER BY nome_hosp ASC";
+        $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->bindValue(":nome_hosp", '%' . $pesquisa_nome . '%');
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -80,10 +222,14 @@ class HospitalDAO implements HospitalDAOInterface
 
     public function gethospital()
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM tb_hospital
-            ORDER BY id_hospital DESC
-        ");
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
+        $sql = "SELECT * FROM tb_hospital";
+        if ($scope['sql'] !== '') {
+            $sql .= " WHERE " . $scope['sql'];
+        }
+        $sql .= " ORDER BY id_hospital DESC";
+        $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -96,11 +242,14 @@ class HospitalDAO implements HospitalDAOInterface
 
     public function gethospitalByNome($nome_hosp)
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM tb_hospital
-            WHERE nome_hosp = :nome_hosp
-            ORDER BY id_hospital DESC
-        ");
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
+        $conds = ["nome_hosp = :nome_hosp"];
+        if ($scope['sql'] !== '') {
+            $conds[] = $scope['sql'];
+        }
+        $sql = "SELECT * FROM tb_hospital WHERE " . implode(' AND ', $conds) . " ORDER BY id_hospital DESC";
+        $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->bindValue(":nome_hosp", $nome_hosp);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -114,10 +263,14 @@ class HospitalDAO implements HospitalDAOInterface
 
     public function findById($id_hospital)
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM tb_hospital
-            WHERE id_hospital = :id_hospital
-        ");
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
+        $conds = ["id_hospital = :id_hospital"];
+        if ($scope['sql'] !== '') {
+            $conds[] = $scope['sql'];
+        }
+        $sql = "SELECT * FROM tb_hospital WHERE " . implode(' AND ', $conds);
+        $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->bindValue(":id_hospital", $id_hospital, PDO::PARAM_INT);
         $stmt->execute();
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -307,20 +460,25 @@ class HospitalDAO implements HospitalDAOInterface
 
     public function findGeral()
     {
-        $stmt = $this->conn->prepare("
-            SELECT * FROM tb_hospital
-            WHERE id_hospital > 1 AND deletado_hosp <> 's'
-            ORDER BY nome_hosp ASC
-        ");
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
+        $conds = ["id_hospital > 1", "deletado_hosp <> 's'"];
+        if ($scope['sql'] !== '') {
+            $conds[] = $scope['sql'];
+        }
+        $sql = "SELECT * FROM tb_hospital WHERE " . implode(' AND ', $conds) . " ORDER BY nome_hosp ASC";
+        $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function selectAllhospital($where = null, $order = null, $limit = null)
     {
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
         $conds = array();
         if (strlen((string)$where)) $conds[] = $where;
         $conds[] = "deletado_hosp <> 's'";
+        if ($scope['sql'] !== '') $conds[] = $scope['sql'];
 
         $sql = "SELECT * FROM tb_hospital";
         if (!empty($conds))  $sql .= " WHERE " . implode(' AND ', $conds);
@@ -328,30 +486,43 @@ class HospitalDAO implements HospitalDAOInterface
         if (strlen((string)$limit)) $sql .= " LIMIT " . $limit;
 
         $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function selectAllhospitalComDeletados($where = null, $order = null, $limit = null)
     {
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
+        $conds = array();
+        if (strlen((string)$where)) $conds[] = $where;
+        if ($scope['sql'] !== '') $conds[] = $scope['sql'];
+
         $sql = "SELECT * FROM tb_hospital";
-        if (strlen((string)$where)) $sql .= " WHERE " . $where;
+        if (!empty($conds)) $sql .= " WHERE " . implode(' AND ', $conds);
         if (strlen((string)$order)) $sql .= " ORDER BY " . $order;
         if (strlen((string)$limit)) $sql .= " LIMIT " . $limit;
 
         $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function QtdHospital($where = null, $order = null, $limite = null)
     {
+        $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
+        $conds = array();
+        if (strlen((string)$where))  $conds[] = $where;
+        if ($scope['sql'] !== '') $conds[] = $scope['sql'];
+
         $sql = "SELECT COUNT(id_hospital) AS qtd FROM tb_hospital";
-        if (strlen((string)$where))  $sql .= " WHERE " . $where;
+        if (!empty($conds)) $sql .= " WHERE " . implode(' AND ', $conds);
         if (strlen((string)$order))  $sql .= " ORDER BY " . $order;
         if (strlen((string)$limite)) $sql .= " LIMIT " . $limite;
 
         $stmt = $this->conn->prepare($sql);
+        $this->bindNamedParams($stmt, $scope['params']);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 

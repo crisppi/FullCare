@@ -108,6 +108,31 @@ function dashCacheSet(string $key, $data): void
 }
 
 $cacheBase = 'dash_menu_' . $hospital_selecionado . '_' . $id_usuario_sessao . '_' . $nivel_sessao . '_' . ($isSeguradoraRole ? 'seg' : 'geral') . '_' . $seguradoraUserId;
+$nomeUsuarioSaudacao = trim((string)($_SESSION['usuario_user'] ?? ($_SESSION['login_user'] ?? ($_SESSION['email_user'] ?? 'Usuário'))));
+$cargoNormSessao = $normCargoAccess($_SESSION['cargo'] ?? '');
+$startsWithAny = static function (string $value, array $prefixes): bool {
+    foreach ($prefixes as $prefix) {
+        if ($prefix !== '' && strpos($value, $prefix) === 0) {
+            return true;
+        }
+    }
+    return false;
+};
+$showUserHospitalCards = $startsWithAny($cargoNormSessao, [
+    'medico',
+    'med',
+    'enfermeiro',
+    'enf',
+    'secretaria',
+    'administrativo',
+    'adm'
+]);
+$userHospitalResumo = [
+    'total' => 0,
+    'ativos' => 0,
+    'com_internados' => 0,
+    'sem_internados' => 0,
+];
 
 // -----------------------------
 // CONDIÇÕES / WHEREs
@@ -256,13 +281,71 @@ foreach ($dados_hospital as $h) {
     if ($hid <= 0) continue; // remove “Medico”, emails etc.
     $map[$hid] = [
         'id_hospital' => $hid,
-        'nome_hosp'   => (string)($h['nome_hosp'] ?? '')
+        'nome_hosp'   => (string)($h['nome_hosp'] ?? ''),
+        'ativo_hosp'  => (string)($h['ativo_hosp'] ?? '')
     ];
 }
 $dados_hospital_select = array_values($map);
 usort($dados_hospital_select, function ($a, $b) {
     return strcasecmp($a['nome_hosp'] ?? '', $b['nome_hosp'] ?? '');
 });
+
+if ($showUserHospitalCards) {
+    $totalHospitais = count($dados_hospital_select);
+    $ativosHospitais = 0;
+    $temInfoAtivo = false;
+    foreach ($dados_hospital_select as $h) {
+        $ativoHosp = strtolower(trim((string)($h['ativo_hosp'] ?? '')));
+        if ($ativoHosp !== '') {
+            $temInfoAtivo = true;
+        }
+        if ($ativoHosp === 's') {
+            $ativosHospitais++;
+        }
+    }
+    if (!$temInfoAtivo) {
+        $ativosHospitais = $totalHospitais;
+    }
+
+    $hospitaisComInternados = 0;
+    if ($totalHospitais > 0) {
+        try {
+            $ids = array_map(static function ($h) {
+                return (int)($h['id_hospital'] ?? 0);
+            }, $dados_hospital_select);
+            $ids = array_values(array_filter($ids, static function ($v) {
+                return $v > 0;
+            }));
+
+            if (!empty($ids)) {
+                $inParams = [];
+                foreach ($ids as $i => $hid) {
+                    $inParams[] = ':h' . $i;
+                }
+                $sqlHospInt = "SELECT COUNT(DISTINCT i.fk_hospital_int) AS hospitais_com_internados
+                                 FROM tb_internacao i
+                                WHERE i.internado_int = 's'
+                                  AND i.fk_hospital_int IN (" . implode(', ', $inParams) . ")";
+                $stmtHospInt = $conn->prepare($sqlHospInt);
+                foreach ($ids as $i => $hid) {
+                    $stmtHospInt->bindValue(':h' . $i, $hid, PDO::PARAM_INT);
+                }
+                $stmtHospInt->execute();
+                $hospitaisComInternados = (int)($stmtHospInt->fetchColumn() ?: 0);
+            }
+        } catch (Throwable $e) {
+            error_log('[DASH_MENU][HOSPITAL_USUARIO] ' . $e->getMessage());
+            $hospitaisComInternados = 0;
+        }
+    }
+
+    $userHospitalResumo = [
+        'total' => $totalHospitais,
+        'ativos' => $ativosHospitais,
+        'com_internados' => $hospitaisComInternados,
+        'sem_internados' => max(0, $totalHospitais - $hospitaisComInternados),
+    ];
+}
 
 // Hospital selecionado (se houver)
 $filtered_hospital = [];
@@ -942,6 +1025,124 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
     border: 1px solid #d6c5f7;
     color: #5e2363;
 }
+
+.user-patient-strip {
+    margin: 10px 0 12px;
+    padding: 12px;
+    border-radius: 16px;
+    background: linear-gradient(130deg, #edf7ff 0%, #f8f1ff 52%, #eefdf8 100%);
+    border: 1px solid rgba(96, 133, 188, 0.24);
+    box-shadow: 0 8px 20px rgba(39, 24, 58, 0.08);
+}
+
+.user-patient-title {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #3a2559;
+    letter-spacing: .01em;
+    text-transform: uppercase;
+}
+
+.user-hospital-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.user-hospital-btn {
+    border: 1px solid rgba(83, 109, 151, 0.28);
+    border-radius: 14px;
+    padding: 11px 12px;
+    min-height: 56px;
+    background: linear-gradient(140deg, #ffffff, #edf4ff);
+    color: #2f1f45;
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-align: left;
+    box-shadow: 0 4px 10px rgba(39, 24, 58, 0.07);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+.user-hospital-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 14px rgba(39, 24, 58, 0.12);
+    border-color: rgba(73, 104, 170, 0.45);
+}
+
+.user-hospital-btn.is-active {
+    border-color: rgba(74, 123, 210, 0.62);
+    background: linear-gradient(140deg, #dff1ff, #e4f9f1);
+    color: #1e3d6b;
+}
+
+.user-hospital-btn.clear {
+    background: linear-gradient(140deg, #fff5fb, #f0f1ff);
+    color: #5b3a84;
+}
+
+.user-patient-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.user-patient-card {
+    border-radius: 14px;
+    padding: 10px 12px;
+    min-height: 86px;
+    color: #2e1c45;
+    border: 1px solid rgba(84, 109, 151, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.user-patient-card .lbl {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: .04em;
+    opacity: .85;
+}
+
+.user-patient-card .val {
+    margin-top: 4px;
+    font-size: 1.65rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.user-patient-card.total {
+    background: linear-gradient(145deg, #ffffff, #eef1ff);
+}
+
+.user-patient-card.ativos {
+    background: linear-gradient(145deg, #effff8, #d9f7ec);
+}
+
+.user-patient-card.internados {
+    background: linear-gradient(145deg, #fff8eb, #ffeecf);
+}
+
+.user-patient-card.sem {
+    background: linear-gradient(145deg, #fff1f6, #ffdfe8);
+}
+
+@media (max-width: 1100px) {
+    .user-patient-grid {
+        grid-template-columns: repeat(2, minmax(130px, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .user-patient-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .user-hospital-buttons {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 
 <script src="js/timeout.js"></script>
@@ -986,6 +1187,51 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                 </form>
             </div>
         </div>
+
+        <?php if ($showUserHospitalCards): ?>
+            <div class="user-patient-strip">
+                <div class="user-patient-title">
+                    Prezado(a) <?= htmlspecialchars($nomeUsuarioSaudacao, ENT_QUOTES, 'UTF-8') ?>, Hospitais vinculados ao seu usuário
+                </div>
+                <form method="POST" class="user-hospital-buttons">
+                    <?php foreach ($dados_hospital_select as $hospitalBtn): ?>
+                        <?php
+                        $hidBtn = (int)($hospitalBtn['id_hospital'] ?? 0);
+                        $nomeBtn = (string)($hospitalBtn['nome_hosp'] ?? ('Hospital #' . $hidBtn));
+                        if ($hidBtn <= 0) {
+                            continue;
+                        }
+                        ?>
+                        <button type="submit" name="hospital_id" value="<?= $hidBtn ?>"
+                            class="user-hospital-btn <?= $hospital_selecionado === $hidBtn ? 'is-active' : '' ?>">
+                            <?= htmlspecialchars($nomeBtn, ENT_QUOTES, 'UTF-8') ?>
+                        </button>
+                    <?php endforeach; ?>
+                    <button type="submit" name="clear_hospital" value="1"
+                        class="user-hospital-btn clear <?= $hospital_selecionado === 0 ? 'is-active' : '' ?>">
+                        Limpar filtro
+                    </button>
+                </form>
+                <div class="user-patient-grid">
+                    <div class="user-patient-card total">
+                        <div class="lbl">Total Hospitais</div>
+                        <div class="val"><?= (int)$userHospitalResumo['total'] ?></div>
+                    </div>
+                    <div class="user-patient-card ativos">
+                        <div class="lbl">Hospitais Ativos</div>
+                        <div class="val"><?= (int)$userHospitalResumo['ativos'] ?></div>
+                    </div>
+                    <div class="user-patient-card internados">
+                        <div class="lbl">Com Internados</div>
+                        <div class="val"><?= (int)$userHospitalResumo['com_internados'] ?></div>
+                    </div>
+                    <div class="user-patient-card sem">
+                        <div class="lbl">Sem Internados</div>
+                        <div class="val"><?= (int)$userHospitalResumo['sem_internados'] ?></div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <div class="kpi-grid-container">
             <div class="grid-item grid-item-kpi kpi-neutral">
@@ -1306,50 +1552,141 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
         "hideMethod": "fadeOut"
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
+    function parseDashValue(value, type) {
+        const text = (value || '').trim();
+        if (type === 'number') {
+            const num = parseFloat(text.replace(/[^\d.-]/g, ''));
+            return Number.isFinite(num) ? num : -Infinity;
+        }
+        if (type === 'date') {
+            const parts = text.split('/');
+            if (parts.length === 3) {
+                return Number(parts[2] + parts[1].padStart(2, '0') + parts[0].padStart(2, '0'));
+            }
+            return -Infinity;
+        }
+        return text.toLowerCase();
+    }
+
+    function sortDashTable(table, colIndex, dir, type) {
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort(function(a, b) {
+            const aCell = a.children[colIndex];
+            const bCell = b.children[colIndex];
+            const aVal = parseDashValue(aCell ? aCell.textContent : '', type);
+            const bVal = parseDashValue(bCell ? bCell.textContent : '', type);
+            if (type === 'text') {
+                return dir === 'asc' ? aVal.localeCompare(bVal, 'pt-BR') : bVal.localeCompare(aVal, 'pt-BR');
+            }
+            return dir === 'asc' ? (aVal - bVal) : (bVal - aVal);
+        });
+        rows.forEach(function(row) {
+            tbody.appendChild(row);
+        });
+    }
+
+    function loadDashTables() {
         const selectElement = document.getElementById('hospital_id');
-        selectElement.addEventListener('focus', function() {
-            selectElement.classList.add('open');
-        });
-        selectElement.addEventListener('blur', function() {
-            selectElement.classList.remove('open');
-        });
+        const visitasEl = document.getElementById('dash-visitas-atraso');
+        const longaEl = document.getElementById('dash-longa-perm');
+        if (!visitasEl || !longaEl) return;
 
-        function parseDashValue(value, type) {
-            const text = (value || '').trim();
-            if (type === 'number') {
-                const num = parseFloat(text.replace(/[^\d.-]/g, ''));
-                return Number.isFinite(num) ? num : -Infinity;
+        const formData = new URLSearchParams();
+        const hospVal = selectElement ? selectElement.value : '';
+        if (hospVal) formData.append('hospital_id', hospVal);
+
+        fetch('<?= $BASE_URL ?>ajax/dashboard_tabelas.php?_ts=' + Date.now(), {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+        .then(function(res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.text();
+        })
+        .then(function(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const visitasContent = temp.querySelector('#dash-visitas-atraso-content');
+            const longaContent = temp.querySelector('#dash-longa-perm-content');
+            visitasEl.innerHTML = visitasContent ? visitasContent.innerHTML : '<div style="padding:10px">Não foi possível carregar.</div>';
+            longaEl.innerHTML = longaContent ? longaContent.innerHTML : '<div style="padding:10px">Não foi possível carregar.</div>';
+        })
+        .catch(function() {
+            visitasEl.innerHTML = '<div style="padding:10px">Erro ao carregar.</div>';
+            longaEl.innerHTML = '<div style="padding:10px">Erro ao carregar.</div>';
+        });
+    }
+
+    function submitDashboardFilter(formData) {
+        fetch(window.location.pathname + '?_ts=' + Date.now(), {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+        .then(function(res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.text();
+        })
+        .then(function(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const nextMain = doc.getElementById('main-container');
+            const currentMain = document.getElementById('main-container');
+            if (!nextMain || !currentMain) return;
+            currentMain.innerHTML = nextMain.innerHTML;
+            initDashboardMenuPage();
+        })
+        .catch(function() {
+            if (window.toastr) {
+                toastr.error('Não foi possível aplicar o filtro agora.');
             }
-            if (type === 'date') {
-                const parts = text.split('/');
-                if (parts.length === 3) {
-                    return Number(parts[2] + parts[1].padStart(2, '0') + parts[0].padStart(2, '0'));
-                }
-                return -Infinity;
-            }
-            return text.toLowerCase();
+        });
+    }
+
+    function initDashboardMenuPage() {
+        const selectElement = document.getElementById('hospital_id');
+        if (selectElement) {
+            selectElement.addEventListener('focus', function() {
+                selectElement.classList.add('open');
+            });
+            selectElement.addEventListener('blur', function() {
+                selectElement.classList.remove('open');
+            });
         }
 
-        function sortDashTable(table, colIndex, dir, type) {
-            const tbody = table.querySelector('tbody');
-            if (!tbody) return;
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            rows.sort(function(a, b) {
-                const aCell = a.children[colIndex];
-                const bCell = b.children[colIndex];
-                const aVal = parseDashValue(aCell ? aCell.textContent : '', type);
-                const bVal = parseDashValue(bCell ? bCell.textContent : '', type);
-                if (type === 'text') {
-                    return dir === 'asc' ? aVal.localeCompare(bVal, 'pt-BR') : bVal.localeCompare(aVal, 'pt-BR');
+        const filterForm = document.getElementById('filter-status-form');
+        if (filterForm) {
+            filterForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const data = new URLSearchParams(new FormData(filterForm));
+                const submitter = event.submitter;
+                if (submitter && submitter.name) {
+                    data.set(submitter.name, submitter.value || '1');
                 }
-                return dir === 'asc' ? (aVal - bVal) : (bVal - aVal);
-            });
-            rows.forEach(function(row) {
-                tbody.appendChild(row);
+                submitDashboardFilter(data);
             });
         }
 
+        document.querySelectorAll('.user-hospital-buttons').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const submitter = event.submitter;
+                if (!submitter || !submitter.name) return;
+                const data = new URLSearchParams();
+                data.set(submitter.name, submitter.value || '');
+                submitDashboardFilter(data);
+            });
+        });
+
+        loadDashTables();
+    }
+
+    if (!window.__dashSortBound) {
         document.addEventListener('click', function(event) {
             const link = event.target.closest('.dash-sortable .sort-icons a');
             if (!link) return;
@@ -1365,45 +1702,12 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                 a.classList.remove('active');
             });
             link.classList.add('active');
-
             sortDashTable(table, colIndex, dir, type);
         });
+        window.__dashSortBound = true;
+    }
 
-        function loadDashTables() {
-            const visitasEl = document.getElementById('dash-visitas-atraso');
-            const longaEl = document.getElementById('dash-longa-perm');
-            if (!visitasEl || !longaEl) return;
-
-            const formData = new URLSearchParams();
-            const hospVal = selectElement ? selectElement.value : '';
-            if (hospVal) formData.append('hospital_id', hospVal);
-
-            fetch('<?= $BASE_URL ?>ajax/dashboard_tabelas.php?_ts=' + Date.now(), {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: formData.toString()
-            })
-            .then(function(res) {
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                return res.text();
-            })
-            .then(function(html) {
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-                const visitasContent = temp.querySelector('#dash-visitas-atraso-content');
-                const longaContent = temp.querySelector('#dash-longa-perm-content');
-                visitasEl.innerHTML = visitasContent ? visitasContent.innerHTML : '<div style="padding:10px">Não foi possível carregar.</div>';
-                longaEl.innerHTML = longaContent ? longaContent.innerHTML : '<div style="padding:10px">Não foi possível carregar.</div>';
-            })
-            .catch(function() {
-                visitasEl.innerHTML = '<div style="padding:10px">Erro ao carregar.</div>';
-                longaEl.innerHTML = '<div style="padding:10px">Erro ao carregar.</div>';
-            });
-        }
-
-        loadDashTables();
-    });
+    document.addEventListener('DOMContentLoaded', initDashboardMenuPage);
     </script>
 </div>
 </body>
