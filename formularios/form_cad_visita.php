@@ -1082,6 +1082,160 @@ function aumentarTextProgramacao() {
     color: #3a184f;
 }
 
+/* Padronização dos campos das tabelas adicionais */
+.visita-card--tabelas .adicional-card .form-group.row,
+.visita-card--tabelas .tabelas-detalhes-block .row {
+    align-items: flex-end;
+}
+
+.visita-card--tabelas .tabelas-selects .form-group label,
+.visita-card--tabelas .adicional-card label,
+.visita-card--tabelas .tabelas-detalhes-block label {
+    min-height: 20px;
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 6px;
+    font-weight: 600;
+    line-height: 1.15;
+}
+
+.visita-card--tabelas .adicional-card .form-group[class*="col-"],
+.visita-card--tabelas .tabelas-detalhes-block .form-group[class*="col-"] {
+    flex: 1 1 210px;
+    min-width: 210px;
+    max-width: none;
+}
+
+.visita-card--tabelas .adicional-card .form-control,
+.visita-card--tabelas .adicional-card .form-control-sm.form-control,
+.visita-card--tabelas .tabelas-detalhes-block .form-control,
+.visita-card--tabelas .tabelas-detalhes-block .form-control-sm.form-control {
+    height: 42px;
+    min-height: 42px;
+    padding: 8px 12px;
+    font-size: .98rem;
+    line-height: 1.25;
+}
+
+.visita-card--tabelas .adicional-card textarea.form-control,
+.visita-card--tabelas .tabelas-detalhes-block textarea.form-control {
+    min-height: 92px;
+    height: auto;
+    padding: 10px 12px;
+}
+
+.visita-card--tabelas .adicional-card .bootstrap-select,
+.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle {
+    width: 100% !important;
+    min-height: 42px !important;
+    height: 42px !important;
+}
+
+.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle .filter-option {
+    display: flex;
+    align-items: center;
+}
+
+.visita-card--tabelas .adicional-card .btn-add,
+.visita-card--tabelas .adicional-card .btn-remove {
+    min-height: 42px;
+    height: 42px;
+    min-width: 42px;
+    padding: 8px 12px;
+}
+
+.visita-card--tabelas .adicional-card .form-group[style*="margin-top:25px"],
+.visita-card--tabelas .adicional-card .form-group[style*="margin-top: 25px"] {
+    margin-top: 0 !important;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+/* Força padronização por bloco (evita conflito de CSS legado nos includes) */
+#container-tuss .form-group[class*="col-"],
+#container-prorrog .form-group[class*="col-"],
+#container-gestao .form-group[class*="col-"],
+#container-uti .form-group[class*="col-"],
+#container-negoc .form-group[class*="col-"],
+#detalhes-card-wrapper .form-group[class*="col-"] {
+    flex: 1 1 210px !important;
+    min-width: 210px;
+    max-width: none !important;
+}
+
+#container-tuss label,
+#container-prorrog label,
+#container-gestao label,
+#container-uti label,
+#container-negoc label,
+#detalhes-card-wrapper label {
+    min-height: 20px;
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 6px;
+    line-height: 1.15;
+}
+
+#container-tuss .form-control,
+#container-tuss .form-control-sm.form-control,
+#container-prorrog .form-control,
+#container-prorrog .form-control-sm.form-control,
+#container-gestao .form-control,
+#container-gestao .form-control-sm.form-control,
+#container-uti .form-control,
+#container-uti .form-control-sm.form-control,
+#container-negoc .form-control,
+#container-negoc .form-control-sm.form-control,
+#detalhes-card-wrapper .form-control,
+#detalhes-card-wrapper .form-control-sm.form-control {
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 8px 12px !important;
+    font-size: .98rem;
+}
+
+#container-tuss textarea.form-control,
+#container-prorrog textarea.form-control,
+#container-gestao textarea.form-control,
+#container-uti textarea.form-control,
+#container-negoc textarea.form-control,
+#detalhes-card-wrapper textarea.form-control {
+    min-height: 92px !important;
+    height: auto !important;
+    padding: 10px 12px !important;
+}
+
+#container-tuss .bootstrap-select,
+#container-gestao .bootstrap-select,
+#container-uti .bootstrap-select,
+#container-negoc .bootstrap-select,
+#container-tuss .bootstrap-select > .dropdown-toggle,
+#container-gestao .bootstrap-select > .dropdown-toggle,
+#container-uti .bootstrap-select > .dropdown-toggle,
+#container-negoc .bootstrap-select > .dropdown-toggle {
+    width: 100% !important;
+    min-height: 42px !important;
+    height: 42px !important;
+}
+
+#container-tuss .bootstrap-select,
+#container-tuss .bootstrap-select > .dropdown-toggle {
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+#container-tuss .btn-add,
+#container-tuss .btn-remove,
+#container-prorrog .btn-add,
+#container-prorrog .btn-remove,
+#container-negoc .btn-add,
+#container-negoc .btn-remove {
+    min-height: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+}
+
 @media (max-width: 991.98px) {
     .visita-hero {
         flex-direction: column;
@@ -1093,6 +1247,20 @@ function aumentarTextProgramacao() {
     }
     .visita-actions .alert {
         width: 100%;
+    }
+    .visita-card--tabelas .adicional-card .form-group[class*="col-"],
+    .visita-card--tabelas .tabelas-detalhes-block .form-group[class*="col-"] {
+        min-width: 160px;
+        flex-basis: 160px;
+    }
+    #container-tuss .form-group[class*="col-"],
+    #container-prorrog .form-group[class*="col-"],
+    #container-gestao .form-group[class*="col-"],
+    #container-uti .form-group[class*="col-"],
+    #container-negoc .form-group[class*="col-"],
+    #detalhes-card-wrapper .form-group[class*="col-"] {
+        min-width: 160px;
+        flex-basis: 160px !important;
     }
 }
 </style>

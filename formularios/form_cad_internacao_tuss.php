@@ -1,39 +1,47 @@
 <style>
-.form-group.row {
+#container-tuss .form-group.row {
     display:flex;
     flex-wrap:wrap;
     gap:15px;
     align-items:flex-start;
 }
-.form-group {margin-bottom:15px;}
-.form-group label {margin-bottom:5px;font-weight:bold;}
-.form-control {width:100%;padding:5px;}
-.btn {padding:5px 10px;font-size:.9rem;border:none;border-radius:5px;cursor:pointer;}
-.btn-add {background-color:#007bff;color:#fff;}
-.btn-remove {background-color:#dc3545;color:#fff;}
+#container-tuss .form-group {margin-bottom:15px;}
+#container-tuss .form-group label {margin-bottom:5px;font-weight:bold;}
+#container-tuss .form-control {width:100%;padding:5px;}
+#container-tuss .btn {padding:5px 10px;font-size:.9rem;border:none;border-radius:5px;cursor:pointer;}
+#container-tuss .btn-add {background-color:#007bff;color:#fff;}
+#container-tuss .btn-remove {background-color:#dc3545;color:#fff;}
 
-.adicional-card {
+/* Corrige o wrapper do bootstrap-select para não criar caixa branca extra */
+#container-tuss .bootstrap-select.form-control,
+#container-tuss .bootstrap-select.form-control-sm {
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+}
+
+#container-tuss .adicional-card {
     background:#f5f5f9;
     border-radius:22px;
     border:1px solid #ebe1f5;
     box-shadow:0 12px 28px rgba(45,18,70,.08);
     padding:22px 24px;
 }
-.adicional-card__header {
+#container-tuss .adicional-card__header {
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:1rem;
     margin-bottom:18px;
 }
-.adicional-card__title {
+#container-tuss .adicional-card__title {
     display:flex;
     align-items:center;
     font-weight:600;
     margin:0;
     color:#3a184f;
 }
-.adicional-card__marker {
+#container-tuss .adicional-card__marker {
     width:6px;
     height:26px;
     border-radius:10px;
