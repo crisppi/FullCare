@@ -148,19 +148,16 @@ foreach ($monthlyRows as $row) {
     }
 }
 
-$lineDatasets = [];
-if (array_sum($totalMonthly) > 0) {
-    $lineDatasets[] = [
-        'label' => 'Total saving',
-        'data' => array_values($totalMonthly),
-        'borderColor' => 'rgba(18, 65, 134, 0.85)',
-        'backgroundColor' => 'rgba(18, 65, 134, 0.08)',
-        'borderWidth' => 2,
-        'tension' => 0.35,
-        'pointRadius' => 2,
-        'fill' => true,
-    ];
-}
+$lineDatasets = [[
+    'label' => 'Total saving',
+    'data' => array_values($totalMonthly),
+    'borderColor' => 'rgba(18, 65, 134, 0.85)',
+    'backgroundColor' => 'rgba(18, 65, 134, 0.08)',
+    'borderWidth' => 2,
+    'tension' => 0.35,
+    'pointRadius' => 2,
+    'fill' => true,
+]];
 
 $lineColors = [
     'rgba(72, 154, 255, 0.8)',
@@ -286,13 +283,9 @@ foreach ($timelineAuditores as $auditor) {
 
     <div class="bi-panel">
         <h3>Evolução mensal <?= $auditorId ? 'de ' . e($selectedAuditorLabel) : 'do saving' ?></h3>
-        <?php if (!empty($lineDatasets)): ?>
-            <div class="bi-chart" style="min-height:320px;">
-                <canvas id="chartSavingTimeline"></canvas>
-            </div>
-        <?php else: ?>
-            <div class="text-muted">Sem dados suficientes para gerar o gráfico.</div>
-        <?php endif; ?>
+        <div class="bi-chart" style="min-height:320px;">
+            <canvas id="chartSavingTimeline"></canvas>
+        </div>
     </div>
 </div>
 
@@ -301,19 +294,35 @@ const timelineMonths = <?= json_encode(array_values($monthNames)) ?>;
 const lineChartDatasets = <?= json_encode($lineDatasets, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
 function lineChart(ctx, labels, datasets) {
+    const scales = window.biChartScales ? window.biChartScales() : undefined;
+    if (scales && scales.yAxes && scales.yAxes[0] && scales.yAxes[0].ticks) {
+        scales.yAxes[0].ticks.callback = function (value) {
+            return window.biMoneyTick ? window.biMoneyTick(value) : ('R$ ' + Number(value || 0).toLocaleString('pt-BR'));
+        };
+    }
     return new Chart(ctx, {
         type: 'line',
         data: { labels, datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: window.biChartScales ? window.biChartScales() : undefined,
+            scales: scales,
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        const ds = data.datasets[tooltipItem.datasetIndex] || {};
+                        const label = ds.label ? ds.label + ': ' : '';
+                        const value = window.biMoneyTick ? window.biMoneyTick(tooltipItem.yLabel) : ('R$ ' + Number(tooltipItem.yLabel || 0).toLocaleString('pt-BR'));
+                        return label + value;
+                    }
+                }
+            }
         }
     });
 }
 
 const timelineCanvas = document.getElementById('chartSavingTimeline');
-if (timelineCanvas && lineChartDatasets.length) {
+if (timelineCanvas) {
     lineChart(timelineCanvas, timelineMonths, lineChartDatasets);
 }
 </script>

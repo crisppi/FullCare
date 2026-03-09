@@ -7,7 +7,25 @@ $biSections = [
     'Resumo' => [
         ['label' => 'Consolidado', 'href' => 'bi/consolidado', 'file' => 'ConsolidadoGestaoBI.php'],
         ['label' => 'Consolidado Cards', 'href' => 'bi/consolidado-cards', 'file' => 'ConsolidadoGestaoCardsBI.php'],
+        ['label' => 'Indicadores Essenciais', 'href' => 'IndicadoresEssenciaisHubBI.php', 'file' => 'IndicadoresEssenciaisHubBI.php'],
         ['label' => 'Indicadores BI', 'href' => 'bi/indicadores', 'file' => 'Indicadores.php'],
+    ],
+    'Indicadores Essenciais' => [
+        ['label' => 'Hub Essenciais', 'href' => 'IndicadoresEssenciaisHubBI.php', 'file' => 'IndicadoresEssenciaisHubBI.php'],
+        ['label' => 'Contas Auditadas por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=contas-auditadas-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Custo Mensal por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=custo-mensal-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Glosa por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=glosa-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Contas Auditadas por Auditor', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=contas-auditadas-auditor', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Glosa por Auditor', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=glosa-auditor', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Saving por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=saving-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Saving por Auditor', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=saving-auditor', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Custo por Patologia', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=custo-patologia', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Custo por Antecedente', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=custo-antecedente', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Custo por UTI', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=custo-uti', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => '% Internacao UTI', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=percentual-internacao-uti', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Eventos Adversos por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=eventos-adversos-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Obitos por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=obitos-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Qualidade Hospitalar', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=qualidade-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
     ],
     'Clínico' => [
         ['label' => 'UTI', 'href' => 'bi/uti', 'file' => 'bi_uti.php'],
@@ -121,6 +139,23 @@ $currentSection = '';
 $currentLabel = '';
 $flatPages = [];
 $matchedByHref = false;
+$ieSlug = trim((string)($_GET['ie'] ?? ''));
+$ieMap = [
+    'contas-auditadas-hospital' => 'Contas Auditadas por Hospital',
+    'custo-mensal-hospital' => 'Custo Mensal por Hospital',
+    'glosa-hospital' => 'Glosa por Hospital',
+    'contas-auditadas-auditor' => 'Contas Auditadas por Auditor',
+    'glosa-auditor' => 'Glosa por Auditor',
+    'saving-hospital' => 'Saving por Hospital',
+    'saving-auditor' => 'Saving por Auditor',
+    'custo-patologia' => 'Custo por Patologia',
+    'custo-antecedente' => 'Custo por Antecedente',
+    'custo-uti' => 'Custo por UTI',
+    'percentual-internacao-uti' => '% Internacao UTI',
+    'eventos-adversos-hospital' => 'Eventos Adversos por Hospital',
+    'obitos-hospital' => 'Obitos por Hospital',
+    'qualidade-hospital' => 'Qualidade Hospitalar',
+];
 
 foreach ($biSections as $section => $items) {
     foreach ($items as $item) {
@@ -139,7 +174,12 @@ foreach ($biSections as $section => $items) {
     }
 }
 
-if (!in_array($currentPage, $flatPages, true) && !$matchedByHref) {
+if ($ieSlug !== '' && isset($ieMap[$ieSlug]) && isset($biSections['Indicadores Essenciais'])) {
+    $currentSection = 'Indicadores Essenciais';
+    $currentLabel = $ieMap[$ieSlug];
+}
+
+if (!in_array($currentPage, $flatPages, true) && !$matchedByHref && !($ieSlug !== '' && isset($ieMap[$ieSlug]))) {
     return;
 }
 ?>
@@ -579,6 +619,7 @@ $sectionDisplay = [
     'Negociação & Rede' => 'Negociação & Rede',
     'Qualidade & Desfecho' => 'Qualidade & Desfecho',
     'Faturamento' => 'Faturamento',
+    'Indicadores Essenciais' => 'Indicadores Essenciais',
 ];
 $sectionSlugMap = [
     'Resumo' => 'resumo',
@@ -595,6 +636,7 @@ $sectionSlugMap = [
     'Negociação & Rede' => 'negociacao',
     'Qualidade & Desfecho' => 'qualidade',
     'Faturamento' => 'faturamento',
+    'Indicadores Essenciais' => 'essenciais',
 ];
 $activeSection = $currentSection ?: array_key_first($biSections);
 $activeSectionSlug = $sectionSlugMap[$activeSection] ?? 'resumo';
@@ -652,7 +694,24 @@ $navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, 
         <?php foreach ($activeItems as $item): ?>
         <?php $itemFile = $item['file'] ?? $item['href']; ?>
         <?php $hrefPath = trim((string) ($item['href'] ?? ''), '/'); ?>
-        <a class="bi-chip <?= ($itemFile === $currentPage || $hrefPath === $currentPath) ? 'is-active' : '' ?>"
+        <?php
+        $isActiveChip = ($itemFile === $currentPage || $hrefPath === $currentPath);
+        if (!$isActiveChip && $currentSection === 'Indicadores Essenciais' && $ieSlug !== '') {
+            $isActiveChip = (strpos($hrefPath, 'bi/indicadores-essenciais/' . $ieSlug) === 0);
+            if (!$isActiveChip) {
+                $q = (string)parse_url((string)$item['href'], PHP_URL_QUERY);
+                $qp = [];
+                if ($q !== '') {
+                    parse_str($q, $qp);
+                }
+                $itemSlug = trim((string)($qp['slug'] ?? ''));
+                if ($itemSlug !== '' && $itemSlug === $ieSlug) {
+                    $isActiveChip = true;
+                }
+            }
+        }
+        ?>
+        <a class="bi-chip <?= $isActiveChip ? 'is-active' : '' ?>"
             href="<?= $BASE_URL . $item['href'] ?>"
             title="<?= htmlspecialchars($activeSection . ' • ' . $item['label'], ENT_QUOTES, 'UTF-8') ?>">
             <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>

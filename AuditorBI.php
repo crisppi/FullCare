@@ -284,6 +284,49 @@ $visitasRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 [$glosaLabels, $glosaValues] = labelsAndValues($glosaRows);
 [$auditadasLabels, $auditadasValues] = labelsAndValues($auditadasRows);
 [$visitasLabels, $visitasValues] = labelsAndValues($visitasRows);
+
+$payload = [
+    'kpis' => [
+        'internacoes' => [
+            'value' => number_format($totalInternacoes, 0, ',', '.'),
+            'trend_state' => $trendInternacoes['trend_state'] ?? 'neutral',
+            'trend_icon' => $trendInternacoes['trend_icon'] ?? 'bi bi-dash',
+            'trend_label' => $trendInternacoes['trend_label'] ?? 'Sem base',
+        ],
+        'diarias' => [
+            'value' => number_format($totalDiarias, 0, ',', '.'),
+            'trend_state' => $trendDiarias['trend_state'] ?? 'neutral',
+            'trend_icon' => $trendDiarias['trend_icon'] ?? 'bi bi-dash',
+            'trend_label' => $trendDiarias['trend_label'] ?? 'Sem base',
+        ],
+        'mp' => [
+            'value' => number_format($mp, 1, ',', '.'),
+            'trend_state' => $trendMp['trend_state'] ?? 'neutral',
+            'trend_icon' => $trendMp['trend_icon'] ?? 'bi bi-dash',
+            'trend_label' => $trendMp['trend_label'] ?? 'Sem base',
+        ],
+        'permanencia' => [
+            'value' => number_format($maiorPermanencia, 0, ',', '.'),
+            'trend_state' => $trendPermanencia['trend_state'] ?? 'neutral',
+            'trend_icon' => $trendPermanencia['trend_icon'] ?? 'bi bi-dash',
+            'trend_label' => $trendPermanencia['trend_label'] ?? 'Sem base',
+        ],
+    ],
+    'charts' => [
+        'contas' => ['labels' => $contasLabels, 'values' => $contasValues],
+        'glosa' => ['labels' => $glosaLabels, 'values' => $glosaValues],
+        'auditadas' => ['labels' => $auditadasLabels, 'values' => $auditadasValues],
+        'visitas' => ['labels' => $visitasLabels, 'values' => $visitasValues],
+    ],
+];
+
+if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($payload);
+    exit;
+}
+
+$ajaxEndpoint = (string)(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: ($_SERVER['PHP_SELF'] ?? 'AuditorBI.php'));
 ?>
 
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260213b">
@@ -304,22 +347,20 @@ $visitasRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     <div class="bi-layout">
         <aside class="bi-sidebar bi-stack">
-            <div class="bi-panel">
-                <h3>Auditor</h3>
-                <div class="bi-filter-list">
-                    <?php foreach ($auditores as $a): ?>
-                        <div class="bi-filter-pill <?= $auditorNome === $a ? 'active' : '' ?>">
-                            <a href="?auditor=<?= e($a) ?>" style="color:inherit;text-decoration:none;display:block;">
-                                <?= e($a) ?>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
             <form class="bi-filter-card" method="get">
                 <div class="bi-filter-card-header">Filtros</div>
                 <div class="bi-filter-card-body bi-stack">
+                    <div class="bi-filter">
+                        <label>Auditor</label>
+                        <select name="auditor">
+                            <option value="">Todos</option>
+                            <?php foreach ($auditores as $a): ?>
+                                <option value="<?= e($a) ?>" <?= $auditorNome === $a ? 'selected' : '' ?>>
+                                    <?= e($a) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                     <div class="bi-filter">
                         <label>Hospitais</label>
                         <select name="hospital_id">
@@ -344,9 +385,6 @@ $visitasRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         <label>Ano</label>
                         <input type="number" name="ano" value="<?= e($ano) ?>" min="2000" max="2100">
                     </div>
-                    <?php if ($auditorNome !== ''): ?>
-                        <input type="hidden" name="auditor" value="<?= e($auditorNome) ?>">
-                    <?php endif; ?>
                     <button class="bi-filter-btn" type="submit">Aplicar</button>
                 </div>
             </form>
@@ -359,8 +397,8 @@ $visitasRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         <span class="kpi-card-v2-icon"><i class="bi bi-hospital"></i></span>
                         <small>Internações</small>
                     </div>
-                    <strong><?= number_format($totalInternacoes, 0, ',', '.') ?></strong>
-                    <div class="kpi-trend kpi-trend-<?= e($trendInternacoes['trend_state']) ?>">
+                    <strong id="kpi-internacoes-value"><?= number_format($totalInternacoes, 0, ',', '.') ?></strong>
+                    <div id="kpi-internacoes-trend" class="kpi-trend kpi-trend-<?= e($trendInternacoes['trend_state']) ?>">
                         <i class="<?= e($trendInternacoes['trend_icon']) ?>"></i>
                         <span><?= e($trendInternacoes['trend_label']) ?></span>
                     </div>
@@ -371,8 +409,8 @@ $visitasRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         <span class="kpi-card-v2-icon"><i class="bi bi-moon-stars"></i></span>
                         <small>Diárias</small>
                     </div>
-                    <strong><?= number_format($totalDiarias, 0, ',', '.') ?></strong>
-                    <div class="kpi-trend kpi-trend-<?= e($trendDiarias['trend_state']) ?>">
+                    <strong id="kpi-diarias-value"><?= number_format($totalDiarias, 0, ',', '.') ?></strong>
+                    <div id="kpi-diarias-trend" class="kpi-trend kpi-trend-<?= e($trendDiarias['trend_state']) ?>">
                         <i class="<?= e($trendDiarias['trend_icon']) ?>"></i>
                         <span><?= e($trendDiarias['trend_label']) ?></span>
                     </div>
@@ -383,8 +421,8 @@ $visitasRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         <span class="kpi-card-v2-icon"><i class="bi bi-activity"></i></span>
                         <small>MP</small>
                     </div>
-                    <strong><?= number_format($mp, 1, ',', '.') ?></strong>
-                    <div class="kpi-trend kpi-trend-<?= e($trendMp['trend_state']) ?>">
+                    <strong id="kpi-mp-value"><?= number_format($mp, 1, ',', '.') ?></strong>
+                    <div id="kpi-mp-trend" class="kpi-trend kpi-trend-<?= e($trendMp['trend_state']) ?>">
                         <i class="<?= e($trendMp['trend_icon']) ?>"></i>
                         <span><?= e($trendMp['trend_label']) ?></span>
                     </div>
@@ -395,8 +433,8 @@ $visitasRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         <span class="kpi-card-v2-icon"><i class="bi bi-stopwatch"></i></span>
                         <small>Maior permanência</small>
                     </div>
-                    <strong><?= number_format($maiorPermanencia, 0, ',', '.') ?></strong>
-                    <div class="kpi-trend kpi-trend-<?= e($trendPermanencia['trend_state']) ?>">
+                    <strong id="kpi-permanencia-value"><?= number_format($maiorPermanencia, 0, ',', '.') ?></strong>
+                    <div id="kpi-permanencia-trend" class="kpi-trend kpi-trend-<?= e($trendPermanencia['trend_state']) ?>">
                         <i class="<?= e($trendPermanencia['trend_icon']) ?>"></i>
                         <span><?= e($trendPermanencia['trend_label']) ?></span>
                     </div>
@@ -429,14 +467,7 @@ $visitasRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 </div>
 
 <script>
-const contasLabels = <?= json_encode($contasLabels) ?>;
-const contasValues = <?= json_encode($contasValues) ?>;
-const glosaLabels = <?= json_encode($glosaLabels) ?>;
-const glosaValues = <?= json_encode($glosaValues) ?>;
-const auditadasLabels = <?= json_encode($auditadasLabels) ?>;
-const auditadasValues = <?= json_encode($auditadasValues) ?>;
-const visitasLabels = <?= json_encode($visitasLabels) ?>;
-const visitasValues = <?= json_encode($visitasValues) ?>;
+const biPayload = <?= json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
 function barOptionsMoney() {
   return {
@@ -486,28 +517,137 @@ function barOptions() {
   };
 }
 
-new Chart(document.getElementById('chartAuditorContas'), {
+const chartAuditorContas = new Chart(document.getElementById('chartAuditorContas'), {
   type: 'bar',
-  data: { labels: contasLabels, datasets: [{ label: '', data: contasValues, backgroundColor: 'rgba(126,150,255,0.82)', borderRadius: 10 }] },
+  data: { labels: biPayload.charts.contas.labels, datasets: [{ label: '', data: biPayload.charts.contas.values, backgroundColor: 'rgba(126,150,255,0.82)', borderRadius: 10 }] },
   options: barOptionsMoney()
 });
 
-new Chart(document.getElementById('chartAuditorGlosa'), {
+const chartAuditorGlosa = new Chart(document.getElementById('chartAuditorGlosa'), {
   type: 'bar',
-  data: { labels: glosaLabels, datasets: [{ label: '', data: glosaValues, backgroundColor: 'rgba(126,150,255,0.82)', borderRadius: 10 }] },
+  data: { labels: biPayload.charts.glosa.labels, datasets: [{ label: '', data: biPayload.charts.glosa.values, backgroundColor: 'rgba(126,150,255,0.82)', borderRadius: 10 }] },
   options: barOptionsMoney()
 });
 
-new Chart(document.getElementById('chartAuditorAuditadas'), {
+const chartAuditorAuditadas = new Chart(document.getElementById('chartAuditorAuditadas'), {
   type: 'bar',
-  data: { labels: auditadasLabels, datasets: [{ label: '', data: auditadasValues, backgroundColor: 'rgba(126,150,255,0.82)', borderRadius: 10 }] },
+  data: { labels: biPayload.charts.auditadas.labels, datasets: [{ label: '', data: biPayload.charts.auditadas.values, backgroundColor: 'rgba(126,150,255,0.82)', borderRadius: 10 }] },
   options: barOptions()
 });
 
-new Chart(document.getElementById('chartAuditorVisitas'), {
+const chartAuditorVisitas = new Chart(document.getElementById('chartAuditorVisitas'), {
   type: 'bar',
-  data: { labels: visitasLabels, datasets: [{ label: '', data: visitasValues, backgroundColor: 'rgba(126,150,255,0.82)', borderRadius: 10 }] },
+  data: { labels: biPayload.charts.visitas.labels, datasets: [{ label: '', data: biPayload.charts.visitas.values, backgroundColor: 'rgba(126,150,255,0.82)', borderRadius: 10 }] },
   options: barOptions()
+});
+
+function updateTrend(baseId, trend) {
+  const trendWrap = document.getElementById(baseId + '-trend');
+  if (!trendWrap) return;
+  trendWrap.className = 'kpi-trend kpi-trend-' + (trend.trend_state || 'neutral');
+  const icon = trendWrap.querySelector('i');
+  const label = trendWrap.querySelector('span');
+  if (icon) icon.className = trend.trend_icon || 'bi bi-dash';
+  if (label) label.textContent = trend.trend_label || 'Sem base';
+}
+
+function updateChart(chart, labels, values) {
+  chart.data.labels = labels || [];
+  chart.data.datasets[0].data = values || [];
+  chart.update();
+}
+
+function applyPayload(data) {
+  if (!data || !data.kpis || !data.charts) return;
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? '';
+  };
+
+  setText('kpi-internacoes-value', data.kpis.internacoes?.value);
+  setText('kpi-diarias-value', data.kpis.diarias?.value);
+  setText('kpi-mp-value', data.kpis.mp?.value);
+  setText('kpi-permanencia-value', data.kpis.permanencia?.value);
+
+  updateTrend('kpi-internacoes', data.kpis.internacoes || {});
+  updateTrend('kpi-diarias', data.kpis.diarias || {});
+  updateTrend('kpi-mp', data.kpis.mp || {});
+  updateTrend('kpi-permanencia', data.kpis.permanencia || {});
+
+  updateChart(chartAuditorContas, data.charts.contas?.labels, data.charts.contas?.values);
+  updateChart(chartAuditorGlosa, data.charts.glosa?.labels, data.charts.glosa?.values);
+  updateChart(chartAuditorAuditadas, data.charts.auditadas?.labels, data.charts.auditadas?.values);
+  updateChart(chartAuditorVisitas, data.charts.visitas?.labels, data.charts.visitas?.values);
+}
+
+async function fetchBiData(form) {
+  const fd = new FormData(form);
+  fd.set('ajax', '1');
+  const qs = new URLSearchParams(fd).toString();
+  const endpoint = '<?= e($ajaxEndpoint) ?>';
+  const url = endpoint + (endpoint.includes('?') ? '&' : '?') + qs;
+  const resp = await fetch(url, {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    credentials: 'same-origin'
+  });
+  const text = await resp.text();
+  if (!resp.ok) throw new Error('Erro ao carregar dados (' + resp.status + ')');
+  let data = null;
+  try {
+    data = JSON.parse(text);
+  } catch (_e) {
+    throw new Error('Resposta nao-JSON (possivel redirect/sessao expirada).');
+  }
+  applyPayload(data);
+
+  fd.delete('ajax');
+  const cleanQs = new URLSearchParams(fd).toString();
+  const newUrl = endpoint + (cleanQs ? ('?' + cleanQs) : '');
+  window.history.replaceState({}, '', newUrl);
+}
+
+const filterForm = document.querySelector('.bi-filter-card');
+if (filterForm) {
+  filterForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    try {
+      await fetchBiData(filterForm);
+    } catch (e) {
+      console.error(e);
+      // Fallback silencioso: recarrega com os filtros atuais sem popup nativo.
+      filterForm.submit();
+    }
+  });
+
+  const autoSubmitFields = filterForm.querySelectorAll('select[name=\"auditor\"], select[name=\"hospital_id\"], select[name=\"mes\"], input[name=\"ano\"]');
+  autoSubmitFields.forEach((el) => {
+    const fn = async () => {
+      try {
+        await fetchBiData(filterForm);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    el.addEventListener('change', fn);
+    if (el.tagName === 'INPUT') {
+      el.addEventListener('blur', fn);
+      el.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          fn();
+        }
+      });
+    }
+  });
+}
+
+window.addEventListener('pageshow', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('ajax') === '1') {
+    params.delete('ajax');
+    const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    window.history.replaceState({}, '', clean);
+  }
 });
 </script>
 

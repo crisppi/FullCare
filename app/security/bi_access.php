@@ -45,6 +45,20 @@ if (!function_exists('fullcare_is_gestor_seguradora')) {
 }
 
 if (!function_exists('fullcare_has_bi_access')) {
+    function fullcare_is_diretoria_bi(): bool
+    {
+        $cargo = fullcare_norm_role($_SESSION['cargo'] ?? '');
+        $nivelRaw = (string)($_SESSION['nivel'] ?? '');
+        $nivel = fullcare_norm_role($nivelRaw);
+        $nivelInt = (int)$nivelRaw;
+
+        return in_array($cargo, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+            || strpos($cargo, 'diretor') !== false
+            || strpos($cargo, 'diretoria') !== false
+            || in_array($nivel, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+            || ($nivelInt === -1);
+    }
+
     function fullcare_has_bi_access(): bool
     {
         $idUsuario = (int)($_SESSION['id_usuario'] ?? 0);
@@ -53,7 +67,7 @@ if (!function_exists('fullcare_has_bi_access')) {
         if ($idUsuario <= 0 || $ativo !== 's') {
             return false;
         }
-        if (!fullcare_is_gestor_seguradora()) {
+        if (!fullcare_is_gestor_seguradora() && !fullcare_is_diretoria_bi()) {
             return false;
         }
 
@@ -100,7 +114,7 @@ if (!function_exists('fullcare_bi_deny_redirect')) {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
-        $_SESSION['mensagem'] = 'Acesso ao BI permitido somente para gestor de seguradora.';
+        $_SESSION['mensagem'] = 'Acesso ao BI permitido para gestor de seguradora e diretoria.';
         $_SESSION['mensagem_tipo'] = 'danger';
         header('Location: dashboard', true, 303);
         exit;

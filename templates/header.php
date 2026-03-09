@@ -733,6 +733,10 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-speedometer2"
                                                     style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
                                                 Resumo</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>IndicadoresEssenciaisHubBI.php"><i
+                                                    class="bi bi-bar-chart-steps"
+                                                    style="font-size: 1rem;margin-right:5px; color:#7ee3c8;"></i>
+                                                Indicadores Essenciais</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/uti"><i
                                                     class="bi bi-heart-pulse"
                                                     style="font-size: 1rem;margin-right:5px; color:#ff9fb3;"></i>

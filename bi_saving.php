@@ -15,37 +15,32 @@ $anoInput = filter_input(INPUT_GET, 'ano', FILTER_VALIDATE_INT);
 $ano = ($anoInput !== null && $anoInput !== false) ? (int)$anoInput : null;
 $mes = (int)(filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT) ?: 0);
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
-$auditorId = filter_input(INPUT_GET, 'auditor_id', FILTER_VALIDATE_INT) ?: null;
 
 $hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
     ->fetchAll(PDO::FETCH_ASSOC);
-$auditores = $conn->query("SELECT id_usuario, usuario_user FROM tb_user ORDER BY usuario_user")
-    ->fetchAll(PDO::FETCH_ASSOC);
 
 if ($ano === null && !filter_has_var(INPUT_GET, 'ano')) {
-    $stmtAno = $conn->query("
-        SELECT MAX(YEAR(data_inicio_neg)) AS ano
-        FROM tb_negociacao
-        WHERE data_inicio_neg IS NOT NULL
-          AND data_inicio_neg <> '0000-00-00'
-    ");
+    $stmtAno = $conn->query("SELECT MAX(YEAR(data_inicio_neg)) AS ano FROM tb_negociacao WHERE data_inicio_neg IS NOT NULL AND data_inicio_neg <> '0000-00-00'");
     $anoDb = $stmtAno->fetch(PDO::FETCH_ASSOC) ?: [];
     $ano = (int)($anoDb['ano'] ?? date('Y'));
 }
 
-$where = "YEAR(ng.data_inicio_neg) = :ano";
-$params = [':ano' => $ano];
-if ($mes > 0) {
-    $where .= " AND MONTH(ng.data_inicio_neg) = :mes";
-    $params[':mes'] = $mes;
-}
+$whereBase = "ng.data_inicio_neg IS NOT NULL
+    AND ng.data_inicio_neg <> '0000-00-00'
+    AND ng.saving IS NOT NULL
+    AND YEAR(ng.data_inicio_neg) = :ano";
+$paramsBase = [':ano' => $ano];
+
 if ($hospitalId) {
-    $where .= " AND i.fk_hospital_int = :hospital_id";
-    $params[':hospital_id'] = $hospitalId;
+    $whereBase .= " AND i.fk_hospital_int = :hospital_id";
+    $paramsBase[':hospital_id'] = $hospitalId;
 }
-if ($auditorId) {
-    $where .= " AND ng.fk_usuario_neg = :auditor_id";
-    $params[':auditor_id'] = $auditorId;
+
+$whereTot = $whereBase;
+$paramsTot = $paramsBase;
+if ($mes > 0) {
+    $whereTot .= " AND MONTH(ng.data_inicio_neg) = :mes";
+    $paramsTot[':mes'] = $mes;
 }
 
 $sqlTot = "
@@ -54,10 +49,10 @@ $sqlTot = "
         COUNT(*) AS total_registros
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    WHERE {$where}
+    WHERE {$whereTot}
 ";
 $stmt = $conn->prepare($sqlTot);
-foreach ($params as $key => $value) {
+foreach ($paramsTot as $key => $value) {
     $stmt->bindValue($key, $value, PDO::PARAM_INT);
 }
 $stmt->execute();
@@ -65,43 +60,25 @@ $tot = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 $totalSaving = (float)($tot['total_saving'] ?? 0);
 $totalRegistros = (int)($tot['total_registros'] ?? 0);
 
-$sqlAuditor = "
+$sqlHosp = "
     SELECT
-        u.usuario_user AS auditor,
+        COALESCE(h.nome_hosp, 'Sem hospital') AS hospital,
         SUM(ng.saving) AS total_saving,
         COUNT(*) AS total_registros
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    LEFT JOIN tb_user u ON u.id_usuario = ng.fk_usuario_neg
-    WHERE {$where}
-    GROUP BY auditor
+    LEFT JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int
+    WHERE {$whereTot}
+    GROUP BY h.id_hospital, h.nome_hosp
     ORDER BY total_saving DESC
-    LIMIT 12
+    LIMIT 15
 ";
-$stmt = $conn->prepare($sqlAuditor);
-foreach ($params as $key => $value) {
+$stmt = $conn->prepare($sqlHosp);
+foreach ($paramsTot as $key => $value) {
     $stmt->bindValue($key, $value, PDO::PARAM_INT);
 }
 $stmt->execute();
-$auditorRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-$sqlTipo = "
-    SELECT
-        COALESCE(ng.tipo_negociacao, 'Sem tipo') AS tipo,
-        SUM(ng.saving) AS total_saving,
-        COUNT(*) AS total_registros
-    FROM tb_negociacao ng
-    INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    WHERE {$where}
-    GROUP BY tipo
-    ORDER BY total_saving DESC
-";
-$stmt = $conn->prepare($sqlTipo);
-foreach ($params as $key => $value) {
-    $stmt->bindValue($key, $value, PDO::PARAM_INT);
-}
-$stmt->execute();
-$tipoRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$hospRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
 $sqlMensal = "
     SELECT
@@ -109,49 +86,44 @@ $sqlMensal = "
         SUM(ng.saving) AS total_saving
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    WHERE {$where}
+    WHERE {$whereBase}
     GROUP BY mes
     ORDER BY mes
 ";
-
 $stmt = $conn->prepare($sqlMensal);
-foreach ($params as $key => $value) {
+foreach ($paramsBase as $key => $value) {
     $stmt->bindValue($key, $value, PDO::PARAM_INT);
 }
 $stmt->execute();
 $mensalRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
 $monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-$labelsMes = [];
-$savingMensal = [];
+$labelsMes = $monthNames;
+$savingMensalMap = array_fill(1, 12, 0.0);
 foreach ($mensalRows as $row) {
-    $mes = (int)($row['mes'] ?? 0);
-    if ($mes < 1 || $mes > 12) {
-        continue;
+    $m = (int)($row['mes'] ?? 0);
+    if ($m >= 1 && $m <= 12) {
+        $savingMensalMap[$m] = (float)($row['total_saving'] ?? 0);
     }
-    $labelsMes[] = $monthNames[$mes - 1] ?? (string)$mes;
-    $savingMensal[] = (float)($row['total_saving'] ?? 0);
 }
+$savingMensal = array_values($savingMensalMap);
 
-$labelsAud = array_map(fn($r) => $r['auditor'] ?: 'Sem auditor', $auditorRows);
-$savingAud = array_map(fn($r) => (float)$r['total_saving'], $auditorRows);
-$countAud = array_map(fn($r) => (int)$r['total_registros'], $auditorRows);
-
-$labelsTipo = array_map(fn($r) => $r['tipo'] ?: 'Sem tipo', $tipoRows);
-$savingTipo = array_map(fn($r) => (float)$r['total_saving'], $tipoRows);
-$countTipo = array_map(fn($r) => (int)$r['total_registros'], $tipoRows);
+$labelsHosp = array_map(fn($r) => $r['hospital'] ?: 'Sem hospital', $hospRows);
+$savingHosp = array_map(fn($r) => (float)$r['total_saving'], $hospRows);
+$countHosp = array_map(fn($r) => (int)$r['total_registros'], $hospRows);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260307">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260110"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260307"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
-        <h1 class="bi-title">Dashboard Saving</h1>
+        <h1 class="bi-title">Saving por Hospital</h1>
         <div class="bi-header-actions">
-            <div class="text-end text-muted">Ano <?= e($ano) ?></div>
+            <div class="text-end text-muted">Ano <?= e($ano) ?><?= $mes > 0 ? ' • Mês ' . e($mes) : '' ?></div>
+            <a class="bi-btn bi-btn-secondary" href="<?= $BASE_URL ?>bi/saving-por-auditor" title="Saving por Auditor">Saving por Auditor</a>
         </div>
     </div>
 
@@ -180,17 +152,6 @@ $countTipo = array_map(fn($r) => (int)$r['total_registros'], $tipoRows);
             <label>Ano</label>
             <input type="number" name="ano" value="<?= e($ano) ?>">
         </div>
-        <div class="bi-filter">
-            <label>Auditor</label>
-            <select name="auditor_id">
-                <option value="">Todos</option>
-                <?php foreach ($auditores as $a): ?>
-                    <option value="<?= (int)$a['id_usuario'] ?>" <?= $auditorId == $a['id_usuario'] ? 'selected' : '' ?>>
-                        <?= e($a['usuario_user']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
         <div class="bi-actions">
             <button class="bi-btn" type="submit">Aplicar</button>
         </div>
@@ -203,55 +164,40 @@ $countTipo = array_map(fn($r) => (int)$r['total_registros'], $tipoRows);
                 <strong>R$ <?= number_format($totalSaving, 2, ',', '.') ?></strong>
             </div>
             <div class="bi-kpi">
-                <small>Qtde de saving</small>
+                <small>Quantidade de negociações</small>
                 <strong><?= $totalRegistros ?></strong>
             </div>
         </div>
     </div>
 
     <div class="bi-panel" style="margin-top:16px;">
-        <h3>Valor de saving por auditor</h3>
-        <div class="bi-chart">
-            <canvas id="chartSavingAuditor"></canvas>
-        </div>
+        <h3>Saving por hospital (R$)</h3>
+        <div class="bi-chart"><canvas id="chartSavingHospital"></canvas></div>
     </div>
     <div class="bi-panel">
-        <h3>Qtde de saving por auditor</h3>
-        <div class="bi-chart">
-            <canvas id="chartQtdeAuditor"></canvas>
-        </div>
+        <h3>Quantidade de negociações por hospital</h3>
+        <div class="bi-chart"><canvas id="chartQtdeHospital"></canvas></div>
     </div>
     <div class="bi-panel">
-        <h3>Tipo de saving por auditor - valores</h3>
-        <div class="bi-chart">
-            <canvas id="chartTipoSavingValor"></canvas>
-        </div>
-    </div>
-    <div class="bi-panel">
-        <h3>Tipo de saving por auditor - quantidade</h3>
-        <div class="bi-chart">
-            <canvas id="chartTipoSavingQtd"></canvas>
-        </div>
-    </div>
-    <div class="bi-panel">
-        <h3>Evolução mensal do saving</h3>
-        <div class="bi-chart">
-            <canvas id="chartSavingEvolucao"></canvas>
-        </div>
+        <h3>Evolução mensal do saving (ano completo)</h3>
+        <div class="bi-chart"><canvas id="chartSavingEvolucao"></canvas></div>
     </div>
 </div>
 
 <script>
-const labelsAud = <?= json_encode($labelsAud) ?>;
-const savingAud = <?= json_encode($savingAud) ?>;
-const countAud = <?= json_encode($countAud) ?>;
-const labelsTipo = <?= json_encode($labelsTipo) ?>;
-const savingTipo = <?= json_encode($savingTipo) ?>;
-const countTipo = <?= json_encode($countTipo) ?>;
+const labelsHosp = <?= json_encode($labelsHosp) ?>;
+const savingHosp = <?= json_encode($savingHosp) ?>;
+const countHosp = <?= json_encode($countHosp) ?>;
 const labelsMes = <?= json_encode($labelsMes) ?>;
 const savingMensal = <?= json_encode($savingMensal) ?>;
 
 function barChart(ctx, labels, data, color) {
+    const scales = window.biChartScales ? window.biChartScales() : undefined;
+    if (scales && scales.yAxes && scales.yAxes[0] && scales.yAxes[0].ticks) {
+        scales.yAxes[0].ticks.callback = function (value) {
+            return window.biMoneyTick ? window.biMoneyTick(value) : ('R$ ' + Number(value || 0).toLocaleString('pt-BR'));
+        };
+    }
     return new Chart(ctx, {
         type: 'bar',
         data: { labels, datasets: [{ data, backgroundColor: color }] },
@@ -259,12 +205,38 @@ function barChart(ctx, labels, data, color) {
             responsive: true,
             maintainAspectRatio: false,
             legend: { display: false },
-            scales: window.biChartScales ? window.biChartScales() : undefined
+            scales: scales,
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItem) {
+                        return window.biMoneyTick ? window.biMoneyTick(tooltipItem.yLabel) : ('R$ ' + Number(tooltipItem.yLabel || 0).toLocaleString('pt-BR'));
+                    }
+                }
+            }
         }
     });
 }
 
-function lineChart(ctx, labels, data, color) {
+function lineChart(ctx, labels, data, color, money = true) {
+    const opts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: window.biChartScales ? window.biChartScales() : undefined
+    };
+    if (money) {
+        opts.tooltips = {
+            callbacks: {
+                label: function (tooltipItem) {
+                    return window.biMoneyTick ? window.biMoneyTick(tooltipItem.yLabel) : ('R$ ' + Number(tooltipItem.yLabel || 0).toLocaleString('pt-BR'));
+                }
+            }
+        };
+        if (opts.scales && opts.scales.yAxes && opts.scales.yAxes[0] && opts.scales.yAxes[0].ticks) {
+            opts.scales.yAxes[0].ticks.callback = function (value) {
+                return window.biMoneyTick ? window.biMoneyTick(value) : ('R$ ' + Number(value || 0).toLocaleString('pt-BR'));
+            };
+        }
+    }
     return new Chart(ctx, {
         type: 'line',
         data: {
@@ -280,18 +252,21 @@ function lineChart(ctx, labels, data, color) {
                 fill: false
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: window.biChartScales ? window.biChartScales() : undefined
-        }
+        options: opts
     });
 }
 
-barChart(document.getElementById('chartSavingAuditor'), labelsAud, savingAud, 'rgba(141, 208, 255, 0.7)');
-barChart(document.getElementById('chartQtdeAuditor'), labelsAud, countAud, 'rgba(208, 113, 176, 0.7)');
-barChart(document.getElementById('chartTipoSavingValor'), labelsTipo, savingTipo, 'rgba(121, 199, 255, 0.7)');
-barChart(document.getElementById('chartTipoSavingQtd'), labelsTipo, countTipo, 'rgba(111, 223, 194, 0.7)');
+barChart(document.getElementById('chartSavingHospital'), labelsHosp, savingHosp, 'rgba(141, 208, 255, 0.7)');
+new Chart(document.getElementById('chartQtdeHospital'), {
+    type: 'bar',
+    data: { labels: labelsHosp, datasets: [{ data: countHosp, backgroundColor: 'rgba(208, 113, 176, 0.7)' }] },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: { display: false },
+        scales: window.biChartScales ? window.biChartScales() : undefined
+    }
+});
 lineChart(document.getElementById('chartSavingEvolucao'), labelsMes, savingMensal, 'rgba(255, 205, 86, 0.85)');
 </script>
 

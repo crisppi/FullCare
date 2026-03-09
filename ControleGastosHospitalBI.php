@@ -15,6 +15,8 @@ $anoInput = filter_input(INPUT_GET, 'ano', FILTER_VALIDATE_INT);
 $mesInput = filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT);
 $ano = ($anoInput !== null && $anoInput !== false) ? (int)$anoInput : null;
 $mes = ($mesInput !== null && $mesInput !== false) ? (int)$mesInput : 0;
+$startInput = (string)(filter_input(INPUT_GET, 'data_inicio') ?: filter_input(INPUT_GET, 'data_ini') ?: '');
+$endInput = (string)(filter_input(INPUT_GET, 'data_fim') ?: '');
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 $seguradoraId = filter_input(INPUT_GET, 'seguradora_id', FILTER_VALIDATE_INT) ?: null;
 $patologiaId = filter_input(INPUT_GET, 'patologia_id', FILTER_VALIDATE_INT) ?: null;
@@ -33,24 +35,45 @@ if ($ano === null && !filter_has_var(INPUT_GET, 'ano')) {
 }
 
 $dateExpr = "COALESCE(NULLIF(ca.data_inicial_capeante,'0000-00-00'), NULLIF(ca.data_digit_capeante,'0000-00-00'), NULLIF(ca.data_fech_capeante,'0000-00-00'))";
-$where = "YEAR(ref_date) = :ano";
-$params = [':ano' => (int)$ano];
-if (!empty($mes)) {
-    $where .= " AND MONTH(ref_date) = :mes";
-    $params[':mes'] = (int)$mes;
+$whereParts = [
+    "ref_date IS NOT NULL",
+    "ref_date <> '0000-00-00'",
+];
+$params = [];
+
+$startDate = DateTime::createFromFormat('Y-m-d', $startInput) ?: null;
+$endDate = DateTime::createFromFormat('Y-m-d', $endInput) ?: null;
+$hasRange = ($startDate instanceof DateTime) && ($endDate instanceof DateTime);
+if ($hasRange) {
+    if ($startDate > $endDate) {
+        [$startDate, $endDate] = [$endDate, $startDate];
+    }
+    $rangeStart = $startDate->format('Y-m-d');
+    $rangeEnd = $endDate->format('Y-m-d');
+    $whereParts[] = "ref_date BETWEEN :data_inicio AND :data_fim";
+    $params[':data_inicio'] = $rangeStart;
+    $params[':data_fim'] = $rangeEnd;
+} else {
+    $whereParts[] = "YEAR(ref_date) = :ano";
+    $params[':ano'] = (int)$ano;
+    if (!empty($mes)) {
+        $whereParts[] = "MONTH(ref_date) = :mes";
+        $params[':mes'] = (int)$mes;
+    }
 }
 if (!empty($hospitalId)) {
-    $where .= " AND fk_hospital_int = :hospital_id";
+    $whereParts[] = "fk_hospital_int = :hospital_id";
     $params[':hospital_id'] = (int)$hospitalId;
 }
 if (!empty($seguradoraId)) {
-    $where .= " AND fk_seguradora_pac = :seguradora_id";
+    $whereParts[] = "fk_seguradora_pac = :seguradora_id";
     $params[':seguradora_id'] = (int)$seguradoraId;
 }
 if (!empty($patologiaId)) {
-    $where .= " AND fk_patologia_int = :patologia_id";
+    $whereParts[] = "fk_patologia_int = :patologia_id";
     $params[':patologia_id'] = (int)$patologiaId;
 }
+$where = implode(" AND ", $whereParts);
 
 $baseSql = "
     SELECT
@@ -66,13 +89,13 @@ $baseSql = "
 
 $sqlHosp = "
     SELECT
+        h.id_hospital AS hospital_id,
         h.nome_hosp AS hospital,
         COUNT(*) AS casos,
         SUM(valor_final_capeante) AS valor_final
     FROM ({$baseSql}) t
     LEFT JOIN tb_hospital h ON h.id_hospital = t.fk_hospital_int
-    WHERE ref_date IS NOT NULL AND ref_date <> '0000-00-00'
-      AND {$where}
+    WHERE {$where}
     GROUP BY hospital
     ORDER BY valor_final DESC
 ";
@@ -92,8 +115,7 @@ $sqlCombo = "
     FROM ({$baseSql}) t
     LEFT JOIN tb_hospital h ON h.id_hospital = t.fk_hospital_int
     LEFT JOIN tb_patologia p ON p.id_patologia = t.fk_patologia_int
-    WHERE ref_date IS NOT NULL AND ref_date <> '0000-00-00'
-      AND {$where}
+    WHERE {$where}
     GROUP BY hospital, patologia
     ORDER BY valor_final DESC
     LIMIT 80
@@ -116,6 +138,103 @@ foreach ($rowsHosp as $row) {
     $totalCasos += (int)($row['casos'] ?? 0);
 }
 $media = $totalCasos > 0 ? $totalFinal / $totalCasos : 0;
+
+$monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+$monthKeys = [];
+$monthLabels = [];
+if ($hasRange) {
+    $cursor = (clone $startDate)->modify('first day of this month');
+    $limitEnd = (clone $endDate)->modify('first day of next month');
+    while ($cursor < $limitEnd) {
+        $key = $cursor->format('Y-m');
+        $monthKeys[] = $key;
+        $monthLabels[] = ($monthNames[(int)$cursor->format('m') - 1] ?? $cursor->format('m')) . '/' . $cursor->format('Y');
+        $cursor->modify('+1 month');
+    }
+} else {
+    for ($m = 1; $m <= 12; $m++) {
+        $monthKeys[] = sprintf('%04d-%02d', (int)$ano, $m);
+        $monthLabels[] = $monthNames[$m - 1] . '/' . $ano;
+    }
+}
+
+$topHosp = array_slice($rowsHosp, 0, 5);
+$topHospIds = [];
+$topHospNames = [];
+foreach ($topHosp as $row) {
+    $hid = (int)($row['hospital_id'] ?? 0);
+    if ($hid > 0) {
+        $topHospIds[] = $hid;
+        $topHospNames[$hid] = (string)($row['hospital'] ?? ('Hospital ' . $hid));
+    }
+}
+
+$monthlyDatasets = [];
+if ($topHospIds && $monthKeys) {
+    $seriesMap = [];
+    foreach ($topHospIds as $hid) {
+        $seriesMap[$hid] = array_fill_keys($monthKeys, 0.0);
+    }
+
+    $whereMonthly = $where;
+    $inParams = [];
+    $inTokens = [];
+    foreach ($topHospIds as $idx => $hid) {
+        $ph = ':h' . $idx;
+        $inTokens[] = $ph;
+        $inParams[$ph] = (int)$hid;
+    }
+    $in = implode(',', $inTokens);
+    $sqlMonthly = "
+        SELECT
+            fk_hospital_int AS hospital_id,
+            DATE_FORMAT(ref_date, '%Y-%m') AS ym,
+            SUM(valor_final_capeante) AS valor_final
+        FROM ({$baseSql}) t
+        WHERE {$whereMonthly}
+          AND fk_hospital_int IN ({$in})
+        GROUP BY hospital_id, ym
+        ORDER BY ym
+    ";
+    $stmt = $conn->prepare($sqlMonthly);
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+    }
+    foreach ($inParams as $ph => $hid) {
+        $stmt->bindValue($ph, $hid, PDO::PARAM_INT);
+    }
+    $stmt->execute();
+    $rowsMonthly = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    foreach ($rowsMonthly as $row) {
+        $hid = (int)($row['hospital_id'] ?? 0);
+        $ym = (string)($row['ym'] ?? '');
+        if (isset($seriesMap[$hid][$ym])) {
+            $seriesMap[$hid][$ym] = (float)($row['valor_final'] ?? 0);
+        }
+    }
+
+    $palette = [
+        'rgba(126,150,255,0.92)',
+        'rgba(92,205,173,0.92)',
+        'rgba(245,168,88,0.92)',
+        'rgba(202,126,255,0.92)',
+        'rgba(255,127,154,0.92)',
+    ];
+    $colorIdx = 0;
+    foreach ($topHospIds as $hid) {
+        $monthlyDatasets[] = [
+            'label' => $topHospNames[$hid] ?? ('Hospital ' . $hid),
+            'data' => array_values($seriesMap[$hid]),
+            'borderColor' => $palette[$colorIdx % count($palette)],
+            'backgroundColor' => 'rgba(0,0,0,0)',
+            'borderWidth' => 2,
+            'pointRadius' => 2,
+            'tension' => 0.35,
+            'fill' => false,
+        ];
+        $colorIdx++;
+    }
+}
 ?>
 
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260111">
@@ -129,11 +248,25 @@ $media = $totalCasos > 0 ? $totalFinal / $totalCasos : 0;
     <div class="bi-header">
         <h1 class="bi-title">Sinistralidade por Hospital</h1>
         <div class="bi-header-actions">
-            <div class="text-end text-muted">Ano <?= e($ano) ?></div>
+            <div class="text-end text-muted">
+                <?php if ($hasRange): ?>
+                    <?= e($rangeStart) ?> a <?= e($rangeEnd) ?>
+                <?php else: ?>
+                    Ano <?= e($ano) ?><?= $mes ? ' • Mês ' . e($mes) : '' ?>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
     <form class="bi-panel bi-filters" method="get">
+        <div class="bi-filter">
+            <label>Data início</label>
+            <input type="date" name="data_inicio" value="<?= e($hasRange ? $rangeStart : '') ?>">
+        </div>
+        <div class="bi-filter">
+            <label>Data fim</label>
+            <input type="date" name="data_fim" value="<?= e($hasRange ? $rangeEnd : '') ?>">
+        </div>
         <div class="bi-filter">
             <label>Ano</label>
             <select name="ano">
@@ -210,6 +343,10 @@ $media = $totalCasos > 0 ? $totalFinal / $totalCasos : 0;
         <h3>Top hospitais (custo final)</h3>
         <div class="bi-chart"><canvas id="chartHospitais"></canvas></div>
     </div>
+    <div class="bi-panel">
+        <h3>Evolução mensal de custo por hospital (Top 5)</h3>
+        <div class="bi-chart"><canvas id="chartMensalHospitais"></canvas></div>
+    </div>
 
     <div class="bi-panel">
         <h3>Hospital x Patologia</h3>
@@ -254,6 +391,8 @@ $media = $totalCasos > 0 ? $totalFinal / $totalCasos : 0;
 <script>
     const hospLabels = <?= json_encode($labels) ?>;
     const hospValues = <?= json_encode($values) ?>;
+    const mensalLabels = <?= json_encode($monthLabels) ?>;
+    const mensalDatasets = <?= json_encode($monthlyDatasets, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     new Chart(document.getElementById('chartHospitais'), {
         type: 'horizontalBar',
         data: {
@@ -270,7 +409,13 @@ $media = $totalCasos > 0 ? $totalFinal / $totalCasos : 0;
             legend: {
                 display: false
             },
-            scales: biChartScales(),
+            scales: (function () {
+                const s = biChartScales();
+                if (s && s.xAxes && s.xAxes[0] && s.xAxes[0].ticks) {
+                    s.xAxes[0].ticks.callback = function (v) { return biMoneyTick(v); };
+                }
+                return s;
+            })(),
             tooltips: {
                 callbacks: {
                     label: (item) => biMoneyTick(item.xLabel)
@@ -278,6 +423,30 @@ $media = $totalCasos > 0 ? $totalFinal / $totalCasos : 0;
             }
         }
     });
+
+    if (mensalDatasets.length) {
+        const scales = biChartScales();
+        if (scales && scales.yAxes && scales.yAxes[0] && scales.yAxes[0].ticks) {
+            scales.yAxes[0].ticks.callback = function (v) { return biMoneyTick(v); };
+        }
+        new Chart(document.getElementById('chartMensalHospitais'), {
+            type: 'line',
+            data: { labels: mensalLabels, datasets: mensalDatasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: scales,
+                tooltips: {
+                    callbacks: {
+                        label: function (item, data) {
+                            const ds = data.datasets[item.datasetIndex] || {};
+                            return (ds.label ? ds.label + ': ' : '') + biMoneyTick(item.yLabel);
+                        }
+                    }
+                }
+            }
+        });
+    }
 </script>
 
 <?php require_once("templates/footer.php"); ?>
