@@ -121,6 +121,49 @@ function decodeJsonArray(?string $raw): ?array
     return $data;
 }
 
+function buildAutoNegociacoesFromProrrog(
+    string $flagProrrog,
+    ?string $prorrogJsonRaw,
+    ?int $fkUsuarioPadrao
+): array {
+    if ($flagProrrog !== 's') return [];
+    $decoded = decodeJsonArray($prorrogJsonRaw);
+    if (!is_array($decoded) || !isset($decoded['prorrogations']) || !is_array($decoded['prorrogations'])) {
+        return [];
+    }
+
+    $auto = [];
+    foreach ($decoded['prorrogations'] as $row) {
+        if (!is_array($row)) continue;
+        $dataIni = strOrNull($row['prorrog1_ini_pror'] ?? null);
+        $dataFim = strOrNull($row['prorrog1_fim_pror'] ?? null);
+        $acomodLiberada = strOrNull($row['acomod1_pror'] ?? null);
+        if (!$dataIni || !$dataFim || !$acomodLiberada) continue;
+
+        $qtd = toIntOrNull($row['diarias_1'] ?? null);
+        if ($qtd === null && $dataIni && $dataFim) {
+            $iniTs = strtotime($dataIni);
+            $fimTs = strtotime($dataFim);
+            if ($iniTs && $fimTs && $fimTs >= $iniTs) {
+                $qtd = (int)ceil(($fimTs - $iniTs) / 86400);
+            }
+        }
+        if ($qtd === null || $qtd <= 0) continue;
+
+        $auto[] = [
+            'tipo_negociacao' => strOrNull($row['tipo_negociacao_pror'] ?? null) ?: 'PRORROGACAO_AUTOMATICA',
+            'data_inicio_negoc' => $dataIni,
+            'data_fim_negoc' => $dataFim,
+            'troca_de' => strOrNull($row['acomod_solicitada_pror'] ?? null) ?: $acomodLiberada,
+            'troca_para' => $acomodLiberada,
+            'qtd' => $qtd,
+            'saving' => toFloatOrNull($row['saving_estimado_pror'] ?? null) ?? 0.0,
+            'fk_usuario_neg' => toIntOrNull($row['fk_usuario_pror'] ?? null) ?? $fkUsuarioPadrao,
+        ];
+    }
+    return $auto;
+}
+
 function processTussEntries(
     string $flag,
     ?string $jsonRaw,
@@ -158,14 +201,16 @@ function processNegociacoesEntries(
     int $visitaId,
     int $fkInternacao,
     negociacaoDAO $negociacaoDao,
-    ?int $fkUsuarioNeg
+    ?int $fkUsuarioNeg,
+    array $autoNegociacoes = []
 ): void {
     if ($visitaId <= 0) return;
     $negociacaoDao->deleteByVisita($visitaId);
     if ($flag !== 's') return;
     $decoded = decodeJsonArray($jsonRaw);
-    if (!is_array($decoded)) return;
-    foreach ($decoded as $row) {
+    if (!is_array($decoded)) $decoded = [];
+    $rows = array_merge($decoded, $autoNegociacoes);
+    foreach ($rows as $row) {
         if (!is_array($row)) continue;
         $tipo = strOrNull($row['tipo_negociacao'] ?? null);
         if (!$tipo) continue;
@@ -572,10 +617,12 @@ if ($type === "create") {
             $usuarioNomeLog = $_SESSION['nome_user'] ?? ($_SESSION['email_user'] ?? null);
             $visitaDao->logAlteracao($visitaEmEdicao, $novoRegistro, $fk_usuario_vis, $usuarioNomeLog);
             processTussEntries($select_tuss ?? '', $tussJsonRaw, $id_visita_edit, $fk_internacao_vis, $tussDao, $fk_usuario_vis);
-            processNegociacoesEntries($select_negoc ?? '', $negociacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $negociacaoDao, $fk_usuario_neg_form ?? $fk_usuario_vis);
+            processProrrogacoesEntries($select_prorrog ?? '', $prorrogacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $prorrogacaoDao, true);
+            $autoNegociacoesProrrog = buildAutoNegociacoesFromProrrog($select_prorrog ?? '', $prorrogacoesJsonRaw, $fk_usuario_neg_form ?? $fk_usuario_vis);
+            $processaNegociacoes = (($select_negoc ?? '') === 's' || !empty($autoNegociacoesProrrog)) ? 's' : 'n';
+            processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $negociacaoDao, $fk_usuario_neg_form ?? $fk_usuario_vis, $autoNegociacoesProrrog);
             processGestaoData($select_gestao ?? '', $gestaoPostData, $id_visita_edit, $fk_internacao_vis, $gestaoDao, true);
             processUtiData($select_uti ?? '', $utiPostData, $id_visita_edit, $fk_internacao_vis, $utiDao, true);
-            processProrrogacoesEntries($select_prorrog ?? '', $prorrogacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $prorrogacaoDao, true);
             flowLog($flowCtx, 'create.edit_mode.finish', 'INFO', [
                 'id_visita' => $id_visita_edit,
                 'fk_internacao_vis' => $fk_internacao_vis
@@ -626,10 +673,12 @@ if ($type === "create") {
     try {
         $novoIdVisita = $visitaDao->create($visita);
         processTussEntries($select_tuss ?? '', $tussJsonRaw, $novoIdVisita, $fk_internacao_vis, $tussDao, $fk_usuario_vis);
-        processNegociacoesEntries($select_negoc ?? '', $negociacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $negociacaoDao, $fk_usuario_neg_form ?? $fk_usuario_vis);
+        processProrrogacoesEntries($select_prorrog ?? '', $prorrogacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $prorrogacaoDao);
+        $autoNegociacoesProrrog = buildAutoNegociacoesFromProrrog($select_prorrog ?? '', $prorrogacoesJsonRaw, $fk_usuario_neg_form ?? $fk_usuario_vis);
+        $processaNegociacoes = (($select_negoc ?? '') === 's' || !empty($autoNegociacoesProrrog)) ? 's' : 'n';
+        processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $negociacaoDao, $fk_usuario_neg_form ?? $fk_usuario_vis, $autoNegociacoesProrrog);
         processGestaoData($select_gestao ?? '', $gestaoPostData, $novoIdVisita, $fk_internacao_vis, $gestaoDao);
         processUtiData($select_uti ?? '', $utiPostData, $novoIdVisita, $fk_internacao_vis, $utiDao);
-        processProrrogacoesEntries($select_prorrog ?? '', $prorrogacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $prorrogacaoDao);
         flowLog($flowCtx, 'create.finish', 'INFO', [
             'id_visita' => $novoIdVisita,
             'fk_internacao_vis' => $fk_internacao_vis

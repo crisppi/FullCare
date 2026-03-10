@@ -32,9 +32,9 @@ if (empty($id_usuario)) {
     }
 }
 ?>
-<div id="main-container" class="container">
+<div id="main-container" class="container form_container" style="margin-top:16px;">
     <div class="row">
-        <h4 class="page-title" style="margin-bottom:10px">Cadastrar</h4>
+        <h4 class="page-title" style="margin-top:18px;margin-bottom:10px">Cadastrar</h4>
 
         <form action="<?= $BASE_URL ?>process_usuario.php" id="add-movie-form" method="POST"
             enctype="multipart/form-data">

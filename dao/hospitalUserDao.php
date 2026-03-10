@@ -297,4 +297,26 @@ class hospitalUserDAO implements hospitalUserDAOInterface
         $st->execute();
         return $st->fetchAll() ?: [];
     }
+
+    public function listarPorHospital(int $hospitalId): array
+    {
+        $sql = "SELECT
+                    hu.id_hospitalUser,
+                    hu.fk_usuario_hosp,
+                    hu.fk_hospital_user,
+                    u.id_usuario,
+                    u.usuario_user,
+                    u.email_user,
+                    u.cargo_user,
+                    u.nivel_user,
+                    u.ativo_user
+                FROM " . self::TBL_LINK . " hu
+                INNER JOIN " . self::TBL_USER . " u ON u.id_usuario = hu.fk_usuario_hosp
+                WHERE hu.fk_hospital_user = :hid
+                ORDER BY u.usuario_user ASC";
+        $st = $this->conn->prepare($sql);
+        $st->bindValue(':hid', $hospitalId, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetchAll() ?: [];
+    }
 }

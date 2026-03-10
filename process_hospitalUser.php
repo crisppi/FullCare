@@ -1,4 +1,5 @@
 <?php
+define('SKIP_HEADER', true);
 
 if (!defined("FLOW_LOGGER_AUTO_V1")) {
     define("FLOW_LOGGER_AUTO_V1", 1);
@@ -40,11 +41,17 @@ $type             = filter_input(INPUT_POST, 'type');
 $id_hospitalUser  = filter_input(INPUT_POST, 'id_hospitalUser', FILTER_VALIDATE_INT);
 $fk_usuario_hosp  = filter_input(INPUT_POST, 'fk_usuario_hosp', FILTER_VALIDATE_INT);
 $fk_hospital_user = filter_input(INPUT_POST, 'fk_hospital_user', FILTER_VALIDATE_INT);
+$redirect_hospital_id = filter_input(INPUT_POST, 'redirect_hospital_id', FILTER_VALIDATE_INT);
 
 // Garantia de inteiros (0 quando null)
 $id_hospitalUser  = $id_hospitalUser  ?: 0;
 $fk_usuario_hosp  = $fk_usuario_hosp  ?: 0;
 $fk_hospital_user = $fk_hospital_user ?: 0;
+$redirect_hospital_id = $redirect_hospital_id ?: 0;
+
+$redirectUrl = $redirect_hospital_id > 0
+    ? rtrim($BASE_URL, '/') . '/hospital_usuarios.php?id_hospital=' . (int) $redirect_hospital_id
+    : rtrim($BASE_URL, '/') . '/list_hospitalUser.php';
 
 // Validação simples
 if (!in_array($type, ['create', 'update'], true)) {
@@ -65,10 +72,18 @@ try {
             throw new RuntimeException("Selecione um usuário e um hospital válidos.");
         }
 
+        $stmtDupe = $conn->prepare("SELECT id_hospitalUser FROM tb_hospitalUser WHERE fk_usuario_hosp = :u AND fk_hospital_user = :h LIMIT 1");
+        $stmtDupe->bindValue(':u', $hu->fk_usuario_hosp, PDO::PARAM_INT);
+        $stmtDupe->bindValue(':h', $hu->fk_hospital_user, PDO::PARAM_INT);
+        $stmtDupe->execute();
+        if ($stmtDupe->fetch(PDO::FETCH_ASSOC)) {
+            throw new RuntimeException("Usuário já vinculado a este hospital.");
+        }
+
         // persiste
         $hospitalUserDao->create($hu);
-        // o create do DAO já faz a mensagem/redirect
-        include_once('list_hospitalUser.php');
+        header('Location: ' . $redirectUrl, true, 303);
+        exit;
     } elseif ($type === 'update') {
 
         // cria o objeto do modelo
@@ -84,17 +99,27 @@ try {
             throw new RuntimeException("Selecione um usuário e um hospital válidos.");
         }
 
+        $stmtDupe = $conn->prepare("SELECT id_hospitalUser FROM tb_hospitalUser WHERE fk_usuario_hosp = :u AND fk_hospital_user = :h AND id_hospitalUser <> :id LIMIT 1");
+        $stmtDupe->bindValue(':u', $hu->fk_usuario_hosp, PDO::PARAM_INT);
+        $stmtDupe->bindValue(':h', $hu->fk_hospital_user, PDO::PARAM_INT);
+        $stmtDupe->bindValue(':id', $hu->id_hospitalUser, PDO::PARAM_INT);
+        $stmtDupe->execute();
+        if ($stmtDupe->fetch(PDO::FETCH_ASSOC)) {
+            throw new RuntimeException("Usuário já vinculado a este hospital.");
+        }
+
         // persiste
         $hospitalUserDao->update($hu);
-        // o update do DAO já faz a mensagem/redirect
-        include_once('list_hospitalUser.php');
+        header('Location: ' . $redirectUrl, true, 303);
+        exit;
     }
 } catch (Throwable $e) {
     // usa o sistema de mensagens já existente
     $hospitalUserDao->message->setMessage(
         "Erro ao processar: " . $e->getMessage(),
         "error",
-        "list_hospitalUser.php"
+        $redirect_hospital_id > 0 ? ('hospital_usuarios.php?id_hospital=' . (int) $redirect_hospital_id) : "list_hospitalUser.php"
     );
+    header('Location: ' . $redirectUrl, true, 303);
     exit;
 }

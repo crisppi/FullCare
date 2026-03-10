@@ -279,6 +279,11 @@ function openModal(page) {
             // Encontre o elemento com o ID "table-content" dentro do elemento temporário
             var tableContent = tempElement.querySelector('#main-container');
             $('#content-php').html(tableContent);
+
+            if ($.fn.selectpicker) {
+                $('#content-php .selectpicker').selectpicker();
+                $('#content-php .selectpicker').selectpicker('refresh');
+            }
         },
         error: function () {
         }

@@ -124,7 +124,35 @@
             }
             $listaHospitais = array_values($listaHospitais); // dedup
         }
-    } ?>
+    }
+
+    if (!isset($hospitalUserDao) || !($hospitalUserDao instanceof hospitalUserDAO)) {
+        include_once("dao/hospitalUserDao.php");
+        $hospitalUserDao = new hospitalUserDAO($conn, $BASE_URL);
+    }
+    $hospitalUsuariosMap = [];
+    try {
+        $hospitalUsuariosRows = $hospitalUserDao->joinHospitalUserAll();
+        if (is_array($hospitalUsuariosRows)) {
+            foreach ($hospitalUsuariosRows as $hu) {
+                $hid = (int) ($hu['fk_hospital_user'] ?? $hu['id_hospital'] ?? 0);
+                $uid = (int) ($hu['fk_usuario_hosp'] ?? $hu['id_usuario'] ?? 0);
+                if ($hid <= 0 || $uid <= 0) {
+                    continue;
+                }
+                if (!isset($hospitalUsuariosMap[$hid])) {
+                    $hospitalUsuariosMap[$hid] = [];
+                }
+                $hospitalUsuariosMap[$hid][$uid] = $uid;
+            }
+        }
+    } catch (Throwable $e) {
+        $hospitalUsuariosMap = [];
+    }
+    foreach ($hospitalUsuariosMap as $hid => $uids) {
+        $hospitalUsuariosMap[$hid] = array_values(array_map('intval', array_keys($uids)));
+    }
+    ?>
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css" rel="stylesheet">
 
@@ -394,8 +422,8 @@
 
                                 <div class="form-group col-sm-4 d-none" id="box_resp_med">
                                     <label class="control-label" for="resp_med_id">Selecionar médico</label>
-                                    <select id="resp_med_id" class="form-control input-lg-fullcare selectpicker" data-live-search="true"
-                                        data-size="5" title="Selecione">
+                                    <select id="resp_med_id" class="form-control input-lg-fullcare selectpicker"
+                                        data-live-search="true" data-size="5" data-style="no-shadow-picker" title="Selecione">
                                         <option value="">Selecione</option>
                                         <?php foreach ($medicosAud as $m): ?>
                                             <option value="<?= (int) $m['id_usuario'] ?>"
@@ -408,8 +436,8 @@
 
                                 <div class="form-group col-sm-5 d-none" id="box_resp_enf">
                                     <label class="control-label" for="resp_enf_id">Selecionar enfermeiro</label>
-                                    <select id="resp_enf_id" class="form-control input-lg-fullcare selectpicker" data-live-search="true"
-                                        data-size="5" title="Selecione">
+                                    <select id="resp_enf_id" class="form-control input-lg-fullcare selectpicker"
+                                        data-live-search="true" data-size="5" data-style="no-shadow-picker" title="Selecione">
                                         <option value="">Selecione</option>
                                         <?php foreach ($enfsAud as $e): ?>
                                             <option value="<?= (int) $e['id_usuario'] ?>"
@@ -807,6 +835,9 @@
         </div>
     </div>
 
+    <script>
+        window.hospitalUsuariosMap = <?= json_encode($hospitalUsuariosMap, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    </script>
     <script src="<?= $BASE_URL ?>js/form_cad_internacao.js"></script>
     <script>
         (function() {

@@ -57,3 +57,23 @@
 [2026-02-27 02:40:07] VISITA create ok id_int=646 id_visita=685
 [2026-02-27 02:40:07] GESTAO skip id_int=646 select= evento=n tipo=
 [2026-02-27 02:40:07] END ok id=646
+[2026-03-09 22:31:47] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-09 22:31:48] CREATE internacao ok id=648
+[2026-03-09 22:31:48] VISITA create ok id_int=648 id_visita=687
+[2026-03-09 22:31:48] GESTAO skip id_int=648 select= evento=n tipo=
+[2026-03-09 22:31:53] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-09 22:44:53] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-09 22:44:53] CREATE internacao ok id=649
+[2026-03-09 22:44:53] VISITA create ok id_int=649 id_visita=688
+[2026-03-09 22:44:53] GESTAO skip id_int=649 select= evento=n tipo=
+[2026-03-09 22:45:02] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-09 23:13:50] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-09 23:13:50] CREATE internacao ok id=650
+[2026-03-09 23:13:50] VISITA create ok id_int=650 id_visita=689
+[2026-03-09 23:13:50] GESTAO skip id_int=650 select= evento=n tipo=
+[2026-03-09 23:14:05] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-09 23:21:11] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-09 23:21:11] CREATE internacao ok id=651
+[2026-03-09 23:21:11] VISITA create ok id_int=651 id_visita=690
+[2026-03-09 23:21:11] GESTAO skip id_int=651 select= evento=n tipo=
+[2026-03-09 23:21:11] END ok id=651

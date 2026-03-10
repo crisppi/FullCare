@@ -302,6 +302,20 @@ document.addEventListener('DOMContentLoaded', function() {
 // selectpicker só se o plugin existir (evita quebrar tudo)
 $(function() {
     if ($.fn.selectpicker) {
+        function stripCentralPickerShadow() {
+            const selectors = [
+                '.bootstrap-select > .dropdown-toggle[data-id="resp_med_id"]',
+                '.bootstrap-select > .dropdown-toggle[data-id="resp_enf_id"]',
+                '#box_resp_med .bootstrap-select > .dropdown-toggle',
+                '#box_resp_enf .bootstrap-select > .dropdown-toggle'
+            ].join(', ');
+            $(selectors).each(function() {
+                this.style.setProperty('box-shadow', 'none', 'important');
+                this.style.setProperty('outline', 'none', 'important');
+                this.style.setProperty('border-color', '#ced4da', 'important');
+            });
+        }
+
         var $allPickers = $('.selectpicker').filter(function() {
             return $(this).attr('data-fcx-picker-locked') !== '1';
         });
@@ -314,7 +328,16 @@ $(function() {
 
         $allPickers.on('loaded.bs.select', function() {
             $(this).parent().find('.bs-searchbox input').attr('placeholder', 'Digite para pesquisar...');
+            stripCentralPickerShadow();
         });
+
+        $allPickers.on('rendered.bs.select refreshed.bs.select shown.bs.select hidden.bs.select changed.bs.select', function() {
+            stripCentralPickerShadow();
+        });
+
+        // fallback imediato
+        setTimeout(stripCentralPickerShadow, 0);
+        setTimeout(stripCentralPickerShadow, 200);
     }
 });
 
@@ -565,6 +588,10 @@ function myFunctionSelected() {
         if (hospitalInsightsHelper && typeof hospitalInsightsHelper.reset === 'function') {
             hospitalInsightsHelper.reset();
         }
+    }
+
+    if (window.cadastroCentralHelper && typeof window.cadastroCentralHelper.applyHospitalFilter === 'function') {
+        window.cadastroCentralHelper.applyHospitalFilter(id);
     }
 }
 
@@ -862,6 +889,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const boxEnf = document.getElementById('box_resp_enf');
     const selMed = document.getElementById('resp_med_id');
     const selEnf = document.getElementById('resp_enf_id');
+    const hospitalUsuarioMap = (window.hospitalUsuariosMap && typeof window.hospitalUsuariosMap === 'object') ? window.hospitalUsuariosMap : {};
+    const allMedOptions = selMed ? Array.from(selMed.options).map(opt => opt.cloneNode(true)) : [];
+    const allEnfOptions = selEnf ? Array.from(selEnf.options).map(opt => opt.cloneNode(true)) : [];
 
     const fkUsuario = document.getElementById('fk_usuario_int');
     const flgMed = document.getElementById('visita_med_int');
@@ -875,9 +905,100 @@ document.addEventListener('DOMContentLoaded', function() {
         if (el) el.classList.remove('is-invalid');
     };
 
+    function neutralizeNativeSelectShadow(el) {
+        if (!el) return;
+        const apply = () => {
+            el.style.setProperty('box-shadow', 'none', 'important');
+            el.style.setProperty('outline', 'none', 'important');
+            el.style.setProperty('border-color', '#ced4da', 'important');
+        };
+        apply();
+        el.addEventListener('focus', apply);
+        el.addEventListener('blur', apply);
+        el.addEventListener('change', apply);
+        el.addEventListener('click', apply);
+    }
+
+    function neutralizePickerShadow(selectEl) {
+        if (!(window.$ && $.fn.selectpicker && selectEl)) return;
+        const $select = $(selectEl);
+        const apply = () => {
+            const $btn = $select.siblings('div.bootstrap-select').find('> button.dropdown-toggle');
+            if (!$btn.length) return;
+            $btn.each(function() {
+                this.style.setProperty('box-shadow', 'none', 'important');
+                this.style.setProperty('outline', 'none', 'important');
+                this.style.setProperty('border-color', '#ced4da', 'important');
+            });
+        };
+        apply();
+        setTimeout(apply, 0);
+        setTimeout(apply, 120);
+        setTimeout(apply, 300);
+
+        $select.on('loaded.bs.select rendered.bs.select refreshed.bs.select shown.bs.select hidden.bs.select changed.bs.select', apply);
+        $(document).on('focus click mousedown', 'div.bootstrap-select > button.dropdown-toggle', apply);
+    }
+
     function refreshPicker(el) {
         if (window.$ && $.fn.selectpicker && el && $(el).hasClass('selectpicker')) {
             $(el).selectpicker('refresh');
+            neutralizePickerShadow(el);
+        }
+    }
+
+    function getAllowedSet(hospitalId) {
+        const hid = String(hospitalId || '');
+        const ids = hospitalUsuarioMap[hid] || hospitalUsuarioMap[Number(hid)] || [];
+        const set = new Set();
+        if (Array.isArray(ids)) {
+            ids.forEach(id => set.add(String(id)));
+        }
+        return set;
+    }
+
+    function filterSelectByHospital(selectEl, allOptions, allowedSet, hasHospital) {
+        if (!selectEl || !Array.isArray(allOptions)) return;
+        const current = String(selectEl.value || '');
+        const nextOptions = [];
+
+        allOptions.forEach(function(opt, idx) {
+            const val = String(opt.value || '');
+            if (val === '' || !hasHospital || allowedSet.has(val)) {
+                nextOptions.push(opt.cloneNode(true));
+            } else if (idx === 0 && val === '') {
+                nextOptions.push(opt.cloneNode(true));
+            }
+        });
+
+        selectEl.innerHTML = '';
+        nextOptions.forEach(function(opt) {
+            selectEl.appendChild(opt);
+        });
+
+        if (current && Array.from(selectEl.options).some(opt => String(opt.value || '') === current)) {
+            selectEl.value = current;
+        } else {
+            selectEl.value = '';
+        }
+
+        refreshPicker(selectEl);
+    }
+
+    function applyHospitalFilter(hospitalId) {
+        const hasHospital = Boolean(String(hospitalId || '').trim());
+        const allowedSet = getAllowedSet(hospitalId);
+        filterSelectByHospital(selMed, allMedOptions, allowedSet, hasHospital);
+        filterSelectByHospital(selEnf, allEnfOptions, allowedSet, hasHospital);
+
+        const tipo = (respTipo && respTipo.value) ? respTipo.value : '';
+        if (tipo === 'med' && selMed && !selMed.value) {
+            if (fkUsuario) fkUsuario.value = idSessao || '';
+            mirrorVisitMedFromFk();
+        }
+        if (tipo === 'enf' && selEnf && !selEnf.value) {
+            if (fkUsuario) fkUsuario.value = idSessao || '';
+            mirrorVisitMedFromFk();
         }
     }
 
@@ -928,11 +1049,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // inicia oculto
     hide(boxMed);
     hide(boxEnf);
+
+    // remove halo/sombra no cadastro central (nativo + selectpicker)
+    neutralizeNativeSelectShadow(respTipo);
+    neutralizePickerShadow(selMed);
+    neutralizePickerShadow(selEnf);
     resetToSessionUser();
 
     window.cadastroCentralHelper = window.cadastroCentralHelper || {};
     window.cadastroCentralHelper.reset = resetCadastroCentralUI;
     window.cadastroCentralHelper.resetToSessionUser = resetToSessionUser;
+    window.cadastroCentralHelper.applyHospitalFilter = applyHospitalFilter;
+
+    const hospitalInicial = document.getElementById('fk_hospital_int')?.value || document.getElementById('hospital_selected')?.value || '';
+    applyHospitalFilter(hospitalInicial);
 
     respTipo?.addEventListener('change', function() {
         clearInvalid(respTipo);
@@ -1420,16 +1550,85 @@ $(document).ready(function() {
     }
 
     function populateSelects(acomodacoes) {
+        const prorrogValorMap = {};
+        const normKey = (v) => (v || '')
+            .toString()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/^\d+\s*-\s*/, '')
+            .trim();
+
+        const parseDateSafe = (v) => {
+            if (!v) return 0;
+            const t = Date.parse(v);
+            return Number.isNaN(t) ? 0 : t;
+        };
+
+        // Dedupe por acomodação (evita pegar valor antigo e inverter saving)
+        const dedupMap = new Map();
+        (acomodacoes || []).forEach((ac) => {
+            const nome = (ac?.acomodacao_aco || '').toString();
+            const key = normKey(nome);
+            if (!key) return;
+            const curr = dedupMap.get(key);
+            if (!curr) {
+                dedupMap.set(key, ac);
+                return;
+            }
+            const currDate = parseDateSafe(curr.data_contrato_aco);
+            const nextDate = parseDateSafe(ac.data_contrato_aco);
+            const currId = parseInt(curr.id_acomodacao || 0, 10) || 0;
+            const nextId = parseInt(ac.id_acomodacao || 0, 10) || 0;
+            if (nextDate > currDate || (nextDate === currDate && nextId > currId)) {
+                dedupMap.set(key, ac);
+            }
+        });
+        const acomodacoesUnicas = Array.from(dedupMap.values());
+
         let options = '<option value="">Selecione a Acomodação</option>';
-        acomodacoes.forEach(ac => {
+        acomodacoesUnicas.forEach(ac => {
+            const valorNum = parseFloat(String(ac.valor_aco ?? '0').replace(',', '.')) || 0;
             options +=
-                `<option value="${ac.id_acomodacao}-${ac.acomodacao_aco}" data-valor="${ac.valor_aco}">${ac.acomodacao_aco}</option>`;
+                `<option value="${ac.id_acomodacao}-${ac.acomodacao_aco}" data-valor="${valorNum}">${ac.acomodacao_aco}</option>`;
+            const key = normKey(ac.acomodacao_aco);
+            if (key) prorrogValorMap[key] = valorNum;
         });
         $('select[name="troca_de"]').html(options);
         $('select[name="troca_para"]').html(options);
         $('input[name="saving"]').val('');
         $('input[name="qtd"]').val('');
         $('input[name="saving_show"]').val('').css('color', '');
+
+        // Prorrogação: mantém valores alinhados às acomodações do hospital selecionado
+        let prorrogOptions = '<option value=""></option>';
+        acomodacoesUnicas.forEach(ac => {
+            const valorNum = parseFloat(String(ac.valor_aco ?? '0').replace(',', '.')) || 0;
+            prorrogOptions +=
+                `<option value="${ac.acomodacao_aco}" data-valor="${valorNum}">${ac.acomodacao_aco}</option>`;
+        });
+
+        const prorrogSelects = document.querySelectorAll(
+            '#container-prorrog select[name="acomod_solicitada_pror"], #container-prorrog select[name="acomod1_pror"]'
+        );
+        prorrogSelects.forEach((sel) => {
+            const prevValue = sel.value || '';
+            const prevText = sel.options?.[sel.selectedIndex]?.text || prevValue;
+            sel.innerHTML = prorrogOptions;
+            const match = Array.from(sel.options).find(opt =>
+                opt.value === prevValue || opt.text === prevValue || opt.text === prevText
+            );
+            if (match) {
+                sel.value = match.value;
+            }
+        });
+
+        if (typeof window.generateProrJSON === 'function') {
+            window.generateProrJSON();
+        }
+        window.__PRORROG_ACOMOD_VALOR_MAP = prorrogValorMap;
+        if (typeof window.recalculateProrrogSavings === 'function') {
+            window.recalculateProrrogSavings();
+        }
     }
 
     $(document).on('change keyup', 'select[name="troca_de"], select[name="troca_para"], input[name="qtd"]',

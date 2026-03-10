@@ -424,6 +424,26 @@ try {
             } else {
                 $prorrogDao->create($pr);
             }
+
+            $dataIni = $p['ini'] ?? null;
+            $dataFim = $p['fim'] ?? null;
+            $acomod = $p['acomod'] ?? '';
+            $diarias = (int)($p['diarias'] ?? 0);
+            if (!empty($dataIni) && !empty($dataFim) && !empty($acomod) && $diarias > 0) {
+                $negAuto = new negociacao();
+                $negAuto->fk_id_int = $idInt;
+                $negAuto->tipo_negociacao = 'PRORROGACAO_AUTOMATICA';
+                $negAuto->data_inicio_neg = $dataIni;
+                $negAuto->data_fim_neg = $dataFim;
+                $negAuto->troca_de = $p['acomod_solicitada'] ?? $acomod;
+                $negAuto->troca_para = $acomod;
+                $negAuto->qtd = $diarias;
+                $negAuto->saving = (float)($p['saving_estimado'] ?? 0);
+                $negAuto->fk_usuario_neg = (int)($_SESSION['id_usuario'] ?? 0);
+                if (!$negDao->existeNegociacao($negAuto)) {
+                    $negDao->create($negAuto);
+                }
+            }
         }
     }
 

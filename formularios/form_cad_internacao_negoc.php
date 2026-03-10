@@ -374,6 +374,164 @@ function removeNegotiationField(button) {
     generateNegotiationsJSON();
 }
 
+function normText(v) {
+    return (v || '')
+        .toString()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+}
+
+function setSelectByTextOrValue(selectEl, wanted) {
+    if (!selectEl) return false;
+    const wantedNorm = normText(wanted);
+    if (!wantedNorm) return false;
+
+    const byValue = Array.from(selectEl.options).find(opt => normText(opt.value) === wantedNorm);
+    if (byValue) {
+        selectEl.value = byValue.value;
+        return true;
+    }
+    const byText = Array.from(selectEl.options).find(opt => normText(opt.textContent) === wantedNorm);
+    if (byText) {
+        selectEl.value = byText.value;
+        return true;
+    }
+    const byContains = Array.from(selectEl.options).find(opt =>
+        normText(opt.textContent).includes(wantedNorm) || wantedNorm.includes(normText(opt.textContent))
+    );
+    if (byContains) {
+        selectEl.value = byContains.value;
+        return true;
+    }
+    return false;
+}
+
+function acomodToken(v) {
+    const n = normText(v);
+    if (n.includes('uti') || n.includes('cti') || n.includes('intensiv')) return 'UTI';
+    if (n.includes('semi')) return 'SEMI';
+    if (n.includes('apto') || n.includes('apart')) return 'APTO';
+    return '';
+}
+
+function inferTipoTroca(acomodDe, acomodPara) {
+    const de = acomodToken(acomodDe);
+    const para = acomodToken(acomodPara);
+    if (de && para) return `TROCA ${de}/${para}`;
+    return 'DIARIA ADM';
+}
+
+function diasEntreDatas(ini, fim) {
+    if (!ini || !fim) return 0;
+    const d1 = new Date(`${ini}T00:00:00`);
+    const d2 = new Date(`${fim}T00:00:00`);
+    if (Number.isNaN(d1.getTime()) || Number.isNaN(d2.getTime())) return 0;
+    if (d2 < d1) return 0;
+    const oneDay = 24 * 60 * 60 * 1000;
+    return Math.floor((d2 - d1) / oneDay);
+}
+
+function isDowngradeFromProrrogRow(row) {
+    const rowEl = row.__container || null;
+    const solicSel = rowEl ? rowEl.querySelector('[name="acomod_solicitada_pror"]') : null;
+    const libSel = rowEl ? rowEl.querySelector('[name="acomod1_pror"]') : null;
+    const solicOpt = solicSel ? solicSel.options[solicSel.selectedIndex] : null;
+    const libOpt = libSel ? libSel.options[libSel.selectedIndex] : null;
+
+    const valSolic = parseFloat(solicOpt?.getAttribute('data-valor') || '0');
+    const valLib = parseFloat(libOpt?.getAttribute('data-valor') || '0');
+
+    if (!Number.isNaN(valSolic) && !Number.isNaN(valLib) && valSolic > 0 && valLib > 0) {
+        return valSolic > valLib;
+    }
+    return normText(row.acomod_solicitada_pror) !== normText(row.acomod1_pror);
+}
+
+window.syncNegociacoesFromProrrog = function syncNegociacoesFromProrrog(prorrogRows) {
+    const container = document.getElementById('negotiationFieldsContainer');
+    if (!container || !Array.isArray(prorrogRows)) return;
+
+    // remove somente linhas automáticas anteriores
+    container.querySelectorAll('.negotiation-field-container[data-auto-prorrog="1"]').forEach(el => el.remove());
+
+    const validRows = prorrogRows.filter(row => {
+        if (!row) return false;
+        const acomodSolic = row.acomod_solicitada_pror || row.acomod1_pror || '';
+        const acomodLib = row.acomod1_pror || '';
+        const ini = row.prorrog1_ini_pror || '';
+        const fim = row.prorrog1_fim_pror || '';
+        return acomodSolic && acomodLib && ini && fim && isDowngradeFromProrrogRow(row);
+    });
+
+    validRows.forEach((row) => {
+        addNegotiationField();
+        const currentRows = container.querySelectorAll('.negotiation-field-container');
+        const negRow = currentRows[currentRows.length - 1];
+        if (!negRow) return;
+        negRow.setAttribute('data-auto-prorrog', '1');
+
+        const tipoSel = negRow.querySelector('[name="tipo_negociacao"]');
+        const deSel = negRow.querySelector('[name="troca_de"]');
+        const paraSel = negRow.querySelector('[name="troca_para"]');
+        const iniEl = negRow.querySelector('[name="data_inicio_negoc"]');
+        const fimEl = negRow.querySelector('[name="data_fim_negoc"]');
+        const qtdEl = negRow.querySelector('[name="qtd"]');
+        const savingEl = negRow.querySelector('[name="saving"]');
+
+        const acomodSolic = row.acomod_solicitada_pror || row.acomod1_pror || '';
+        const acomodLib = row.acomod1_pror || '';
+
+        if (tipoSel) tipoSel.value = inferTipoTroca(acomodSolic, acomodLib);
+        if (deSel) setSelectByTextOrValue(deSel, acomodSolic);
+        if (paraSel) setSelectByTextOrValue(paraSel, acomodLib);
+        if (iniEl) iniEl.value = row.prorrog1_ini_pror || '';
+        if (fimEl) fimEl.value = row.prorrog1_fim_pror || '';
+
+        let qtd = parseInt(row.diarias_1 || '0', 10);
+        if (!Number.isFinite(qtd) || qtd <= 0) {
+            qtd = diasEntreDatas(row.prorrog1_ini_pror || '', row.prorrog1_fim_pror || '');
+        }
+        if (qtdEl) qtdEl.value = Number.isFinite(qtd) && qtd > 0 ? String(qtd) : '';
+
+        const savingNum = parseFloat(row.saving_estimado_pror || '0');
+        if (savingEl && !Number.isNaN(savingNum)) {
+            savingEl.value = savingNum.toFixed(2);
+            const showEl = negRow.querySelector('[name="saving_show"]');
+            if (showEl) {
+                showEl.value = savingNum >= 0 ? `R$ ${savingNum.toFixed(2)}` : `-R$ ${Math.abs(savingNum).toFixed(2)}`;
+                showEl.style.color = savingNum >= 0 ? 'green' : 'red';
+            }
+        }
+
+        const deOpt = deSel?.options?.[deSel.selectedIndex];
+        const paraOpt = paraSel?.options?.[paraSel.selectedIndex];
+        const deValor = parseFloat(deOpt?.getAttribute('data-valor') || '0');
+        const paraValor = parseFloat(paraOpt?.getAttribute('data-valor') || '0');
+        if (!Number.isNaN(deValor) && !Number.isNaN(paraValor) && (deValor > 0 || paraValor > 0)) {
+            const $negRow = $(negRow);
+            calculateSaving($negRow);
+        }
+    });
+
+    // Remove linha inicial vazia quando já houver linhas automáticas da prorrogação
+    if (validRows.length > 0) {
+        const initialRow = container.querySelector('.negotiation-field-container[data-initial="true"]');
+        if (initialRow) {
+            const hasAnyValue = Array.from(initialRow.querySelectorAll('input, select')).some((el) => {
+                const name = (el.getAttribute('name') || '').trim();
+                if (name === 'fk_id_int' || name === 'fk_usuario_neg' || name === 'negociacoes_json') return false;
+                return (el.value || '').trim() !== '';
+            });
+            if (!hasAnyValue) {
+                initialRow.remove();
+            }
+        }
+    }
+
+    generateNegotiationsJSON();
+};
+
 // ========= JSON / validações =========
 function generateNegotiationsJSON() {
     const fkIdInt = document.getElementById("fk_id_int")?.value || "";

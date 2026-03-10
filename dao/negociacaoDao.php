@@ -11,6 +11,7 @@ class negociacaoDAO implements negociacaoDAOInterface
 
     private $conn;
     private $url;
+    private $columnCache = [];
     public $message;
 
     public function __construct(PDO $conn, $url)
@@ -101,6 +102,23 @@ class negociacaoDAO implements negociacaoDAOInterface
             }
             $stmt->bindValue($key, (string)$value, PDO::PARAM_STR);
         }
+    }
+
+    private function hasColumn(string $table, string $column): bool
+    {
+        $key = strtolower($table . '.' . $column);
+        if (array_key_exists($key, $this->columnCache)) {
+            return $this->columnCache[$key];
+        }
+        try {
+            $stmt = $this->conn->prepare("SHOW COLUMNS FROM {$table} LIKE :col");
+            $stmt->bindValue(':col', $column, PDO::PARAM_STR);
+            $stmt->execute();
+            $this->columnCache[$key] = (bool)$stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $this->columnCache[$key] = false;
+        }
+        return $this->columnCache[$key];
     }
 
     public function buildNegociacao($data)
@@ -226,39 +244,29 @@ class negociacaoDAO implements negociacaoDAOInterface
 
     public function create(Negociacao $negociacao)
     {
-        $stmt = $this->conn->prepare("
-        INSERT INTO tb_negociacao (
-            fk_id_int, 
-            troca_de, 
-            troca_para, 
-            qtd, 
-            saving, 
-            fk_usuario_neg,
-            data_inicio_neg,
-            data_fim_neg,
-            tipo_negociacao
-        ) VALUES (
-            :fk_id_int, 
-            :troca_de, 
-            :troca_para, 
-            :qtd, 
-            :saving, 
-            :fk_usuario_neg,
-            :data_inicio_neg,
-            :data_fim_neg,
-            :tipo_negociacao
-        )
-    ");
+        $fields = [
+            'fk_id_int',
+            'troca_de',
+            'troca_para',
+            'qtd',
+            'saving',
+            'fk_usuario_neg',
+            'data_inicio_neg',
+            'data_fim_neg',
+            'tipo_negociacao',
+        ];
 
-        $stmt->bindParam(":fk_id_int", $negociacao->fk_id_int);
-        $stmt->bindParam(":troca_de", $negociacao->troca_de);
-        $stmt->bindParam(":troca_para", $negociacao->troca_para);
-        $stmt->bindParam(":qtd", $negociacao->qtd);
-        $stmt->bindParam(":saving", $negociacao->saving);
-        $stmt->bindParam(":fk_usuario_neg", $negociacao->fk_usuario_neg);
-        $stmt->bindParam(":data_inicio_neg", $negociacao->data_inicio_neg);
-        $stmt->bindParam(":data_fim_neg", $negociacao->data_fim_neg);
-        $stmt->bindParam(":tipo_negociacao", $negociacao->tipo_negociacao);
+        if ($this->hasColumn('tb_negociacao', 'fk_visita_neg')) {
+            $fields[] = 'fk_visita_neg';
+        }
+
+        $placeholders = array_map(fn($f) => ':' . $f, $fields);
+        $sql = "INSERT INTO tb_negociacao (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $placeholders) . ")";
+        $stmt = $this->conn->prepare($sql);
+
+        foreach ($fields as $f) {
+            $stmt->bindValue(':' . $f, $negociacao->$f ?? null);
+        }
 
         $stmt->execute();
 
@@ -268,31 +276,41 @@ class negociacaoDAO implements negociacaoDAOInterface
 
     public function update(Negociacao $negociacao)
     {
+        $sets = [
+            'fk_id_int = :fk_id_int',
+            'troca_de = :troca_de',
+            'troca_para = :troca_para',
+            'qtd = :qtd',
+            'saving = :saving',
+            'fk_usuario_neg = :fk_usuario_neg',
+            'data_inicio_neg = :data_inicio_neg',
+            'data_fim_neg = :data_fim_neg',
+            'tipo_negociacao = :tipo_negociacao',
+        ];
+
+        if ($this->hasColumn('tb_negociacao', 'fk_visita_neg')) {
+            $sets[] = 'fk_visita_neg = :fk_visita_neg';
+        }
+
         $stmt = $this->conn->prepare("
         UPDATE tb_negociacao SET
-            fk_id_int = :fk_id_int,
-            troca_de = :troca_de,
-            troca_para = :troca_para,
-            qtd = :qtd,
-            saving = :saving,
-            fk_usuario_neg = :fk_usuario_neg,
-            data_inicio_neg = :data_inicio_neg,
-            data_fim_neg = :data_fim_neg,
-            tipo_negociacao = :tipo_negociacao
+            " . implode(",\n            ", $sets) . "
         WHERE id_negociacao = :id_negociacao
     ");
 
-        $stmt->bindParam(":fk_id_int", $negociacao->fk_id_int);
-        $stmt->bindParam(":troca_de", $negociacao->troca_de);
-        $stmt->bindParam(":troca_para", $negociacao->troca_para);
-        $stmt->bindParam(":qtd", $negociacao->qtd);
-        $stmt->bindParam(":saving", $negociacao->saving);
-        $stmt->bindParam(":fk_usuario_neg", $negociacao->fk_usuario_neg);
-        $stmt->bindParam(":data_inicio_neg", $negociacao->data_inicio_neg);
-        $stmt->bindParam(":data_fim_neg", $negociacao->data_fim_neg);
-        $stmt->bindParam(":tipo_negociacao", $negociacao->tipo_negociacao);
-
-        $stmt->bindParam(":id_negociacao", $negociacao->id_negociacao);
+        $stmt->bindValue(":fk_id_int", $negociacao->fk_id_int);
+        $stmt->bindValue(":troca_de", $negociacao->troca_de);
+        $stmt->bindValue(":troca_para", $negociacao->troca_para);
+        $stmt->bindValue(":qtd", $negociacao->qtd);
+        $stmt->bindValue(":saving", $negociacao->saving);
+        $stmt->bindValue(":fk_usuario_neg", $negociacao->fk_usuario_neg);
+        $stmt->bindValue(":data_inicio_neg", $negociacao->data_inicio_neg);
+        $stmt->bindValue(":data_fim_neg", $negociacao->data_fim_neg);
+        $stmt->bindValue(":tipo_negociacao", $negociacao->tipo_negociacao);
+        if ($this->hasColumn('tb_negociacao', 'fk_visita_neg')) {
+            $stmt->bindValue(":fk_visita_neg", $negociacao->fk_visita_neg);
+        }
+        $stmt->bindValue(":id_negociacao", $negociacao->id_negociacao);
 
         $stmt->execute();
 

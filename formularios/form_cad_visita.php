@@ -890,6 +890,16 @@ function aumentarTextProgramacao() {
     color: #c4c4c4;
 }
 
+/* Cadastro central: remove halo/sombra azul dos selects de auditor */
+#cadastro-central-visita .form-select,
+#cadastro-central-visita .form-select:focus,
+#cadastro-central-visita .form-select:active,
+#cadastro-central-visita .form-select:focus-visible {
+    box-shadow: none !important;
+    outline: none !important;
+    border-color: #ced4da !important;
+}
+
 #add-visita-form {
     display: flex;
     flex-direction: column;
@@ -1856,6 +1866,8 @@ function applyProrrogEntries(entries) {
         if (!target) return;
         const acomod = target.querySelector('[name="acomod1_pror"]');
         if (acomod) acomod.value = entry.acomod1_pror || '';
+        const acomodSolic = target.querySelector('[name="acomod_solicitada_pror"]');
+        if (acomodSolic) acomodSolic.value = entry.acomod_solicitada_pror || entry.acomod1_pror || '';
         const ini = target.querySelector('[name="prorrog1_ini_pror"]');
         if (ini) ini.value = normalizeDateValue(entry.prorrog1_ini_pror);
         const fim = target.querySelector('[name="prorrog1_fim_pror"]');
@@ -1864,6 +1876,8 @@ function applyProrrogEntries(entries) {
         if (isol) isol.value = entry.isol_1_pror || 'n';
         const diarias = target.querySelector('[name="diarias_1"]');
         if (diarias) diarias.value = entry.diarias_1 || '';
+        const saving = target.querySelector('[name="saving_estimado_pror"]');
+        if (saving) saving.value = entry.saving_estimado_pror || '';
         if (typeof calculateDiarias === 'function') {
             calculateDiarias(target);
         }

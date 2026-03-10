@@ -71,7 +71,7 @@ $hospitalUserDao = new hospitalUserDAO($conn, $BASE_URL);
 $id_hospitalUser = filter_input(INPUT_GET, "id_hospitalUser", FILTER_VALIDATE_INT);
 
 ?>
-<div id="main-container" class="container">
+<div id="main-container" class="container form_container" style="margin-top:16px;">
     <div class="row">
         <form class="formulario-borderless" action="<?= htmlspecialchars($BASE_URL) ?>process_hospitalUser.php"
             id="add-movie-form" method="POST" enctype="multipart/form-data">
@@ -79,7 +79,14 @@ $id_hospitalUser = filter_input(INPUT_GET, "id_hospitalUser", FILTER_VALIDATE_IN
 
             <div class="form-group col-sm-3">
                 <label class="control-label col-sm-3" for="fk_hospital_user">Hospital</label>
-                <select class="form-control" id="fk_hospital_user" name="fk_hospital_user" required>
+                <select class="form-control selectpicker show-tick"
+                    id="fk_hospital_user"
+                    name="fk_hospital_user"
+                    required
+                    data-live-search="true"
+                    data-size="8"
+                    data-width="100%"
+                    title="Selecione o Hospital">
                     <option value="">Selecione o Hospital</option>
                     <?php if (!empty($hospitals)): ?>
                     <?php foreach ($hospitals as $hospital): ?>
@@ -93,7 +100,14 @@ $id_hospitalUser = filter_input(INPUT_GET, "id_hospitalUser", FILTER_VALIDATE_IN
 
             <div class="form-group col-sm-3">
                 <label class="control-label" for="fk_usuario_hosp">Usuário</label>
-                <select class="form-control" id="fk_usuario_hosp" name="fk_usuario_hosp" required>
+                <select class="form-control selectpicker show-tick"
+                    id="fk_usuario_hosp"
+                    name="fk_usuario_hosp"
+                    required
+                    data-live-search="true"
+                    data-size="8"
+                    data-width="100%"
+                    title="Selecione o usuário">
                     <option value="">Selecione o usuário</option>
                     <?php if (!empty($usuarios)): ?>
                     <?php foreach ($usuarios as $usuario): ?>
@@ -116,6 +130,18 @@ $id_hospitalUser = filter_input(INPUT_GET, "id_hospitalUser", FILTER_VALIDATE_IN
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window.jQuery || !jQuery.fn || !jQuery.fn.selectpicker) return;
+    ['#fk_hospital_user', '#fk_usuario_hosp'].forEach(function(sel) {
+        var $el = jQuery(sel);
+        if (!$el.length) return;
+        if (!$el.data('selectpicker')) {
+            $el.selectpicker();
+        }
+        $el.selectpicker('refresh');
+    });
+});
+
 // (mantenha apenas UMA definição por função)
 function mascara(i, t) {
     var v = i.value;

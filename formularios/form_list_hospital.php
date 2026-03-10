@@ -207,6 +207,13 @@
                                                 </a>
                                             </li>
                                             <li>
+                                                <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospital_usuarios.php?id_hospital=' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>">
+                                                    <i class="fa-solid fa-users"
+                                                        style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>Usuários
+                                                </a>
+                                            </li>
+                                            <li>
                                                 <button class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     onclick="openModal('<?= $BASE_URL ?>show_hospital.php?id_hospital=<?= $id_hospital ?>')"
                                                     data-bs-toggle="modal" data-bs-target="#myModal"><i

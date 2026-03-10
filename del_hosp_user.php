@@ -19,10 +19,16 @@ if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     exit;
 }
 
+$redirectHospitalId = filter_input(INPUT_POST, 'redirect_hospital_id', FILTER_VALIDATE_INT) ?: 0;
+$redirectUrl = $redirectHospitalId > 0
+    ? rtrim($BASE_URL, '/') . '/hospital_usuarios.php?id_hospital=' . (int) $redirectHospitalId
+    : rtrim($BASE_URL, '/') . '/list_hospitalUser.php';
+
 $csrf = (string)filter_input(INPUT_POST, 'csrf', FILTER_UNSAFE_RAW);
 if (!csrf_is_valid($csrf)) {
     http_response_code(400);
-    $message->setMessage("CSRF inválido.", "error", "list_hospitalUser.php");
+    $message->setMessage("CSRF inválido.", "error", $redirectHospitalId > 0 ? ('hospital_usuarios.php?id_hospital=' . (int) $redirectHospitalId) : "list_hospitalUser.php");
+    header('Location: ' . $redirectUrl, true, 303);
     exit;
 }
 
@@ -31,5 +37,5 @@ if ($id_hospitalUser) {
     $hospitalUserDao->destroy($id_hospitalUser);
 }
 
-header('Location: ' . $BASE_URL . 'list_hospitalUser.php', true, 303);
+header('Location: ' . $redirectUrl, true, 303);
 exit;

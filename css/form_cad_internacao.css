@@ -455,6 +455,55 @@
             height: 42px !important;
         }
 
+        /* Cadastro central (internacao): remove halo azul dos selects de responsavel */
+        #cadastro-central-wrapper #resp_tipo,
+        #cadastro-central-wrapper #resp_tipo:focus,
+        #cadastro-central-wrapper #resp_tipo:active,
+        #cadastro-central-wrapper #resp_tipo:focus-visible {
+            box-shadow: none !important;
+            outline: none !important;
+            border-color: #ced4da !important;
+        }
+
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_med_id"],
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_enf_id"],
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select > .dropdown-toggle,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select > .dropdown-toggle,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_med_id"]:focus,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_enf_id"]:focus,
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select > .dropdown-toggle:focus,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select > .dropdown-toggle:focus,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_med_id"]:active,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_enf_id"]:active,
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select > .dropdown-toggle:active,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select > .dropdown-toggle:active,
+        #cadastro-central-wrapper .bootstrap-select.show > .dropdown-toggle[data-id="resp_med_id"],
+        #cadastro-central-wrapper .bootstrap-select.show > .dropdown-toggle[data-id="resp_enf_id"],
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select.show > .dropdown-toggle,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select.show > .dropdown-toggle,
+        #cadastro-central-wrapper #resp_med_id,
+        #cadastro-central-wrapper #resp_enf_id,
+        #cadastro-central-wrapper #resp_med_id:focus,
+        #cadastro-central-wrapper #resp_enf_id:focus,
+        #cadastro-central-wrapper #resp_med_id:active,
+        #cadastro-central-wrapper #resp_enf_id:active,
+        #cadastro-central-wrapper #resp_med_id:focus-visible,
+        #cadastro-central-wrapper #resp_enf_id:focus-visible {
+            box-shadow: none !important;
+            outline: none !important;
+            border-color: #ced4da !important;
+        }
+
+        /* Picker de responsavel com busca, sem halo */
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle.no-shadow-picker,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle.no-shadow-picker:focus,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle.no-shadow-picker:active,
+        #cadastro-central-wrapper .bootstrap-select.show > .dropdown-toggle.no-shadow-picker {
+            box-shadow: none !important;
+            outline: none !important;
+            border-color: #ced4da !important;
+        }
+
         .internacao-page {
             width: 100%;
             margin: -26px 0 0;

@@ -82,7 +82,7 @@ if ($qtdIntItens > $limite) {
 };
 ?>
 
-<div class="container-fluid form_container" style="margin-top:-5px;">
+<div class="container-fluid form_container" style="margin-top:12px;">
     <?php if ($debug): ?>
         <div class="alert alert-warning" style="font-size:0.9rem;">
             <strong>DEBUG list_hospitalUser</strong><br>
@@ -96,7 +96,7 @@ if ($qtdIntItens > $limite) {
     <?php endif; ?>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <div class="d-flex justify-content-between align-items-center">
-        <h4 style="margin-top:-10px" class="page-title">Hospitais por Usuário</h4>
+        <h4 style="margin-top:8px;margin-bottom:8px" class="page-title">Hospitais por Usuário</h4>
         <div>
             <a href="exportar_excel_list_hosp_user.php" class="btn btn-success"
                 style="border-radius:10px; margin-right: 10px;">Exportar para

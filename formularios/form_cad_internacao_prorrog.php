@@ -113,6 +113,50 @@
 }
 </style>
 
+<?php
+if (!function_exists('prorrogNormAcomod')) {
+    function prorrogNormAcomod(string $value): string
+    {
+        $value = trim($value);
+        if (function_exists('mb_strtolower')) {
+            $value = mb_strtolower($value, 'UTF-8');
+        } else {
+            $value = strtolower($value);
+        }
+        $value = preg_replace('/^\d+\s*-\s*/', '', $value);
+        $value = str_replace(
+            ['á', 'à', 'â', 'ã', 'ä', 'é', 'è', 'ê', 'ë', 'í', 'ì', 'î', 'ï', 'ó', 'ò', 'ô', 'õ', 'ö', 'ú', 'ù', 'û', 'ü', 'ç'],
+            ['a', 'a', 'a', 'a', 'a', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'c'],
+            $value
+        );
+        return trim($value);
+    }
+}
+
+if (!function_exists('prorrogValorAcomod')) {
+    function prorrogValorAcomod(string $acomod, array $map): float
+    {
+        $norm = prorrogNormAcomod($acomod);
+        if (isset($map[$norm]) && is_numeric($map[$norm])) {
+            return (float)$map[$norm];
+        }
+        return 0.0;
+    }
+}
+
+$prorrogAcomodValorMap = [];
+if (isset($acomodacao) && is_array($acomodacao)) {
+    foreach ($acomodacao as $row) {
+        if (!is_array($row)) continue;
+        $nome = (string)($row['acomodacao_aco'] ?? $row['acomodacao'] ?? '');
+        $valor = $row['valor_aco'] ?? $row['valor'] ?? null;
+        if ($nome !== '' && is_numeric($valor)) {
+            $prorrogAcomodValorMap[prorrogNormAcomod($nome)] = (float)$valor;
+        }
+    }
+}
+?>
+
 <div class="prorrogacao-container" id="container-prorrog" style="display:none;">
     <div class="adicional-card">
         <div class="adicional-card__header">
@@ -136,13 +180,25 @@
             <input type="hidden" id="fk_usuario_pror" name="fk_usuario_pror" value="<?= $_SESSION["id_usuario"] ?>">
 
             <div class="form-group col-sm-2">
-                <label class="control-label" for="acomod1_pror">Acomodação</label>
+                <label class="control-label" for="acomod_solicitada_pror">Acomod. Solicitada</label>
+                <select onchange="generateProrJSON()" class="form-control-sm form-control" id="acomod_solicitada_pror"
+                    name="acomod_solicitada_pror">
+                    <option value=""> </option>
+                    <?php sort($dados_acomodacao, SORT_ASC);
+                    foreach ($dados_acomodacao as $acomd) { ?>
+                    <option value="<?= $acomd; ?>" data-valor="<?= htmlspecialchars((string)prorrogValorAcomod((string)$acomd, $prorrogAcomodValorMap), ENT_QUOTES, 'UTF-8'); ?>"><?= $acomd; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+
+            <div class="form-group col-sm-2">
+                <label class="control-label" for="acomod1_pror">Acomod. Liberada</label>
                 <select onchange="generateProrJSON()" class="form-control-sm form-control" id="acomod1_pror"
                     name="acomod1_pror">
                     <option value=""> </option>
                     <?php sort($dados_acomodacao, SORT_ASC);
                     foreach ($dados_acomodacao as $acomd) { ?>
-                    <option value="<?= $acomd; ?>"><?= $acomd; ?></option>
+                    <option value="<?= $acomd; ?>" data-valor="<?= htmlspecialchars((string)prorrogValorAcomod((string)$acomd, $prorrogAcomodValorMap), ENT_QUOTES, 'UTF-8'); ?>"><?= $acomd; ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -172,6 +228,12 @@
                     <option value="n">Não</option>
                     <option value="s">Sim</option>
                 </select>
+            </div>
+
+            <div class="form-group col-sm-1">
+                <label class="control-label" for="saving_estimado_pror">Saving (R$)</label>
+                <input onchange="generateProrJSON()" type="number" step="0.01" min="0" class="form-control-sm form-control"
+                    id="saving_estimado_pror" name="saving_estimado_pror" placeholder="0,00">
             </div>
 
             <div class="form-group col-sm-2" style="margin-top:25px">
@@ -310,19 +372,40 @@ document.addEventListener("DOMContentLoaded", setFirstProrrogationDate);
 
 // Template de novas linhas (com "-" e "+")
 function createProrrogationField() {
+    const firstRow = document.querySelector('.field-container');
+    const solicitadaRef = firstRow ? firstRow.querySelector('[name="acomod_solicitada_pror"]') : null;
+    const liberadaRef = firstRow ? firstRow.querySelector('[name="acomod1_pror"]') : null;
+
+    const buildOptionsFromSelect = (selectEl) => {
+        if (!selectEl) return '<option value=""> </option>';
+        return Array.from(selectEl.options).map((opt) => {
+            const value = String(opt.value || '');
+            const text = String(opt.text || '');
+            const dataValor = opt.getAttribute('data-valor');
+            const dataAttr = dataValor !== null ? ` data-valor="${dataValor}"` : '';
+            return `<option value="${value}"${dataAttr}>${text}</option>`;
+        }).join('');
+    };
+
+    const optionsSolicitada = buildOptionsFromSelect(solicitadaRef);
+    const optionsLiberada = buildOptionsFromSelect(liberadaRef);
+
     return `
         <div class="field-container form-group row">
             <input type="hidden" name="fk_internacao_pror" value="<?= $ultimoReg ?>">
             <input type="hidden" name="fk_usuario_pror" value="<?= $_SESSION["id_usuario"] ?>">
 
             <div class="form-group col-sm-2">
-                <label class="control-label">Acomodação</label>
+                <label class="control-label">Acomod. Solicitada</label>
+                <select onchange="generateProrJSON()" class="form-control-sm form-control" name="acomod_solicitada_pror">
+                    ${optionsSolicitada}
+                </select>
+            </div>
+
+            <div class="form-group col-sm-2">
+                <label class="control-label">Acomod. Liberada</label>
                 <select onchange="generateProrJSON()" class="form-control-sm form-control" name="acomod1_pror">
-                    <option value=""> </option>
-                    <?php sort($dados_acomodacao, SORT_ASC);
-                    foreach ($dados_acomodacao as $acomd) { ?>
-                        <option value="<?= $acomd; ?>"><?= $acomd; ?></option>
-                    <?php } ?>
+                    ${optionsLiberada}
                 </select>
             </div>
 
@@ -347,6 +430,11 @@ function createProrrogationField() {
                     <option value="n">Não</option>
                     <option value="s">Sim</option>
                 </select>
+            </div>
+
+            <div class="form-group col-sm-1">
+                <label class="control-label">Saving (R$)</label>
+                <input onchange="generateProrJSON()" type="number" step="0.01" min="0" class="form-control-sm form-control" name="saving_estimado_pror" placeholder="0,00">
             </div>
 
             <div class="form-group col-sm-2" style="margin-top:25px">
@@ -382,6 +470,59 @@ function removeField(button) {
     fieldContainer.remove();
     generateProrJSON();
 }
+
+function normAcomodKey(value) {
+    return (value || '')
+        .toString()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/^\d+\s*-\s*/, '')
+        .trim();
+}
+
+function getAcomodValor(selectEl) {
+    if (!selectEl) return 0;
+    const selected = selectEl.options?.[selectEl.selectedIndex];
+    const fromOption = parseFloat(selected?.getAttribute('data-valor') || '0');
+
+    const map = window.__PRORROG_ACOMOD_VALOR_MAP || {};
+    const keyByValue = normAcomodKey(selectEl.value);
+    const keyByText = normAcomodKey(selected?.text || '');
+
+    const fromMapValue = parseFloat(map[keyByValue] ?? 'NaN');
+    const fromMapText = parseFloat(map[keyByText] ?? 'NaN');
+
+    if (!Number.isNaN(fromMapValue)) return fromMapValue;
+    if (!Number.isNaN(fromMapText)) return fromMapText;
+    if (!Number.isNaN(fromOption)) return fromOption;
+    return 0;
+}
+
+function calculateProrSaving(container) {
+    if (!container) return;
+    const solicitadaSel = container.querySelector('[name="acomod_solicitada_pror"]');
+    const liberadaSel = container.querySelector('[name="acomod1_pror"]');
+    const diarias = parseFloat(container.querySelector('[name="diarias_1"]')?.value || '0');
+    const savingInput = container.querySelector('[name="saving_estimado_pror"]');
+    if (!savingInput) return;
+
+    const valorSolicitada = getAcomodValor(solicitadaSel);
+    const valorLiberada = getAcomodValor(liberadaSel);
+
+    let saving = 0;
+    if (!Number.isNaN(valorSolicitada) && !Number.isNaN(valorLiberada) && !Number.isNaN(diarias) && diarias > 0) {
+        saving = (valorSolicitada - valorLiberada) * diarias;
+    }
+    savingInput.value = saving.toFixed(2);
+}
+
+window.recalculateProrrogSavings = function recalculateProrrogSavings() {
+    document.querySelectorAll('#fieldsContainer .field-container').forEach((container) => {
+        calculateDiarias(container);
+        calculateProrSaving(container);
+    });
+    generateProrJSON();
+};
 
 // Calcula diárias e valida datas
 function calculateDiarias(container) {
@@ -441,9 +582,11 @@ function calculateDiarias(container) {
         const diffTime = Math.abs(fim - inicio);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         diariasField.value = diffDays;
+        calculateProrSaving(container);
         generateProrJSON();
     } else if (diariasField) {
         diariasField.value = "";
+        calculateProrSaving(container);
     }
 }
 
@@ -458,6 +601,52 @@ document.getElementById("fieldsContainer").addEventListener("focusout", (event) 
     if (fieldContainer) calculateDiarias(fieldContainer);
 });
 
+// Recalcula também durante mudança/input de datas para não deixar diárias/saving zerados
+document.getElementById("fieldsContainer").addEventListener("change", (event) => {
+    const target = event.target;
+    if (!target) return;
+    if (!target.matches('[name="prorrog1_ini_pror"], [name="prorrog1_fim_pror"]')) return;
+    const fieldContainer = target.closest(".field-container");
+    if (!fieldContainer) return;
+    calculateDiarias(fieldContainer);
+});
+
+document.getElementById("fieldsContainer").addEventListener("input", (event) => {
+    const target = event.target;
+    if (!target) return;
+    if (!target.matches('[name="prorrog1_ini_pror"], [name="prorrog1_fim_pror"]')) return;
+    const fieldContainer = target.closest(".field-container");
+    if (!fieldContainer) return;
+    calculateDiarias(fieldContainer);
+});
+
+document.getElementById("fieldsContainer").addEventListener("change", (event) => {
+    const target = event.target;
+    if (!target) return;
+    if (!target.matches('[name="acomod_solicitada_pror"], [name="acomod1_pror"]')) return;
+    const fieldContainer = target.closest(".field-container");
+    if (!fieldContainer) return;
+    calculateProrSaving(fieldContainer);
+    generateProrJSON();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (!window.__PRORROG_ACOMOD_VALOR_MAP || Object.keys(window.__PRORROG_ACOMOD_VALOR_MAP).length === 0) {
+        const map = {};
+        document.querySelectorAll('#container-prorrog select[name="acomod_solicitada_pror"] option, #container-prorrog select[name="acomod1_pror"] option').forEach((opt) => {
+            const key = normAcomodKey(opt.value || opt.text || '');
+            const val = parseFloat(opt.getAttribute('data-valor') || 'NaN');
+            if (key && !Number.isNaN(val) && !(key in map)) {
+                map[key] = val;
+            }
+        });
+        window.__PRORROG_ACOMOD_VALOR_MAP = map;
+    }
+    if (typeof window.recalculateProrrogSavings === 'function') {
+        window.recalculateProrrogSavings();
+    }
+});
+
 // Gera JSON das prorrogações
 function generateProrJSON() {
     // pega fk_internacao e usuario da primeira linha (evita conflito de IDs repetidos)
@@ -466,20 +655,40 @@ function generateProrJSON() {
     const fk_usuario_pror = first ? (first.querySelector('input[name="fk_usuario_pror"]')?.value || '') : '';
 
     const fieldContainers = document.querySelectorAll(".field-container");
-    const prorrogations = Array.from(fieldContainers).map((container) => ({
+    const prorrogationsWithContext = Array.from(fieldContainers).map((container) => ({
         fk_internacao_pror: fk_internacao_pror,
         fk_usuario_pror: fk_usuario_pror,
+        acomod_solicitada_pror: container.querySelector('[name="acomod_solicitada_pror"]')?.value || '',
         acomod1_pror: container.querySelector('[name="acomod1_pror"]').value,
         prorrog1_ini_pror: container.querySelector('[name="prorrog1_ini_pror"]').value,
         prorrog1_fim_pror: container.querySelector('[name="prorrog1_fim_pror"]').value,
         isol_1_pror: container.querySelector('[name="isol_1_pror"]').value,
         diarias_1: container.querySelector('[name="diarias_1"]').value,
+        saving_estimado_pror: container.querySelector('[name="saving_estimado_pror"]')?.value || '',
+        tipo_negociacao_pror: 'PRORROGACAO_AUTOMATICA',
+        __container: container
+    }));
+
+    const prorrogations = prorrogationsWithContext.map((row) => ({
+        fk_internacao_pror: row.fk_internacao_pror,
+        fk_usuario_pror: row.fk_usuario_pror,
+        acomod_solicitada_pror: row.acomod_solicitada_pror,
+        acomod1_pror: row.acomod1_pror,
+        prorrog1_ini_pror: row.prorrog1_ini_pror,
+        prorrog1_fim_pror: row.prorrog1_fim_pror,
+        isol_1_pror: row.isol_1_pror,
+        diarias_1: row.diarias_1,
+        saving_estimado_pror: row.saving_estimado_pror,
+        tipo_negociacao_pror: row.tipo_negociacao_pror,
     }));
 
     const jsonData = {
         prorrogations
     };
     document.getElementById("prorrogacoes-json").value = JSON.stringify(jsonData, null, 2);
+    if (typeof window.syncNegociacoesFromProrrog === 'function') {
+        window.syncNegociacoesFromProrrog(prorrogationsWithContext);
+    }
 }
 
 // Limpa todos os inputs (mantém só a primeira linha)
