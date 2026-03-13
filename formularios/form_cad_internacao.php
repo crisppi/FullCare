@@ -276,9 +276,14 @@
                                     ['#hospital_selected', '#fk_paciente_int'].forEach(function(sel) {
                                         var $el = jQuery(sel);
                                         if (!$el.length) return;
-                                        if (!$el.data('selectpicker')) {
+                                        var hasWrapper = $el.siblings('div.bootstrap-select').length > 0;
+                                        if (!hasWrapper && !$el.data('selectpicker')) {
                                             $el.selectpicker();
                                         }
+                                        if ($el.siblings('div.bootstrap-select').length > 1) {
+                                            $el.siblings('div.bootstrap-select').slice(1).remove();
+                                        }
+                                        $el.addClass('bs-select-hidden');
                                         $el.attr('data-fcx-picker-locked', '1');
                                     });
                                 })();

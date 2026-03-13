@@ -264,6 +264,10 @@ if ($type === "create") {
     $timer_int_raw = filter_input(INPUT_POST, "timer_int", FILTER_VALIDATE_INT);
     $timer_int = ($timer_int_raw !== false && $timer_int_raw !== null) ? max(0, $timer_int_raw) : null;
 
+    $cargoSessao = strtolower(str_replace([' ', '-'], '_', (string)($_SESSION['cargo'] ?? ($_SESSION['cargo_user'] ?? ''))));
+    $isMedSessao = (strpos($cargoSessao, 'med') !== false);
+    $isEnfSessao = (strpos($cargoSessao, 'enf') !== false);
+
     $senha_int = filter_input(INPUT_POST, "senha_int");
     if ($senha_int && $internacaoDao->senhaExists($senha_int, $id_internacao)) {
         flowLog($flowCtx, 'create.validation', 'WARN', ['error' => 'senha_duplicada_edicao']);
@@ -276,16 +280,42 @@ if ($type === "create") {
         exit;
     }
 
+    $cargoSessao = strtolower(str_replace([' ', '-'], '_', (string)($_SESSION['cargo'] ?? ($_SESSION['cargo_user'] ?? ''))));
+    $isMedSessao = (strpos($cargoSessao, 'med') !== false);
+    $isEnfSessao = (strpos($cargoSessao, 'enf') !== false);
+
     $usuario_create_int = filter_input(INPUT_POST, "usuario_create_int");
     $data_create_int = filter_input(INPUT_POST, "data_create_int") ?: null;
     $grupo_patologia_int = filter_input(INPUT_POST, "grupo_patologia_int");
     $primeira_vis_int = filter_input(INPUT_POST, "primeira_vis_int");
     $visita_med_int = filter_input(INPUT_POST, "visita_med_int");
     $visita_enf_int = filter_input(INPUT_POST, "visita_enf_int");
+    $visita_med_int = ($visita_med_int === 's') ? 's' : 'n';
+    $visita_enf_int = ($visita_enf_int === 's') ? 's' : 'n';
+    if ($isMedSessao && $visita_med_int !== 's' && $visita_enf_int !== 's') {
+        $visita_med_int = 's';
+    }
+    if ($isEnfSessao && $visita_enf_int !== 's' && $visita_med_int !== 's') {
+        $visita_enf_int = 's';
+    }
+    $visita_med_int = ($visita_med_int === 's') ? 's' : 'n';
+    $visita_enf_int = ($visita_enf_int === 's') ? 's' : 'n';
+    if ($isMedSessao && $visita_med_int !== 's' && $visita_enf_int !== 's') {
+        $visita_med_int = 's';
+    }
+    if ($isEnfSessao && $visita_enf_int !== 's' && $visita_med_int !== 's') {
+        $visita_enf_int = 's';
+    }
     $visita_no_int = filter_input(INPUT_POST, "visita_no_int");
     $visita_auditor_prof_med = filter_input(INPUT_POST, "visita_auditor_prof_med");
     $visita_auditor_prof_enf = filter_input(INPUT_POST, "visita_auditor_prof_enf");
-    $fk_usuario_int = filter_input(INPUT_POST, "fk_usuario_int");
+    $fk_usuario_int = filter_input(INPUT_POST, "fk_usuario_int", FILTER_VALIDATE_INT);
+    if ($fk_usuario_int === false || $fk_usuario_int === null || $fk_usuario_int <= 0) {
+        $fk_usuario_int = (int)($_SESSION['id_usuario'] ?? 0);
+    }
+    if ($fk_usuario_int <= 0) {
+        $fk_usuario_int = null;
+    }
     $censo_int = filter_input(INPUT_POST, "censo_int");
     $origem_int = filter_input(INPUT_POST, "origem_int");
     $int_pertinente_int = filter_input(INPUT_POST, "int_pertinente_int");
@@ -426,7 +456,7 @@ if ($type === "create") {
     $tipo_alta_alt = filter_input(INPUT_POST, "tipo_alta_alt") ?: "Alta médica";
     $data_create_alt = date('Y-m-d');
     $usuario_alt = filter_input(INPUT_POST, "usuario_create_int") ?: ($_SESSION['email_user'] ?? 'sistema');
-    $fk_usuario_alt = filter_input(INPUT_POST, "fk_usuario_int") ?: ($_SESSION['id_usuario'] ?? null);
+    $fk_usuario_alt = $fk_usuario_int ?: ((int)($_SESSION['id_usuario'] ?? 0) ?: null);
     $num_atendimento_int = filter_input(INPUT_POST, "num_atendimento_int");
 
     // Monta objeto pai
@@ -528,7 +558,7 @@ if ($type === "create") {
         $aberto_cap = filter_input(INPUT_POST, "aberto_cap");
         $em_auditoria_cap = filter_input(INPUT_POST, "em_auditoria_cap");
         $senha_finalizada = filter_input(INPUT_POST, "senha_finalizada");
-        $fk_user_cap = filter_input(INPUT_POST, "fk_usuario_int");
+        $fk_user_cap = $fk_usuario_int;
         $capeante->fk_int_capeante = $lastId; // [FK:$lastId]
         $capeante->encerrado_cap = $encerrado_cap;
         $capeante->aberto_cap = $aberto_cap;
@@ -867,7 +897,13 @@ if ($type == "update") {
     $visita_no_int = filter_input(INPUT_POST, "visita_no_int");
     $visita_auditor_prof_med = filter_input(INPUT_POST, "visita_auditor_prof_med");
     $visita_auditor_prof_enf = filter_input(INPUT_POST, "visita_auditor_prof_enf");
-    $fk_usuario_int = filter_input(INPUT_POST, "fk_usuario_int");
+    $fk_usuario_int = filter_input(INPUT_POST, "fk_usuario_int", FILTER_VALIDATE_INT);
+    if ($fk_usuario_int === false || $fk_usuario_int === null || $fk_usuario_int <= 0) {
+        $fk_usuario_int = (int)($_SESSION['id_usuario'] ?? 0);
+    }
+    if ($fk_usuario_int <= 0) {
+        $fk_usuario_int = null;
+    }
     $censo_int = filter_input(INPUT_POST, "censo_int");
     $origem_int = filter_input(INPUT_POST, "origem_int");
     $int_pertinente_int = filter_input(INPUT_POST, "int_pertinente_int");

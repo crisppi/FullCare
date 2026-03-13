@@ -131,8 +131,6 @@ $tussGeral = $tuss->findAll();
 ?>
 
 <div id="main-container" style="background-color: #f0f2f4ff;padding: 20px;">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-
     <!-- FORMULARIO INTERNACAO -->
     <?php include_once('formularios/form_cad_internacao.php'); ?>
 

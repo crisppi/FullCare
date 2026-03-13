@@ -1,5 +1,4 @@
 <?php
-define('SKIP_HEADER', true);
 
 if (!defined("FLOW_LOGGER_AUTO_V1")) {
     define("FLOW_LOGGER_AUTO_V1", 1);

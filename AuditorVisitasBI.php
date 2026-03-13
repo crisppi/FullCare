@@ -123,6 +123,12 @@ foreach ($matrix as $aud => $data) {
         $grandTotal += $total;
     }
 }
+
+// Esconde colunas de hospital sem nenhuma visita no periodo/filtro atual.
+$hospitais = array_values(array_filter($hospitais, static function ($h) use ($colTotals): bool {
+    $hid = (int)($h['id_hospital'] ?? 0);
+    return (int)($colTotals[$hid] ?? 0) > 0;
+}));
 ?>
 
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">

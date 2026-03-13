@@ -321,8 +321,15 @@ $(function() {
         });
         $allPickers.each(function() {
             var $el = $(this);
-            if (!$el.data('selectpicker')) {
+            var hasWrapper = $el.siblings('div.bootstrap-select').length > 0;
+            if (!hasWrapper && !$el.data('selectpicker')) {
                 $el.selectpicker();
+            }
+            if ($el.siblings('div.bootstrap-select').length > 1) {
+                $el.siblings('div.bootstrap-select').slice(1).remove();
+            }
+            if ($el.siblings('div.bootstrap-select').length) {
+                $el.addClass('bs-select-hidden');
             }
         });
 
@@ -901,6 +908,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const idSessao = config.idSessao || "";
     const cargoSessao = config.cargoSessao || "";
+    const cargoSessaoNorm = String(cargoSessao).toLowerCase().replace(/[\s-]+/g, '_');
+    const isMedSessao = cargoSessaoNorm.indexOf('med') !== -1;
+    const isEnfSessao = cargoSessaoNorm.indexOf('enf') !== -1;
     const clearInvalid = (el) => {
         if (el) el.classList.remove('is-invalid');
     };
@@ -929,6 +939,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.style.setProperty('box-shadow', 'none', 'important');
                 this.style.setProperty('outline', 'none', 'important');
                 this.style.setProperty('border-color', '#ced4da', 'important');
+                this.removeAttribute('title');
+                this.setAttribute('data-original-title', '');
             });
         };
         apply();
@@ -1023,8 +1035,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetToSessionUser() {
         if (!fkUsuario) return;
         fkUsuario.value = idSessao || '';
-        if (flgMed) flgMed.value = (cargoSessao === 'Med_auditor') ? 's' : 'n';
-        if (flgEnf) flgEnf.value = (cargoSessao === 'Enf_Auditor') ? 's' : 'n';
+        if (flgMed) flgMed.value = isMedSessao ? 's' : 'n';
+        if (flgEnf) flgEnf.value = isEnfSessao ? 's' : 'n';
         if (emailMed) emailMed.value = ''; // será setado por mirrorVisitMedFromFk
         if (emailEnf) emailEnf.value = '';
         mirrorVisitMedFromFk();

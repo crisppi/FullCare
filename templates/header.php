@@ -7,6 +7,23 @@ require_once(__DIR__ . "/../app/security/inteligencia_access.php");
 date_default_timezone_set('America/Sao_Paulo');
 header("Content-type: text/html; charset=utf-8");
 
+// Fallback defensivo: se BASE_URL vier na raiz, mas a aplicacao estiver em subpasta
+// (ex.: /FullCare), forca BASE_URL para evitar links do header indo para /index.php.
+$basePathFromBaseUrl = (string)(parse_url((string)$BASE_URL, PHP_URL_PATH) ?? '/');
+$basePathFromBaseUrl = '/' . trim($basePathFromBaseUrl, '/') . '/';
+if ($basePathFromBaseUrl === '//') {
+    $basePathFromBaseUrl = '/';
+}
+$requestUriPath = (string)(parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) ?? '');
+if ($basePathFromBaseUrl === '/' && preg_match('#^/(FullCare|FullConex(?:Aud)?)(/|$)#i', $requestUriPath, $mBaseApp)) {
+    $isHttpsHeader = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || ((int)($_SERVER['SERVER_PORT'] ?? 0) === 443)
+        || (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https');
+    $schemeHeader = $isHttpsHeader ? 'https' : 'http';
+    $hostHeader = (string)($_SERVER['HTTP_HOST'] ?? 'localhost');
+    $BASE_URL = $schemeHeader . '://' . $hostHeader . '/' . trim((string)$mBaseApp[1], '/') . '/';
+}
+
 // Caminho default
 $defaultFoto = $BASE_URL . 'img/user-default.png';
 
@@ -420,7 +437,7 @@ if (!empty($sessionIdUsuario)) {
             ">
             </div>
             <div class="container-fluid">
-                <a class="navbar-brand" href="index.php" style="gap:12px;">
+                <a class="navbar-brand" href="<?= $BASE_URL ?>dashboard" style="gap:12px;">
                     <img src="<?= $BASE_URL ?>img/LogoFullCare.png" class="logo-novo" width="224" height="56"
                         style="max-width:100%;height:auto;" alt="FullCare">
                     <?php if (!empty($seguradoraHeaderLogoUrl)): ?>
@@ -561,11 +578,11 @@ if (!empty($sessionIdUsuario)) {
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
 
-                                        <li><a class="dropdown-item" href="<?php $BASE_URL ?>internacoes/nova"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/nova"><i
                                                     class="bi bi-calendar2-date"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i> Nova
                                                 Internação</a></li>
-                                        <li><a class="dropdown-item" href="<?php $BASE_URL ?>censo/lista"><i class="bi bi-book"
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
                                                 Censo</a></li>
                                         <li>
@@ -1019,7 +1036,7 @@ if (!empty($sessionIdUsuario)) {
                                 </div>
                             </div> -->
                             <div class="account-dropdown__footer">
-                                <a href="<?php $BASE_URL ?>destroi.php">
+                                <a href="<?= $BASE_URL ?>destroi.php">
                                     <i class="zmdi zmdi-power"></i>Sair</a>
                             </div>
                         </div>
@@ -1141,7 +1158,6 @@ if (!empty($sessionIdUsuario)) {
 
 <!-- Jquery JS-->
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
 
 <!-- Bootstrap JS-->
 <script src="./diversos/CoolAdmin-master/vendor/bootstrap-4.1/popper.min.js"></script>
@@ -1149,6 +1165,7 @@ if (!empty($sessionIdUsuario)) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
 <!-- Vendor JS       -->
 <script src="./diversos/CoolAdmin-master/vendor/slick/slick.min.js">
 </script>
@@ -1253,8 +1270,22 @@ if (!empty($sessionIdUsuario)) {
 
         try {
             if (window.$ && typeof $('.selectpicker').selectpicker === 'function') {
-                $('.selectpicker', target).selectpicker();
-                $('.selectpicker', target).selectpicker('refresh');
+                $('.selectpicker', target).each(function() {
+                    var $el = $(this);
+                    var hasWrapper = $el.siblings('div.bootstrap-select').length > 0;
+                    if (!hasWrapper && !$el.data('selectpicker')) {
+                        $el.selectpicker();
+                    }
+                    if ($el.siblings('div.bootstrap-select').length > 1) {
+                        $el.siblings('div.bootstrap-select').slice(1).remove();
+                    }
+                    if ($el.siblings('div.bootstrap-select').length) {
+                        $el.addClass('bs-select-hidden');
+                    }
+                    try {
+                        $el.selectpicker('refresh');
+                    } catch (_) {}
+                });
             }
         } catch (_) {}
 

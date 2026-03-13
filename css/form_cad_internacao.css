@@ -443,7 +443,9 @@
 
         /* Quando o bootstrap-select assume, preserva o mesmo espaço */
         #hospital_selected.selectpicker.bs-select-hidden,
-        #fk_paciente_int.selectpicker.bs-select-hidden {
+        #fk_paciente_int.selectpicker.bs-select-hidden,
+        #resp_med_id.selectpicker.bs-select-hidden,
+        #resp_enf_id.selectpicker.bs-select-hidden {
             display: none !important;
         }
 
@@ -471,8 +473,12 @@
         #cadastro-central-wrapper #box_resp_enf .bootstrap-select > .dropdown-toggle,
         #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_med_id"]:focus,
         #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_enf_id"]:focus,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_med_id"]:hover,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_enf_id"]:hover,
         #cadastro-central-wrapper #box_resp_med .bootstrap-select > .dropdown-toggle:focus,
         #cadastro-central-wrapper #box_resp_enf .bootstrap-select > .dropdown-toggle:focus,
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select > .dropdown-toggle:hover,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select > .dropdown-toggle:hover,
         #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_med_id"]:active,
         #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle[data-id="resp_enf_id"]:active,
         #cadastro-central-wrapper #box_resp_med .bootstrap-select > .dropdown-toggle:active,
@@ -496,12 +502,51 @@
 
         /* Picker de responsavel com busca, sem halo */
         #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle.no-shadow-picker,
+        #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle.no-shadow-picker:hover,
         #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle.no-shadow-picker:focus,
         #cadastro-central-wrapper .bootstrap-select > .dropdown-toggle.no-shadow-picker:active,
         #cadastro-central-wrapper .bootstrap-select.show > .dropdown-toggle.no-shadow-picker {
             box-shadow: none !important;
             outline: none !important;
             border-color: #ced4da !important;
+        }
+
+        /* Zera qualquer halo residual do select de responsavel medico/enfermagem */
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select,
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select .dropdown-toggle,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select .dropdown-toggle,
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select .filter-option,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select .filter-option,
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select .filter-option-inner,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select .filter-option-inner,
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select .filter-option-inner-inner,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select .filter-option-inner-inner {
+            box-shadow: none !important;
+            text-shadow: none !important;
+            background-image: none !important;
+            filter: none !important;
+        }
+
+        /* Mantem wrapper e botao com a mesma altura para evitar "faixa" abaixo do select */
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select {
+            width: 100% !important;
+            min-height: 42px !important;
+            height: 42px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            vertical-align: top !important;
+        }
+
+        #cadastro-central-wrapper #box_resp_med .bootstrap-select > .dropdown-toggle,
+        #cadastro-central-wrapper #box_resp_enf .bootstrap-select > .dropdown-toggle {
+            min-height: 42px !important;
+            height: 42px !important;
+            margin: 0 !important;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
+            line-height: 24px !important;
         }
 
         .internacao-page {

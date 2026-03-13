@@ -4,19 +4,32 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+if (!function_exists('fullcare_login_index_url')) {
+    function fullcare_login_index_url(): string
+    {
+        $script = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+        if (preg_match('#^/(FullCare|FullConex(?:Aud)?)(/|$)#i', $script, $m)) {
+            return '/' . trim($m[1], '/') . '/index.php';
+        }
+        return '/index.php';
+    }
+}
+
 require_once(__DIR__ . "/app/security/bi_access.php");
 require_once(__DIR__ . "/app/security/inteligencia_access.php");
 
 if (empty($_SESSION['email_user']) && empty($_SESSION['id_usuario'])) {
-    header('location:index.php');
+    header('Location: ' . fullcare_login_index_url(), true, 303);
     exit;
 }
 
-$ativo = $_SESSION['ativo'] ?? null;
-if ($ativo !== 's') {
+$ativoRaw = (string)($_SESSION['ativo'] ?? '');
+$ativoNorm = strtolower(trim($ativoRaw));
+$ativoOk = in_array($ativoNorm, ['s', '1', 'true', 'ativo'], true);
+if (!$ativoOk) {
     $erro_login = "Usuário inativo";
     $_SESSION['mensagem'] = $erro_login;
-    header('location:index.php');
+    header('Location: ' . fullcare_login_index_url(), true, 303);
     exit;
 } else {
 };
@@ -45,8 +58,4 @@ if (function_exists('flowLog')) {
         'script' => basename((string)($_SERVER['SCRIPT_NAME'] ?? '')),
         'query_string' => $_SERVER['QUERY_STRING'] ?? null
     ]);
-}
-
-if (!defined('SKIP_HEADER') || !SKIP_HEADER) {
-    require_once("templates/header.php");
 }
