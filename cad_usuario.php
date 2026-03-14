@@ -226,7 +226,10 @@ if (empty($id_usuario)) {
                 <div class="form-group col-sm-2">
                     <label for="senha_user">Senha</label>
                     <input type="password" class="form-control" id="senha_user" name="senha_user"
-                        placeholder="Digite a senha">
+                        placeholder="Digite a senha" minlength="8"
+                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}"
+                        title="Mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.">
+                    <small class="form-text text-muted">Mínimo 8 caracteres, com maiúscula, minúscula, número e especial.</small>
                 </div>
                 <div class="form-group col-sm-2">
                     <input type="hidden" class="form-control" value="s" id="senha_default_user"

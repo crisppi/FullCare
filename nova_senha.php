@@ -5,6 +5,7 @@ require_once("models/usuario.php");
 require_once("models/usuario.php");
 require_once("dao/usuarioDao.php");
 require_once("dao/pacienteDao.php");
+require_once("app/passwordPolicy.php");
 require_once("templates/header.php");
 
 include_once("array_dados.php");
@@ -141,7 +142,9 @@ $usuarioDao = new UserDAO($conn, $BASE_URL);
                         <label class="password-label" for="nova_senha_user">Nova senha</label>
                         <div class="input-group password-field">
                             <input type="password" class="form-control" id="nova_senha_user" name="nova_senha_user"
-                                autocomplete="new-password" onkeyup="checkIn()">
+                                autocomplete="new-password" onkeyup="checkIn()" minlength="8"
+                                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}"
+                                title="<?= htmlspecialchars(password_policy_message(), ENT_QUOTES, 'UTF-8') ?>">
                             <button type="button" class="btn password-toggle" data-toggle-password="#nova_senha_user" title="Mostrar/ocultar senha">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -151,7 +154,9 @@ $usuarioDao = new UserDAO($conn, $BASE_URL);
                     <div class="col-md-6">
                         <label class="password-label" for="nova_senha_user2">Confirme a nova senha</label>
                         <div class="input-group password-field">
-                            <input type="password" class="form-control" id="nova_senha_user2" autocomplete="new-password" onblur="check()">
+                            <input type="password" class="form-control" id="nova_senha_user2" autocomplete="new-password" onblur="check()" minlength="8"
+                                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}"
+                                title="<?= htmlspecialchars(password_policy_message(), ENT_QUOTES, 'UTF-8') ?>">
                             <button type="button" class="btn password-toggle" data-toggle-password="#nova_senha_user2" title="Mostrar/ocultar senha">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -212,6 +217,13 @@ include_once("templates/footer.php");
         if (!senhaAtual || !novaSenha || !novaSenha2) {
             e.preventDefault();
             erroNova.textContent = 'Preencha todos os campos para continuar.';
+            erroNova.style.display = 'block';
+            return;
+        }
+        var policyRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+        if (!policyRegex.test(novaSenha)) {
+            e.preventDefault();
+            erroNova.textContent = 'A nova senha deve ter no mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.';
             erroNova.style.display = 'block';
             return;
         }

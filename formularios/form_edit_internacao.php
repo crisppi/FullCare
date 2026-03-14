@@ -253,7 +253,34 @@
 
     $tussGeral = $tuss->findAll();
 
+    $hasDetalhesReg = !empty($haDetalhes);
+    $hasTussReg = !empty($tussDaInt);
+    $hasGestaoReg = !empty($int_gestao);
+    $hasUtiReg = (!empty($utiList) && !empty(array_filter($utiList, static function ($row) {
+        $row = (array)$row;
+        return trim((string)($row['entrada'] ?? '')) !== ''
+            || trim((string)($row['saida'] ?? '')) !== ''
+            || trim((string)($row['motivo_uti'] ?? '')) !== ''
+            || trim((string)($row['internado_uti'] ?? '')) !== '';
+    }))) || (($intern['acomodacao_int'] ?? '') === 'UTI');
+    $hasProrrogReg = !empty(array_filter($prorList ?? [], static function ($row) {
+        $row = (array)$row;
+        return trim((string)($row['acomod'] ?? '')) !== ''
+            || trim((string)($row['ini'] ?? '')) !== ''
+            || trim((string)($row['fim'] ?? '')) !== '';
+    }));
+    $hasNegocReg = !empty(array_filter($negociacoesInt ?? [], static function ($row) {
+        $row = (array)$row;
+        return trim((string)($row['tipo_negociacao'] ?? '')) !== ''
+            || trim((string)($row['data_inicio_neg'] ?? $row['data_inicio_negoc'] ?? '')) !== ''
+            || trim((string)($row['troca_de'] ?? '')) !== ''
+            || trim((string)($row['troca_para'] ?? '')) !== '';
+    }));
+
     ?>
+
+    <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/form_cad_internacao.css" rel="stylesheet">
 
 
     <div class="internacao-page">
@@ -265,6 +292,11 @@
         </div>
         <div class="internacao-page__content">
             <div class="internacao-card internacao-card--general">
+                <div class="internacao-card__header">
+                    <div>
+                        <p class="internacao-card__eyebrow">Dados essenciais</p>
+                    </div>
+                </div>
                 <div class="internacao-card__body">
                     <form class="visible" action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/process_internacao_editar.php', ENT_QUOTES, 'UTF-8') ?>" id="myForm" method="POST"
                         enctype="multipart/form-data">
@@ -589,28 +621,78 @@
                         <input type="hidden" name="id_detalhes" value="<?= $detalhesDaInt[0]['id_detalhes'] ?>">
                     <?php endif; ?>
                     <input type="hidden" name="fk_int_det" value="<?= $intern['id_internacao'] ?>">
-                    <div>
-                        <hr>
-                    </div>
-                    <div class="form-group col-sm-2" style=" margin-top:15px">
-                        <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório
-                            detalhado</label>
-                        <select class="form-control-sm form-control" id="relatorio-detalhado"
-                            name="relatorio-detalhado">
-                            <option value="s">Sim</option>
-                            <option value="n" selected>Não</option>
-                        </select>
-
+                    <div class="tabelas-adicionais-card">
+                        <div class="tabelas-adicionais-card__header">
+                            <h4 class="tabelas-adicionais-card__title">
+                                <span class="tabelas-adicionais-card__marker"></span>
+                                Tabelas Adicionais
+                            </h4>
+                        </div>
+                        <div class="tabelas-selects d-flex flex-wrap justify-content-between align-items-end">
+                            <div class="form-group tabelas-col">
+                                <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório detalhado</label>
+                                <select class="input-lg-fullcare form-control detail-select" id="relatorio-detalhado" name="relatorio-detalhado">
+                                    <option value="">Selecione</option>
+                                    <option value="s" <?= $hasDetalhesReg ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$hasDetalhesReg ? 'selected' : '' ?>>Não</option>
+                                </select>
+                            </div>
+                            <div class="form-group tabelas-col">
+                                <label class="control-label" style="font-weight: bold;" for="select_tuss">Tuss</label>
+                                <select class="input-lg-fullcare form-control select-purple" id="select_tuss" name="select_tuss">
+                                    <option value="">Selecione</option>
+                                    <option value="s" <?= $hasTussReg ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$hasTussReg ? 'selected' : '' ?>>Não</option>
+                                </select>
+                            </div>
+                            <div class="form-group tabelas-col">
+                                <label class="control-label" style="font-weight: bold;" for="select_prorrog">Prorrogação</label>
+                                <select class="input-lg-fullcare form-control select-purple" id="select_prorrog" name="select_prorrog">
+                                    <option value="">Selecione</option>
+                                    <option value="s" <?= $hasProrrogReg ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$hasProrrogReg ? 'selected' : '' ?>>Não</option>
+                                </select>
+                            </div>
+                            <div class="form-group tabelas-col">
+                                <label class="control-label" style="font-weight: bold;" for="select_gestao">Gestão Assistencial</label>
+                                <select class="input-lg-fullcare form-control select-purple" id="select_gestao" name="select_gestao">
+                                    <option value="">Selecione</option>
+                                    <option value="s" <?= $hasGestaoReg ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$hasGestaoReg ? 'selected' : '' ?>>Não</option>
+                                </select>
+                            </div>
+                            <div class="form-group tabelas-col">
+                                <label class="control-label" style="font-weight: bold;" for="select_uti">UTI</label>
+                                <select class="input-lg-fullcare form-control select-purple" id="select_uti" name="select_uti">
+                                    <option value="">Selecione</option>
+                                    <option value="s" <?= $hasUtiReg ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$hasUtiReg ? 'selected' : '' ?>>Não</option>
+                                </select>
+                            </div>
+                            <div class="form-group tabelas-col">
+                                <label class="control-label" style="font-weight: bold;" for="select_negoc">Negociações</label>
+                                <select class="input-lg-fullcare form-control select-purple" id="select_negoc" name="select_negoc">
+                                    <option value="">Selecione</option>
+                                    <option value="s" <?= $hasNegocReg ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$hasNegocReg ? 'selected' : '' ?>>Não</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group col-sm-3">
                         <?php $agora = date('Y-m-d'); ?> <input type="hidden" id="data_create_int"
                             value='<?= $agora; ?>' name="data_create_int">
                     </div>
-                    <div>
-                        <hr>
-                    </div>
                 </div>
-                <div id="div-detalhado" class="form-group row" style="margin-left:5px; display:none;">
+                <div id="detalhes-card-wrapper" style="display:none;">
+                <div class="detalhes-card">
+                <div class="detalhes-card__header">
+                    <h4 class="detalhes-card__title">
+                        <span class="detalhes-card__marker"></span>
+                        Detalhes do relatório
+                    </h4>
+                </div>
+                <div id="div-detalhado" class="form-group row" style="margin-left:-12px; display:none;">
                     <div class="form-group row">
 
                         <?php
@@ -912,87 +994,20 @@
                         <hr>
                     </div>
                 </div>
+                </div>
+                </div>
 
-                <!-- Accordion com toggle individual em Bootstrap 5 -->
-                <div class="accordion" id="accordionInternacao">
-                    <!-- 1) TUSS -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingTuss">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseTuss" aria-expanded="false" aria-controls="collapseTuss">
-                                <i class="fa-solid fa-notes-medical me-2"></i>
-                                <span>TUSS</span>
-                            </button>
-                        </h2>
-                        <div id="collapseTuss" class="accordion-collapse collapse" aria-labelledby="headingTuss">
-                            <div class="accordion-body">
-                                <?php include_once('formularios/form_edit_internacao_tuss2.php'); ?>
-                            </div>
-                        </div>
+                <div id="tabelas-dynamic-stack-edit">
+                    <div id="container-tuss" style="display:none; margin:5px;">
+                        <?php include_once('formularios/form_edit_internacao_tuss2.php'); ?>
                     </div>
-
-                    <!-- 2) UTI -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingUti">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseUti" aria-expanded="false" aria-controls="collapseUti">
-                                <i class="fa-solid fa-procedures me-2"></i>
-                                <span>Editar UTI</span>
-                            </button>
-                        </h2>
-                        <div id="collapseUti" class="accordion-collapse collapse" aria-labelledby="headingUti">
-                            <div class="accordion-body">
-                                <?php include_once('formularios/form_edit_internacao_uti2.php'); ?>
-                            </div>
-                        </div>
+                    <?php include_once('formularios/form_edit_internacao_gestao2.php'); ?>
+                    <?php include_once('formularios/form_edit_internacao_uti2.php'); ?>
+                    <div id="container-prorrog" style="display:none; margin:5px;">
+                        <?php include_once('formularios/form_edit_internacao_prorrog2.php'); ?>
                     </div>
-
-                    <!-- 3) GESTÃO -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingGestao">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseGestao" aria-expanded="false" aria-controls="collapseGestao">
-                                <i class="fa-solid fa-wallet me-2"></i>
-                                <span>Editar Gestão Assistencial</span>
-                            </button>
-                        </h2>
-                        <div id="collapseGestao" class="accordion-collapse collapse" aria-labelledby="headingGestao">
-                            <div class="accordion-body">
-                                <?php include_once('formularios/form_edit_internacao_gestao2.php'); ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4) PRORROGAÇÕES -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingProrrog">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseProrrog" aria-expanded="false" aria-controls="collapseProrrog">
-                                <i class="fa-solid fa-calendar-alt me-2"></i>
-                                <span>Editar Prorrogações</span>
-                            </button>
-                        </h2>
-                        <div id="collapseProrrog" class="accordion-collapse collapse" aria-labelledby="headingProrrog">
-                            <div class="accordion-body">
-                                <?php include_once('formularios/form_edit_internacao_prorrog2.php'); ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 5) NEGOCIAÇÕES -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingNegoc">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseNegoc" aria-expanded="false" aria-controls="collapseNegoc">
-                                <i class="fa-solid fa-handshake me-2"></i>
-                                <span>Editar Negociações</span>
-                            </button>
-                        </h2>
-                        <div id="collapseNegoc" class="accordion-collapse collapse" aria-labelledby="headingNegoc">
-                            <div class="accordion-body">
-                                <?php include_once('formularios/form_edit_internacao_negoc2.php'); ?>
-                            </div>
-                        </div>
+                    <div id="container-negoc" style="display:none; margin:5px;">
+                        <?php include_once('formularios/form_edit_internacao_negoc2.php'); ?>
                     </div>
                 </div>
 
@@ -1027,30 +1042,58 @@
         function reduzirText(textareaId, originalRows) {
             document.getElementById(textareaId).rows = originalRows;
         }
-        // Abre accordion de prorrogações/TUSS quando solicitado via hash ou querystring
         document.addEventListener('DOMContentLoaded', function() {
-            var params = new URLSearchParams(window.location.search);
-            var target = null;
-            if (window.location.hash === '#collapseProrrog' || params.get('section') === 'prorrog') {
-                target = 'collapseProrrog';
-            } else if (window.location.hash === '#collapseTuss' || params.get('section') === 'tuss') {
-                target = 'collapseTuss';
-            } else if (window.location.hash === '#collapseNegoc' || params.get('section') === 'negoc') {
-                target = 'collapseNegoc';
+            function setupToggle(selectId, containerId) {
+                var selectEl = document.getElementById(selectId);
+                var containerEl = document.getElementById(containerId);
+                if (!selectEl || !containerEl) return;
+
+                function aplicar() {
+                    containerEl.style.display = selectEl.value === 's' ? 'block' : 'none';
+                }
+
+                aplicar();
+                selectEl.addEventListener('change', aplicar);
             }
-            if (!target) return;
-            var collapseEl = document.getElementById(target);
-            if (!collapseEl) return;
-            try {
-                var bs = bootstrap.Collapse.getOrCreateInstance(collapseEl, {
-                    toggle: false
-                });
-                bs.show();
-            } catch (e) {
-                collapseEl.classList.add('show');
+
+            function setupDetalhesToggle() {
+                var selectDet = document.getElementById('relatorio-detalhado');
+                var wrapperDet = document.getElementById('detalhes-card-wrapper');
+                var divDet = document.getElementById('div-detalhado');
+                if (!selectDet || !wrapperDet || !divDet) return;
+
+                function aplicarDetalhes() {
+                    var show = selectDet.value === 's';
+                    wrapperDet.style.display = show ? 'block' : 'none';
+                    divDet.style.display = show ? 'flex' : 'none';
+                }
+
+                aplicarDetalhes();
+                selectDet.addEventListener('change', aplicarDetalhes);
             }
-            var btn = document.querySelector('[data-bs-target="#' + target + '"]');
-            if (btn) btn.setAttribute('aria-expanded', 'true');
+
+            setupToggle('select_tuss', 'container-tuss');
+            setupToggle('select_prorrog', 'container-prorrog');
+            setupToggle('select_gestao', 'container-gestao');
+            setupToggle('select_negoc', 'container-negoc');
+            setupDetalhesToggle();
+
+            (function() {
+                var selectUti = document.getElementById('select_uti');
+                var acomEl = document.getElementById('acomodacao_int');
+                var containerUti = document.getElementById('container-uti');
+                if (!containerUti) return;
+
+                function aplicarUti() {
+                    var viaSelect = selectUti && selectUti.value === 's';
+                    var viaAcomod = acomEl && acomEl.value === 'UTI';
+                    containerUti.style.display = (viaSelect || viaAcomod) ? 'block' : 'none';
+                }
+
+                aplicarUti();
+                if (selectUti) selectUti.addEventListener('change', aplicarUti);
+                if (acomEl) acomEl.addEventListener('change', aplicarUti);
+            })();
         });
     </script>
     <script>

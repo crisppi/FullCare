@@ -24,6 +24,7 @@ if (!defined("FLOW_LOGGER_AUTO_V1")) {
 
 require_once("globals.php");
 require_once("db.php");
+require_once("app/passwordPolicy.php");
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -55,8 +56,8 @@ if ($senha !== $senha2) {
     exit;
 }
 
-if (mb_strlen($senha) < 6) {
-    $_SESSION['recuperacao_msg'] = 'A senha deve ter pelo menos 6 caracteres.';
+if ($policyErrors = password_policy_errors($senha)) {
+    $_SESSION['recuperacao_msg'] = $policyErrors[0];
     $_SESSION['recuperacao_tipo'] = 'error';
     header('Location: ' . app_url('redefinir_senha.php') . '?token=' . urlencode($token), true, 303);
     exit;

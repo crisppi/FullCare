@@ -27,6 +27,7 @@ require_once("globals.php");
 require_once("db.php");
 require_once("models/message.php");
 require_once("dao/usuarioDao.php");
+require_once("app/passwordPolicy.php");
 
 $message = new Message($BASE_URL);
 $userDao = new UserDAO($conn, $BASE_URL);
@@ -188,7 +189,13 @@ if ($type === "create") {
 
         // $hash_user = password_hash(filter_input(INPUT_POST, "senha_user"), PASSWORD_DEFAULT);
         // $senha_user = filter_input(INPUT_POST, "senha_user");
-        $senha_user = password_hash(filter_input(INPUT_POST, "senha_user"), PASSWORD_DEFAULT);
+        $senha_user_raw = (string)filter_input(INPUT_POST, "senha_user");
+        $passwordErrors = password_policy_errors($senha_user_raw);
+        if ($passwordErrors) {
+            $message->setMessage($passwordErrors[0], "error", "back");
+            exit;
+        }
+        $senha_user = password_hash($senha_user_raw, PASSWORD_DEFAULT);
 
         $foto_usuario = (string)($arquivo ?? '');
         $usuario = new Usuario();
@@ -318,6 +325,11 @@ if ($type === "create") {
         $foto_usuario = $arquivo !== null ? $arquivo : (string)($usuarioData->foto_usuario ?? '');
 
         if ($senha_user_raw !== '') {
+            $passwordErrors = password_policy_errors($senha_user_raw);
+            if ($passwordErrors) {
+                $message->setMessage($passwordErrors[0], "error", "back");
+                exit;
+            }
             $senha_user = password_hash($senha_user_raw, PASSWORD_DEFAULT);
         } else {
             $senha_user = (string)($usuarioData->senha_user ?? '');
@@ -374,36 +386,30 @@ if ($type === "create") {
 // atualizacao de senha default //
 if ($type === "update-senha") {
 
-    $senha_user = filter_input(INPUT_POST, "nova_senha_user");
+    $senha_user = (string)filter_input(INPUT_POST, "nova_senha_user");
     $senha_default_user = filter_input(INPUT_POST, "senha_default_user");
-    $senha_usuario = filter_input(INPUT_POST, "senha_usuario");
-    // $senha_usuario = password_hash(filter_input(INPUT_POST, "senha_usuario"), PASSWORD_DEFAULT);
-    // $senha_user = password_hash(filter_input(INPUT_POST, "nova_senha_user"), PASSWORD_DEFAULT);
-    $senha_bd = $_SESSION['senha_user'];
-    // $senha_bd = password_hash($_SESSION['senha_user'], PASSWORD_DEFAULT);
-
-    if (password_verify($senha_usuario, $senha_bd)) {
-        echo 'Password is valid!';
-        echo "<hr>";
-        // exit;
-    } else {
-        echo 'Invalid password.';
-        echo "<hr>";
-
-        print_r($senha_bd . "<br>");
-        print_r($senha_usuario . "<br>");
-        // exit;
-    }
-    ;
+    $senha_usuario = (string)filter_input(INPUT_POST, "senha_user");
     $usuarioDao = new userDAO($conn, $BASE_URL);
 
     // Receber os dados dos inputs
     $id_usuario = filter_input(INPUT_POST, "id_usuario");
 
-    // $senha_user = filter_input(INPUT_POST, "nova_senha_user");
-    $senha_default_user = filter_input(INPUT_POST, "senha_default_user");
-
     $usuarioData = $usuarioDao->findById_user($id_usuario);
+    if (!$usuarioData) {
+        $message->setMessage("Usuário não encontrado.", "error", "back");
+        exit;
+    }
+
+    if ($senha_usuario === '' || !password_verify($senha_usuario, (string)$usuarioData->senha_user)) {
+        $message->setMessage("Senha atual incorreta.", "error", "back");
+        exit;
+    }
+
+    $passwordErrors = password_policy_errors($senha_user);
+    if ($passwordErrors) {
+        $message->setMessage($passwordErrors[0], "error", "back");
+        exit;
+    }
 
     $usuarioData->id_usuario = $id_usuario;
 

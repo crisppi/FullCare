@@ -257,7 +257,11 @@ $usuario = $usuarioDao->findById_user($id_usuario);
                 <div class="form-group col-sm-2">
                     <label for="senha_user">Senha</label>
                     <input type="password" class="form-control" value="" id="senha_user"
-                        name="senha_user" placeholder="Deixe em branco para manter">
+                        name="senha_user" placeholder="Deixe em branco para manter"
+                        minlength="8"
+                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}"
+                        title="Mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.">
+                    <small class="form-text text-muted">Ao preencher, use no mínimo 8 caracteres com maiúscula, minúscula, número e especial.</small>
                 </div>
 
                 <div class="form-group col-sm-4">

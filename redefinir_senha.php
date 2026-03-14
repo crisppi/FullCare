@@ -174,10 +174,19 @@ if ($token) {
             <input type="text" id="codigo" name="codigo" inputmode="numeric" maxlength="6" required />
 
             <label for="senha">Nova senha</label>
-            <input type="password" id="senha" name="senha" required />
+            <input type="password" id="senha" name="senha" required minlength="8"
+                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}"
+                title="Mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial." />
 
             <label for="senha2">Confirmar nova senha</label>
-            <input type="password" id="senha2" name="senha2" required />
+            <input type="password" id="senha2" name="senha2" required minlength="8"
+                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}"
+                title="Mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial." />
+
+            <div class="msg info" style="display:block; margin-top:12px;">
+                A senha deve ter no mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.
+            </div>
+            <div class="msg error" id="senha-msg-inline" style="display:none;"></div>
 
             <button type="submit" class="btn">Atualizar senha</button>
         </form>
@@ -187,6 +196,33 @@ if ($token) {
 
         <a class="back" href="<?= app_url('index_novo.php') ?>">Voltar ao login</a>
     </div>
+    <script>
+    document.querySelector('form')?.addEventListener('submit', function(e) {
+        var senha = document.getElementById('senha')?.value || '';
+        var senha2 = document.getElementById('senha2')?.value || '';
+        var msg = document.getElementById('senha-msg-inline');
+        var policyRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+        if (msg) {
+            msg.style.display = 'none';
+            msg.textContent = '';
+        }
+        if (!policyRegex.test(senha)) {
+            e.preventDefault();
+            if (msg) {
+                msg.textContent = 'A senha deve ter no mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.';
+                msg.style.display = 'block';
+            }
+            return;
+        }
+        if (senha !== senha2) {
+            e.preventDefault();
+            if (msg) {
+                msg.textContent = 'As senhas não conferem.';
+                msg.style.display = 'block';
+            }
+        }
+    });
+    </script>
 </body>
 
 </html>
