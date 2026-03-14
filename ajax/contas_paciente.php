@@ -186,7 +186,7 @@ try {
         $fimRaw = $r['data_final_capeante'] ?? null;
         $inicioIso = ($inicioRaw && $inicioRaw !== '0000-00-00') ? $inicioRaw : null;
         $fimIso = ($fimRaw && $fimRaw !== '0000-00-00') ? $fimRaw : null;
-        $isPeriodoAberto = $fimIso === null;
+        $isPeriodoAberto = $inicioIso !== null && $fimIso === null;
 
         [$cycleIndex, $cycleStartDt, $cycleEndDt] = $calcCycle($r);
         $cycleStartIso = $cycleStartDt ? $cycleStartDt->format('Y-m-d') : null;
@@ -199,7 +199,9 @@ try {
             'id_internacao'      => (int)($r['id_internacao'] ?? 0),
             'id_capeante'        => (int)($r['id_capeante'] ?? 0),
             'hospital'           => $r['nome_hosp'] ?? '',
-            'periodo'            => trim(($fmtDate($r['data_inicial_capeante'] ?? null) ?: '—') . ' a ' . ($fmtDate($r['data_final_capeante'] ?? null) ?: '—')),
+            'periodo'            => ($inicioIso || $fimIso)
+                ? trim(($fmtDate($r['data_inicial_capeante'] ?? null) ?: '—') . ' a ' . ($fmtDate($r['data_final_capeante'] ?? null) ?: '—'))
+                : 'Sem período informado',
             'periodo_inicio_raw' => $inicioIso,
             'periodo_fim_raw'    => $fimIso,
             'periodo_em_aberto'  => $isPeriodoAberto,

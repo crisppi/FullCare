@@ -194,14 +194,18 @@
       const altaDisplay = formatDateTimeBr(alta, row.hora_alta ?? row.hora_alta_alt ?? null);
       const unidade = row.unidade ?? row.nome_hosp ?? row.hospital ?? row.estabelecimento ?? row.acomodacao_int ?? '—';
       const medico = row.medico ?? row.medico_responsavel ?? row.crm_int ?? row.crm ?? '—';
+      const hasAlta = Boolean((row.tem_alta ?? false)) || (String(alta || '').trim() !== '');
       const status =
         row.status ??
-        (String(row.internado_int).toLowerCase() === 'n'
+        (hasAlta || String(row.internado_int).toLowerCase() === 'n'
           ? 'Alta'
           : (String(row.internado_int).toLowerCase() === 's' ? 'Internado' : '—'));
       const pror = Number(row.prorrogacoes ?? row.qtd_prorrog ?? 0) || 0;
+      const prorPend = Number(row.prorrogacoes_pendentes ?? row.prorrog_pendentes ?? 0) || 0;
+      const prorPendLabel = (row.prorrogacoes_pendentes_label ?? row.prorrog_pendente_label ?? '').toString().trim();
       const visitas = Number(row.visitas ?? row.visitas_total ?? row.num_visitas ?? row.qtd_visitas ?? 0) || 0;
-      const isAlta = String(status).toLowerCase() === 'alta' ||
+      const isAlta = hasAlta ||
+        String(status).toLowerCase() === 'alta' ||
         String(row.internado_int).toLowerCase() === 'n';
 
       const partialUrl = `${window.BASE_URL || ''}cad_capeante_rah.php?type=create&nova_parcial=1&id_internacao=${encodeURIComponent(iid)}`;
@@ -219,7 +223,10 @@
         <td>${esc(medico)}</td>
         <td>${esc(status)}</td>
         <td>${visitas}</td>
-        <td>${pror}</td>
+        <td>
+          <div>${pror}</div>
+          ${prorPend > 0 ? `<div class="text-danger small fw-semibold">Pendente${prorPendLabel ? ` (${esc(prorPendLabel)})` : ''}</div>` : ''}
+        </td>
         <td class="text-center">
           <button class="btn btn-sm btn-outline-primary" data-action="ver-int" data-id-int="${esc(iid)}">Ver</button>
           ${isAlta ? '' : `
@@ -536,7 +543,7 @@
         row.__parsedEnd = end;
         if (!firstDate && start) firstDate = start;
 
-        if (!end) {
+        if (start && !end) {
           row.__periodoAberto = true;
           hasOpen = true;
         }

@@ -13,6 +13,85 @@ require_once 'models/message.php';
 require_once 'models/internacao.php'; // opcional, mas não atrapalha (require_once)
 require_once 'dao/internacaoDao.php';
 
+function hubDateToTs(?string $date): ?int
+{
+    if (!$date) {
+        return null;
+    }
+    $ts = strtotime(substr((string)$date, 0, 10));
+    return $ts ? (int)$ts : null;
+}
+
+function hubDaysExclusive(int $startTs, int $endTs): int
+{
+    if ($endTs <= $startTs) {
+        return 0;
+    }
+    return (int) floor(($endTs - $startTs) / 86400);
+}
+
+function hubComputeCoverageAndGaps(array $intervals, int $startTs, int $endTs): array
+{
+    if (!$intervals) {
+        return [0, hubDaysExclusive($startTs, $endTs), [[date('d/m/Y', $startTs), date('d/m/Y', $endTs)]]];
+    }
+
+    usort($intervals, fn($a, $b) => $a['s'] <=> $b['s']);
+
+    $coveredDays = 0;
+    $gaps = [];
+    $curS = $intervals[0]['s'];
+    $curE = $intervals[0]['e'];
+
+    foreach ($intervals as $idx => $it) {
+        if ($idx === 0) {
+            continue;
+        }
+
+        if ($it['s'] <= $curE) {
+            if ($it['e'] > $curE) {
+                $curE = $it['e'];
+            }
+            continue;
+        }
+
+        if ($curS > $startTs) {
+            $gapStart = $startTs;
+            $gapEnd = $curS;
+            if ($gapEnd > $gapStart) {
+                $gaps[] = [date('d/m/Y', $gapStart), date('d/m/Y', $gapEnd)];
+            }
+        }
+
+        $coveredDays += hubDaysExclusive($curS, $curE);
+        $curS = $it['s'];
+        $curE = $it['e'];
+    }
+
+    if ($curS > $startTs) {
+        $gapStart = $startTs;
+        $gapEnd = $curS;
+        if ($gapEnd > $gapStart) {
+            $gaps[] = [date('d/m/Y', $gapStart), date('d/m/Y', $gapEnd)];
+        }
+    }
+
+    $coveredDays += hubDaysExclusive($curS, $curE);
+
+    if ($curE < $endTs) {
+        $gapStart = $curE;
+        $gapEnd = $endTs;
+        if ($gapEnd > $gapStart) {
+            $gaps[] = [date('d/m/Y', $gapStart), date('d/m/Y', $gapEnd)];
+        }
+    }
+
+    $totalDays = hubDaysExclusive($startTs, $endTs);
+    $missingDays = max(0, $totalDays - $coveredDays);
+
+    return [$coveredDays, $missingDays, $gaps];
+}
+
 try {
     ajax_require_active_session();
     $ctx = ajax_user_context($conn);
@@ -84,6 +163,26 @@ try {
     $stmtRows->execute();
     $rows = $stmtRows->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
+    $ids = array_values(array_unique(array_filter(array_map(static fn($r) => (int)($r['id_internacao'] ?? 0), $rows))));
+    $prorrogacoesByInternacao = [];
+
+    if ($ids) {
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmtPr = $conn->prepare("
+            SELECT fk_internacao_pror, prorrog1_ini_pror, prorrog1_fim_pror
+            FROM tb_prorrogacao
+            WHERE fk_internacao_pror IN ({$placeholders})
+            ORDER BY fk_internacao_pror, prorrog1_ini_pror
+        ");
+        $stmtPr->execute($ids);
+        while ($row = $stmtPr->fetch(PDO::FETCH_ASSOC)) {
+            $fk = (int)($row['fk_internacao_pror'] ?? 0);
+            if ($fk > 0) {
+                $prorrogacoesByInternacao[$fk][] = $row;
+            }
+        }
+    }
+
     // formata datas
     $fmtDate = function ($d) {
         if (!$d || $d === '0000-00-00')
@@ -92,18 +191,54 @@ try {
         return $dt ? $dt->format('d/m/Y') : '';
     };
 
-    $payload = array_map(function ($r) use ($fmtDate) {
+    $todayTs = strtotime(date('Y-m-d'));
+    $payload = array_map(function ($r) use ($fmtDate, $todayTs, $prorrogacoesByInternacao) {
+        $idInternacao = (int)($r['id_internacao'] ?? 0);
+        $startTs = hubDateToTs($r['data_intern_int'] ?? null);
+        $endTs = hubDateToTs($r['data_alta_alt'] ?? null) ?: $todayTs;
+        $prorrogPendentes = 0;
+        $prorrogPendentesLabel = '';
+
+        if ($startTs && $endTs > $startTs) {
+            $intervals = [];
+            foreach (($prorrogacoesByInternacao[$idInternacao] ?? []) as $p) {
+                $iniTs = hubDateToTs($p['prorrog1_ini_pror'] ?? null);
+                if (!$iniTs) {
+                    continue;
+                }
+                $fimTs = hubDateToTs($p['prorrog1_fim_pror'] ?? null) ?: $endTs;
+                if ($fimTs <= $startTs || $iniTs >= $endTs) {
+                    continue;
+                }
+                $intervals[] = [
+                    's' => max($startTs, $iniTs),
+                    'e' => min($endTs, $fimTs),
+                ];
+            }
+
+            [, $missingDays, $gaps] = hubComputeCoverageAndGaps($intervals, $startTs, $endTs);
+            if ($missingDays > 0) {
+                $prorrogPendentes = count($gaps);
+                $prorrogPendentesLabel = implode(' | ', array_map(static fn($g) => $g[0] . ' -> ' . $g[1], $gaps));
+            }
+        }
+
+        $temAlta = !empty($r['data_alta_alt']) && $r['data_alta_alt'] !== '0000-00-00';
+
         return [
-            'id_internacao' => (int) ($r['id_internacao'] ?? 0),
+            'id_internacao' => $idInternacao,
             'admissao' => $fmtDate($r['data_intern_int'] ?? null),
             'alta' => $fmtDate($r['data_alta_alt'] ?? null),
             'hora_admissao' => $r['hora_intern_int'] ?? null,
             'hora_alta' => $r['hora_alta_alt'] ?? null,
             'unidade' => trim($r['nome_hosp'] ?? ''),
             'medico' => '', // TODO: incluir no SELECT se precisar
-            'status' => (isset($r['internado_int']) && $r['internado_int'] === 's') ? 'Internado' : 'Alta',
+            'status' => $temAlta ? 'Alta' : ((isset($r['internado_int']) && $r['internado_int'] === 's') ? 'Internado' : 'Alta'),
             'prorrogacoes' => (int)($r['prorrogacoes'] ?? 0),
-            'visitas' => (int)($r['visitas_total'] ?? 0)
+            'prorrogacoes_pendentes' => $prorrogPendentes,
+            'prorrogacoes_pendentes_label' => $prorrogPendentesLabel,
+            'visitas' => (int)($r['visitas_total'] ?? 0),
+            'tem_alta' => $temAlta,
         ];
     }, $rows ?: []);
 

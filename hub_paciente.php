@@ -1222,8 +1222,8 @@ $complexInfo = $complexMap[$effectiveLevel];
 <script>
   // Diz qual campo é a senha e injeta os dados pro JS
   window.HUB_SENHA_FIELD = 'senha_int';
-  window.PRELOADED_INT = <?= $preloadEnabled ? json_encode($internacoes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : 'null' ?>;
-  window.PRELOAD_ENABLED = <?= $preloadEnabled ? 'true' : 'false' ?>;
+  window.PRELOADED_INT = null;
+  window.PRELOAD_ENABLED = false;
   window.PRELOAD_THRESHOLD = <?= (int)$preloadThreshold ?>;
 
   // (mantém o que você já tinha)
