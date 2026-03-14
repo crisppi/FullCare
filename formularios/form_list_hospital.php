@@ -97,7 +97,12 @@
     <div class="container-fluid form_container" style="margin-top:-5px;">
         <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
             <h4 class="page-title">Hospitais</h4>
-            <div style="margin-left: auto;">
+            <div style="margin-left: auto; display:flex; gap:10px; align-items:center;">
+                <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/list_hospitalUser.php', ENT_QUOTES, 'UTF-8') ?>"
+                    class="btn btn-outline-secondary btn-sm"
+                    style="border-radius:10px;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.08);">
+                    <i class="bi bi-diagram-3" style="font-size: 1rem;margin-right:5px;"></i>Usuários por Hospital
+                </a>
                 <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/cad_hospital.php', ENT_QUOTES, 'UTF-8') ?>"
                     class="btn btn-success styled"
                     style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
@@ -192,6 +197,13 @@
                                 </td>
 
                                 <td class="action">
+                                    <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px;">
+                                        <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospital_usuarios.php?id_hospital=' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>"
+                                            class="btn btn-sm btn-outline-secondary"
+                                            title="Resumo de usuários deste hospital"
+                                            style="border-radius:8px; line-height:1;">
+                                            <i class="bi bi-people-fill"></i>
+                                        </a>
                                     <div class="dropdown">
                                         <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown"
                                             role="button" data-bs-toggle="dropdown" style="color:#5e2363"
@@ -230,6 +242,7 @@
                                             </li>
 
                                         </ul>
+                                    </div>
                                     </div>
                                 </td>
                             </tr>

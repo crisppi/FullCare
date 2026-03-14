@@ -95,7 +95,7 @@ if ($qtdIntItens > $limite) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="./scripts/cadastro/general.js"></script>
     <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
-        <h4 style="margin-top:-10px" class="page-title">Estipulantes</h4>
+        <h4 class="page-title">Estipulantes</h4>
         <div style="margin-left: auto;">
             <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/cad_estipulante.php', ENT_QUOTES, 'UTF-8') ?>"
                 class="btn btn-success styled"
@@ -104,7 +104,7 @@ if ($qtdIntItens > $limite) {
             </a>
         </div>
     </div>
-    <hr style="margin-top: 1px; margin-bottom: 10px;">
+    <hr style="margin-top: 5px; margin-bottom: 10px;">
 
     <div class="complete-table">
         <div id="navbarToggleExternalContent" class="table-filters">

@@ -64,6 +64,7 @@ $isDiretoria = in_array($normCargoAccess, ['diretoria', 'diretor', 'administrado
     || in_array($normNivelAccess, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
     || ($sessionNivel === -1);
 $canSeeInteligenciaMenu = $isDiretoria;
+$canSeeUsuariosCadastro = $isDiretoria && in_array($sessionNivel, [5, -1], true);
 $isPerfilMedicoMenu = $startsWithAnyAccess($normCargoAccess, ['medico', 'med']);
 $seguradoraHeaderLogoUrl = null;
 $seguradoraHeaderNome = null;
@@ -507,31 +508,7 @@ if (!empty($sessionIdUsuario)) {
                                 </li>
                             <?php } ?>
 
-                            <?php if ($canSeeFullMenu && $sessionNivel > 3) { ?>
-                                <li id="drop1" class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="<?= $BASE_URL ?>pacientes"
-                                        id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown"
-                                        aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                            class="bi bi-people-fill edit-icon"></i>
-                                        Usuários
-                                    </a>
-                                    <ul class="dropdown-menu" id="dropMenu1" aria-labelledby="navbarScrollingDropdown">
-
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_usuario.php"><i
-                                                    class="bi bi-file-medical"
-                                                    style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
-                                                Pesquisa Usuários</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_hospitalUser.php"><i
-                                                    class="bi bi-person-badge"
-                                                    style="font-size: 1rem; margin-right:5px; color: rgb(15, 155, 176);"></i>
-                                                Hospital por Usuário</a>
-                                        </li>
-                                    </ul>
-                                </li>
-
-                            <?php }; ?>
-                            <?php if ($canSeeFullMenu && $sessionNivel > 3) { ?>
+                            <?php if ($canSeeFullMenu && ($sessionNivel > 3 || $canSeeUsuariosCadastro)) { ?>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
@@ -556,6 +533,12 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-building"
                                                     style="font-size:  1rem;margin-right:5px; color: rgb(213, 12, 155);"></i>
                                                 Estipulantes</a></li>
+                                        <?php if ($canSeeUsuariosCadastro) { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_usuario.php"><i
+                                                        class="bi bi-people-fill"
+                                                        style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
+                                                    Usuários</a></li>
+                                        <?php } ?>
                                         <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_patologia.php"><span
                                             class=" bi bi-virus"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(178, 155, 155);"></span>

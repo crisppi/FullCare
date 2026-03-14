@@ -4,6 +4,21 @@ include_once("globals.php");
 include_once("db.php");
 date_default_timezone_set('America/Sao_Paulo');
 header("Content-type: text/html; charset=utf-8");
+$sessionNivelHeaderFull = isset($_SESSION['nivel']) ? (int)$_SESSION['nivel'] : 0;
+$normHeaderFull = function ($txt) {
+    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
+    $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
+    $txt = $c !== false ? $c : $txt;
+    return preg_replace('/[^a-z]/', '', $txt);
+};
+$cargoHeaderFull = $normHeaderFull($_SESSION['cargo'] ?? '');
+$nivelHeaderFull = $normHeaderFull($_SESSION['nivel'] ?? '');
+$isDiretoriaHeaderFull = in_array($cargoHeaderFull, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+    || (strpos($cargoHeaderFull, 'diretor') !== false)
+    || (strpos($cargoHeaderFull, 'diretoria') !== false)
+    || in_array($nivelHeaderFull, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
+    || ($sessionNivelHeaderFull === -1);
+$canSeeUsuariosCadastroHeaderFull = $isDiretoriaHeaderFull && in_array($sessionNivelHeaderFull, [5, -1], true);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -79,32 +94,6 @@ header("Content-type: text/html; charset=utf-8");
                                         Menu</a></li>
                             </ul>
                         </li>
-                        <?php if ($_SESSION['nivel'] > 3) { ?>
-                        <li id="drop1" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="<?= $BASE_URL ?>pacientes"
-                                id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Usuários
-                            </a>
-                            <ul class="dropdown-menu" id="dropMenu1" aria-labelledby="navbarScrollingDropdown">
-                                <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>cad_usuario.php"><i class="bi bi-person-add" style="font-size: 1rem; margin-right:5px; color: rgb(15, 155, 76);"></i> Cadastro Usuário</a></li>
-                  <li>
-                  <li><a class="dropdown-item" href="<?php $BASE_URL ?>cad_hospitalUser.php"><i class="bi bi-person-add" style="font-size: 1rem; margin-right:5px; color: rgb(15, 15, 276);"></i> Cadastro
-                      Hospital/Usuário</a></li>
-                  <li>
-                    <hr class="dropdown-divider">
-                  </li> -->
-                                <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_usuario.php"><i
-                                            class="bi bi-file-medical"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
-                                        Pesquisa Usuários</a></li>
-                                <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_hospitalUser.php"><i
-                                            class="bi bi-person-badge"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(15, 155, 176);"></i>
-                                        Hospital por Usuário</a>
-                                </li>
-                            </ul>
-                        </li>
                         <!-- <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle " href="<?= $BASE_URL ?>pacientes" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Cadastro
@@ -122,8 +111,7 @@ header("Content-type: text/html; charset=utf-8");
                   <li><a class="dropdown-item" href="<?php $BASE_URL ?>cad_antecedente.php"><span class="bi bi-people" style="font-size: 1rem; margin-right:5px; color: rgb(155, 155, 76);"></span> Antecedente</a></li>
                 </ul>
               </li> -->
-                        <?php }; ?>
-                        <?php if ($_SESSION['nivel'] > 3) { ?>
+                        <?php if ($_SESSION['nivel'] > 3 || $canSeeUsuariosCadastroHeaderFull) { ?>
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
@@ -147,6 +135,12 @@ header("Content-type: text/html; charset=utf-8");
                                             class="bi bi-building"
                                             style="font-size: 1rem;margin-right:5px; color: rgb(213, 12, 155);"></i>
                                         Estipulantes</a></li>
+                                <?php if ($canSeeUsuariosCadastroHeaderFull) { ?>
+                                <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_usuario.php"><i
+                                            class="bi bi-people-fill"
+                                            style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
+                                        Usuários</a></li>
+                                <?php } ?>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

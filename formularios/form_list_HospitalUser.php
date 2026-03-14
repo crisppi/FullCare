@@ -96,7 +96,7 @@ if ($qtdIntItens > $limite) {
     <?php endif; ?>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <div class="d-flex justify-content-between align-items-center">
-        <h4 style="margin-top:8px;margin-bottom:8px" class="page-title">Hospitais por Usuário</h4>
+        <h4 style="margin-top:8px;margin-bottom:8px" class="page-title">Distribuição de usuários por Hospital</h4>
         <div>
             <a href="exportar_excel_list_hosp_user.php" class="btn btn-success"
                 style="border-radius:10px; margin-right: 10px;">Exportar para
@@ -163,94 +163,95 @@ if ($qtdIntItens > $limite) {
         </div>
         <div>
             <div id="table-content">
-                <table class="table table-sm table-striped  table-hover table-condensed">
-                    <thead>
-                        <tr>
-                            <th scope="col">Id</th>
-                            <th scope="col">Hospital</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">E-mail</th>
-                            <th scope="col">Id Usuário</th>
-                            <th scope="col">Cargo</th>
-                            <th scope="col">Nível</th>
-                            <th scope="col">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // print_r($query);
-                        foreach ($query as $hospitalUserSel):
-                            extract($hospitalUserSel);
-                        ?>
-                        <tr style='font-size:12px'>
-                            <td style='font-size:11px; font-weight:bold' scope="row" class="col-id">
-                                <?= $id_hospitalUser ?>
-                            </td>
-                            <td style='font-size:11px; font-weight:bold' scope="row" class="nome-coluna-table">
-                                <?= $nome_hosp ?>
-                            </td>
-                            <td scope="row" class="nome-coluna-table" style="font-weight: bold;">
-                                <?= $usuario_user ?>
-                            </td>
-                            <td scope="row" class="nome-coluna-table">
-                                <?= $email_user ?>
-                            </td>
+                <?php
+                $groupedHospitais = [];
+                foreach ($query as $hospitalUserSel) {
+                    $groupKey = (string)($hospitalUserSel['nome_hosp'] ?? 'Sem hospital');
+                    if (!isset($groupedHospitais[$groupKey])) {
+                        $groupedHospitais[$groupKey] = [];
+                    }
+                    $groupedHospitais[$groupKey][] = $hospitalUserSel;
+                }
+                ?>
 
-                            <td scope="row" class="nome-coluna-table">
-                                <?= $fk_usuario_hosp ?>
-                            </td>
-                            <td scope="row" class="nome-coluna-table">
-                                <?= $cargo_user ?>
-                            </td>
-                            <td scope="row" class="nome-coluna-table">
-                                <?= $nivel_user ?>
-                            </td>
-
-                            <td class="action">
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown"
-                                        role="button" data-bs-toggle="dropdown" style="color:#5e2363"
-                                        aria-expanded="false">
-                                        <i class="bi bi-stack"></i>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-
-                                        <li>
-                                            <button data-bs-toggle="modal" data-bs-target="#myModal"
-                                                class="btn btn-default"
-                                                onclick="openModal('<?= $BASE_URL ?>edit_hospitalUser.php?id_hospitalUser=<?= $id_hospitalUser ?>')"><i
-                                                    style="font-size: 1rem;margin-right:5px;color:blue" name="type"
-                                                    value="edite"
-                                                    class="aparecer-acoes far fa-edit edit-icon"></i>Editar -
-                                                <?= $id_hospitalUser ?></button>
-                                        </li>
-                                        <li>
-                                            <form class="d-inline-block delete-form" action="del_hosp_user.php"
-                                                method="post">
-                                                <input type="hidden" name="type" value="delete">
-                                                <input type="hidden" name="id_hospitalUser"
-                                                    value="<?= $id_hospitalUser ?>">
-                                                <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
-                                                <button class="btn btn-default"><i
-                                                        style="font-size: 1rem;margin-right:5px; color: red;"
-                                                        class="bi bi-x-circle-fill"></i>Deletar</button>
-                                            </form>
-                                        </li>
-                                    </ul>
+                <div class="hospital-user-groups">
+                    <?php foreach ($groupedHospitais as $hospitalNome => $usuariosHospital): ?>
+                        <section class="hospital-user-group">
+                            <div class="hospital-user-group__header">
+                                <div>
+                                    <div class="hospital-user-group__title"><?= htmlspecialchars((string)$hospitalNome, ENT_QUOTES, 'UTF-8') ?></div>
+                                    <div class="hospital-user-group__meta">
+                                        <?= count($usuariosHospital) ?> usuário<?= count($usuariosHospital) !== 1 ? 's' : '' ?> vinculado<?= count($usuariosHospital) !== 1 ? 's' : '' ?>
+                                    </div>
                                 </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                        <?php if ($qtdIntItens == 0): ?>
-                        <tr>
-                            <td colspan="8" scope="row" class="col-id" style='font-size:15px'>
-                                Não foram encontrados registros
-                            </td>
-                        </tr>
+                            </div>
 
-                        <?php endif ?>
-                    </tbody>
-                </table>
+                            <div class="hospital-user-group__rows">
+                                <?php foreach ($usuariosHospital as $hospitalUserSel):
+                                    extract($hospitalUserSel);
+                                    ?>
+                                    <article class="hospital-user-card">
+                                        <div class="hospital-user-card__main">
+                                            <div class="hospital-user-card__name"><?= htmlspecialchars((string)$usuario_user, ENT_QUOTES, 'UTF-8') ?></div>
+                                            <div class="hospital-user-card__email"><?= htmlspecialchars((string)$email_user, ENT_QUOTES, 'UTF-8') ?></div>
+                                        </div>
+
+                                        <div class="hospital-user-card__chips">
+                                            <span class="hospital-user-chip">Usuário #<?= (int)$fk_usuario_hosp ?></span>
+                                            <span class="hospital-user-chip"><?= htmlspecialchars((string)$cargo_user, ENT_QUOTES, 'UTF-8') ?></span>
+                                            <span class="hospital-user-chip">Nível <?= htmlspecialchars((string)$nivel_user, ENT_QUOTES, 'UTF-8') ?></span>
+                                        </div>
+
+                                        <div class="hospital-user-card__actions action">
+                                            <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/edit_usuario.php?id_usuario=' . (int) $fk_usuario_hosp, ENT_QUOTES, 'UTF-8') ?>"
+                                                class="btn btn-sm btn-outline-secondary"
+                                                title="Editar usuário"
+                                                style="border-radius:8px; margin-right:8px;">
+                                                <i class="bi bi-person-gear"></i>
+                                            </a>
+                                            <div class="dropdown">
+                                                <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown"
+                                                    role="button" data-bs-toggle="dropdown" style="color:#5e2363"
+                                                    aria-expanded="false">
+                                                    <i class="bi bi-stack"></i>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+
+                                                    <li>
+                                                        <button data-bs-toggle="modal" data-bs-target="#myModal"
+                                                            class="btn btn-default"
+                                                            onclick="openModal('<?= $BASE_URL ?>edit_hospitalUser.php?id_hospitalUser=<?= $id_hospitalUser ?>')"><i
+                                                                style="font-size: 1rem;margin-right:5px;color:blue" name="type"
+                                                                value="edite"
+                                                                class="aparecer-acoes far fa-edit edit-icon"></i>Editar</button>
+                                                    </li>
+                                                    <li>
+                                                        <form class="d-inline-block delete-form" action="del_hosp_user.php"
+                                                            method="post">
+                                                            <input type="hidden" name="type" value="delete">
+                                                            <input type="hidden" name="id_hospitalUser"
+                                                                value="<?= $id_hospitalUser ?>">
+                                                            <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+                                                            <button class="btn btn-default"><i
+                                                                    style="font-size: 1rem;margin-right:5px; color: red;"
+                                                                    class="bi bi-x-circle-fill"></i>Deletar</button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </article>
+                                <?php endforeach; ?>
+                            </div>
+                        </section>
+                    <?php endforeach; ?>
+
+                    <?php if ($qtdIntItens == 0): ?>
+                        <div class="hospital-user-empty">
+                            Não foram encontrados registros
+                        </div>
+                    <?php endif ?>
+                </div>
                 <!-- Modal para abrir tela de cadastro -->
                 <div class="modal fade" id="myModal">
                     <div class="modal-dialog  modal-dialog-centered modal-xl">
@@ -380,6 +381,124 @@ $(document).ready(function() {
 
 </script>
 <style>
+.hospital-user-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.hospital-user-group {
+    border: 1px solid rgba(94, 35, 99, 0.12);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 243, 251, 0.98));
+    box-shadow: 0 12px 25px -18px rgba(94, 35, 99, 0.35);
+    overflow: hidden;
+}
+
+.hospital-user-group__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px 9px;
+    background: #e8d8ef;
+    color: #4f2d5a;
+    border-bottom: 1px solid rgba(94, 35, 99, 0.14);
+    border-left: 5px solid #7b4d8a;
+}
+
+.hospital-user-group__title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    line-height: 1.35;
+}
+
+.hospital-user-group__meta {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    font-weight: 400;
+    color: #7a6a86;
+}
+
+.hospital-user-group__rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.hospital-user-card {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.5fr) minmax(250px, 1.2fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 18px;
+    border-top: 1px solid rgba(94, 35, 99, 0.08);
+}
+
+.hospital-user-card:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.hospital-user-card:nth-child(even) {
+    background: rgba(239, 232, 244, 0.7);
+}
+
+.hospital-user-card__name {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #2b2230;
+}
+
+.hospital-user-card__email {
+    margin-top: 2px;
+    font-size: 0.9rem;
+    color: #64556f;
+    word-break: break-word;
+}
+
+.hospital-user-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.hospital-user-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(94, 35, 99, 0.08);
+    color: #5e2363;
+    font-size: 0.84rem;
+    font-weight: 700;
+    border: 1px solid rgba(94, 35, 99, 0.12);
+}
+
+.hospital-user-card__actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.hospital-user-empty {
+    padding: 20px;
+    text-align: center;
+    border: 1px dashed rgba(94, 35, 99, 0.2);
+    border-radius: 16px;
+    color: #6f617a;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 991.98px) {
+    .hospital-user-card {
+        grid-template-columns: 1fr;
+    }
+
+    .hospital-user-card__actions {
+        justify-content: flex-start;
+    }
+}
+
 .modal-backdrop {
     display: none;
 
