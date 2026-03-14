@@ -472,14 +472,18 @@ $(document).ready(function() {
 }
 
 .hospital-user-card__chips {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(132px, 148px));
     gap: 8px;
+    justify-content: start;
 }
 
 .hospital-user-chip {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 38px;
     padding: 5px 10px;
     border-radius: 999px;
     background: rgba(94, 35, 99, 0.08);
@@ -487,6 +491,7 @@ $(document).ready(function() {
     font-size: 0.84rem;
     font-weight: 700;
     border: 1px solid rgba(94, 35, 99, 0.12);
+    text-align: center;
 }
 
 .hospital-user-card__actions {
@@ -506,6 +511,10 @@ $(document).ready(function() {
 @media (max-width: 991.98px) {
     .hospital-user-card {
         grid-template-columns: 1fr;
+    }
+
+    .hospital-user-card__chips {
+        grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
     }
 
     .hospital-user-card__actions {
