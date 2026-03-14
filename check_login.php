@@ -2,11 +2,23 @@
 
 include_once("globals.php");
 require_once(__DIR__ . "/utils/flow_logger.php");
+require_once(__DIR__ . '/app/schemaEnsurer.php');
+
+ensure_user_login_security_columns($conn);
 
 $redirectLogin = $BASE_URL . 'index.php';
+$maxTentativasLogin = 6;
+$lockMinutes = 15;
+$hasLoginSecurityColumns = function_exists('schema_columns_exist')
+    && schema_columns_exist($conn, 'tb_user', ['login_fail_count', 'login_locked_until', 'login_last_fail_at']);
 
-$failLogin = static function (string $mensagem) use ($redirectLogin): void {
+$failLogin = static function (string $mensagem, string $attemptNotice = '') use ($redirectLogin): void {
     $_SESSION['login_error'] = $mensagem;
+    if ($attemptNotice !== '') {
+        $_SESSION['login_attempts_notice'] = $attemptNotice;
+    } else {
+        unset($_SESSION['login_attempts_notice']);
+    }
 
     // Limpa dados de sessão de autenticação para não permitir entrada parcial.
     unset(
@@ -36,11 +48,19 @@ $senha_login = (string)filter_input(INPUT_POST, 'senha_login');
 
 if ($email_login === '' || $senha_login === '') {
     unset($_SESSION['login_error']);
+    unset($_SESSION['login_attempts_notice']);
     header('Location: ' . $redirectLogin);
     exit;
 }
 
 try {
+    $securitySelect = $hasLoginSecurityColumns
+        ? ",
+            login_fail_count,
+            login_locked_until,
+            login_last_fail_at"
+        : "";
+
     $stmt = $conn->prepare("
         SELECT
             id_usuario,
@@ -53,6 +73,7 @@ try {
             cargo_user,
             foto_usuario,
             fk_seguradora_user
+            {$securitySelect}
         FROM tb_user
         WHERE email_user = :email
         LIMIT 1
@@ -79,14 +100,91 @@ if (($user['ativo_user'] ?? 'n') !== 's') {
     $failLogin('Seu usuário está inativo. Entre em contato com o administrador.');
 }
 
+if ($hasLoginSecurityColumns) {
+    $lockedUntilRaw = (string)($user['login_locked_until'] ?? '');
+    if ($lockedUntilRaw !== '') {
+        try {
+            $lockedUntil = new DateTimeImmutable($lockedUntilRaw);
+            $now = new DateTimeImmutable('now');
+            if ($lockedUntil > $now) {
+                $diff = $now->diff($lockedUntil);
+                $remainingMinutes = ($diff->days * 24 * 60) + ($diff->h * 60) + $diff->i + ($diff->s > 0 ? 1 : 0);
+                error_log('[LOGIN][LOCKED] email=' . $email_login . ' user_id=' . (int)($user['id_usuario'] ?? 0) . ' locked_until=' . $lockedUntilRaw);
+                $failLogin('Usuário temporariamente bloqueado por excesso de tentativas. Tente novamente em ' . max(1, $remainingMinutes) . ' minuto(s).');
+            }
+        } catch (Throwable $e) {
+            error_log('[LOGIN][LOCK_PARSE] ' . $e->getMessage());
+        }
+    }
+}
+
 $senhaUser = (string)($user['senha_user'] ?? '');
 $senhaValida = $senhaUser !== '' && (
     password_verify($senha_login, $senhaUser)
 );
 
 if (!$senhaValida) {
+    if ($hasLoginSecurityColumns) {
+        try {
+            $tentativas = max(0, (int)($user['login_fail_count'] ?? 0)) + 1;
+            $bloqueouAgora = $tentativas >= $maxTentativasLogin;
+            $lockedUntil = $bloqueouAgora
+                ? (new DateTimeImmutable('now'))->modify('+' . $lockMinutes . ' minutes')->format('Y-m-d H:i:s')
+                : null;
+
+            $stmtFail = $conn->prepare("
+                UPDATE tb_user
+                   SET login_fail_count = :count,
+                       login_last_fail_at = NOW(),
+                       login_locked_until = :locked_until
+                 WHERE id_usuario = :id
+                 LIMIT 1
+            ");
+            $stmtFail->bindValue(':count', $tentativas, PDO::PARAM_INT);
+            if ($lockedUntil === null) {
+                $stmtFail->bindValue(':locked_until', null, PDO::PARAM_NULL);
+            } else {
+                $stmtFail->bindValue(':locked_until', $lockedUntil, PDO::PARAM_STR);
+            }
+            $stmtFail->bindValue(':id', (int)($user['id_usuario'] ?? 0), PDO::PARAM_INT);
+            $stmtFail->execute();
+
+            error_log('[LOGIN][FAIL_COUNT] email=' . $email_login . ' user_id=' . (int)($user['id_usuario'] ?? 0) . ' attempts=' . $tentativas . ' locked=' . ($bloqueouAgora ? 's' : 'n'));
+
+            if ($bloqueouAgora) {
+                $failLogin('Usuário temporariamente bloqueado após 6 tentativas inválidas. Tente novamente em 15 minutos.');
+            }
+
+            $restantes = max(0, $maxTentativasLogin - $tentativas);
+            $sufixoTentativas = $restantes === 1 ? ' tentativa restante' : ' tentativas restantes';
+            $failLogin(
+                'E-mail ou senha inválidos. Verifique os dados e tente novamente.',
+                'Restam ' . $restantes . $sufixoTentativas . ' antes do bloqueio temporário.'
+            );
+        } catch (Throwable $e) {
+            error_log('[LOGIN][FAIL_COUNT_UPDATE] ' . $e->getMessage());
+        }
+    }
+
     error_log('[LOGIN][FAIL][INVALID_PASSWORD] email=' . $email_login . ' user_id=' . (int)($user['id_usuario'] ?? 0) . ' fonte=' . ($fonte_conexao ?? 'n/a'));
     $failLogin('E-mail ou senha inválidos. Verifique os dados e tente novamente.');
+}
+
+if ($hasLoginSecurityColumns && ((int)($user['login_fail_count'] ?? 0) > 0 || !empty($user['login_locked_until']) || !empty($user['login_last_fail_at']))) {
+    try {
+        $stmtReset = $conn->prepare("
+            UPDATE tb_user
+               SET login_fail_count = 0,
+                   login_locked_until = NULL,
+                   login_last_fail_at = NULL
+             WHERE id_usuario = :id
+             LIMIT 1
+        ");
+        $stmtReset->bindValue(':id', (int)($user['id_usuario'] ?? 0), PDO::PARAM_INT);
+        $stmtReset->execute();
+    } catch (Throwable $e) {
+        error_log('[LOGIN][FAIL_COUNT_RESET] ' . $e->getMessage());
+    }
 }
 
 session_regenerate_id(true);
@@ -104,6 +202,7 @@ $_SESSION['fk_seguradora_user'] = isset($user['fk_seguradora_user'])
     ? (int)$user['fk_seguradora_user']
     : null;
 unset($_SESSION['login_error']);
+unset($_SESSION['login_attempts_notice']);
 $_SESSION['msg'] = '';
 
 if (function_exists('flowLogStart') && function_exists('flowLog')) {

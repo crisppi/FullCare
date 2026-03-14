@@ -175,6 +175,44 @@ if (!function_exists('ensure_password_reset_table')) {
     }
 }
 
+if (!function_exists('ensure_user_login_security_columns')) {
+    function ensure_user_login_security_columns(PDO $conn): void
+    {
+        static $checked = false;
+        if ($checked) {
+            return;
+        }
+        $checked = true;
+
+        $columns = [
+            'login_fail_count' => "ALTER TABLE tb_user ADD COLUMN login_fail_count INT NOT NULL DEFAULT 0 AFTER senha_default_user",
+            'login_locked_until' => "ALTER TABLE tb_user ADD COLUMN login_locked_until DATETIME NULL DEFAULT NULL AFTER login_fail_count",
+            'login_last_fail_at' => "ALTER TABLE tb_user ADD COLUMN login_last_fail_at DATETIME NULL DEFAULT NULL AFTER login_locked_until",
+        ];
+
+        foreach ($columns as $column => $ddl) {
+            try {
+                $stmt = $conn->prepare("
+                    SELECT COUNT(*)
+                      FROM information_schema.COLUMNS
+                     WHERE TABLE_SCHEMA = DATABASE()
+                       AND TABLE_NAME = 'tb_user'
+                       AND COLUMN_NAME = :column
+                ");
+                $stmt->bindValue(':column', $column, PDO::PARAM_STR);
+                $stmt->execute();
+                $exists = (int)$stmt->fetchColumn() > 0;
+                if ($exists) {
+                    continue;
+                }
+                $conn->exec($ddl);
+            } catch (Throwable $e) {
+                error_log('[SCHEMA][tb_user:' . $column . '] ' . $e->getMessage());
+            }
+        }
+    }
+}
+
 if (!function_exists('schema_table_exists')) {
     function schema_table_exists(PDO $conn, string $table): bool
     {

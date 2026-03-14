@@ -170,6 +170,18 @@
         text-decoration: underline;
     }
 
+    .login-attempts-notice {
+        margin: 8px 0 0;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: rgba(255, 243, 205, 0.22);
+        border: 1px solid rgba(255, 232, 163, 0.45);
+        color: #fff5d6;
+        font-size: 13px;
+        line-height: 1.35;
+        text-align: left;
+    }
+
     /* ===============================
        Bloco Lilás (lado direito)
     =============================== */
@@ -427,6 +439,13 @@
                         <a href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/esqueci_senha.php">Esqueci minha senha</a>
                     </div>
 
+                    <?php if (isset($_SESSION['login_attempts_notice']) && $_SESSION['login_attempts_notice'] !== "") { ?>
+                    <div class="login-attempts-notice">
+                        <?= htmlspecialchars((string)$_SESSION['login_attempts_notice'], ENT_QUOTES, 'UTF-8') ?>
+                    </div>
+                    <?php unset($_SESSION['login_attempts_notice']); ?>
+                    <?php } ?>
+
                     <input type="submit" value="Login" class="login-btn" />
                 </form>
 
@@ -476,14 +495,6 @@
         }, 100);
     });
 
-    // fechar alerta automaticamente em ~6 segundos
-    const loginError = document.querySelector(".error-message");
-    if (loginError) {
-        setTimeout(() => {
-            loginError.classList.add("hide");
-            setTimeout(() => loginError.remove(), 400);
-        }, 6000);
-    }
     </script>
 </body>
 

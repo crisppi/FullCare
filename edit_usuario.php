@@ -256,8 +256,8 @@ $usuario = $usuarioDao->findById_user($id_usuario);
             <div class="form-group row">
                 <div class="form-group col-sm-2">
                     <label for="senha_user">Senha</label>
-                    <input type="text" class="form-control" value="<?= $usuario->senha_user ?>" id="senha_user"
-                        name="senha_user">
+                    <input type="password" class="form-control" value="" id="senha_user"
+                        name="senha_user" placeholder="Deixe em branco para manter">
                 </div>
 
                 <div class="form-group col-sm-4">
@@ -274,7 +274,7 @@ $usuario = $usuarioDao->findById_user($id_usuario);
                         value="<?= $_SESSION['id_usuario'] ?>" name="fk_usuario_user">
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type="hidden" class="form-control" value="s" id="senha_default_user"
+                    <input type="hidden" class="form-control" value="<?= htmlspecialchars((string)$usuario->senha_default_user, ENT_QUOTES, 'UTF-8') ?>" id="senha_default_user"
                         name="senha_default_user">
                 </div>
                 <div class="form-group col-sm-12">

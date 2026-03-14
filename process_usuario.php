@@ -303,8 +303,7 @@ if ($type === "create") {
             $fk_seguradora_user = null;
         }
 
-        $hash_user = password_hash(filter_input(INPUT_POST, "senha_user"), PASSWORD_DEFAULT);
-        $senha_user = password_hash($hash_user, PASSWORD_DEFAULT);
+        $senha_user_raw = trim((string)filter_input(INPUT_POST, "senha_user"));
         $senha_default_user = filter_input(INPUT_POST, "senha_default_user");
 
         $reg_profissional_user = filter_input(INPUT_POST, "reg_profissional_user");
@@ -317,6 +316,13 @@ if ($type === "create") {
 
         $usuarioData = $usuarioDao->findById_user($id_usuario);
         $foto_usuario = $arquivo !== null ? $arquivo : (string)($usuarioData->foto_usuario ?? '');
+
+        if ($senha_user_raw !== '') {
+            $senha_user = password_hash($senha_user_raw, PASSWORD_DEFAULT);
+        } else {
+            $senha_user = (string)($usuarioData->senha_user ?? '');
+            $senha_default_user = (string)($usuarioData->senha_default_user ?? $senha_default_user);
+        }
 
         $usuarioData->id_usuario = $id_usuario;
         $usuarioData->usuario_user = $usuario_user;
