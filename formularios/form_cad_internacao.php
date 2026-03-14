@@ -253,8 +253,7 @@
                                 </select>
                                 <div style="display:flex;justify-content:space-between;align-items:center;">
                                     <a style="font-size:.8em;margin-left:7px;color:blue;"
-                                        href="<?= htmlspecialchars($BASE_URL . 'cad_paciente.php', ENT_QUOTES, 'UTF-8') ?>"
-                                        target="_blank" rel="noopener">
+                                        href="<?= htmlspecialchars($BASE_URL . 'cad_paciente.php', ENT_QUOTES, 'UTF-8') ?>">
                                         <i style="color:blue;margin-bottom:7px;" class="far fa-edit edit-icon"></i> Novo Paciente
                                     </a>
                                 </div>
