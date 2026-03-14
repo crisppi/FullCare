@@ -6,6 +6,18 @@ function eLogUser($value): string
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
+function formatCargoLogUser(?string $cargo): string
+{
+    $cargo = trim((string)$cargo);
+    $map = [
+        'Med_auditor' => 'Médico Auditor',
+        'Enf_auditor' => 'Enfermeiro Auditor',
+        'Enf_Auditor' => 'Enfermeiro Auditor',
+    ];
+
+    return $map[$cargo] ?? $cargo;
+}
+
 $norm = static function ($txt): string {
     $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
     $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
@@ -407,7 +419,7 @@ $acessosRows = array_slice($acessosRows, 0, 30);
                             <?= eLogUser($s['nome']) ?>
                             <?php endif; ?>
                         </td>
-                        <td><?= eLogUser($s['cargo']) ?></td>
+                        <td><?= eLogUser(formatCargoLogUser($s['cargo'])) ?></td>
                         <td class="text-center fw-bold"><?= (int)$s['total'] ?></td>
                         <td class="text-center"><?= (int)$s['info'] ?></td>
                         <td class="text-center text-warning"><?= (int)$s['warning'] ?></td>

@@ -50,6 +50,20 @@ $query = $hospitalUser->selectAllhospitalUser($where, $order, $obLimite);
 
 $__t1 = microtime(true);
 
+if (!function_exists('formatCargoLabel')) {
+    function formatCargoLabel(?string $cargo): string
+    {
+        $cargo = trim((string)$cargo);
+        $map = [
+            'Med_auditor' => 'Médico Auditor',
+            'Enf_auditor' => 'Enfermeiro Auditor',
+            'Enf_Auditor' => 'Enfermeiro Auditor',
+        ];
+
+        return $map[$cargo] ?? $cargo;
+    }
+}
+
 // GETS 
 // unset($_GET['pag']);
 // $gets = http_build_query($_GET['pag']);
@@ -198,7 +212,7 @@ if ($qtdIntItens > $limite) {
 
                                         <div class="hospital-user-card__chips">
                                             <span class="hospital-user-chip">Usuário #<?= (int)$fk_usuario_hosp ?></span>
-                                            <span class="hospital-user-chip"><?= htmlspecialchars((string)$cargo_user, ENT_QUOTES, 'UTF-8') ?></span>
+                                            <span class="hospital-user-chip"><?= htmlspecialchars(formatCargoLabel((string)$cargo_user), ENT_QUOTES, 'UTF-8') ?></span>
                                             <span class="hospital-user-chip">Nível <?= htmlspecialchars((string)$nivel_user, ENT_QUOTES, 'UTF-8') ?></span>
                                         </div>
 

@@ -534,10 +534,13 @@ if (!empty($sessionIdUsuario)) {
                                                     style="font-size:  1rem;margin-right:5px; color: rgb(213, 12, 155);"></i>
                                                 Estipulantes</a></li>
                                         <?php if ($canSeeUsuariosCadastro) { ?>
-                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_usuario.php"><i
-                                                        class="bi bi-people-fill"
-                                                        style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
-                                                    Usuários</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_usuario.php"><i
+                                                    class="bi bi-people-fill"
+                                                    style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
+                                                Usuários</a></li>
                                         <?php } ?>
                                         <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_patologia.php"><span
                                             class=" bi bi-virus"

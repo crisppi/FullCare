@@ -6,6 +6,20 @@ include_once("dao/usuarioDao.php");
 include_once("templates/header.php");
 include_once("array_dados.php");
 
+if (!function_exists('formatCargoLabel')) {
+    function formatCargoLabel(?string $cargo): string
+    {
+        $cargo = trim((string)$cargo);
+        $map = [
+            'Med_auditor' => 'Médico Auditor',
+            'Enf_auditor' => 'Enfermeiro Auditor',
+            'Enf_Auditor' => 'Enfermeiro Auditor',
+        ];
+
+        return $map[$cargo] ?? $cargo;
+    }
+}
+
 if (empty($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(16));
 }
@@ -241,7 +255,7 @@ if ($qtdIntItens > $limite) {
                                 <?= $endereco_user ?>
                             </td>
                             <td scope="row" class="nome-coluna-table">
-                                <?= $cargo_user ?>
+                                <?= htmlspecialchars(formatCargoLabel($cargo_user), ENT_QUOTES, 'UTF-8') ?>
                             </td>
                             <td scope="row" class="nome-coluna-table">
                                 <?= $depto_user ?>
