@@ -431,21 +431,31 @@
   function renderContasResumo(summary) {
     const resumo = document.querySelector('#tab-contas .card:nth-of-type(1) .card-body');
     const resumoValores = document.getElementById('contasResumoValores');
+    const totalContas = Number(summary?.total_contas || 0);
+    const emptyMessage = '<div class="text-muted">Não existem contas finalizadas para este paciente.</div>';
     if (resumoValores) {
+      if (totalContas <= 0) {
+        resumoValores.innerHTML = emptyMessage;
+      } else {
       const glosaSomada = Math.max(0, (summary?.soma_glosa_total || 0));
       resumoValores.innerHTML = `
         <div><strong>Valor apresentado:</strong> R$ ${Number(summary?.soma_apresentado || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
         <div><strong>Glosa total:</strong> R$ ${Number(glosaSomada).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
         <div><strong>Desconto total:</strong> R$ ${Number(summary?.soma_desconto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
         <div><strong>Valor final:</strong> R$ ${Number(summary?.soma_final || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>`;
+      }
     }
     const resumoIndicadores = document.getElementById('contasResumoIndicadores');
     if (resumoIndicadores) {
+      if (totalContas <= 0) {
+        resumoIndicadores.innerHTML = emptyMessage;
+      } else {
       resumoIndicadores.innerHTML = `
         <div><strong>Total de contas:</strong> ${summary?.total_contas ?? 0}</div>
         <div><strong>Total de internações:</strong> ${summary?.total_internacoes ?? 0}</div>
         <div><strong>Custo médio / conta:</strong> R$ ${Number(summary?.custo_medio_conta || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
         <div><strong>Custo médio / internação:</strong> R$ ${Number(summary?.custo_medio_internacao || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
+      }
     }
   }
 
@@ -483,7 +493,7 @@
     tbody.innerHTML = '';
     if (!rows || !rows.length) {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td colspan="${colCount}" class="text-center text-muted py-3">Nenhuma conta encontrada.</td>`;
+      tr.innerHTML = `<td colspan="${colCount}" class="text-center text-muted py-3">Não existem contas finalizadas para este paciente.</td>`;
       tbody.appendChild(tr);
       return;
     }

@@ -255,7 +255,18 @@
 
     $hasDetalhesReg = !empty($haDetalhes);
     $hasTussReg = !empty($tussDaInt);
-    $hasGestaoReg = !empty($int_gestao);
+    $gestaoData = is_object($int_gestao) ? get_object_vars($int_gestao) : (array)($int_gestao ?? []);
+    $hasGestaoReg = !empty($gestaoData['id_gestao'])
+        || !empty(array_filter($gestaoData, static function ($value, $key) {
+            if ($key === 'id_gestao' || strpos((string)$key, 'fk_') === 0) {
+                return false;
+            }
+            if (is_string($value)) {
+                $value = trim($value);
+                return $value !== '' && strtolower($value) !== 'n';
+            }
+            return $value !== null && $value !== '' && $value !== false && $value !== 0 && $value !== '0';
+        }, ARRAY_FILTER_USE_BOTH));
     $hasUtiReg = (!empty($utiList) && !empty(array_filter($utiList, static function ($row) {
         $row = (array)$row;
         return trim((string)($row['entrada'] ?? '')) !== ''
