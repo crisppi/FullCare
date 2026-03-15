@@ -98,7 +98,7 @@ if ($qtdIntItens > $limite) {
 ?>
 
 <!--tabela evento-->
-<div class="container-fluid form_container" style="margin-top:-5px;">
+<div class="container-fluid form_container" style="margin-top:12px;">
     <?php if ($debug): ?>
         <div class="alert alert-warning" style="font-size:0.9rem;">
             <strong>DEBUG list_usuario</strong><br>
@@ -115,7 +115,7 @@ if ($qtdIntItens > $limite) {
     <script src="./scripts/cadastro/general.js"></script>
 
     <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
-        <h4 style="margin-top:-10px" class="page-title">Usuários - Listagem</h4>
+        <h4 style="margin-top:8px; margin-bottom:8px;" class="page-title">Usuários - Listagem</h4>
         <div style="margin-left: auto;">
             <button onclick="openModal('cad_usuario.php')" data-bs-toggle="modal" data-bs-target="#myModal"
                 class="btn btn-success"
@@ -263,8 +263,8 @@ if ($qtdIntItens > $limite) {
                             <td scope="row" class="nome-coluna-table">
                                 <?= $nivel_user ?>
                             </td>
-                            <td scope="row" class="nome-coluna-table">
-                                <?= $email_user ?>
+                            <td scope="row" class="nome-coluna-table user-email-cell">
+                                <?= htmlspecialchars(mb_strtolower((string)$email_user, 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>
                             </td>
                             <td scope="row" class="nome-coluna-table">
                                 <?= $telefone01_format ?>
@@ -550,6 +550,11 @@ function resetSenha(id_user, evt) {
 
 .btn-filtro-limpar:hover i {
     color: #ffffff !important;
+}
+
+.user-email-cell {
+    text-transform: none !important;
+    text-transform: lowercase !important;
 }
 </style>
 <script src="./js/input-estilo.js"></script>

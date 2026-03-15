@@ -40,13 +40,13 @@ $sheet = $spreadsheet->getActiveSheet();
 $sheet->setShowGridlines(false); // Não exibir as linhas de grade
 
 // Inserir o logo
-$logoPath = __DIR__ . '/img/LogoConexAud.png';
+$logoPath = __DIR__ . '/img/LogoFullCare.png';
 if (file_exists($logoPath)) {
     $logo = new Drawing();
     $logo->setName('Logo');
     $logo->setDescription('Logo da Empresa');
     $logo->setPath($logoPath);
-    $logo->setHeight(32);
+    $logo->setHeight(41);
     $logo->setCoordinates('A2');
     $logo->setWorksheet($sheet);
 }

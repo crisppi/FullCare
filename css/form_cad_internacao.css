@@ -551,7 +551,7 @@
 
         .internacao-page {
             width: 100%;
-            margin: -26px 0 0;
+            margin: -8px 0 0;
             padding: 0 0 60px;
         }
 
@@ -565,7 +565,7 @@
             align-items: flex-start;
             justify-content: space-between;
             gap: 24px;
-            margin: -12px 0 4px;
+            margin: 0 0 4px;
         }
 
         .internacao-page__hero h1 {
