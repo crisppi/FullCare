@@ -223,7 +223,7 @@ $uti = new utiDAO($conn, $BASE_URL);
 
                             <td class="action">
                                 <a
-                                    href="<?= $BASE_URL ?>show_internacao.php?id_internacao=<?= $intern["id_internacao"] ?>"><i
+                                    href="<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern["id_internacao"] ?>"><i
                                         style="color:green; margin-right:10px"
                                         class="aparecer-acoes fas fa-eye check-icon"></i></a>
 

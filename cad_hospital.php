@@ -90,7 +90,9 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
             <h1>Cadastrar hospital</h1>
         </div>
         <div class="hero-actions">
-            <a class="hero-back-btn" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais', ENT_QUOTES, 'UTF-8') ?>">
+            <a class="hero-back-btn js-friendly-back"
+                data-default-return="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais', ENT_QUOTES, 'UTF-8') ?>"
+                href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais', ENT_QUOTES, 'UTF-8') ?>">
                 Voltar para lista
             </a>
             <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
@@ -483,6 +485,25 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var backLink = document.querySelector('.js-friendly-back');
+        if (!backLink) return;
+        var fallbackUrl = backLink.getAttribute('data-default-return') || backLink.href;
+        var returnUrl = null;
+        try {
+            returnUrl = sessionStorage.getItem('return_flow_url');
+        } catch (e) {
+            returnUrl = null;
+        }
+        if (returnUrl && returnUrl !== window.location.href) {
+            backLink.href = returnUrl;
+            backLink.textContent = 'Voltar ao fluxo anterior';
+        } else {
+            backLink.href = fallbackUrl;
+            backLink.textContent = 'Voltar para lista';
+        }
+    });
+
     (function () {
         const nomeEl = document.getElementById('acomodacao_nome_inline');
         const valorEl = document.getElementById('acomodacao_valor_inline');

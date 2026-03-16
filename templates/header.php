@@ -1462,7 +1462,7 @@ if (!empty($sessionIdUsuario)) {
         const termo = $input.val().trim();
         // Se quiser pré-preencher:
         // const url = BASE_URL + 'cad_paciente.php' + (termo ? ('?nome_pac=' + encodeURIComponent(termo)) : '');
-        const url = BASE_URL + 'cad_paciente.php';
+        const url = BASE_URL + 'pacientes/novo';
         navigateWithReturn(url);
         $menu.hide();
     });
@@ -1627,7 +1627,7 @@ if (!empty($sessionIdUsuario)) {
             navigateWithReturn(BASE_URL + 'internacoes/nova');
         } else if (key === 'P') {
             handled = true;
-            navigateWithReturn(BASE_URL + 'cad_paciente.php');
+            navigateWithReturn(BASE_URL + 'pacientes/novo');
         } else if (key === 'V') {
             handled = true;
             navigateWithReturn(BASE_URL + 'cad_visita.php');

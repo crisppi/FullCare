@@ -93,7 +93,7 @@
         <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
             <h4 style="margin-top:0" class="page-title">Seguradora</h4>
             <div style="margin-left: auto;">
-                <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/cad_seguradora.php', ENT_QUOTES, 'UTF-8') ?>"
+                <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/seguradoras/nova', ENT_QUOTES, 'UTF-8') ?>"
                     class="btn btn-success styled"
                     style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
                     <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Nova Seguradora
@@ -229,7 +229,7 @@
 
                                             <li>
                                                 <a class="btn btn-default" style="font-size: .9rem;"
-                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/edit_seguradora.php?id_seguradora=' . (int) $id_seguradora, ENT_QUOTES, 'UTF-8') ?>">
+                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/seguradoras/editar/' . (int) $id_seguradora, ENT_QUOTES, 'UTF-8') ?>">
                                                     <i style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
                                                         name="type" value="edite"
                                                         class="far fa-edit edit-icon"></i>Editar

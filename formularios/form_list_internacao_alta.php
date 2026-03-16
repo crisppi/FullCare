@@ -444,7 +444,7 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                                 </td>
                                 <td scope="row">
                                     <a class="btn btn-sm btn-outline-primary"
-                                       href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/show_internacao.php?id_internacao=' . (int)$intern["fk_id_int_alt"], ENT_QUOTES, 'UTF-8') ?>"
+                                       href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/visualizar/' . (int)$intern["fk_id_int_alt"], ENT_QUOTES, 'UTF-8') ?>"
                                        title="Visualizar internação">
                                         <i class="fa-solid fa-eye me-1"></i> Ver
                                     </a>

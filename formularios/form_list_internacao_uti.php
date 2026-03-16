@@ -381,7 +381,7 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                         <li>
                                             <button class="btn btn-default" style="font-size: .9rem;"
-                                                onclick="edit('<?= $BASE_URL ?>show_internacao.php?id_internacao=<?= $intern['id_internacao'] ?>')"><i
+                                                onclick="edit('<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern['id_internacao'] ?>')"><i
                                                     class="fas fa-eye"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>Ver</button>
                                         </li>

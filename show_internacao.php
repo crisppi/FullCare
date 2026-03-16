@@ -357,6 +357,7 @@ if ($activeVisit) {
 }
 
 $visitaBtnClass = $initId ? 'btn-success' : 'btn-outline-secondary';
+$visualizarInternacaoUrl = rtrim($BASE_URL, '/') . '/internacoes/visualizar/' . (int)$id_internacao;
 $visitaPdfBase = $BASE_URL . 'process_visita_pdf.php?id_internacao=' . urlencode((string)$id_internacao) . '&id_visita=';
 $visitaPdfHref = $initId ? $visitaPdfBase . urlencode((string)$initId) : '#';
 $visitaRangePdfBase = $BASE_URL . 'process_visita_pdf.php?range=1&id_internacao=' . urlencode((string)$id_internacao);
@@ -1229,7 +1230,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                         <button class="btn btn-sm btn-primary" style="background:#5e2363;border-color:#5e2363;">Filtrar</button>
                                     </div>
                                     <div class="col-auto">
-                                        <a class="btn btn-sm btn-outline-secondary" href="<?= e($_SERVER['PHP_SELF']) . '?id_internacao=' . urlencode((string)$id_internacao) . '&aba=prorrog' ?>#prorrog">Limpar</a>
+                                        <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=prorrog') ?>#prorrog">Limpar</a>
                                     </div>
                                 </form>
                                 <div class="mb-2">
@@ -1322,7 +1323,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                         <button class="btn btn-sm btn-primary" style="background:#5e2363;border-color:#5e2363;">Filtrar</button>
                                     </div>
                                     <div class="col-auto">
-                                        <a class="btn btn-sm btn-outline-secondary" href="<?= e($_SERVER['PHP_SELF']) . '?id_internacao=' . urlencode((string)$id_internacao) . '&aba=tuss' ?>#tuss">Limpar</a>
+                                        <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=tuss') ?>#tuss">Limpar</a>
                                     </div>
                                 </form>
                                 <div class="mb-2">
@@ -1421,7 +1422,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                         <button class="btn btn-sm btn-primary" style="background:#5e2363;border-color:#5e2363;">Filtrar</button>
                                     </div>
                                     <div class="col-auto">
-                                        <a class="btn btn-sm btn-outline-secondary" href="<?= e($_SERVER['PHP_SELF']) . '?id_internacao=' . urlencode((string)$id_internacao) . '&aba=neg' ?>#neg">Limpar</a>
+                                        <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=neg') ?>#neg">Limpar</a>
                                     </div>
                                 </form>
                                 <div class="mb-2">
@@ -1596,7 +1597,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
             var feedback = modal ? modal.querySelector('.js-delete-feedback') : null;
             var currentId = <?= $initId ? (int)$initId : 'null' ?>;
             var currentRet = <?= $activeVisitRet ? 'true' : 'false' ?>;
-            var redirectUrl = <?= json_encode($BASE_URL . 'show_internacao.php?id_internacao=' . (int)$id_internacao . '#visitas') ?>;
+            var redirectUrl = <?= json_encode($visualizarInternacaoUrl . '#visitas') ?>;
             var rangeBtn = document.getElementById('btn-visitas-range-pdf');
             var rangeInfo = document.getElementById('btn-visitas-range-info');
             var rangeSel = document.getElementById('vis-periodo-selecionado');

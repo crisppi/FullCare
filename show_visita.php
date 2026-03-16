@@ -793,7 +793,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         if (!modalDelete) return;
         var confirmBtn = modalDelete.querySelector('[data-action="confirm-delete"]');
         var feedback = modalDelete.querySelector('.js-delete-feedback');
-        var redirectUrl = <?= json_encode($BASE_URL . 'show_internacao.php?id_internacao=' . (int)$id_internacao . '#tab-visitas') ?>;
+        var redirectUrl = <?= json_encode(rtrim($BASE_URL, '/') . '/internacoes/visualizar/' . (int)$id_internacao . '#tab-visitas') ?>;
         var defaultVisitaId = <?= (int)$id_visita_row ?>;
         var selectedVisitaId = defaultVisitaId;
 

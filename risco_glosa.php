@@ -3,8 +3,11 @@ include_once("check_logado.php");
 include_once("globals.php");
 require_once("app/services/OperationalIntelligenceService.php");
 
+$page = isset($_GET['pag']) ? max(1, (int) $_GET['pag']) : 1;
+$perPage = isset($_GET['reg_pag']) ? max(5, min(100, (int) $_GET['reg_pag'])) : 15;
+
 $service = new OperationalIntelligenceService($conn);
-$glosaData = $service->glosaRiskAlerts();
+$glosaData = $service->glosaRiskAlerts($perPage, $page);
 
 include_once("templates/header.php");
 ?>
@@ -33,7 +36,11 @@ include_once("templates/header.php");
             padding:0.2rem 0.75rem;
             font-weight:600;
         }
-        .risk-pill.alto {background:#fee2e2;color:#991b1b;}
+        .risk-pill.alto {
+            background: linear-gradient(135deg, #ffe0e0 0%, #ffc9c9 100%);
+            color:#8f1111;
+            box-shadow: 0 0 0 1px rgba(177, 22, 22, 0.14), 0 8px 18px rgba(177, 22, 22, 0.14);
+        }
         .risk-pill.moderado {background:#fff1c3;color:#a15c00;}
         .risk-pill.baixo {background:#dcfce7;color:#166534;}
         .factor-chip {
@@ -45,6 +52,35 @@ include_once("templates/header.php");
             border-radius:999px;
             padding:0.2rem 0.65rem;
             margin:0.15rem;
+        }
+        .glosa-toolbar {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:1rem;
+            margin-bottom:1rem;
+            flex-wrap:wrap;
+        }
+        .glosa-toolbar .meta {
+            color:#6b7280;
+            font-size:0.92rem;
+        }
+        .glosa-legend {
+            display:flex;
+            flex-wrap:wrap;
+            gap:0.5rem;
+            margin:0.25rem 0 1rem;
+        }
+        .glosa-legend .item {
+            display:inline-flex;
+            align-items:center;
+            gap:0.45rem;
+            padding:0.35rem 0.75rem;
+            border-radius:999px;
+            font-size:0.84rem;
+            border:1px solid rgba(94,35,99,0.12);
+            background:#faf7fc;
+            color:#5e2363;
         }
     </style>
 </head>
@@ -66,6 +102,31 @@ include_once("templates/header.php");
 
         <div class="insight-card">
             <?php if (!empty($glosaData['available'])): ?>
+            <?php
+                $pagination = $glosaData['pagination'] ?? ['page' => 1, 'per_page' => $perPage, 'total' => count($glosaData['entries'] ?? []), 'pages' => 1];
+                $startItem = (($pagination['page'] - 1) * $pagination['per_page']) + 1;
+                $endItem = min($pagination['total'], $startItem + count($glosaData['entries']) - 1);
+                $paramsBase = $_GET;
+            ?>
+            <div class="glosa-legend">
+                <span class="item"><strong>Baixo</strong> oportunidade abaixo de 15%</span>
+                <span class="item"><strong>Moderado</strong> oportunidade entre 15% e 39,9%</span>
+                <span class="item"><strong>Alto</strong> oportunidade a partir de 40%</span>
+            </div>
+            <div class="glosa-toolbar">
+                <div class="meta">
+                    Exibindo <?= (int)$startItem ?> a <?= (int)$endItem ?> de <?= (int)$pagination['total'] ?> contas analisadas.
+                </div>
+                <form method="get" class="d-flex align-items-center gap-2">
+                    <label for="reg_pag" class="small text-muted mb-0">Reg por pág</label>
+                    <select name="reg_pag" id="reg_pag" class="form-select form-select-sm" onchange="this.form.submit()" style="width:auto;">
+                        <?php foreach ([15, 30, 50, 100] as $size): ?>
+                            <option value="<?= $size ?>" <?= (int)$perPage === $size ? 'selected' : '' ?>><?= $size ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="hidden" name="pag" value="1">
+                </form>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
@@ -93,7 +154,7 @@ include_once("templates/header.php");
                             <td class="text-center fw-semibold"><?= (int)$entry['dias_aberto'] ?>d</td>
                             <td class="text-center">
                                 <div class="risk-pill <?= $entry['risk_level'] ?>">
-                                    <?= ucfirst($entry['risk_level']) ?> · <?= number_format($entry['probability'] * 100, 1) ?>%
+                                    <?= ucfirst($entry['risk_level']) ?> · oportunidade <?= number_format($entry['probability'] * 100, 1) ?>%
                                 </div>
                                 <small class="d-block text-muted">
                                     Glosa projetada: <?= number_format($entry['glosa_ratio'] * 100, 1) ?>% | Valor: R$ <?= number_format($entry['valor_glosa'], 2, ',', '.') ?>
@@ -112,6 +173,41 @@ include_once("templates/header.php");
                     </tbody>
                 </table>
             </div>
+            <?php if (($pagination['pages'] ?? 1) > 1): ?>
+            <nav class="d-flex justify-content-center mt-3" aria-label="Paginação glosa">
+                <ul class="pagination pagination-sm mb-0">
+                    <?php
+                        $currentPage = (int) $pagination['page'];
+                        $totalPages = (int) $pagination['pages'];
+                        $startPage = max(1, $currentPage - 2);
+                        $endPage = min($totalPages, $startPage + 4);
+                        if (($endPage - $startPage) < 4) {
+                            $startPage = max(1, $endPage - 4);
+                        }
+                    ?>
+                    <?php
+                        $prevParams = $paramsBase;
+                        $prevParams['pag'] = max(1, $currentPage - 1);
+                    ?>
+                    <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?<?= htmlspecialchars(http_build_query($prevParams), ENT_QUOTES, 'UTF-8') ?>">‹</a>
+                    </li>
+                    <?php for ($p = $startPage; $p <= $endPage; $p++): ?>
+                        <?php $pageParams = $paramsBase; $pageParams['pag'] = $p; ?>
+                        <li class="page-item <?= $p === $currentPage ? 'active' : '' ?>">
+                            <a class="page-link" href="?<?= htmlspecialchars(http_build_query($pageParams), ENT_QUOTES, 'UTF-8') ?>"><?= $p ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    <?php
+                        $nextParams = $paramsBase;
+                        $nextParams['pag'] = min($totalPages, $currentPage + 1);
+                    ?>
+                    <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+                        <a class="page-link" href="?<?= htmlspecialchars(http_build_query($nextParams), ENT_QUOTES, 'UTF-8') ?>">›</a>
+                    </li>
+                </ul>
+            </nav>
+            <?php endif; ?>
             <small class="text-muted"><?= htmlspecialchars($glosaData['message']) ?></small>
             <?php else: ?>
             <p class="text-muted mb-0"><?= htmlspecialchars($glosaData['message'] ?? 'Sem dados para análise.') ?></p>

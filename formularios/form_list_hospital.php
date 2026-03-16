@@ -103,7 +103,7 @@
                     style="border-radius:10px;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.08);">
                     <i class="bi bi-diagram-3" style="font-size: 1rem;margin-right:5px;"></i>Usuários por Hospital
                 </a>
-                <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/cad_hospital.php', ENT_QUOTES, 'UTF-8') ?>"
+                <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais/novo', ENT_QUOTES, 'UTF-8') ?>"
                     class="btn btn-success styled"
                     style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
                     <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Novo Hospital
@@ -234,7 +234,7 @@
                                             </li>
                                             <li>
                                                 <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
-                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/edit_hospital.php?id_hospital=' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>">
+                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais/editar/' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>">
                                                     <i style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
                                                         name="type" value="edite"
                                                         class="far fa-edit edit-icon"></i>Editar

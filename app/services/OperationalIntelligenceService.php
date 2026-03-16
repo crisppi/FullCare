@@ -610,8 +610,19 @@ class OperationalIntelligenceService
         return round(1 / (1 + exp(-$x)), 3);
     }
 
-    public function glosaRiskAlerts(int $limit = 40): array
+    public function glosaRiskAlerts(int $limit = 20, int $page = 1): array
     {
+        $limit = max(5, min(100, $limit));
+        $page = max(1, $page);
+        $offset = ($page - 1) * $limit;
+
+        $countSql = "
+            SELECT COUNT(*)
+            FROM tb_capeante ca
+            WHERE ca.deletado_cap <> 's' OR ca.deletado_cap IS NULL
+        ";
+        $total = (int) $this->conn->query($countSql)->fetchColumn();
+
         $sql = "
             SELECT
                 ca.id_capeante,
@@ -647,15 +658,23 @@ class OperationalIntelligenceService
             WHERE ca.deletado_cap <> 's' OR ca.deletado_cap IS NULL
             ORDER BY ca.data_inicial_capeante DESC, ca.id_capeante DESC
             LIMIT :limite
+            OFFSET :offset
         ";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':limite', max(10, $limit), PDO::PARAM_INT);
+        $stmt->bindValue(':limite', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         if (!$rows) {
             return [
                 'available' => false,
-                'message'   => 'Nenhuma conta disponível para análise.'
+                'message'   => 'Nenhuma conta disponível para análise.',
+                'pagination' => [
+                    'page' => $page,
+                    'per_page' => $limit,
+                    'total' => $total,
+                    'pages' => 0,
+                ],
             ];
         }
 
@@ -668,8 +687,14 @@ class OperationalIntelligenceService
 
         return [
             'available' => true,
-            'message'   => 'Probabilidades estimadas com base em status e valores registrados.',
-            'entries'   => $entries
+            'message'   => 'Classificação estimada com base em valores e sinais administrativos registrados.',
+            'entries'   => $entries,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $limit,
+                'total' => $total,
+                'pages' => (int) ceil($total / max(1, $limit)),
+            ],
         ];
     }
 
@@ -691,26 +716,23 @@ class OperationalIntelligenceService
         }
         if (!empty($row['em_auditoria_cap']) && strtolower($row['em_auditoria_cap']) === 's') {
             $score += 10;
-            $factors[] = 'Em auditoria pendente';
         }
         if (!empty($row['aberto_cap']) && strtolower($row['aberto_cap']) === 's') {
             $score += 6;
-            $factors[] = 'Conta ainda aberta';
         }
         if (strtolower($row['encerrado_cap'] ?? '') !== 's') {
             $score += 4;
         }
         if ($diasAberto > 30) {
             $score += min(18, ($diasAberto - 30) * 0.6);
-            $factors[] = "Aberta há {$diasAberto} dias";
         }
         if ($valorApresentado > 0) {
             $glosaRatio = $valorGlosa / max(1, $valorApresentado);
             if ($glosaRatio >= 0.25) {
-                $score += 15;
+                $score += 22;
                 $factors[] = 'Glosa projetada acima de 25%';
             } elseif ($glosaRatio >= 0.15) {
-                $score += 8;
+                $score += 14;
                 $factors[] = 'Glosa projetada acima de 15%';
             }
         } else {
@@ -733,7 +755,13 @@ class OperationalIntelligenceService
 
         $score = max(5, min(95, $score));
         $prob = $this->logisticProbability($score);
-        $riskLevel = $prob >= 0.7 ? 'alto' : ($prob >= 0.45 ? 'moderado' : 'baixo');
+        $opportunityPercent = $prob * 100;
+        $riskLevel = 'baixo';
+        if ($opportunityPercent >= 40.0) {
+            $riskLevel = 'alto';
+        } elseif ($opportunityPercent >= 15.0) {
+            $riskLevel = 'moderado';
+        }
         $recommendation = $this->glosaRecommendation($riskLevel, $row, $diasAberto);
 
         return [
@@ -758,7 +786,7 @@ class OperationalIntelligenceService
             ],
             'probability'       => $prob,
             'risk_level'        => $riskLevel,
-            'factors'           => $factors ?: ['Sem fatores críticos identificados.'],
+            'factors'           => $factors ?: ['Sem alavancas relevantes de glosa identificadas.'],
             'recommendation'    => $recommendation
         ];
     }

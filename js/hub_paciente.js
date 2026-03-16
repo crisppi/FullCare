@@ -266,7 +266,8 @@
     on(table, 'click', '[data-action="ver-int"]', (_e, btn) => {
       const id = btn.getAttribute('data-id-int');
       if (!id) return;
-      window.location.href = `show_internacao.php?id_internacao=${id}`;
+      const base = (window.BASE_URL || '').replace(/\/?$/, '/');
+      window.location.href = `${base}internacoes/visualizar/${encodeURIComponent(id)}`;
     });
 
     // Botão: Editar

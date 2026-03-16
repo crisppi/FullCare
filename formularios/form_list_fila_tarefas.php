@@ -367,7 +367,7 @@ try {
                         <td><?= h($row['usuario_create_int'] ?? '-') ?></td>
                         <td class="text-end">
                             <a class="btn btn-outline-primary btn-sm"
-                                href="show_internacao.php?id_internacao=<?= h($row['id_internacao']) ?>">Abrir</a>
+                                href="<?= h(rtrim($BASE_URL, '/') . '/internacoes/visualizar/' . (int)$row['id_internacao']) ?>">Abrir</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>

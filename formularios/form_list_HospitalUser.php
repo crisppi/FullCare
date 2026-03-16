@@ -217,7 +217,7 @@ if ($qtdIntItens > $limite) {
                                         </div>
 
                                         <div class="hospital-user-card__actions action">
-                                            <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/edit_usuario.php?id_usuario=' . (int) $fk_usuario_hosp, ENT_QUOTES, 'UTF-8') ?>"
+                                            <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/usuarios/editar/' . (int) $fk_usuario_hosp, ENT_QUOTES, 'UTF-8') ?>"
                                                 class="btn btn-sm btn-outline-secondary"
                                                 title="Editar usuário"
                                                 style="border-radius:8px; margin-right:8px;">

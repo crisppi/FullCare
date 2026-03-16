@@ -1100,7 +1100,7 @@ if (typeof jQuery !== 'undefined') {
                                         <?php if ($pesqInternado == "s" and $intern['censo_int'] <> "s") { ?>
                                         <li>
                                             <button class="btn btn-default"
-                                                onclick="edit('<?= $BASE_URL ?>show_internacao.php?id_internacao=<?= $intern['id_internacao'] ?>')"
+                                                onclick="edit('<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern['id_internacao'] ?>')"
                                                 style="font-size: 1rem;">
                                                 <i class="fas fa-eye"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>

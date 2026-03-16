@@ -452,7 +452,7 @@ $baseParams = [
                                 <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                     <li>
                                         <button class="btn btn-default"
-                                            onclick="window.location.href='<?= e($BASE_URL) ?>show_internacao.php?id_internacao=<?= (int)$row['id_internacao'] ?>'"
+                                            onclick="window.location.href='<?= e(rtrim($BASE_URL, '/')) ?>/internacoes/visualizar/<?= (int)$row['id_internacao'] ?>'"
                                             style="font-size: .9rem;">
                                             <i class="fas fa-eye"
                                                 style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>

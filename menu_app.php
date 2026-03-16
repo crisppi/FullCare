@@ -1405,7 +1405,7 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                                 </span>
                             </td>
                             <td>
-                                <a href="<?= $BASE_URL ?>show_internacao.php?id_internacao=<?= (int)$prev['id_internacao'] ?>">
+                                <a href="<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$prev['id_internacao'] ?>">
                                     <i class="bi bi-box-arrow-up-right fw-bold"
                                         style="margin-right:6px; font-size:1.1em;"></i>
                                 </a>
