@@ -1,6 +1,7 @@
 <?php
 include_once("check_logado.php");
 require_once("globals.php");
+require_once("templates/header.php");
 require_once("dao/solicitacaoCustomizacaoDao.php");
 
 $norm = function ($txt) {
@@ -52,16 +53,174 @@ $resolvidoEmValue = $solicitacao->resolvido_em ? date('Y-m-d\TH:i', strtotime($s
 $hasOrcamento = trim((string)$solicitacao->precificacao) !== '';
 ?>
 
-<div class="container-fluid" id="main-container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/form_cad_internacao.css">
+<style>
+    #main-container.customizacao-edit-page {
+        margin: 2px 0 0 !important;
+        padding-inline: 8px !important;
+        padding-top: 0 !important;
+        width: auto !important;
+        max-width: 100% !important;
+        overflow-x: hidden;
+    }
+
+    #main-container.customizacao-edit-page .internacao-page__hero {
+        margin: 0 0 10px !important;
+    }
+
+    .customizacao-edit-page .hero-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .customizacao-edit-page .hero-back-btn {
+        border-radius: 999px;
+        border: 1px solid #d9c3f4;
+        color: #5e2363;
+        padding: 7px 14px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: .85rem;
+        background: #f4ecfb;
+    }
+
+    .customizacao-edit-page .hero-back-btn:hover {
+        color: #4a1b4e;
+        background: #eadcf8;
+    }
+
+    .customizacao-edit-page .internacao-page__content {
+        display: grid;
+        gap: 14px;
+    }
+
+    .customizacao-edit-page .edit-form {
+        display: grid;
+        gap: 14px;
+    }
+
+    .customizacao-edit-page .card {
+        border: 1px solid #e6dff0;
+        border-radius: 18px;
+        box-shadow: 0 16px 35px rgba(39, 14, 58, 0.08);
+        overflow: hidden;
+    }
+
+    .customizacao-edit-page .card-header {
+        padding: 14px 18px;
+    }
+
+    .customizacao-edit-page .card-header strong {
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+    }
+
+    .customizacao-edit-page .card-body {
+        padding: 18px;
+    }
+
+    .customizacao-edit-page .conex-section {
+        background: linear-gradient(180deg, #f7f8fb 0%, #f1f4f8 100%);
+        border-color: #d9e0e8;
+    }
+
+    .customizacao-edit-page .conex-section .card-header {
+        background: #4f555d;
+        border-bottom: 0;
+    }
+
+    .customizacao-edit-page .conex-section .card-header strong {
+        color: #fff;
+    }
+
+    .customizacao-edit-page .conex-aprovacao {
+        background: linear-gradient(180deg, #eef1f5 0%, #e7ebf1 100%);
+    }
+
+    .customizacao-edit-page .conex-aprovacao .card-header {
+        background: #3f454d;
+    }
+
+    .customizacao-edit-page .fullcare-resposta {
+        border-color: #edd9cf;
+        background: linear-gradient(180deg, #fff9f5 0%, #fff2e8 100%);
+    }
+
+    .customizacao-edit-page .fullcare-resposta .card-header {
+        background: #5e2363;
+        border-bottom: 0;
+    }
+
+    .customizacao-edit-page .fullcare-resposta .card-header strong {
+        color: #fff;
+    }
+
+    .customizacao-edit-page .form-label {
+        font-weight: 600;
+        color: #49354d;
+        margin-bottom: 6px;
+    }
+
+    .customizacao-edit-page .form-control,
+    .customizacao-edit-page .form-select {
+        min-height: 44px;
+        border-radius: 12px;
+        border-color: #d9dce3;
+    }
+
+    .customizacao-edit-page textarea.form-control {
+        min-height: 110px;
+    }
+
+    .customizacao-edit-page .form-check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        margin-bottom: 0;
+    }
+
+    .customizacao-edit-page .form-check-input {
+        margin: 0;
+        flex: 0 0 auto;
+    }
+
+    .customizacao-edit-page .form-check-label {
+        margin: 0;
+        font-weight: 500;
+        color: #2f3541;
+    }
+
+    .customizacao-edit-page .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 4px;
+    }
+
+    @media (max-width: 991.98px) {
+        .customizacao-edit-page .card-body {
+            padding: 16px;
+        }
+    }
+</style>
+
+<div class="internacao-page customizacao-edit-page" id="main-container">
+    <div class="internacao-page__hero">
         <div>
-            <h2 class="mb-1">Editar Solicitação #<?= (int)$solicitacao->id_solicitacao ?></h2>
-            <p class="text-muted mb-0">Atualize a solicitação e finalize quando estiver resolvida.</p>
+            <h1>Editar Solicitação #<?= (int)$solicitacao->id_solicitacao ?></h1>
+            <p>Atualize a solicitação e finalize quando estiver resolvida.</p>
         </div>
-        <a class="btn btn-outline-primary" href="<?= $BASE_URL ?>SolicitacaoCustomizacaoList.php">Voltar à lista</a>
+        <div class="hero-actions">
+            <a class="hero-back-btn" href="<?= $BASE_URL ?>SolicitacaoCustomizacaoList.php">Voltar à lista</a>
+        </div>
     </div>
 
-    <form action="<?= $BASE_URL ?>process_solicitacao_customizacao.php" method="POST" enctype="multipart/form-data" class="needs-validation">
+    <div class="internacao-page__content">
+    <form action="<?= $BASE_URL ?>process_solicitacao_customizacao.php" method="POST" enctype="multipart/form-data" class="needs-validation edit-form">
         <input type="hidden" name="type" value="update">
         <input type="hidden" name="id_solicitacao" value="<?= (int)$solicitacao->id_solicitacao ?>">
         <input type="hidden" name="fk_usuario_solicitante" value="<?= (int)$solicitacao->fk_usuario_solicitante ?>">
@@ -347,58 +506,11 @@ $hasOrcamento = trim((string)$solicitacao->precificacao) !== '';
             </div>
         </div>
 
-        <div class="d-flex justify-content-end">
+        <div class="form-actions">
             <button type="submit" class="btn btn-success">Salvar alterações</button>
         </div>
     </form>
+    </div>
 </div>
 
 <?php include_once("templates/footer.php"); ?>
-<style>
-.fullcare-resposta {
-    border: 1px solid #d4c1ea;
-    background: linear-gradient(180deg, #fff7f2 0%, #fff1e6 100%);
-}
-.fullcare-resposta .card-header {
-    background: #5e2363;
-    border-bottom: 0;
-}
-.fullcare-resposta .card-header strong {
-    color: #fff;
-}
-.fullcare-resposta .form-control,
-.fullcare-resposta .form-select,
-.fullcare-resposta textarea {
-    background-color: #fffaf3;
-}
-.conex-section {
-    background: #eef0f3;
-    border: 1px solid #d6dbe2;
-}
-.conex-section .card-header {
-    background: #4f555d;
-    border-bottom: 0;
-}
-.conex-section .card-header strong {
-    color: #fff;
-}
-.conex-aprovacao {
-    background: #e3e6eb;
-    border-color: #c9ced7;
-}
-.conex-aprovacao .card-header {
-    background: #3f454d;
-}
-.conex-section .form-check {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-}
-.conex-section .form-check-input {
-    margin-left: 0;
-    margin-right: 2px;
-}
-.conex-section .form-check-label {
-    margin-left: 2px;
-}
-</style>

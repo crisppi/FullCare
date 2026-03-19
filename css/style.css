@@ -140,11 +140,6 @@ p {
     display: none;
 }
 
-.visible {
-    display: yes;
-}
-
-
 #back-link-container {
     display: block;
     width: 500px;
@@ -182,12 +177,12 @@ p {
 
 .table th {
     text-align: center;
-    font-style: uppercase;
     color: white;
     vertical-align: middle;
     font-weight: 400;
     font-size: 13px;
     vertical-align: middle !important;
+    text-transform: uppercase;
 }
 
 .table a {
@@ -201,10 +196,6 @@ p {
     border-color: #5e2363;
     height: 37px;
     vertical-align: middle;
-}
-
-.table a:hover {
-    font-style: bold;
 }
 
 .actions {
@@ -283,12 +274,6 @@ p {
     border-color: #BADBCC;
 }
 
-
-.msg.success {
-    color: #0F5132;
-    background-color: #D1E7DD;
-    border-color: #BADBCC;
-}
 
 .logado {
     color: #0F5132;
