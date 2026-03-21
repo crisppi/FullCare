@@ -200,7 +200,7 @@ if (!empty($sessionIdUsuario)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/font-awesome-5/css/fontawesome-all.min.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
@@ -514,7 +514,7 @@ if (!empty($sessionIdUsuario)) {
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                            class="fa-solid fa-pen-to-square edit-icon"></i>
+                                            class="bi bi-pencil-square edit-icon"></i>
                                         Cadastros
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
@@ -559,7 +559,7 @@ if (!empty($sessionIdUsuario)) {
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                            class="fa-solid fa-calendar edit-icon"></i>
+                                            class="bi bi-calendar3 edit-icon"></i>
                                         Produção
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
@@ -624,7 +624,7 @@ if (!empty($sessionIdUsuario)) {
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                            class="fa-solid fa-list edit-icon"></i>
+                                            class="bi bi-list-ul edit-icon"></i>
                                         Listas
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
@@ -653,7 +653,7 @@ if (!empty($sessionIdUsuario)) {
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
-                                            class="fa-solid fa-file-invoice edit-icon"></i>
+                                            class="bi bi-receipt edit-icon"></i>
                                         Gestão
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">

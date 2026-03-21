@@ -1156,7 +1156,7 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
         <?php endif; ?>
         <div class="grid-container">
             <div class="grid-item grid-item-filter">
-                <div class="title-item"><i class="fa-solid fa-hospital"></i> Filtrar Hospital</div>
+                <div class="title-item"><i class="bi bi-hospital"></i> Filtrar Hospital</div>
                 <form id="filter-status-form" method="POST">
                     <div class="select-item">
                         <div class="select-wrapper">
@@ -1174,7 +1174,7 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                                     </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <span class="select-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+                                <span class="select-chevron"><i class="bi bi-chevron-down"></i></span>
                                 <button type="submit" class="btn button-item">
                                     <span class="material-icons">search</span>
                                 </button>
@@ -1235,14 +1235,14 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
 
         <div class="kpi-grid-container">
             <div class="grid-item grid-item-kpi kpi-neutral">
-                <div class="title-item"><i class="fa-solid fa-bed"></i> Total Internados</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="title-item"><i class="bi bi-bed"></i> Total Internados</div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="badge-item badge-neutral"><?= count($dados_internacoes) ?></div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-warning">
-                <div class="title-item"><i class="fa-solid fa-clock"></i> Longa Permanência</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="title-item"><i class="bi bi-clock-history"></i> Longa Permanência</div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="kpi-helper">Dias de internação</div>
                 <div class="longa-mini-group">
                     <span class="longa-mini-btn">&gt;10d <b><?= (int)$longa_perm_10 ?></b></span>
@@ -1252,9 +1252,9 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
             </div>
 
             <div class="grid-item grid-item-kpi kpi-warning">
-                <div class="title-item"><i class="fa-solid fa-bars-progress"></i> Reinternações</div>
+                <div class="title-item"><i class="bi bi-arrow-repeat"></i> Reinternações</div>
                 <div class="reint-helper">Tempo entre alta e nova internação</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="reint-mini-group">
                     <span class="reint-mini-btn"><span class="txt">até 5d</span><b><?= $total_reinternacoes_5 ?? 0 ?></b></span>
                     <span class="reint-mini-btn"><span class="txt">até 10d</span><b><?= $total_reinternacoes_10 ?? 0 ?></b></span>
@@ -1263,39 +1263,39 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
             </div>
 
             <div class="grid-item grid-item-kpi kpi-warning">
-                <div class="title-item"><i class="fa-solid fa-calendar"></i> Visitas em Atraso</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="title-item"><i class="bi bi-calendar-x"></i> Visitas em Atraso</div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="badge-item badge-warning"><?= count($dados_visitas_atraso) ?></div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-critical">
-                <div class="title-item"><i class="fa-solid fa-stethoscope"></i> Acima meta DRG</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="title-item"><i class="bi bi-heart-pulse"></i> Acima meta DRG</div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="badge-item badge-critical"><?= $drg_acima[0] ?? 0 ?></div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-info">
-                <div class="title-item"><i class="fa-solid fa-dollar-sign"></i> Contas em Auditoria</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="title-item"><i class="bi bi-currency-dollar"></i> Contas em Auditoria</div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="badge-item badge-info"><?= is_array($dados_capeante) ? count($dados_capeante) : 0 ?></div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-critical">
-                <div class="title-item"><i class="fa-solid fa-circle-stop"></i> Contas Paradas</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="title-item"><i class="bi bi-pause-circle"></i> Contas Paradas</div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="badge-item badge-critical"><?= $contas_paradas[0] ?? 0 ?></div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-info">
-                <div class="title-item"><i class="fa-solid fa-percent"></i> Porcentagem em UTI</div>
+                <div class="title-item"><i class="bi bi-percent"></i> Porcentagem em UTI</div>
                 <div class="kpi-helper">Internações UTI / total de internações</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="badge-item badge-info"><?= $perc_uti['perc'] ?? "0.00%" ?></div>
             </div>
 
             <div class="grid-item grid-item-kpi kpi-critical">
-                <div class="title-item"><i class="fa-solid fa-heart"></i> UTI Não Pertinente</div>
-                <div class="icon-item"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="title-item"><i class="bi bi-heart"></i> UTI Não Pertinente</div>
+                <div class="icon-item"><i class="bi bi-bar-chart-line"></i></div>
                 <div class="badge-item badge-critical"><?= $uti_nao_pertinente[0] ?? 0 ?></div>
             </div>
         </div>
@@ -1329,7 +1329,7 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                 <div class="header_div d-flex flex-column flex-md-row align-items-md-center justify-content-between">
                     <div>
                         <span>Previsão de permanência (IA)</span>
-                        <i class="fa-solid fa-robot" style="color:white; margin-left:10px;"></i>
+                        <i class="bi bi-robot" style="color:white; margin-left:10px;"></i>
                     </div>
                     <small style="color:#f1f1f1">
                         Modelo <?= htmlspecialchars($forecastSummary['model'] ?? 'n/d', ENT_QUOTES, 'UTF-8') ?> ·

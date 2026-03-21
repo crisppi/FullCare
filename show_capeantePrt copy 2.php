@@ -45,6 +45,14 @@ $internacao = $capeanteDao->selectAllcapeante($where, $order, $obLimite);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="<?php $BASE_URL ?>css/impressao.css" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Allura';
+            font-style: normal;
+            font-weight: 400;
+            src: url('fonts/Allura-Regular.ttf') format('truetype');
+        }
+    </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
         integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
@@ -202,28 +210,28 @@ $internacao = $capeanteDao->selectAllcapeante($where, $order, $obLimite);
 
         <div class="container" style="display: flex; width: 100%;margin-top:100px">
             <div class="container row" style="flex: 1; padding: 10px; box-sizing: border-box; text-align: center;">
-                <div style="font-size: 2em ; font-weight: bold; font-style: italic; font-family: 'Brush Script MT', 'Cursive', 'Segoe Script', 'Comic Sans MS'"
+                <div style="font-size: 2em ; font-weight: bold; font-style: italic; font-family: 'Allura'"
                     class="item">
                     <?= $internacao['0']['nome_med'] ?>
                 </div>
                 <div style="font-size: small;" class="item">Médico(a) Auditor(a)</div>
             </div>
             <div class="container row" style="flex: 1; padding: 10px; box-sizing: border-box; text-align: center;">
-                <div style="font-size: 2em ; font-weight: bold; font-style: italic; font-family: 'Brush Script MT', 'Cursive', 'Segoe Script', 'Comic Sans MS'"
+                <div style="font-size: 2em ; font-weight: bold; font-style: italic; font-family: 'Allura'"
                     class="item">
                     <?= $internacao['0']['nome_enf'] ?>
                 </div>
                 <div style="font-size: small;" class="item">Enfermeiro(a) Auditor(a)</div>
             </div>
             <div class="container row" style="flex: 1; padding: 10px; box-sizing: border-box; text-align: center;">
-                <div style="font-size: 2em ; font-weight: bold; font-style: italic; font-family: 'Brush Script MT', 'Cursive', 'Segoe Script', 'Comic Sans MS'"
+                <div style="font-size: 2em ; font-weight: bold; font-style: italic; font-family: 'Allura'"
                     class="item">
                     <?= $internacao['0']['nome_adm'] ?>
                 </div>
                 <div style="font-size: small;" class="item">Administrativo(a)</div>
             </div>
             <div class="container row" style="flex: 1; padding: 10px; box-sizing: border-box; text-align: center;">
-                <div style="font-size: 2em ; font-weight: bold; font-style: italic; font-family: 'Brush Script MT', 'Cursive', 'Segoe Script', 'Comic Sans MS'"
+                <div style="font-size: 2em ; font-weight: bold; font-style: italic; font-family: 'Allura'"
                     class="item">
                     <?= $internacao['0']['nome_aud_hosp'] ?>
                 </div>

@@ -426,7 +426,7 @@ p {
 
 .select2-container--default .select2-results__option {
     font-size: 0.7em !important;
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     color: rgb(122, 121, 121);
 }
 

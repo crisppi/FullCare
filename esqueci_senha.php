@@ -12,6 +12,9 @@ unset($_SESSION['recuperacao_msg'], $_SESSION['recuperacao_tipo']);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recuperar senha</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
     body {
         margin: 0;
@@ -19,7 +22,7 @@ unset($_SESSION['recuperacao_msg'], $_SESSION['recuperacao_tipo']);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
         background-image: linear-gradient(135deg, rgba(247, 244, 255, 0.55) 0%, rgba(226, 243, 255, 0.55) 60%, rgba(212, 240, 255, 0.55) 100%);
         background-attachment: fixed;
     }

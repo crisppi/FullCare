@@ -930,7 +930,7 @@ function perfTimerClock($seconds)
         max-width: none;
         margin: 24px 0 60px;
         padding: 0 24px;
-        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont;
+        font-family: 'Inter', sans-serif;
     }
 
     .perf-hero {

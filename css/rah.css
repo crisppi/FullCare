@@ -1,3 +1,5 @@
+@import url("../diversos/CoolAdmin-master/css/font-face.css");
+
 /* =========================================================================
    RAH — estilos do formulário “Capeante RAH”
    - Base visual
@@ -10,7 +12,7 @@
 /* ===== Base ===== */
 body {
   background-color: #f5f7fa;
-  font-family: "Nunito", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Poppins", sans-serif;
   color: #212529;
 }
 form#form-capeante-rah {

@@ -112,7 +112,7 @@ for ($i = 0; $i < 4; $i++) {
     max-width: none;
     margin: 24px 0 70px;
     padding: 0 24px;
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont;
+    font-family: 'Inter', sans-serif;
 }
 .forecast-hero {
     background: linear-gradient(120deg, #f6f8ff, #fef1ff);

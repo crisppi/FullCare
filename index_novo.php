@@ -7,6 +7,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FullCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
     /* ===============================
@@ -19,7 +22,7 @@
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        font-family: Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
         background-image: linear-gradient(135deg, rgba(247, 244, 255, 0.55) 0%, rgba(226, 243, 255, 0.55) 60%, rgba(212, 240, 255, 0.55) 100%);
         background-size: cover;
         background-position: center;

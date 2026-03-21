@@ -41,8 +41,8 @@ foreach ($estipulantes as $estipulanteItem) {
 $id_hospital = filter_input(INPUT_GET, "id_hospital");
 ?>
 
-<!-- Incluindo o Font Awesome para os ícones -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<!-- Ícones via pacote local Font Awesome Free -->
+<link rel="stylesheet" href="diversos/CoolAdmin-master/vendor/font-awesome-5/css/fontawesome-all.min.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/form_cad_internacao.css">
 <style>

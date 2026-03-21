@@ -47,8 +47,7 @@ $canSeeUsuariosCadastroHeaderFull = $isDiretoriaHeaderFull && in_array($sessionN
     <!-- boostrap icones -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
+    <link rel="stylesheet" href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/font-awesome-5/css/fontawesome-all.min.css">
 
     <!-- script jquery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"

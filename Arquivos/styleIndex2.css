@@ -1,10 +1,12 @@
+@import url("../diversos/CoolAdmin-master/css/font-face.css");
+
 body {
     background-image: linear-gradient(135deg, #35bae1 10%, #CDEE21 100%);
     /* background-image: linear-gradient(135deg, #421849 10%, #35bae1 100%); */
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    font-family: "Open Sans", sans-serif;
+    font-family: "Poppins", sans-serif;
     color: #333333;
 }
 
