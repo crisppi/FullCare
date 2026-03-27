@@ -231,18 +231,26 @@ if (!empty($sessionIdUsuario)) {
 
     <!-- ======= APENAS DESIGN (logos alinhados e simétricos) ======= -->
     <style>
+        .navbar .container-fluid {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 10px;
+        }
+
         .navbar .navbar-brand {
             display: inline-flex !important;
             align-items: center;
             line-height: 1;
             flex: 0 1 auto !important;
-            max-width: 220px;
+            max-width: 180px;
+            margin-right: 6px;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
         .navbar .navbar-brand .logo-novo {
-            height: 44px !important;
+            height: 40px !important;
             width: auto !important;
             max-height: none !important;
             min-height: 0 !important;
@@ -256,13 +264,13 @@ if (!empty($sessionIdUsuario)) {
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 40px !important;
+                height: 36px !important;
             }
         }
 
         @media (max-width: 575.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 36px !important;
+                height: 32px !important;
             }
         }
 
@@ -292,9 +300,9 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .navbar .navbar-brand .logo-seguradora {
-            height: 44px;
+            height: 40px;
             width: auto;
-            max-width: 150px;
+            max-width: 110px;
             object-fit: contain;
             display: block;
             flex: 0 1 auto;
@@ -302,8 +310,8 @@ if (!empty($sessionIdUsuario)) {
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-seguradora {
-                height: 38px;
-                max-width: 120px;
+                height: 34px;
+                max-width: 96px;
             }
         }
 
@@ -313,17 +321,26 @@ if (!empty($sessionIdUsuario)) {
             }
 
             .navbar .navbar-brand .logo-seguradora {
-                height: 32px;
-                max-width: 100px;
+                height: 28px;
+                max-width: 82px;
             }
         }
 
-        .container-fluid {
-            gap: 12px;
+        #navbarScroll {
+            flex: 1 1 auto;
+            min-width: 0;
         }
 
-        #navbarScroll {
+        .navbar-nav.navbar-nav-scroll {
+            flex-wrap: nowrap;
+            gap: 2px;
             min-width: 0;
+        }
+
+        .navbar-nav.navbar-nav-scroll .nav-link {
+            white-space: nowrap;
+            padding: 0.45rem 0.45rem;
+            font-size: 0.94rem;
         }
 
         #navbarGestorListas {
@@ -336,11 +353,12 @@ if (!empty($sessionIdUsuario)) {
         .header-actions {
             margin-left: auto !important;
             margin-right: 0 !important;
-            gap: 0.75rem !important;
+            gap: 0.5rem !important;
+            flex: 0 0 auto;
         }
 
         .header-actions #global-patient-search {
-            min-width: 300px;
+            min-width: 220px;
             flex: 0 0 auto;
         }
 

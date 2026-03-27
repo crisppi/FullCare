@@ -1674,7 +1674,7 @@
 
         .internacao-page {
             width: 100%;
-            margin: 24px 0 0;
+            margin: 42px 0 0;
             padding: 0;
             background: #fff;
         }
