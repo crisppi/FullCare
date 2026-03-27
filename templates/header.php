@@ -235,29 +235,34 @@ if (!empty($sessionIdUsuario)) {
             display: inline-flex !important;
             align-items: center;
             line-height: 1;
+            flex: 0 1 auto !important;
+            max-width: 220px;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
         .navbar .navbar-brand .logo-novo {
-            height: 56px !important;
+            height: 44px !important;
             width: auto !important;
             max-height: none !important;
             min-height: 0 !important;
             display: block !important;
+            max-width: 100% !important;
+            flex: 0 1 auto !important;
+            object-fit: contain !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 52px !important;
+                height: 40px !important;
             }
         }
 
         @media (max-width: 575.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 48px !important;
+                height: 36px !important;
             }
         }
 
@@ -287,17 +292,18 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .navbar .navbar-brand .logo-seguradora {
-            height: 56px;
+            height: 44px;
             width: auto;
-            max-width: 220px;
+            max-width: 150px;
             object-fit: contain;
             display: block;
+            flex: 0 1 auto;
         }
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-seguradora {
-                height: 48px;
-                max-width: 180px;
+                height: 38px;
+                max-width: 120px;
             }
         }
 
@@ -307,9 +313,17 @@ if (!empty($sessionIdUsuario)) {
             }
 
             .navbar .navbar-brand .logo-seguradora {
-                height: 38px;
-                max-width: 130px;
+                height: 32px;
+                max-width: 100px;
             }
+        }
+
+        .container-fluid {
+            gap: 12px;
+        }
+
+        #navbarScroll {
+            min-width: 0;
         }
 
         #navbarGestorListas {

@@ -43,16 +43,6 @@ function showIf(?string $cur): string
     <input type="hidden" name="fk_internacao_ges" value="<?= $intern['id_internacao'] ?>">
     <input type="hidden" name="id_gestao" value="<?= $int_gestao->id_gestao ?>">
     <input type="hidden" name="type" value="edit_gestao">
-    <div class="form-group row">
-        <div class="form-group col-sm-2">
-            <label for="select_gestao">Cadastrar Gestao</label>
-            <select class="form-control-sm form-control" id="select_gestao" name="select_gestao">
-                <option value="n" <?= is_null($int_gestao->id_gestao) ? 'selected' : '' ?>>Não</option>
-                <option value="s" <?= !is_null($int_gestao->id_gestao) ? 'selected' : '' ?>>Sim</option>
-            </select>
-
-        </div>
-    </div>
     <!-- ========== ALTO CUSTO ======================================== -->
     <div class="form-group row">
         <div class="form-group col-sm-2">

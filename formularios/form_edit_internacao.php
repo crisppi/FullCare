@@ -256,17 +256,49 @@
     $hasDetalhesReg = !empty($haDetalhes);
     $hasTussReg = !empty($tussDaInt);
     $gestaoData = is_object($int_gestao) ? get_object_vars($int_gestao) : (array)($int_gestao ?? []);
-    $hasGestaoReg = !empty($gestaoData['id_gestao'])
-        || !empty(array_filter($gestaoData, static function ($value, $key) {
-            if ($key === 'id_gestao' || strpos((string)$key, 'fk_') === 0) {
-                return false;
+    $gestaoCamposRelevantes = [
+        'alto_custo_ges',
+        'rel_alto_custo_ges',
+        'opme_ges',
+        'rel_opme_ges',
+        'home_care_ges',
+        'rel_home_care_ges',
+        'desospitalizacao_ges',
+        'rel_desospitalizacao_ges',
+        'evento_adverso_ges',
+        'rel_evento_adverso_ges',
+        'tipo_evento_adverso_gest',
+        'evento_sinalizado_ges',
+        'evento_discutido_ges',
+        'evento_negociado_ges',
+        'evento_valor_negoc_ges',
+        'evento_prorrogar_ges',
+        'evento_retorno_qual_hosp_ges',
+        'evento_classificado_hospital_ges',
+        'evento_data_ges',
+        'evento_encerrar_ges',
+        'evento_impacto_financ_ges',
+        'evento_prolongou_internacao_ges',
+        'evento_concluido_ges',
+        'evento_classificacao_ges',
+        'evento_fech_ges'
+    ];
+    $hasGestaoReg = false;
+    foreach ($gestaoCamposRelevantes as $campoGestao) {
+        $valorGestao = $gestaoData[$campoGestao] ?? null;
+        if (is_string($valorGestao)) {
+            $valorGestao = trim($valorGestao);
+            if ($valorGestao !== '' && strtolower($valorGestao) !== 'n') {
+                $hasGestaoReg = true;
+                break;
             }
-            if (is_string($value)) {
-                $value = trim($value);
-                return $value !== '' && strtolower($value) !== 'n';
-            }
-            return $value !== null && $value !== '' && $value !== false && $value !== 0 && $value !== '0';
-        }, ARRAY_FILTER_USE_BOTH));
+            continue;
+        }
+        if ($valorGestao !== null && $valorGestao !== false && $valorGestao !== 0 && $valorGestao !== '0') {
+            $hasGestaoReg = true;
+            break;
+        }
+    }
     $hasUtiReg = (!empty($utiList) && !empty(array_filter($utiList, static function ($row) {
         $row = (array)$row;
         return trim((string)($row['entrada'] ?? '')) !== ''
@@ -292,6 +324,103 @@
 
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css" rel="stylesheet">
+    <style>
+        .edit-primary-row {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr 1.5fr 1.5fr 1.7fr 0.8fr 1.2fr 1.2fr;
+            gap: 12px;
+            align-items: end;
+            width: 100%;
+        }
+
+        .edit-secondary-row {
+            display: grid;
+            grid-template-columns: 3fr 3fr 2fr 1fr 1fr 2fr;
+            gap: 12px;
+            align-items: end;
+            width: 100%;
+        }
+
+        .edit-alta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: end;
+            width: 100%;
+        }
+
+        .edit-primary-row .form-control,
+        .edit-primary-row .form-control-sm,
+        .edit-top-row .form-control,
+        .edit-top-row .form-control-sm,
+        .edit-alta-row .form-control,
+        .edit-alta-row .form-control-sm {
+            min-height: 44px;
+            height: 44px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .assist-select-clear {
+            position: relative;
+        }
+
+        .assist-select-clear .bootstrap-select,
+        .assist-select-clear>select {
+            width: 100% !important;
+        }
+
+        #fk_cid_int.selectpicker.bs-select-hidden,
+        #fk_patologia2.selectpicker.bs-select-hidden {
+            display: none !important;
+        }
+
+        .assist-select-clear .bootstrap-select>.dropdown-toggle {
+            padding-right: 46px !important;
+        }
+
+        .assist-clear-btn {
+            position: absolute;
+            top: 50%;
+            right: 28px;
+            transform: translateY(-50%);
+            z-index: 4;
+            width: 18px;
+            height: 18px;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(94, 35, 99, 0.10);
+            color: #5e2363;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 18px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .assist-clear-btn:hover {
+            background: rgba(94, 35, 99, 0.18);
+            color: #4b1850;
+        }
+
+        @media (max-width: 991.98px) {
+            .edit-primary-row,
+            .edit-secondary-row,
+            .edit-alta-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .edit-primary-row,
+            .edit-secondary-row,
+            .edit-alta-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 
 
     <div class="internacao-page">
@@ -319,7 +448,7 @@
                 <p style="display:none" id="proximoId_int">0</p>
                 <input type="hidden" value="n" id="censo_int" name="censo_int">
                 <input type="hidden" value="<?= $_SESSION["id_usuario"] ?>" id="fk_usuario_int" name="fk_usuario_int">
-                <div class="form-group row align-items-end">
+                <div class="form-group row align-items-end edit-top-row">
 
                     <!-- Hospital (Somente leitura) -->
                     <div class="form-group col-sm-3 mb-2">
@@ -398,17 +527,16 @@
 
                 <?php
                 $cidSelecionado = isset($intern['fk_cid_int']) ? (int)$intern['fk_cid_int'] : null;
+                $antecedenteSelecionado = isset($intern['fk_patologia2']) ? (int)$intern['fk_patologia2'] : null;
                 ?>
-                <div class="row align-items-end">
-                    <!-- Data Visita -->
-                    <div class="form-group col-sm-2 mb-2">
+                <div class="edit-primary-row">
+                    <div class="form-group mb-2">
                         <label for="data_visita_int"><span style="color: red;">*</span> Data Visita</label>
                         <input type="date" class="form-control form-control-sm" id="data_visita_int"
                             name="data_visita_int" value="<?= date('Y-m-d'); ?>">
                     </div>
 
-                    <!-- Internado -->
-                    <div class="form-group col-sm-2 mb-2">
+                    <div class="form-group mb-2">
                         <label class="control-label" for="internado_int">Internado</label>
                         <select class="form-control-sm form-control" id="internado_int" name="internado_int">
                             <option value="s" <?= $intern['internado_int'] == 's' ? 'selected' : '' ?>>Sim</option>
@@ -416,35 +544,13 @@
                         </select>
                     </div>
 
-                    <div class="form-group col-sm-2 mb-2" id="div-data-alta" style="display:none">
-                        <label class="control-label" for="data_alta_alt">Data/Hora Alta</label>
-                        <input type="datetime-local" class="form-control form-control-sm" id="data_alta_alt"
-                            name="data_alta_alt" value="<?= htmlspecialchars($altaDataHoraValue) ?>" step="60">
-                    </div>
-
-                    <div class="form-group col-sm-2 mb-2" id="div-motivo-alta" style="display:none">
-                        <label class="control-label" for="tipo_alta_alt">Motivo Alta</label>
-                        <select class="form-control form-control-sm" id="tipo_alta_alt" name="tipo_alta_alt">
-                            <option value="">Selecione o motivo da alta</option>
-                            <?php
-                            $dados_alta = is_array($dados_alta ?? null) ? $dados_alta : [];
-                            sort($dados_alta, SORT_ASC);
-                            foreach ($dados_alta as $alta): ?>
-                                <option value="<?= htmlspecialchars($alta); ?>" <?= ($altaAtual['tipo_alta_alt'] ?? '') === $alta ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($alta); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group col-sm-2 mb-2">
+                    <div class="form-group mb-2">
                         <label class="control-label" for="acomodacao_int">Acomodação</label>
                         <select class="form-control-sm form-control" id="acomodacao_int" name="acomodacao_int">
                             <option value=""></option>
                             <?php
                             sort($dados_acomodacao, SORT_ASC);
                             foreach ($dados_acomodacao as $acomd) {
-                                // Verifica se o valor da acomodação corresponde ao valor vindo do banco
                                 $selected = ($acomd == $intern['acomodacao_int']) ? 'selected' : '';
                             ?>
                                 <option value="<?= $acomd; ?>" <?= $selected; ?>><?= $acomd; ?></option>
@@ -452,7 +558,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group col-sm-2 mb-2">
+                    <div class="form-group mb-2">
                         <label class="control-label" for="especialidade_int">Especialidade</label>
                         <input list="especialidade-options" class="form-control-sm form-control" id="especialidade_int"
                             name="especialidade_int" value="<?= htmlspecialchars($intern['especialidade_int'] ?? '') ?>"
@@ -467,19 +573,19 @@
                         </datalist>
                     </div>
 
-                    <div class="form-group col-sm-3 mb-2">
+                    <div class="form-group mb-2">
                         <label for="titular_int">Médico</label>
                         <input type="text" maxlength="100" class="form-control form-control-sm" id="titular_int"
                             value="<?= $intern["titular_int"] ?>" name="titular_int">
                     </div>
-                    <div class="form-group col-sm-1 mb-2">
+
+                    <div class="form-group mb-2">
                         <label for="crm_int">CRM</label>
                         <input type="text" maxlength="10" class="form-control form-control-sm" id="crm_int"
                             name="crm_int" value="<?= $intern["crm_int"] ?>">
                     </div>
-                </div>
-                <div class="row align-items-end">
-                    <div class="form-group col-sm-2 mb-2">
+
+                    <div class="form-group mb-2">
                         <label class="control-label" for="modo_internacao_int">Modo Admissão</label>
                         <select class="form-control-sm form-control" id="modo_internacao_int"
                             name="modo_internacao_int">
@@ -502,7 +608,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group col-sm-2 mb-2">
+                    <div class="form-group mb-2">
                         <label class="control-label" for="tipo_admissao_int">Tipo Internação</label>
                         <select class="form-control-sm form-control" id="tipo_admissao_int" name="tipo_admissao_int">
                             <option value=""></option>
@@ -514,21 +620,68 @@
                                 Urgência</option>
                         </select>
                     </div>
-                    <div class="form-group col-sm-3 mb-2">
-                        <label class="control-label" for="fk_cid_int">CID</label>
-                        <select class="form-control selectpicker show-tick" data-size="5" id="fk_cid_int"
-                            name="fk_cid_int" data-live-search="true">
-                            <option value="">Cid</option>
+                </div>
 
-                            <?php foreach ($cids as $cid): ?>
-                                <?php $idCid = (int)$cid['id_cid']; ?>
-                                <option value="<?= $idCid ?>" <?= ($cidSelecionado == $idCid) ? 'selected' : '' ?>>
-                                    <?= $cid['cat'] . " - " . $cid["descricao"] ?>
+                <div class="edit-alta-row">
+                    <div class="form-group mb-2" id="div-data-alta" style="display:none">
+                        <label class="control-label" for="data_alta_alt">Data/Hora Alta</label>
+                        <input type="datetime-local" class="form-control form-control-sm" id="data_alta_alt"
+                            name="data_alta_alt" value="<?= htmlspecialchars($altaDataHoraValue) ?>" step="60">
+                    </div>
+
+                    <div class="form-group mb-2" id="div-motivo-alta" style="display:none">
+                        <label class="control-label" for="tipo_alta_alt">Motivo Alta</label>
+                        <select class="form-control form-control-sm" id="tipo_alta_alt" name="tipo_alta_alt">
+                            <option value="">Selecione o motivo da alta</option>
+                            <?php
+                            $dados_alta = is_array($dados_alta ?? null) ? $dados_alta : [];
+                            sort($dados_alta, SORT_ASC);
+                            foreach ($dados_alta as $alta): ?>
+                                <option value="<?= htmlspecialchars($alta); ?>" <?= ($altaAtual['tipo_alta_alt'] ?? '') === $alta ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($alta); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group col-sm-2 mb-2">
+                </div>
+
+                <div class="edit-secondary-row">
+                    <div class="form-group mb-2">
+                        <label class="control-label" for="fk_cid_int">CID (Patologia)</label>
+                        <div class="assist-select-clear">
+                            <select class="form-control selectpicker show-tick bs-select-hidden" data-size="5" id="fk_cid_int"
+                                name="fk_cid_int" data-live-search="true" data-width="100%" data-style="input-lg-fullcare">
+                                <option value="">Cid</option>
+
+                                <?php foreach ($cids as $cid): ?>
+                                    <?php $idCid = (int)$cid['id_cid']; ?>
+                                    <option value="<?= $idCid ?>" <?= ($cidSelecionado == $idCid) ? 'selected' : '' ?>>
+                                        <?= $cid['cat'] . " - " . $cid["descricao"] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button type="button" class="assist-clear-btn" data-clear-select="fk_cid_int" aria-label="Limpar CID">&times;</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label class="control-label" for="fk_patologia2">Antecedente</label>
+                        <div class="assist-select-clear">
+                            <select class="form-control selectpicker show-tick bs-select-hidden" data-size="5" id="fk_patologia2"
+                                name="fk_patologia2" data-live-search="true" data-width="100%" data-style="input-lg-fullcare">
+                                <option value="">Antecedente</option>
+                                <?php foreach ($cids as $cid): ?>
+                                    <?php $idCidAnte = (int)$cid['id_cid']; ?>
+                                    <option value="<?= $idCidAnte ?>" <?= ($antecedenteSelecionado == $idCidAnte) ? 'selected' : '' ?>>
+                                        <?= $cid['cat'] . " - " . $cid["descricao"] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button type="button" class="assist-clear-btn" data-clear-select="fk_patologia2" aria-label="Limpar antecedente">&times;</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-2">
                         <label class="control-label" for="grupo_patologia_int">Grupo Patologia</label>
                         <select class="form-control-sm form-control" id="grupo_patologia_int"
                             name="grupo_patologia_int">
@@ -541,7 +694,8 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group col-sm-2 mb-2">
+
+                    <div class="form-group mb-2">
                         <label class="control-label" for="origem_int">Origem</label>
                         <select class="form-control-sm form-control" id="origem_int" name="origem_int">
                             <option value=""></option>
@@ -553,10 +707,17 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group col-sm-1 mb-2">
+
+                    <div class="form-group mb-2">
                         <label for="senha_int">Senha</label>
                         <input type="text" maxlength="20" class="form-control form-control-sm" id="senha_int"
                             value="<?= $intern["senha_int"] ?>" name="senha_int">
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="num_atendimento_int">Num. Atendimento</label>
+                        <input type="text" maxlength="30" class="form-control form-control-sm" id="num_atendimento_int"
+                            value="<?= htmlspecialchars($intern["num_atendimento_int"] ?? '') ?>" name="num_atendimento_int">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -1037,8 +1198,10 @@
 
 
                 <br>
-                <button type="submit" class="btn btn-success btn-submit-standard"><i style="font-size: 1rem;margin-right:5px;" value="edit"
-                        class="fa-solid fa-check edit-icon"></i>Atualizar</button>
+                <button type="submit" class="btn btn-success btn-submit-standard">
+                    <i class="fas fa-check edit-icon" style="font-size:1rem;margin-right:8px;"></i>
+                    Atualizar
+                </button>
 
                     </form>
                 </div>
@@ -1130,6 +1293,22 @@
                     $('.bs-searchbox input').attr('placeholder', 'Digite para pesquisar...');
                 });
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[data-clear-select]').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var targetId = button.getAttribute('data-clear-select');
+                    var select = document.getElementById(targetId);
+                    if (!select) return;
+                    select.value = '';
+                    if (window.jQuery && window.jQuery.fn && window.jQuery(select).hasClass('selectpicker')) {
+                        window.jQuery(select).selectpicker('val', '');
+                    }
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            });
         });
     </script>
 
@@ -1495,7 +1674,7 @@
 
         .internacao-page {
             width: 100%;
-            margin: -26px 0 0;
+            margin: 24px 0 0;
             padding: 0;
             background: #fff;
         }
@@ -1510,7 +1689,7 @@
             align-items: flex-start;
             justify-content: space-between;
             gap: 24px;
-            margin: -12px 0 4px;
+            margin: 0 0 8px;
         }
 
         .internacao-page__hero h1 {

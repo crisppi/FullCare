@@ -84,6 +84,7 @@
         var managementSelect = document.getElementById('select_gestao');
         var form = relatorioField.closest('form');
         var autoFlag = false;
+        var hasUserEditedReport = false;
 
         function updateAlert() {
             var matches = uniqueLabels(detectConditions(relatorioField.value));
@@ -101,7 +102,7 @@
                 matchedList.textContent = matches.join(', ');
             }
 
-            if (managementSelect && managementSelect.value === '') {
+            if (hasUserEditedReport && managementSelect && managementSelect.value === '') {
                 managementSelect.value = 's';
                 autoFlag = true;
                 if (window.jQuery) {
@@ -128,8 +129,14 @@
             alertBox.removeAttribute('hidden');
         }
 
-        relatorioField.addEventListener('input', updateAlert);
-        relatorioField.addEventListener('change', updateAlert);
+        relatorioField.addEventListener('input', function() {
+            hasUserEditedReport = true;
+            updateAlert();
+        });
+        relatorioField.addEventListener('change', function() {
+            hasUserEditedReport = true;
+            updateAlert();
+        });
         if (managementSelect) {
             managementSelect.addEventListener('change', updateAlert);
         }

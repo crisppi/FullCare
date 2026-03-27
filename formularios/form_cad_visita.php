@@ -195,17 +195,20 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
 
             <div class="form-group col-sm-3">
                 <label for="retificou">Retificar Visita</label>
-                <select class="form-control" id="retificou" name="retificou">
-                    <option value="">Selecione a visita</option>
-                    <?php foreach ((array) $visitasAntigas as $visita): ?>
-                    <?php if (is_array($visita) && isset($visita['visita_no_vis'])): ?>
-                    <option value="<?= $visita['visita_no_vis'] ?>">
-                        Visita ID <?= $visita['visita_no_vis'] ?> -
-                        <?= isset($visita['data_visita_vis']) ? DateTime::createFromFormat('Y-m-d', $visita['data_visita_vis'])->format('d/m/Y') : 'Data não informada' ?>
-                    </option>
-                    <?php endif; ?>
-                    <?php endforeach; ?>
-                </select>
+                <div class="visita-inline-clear">
+                    <select class="form-control" id="retificou" name="retificou">
+                        <option value="">Selecione a visita</option>
+                        <?php foreach ((array) $visitasAntigas as $visita): ?>
+                        <?php if (is_array($visita) && isset($visita['visita_no_vis'])): ?>
+                        <option value="<?= $visita['visita_no_vis'] ?>">
+                            Visita ID <?= $visita['visita_no_vis'] ?> -
+                            <?= isset($visita['data_visita_vis']) ? DateTime::createFromFormat('Y-m-d', $visita['data_visita_vis'])->format('d/m/Y') : 'Data não informada' ?>
+                        </option>
+                        <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="button" class="visita-inline-clear__btn" data-clear-select="retificou" aria-label="Limpar visita retificada">&times;</button>
+                </div>
             </div>
 
             <!-- Campo de antecedentes removido conforme solicitação -->
@@ -903,6 +906,40 @@ function aumentarTextProgramacao() {
     color: #c4c4c4;
 }
 
+.visita-inline-clear {
+    position: relative;
+}
+
+.visita-inline-clear select {
+    padding-right: 38px;
+}
+
+.visita-inline-clear__btn {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 18px;
+    height: 18px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(94, 35, 99, 0.10);
+    color: #5e2363;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 18px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.visita-inline-clear__btn:hover {
+    background: rgba(94, 35, 99, 0.18);
+    color: #4b1850;
+}
+
 /* Cadastro central: remove halo/sombra azul dos selects de auditor */
 #cadastro-central-visita .form-select,
 #cadastro-central-visita .form-select:focus,
@@ -1500,6 +1537,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-clear-select]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var targetId = button.getAttribute('data-clear-select');
+            var select = document.getElementById(targetId);
+            if (!select) return;
+            select.value = '';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    });
+});
 
 const GESTAO_FIELD_DEFAULTS = {
     alto_custo_ges: 'n',
