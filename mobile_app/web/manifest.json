@@ -1,11 +1,11 @@
 {
-    "name": "mobile_app",
-    "short_name": "mobile_app",
+    "name": "FullCare Mobile",
+    "short_name": "FullCare",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#ffffff",
+    "theme_color": "#2bb9dd",
+    "description": "Aplicativo FullCare para internacao, TUSS e prorrogacao.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

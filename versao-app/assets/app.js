@@ -1,4 +1,4 @@
-const API_URL = "../api/mobile/index.php";
+const API_URL = `${window.location.origin}/FullCare/api/mobile/index.php`;
 const TOKEN_KEY = "fullcare_mobile_web_token";
 
 const state = {
@@ -66,6 +66,16 @@ function showFeedback(message, type = "success") {
     }, 3200);
 }
 
+window.addEventListener("error", (event) => {
+    showFeedback(event.message || "Erro inesperado na interface.", "error");
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+    const reason = event.reason;
+    const message = reason instanceof Error ? reason.message : String(reason || "Falha assíncrona.");
+    showFeedback(message, "error");
+});
+
 function formatDate(value) {
     if (!value) return "-";
     const datePart = String(value).trim().split(" ")[0];
@@ -113,13 +123,23 @@ async function request(action, options = {}) {
         headers.Authorization = `Bearer ${state.token}`;
     }
 
-    const response = await fetch(`${API_URL}?${query.toString()}`, {
-        method,
-        headers,
-        body: options.body ? JSON.stringify(options.body) : undefined,
-    });
+    let response;
+    try {
+        response = await fetch(`${API_URL}?${query.toString()}`, {
+            method,
+            headers,
+            body: options.body ? JSON.stringify(options.body) : undefined,
+        });
+    } catch (error) {
+        throw new Error("Falha de conexão com a API mobile.");
+    }
 
-    const payload = await response.json();
+    let payload;
+    try {
+        payload = await response.json();
+    } catch (error) {
+        throw new Error("Resposta inválida da API mobile.");
+    }
     if (response.status === 401) {
         clearSession();
         throw new Error(payload.message || "Sessão expirada.");
@@ -353,7 +373,14 @@ async function openTussModal() {
         picker.innerHTML = "";
         state.selectedTuss = null;
         codeField.value = "";
-        if (!query) return;
+        if (query.length < 2) {
+            if (query.length === 1) {
+                picker.innerHTML = '<p class="support-text">Digite pelo menos 2 caracteres para consultar.</p>';
+            }
+            return;
+        }
+
+        picker.innerHTML = '<p class="support-text">Buscando TUSS no banco...</p>';
 
         const data = await request("tuss-catalog", { query: { query } });
         const unique = new Map();
@@ -362,6 +389,12 @@ async function openTussModal() {
             if (code && !unique.has(code)) unique.set(code, item);
         });
         state.tussCatalog = [...unique.values()];
+
+        picker.innerHTML = "";
+        if (!state.tussCatalog.length) {
+            picker.innerHTML = '<p class="support-text">Nenhum TUSS encontrado.</p>';
+            return;
+        }
 
         state.tussCatalog.slice(0, 4).forEach((item) => {
             const option = document.createElement("button");
@@ -386,7 +419,7 @@ async function openTussModal() {
         window.clearTimeout(timer);
         timer = window.setTimeout(() => {
             searchTuss().catch((error) => showFeedback(error.message, "error"));
-        }, 240);
+        }, 320);
     });
 
     modalForm.onsubmit = async (event) => {

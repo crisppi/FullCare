@@ -11,7 +11,7 @@
     --fc-muted: #64748b;
     --fc-line: #d8e3f0;
     --fc-panel: rgba(255, 255, 255, 0.96);
-    --fc-shadow: 0 22px 44px rgba(21, 34, 51, 0.12);
+    --fc-shadow: 0 10px 24px rgba(21, 34, 51, 0.1);
 }
 
 * {
@@ -71,7 +71,6 @@ textarea {
     color: #fff;
     background: rgba(22, 38, 62, 0.2);
     border-color: rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(14px);
 }
 
 .auth-logo,
@@ -301,7 +300,7 @@ textarea:focus {
     text-align: left;
     cursor: pointer;
     min-height: 118px;
-    box-shadow: var(--fc-shadow);
+    box-shadow: 0 8px 18px rgba(21, 34, 51, 0.08);
 }
 
 .action-tile strong,
@@ -377,7 +376,7 @@ textarea:focus {
     overflow: auto;
     background: #f9fbff;
     border-radius: 28px;
-    box-shadow: var(--fc-shadow);
+    box-shadow: 0 12px 28px rgba(21, 34, 51, 0.16);
     padding: 18px 16px 24px;
 }
 

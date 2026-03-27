@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+$assetVersion = '20260322b';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -7,7 +8,7 @@ declare(strict_types=1);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>FullCare Mobile Web</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=<?= $assetVersion ?>">
 </head>
 <body>
     <main class="mobile-shell">
@@ -177,6 +178,6 @@ declare(strict_types=1);
         </article>
     </template>
 
-    <script src="assets/app.js"></script>
+    <script src="assets/app.js?v=<?= $assetVersion ?>"></script>
 </body>
 </html>

@@ -165,15 +165,13 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2D63A6),
-                            borderRadius: BorderRadius.circular(18),
+                        Center(
+                          child: Image.asset(
+                            'assets/branding/fullcare_footer_logo.png',
+                            width: 104,
+                            height: 104,
+                            fit: BoxFit.contain,
                           ),
-                          child: const Icon(Icons.health_and_safety,
-                              color: Colors.white),
                         ),
                         const SizedBox(height: 18),
                         Text(
