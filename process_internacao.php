@@ -42,6 +42,7 @@ require_once("dao/internacaoAntecedenteDao.php");
 require_once("models/alta.php");
 require_once("dao/altaDao.php");
 require_once("utils/flow_logger.php");
+require_once(__DIR__ . "/app/cuidadoContinuado.php");
 
 if (!function_exists('normalizeDateTimeInput')) {
 function normalizeDateTimeInput($value)
@@ -528,6 +529,36 @@ if ($type === "create") {
     }
     flowLog($flowCtx, 'create.internacao.id', 'INFO', ['id_internacao_novo' => $lastId]);
     internacaoCreateDebugLog('CREATE internacao ok id=' . $lastId);
+    try {
+        $cronicosInseridos = cc_upsert_patient_chronics_from_text(
+            $conn,
+            (int)$fk_paciente_int,
+            (string)$rel_int,
+            'relatório da internação'
+        );
+        $cronicosPorAntecedentes = cc_sync_patient_chronics_from_existing_antecedents(
+            $conn,
+            (int)$fk_paciente_int,
+            'antecedentes já cadastrados do paciente'
+        );
+        $cronicosPorAntecedenteSelecionado = cc_upsert_patient_chronics_from_antecedent_id(
+            $conn,
+            (int)$fk_paciente_int,
+            (int)$fk_patologia2,
+            'antecedente selecionado na internação'
+        );
+        if ($cronicosInseridos) {
+            flowLog($flowCtx, 'create.cronicos', 'INFO', ['condicoes' => $cronicosInseridos]);
+        }
+        if ($cronicosPorAntecedentes) {
+            flowLog($flowCtx, 'create.cronicos.antecedentes', 'INFO', ['condicoes' => $cronicosPorAntecedentes]);
+        }
+        if ($cronicosPorAntecedenteSelecionado) {
+            flowLog($flowCtx, 'create.cronicos.antecedente_selecionado', 'INFO', ['condicoes' => $cronicosPorAntecedenteSelecionado]);
+        }
+    } catch (Throwable $e) {
+        error_log('[CRONICOS][INTERNACAO][CREATE] ' . $e->getMessage());
+    }
 
     // Alta automática se internado = 'n'
     if ($internado_int === 'n') {
@@ -994,6 +1025,45 @@ if ($type == "update") {
     $internacao->hora_intern_int = $hora_intern_int;
     $internacao->id_internacao = $id_internacao;
     $internacaoDao->update($internacao);
+    try {
+        $cronicosAtualizados = cc_upsert_patient_chronics_from_text(
+            $conn,
+            (int)$fk_paciente_int,
+            (string)$rel_int,
+            'edição do relatório da internação'
+        );
+        $cronicosPorAntecedentes = cc_sync_patient_chronics_from_existing_antecedents(
+            $conn,
+            (int)$fk_paciente_int,
+            'antecedentes já cadastrados do paciente'
+        );
+        $cronicosPorAntecedenteSelecionado = cc_upsert_patient_chronics_from_antecedent_id(
+            $conn,
+            (int)$fk_paciente_int,
+            (int)$fk_patologia2,
+            'antecedente selecionado na internação'
+        );
+        if ($cronicosAtualizados) {
+            flowLog($flowCtx, 'update.cronicos', 'INFO', [
+                'condicoes' => $cronicosAtualizados,
+                'id_internacao' => $id_internacao
+            ]);
+        }
+        if ($cronicosPorAntecedentes) {
+            flowLog($flowCtx, 'update.cronicos.antecedentes', 'INFO', [
+                'condicoes' => $cronicosPorAntecedentes,
+                'id_internacao' => $id_internacao
+            ]);
+        }
+        if ($cronicosPorAntecedenteSelecionado) {
+            flowLog($flowCtx, 'update.cronicos.antecedente_selecionado', 'INFO', [
+                'condicoes' => $cronicosPorAntecedenteSelecionado,
+                'id_internacao' => $id_internacao
+            ]);
+        }
+    } catch (Throwable $e) {
+        error_log('[CRONICOS][INTERNACAO][UPDATE] ' . $e->getMessage());
+    }
 
     // UTI (em update usa o id_internacao existente)
     if ($select_uti == "s") {

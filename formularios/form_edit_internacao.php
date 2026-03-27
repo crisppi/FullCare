@@ -600,6 +600,19 @@
                 <div class="form-group" style="margin-left:0px; margin-top:-15px">
                     <div>
                         <label for="rel_int">Relatório de Auditoria</label>
+                        <div id="cronicos-relatorio-alert"
+                            style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff3cd,#ffe3a3);border:1px solid #f0c36d;color:#6a4a00;box-shadow:0 8px 20px rgba(240,195,109,.18);"
+                            hidden>
+                            <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:4px;">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                Alerta de condição crônica
+                            </div>
+                            <p style="margin:0;line-height:1.45;">
+                                Foram identificados termos compatíveis com doenças crônicas no relatório:
+                                <strong data-role="matched-list"></strong>.
+                            </p>
+                            <p style="margin:4px 0 0;line-height:1.45;" data-role="auto-note"></p>
+                        </div>
                         <textarea id="rel_int" name="rel_int" maxlength="5000" class="form-control" style="resize:none"
                             rows="2" onclick="aumentarText('rel_int')" onblur="reduzirText('rel_int', 2)"><?= htmlspecialchars($intern['rel_int'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
 </textarea>
@@ -1122,6 +1135,7 @@
 
     <!-- <script src="js/scriptDataInt.js"></script> -->
     <script src="<?= $BASE_URL ?>js/text_cad_internacao.js"></script>
+    <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
     <script src="js/select_internacao.js"></script>
 
     <script>

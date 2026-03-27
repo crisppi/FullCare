@@ -716,6 +716,30 @@ if (!empty($sessionIdUsuario)) {
                                     </ul>
                                 </li>
                             <?php }; ?>
+                            <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarCuidadoContinuado" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i style="font-size: 1rem;margin-right:5px; color:#5e2363;"
+                                            class="bi bi-heart-pulse"></i>
+                                        Cuidado Continuado
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarCuidadoContinuado">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado"><i
+                                                    class="bi bi-grid-1x2"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                Dashboard</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/cronicos"><i
+                                                    class="bi bi-heart-pulse-fill"
+                                                    style="font-size: 1rem;margin-right:5px; color:#c43d4b;"></i>
+                                                Gestão de Crônicos</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/medicina-preventiva"><i
+                                                    class="bi bi-shield-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#198754;"></i>
+                                                Medicina Preventiva</a></li>
+                                    </ul>
+                                </li>
+                            <?php }; ?>
                             <?php if ($canSeeBiMenu) { ?>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"

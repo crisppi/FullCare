@@ -155,6 +155,66 @@
     ?>
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css" rel="stylesheet">
+    <style>
+        .assist-select-clear {
+            position: relative;
+        }
+
+        .assist-select-clear .bootstrap-select,
+        .assist-select-clear > select {
+            width: 100% !important;
+        }
+
+        .assist-select-clear .bootstrap-select > .dropdown-toggle {
+            padding-right: 46px !important;
+        }
+
+        .assist-clear-btn {
+            position: absolute;
+            top: 50%;
+            right: 28px;
+            transform: translateY(-50%);
+            z-index: 4;
+            width: 18px;
+            height: 18px;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(94, 35, 99, 0.10);
+            color: #5e2363;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 18px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .assist-clear-btn:hover {
+            background: rgba(94, 35, 99, 0.18);
+            color: #4b1850;
+        }
+
+        .assistenciais-row-full {
+            display: grid;
+            grid-template-columns: 3fr 3fr 2fr 1fr 1fr 2fr;
+            gap: 12px;
+            width: 100%;
+            align-items: end;
+        }
+
+        @media (max-width: 991.98px) {
+            .assistenciais-row-full {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .assistenciais-row-full {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 
 
     <div class="internacao-page">
@@ -543,7 +603,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row">
+                        <div class="form-group assistenciais-row-full">
                             <!-- <div class="form-group col-sm-3">
                     <label class="control-label" for="fk_patologia_int">Patologia</label>
                     <select class="input-lg-fullcare form-control selectpicker show-tick" data-size="5"
@@ -561,20 +621,40 @@
                         <?php endforeach; ?>
                     </select>
                 </div> -->
-                            <div class="form-group col-sm-3">
-                                <label class="control-label" for="fk_cid_int">CID</label>
-                                <select class="form-control selectpicker show-tick" data-size="5" id="fk_cid_int" name="fk_cid_int"
-                                    data-live-search="true">
-                                    <option value="">CID</option>
-                                    <?php foreach ($cids as $cid): ?>
-                                        <option value="<?= $cid["id_cid"] ?>">
-                                            <?= $cid['cat'] . " - " . $cid["descricao"] ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                            <div class="form-group assist-col-cid">
+                                <label class="control-label" for="fk_cid_int">CID (Patologia)</label>
+                                <div class="assist-select-clear">
+                                    <select class="form-control selectpicker show-tick" data-size="5" id="fk_cid_int" name="fk_cid_int"
+                                        data-live-search="true" data-width="100%" data-style="input-lg-fullcare">
+                                        <option value="">CID</option>
+                                        <?php foreach ($cids as $cid): ?>
+                                            <option value="<?= $cid["id_cid"] ?>">
+                                                <?= $cid['cat'] . " - " . $cid["descricao"] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <button type="button" class="assist-clear-btn" data-clear-select="fk_cid_int" aria-label="Limpar CID">&times;</button>
+                                </div>
                             </div>
 
-                            <div class="form-group col-sm-2">
+                            <div class="form-group assist-col-antecedente">
+                                <label class="control-label" for="fk_patologia2">Antecedente</label>
+                                <div class="assist-select-clear">
+                                    <select class="form-control selectpicker show-tick" data-size="5" id="fk_patologia2" name="fk_patologia2"
+                                        data-live-search="true" data-width="100%" data-style="input-lg-fullcare"
+                                        data-live-search-placeholder="Pesquisar">
+                                        <option value="">Antecedente</option>
+                                        <?php foreach ($cids as $cid): ?>
+                                            <option value="<?= (int)$cid["id_cid"] ?>">
+                                                <?= htmlspecialchars($cid['cat'] . " - " . $cid["descricao"]) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <button type="button" class="assist-clear-btn" data-clear-select="fk_patologia2" aria-label="Limpar antecedente">&times;</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group assist-col-grupo">
                                 <label class="control-label" for="grupo_patologia_int">Grupo Patologia</label>
                                 <select class="input-lg-fullcare form-control" id="grupo_patologia_int" name="grupo_patologia_int">
                                     <option value=""></option>
@@ -584,7 +664,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-sm-1">
+                            <div class="form-group assist-col-origem">
                                 <label class="control-label" for="origem_int">Origem</label>
                                 <select class="input-lg-fullcare form-control" id="origem_int" name="origem_int">
                                     <option value=""></option>
@@ -594,33 +674,15 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-sm-2">
+                            <div class="form-group assist-col-senha">
                                 <label for="senha_int">Senha</label>
                                 <input type="text" maxlength="20" class="form-control input-lg-fullcare" id="senha_int" name="senha_int">
                             </div>
-                            <div class="form-group col-sm-2">
+                            <div class="form-group assist-col-atendimento">
                                 <label for="num_atendimento_int">Num. Atendimento</label>
                                 <input type="text" maxlength="20" class="form-control input-lg-fullcare" id="num_atendimento_int"
                                     name="num_atendimento_int">
                             </div>
-
-                            <!-- <div class="form-group col-sm-2">
-                    <label class="control-label" for="fk_patologia2">Antecedente</label>
-                    <select class="input-lg-fullcare form-control selectpicker show-tick" data-size="5"
-                        data-live-search="true" id="fk_patologia2" name="fk_patologia2[]" multiple title="Selecione">
-                        <?php
-                        if (!is_array($antecedentes)) {
-                            $antecedentes = [];
-                        };
-                        usort($antecedentes, fn($a, $b) => strcmp($a["antecedente_ant"], $b["antecedente_ant"]));
-                        foreach ($antecedentes as $antecedente): ?>
-                        <option value="<?= (int) $antecedente["id_antecedente"] ?>">
-                            <?= htmlspecialchars($antecedente["antecedente_ant"]) ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div> -->
-                            <!-- <input type="hidden" value="" id="json-antec" name="json-antec"> -->
                         </div>
 
                     </div>
@@ -637,6 +699,19 @@
             <div class="internacao-card__body">
                 <div>
                     <label for="rel_int">Relatório de Auditoria</label>
+                    <div id="cronicos-relatorio-alert"
+                        style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff3cd,#ffe3a3);border:1px solid #f0c36d;color:#6a4a00;box-shadow:0 8px 20px rgba(240,195,109,.18);"
+                        hidden>
+                        <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:4px;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            Alerta de condição crônica
+                        </div>
+                        <p style="margin:0;line-height:1.45;">
+                            Foram identificados termos compatíveis com doenças crônicas no relatório:
+                            <strong data-role="matched-list"></strong>.
+                        </p>
+                        <p style="margin:4px 0 0;line-height:1.45;" data-role="auto-note"></p>
+                    </div>
                     <textarea data-saude-autocomplete="true" maxlength="5000" style="resize:none" rows="2"
                         onclick="aumentarText('rel_int')" class="form-control" id="rel_int" name="rel_int"></textarea>
                 </div>
@@ -843,7 +918,23 @@
         window.hospitalUsuariosMap = <?= json_encode($hospitalUsuariosMap, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     </script>
     <script src="<?= $BASE_URL ?>js/form_cad_internacao.js"></script>
+    <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[data-clear-select]').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var targetId = button.getAttribute('data-clear-select');
+                    var select = document.getElementById(targetId);
+                    if (!select) return;
+                    select.value = '';
+                    if (window.jQuery && window.jQuery.fn && window.jQuery(select).hasClass('selectpicker')) {
+                        window.jQuery(select).selectpicker('val', '');
+                    }
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            });
+        });
+
         (function() {
             var dataInternDt = document.getElementById('data_intern_int_dt');
             var dataIntern = document.getElementById('data_intern_int');

@@ -52,6 +52,7 @@ require_once("dao/usuarioDao.php");
 
 require_once("models/message.php");
 require_once("utils/flow_logger.php");
+require_once(__DIR__ . "/app/cuidadoContinuado.php");
 
 $message                = new Message($BASE_URL);
 $userDao                = new UserDAO($conn, $BASE_URL);
@@ -63,6 +64,40 @@ $tussDao                = new tussDAO($conn, $BASE_URL);
 $prorrogacaoDao         = new prorrogacaoDAO($conn, $BASE_URL);
 $visitaDao              = new visitaDAO($conn, $BASE_URL);
 $internAntecedenteDao   = new InternacaoAntecedenteDAO($conn, $BASE_URL);
+
+if (!function_exists('cc_process_visita_cronicos')) {
+    function cc_process_visita_cronicos(PDO $conn, internacaoDAO $internacaoDao, ?int $internacaoId, ?string $reportText, string $source): array
+    {
+        if (!$internacaoId || trim((string)$reportText) === '') {
+            return [];
+        }
+
+        $internacao = $internacaoDao->findById($internacaoId);
+        $patientId = (int)($internacao->fk_paciente_int ?? 0);
+        if ($patientId <= 0) {
+            return [];
+        }
+
+        return cc_upsert_patient_chronics_from_text($conn, $patientId, $reportText, $source);
+    }
+}
+
+if (!function_exists('cc_process_visita_cronicos_from_antecedentes')) {
+    function cc_process_visita_cronicos_from_antecedentes(PDO $conn, internacaoDAO $internacaoDao, ?int $internacaoId, string $source): array
+    {
+        if (!$internacaoId) {
+            return [];
+        }
+
+        $internacao = $internacaoDao->findById($internacaoId);
+        $patientId = (int)($internacao->fk_paciente_int ?? 0);
+        if ($patientId <= 0) {
+            return [];
+        }
+
+        return cc_sync_patient_chronics_from_existing_antecedents($conn, $patientId, $source);
+    }
+}
 
 // ======================================================================
 // Utilitários simples
@@ -623,9 +658,13 @@ if ($type === "create") {
             processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $negociacaoDao, $fk_usuario_neg_form ?? $fk_usuario_vis, $autoNegociacoesProrrog);
             processGestaoData($select_gestao ?? '', $gestaoPostData, $id_visita_edit, $fk_internacao_vis, $gestaoDao, true);
             processUtiData($select_uti ?? '', $utiPostData, $id_visita_edit, $fk_internacao_vis, $utiDao, true);
+            $cronicosAtualizados = cc_process_visita_cronicos($conn, $internacaoDao, $fk_internacao_vis, $rel_visita_vis, 'edição do relatório da visita');
+            $cronicosAntecedentes = cc_process_visita_cronicos_from_antecedentes($conn, $internacaoDao, $fk_internacao_vis, 'antecedentes já cadastrados do paciente');
             flowLog($flowCtx, 'create.edit_mode.finish', 'INFO', [
                 'id_visita' => $id_visita_edit,
-                'fk_internacao_vis' => $fk_internacao_vis
+                'fk_internacao_vis' => $fk_internacao_vis,
+                'condicoes_cronicas' => $cronicosAtualizados,
+                'condicoes_antecedentes' => $cronicosAntecedentes
             ]);
         } catch (Throwable $e) {
             flowLog($flowCtx, 'create.edit_mode.error', 'ERROR', ['error' => $e->getMessage(), 'id_visita' => $id_visita_edit]);
@@ -679,9 +718,13 @@ if ($type === "create") {
         processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $negociacaoDao, $fk_usuario_neg_form ?? $fk_usuario_vis, $autoNegociacoesProrrog);
         processGestaoData($select_gestao ?? '', $gestaoPostData, $novoIdVisita, $fk_internacao_vis, $gestaoDao);
         processUtiData($select_uti ?? '', $utiPostData, $novoIdVisita, $fk_internacao_vis, $utiDao);
+        $cronicosCriados = cc_process_visita_cronicos($conn, $internacaoDao, $fk_internacao_vis, $rel_visita_vis, 'relatório da visita');
+        $cronicosAntecedentes = cc_process_visita_cronicos_from_antecedentes($conn, $internacaoDao, $fk_internacao_vis, 'antecedentes já cadastrados do paciente');
         flowLog($flowCtx, 'create.finish', 'INFO', [
             'id_visita' => $novoIdVisita,
-            'fk_internacao_vis' => $fk_internacao_vis
+            'fk_internacao_vis' => $fk_internacao_vis,
+            'condicoes_cronicas' => $cronicosCriados,
+            'condicoes_antecedentes' => $cronicosAntecedentes
         ]);
         if ($__DEBUG) dbg("VISITA criada", $visita);
     } catch (Throwable $e) {

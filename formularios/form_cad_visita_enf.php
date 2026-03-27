@@ -64,6 +64,19 @@
 
             <div>
                 <label for="rel_visita_vis">Relatório Auditoria</label>
+                <div id="cronicos-relatorio-alert"
+                    style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff3cd,#ffe3a3);border:1px solid #f0c36d;color:#6a4a00;box-shadow:0 8px 20px rgba(240,195,109,.18);"
+                    hidden>
+                    <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:4px;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Alerta de condição crônica
+                    </div>
+                    <p style="margin:0;line-height:1.45;">
+                        Foram identificados termos compatíveis com doenças crônicas no relatório:
+                        <strong data-role="matched-list"></strong>.
+                    </p>
+                    <p style="margin:4px 0 0;line-height:1.45;" data-role="auto-note"></p>
+                </div>
                 <textarea type="textarea" rows="2" onclick="aumentarTextAudit()" class="form-control"
                     id="rel_visita_vis" name="rel_visita_vis"></textarea>
             </div>
@@ -289,6 +302,7 @@
 </div>
 
 <script src="js/text_cad_visita.js"></script>
+<script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
 <script src="js/select_visita.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
