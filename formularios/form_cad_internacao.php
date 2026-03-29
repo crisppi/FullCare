@@ -257,10 +257,10 @@
                         </div>
                     </div>
                     <div class="internacao-card__body">
-                        <div class="internacao-head-row internacao-head-grid">
+                        <div class="internacao-head-row internacao-head-grid" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;">
                             <input type="hidden" value="" name="fk_hospital_int" id="fk_hospital_int">
 
-                            <div class="form-group hospital-col">
+                            <div class="form-group hospital-col" style="flex:2.2 1 300px;min-width:260px;">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="control-label mb-0" for="hospital_selected">
                                         <span style="color:red;">*</span> Hospital
@@ -290,7 +290,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group patient-col">
+                            <div class="form-group patient-col" style="flex:2.2 1 300px;min-width:260px;">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="control-label mb-0" for="fk_paciente_int">
                                         <span style="color:red;">*</span> Paciente
@@ -375,7 +375,7 @@
                                 })();
                             </script>
 
-                            <div class="form-group essential-medium">
+                            <div class="form-group essential-medium" style="flex:1.2 1 180px;min-width:160px;">
                                 <label class="control-label" for="matricula_paciente_display">Matrícula</label>
                                 <input type="text" class="form-control input-lg-fullcare" id="matricula_paciente_display"
                                     placeholder="Digite para pesquisar por matrícula" list="matricula_list">
@@ -388,7 +388,7 @@
                                 </datalist>
                             </div>
 
-                            <div class="form-group essential-medium">
+                            <div class="form-group essential-medium" style="flex:1.2 1 180px;min-width:160px;">
                                 <label class="control-label" for="data_intern_int_dt"><span style="color:red;">*</span> Data
                                     Internação</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_intern_int_dt" required
@@ -397,20 +397,20 @@
                                 <input type="hidden" id="hora_intern_int" name="hora_intern_int" value="">
                             </div>
 
-                            <div class="form-group essential-small">
+                            <div class="form-group essential-small" style="flex:0.9 1 140px;min-width:130px;">
                                 <label class="control-label" for="data_lancamento_int">Data lançamento</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_lancamento_int"
                                     name="data_lancamento_int" value="<?= $agoraLanc ?>">
                             </div>
 
-                            <div class="form-group essential-small">
+                            <div class="form-group essential-small" style="flex:0.9 1 140px;min-width:130px;">
                                 <label for="data_visita_int">Data Visita</label>
                                 <input type="date" value='<?= $dataAtual; ?>' class="form-control input-lg-fullcare" id="data_visita_int"
                                     name="data_visita_int">
                                 <p id="error-message" style="color:red;display:none;font-size:.6em;"></p>
                             </div>
 
-                            <div class="form-group essential-small">
+                            <div class="form-group essential-small" style="flex:0.8 1 120px;min-width:110px;">
                                 <label class="control-label" for="internado_int">Internado</label>
                                 <select class="input-lg-fullcare form-control" id="internado_int" name="internado_int">
                                     <option value="s">Sim</option>
@@ -418,11 +418,11 @@
                                 </select>
                             </div>
 
-                            <div class="form-group essential-full mb-2">
+                            <div class="form-group essential-full mb-2" style="flex:1 1 100%;">
                                 <div id="erro-data-internacao" class="alert d-none w-100 mb-0" role="alert"></div>
                             </div>
 
-                            <div class="form-group essential-full d-none" id="alta-obrigatoria-container">
+                            <div class="form-group essential-full d-none" id="alta-obrigatoria-container" style="flex:1 1 100%;">
                                 <div class="alta-obrigatoria-box">
                                     <div class="alta-obrigatoria-box__title">
                                         <span style="color:red;">*</span> Alta obrigatória para internação retroativa (paciente internado em outro hospital)
@@ -452,7 +452,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group essential-full d-none" id="retroativa-container">
+                            <div class="form-group essential-full d-none" id="retroativa-container" style="flex:1 1 100%;">
                                 <div id="retroativa-alert" class="retroativa-banner d-none">
                                     <i class="fa-solid fa-rotate-left"></i>
                                     <span id="retroativa-alert-text"></span>
