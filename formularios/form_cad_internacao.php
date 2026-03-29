@@ -310,6 +310,7 @@
                                         <span style="color:red;">*</span> Paciente
                                     </label>
                                     <button type="button" id="patientInsightToggle" class="patient-insight-inline-btn"
+                                        style="display:none;"
                                         title="Mostrar resumo do paciente" aria-expanded="false">i</button>
                                 </div>
                                 <select data-size="10" data-live-search="true" data-live-search-placeholder="Pesquisa por nome"

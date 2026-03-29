@@ -130,6 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var selectedText = pacienteSelect.options[pacienteSelect.selectedIndex]?.text?.trim() || '';
         var id = pacienteSelect.value;
         var selectedOption = pacienteSelect.options[pacienteSelect.selectedIndex] || null;
+        if (patientInsightDisplay && typeof patientInsightDisplay.setEnabled === 'function') {
+            patientInsightDisplay.setEnabled(!!id);
+        }
         if (matriculaField) {
             var matricula = selectedOption ? (selectedOption.getAttribute('data-matricula') || '') : '';
             matriculaField.value = id ? matricula : '';
@@ -588,9 +591,13 @@ const patientInsightDisplay = (function() {
     const card = document.getElementById('patientInsightCard');
     const btn = document.getElementById('patientInsightToggle');
     let visible = false;
+    let enabled = false;
 
     function update() {
-        if (card) card.style.display = visible ? 'block' : 'none';
+        if (btn) {
+            btn.style.display = enabled ? 'inline-flex' : 'none';
+        }
+        if (card) card.style.display = (enabled && visible) ? 'block' : 'none';
         if (btn) {
             btn.classList.toggle('active', visible);
             btn.setAttribute('aria-expanded', visible ? 'true' : 'false');
@@ -611,11 +618,36 @@ const patientInsightDisplay = (function() {
             visible = false;
             update();
         },
+        setEnabled(value) {
+            enabled = !!value;
+            if (!enabled) {
+                visible = false;
+            }
+            update();
+        },
         isVisible() {
             return visible;
         }
     };
 })();
+
+function syncHospitalInsightAvailability(hasHospital) {
+    const button = document.getElementById('hospitalTipButton');
+    const popover = document.getElementById('hospitalTipPopover');
+    const alertBox = document.getElementById('hospitalUtiAlert');
+    if (button) {
+        button.style.display = hasHospital ? 'inline-flex' : 'none';
+        button.disabled = !hasHospital;
+        button.setAttribute('aria-hidden', hasHospital ? 'false' : 'true');
+    }
+    if (!hasHospital) {
+        if (popover) popover.classList.remove('show');
+        if (alertBox) {
+            alertBox.textContent = '';
+            alertBox.classList.remove('show');
+        }
+    }
+}
 
 // Hospital selecionado -> mostra nome e grava hidden
 function getHospitalPickerToggle() {
@@ -636,6 +668,7 @@ function myFunctionSelected() {
     const nome = select.options[select.selectedIndex]?.text || "";
 
     inputHospital.value = id;
+    syncHospitalInsightAvailability(!!id);
 
     if (id) {
         select.style.color = "#495057";
@@ -677,6 +710,15 @@ function myFunctionSelected() {
         window.cadastroCentralHelper.applyHospitalFilter(id);
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const pacienteSelect = document.getElementById('fk_paciente_int');
+    const hospitalSelect = document.getElementById('hospital_selected');
+    if (patientInsightDisplay && typeof patientInsightDisplay.setEnabled === 'function') {
+        patientInsightDisplay.setEnabled(!!(pacienteSelect && pacienteSelect.value));
+    }
+    syncHospitalInsightAvailability(!!(hospitalSelect && hospitalSelect.value));
+});
 
 // Estilo do select "relatório detalhado"
 $('#relatorio-detalhado').on('change', function() {
