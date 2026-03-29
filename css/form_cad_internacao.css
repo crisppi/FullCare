@@ -398,11 +398,14 @@
             min-height: 42px !important;
             height: 42px !important;
             padding: 8px 10px !important;
-            border: none !important;
+            border: 1px solid #ced4da !important;
+            border-color: #ced4da !important;
+            border-radius: 6px !important;
             box-shadow: none !important;
             outline: none !important;
             background-color: #fff !important;
             color: #495057 !important;
+            opacity: 1 !important;
         }
 
         .patient-select-btn .filter-option {
@@ -413,19 +416,29 @@
         .patient-select-btn:focus,
         .patient-select-btn:active,
         .bootstrap-select.show>.patient-select-btn {
-            border: none !important;
+            border: 1px solid #ced4da !important;
             box-shadow: none !important;
             outline: none !important;
         }
 
         .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"],
+        .bootstrap-select > .dropdown-toggle[data-id="fk_paciente_int"],
+        .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"],
         .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"]:focus,
         .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"]:active,
-        .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"]:hover {
-            border: none !important;
+        .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"]:hover,
+        .bootstrap-select > .dropdown-toggle[data-id="fk_paciente_int"]:focus,
+        .bootstrap-select > .dropdown-toggle[data-id="fk_paciente_int"]:active,
+        .bootstrap-select > .dropdown-toggle[data-id="fk_paciente_int"]:hover {
+            border: 1px solid #ced4da !important;
+            border-radius: 6px !important;
+            border-color: #ced4da !important;
             box-shadow: none !important;
             outline: none !important;
             background-image: none !important;
+            background-color: #fff !important;
+            color: #495057 !important;
+            opacity: 1 !important;
         }
 
         /* Evita "pulo" no carregamento: nativo já nasce com a mesma caixa do picker */
