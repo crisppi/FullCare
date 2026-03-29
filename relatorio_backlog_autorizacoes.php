@@ -60,7 +60,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 .report-wrapper {
     width: 100%;
     max-width: none;
-    margin: 90px 0 60px;
+    margin: 12px 0 60px;
     padding: 0 24px;
 }
 .report-header {

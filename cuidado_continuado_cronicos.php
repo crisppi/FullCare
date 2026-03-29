@@ -33,7 +33,7 @@ function cc_badge_class(string $risk): string
 <script src="js/timeout.js"></script>
 <style>
     .cc-module-shell {
-        padding: 82px 20px 32px;
+        padding: 36px 20px 32px;
         background: #f6f8fc;
         min-height: 100vh;
     }

@@ -152,6 +152,29 @@
     foreach ($hospitalUsuariosMap as $hid => $uids) {
         $hospitalUsuariosMap[$hid] = array_values(array_map('intval', array_keys($uids)));
     }
+
+    $patientCareProgramMap = [];
+    try {
+        $cronicosStmt = $conn->query("
+            SELECT fk_paciente,
+                   GROUP_CONCAT(DISTINCT condicao ORDER BY condicao SEPARATOR ', ') AS condicoes
+              FROM tb_paciente_cronico
+             GROUP BY fk_paciente
+        ");
+        foreach (($cronicosStmt ? $cronicosStmt->fetchAll(PDO::FETCH_ASSOC) : []) as $row) {
+            $pacId = (int)($row['fk_paciente'] ?? 0);
+            if ($pacId <= 0) {
+                continue;
+            }
+            $patientCareProgramMap[$pacId] = [
+                'programas' => ['Gestão de Crônicos'],
+                'condicoes' => trim((string)($row['condicoes'] ?? '')),
+            ];
+        }
+
+    } catch (Throwable $e) {
+        $patientCareProgramMap = [];
+    }
     ?>
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css" rel="stylesheet">
@@ -234,8 +257,10 @@
                         </div>
                     </div>
                     <div class="internacao-card__body">
-                        <div class="col-12 d-flex align-items-end flex-wrap justify-content-between internacao-head-row" style="margin-top:-8px;">
-                            <div class="form-group mb-0 hospital-col">
+                        <div class="internacao-head-row internacao-head-grid">
+                            <input type="hidden" value="" name="fk_hospital_int" id="fk_hospital_int">
+
+                            <div class="form-group hospital-col">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="control-label mb-0" for="hospital_selected">
                                         <span style="color:red;">*</span> Hospital
@@ -260,15 +285,12 @@
                                         <?php endif; ?>
                                     </select>
                                 </div>
+                                <div class="hospital-name-slot">
+                                    <div id="hospitalNomeTexto" class="hospital-name-chip"></div>
+                                </div>
                             </div>
-                            <div class="hospital-name-slot">
-                                <div id="hospitalNomeTexto" class="hospital-name-chip"></div>
-                            </div>
-                        </div>
-                        <div class="form-group row internacao-head-row">
-                            <input type="hidden" value="" name="fk_hospital_int" id="fk_hospital_int">
 
-                            <div class="form-group col-sm-4 patient-col" style="margin-bottom:-5px">
+                            <div class="form-group patient-col">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="control-label mb-0" for="fk_paciente_int">
                                         <span style="color:red;">*</span> Paciente
@@ -301,11 +323,15 @@
                                     });
                                     foreach ($pacientes as $paciente): ?>
                                         <?php
+                                        $pacienteId = (int) ($paciente["id_paciente"] ?? 0);
                                         $matriculaPac = trim((string) ($paciente["matricula_pac"] ?? ""));
                                         $pacienteLabel = $paciente["nome_pac"];
+                                        $careData = $patientCareProgramMap[$pacienteId] ?? ['programas' => [], 'condicoes' => ''];
                                         ?>
-                                        <option value="<?= (int) $paciente["id_paciente"] ?>"
+                                        <option value="<?= $pacienteId ?>"
                                             data-matricula="<?= htmlspecialchars($matriculaPac) ?>"
+                                            data-care-programs="<?= htmlspecialchars(json_encode(array_values($careData['programas']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>"
+                                            data-care-condicoes="<?= htmlspecialchars((string) $careData['condicoes']) ?>"
                                             data-tokens="<?= htmlspecialchars(trim((string) $paciente["nome_pac"])) ?>">
                                             <?= htmlspecialchars($pacienteLabel) ?>
                                         </option>
@@ -317,6 +343,7 @@
                                         <i style="color:blue;margin-bottom:7px;" class="far fa-edit edit-icon"></i> Novo Paciente
                                     </a>
                                 </div>
+                                <div id="patientCareProgramAlert" class="patient-care-program-alert" style="display:none;" role="status" aria-live="polite"></div>
                                 <div class="patient-insight-card" id="patientInsightCard"
                                     data-hub-base="<?= $BASE_URL ?>hub_paciente.php?id_paciente=" style="display:none;">
                                     <div class="patient-insight-header">
@@ -348,7 +375,7 @@
                                 })();
                             </script>
 
-                            <div class="form-group col-6 col-sm-2">
+                            <div class="form-group">
                                 <label class="control-label" for="matricula_paciente_display">Matrícula</label>
                                 <input type="text" class="form-control input-lg-fullcare" id="matricula_paciente_display"
                                     placeholder="Digite para pesquisar por matrícula" list="matricula_list">
@@ -361,7 +388,7 @@
                                 </datalist>
                             </div>
 
-                            <div class="form-group col-sm-2">
+                            <div class="form-group">
                                 <label class="control-label" for="data_intern_int_dt"><span style="color:red;">*</span> Data
                                     Internação</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_intern_int_dt" required
@@ -370,20 +397,20 @@
                                 <input type="hidden" id="hora_intern_int" name="hora_intern_int" value="">
                             </div>
 
-                            <div class="form-group col-sm-1">
+                            <div class="form-group">
                                 <label class="control-label" for="data_lancamento_int">Data lançamento</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_lancamento_int"
                                     name="data_lancamento_int" value="<?= $agoraLanc ?>">
                             </div>
 
-                            <div class="form-group col-sm-1">
+                            <div class="form-group">
                                 <label for="data_visita_int">Data Visita</label>
                                 <input type="date" value='<?= $dataAtual; ?>' class="form-control input-lg-fullcare" id="data_visita_int"
                                     name="data_visita_int">
                                 <p id="error-message" style="color:red;display:none;font-size:.6em;"></p>
                             </div>
 
-                            <div class="form-group col-sm-1">
+                            <div class="form-group">
                                 <label class="control-label" for="internado_int">Internado</label>
                                 <select class="input-lg-fullcare form-control" id="internado_int" name="internado_int">
                                     <option value="s">Sim</option>
@@ -391,11 +418,11 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-12 mb-2">
+                            <div class="form-group essential-full mb-2">
                                 <div id="erro-data-internacao" class="alert d-none w-100 mb-0" role="alert"></div>
                             </div>
 
-                            <div class="form-group col-12 d-none" id="alta-obrigatoria-container">
+                            <div class="form-group essential-full d-none" id="alta-obrigatoria-container">
                                 <div class="alta-obrigatoria-box">
                                     <div class="alta-obrigatoria-box__title">
                                         <span style="color:red;">*</span> Alta obrigatória para internação retroativa (paciente internado em outro hospital)
@@ -425,7 +452,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-12 d-none" id="retroativa-container">
+                            <div class="form-group essential-full d-none" id="retroativa-container">
                                 <div id="retroativa-alert" class="retroativa-banner d-none">
                                     <i class="fa-solid fa-rotate-left"></i>
                                     <span id="retroativa-alert-text"></span>

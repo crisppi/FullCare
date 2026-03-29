@@ -11,6 +11,7 @@ require_once 'db.php';
 require_once 'ajax/_auth_scope.php';
 require_once 'models/internacao.php';
 require_once 'dao/internacaoDao.php';
+require_once 'app/cuidadoContinuado.php';
 
 ajax_require_active_session();
 
@@ -56,12 +57,34 @@ try {
 
     $mp = $totalInternacoes > 0 ? round($totalDiarias / $totalInternacoes, 1) : 0;
 
+    ensure_cuidado_continuado_schema($conn);
+
+    $stmtCronicos = $conn->prepare("SELECT COUNT(*) AS total,
+                                           GROUP_CONCAT(DISTINCT condicao ORDER BY condicao SEPARATOR ', ') AS condicoes
+                                      FROM tb_paciente_cronico
+                                     WHERE fk_paciente = :pac");
+    $stmtCronicos->bindValue(':pac', (int)$pacienteId, PDO::PARAM_INT);
+    $stmtCronicos->execute();
+    $cronicosRow = $stmtCronicos->fetch(PDO::FETCH_ASSOC) ?: [];
+
+    $cronicosTotal = (int)($cronicosRow['total'] ?? 0);
+    $programas = [];
+    if ($cronicosTotal > 0) {
+        $programas[] = 'Gestão de Crônicos';
+    }
+
     echo json_encode([
         'success' => true,
         'data' => [
             'total_internacoes' => $totalInternacoes,
             'total_diarias'     => $totalDiarias,
-            'mp'                => $mp
+            'mp'                => $mp,
+            'cuidado_programa'  => [
+                'em_programa' => !empty($programas),
+                'programas' => $programas,
+                'cronicos_total' => $cronicosTotal,
+                'condicoes' => (string)($cronicosRow['condicoes'] ?? ''),
+            ],
         ]
     ]);
 } catch (Throwable $e) {

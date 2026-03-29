@@ -127,3 +127,23 @@
 [2026-03-27 02:08:20] [gestaoDAO] create OK fk_internacao_ges=664
 [2026-03-27 02:08:20] GESTAO create ok id_int=664 evento=n tipo=
 [2026-03-27 02:08:20] END ok id=664
+[2026-03-29 00:10:29] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-29 00:10:29] CREATE internacao ok id=665
+[2026-03-29 00:10:29] VISITA create ok id_int=665 id_visita=700
+[2026-03-29 00:10:29] GESTAO skip id_int=665 select= evento=n tipo=
+[2026-03-29 00:10:29] END ok id=665
+[2026-03-29 00:17:27] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-29 00:17:27] CREATE internacao ok id=666
+[2026-03-29 00:17:27] VISITA create ok id_int=666 id_visita=701
+[2026-03-29 00:17:27] GESTAO skip id_int=666 select= evento=n tipo=
+[2026-03-29 00:17:27] END ok id=666
+[2026-03-29 00:27:43] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-29 00:27:44] CREATE internacao ok id=667
+[2026-03-29 00:27:44] VISITA create ok id_int=667 id_visita=702
+[2026-03-29 00:27:44] GESTAO skip id_int=667 select= evento=n tipo=
+[2026-03-29 00:27:44] END ok id=667
+[2026-03-29 00:36:42] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-03-29 00:36:42] CREATE internacao ok id=668
+[2026-03-29 00:36:42] VISITA create ok id_int=668 id_visita=703
+[2026-03-29 00:36:42] GESTAO skip id_int=668 select= evento=n tipo=
+[2026-03-29 00:36:42] END ok id=668

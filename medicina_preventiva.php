@@ -21,7 +21,7 @@ function mp_fmt_date(?string $date): string
 <script src="js/timeout.js"></script>
 <style>
     .mp-shell {
-        padding: 82px 20px 32px;
+        padding: 36px 20px 32px;
         background: #f7faf5;
         min-height: 100vh;
     }

@@ -129,12 +129,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!pacienteSelect) return;
         var selectedText = pacienteSelect.options[pacienteSelect.selectedIndex]?.text?.trim() || '';
         var id = pacienteSelect.value;
+        var selectedOption = pacienteSelect.options[pacienteSelect.selectedIndex] || null;
         if (matriculaField) {
-            var opt = pacienteSelect.options[pacienteSelect.selectedIndex];
-            var matricula = opt ? (opt.getAttribute('data-matricula') || '') : '';
+            var matricula = selectedOption ? (selectedOption.getAttribute('data-matricula') || '') : '';
             matriculaField.value = id ? matricula : '';
         }
         if (id) startTimer();
+        if (patientInsightsHelper && typeof patientInsightsHelper.showFromOption === 'function') {
+            patientInsightsHelper.showFromOption(selectedOption, selectedText);
+        }
         if (patientInsightsHelper && typeof patientInsightsHelper.fetch === 'function') {
             patientInsightsHelper.fetch(id, selectedText);
         }
@@ -457,9 +460,11 @@ const patientInsightsHelper = (function() {
     const card = document.getElementById('patientInsightCard');
     const body = document.getElementById('patientInsightBody');
     const hubLink = document.getElementById('patientInsightHub');
+    const careAlert = document.getElementById('patientCareProgramAlert');
     const hubBase = card ? card.dataset.hubBase || '' : '';
     const defaultMessage = 'Selecione um paciente para visualizar o histórico resumido.';
     let requestId = 0;
+    let careAlertTimer = null;
 
     function setMessage(msg) {
         if (body) body.innerHTML = msg;
@@ -482,6 +487,49 @@ const patientInsightsHelper = (function() {
     function reset() {
         setMessage(defaultMessage);
         disableHub();
+        if (careAlertTimer) {
+            clearTimeout(careAlertTimer);
+            careAlertTimer = null;
+        }
+        if (careAlert) {
+            careAlert.style.display = 'none';
+            careAlert.innerHTML = '';
+        }
+    }
+
+    function showCareProgramAlert(data, pacName) {
+        if (!careAlert) return;
+        if (!data || !data.em_programa) {
+            careAlert.style.display = 'none';
+            careAlert.innerHTML = '';
+            return;
+        }
+        const nome = pacName || 'Paciente';
+        const programas = Array.isArray(data.programas) ? data.programas.join(' e ') : '';
+        const condicoes = (data.condicoes || '').trim();
+        const detalhe = condicoes ? `<br>Condições registradas: <strong>${condicoes}</strong>.` : '';
+        careAlert.innerHTML = `<strong>${nome}</strong><br>Paciente em <strong>${programas}</strong>.${detalhe}`;
+        careAlert.style.display = 'block';
+        if (careAlertTimer) clearTimeout(careAlertTimer);
+        careAlertTimer = setTimeout(function() {
+            careAlert.style.display = 'none';
+            careAlert.innerHTML = '';
+        }, 7000);
+    }
+
+    function showCareProgramAlertFromOption(option, pacName) {
+        if (!option) return;
+        let programas = [];
+        try {
+            programas = JSON.parse(option.getAttribute('data-care-programs') || '[]') || [];
+        } catch (e) {
+            programas = [];
+        }
+        showCareProgramAlert({
+            em_programa: programas.length > 0,
+            programas: programas,
+            condicoes: option.getAttribute('data-care-condicoes') || ''
+        }, pacName);
     }
 
     async function fetchInsights(pacId, pacName) {
@@ -520,15 +568,20 @@ const patientInsightsHelper = (function() {
             `;
             setMessage(html);
             enableHub(pacId);
+            showCareProgramAlert(data.cuidado_programa || null, pacName);
         } catch (err) {
             if (current !== requestId) return;
             setMessage(`Não foi possível carregar o resumo. ${err.message}`);
             disableHub();
+            if (careAlert) {
+                careAlert.style.display = 'none';
+                careAlert.innerHTML = '';
+            }
         }
     }
 
     reset();
-    return { fetch: fetchInsights, reset };
+    return { fetch: fetchInsights, reset, showFromOption: showCareProgramAlertFromOption };
 })();
 
 const patientInsightDisplay = (function() {

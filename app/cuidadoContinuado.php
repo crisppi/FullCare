@@ -103,6 +103,7 @@ if (!function_exists('cc_fetch_cronicos_summary')) {
     function cc_fetch_cronicos_summary(PDO $conn): array
     {
         ensure_cuidado_continuado_schema($conn);
+        cc_sync_existing_i50_group_chronics($conn);
 
         $sql = "SELECT
                     COUNT(*) AS total,
@@ -133,6 +134,7 @@ if (!function_exists('cc_fetch_cronicos_list')) {
     function cc_fetch_cronicos_list(PDO $conn, string $search = '', string $risk = ''): array
     {
         ensure_cuidado_continuado_schema($conn);
+        cc_sync_existing_i50_group_chronics($conn);
 
         $where = [];
         $params = [];
@@ -190,6 +192,7 @@ if (!function_exists('cc_fetch_preventiva_summary')) {
     function cc_fetch_preventiva_summary(PDO $conn): array
     {
         ensure_cuidado_continuado_schema($conn);
+        cc_sync_existing_i50_group_chronics($conn);
 
         $campanhas = $conn->query("SELECT
                 COUNT(*) AS total,
@@ -218,6 +221,7 @@ if (!function_exists('cc_fetch_active_campaigns')) {
     function cc_fetch_active_campaigns(PDO $conn): array
     {
         ensure_cuidado_continuado_schema($conn);
+        cc_sync_existing_i50_group_chronics($conn);
 
         $sql = "SELECT
                     cp.id_campanha,
@@ -257,6 +261,7 @@ if (!function_exists('cc_fetch_preventiva_elegiveis')) {
     function cc_fetch_preventiva_elegiveis(PDO $conn): array
     {
         ensure_cuidado_continuado_schema($conn);
+        cc_sync_existing_i50_group_chronics($conn);
 
         $sql = "SELECT
                     c.id_cronico,
@@ -306,12 +311,12 @@ if (!function_exists('cc_detect_chronic_conditions')) {
             [
                 'condicao' => 'Hipertensão arterial',
                 'risco' => 'moderado',
-                'patterns' => ['/\bhipertens[aã]o\b/ui', '/\bhas\b/ui', '/\bpress[aã]o alta\b/ui'],
+                'patterns' => ['/\bhipertens[aã]o\b/ui', '/\bhiperten[sç][aã]o\b/ui', '/\bhas\b/ui', '/\bpress[aã]o alta\b/ui'],
             ],
             [
                 'condicao' => 'Diabetes mellitus',
                 'risco' => 'moderado',
-                'patterns' => ['/\bdiabetes\b/ui', '/\bdm\b/ui', '/\bdm1\b/ui', '/\bdm2\b/ui'],
+                'patterns' => ['/\bdiabetes?\b/ui', '/\bdm\b/ui', '/\bdm[\s-]*1\b/ui', '/\bdm[\s-]*2\b/ui'],
             ],
             [
                 'condicao' => 'DPOC',
@@ -331,12 +336,12 @@ if (!function_exists('cc_detect_chronic_conditions')) {
             [
                 'condicao' => 'Insuficiência cardíaca',
                 'risco' => 'alto',
-                'patterns' => ['/\binsufici[eê]ncia card[ií]aca\b/ui', '/\bicc\b/ui', '/\bicc\b/ui'],
+                'patterns' => ['/\binsufici[eê]ncia card[ií]aca\b/ui', '/\binsuf\.?\s*card[ií]aca\b/ui', '/\bicc\b/ui', '/\bi50(?:\b|[.\d])/ui'],
             ],
             [
                 'condicao' => 'Doença renal crônica',
                 'risco' => 'alto',
-                'patterns' => ['/\bdoen[cç]a renal cr[oô]nica\b/ui', '/\bdrc\b/ui', '/\binsufici[eê]ncia renal cr[oô]nica\b/ui'],
+                'patterns' => ['/\bdoen[cç]a renal cr[oô]nica\b/ui', '/\bdrc\b/ui', '/\binsufici[eê]ncia renal cr[oô]nica\b/ui', '/\binsuf\.?\s*renal cr[oô]nica\b/ui', '/\birc\b/ui'],
             ],
             [
                 'condicao' => 'Coronariopatia',
@@ -494,15 +499,49 @@ if (!function_exists('cc_fetch_patient_antecedent_names')) {
         }
 
         $stmt = $conn->prepare("
-            SELECT DISTINCT a.antecedente_ant
-              FROM tb_intern_antec ia
-              INNER JOIN tb_antecedente a
-                      ON a.id_antecedente = ia.intern_antec_ant_int
-             WHERE ia.fk_id_paciente = :patient_id
-               AND COALESCE(a.antecedente_ant, '') <> ''
-             ORDER BY a.antecedente_ant ASC
+            SELECT DISTINCT antecedente_texto
+              FROM (
+                    SELECT TRIM(CONCAT_WS(' ',
+                               NULLIF(a.antecedente_ant, ''),
+                               NULLIF(c.cat, ''),
+                               NULLIF(c.descricao, '')
+                           )) AS antecedente_texto
+                      FROM tb_intern_antec ia
+                      INNER JOIN tb_antecedente a
+                              ON a.id_antecedente = ia.intern_antec_ant_int
+                      LEFT JOIN tb_cid c
+                             ON c.id_cid = a.fk_cid_10_ant
+                     WHERE ia.fk_id_paciente = :patient_id
+                       AND (
+                           COALESCE(a.antecedente_ant, '') <> ''
+                           OR COALESCE(c.cat, '') <> ''
+                           OR COALESCE(c.descricao, '') <> ''
+                       )
+                    UNION
+                    SELECT TRIM(CONCAT_WS(' ',
+                               NULLIF(a.antecedente_ant, ''),
+                               NULLIF(c.cat, ''),
+                               NULLIF(c.descricao, '')
+                           )) AS antecedente_texto
+                      FROM tb_internacao i
+                      INNER JOIN tb_antecedente a
+                              ON a.id_antecedente = i.fk_patologia2
+                      LEFT JOIN tb_cid c
+                             ON c.id_cid = a.fk_cid_10_ant
+                     WHERE i.fk_paciente_int = :patient_id_internacao
+                       AND i.fk_patologia2 IS NOT NULL
+                       AND i.fk_patologia2 > 0
+                       AND (
+                           COALESCE(a.antecedente_ant, '') <> ''
+                           OR COALESCE(c.cat, '') <> ''
+                           OR COALESCE(c.descricao, '') <> ''
+                       )
+                ) antecedentes
+             WHERE antecedente_texto <> ''
+             ORDER BY antecedente_texto ASC
         ");
         $stmt->bindValue(':patient_id', $patientId, PDO::PARAM_INT);
+        $stmt->bindValue(':patient_id_internacao', $patientId, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
@@ -534,8 +573,14 @@ if (!function_exists('cc_fetch_antecedent_name_by_id')) {
         }
 
         $stmt = $conn->prepare("
-            SELECT antecedente_ant
-              FROM tb_antecedente
+            SELECT TRIM(CONCAT_WS(' ',
+                       NULLIF(a.antecedente_ant, ''),
+                       NULLIF(c.cat, ''),
+                       NULLIF(c.descricao, '')
+                   )) AS antecedente_texto
+              FROM tb_antecedente a
+              LEFT JOIN tb_cid c
+                     ON c.id_cid = a.fk_cid_10_ant
              WHERE id_antecedente = :antecedent_id
              LIMIT 1
         ");
@@ -543,7 +588,29 @@ if (!function_exists('cc_fetch_antecedent_name_by_id')) {
         $stmt->execute();
 
         $name = $stmt->fetchColumn();
-        return $name !== false ? trim((string)$name) : null;
+        if ($name !== false) {
+            $text = trim((string)$name);
+            if ($text !== '') {
+                return $text;
+            }
+        }
+
+        // Fallback para o cadastro de internação, onde o campo "Antecedente"
+        // atualmente envia id_cid em vez de id_antecedente.
+        $cidStmt = $conn->prepare("
+            SELECT TRIM(CONCAT_WS(' ',
+                       NULLIF(c.cat, ''),
+                       NULLIF(c.descricao, '')
+                   )) AS antecedente_texto
+              FROM tb_cid c
+             WHERE c.id_cid = :cid_id
+             LIMIT 1
+        ");
+        $cidStmt->bindValue(':cid_id', $antecedentId, PDO::PARAM_INT);
+        $cidStmt->execute();
+
+        $cidText = $cidStmt->fetchColumn();
+        return $cidText !== false ? trim((string)$cidText) : null;
     }
 }
 
@@ -561,5 +628,162 @@ if (!function_exists('cc_upsert_patient_chronics_from_antecedent_id')) {
             [$name],
             $source !== '' ? $source : 'antecedente selecionado na internação'
         );
+    }
+}
+
+if (!function_exists('cc_backfill_patient_chronics_from_existing_antecedents')) {
+    function cc_backfill_patient_chronics_from_existing_antecedents(PDO $conn): void
+    {
+        static $synced = false;
+        if ($synced) {
+            return;
+        }
+        $synced = true;
+
+        $stmt = $conn->query("
+            SELECT DISTINCT
+                   ia.fk_id_paciente AS patient_id,
+                   TRIM(CONCAT_WS(' ',
+                       NULLIF(a.antecedente_ant, ''),
+                       NULLIF(c.cat, ''),
+                       NULLIF(c.descricao, '')
+                   )) AS antecedente_texto
+              FROM tb_intern_antec ia
+              INNER JOIN tb_antecedente a
+                      ON a.id_antecedente = ia.intern_antec_ant_int
+              LEFT JOIN tb_cid c
+                     ON c.id_cid = a.fk_cid_10_ant
+             WHERE ia.fk_id_paciente IS NOT NULL
+               AND (
+                   COALESCE(a.antecedente_ant, '') <> ''
+                   OR COALESCE(c.cat, '') <> ''
+                   OR COALESCE(c.descricao, '') <> ''
+               )
+             ORDER BY ia.fk_id_paciente ASC
+        ");
+
+        $byPatient = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+            $patientId = (int)($row['patient_id'] ?? 0);
+            $texto = trim((string)($row['antecedente_texto'] ?? ''));
+            if ($patientId <= 0 || $texto === '') {
+                continue;
+            }
+            $byPatient[$patientId][$texto] = $texto;
+        }
+
+        foreach ($byPatient as $patientId => $texts) {
+            cc_upsert_patient_chronics_from_antecedent_names(
+                $conn,
+                (int)$patientId,
+                array_values($texts),
+                'backfill automático de antecedentes'
+            );
+        }
+    }
+}
+
+if (!function_exists('cc_sync_existing_i50_group_chronics')) {
+    function cc_sync_existing_i50_group_chronics(PDO $conn): void
+    {
+        static $synced = false;
+        if ($synced) {
+            return;
+        }
+        $synced = true;
+
+        $insertSql = "
+            INSERT INTO tb_paciente_cronico (
+                fk_paciente,
+                condicao,
+                cid_codigo,
+                status_acompanhamento,
+                nivel_risco,
+                data_diagnostico,
+                ultima_consulta,
+                proximo_contato,
+                observacoes
+            )
+            SELECT src.patient_id,
+                   'Insuficiência cardíaca',
+                   'I50',
+                   'ativo',
+                   'alto',
+                   CURRENT_DATE(),
+                   CURRENT_DATE(),
+                   DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY),
+                   'Sugerido automaticamente a partir de antecedentes/CID I50 em ' . DATE_FORMAT(NOW(), '%d/%m/%Y %H:%i')
+              FROM (
+                    SELECT DISTINCT i.fk_paciente_int AS patient_id
+                      FROM tb_internacao i
+                      INNER JOIN tb_antecedente a
+                              ON a.id_antecedente = i.fk_patologia2
+                      INNER JOIN tb_cid c
+                              ON c.id_cid = a.fk_cid_10_ant
+                     WHERE i.fk_paciente_int IS NOT NULL
+                       AND i.fk_patologia2 IS NOT NULL
+                       AND i.fk_patologia2 > 0
+                       AND c.cat LIKE 'I50%'
+                    UNION
+                    SELECT DISTINCT ia.fk_id_paciente AS patient_id
+                      FROM tb_intern_antec ia
+                      INNER JOIN tb_antecedente a
+                              ON a.id_antecedente = ia.intern_antec_ant_int
+                      INNER JOIN tb_cid c
+                              ON c.id_cid = a.fk_cid_10_ant
+                     WHERE ia.fk_id_paciente IS NOT NULL
+                       AND c.cat LIKE 'I50%'
+                ) src
+             WHERE src.patient_id IS NOT NULL
+               AND NOT EXISTS (
+                    SELECT 1
+                      FROM tb_paciente_cronico pc
+                     WHERE pc.fk_paciente = src.patient_id
+                       AND pc.condicao = 'Insuficiência cardíaca'
+               )";
+
+        $updateSql = "
+            UPDATE tb_paciente_cronico pc
+               JOIN (
+                    SELECT DISTINCT i.fk_paciente_int AS patient_id
+                      FROM tb_internacao i
+                      INNER JOIN tb_antecedente a
+                              ON a.id_antecedente = i.fk_patologia2
+                      INNER JOIN tb_cid c
+                              ON c.id_cid = a.fk_cid_10_ant
+                     WHERE i.fk_paciente_int IS NOT NULL
+                       AND i.fk_patologia2 IS NOT NULL
+                       AND i.fk_patologia2 > 0
+                       AND c.cat LIKE 'I50%'
+                    UNION
+                    SELECT DISTINCT ia.fk_id_paciente AS patient_id
+                      FROM tb_intern_antec ia
+                      INNER JOIN tb_antecedente a
+                              ON a.id_antecedente = ia.intern_antec_ant_int
+                      INNER JOIN tb_cid c
+                              ON c.id_cid = a.fk_cid_10_ant
+                     WHERE ia.fk_id_paciente IS NOT NULL
+                       AND c.cat LIKE 'I50%'
+               ) src
+                 ON src.patient_id = pc.fk_paciente
+               SET pc.status_acompanhamento = 'ativo',
+                   pc.nivel_risco = 'alto',
+                   pc.cid_codigo = CASE
+                       WHEN COALESCE(pc.cid_codigo, '') = '' THEN 'I50'
+                       ELSE pc.cid_codigo
+                   END,
+                   pc.proximo_contato = CASE
+                       WHEN pc.proximo_contato IS NULL OR pc.proximo_contato < CURRENT_DATE()
+                           THEN DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY)
+                       ELSE pc.proximo_contato
+                   END
+             WHERE pc.condicao = 'Insuficiência cardíaca'";
+
+        try {
+            $conn->exec($insertSql);
+            $conn->exec($updateSql);
+        } catch (Throwable $e) {
+            error_log('[CRONICOS][SYNC_I50] ' . $e->getMessage());
+        }
     }
 }

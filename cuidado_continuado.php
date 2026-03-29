@@ -32,7 +32,7 @@ function cc_card(string $title, string $value, string $subtitle, string $accent)
 <script src="js/timeout.js"></script>
 <style>
     .cc-shell {
-        padding: 82px 20px 32px;
+        padding: 36px 20px 32px;
         background: linear-gradient(180deg, #f5f8ff 0%, #ffffff 180px);
         min-height: 100vh;
     }
