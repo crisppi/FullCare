@@ -11,6 +11,20 @@
     include_once("dao/cidDao.php");
     $cid = new cidDAO($conn, $BASE_URL);
     $cids = $cid->findAll();
+    if (!is_array($cids)) {
+        $cids = [];
+    }
+    usort($cids, function ($a, $b) {
+        $catA = strtoupper(trim((string) ($a['cat'] ?? '')));
+        $catB = strtoupper(trim((string) ($b['cat'] ?? '')));
+        if ($catA !== $catB) {
+            return strcmp($catA, $catB);
+        }
+
+        $descA = strtoupper(trim((string) ($a['descricao'] ?? '')));
+        $descB = strtoupper(trim((string) ($b['descricao'] ?? '')));
+        return strcmp($descA, $descB);
+    });
 
     // ...
     $id_paciente_get = filter_input(INPUT_GET, 'id_paciente', FILTER_VALIDATE_INT) ?: 0;
