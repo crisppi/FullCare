@@ -375,7 +375,7 @@
                                 })();
                             </script>
 
-                            <div class="form-group">
+                            <div class="form-group essential-medium">
                                 <label class="control-label" for="matricula_paciente_display">Matrícula</label>
                                 <input type="text" class="form-control input-lg-fullcare" id="matricula_paciente_display"
                                     placeholder="Digite para pesquisar por matrícula" list="matricula_list">
@@ -388,7 +388,7 @@
                                 </datalist>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group essential-medium">
                                 <label class="control-label" for="data_intern_int_dt"><span style="color:red;">*</span> Data
                                     Internação</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_intern_int_dt" required
@@ -397,20 +397,20 @@
                                 <input type="hidden" id="hora_intern_int" name="hora_intern_int" value="">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group essential-small">
                                 <label class="control-label" for="data_lancamento_int">Data lançamento</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_lancamento_int"
                                     name="data_lancamento_int" value="<?= $agoraLanc ?>">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group essential-small">
                                 <label for="data_visita_int">Data Visita</label>
                                 <input type="date" value='<?= $dataAtual; ?>' class="form-control input-lg-fullcare" id="data_visita_int"
                                     name="data_visita_int">
                                 <p id="error-message" style="color:red;display:none;font-size:.6em;"></p>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group essential-small">
                                 <label class="control-label" for="internado_int">Internado</label>
                                 <select class="input-lg-fullcare form-control" id="internado_int" name="internado_int">
                                     <option value="s">Sim</option>

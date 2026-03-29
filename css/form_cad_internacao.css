@@ -687,24 +687,36 @@
         }
 
         .internacao-head-grid {
-            display: grid;
-            grid-template-columns: 2.2fr 2.2fr 1.1fr 1.1fr 0.95fr 0.9fr 0.65fr;
+            display: flex;
+            flex-wrap: wrap;
             gap: 12px;
             align-items: start;
             margin-top: -8px;
         }
 
         .internacao-head-grid > .form-group {
-            width: auto;
-            max-width: none;
+            flex: 1 1 160px;
             min-width: 0;
             margin-bottom: 0 !important;
             padding-left: 0;
             padding-right: 0;
         }
 
+        .internacao-head-grid > .hospital-col,
+        .internacao-head-grid > .patient-col {
+            flex: 2.2 1 300px;
+        }
+
+        .internacao-head-grid > .essential-medium {
+            flex: 1.25 1 190px;
+        }
+
+        .internacao-head-grid > .essential-small {
+            flex: 0.9 1 140px;
+        }
+
         .internacao-head-grid .essential-full {
-            grid-column: 1 / -1;
+            flex: 1 1 100%;
         }
 
         .internacao-head-grid .hospital-select-wrapper {
@@ -715,21 +727,23 @@
             display: none;
         }
 
-        @media (max-width: 1399.98px) {
-            .internacao-head-grid {
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-            }
-        }
-
         @media (max-width: 991.98px) {
-            .internacao-head-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+            .internacao-head-grid > .hospital-col,
+            .internacao-head-grid > .patient-col,
+            .internacao-head-grid > .essential-medium,
+            .internacao-head-grid > .essential-small,
+            .internacao-head-grid > .form-group {
+                flex-basis: calc(50% - 6px);
             }
         }
 
         @media (max-width: 575.98px) {
-            .internacao-head-grid {
-                grid-template-columns: 1fr;
+            .internacao-head-grid > .hospital-col,
+            .internacao-head-grid > .patient-col,
+            .internacao-head-grid > .essential-medium,
+            .internacao-head-grid > .essential-small,
+            .internacao-head-grid > .form-group {
+                flex-basis: 100%;
             }
         }
 
