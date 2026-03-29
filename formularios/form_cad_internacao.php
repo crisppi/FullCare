@@ -267,7 +267,7 @@
                                     </label>
                                 </div>
                                 <div class="hospital-select-wrapper">
-                                    <select onchange="myFunctionSelected()"
+                                    <select onchange="myFunctionSelected()" data-size="10"
                                         class="form-control input-lg-fullcare selectpicker show-tick" id="hospital_selected"
                                         name="hospital_selected" required data-live-search="true"
                                         data-live-search-placeholder="Pesquise por Hospital" data-none-selected-text="Pesquise por Hospital"
@@ -298,7 +298,7 @@
                                     <button type="button" id="patientInsightToggle" class="patient-insight-inline-btn"
                                         title="Mostrar resumo do paciente" aria-expanded="false">i</button>
                                 </div>
-                                <select data-size="5" data-live-search="true" data-live-search-placeholder="Pesquisa por nome"
+                                <select data-size="10" data-live-search="true" data-live-search-placeholder="Pesquisa por nome"
                                     data-style="patient-select-btn" data-width="100%"
                                     data-none-selected-text="Pesquisa por nome"
                                     class="form-control input-lg-fullcare selectpicker show-tick" id="fk_paciente_int"
