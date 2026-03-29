@@ -206,10 +206,6 @@
             margin-bottom: 0 !important;
         }
 
-        .hospital-col .hospital-select-wrapper {
-            margin-top: -2px;
-        }
-
         .hospital-name-slot {
             flex: 1 1 auto;
             min-width: 260px;
@@ -402,25 +398,11 @@
             min-height: 42px !important;
             height: 42px !important;
             padding: 8px 10px !important;
-            border: 2px solid #7a1e57 !important;
-            box-shadow: 0 3px 8px rgba(122, 30, 87, 0.12) !important;
-        }
-
-        .hospital-select-btn {
-            min-height: 42px !important;
-            height: 42px !important;
-            padding: 8px 10px !important;
-            border: 1px solid #555 !important;
+            border: none !important;
             box-shadow: none !important;
+            outline: none !important;
             background-color: #fff !important;
-            color: #000 !important;
-        }
-
-        .hospital-select-btn:focus,
-        .hospital-select-btn:active,
-        .bootstrap-select.show>.hospital-select-btn {
-            border-color: #6b7280 !important;
-            box-shadow: 0 0 0 0.15rem rgba(107, 114, 128, 0.14) !important;
+            color: #495057 !important;
         }
 
         .patient-select-btn .filter-option {
@@ -431,8 +413,19 @@
         .patient-select-btn:focus,
         .patient-select-btn:active,
         .bootstrap-select.show>.patient-select-btn {
-            border-color: #5e2363 !important;
-            box-shadow: 0 0 0 0.2rem rgba(94, 35, 99, 0.2) !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"],
+        .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"]:focus,
+        .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"]:active,
+        .bootstrap-select > .dropdown-toggle[data-id="hospital_selected"]:hover {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background-image: none !important;
         }
 
         /* Evita "pulo" no carregamento: nativo já nasce com a mesma caixa do picker */
@@ -447,15 +440,9 @@
             padding-bottom: 8px !important;
             border-radius: 6px !important;
             box-sizing: border-box !important;
-        }
-
-        #hospital_selected {
-            border: 1px solid #555 !important;
-        }
-
-        #fk_paciente_int {
-            border: 2px solid #7a1e57 !important;
-            box-shadow: 0 3px 8px rgba(122, 30, 87, 0.12) !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
         }
 
         /* Quando o bootstrap-select assume, preserva o mesmo espaço */
@@ -463,7 +450,15 @@
         #fk_paciente_int.selectpicker.bs-select-hidden,
         #resp_med_id.selectpicker.bs-select-hidden,
         #resp_enf_id.selectpicker.bs-select-hidden {
-            display: none !important;
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
         }
 
         .hospital-select-wrapper .bootstrap-select,
@@ -659,7 +654,7 @@
         .internacao-card__body {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 12px;
             padding: 0 10px;
         }
 
@@ -691,7 +686,7 @@
             flex-wrap: wrap;
             gap: 12px;
             align-items: start;
-            margin-top: -8px;
+            margin-top: 0;
         }
 
         .internacao-head-grid > .form-group {
@@ -700,6 +695,21 @@
             margin-bottom: 0 !important;
             padding-left: 0;
             padding-right: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .internacao-head-grid > .form-group > label,
+        .internacao-head-grid > .hospital-col > .d-flex.mb-1,
+        .internacao-head-grid > .patient-col > .d-flex.mb-1 {
+            min-height: 28px;
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 4px !important;
+        }
+
+        .internacao-head-grid > .form-group > label {
+            margin-bottom: 4px;
         }
 
         .internacao-head-grid > .hospital-col,
@@ -721,6 +731,13 @@
 
         .internacao-head-grid .hospital-select-wrapper {
             gap: 0;
+        }
+
+        .internacao-head-grid .patient-insight-inline-btn {
+            margin-bottom: 0;
+            align-self: flex-end;
+            flex: 0 0 26px;
+            margin-left: 8px;
         }
 
         .internacao-head-grid .hospital-name-slot {

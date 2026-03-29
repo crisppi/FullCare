@@ -268,10 +268,10 @@
                                 </div>
                                 <div class="hospital-select-wrapper">
                                     <select onchange="myFunctionSelected()"
-                                        class="botao_select selectpicker show-tick" id="hospital_selected"
+                                        class="form-control input-lg-fullcare selectpicker show-tick" id="hospital_selected"
                                         name="hospital_selected" required data-live-search="true"
                                         data-live-search-placeholder="Pesquise por Hospital" data-none-selected-text="Pesquise por Hospital"
-                                        data-width="100%" data-style="hospital-select-btn"
+                                        data-width="100%" data-style="patient-select-btn"
                                         style="font-size:1em;background-color:#fff;color:#000;">
                                         <option value=""></option>
                                         <?php if (!empty($listaHospitais)): ?>

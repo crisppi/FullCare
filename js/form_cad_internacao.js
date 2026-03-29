@@ -618,10 +618,17 @@ const patientInsightDisplay = (function() {
 })();
 
 // Hospital selecionado -> mostra nome e grava hidden
+function getHospitalPickerToggle() {
+    if (!window.jQuery) return null;
+    const $toggle = window.jQuery('.bootstrap-select > .dropdown-toggle[data-id="hospital_selected"]').first();
+    return $toggle.length ? $toggle : null;
+}
+
 function myFunctionSelected() {
     const select = document.getElementById("hospital_selected");
     const inputHospital = document.getElementById("fk_hospital_int");
     const divNome = document.getElementById("hospitalNomeTexto");
+    const $toggle = getHospitalPickerToggle();
 
     if (!select || !inputHospital || !divNome) return;
 
@@ -631,18 +638,34 @@ function myFunctionSelected() {
     inputHospital.value = id;
 
     if (id) {
-        select.style.color = "black";
-        select.style.fontWeight = "bold";
-        select.style.border = "2px solid green";
+        select.style.color = "#495057";
+        select.style.fontWeight = "normal";
+        select.style.border = "1px solid #ced4da";
+        if ($toggle) {
+            $toggle.css({
+                color: '#495057',
+                'font-weight': 'normal',
+                border: '1px solid #ced4da',
+                'box-shadow': 'none'
+            });
+        }
         divNome.textContent = nome;
         divNome.style.display = "flex";
         if (hospitalInsightsHelper && typeof hospitalInsightsHelper.fetch === 'function') {
             hospitalInsightsHelper.fetch(id, nome);
         }
     } else {
-        select.style.color = "#000";
+        select.style.color = "#495057";
         select.style.fontWeight = "normal";
-        select.style.border = "1px solid #555";
+        select.style.border = "1px solid #ced4da";
+        if ($toggle) {
+            $toggle.css({
+                color: '#495057',
+                'font-weight': 'normal',
+                border: '1px solid #ced4da',
+                'box-shadow': 'none'
+            });
+        }
         divNome.textContent = "";
         divNome.style.display = "none";
         if (hospitalInsightsHelper && typeof hospitalInsightsHelper.reset === 'function') {
@@ -1224,11 +1247,13 @@ $("#myForm").submit(function(event) {
         // Usa a div de alerta existente para exibir o erro
         $('#alert').removeClass("alert-success").addClass("alert-danger");
         $('#alert').fadeIn().html("<b>Erro:</b> O campo Hospital é obrigatório.");
-
-        // --- INÍCIO DA ALTERAÇÃO ---
-        // Adiciona borda vermelha para indicar erro no campo
-        $("#hospital_selected").css("border", "2px solid red");
-        // --- FIM DA ALTERAÇÃO ---
+        const $hospitalToggle = getHospitalPickerToggle();
+        if ($hospitalToggle) {
+            $hospitalToggle.css({
+                border: '1px solid #dc3545',
+                'box-shadow': '0 0 0 0.2rem rgba(220, 53, 69, 0.12)'
+            });
+        }
 
         // Oculta a mensagem após 3 segundos
         setTimeout(function() {
@@ -1243,8 +1268,12 @@ $("#myForm").submit(function(event) {
     // A função myFunctionSelected já deve ter deixado verde se um valor foi selecionado.
     // Esta linha é uma segurança extra caso algum cenário não dispare o 'onchange'.
     // Se a borda já for verde (ou padrão), não fará mal.
-    if ($("#hospital_selected").css("border-color") === "rgb(255, 0, 0)") { // Verifica se a cor é vermelho
-        $("#hospital_selected").css("border", "2px solid green"); // Muda para verde se estava vermelha
+    const $hospitalToggle = getHospitalPickerToggle();
+    if ($hospitalToggle) {
+        $hospitalToggle.css({
+            border: '1px solid #ced4da',
+            'box-shadow': 'none'
+        });
     }
 
     if (typeof window.isSenhaDuplicada === 'function' && window.isSenhaDuplicada()) {
