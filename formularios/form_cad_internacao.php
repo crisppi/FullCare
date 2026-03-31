@@ -203,13 +203,13 @@
         }
 
         .assist-select-clear .bootstrap-select > .dropdown-toggle {
-            padding-right: 46px !important;
+            padding-right: 34px !important;
         }
 
         .assist-clear-btn {
             position: absolute;
             top: 50%;
-            right: 28px;
+            right: 14px;
             transform: translateY(-50%);
             z-index: 4;
             width: 18px;
@@ -227,6 +227,11 @@
             justify-content: center;
         }
 
+        .assist-select-clear:not(.picker-ready) .assist-clear-btn {
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .assist-clear-btn:hover {
             background: rgba(94, 35, 99, 0.18);
             color: #4b1850;
@@ -235,7 +240,8 @@
         .assistenciais-row-full {
             display: grid;
             grid-template-columns: 3fr 3fr 2fr 1fr 1fr 2fr;
-            gap: 12px;
+            column-gap: 12px;
+            row-gap: 4px;
             width: 100%;
             align-items: end;
         }
@@ -285,7 +291,7 @@
                                         class="form-control input-lg-fullcare selectpicker show-tick" id="hospital_selected"
                                         name="hospital_selected" required data-live-search="true"
                                         data-live-search-placeholder="Pesquise por Hospital" data-none-selected-text="Pesquise por Hospital"
-                                        data-width="100%" data-style="patient-select-btn"
+                                        data-width="100%" data-style="input-lg-fullcare"
                                         style="font-size:1em;background-color:#fff;color:#000;">
                                         <option value=""></option>
                                         <?php if (!empty($listaHospitais)): ?>
@@ -314,7 +320,7 @@
                                         title="Mostrar resumo do paciente" aria-expanded="false">i</button>
                                 </div>
                                 <select data-size="10" data-live-search="true" data-live-search-placeholder="Pesquisa por nome"
-                                    data-style="patient-select-btn" data-width="100%"
+                                    data-style="input-lg-fullcare" data-width="100%"
                                     data-none-selected-text="Pesquisa por nome"
                                     class="form-control input-lg-fullcare selectpicker show-tick" id="fk_paciente_int"
                                     name="fk_paciente_int" required>
@@ -666,7 +672,7 @@
                             <div class="form-group assist-col-cid">
                                 <label class="control-label" for="fk_cid_int">CID (Patologia)</label>
                                 <div class="assist-select-clear">
-                                    <select class="form-control selectpicker show-tick" data-size="5" id="fk_cid_int" name="fk_cid_int"
+                                    <select class="form-control selectpicker show-tick" data-size="10" id="fk_cid_int" name="fk_cid_int"
                                         data-live-search="true" data-width="100%" data-style="input-lg-fullcare">
                                         <option value="">CID</option>
                                         <?php foreach ($cids as $cid): ?>
@@ -682,7 +688,7 @@
                             <div class="form-group assist-col-antecedente">
                                 <label class="control-label" for="fk_patologia2">Antecedente</label>
                                 <div class="assist-select-clear">
-                                    <select class="form-control selectpicker show-tick" data-size="5" id="fk_patologia2" name="fk_patologia2"
+                                    <select class="form-control selectpicker show-tick" data-size="10" id="fk_patologia2" name="fk_patologia2"
                                         data-live-search="true" data-width="100%" data-style="input-lg-fullcare"
                                         data-live-search-placeholder="Pesquisar">
                                         <option value="">Antecedente</option>
@@ -726,6 +732,26 @@
                                     name="num_atendimento_int">
                             </div>
                         </div>
+                        <script>
+                            (function() {
+                                if (!window.jQuery || !jQuery.fn || !jQuery.fn.selectpicker) return;
+                                ['#fk_cid_int', '#fk_patologia2'].forEach(function(sel) {
+                                    var $el = jQuery(sel);
+                                    if (!$el.length) return;
+                                    var hasWrapper = $el.siblings('div.bootstrap-select').length > 0;
+                                    if (!hasWrapper && !$el.data('selectpicker')) {
+                                        $el.selectpicker();
+                                    }
+                                    if ($el.siblings('div.bootstrap-select').length > 1) {
+                                        $el.siblings('div.bootstrap-select').slice(1).remove();
+                                    }
+                                    if ($el.siblings('div.bootstrap-select').length) {
+                                        $el.addClass('bs-select-hidden');
+                                        $el.attr('data-fcx-picker-locked', '1');
+                                    }
+                                });
+                            })();
+                        </script>
 
                     </div>
                 </div>
@@ -963,6 +989,28 @@
     <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            function syncAssistClearButtons() {
+                document.querySelectorAll('.assist-select-clear').forEach(function(wrapper) {
+                    var select = wrapper.querySelector('select');
+                    if (!select) return;
+                    var hasPicker = !!wrapper.querySelector('.bootstrap-select');
+                    if (hasPicker || !select.classList.contains('selectpicker')) {
+                        wrapper.classList.add('picker-ready');
+                    }
+                });
+            }
+
+            syncAssistClearButtons();
+
+            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
+                window.jQuery('#fk_cid_int, #fk_patologia2').on('loaded.bs.select rendered.bs.select refreshed.bs.select', function() {
+                    syncAssistClearButtons();
+                });
+                setTimeout(syncAssistClearButtons, 0);
+                setTimeout(syncAssistClearButtons, 120);
+                setTimeout(syncAssistClearButtons, 300);
+            }
+
             document.querySelectorAll('[data-clear-select]').forEach(function(button) {
                 button.addEventListener('click', function() {
                     var targetId = button.getAttribute('data-clear-select');
