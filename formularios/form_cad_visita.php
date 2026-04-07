@@ -1684,7 +1684,6 @@ function applyTussEntries(entries) {
         const selectDesc = target.querySelector('[name="tuss_solicitado"]');
         if (selectDesc) {
             selectDesc.value = entry.tuss_solicitado || '';
-            if (typeof $ !== 'undefined' && $.fn.selectpicker) $(selectDesc).selectpicker('refresh');
         }
         const dataInput = target.querySelector('[name="data_realizacao_tuss"]');
         if (dataInput) dataInput.value = (entry.data_realizacao_tuss || '').substring(0, 10);

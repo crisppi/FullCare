@@ -3,7 +3,7 @@
     display:flex;
     flex-wrap:wrap;
     gap:15px;
-    align-items:flex-start;
+    align-items:flex-end;
 }
 #container-tuss .form-group {margin-bottom:15px;}
 #container-tuss .form-group label {margin-bottom:5px;font-weight:bold;}
@@ -48,6 +48,41 @@
     margin-right:12px;
     background:linear-gradient(180deg,#9654c8,#b983f1);
 }
+
+#container-tuss .tuss-field-container {
+    align-items: flex-end;
+}
+
+#container-tuss .tuss-actions-col {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 72px;
+}
+
+#container-tuss .tuss-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 42px;
+}
+
+#container-tuss .btn-add,
+#container-tuss .btn-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 8px;
+    line-height: 1;
+    font-size: 1rem;
+    font-weight: 700;
+}
 </style>
 
 <div id="container-tuss" style="display:none; margin:5px;">
@@ -75,7 +110,7 @@
 
             <div class="form-group col-sm-3">
                 <label class="control-label" for="tuss_solicitado">Descrição Tuss</label>
-                <select onchange="generateTussJSON()" class="form-control-sm form-control selectpicker show-tick"
+                <select onchange="generateTussJSON()" class="form-control-sm form-control"
                     data-size="5" data-live-search="true" id="tuss_solicitado" name="tuss_solicitado">
                     <option value="">...</option>
                     <?php foreach ($tussGeral as $tuss): ?>
@@ -114,9 +149,11 @@
                 </select>
             </div>
 
-            <div class="form-group col-sm-1" style="margin-top:25px;">
-                <button type="button" class="btn btn-add" onclick="addTussField()">+</button>
-                <!-- sem botão "-" na linha inicial -->
+            <div class="form-group col-sm-1 tuss-actions-col">
+                <div class="tuss-actions">
+                    <button type="button" class="btn btn-add" onclick="addTussField()">+</button>
+                    <!-- sem botão "-" na linha inicial -->
+                </div>
             </div>
         </div>
     </div>
@@ -210,7 +247,7 @@ function addTussField() {
 
       <div class="form-group col-sm-3">
         <label class="control-label">Descrição Tuss</label>
-        <select onchange="generateTussJSON()" class="form-control-sm form-control selectpicker" data-size="5" data-live-search="true" name="tuss_solicitado">
+        <select onchange="generateTussJSON()" class="form-control-sm form-control" data-size="5" data-live-search="true" name="tuss_solicitado">
           <option value="">...</option>
           <?php foreach ($tussGeral as $tuss): ?>
             <option value="<?= $tuss["cod_tuss"] ?>">
@@ -245,19 +282,15 @@ function addTussField() {
         </select>
       </div>
 
-      <div class="form-group col-sm-1" style="margin-top:25px;">
-        <button type="button" class="btn btn-add" onclick="addTussField()">+</button>
-        <button type="button" class="btn btn-remove" onclick="removeTussField(this)">-</button>
+      <div class="form-group col-sm-1 tuss-actions-col">
+        <div class="tuss-actions">
+          <button type="button" class="btn btn-add" onclick="addTussField()">+</button>
+          <button type="button" class="btn btn-remove" onclick="removeTussField(this)">-</button>
+        </div>
       </div>
     </div>
   `;
     tussFieldsContainer.insertAdjacentHTML("beforeend", newField);
-
-    // Inicializa o selectpicker para o novo select
-    const newSelect = tussFieldsContainer.querySelector('.tuss-field-container:last-child select.selectpicker');
-    if (newSelect && typeof $ !== "undefined" && $.fn.selectpicker) {
-        $(newSelect).selectpicker();
-    }
 
     // atualiza JSON
     generateTussJSON();
@@ -315,7 +348,6 @@ function clearTussInputs() {
             const s2 = container.querySelector('[name="tuss_liberado_sn"]');
             if (s1) {
                 s1.value = '';
-                if (typeof $ !== "undefined" && $.fn.selectpicker) $(s1).selectpicker('refresh');
             }
             if (s2) {
                 s2.value = '';
