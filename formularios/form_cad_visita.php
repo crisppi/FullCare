@@ -119,7 +119,7 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
 <div class="visita-page">
     <div class="visita-hero">
         <div>
-            <h1>Cadastrar visita</h1>
+            <h1 id="visita-page-title">Cadastrar visita</h1>
         </div>
         <div class="visita-hero__actions">
             <span class="visita-hero__tag">Campos obrigatórios em destaque</span>
@@ -143,7 +143,7 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
                     <p class="visita-card__eyebrow">Dados essenciais</p>
                     <h2 class="visita-card__title">Dados da visita</h2>
                 </div>
-                <span class="visita-card__tag">Informações principais</span>
+                    <span class="visita-card__tag" id="visita-main-tag">Informações principais</span>
             </div>
             <div class="visita-card__body">
         <div class="form-group row visita-dados-row">
@@ -447,8 +447,8 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
             </script>
 
             <div class="visita-actions">
-                <button type="submit" class="btn btn-success btn-submit-standard">
-                    <i class="fas fa-check"></i> Cadastrar
+                <button type="submit" class="btn btn-success btn-submit-standard" id="visita-submit-btn">
+                    <i class="fas fa-check"></i> <span id="visita-submit-label">Cadastrar</span>
                 </button>
                 <div class="alert" id="alert" role="alert"></div>
             </div>
@@ -1437,6 +1437,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const editIdInput = document.getElementById('id_visita_edit');
     const fkVisitaInput = document.getElementById('fk_int_visita');
     const modalEl = document.getElementById('myModal1');
+    const pageTitleEl = document.getElementById('visita-page-title');
+    const mainTagEl = document.getElementById('visita-main-tag');
+    const submitLabelEl = document.getElementById('visita-submit-label');
 
     if (!selectRet) return;
 
@@ -1467,6 +1470,21 @@ document.addEventListener('DOMContentLoaded', function() {
         dataLanc: dataLancInput ? dataLancInput.value : ''
     };
 
+    let currentEditVisitaId = null;
+    let isHydratingAdditionalSection = false;
+
+    function syncVisitaFormMode(isEditMode) {
+        if (pageTitleEl) {
+            pageTitleEl.textContent = isEditMode ? 'Editar visita' : 'Cadastrar visita';
+        }
+        if (mainTagEl) {
+            mainTagEl.textContent = isEditMode ? 'Edição da visita selecionada' : 'Informações principais';
+        }
+        if (submitLabelEl) {
+            submitLabelEl.textContent = isEditMode ? 'Atualizar' : 'Cadastrar';
+        }
+    }
+
     function fillCampos(vis) {
         if (visitaNoInput && vis.visita_no_vis != null) {
             visitaNoInput.value = vis.visita_no_vis;
@@ -1491,11 +1509,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (auditorEnfInput) auditorEnfInput.value = vis.visita_auditor_prof_enf || '';
         if (flagMedInput) flagMedInput.value = vis.visita_med_vis || flagMedInput.value;
         if (flagEnfInput) flagEnfInput.value = vis.visita_enf_vis || flagEnfInput.value;
-        hydrateTussForVisita(vis.id_visita);
-        hydrateNegForVisita(vis.id_visita);
-        hydrateGestaoForVisita(vis.id_visita);
-        hydrateUtiForVisita(vis.id_visita);
-        hydrateProrrogForVisita(vis.id_visita);
+        currentEditVisitaId = vis.id_visita != null ? String(vis.id_visita) : null;
+        syncVisitaFormMode(true);
+        resetAdditionalTables();
     }
 
     function resetCampos() {
@@ -1509,6 +1525,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (fkVisitaInput) fkVisitaInput.value = defaults.fkVisita;
         if (editIdInput) editIdInput.value = '';
         if (dataLancInput) dataLancInput.value = defaults.dataLanc;
+        currentEditVisitaId = null;
+        syncVisitaFormMode(false);
         resetAdditionalTables();
     }
 
@@ -1658,6 +1676,43 @@ function hydrateTussForVisita(visitaId) {
     selectTuss.value = 's';
     selectTuss.dispatchEvent(new Event('change'));
     applyTussEntries(entries);
+}
+
+function hasEntriesForVisita(visitaId, visitMap, fallbackMap) {
+    const key = visitaId != null ? String(visitaId) : null;
+    if (!key) return false;
+    const directData = visitMap && visitMap[key];
+    if (Array.isArray(directData)) {
+        return directData.length > 0;
+    }
+    if (directData) {
+        return true;
+    }
+    const interId = __VISITA_INTER_MAP[key];
+    const fallbackData = interId && fallbackMap ? fallbackMap[String(interId)] : null;
+    if (Array.isArray(fallbackData)) {
+        return fallbackData.length > 0;
+    }
+    return !!fallbackData;
+}
+
+function bindLazyHydration(selectId, shouldHydrate, hydrator) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    select.addEventListener('change', function() {
+        if (isHydratingAdditionalSection || this.value !== 's' || !currentEditVisitaId) {
+            return;
+        }
+        if (!shouldHydrate(currentEditVisitaId)) {
+            return;
+        }
+        isHydratingAdditionalSection = true;
+        try {
+            hydrator(currentEditVisitaId);
+        } finally {
+            isHydratingAdditionalSection = false;
+        }
+    });
 }
 
 function resetTussFields() {
@@ -1981,6 +2036,46 @@ function hydrateProrrogForVisita(visitaId) {
     }
     applyProrrogEntries(entries);
 }
+
+bindLazyHydration(
+    'select_tuss',
+    function(visitaId) {
+        return hasEntriesForVisita(visitaId, window.VISITA_TUSS_DATA || {}, __TUSS_FALLBACK);
+    },
+    hydrateTussForVisita
+);
+
+bindLazyHydration(
+    'select_negoc',
+    function(visitaId) {
+        return hasEntriesForVisita(visitaId, window.VISITA_NEG_DATA || {}, __NEG_FALLBACK);
+    },
+    hydrateNegForVisita
+);
+
+bindLazyHydration(
+    'select_gestao',
+    function(visitaId) {
+        return hasEntriesForVisita(visitaId, window.VISITA_GESTAO_DATA || {}, __GESTAO_FALLBACK);
+    },
+    hydrateGestaoForVisita
+);
+
+bindLazyHydration(
+    'select_uti',
+    function(visitaId) {
+        return hasEntriesForVisita(visitaId, window.VISITA_UTI_DATA || {}, __UTI_FALLBACK);
+    },
+    hydrateUtiForVisita
+);
+
+bindLazyHydration(
+    'select_prorrog',
+    function(visitaId) {
+        return hasEntriesForVisita(visitaId, window.VISITA_PRORR_DATA || {}, __PRORR_FALLBACK);
+    },
+    hydrateProrrogForVisita
+);
 </script>
 
 <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
