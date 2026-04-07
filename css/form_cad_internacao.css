@@ -642,10 +642,12 @@
 
         .internacao-card__eyebrow {
             text-transform: uppercase;
-            letter-spacing: .35em;
-            font-size: .65rem;
+            letter-spacing: .18em;
+            font-size: .78rem;
             margin: 0;
-            color: #000;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #4b5563;
         }
 
         .internacao-card__title {

@@ -5,17 +5,79 @@ require_once(__DIR__ . "/app/cuidadoContinuado.php");
 
 ensure_cuidado_continuado_schema($conn);
 
+$feedback = null;
+$feedbackType = 'success';
+$userId = (int)($_SESSION['id_usuario'] ?? 0);
+$responsavelNome = trim((string)($_SESSION['usuario_nome'] ?? ($_SESSION['nome_usuario'] ?? ($_SESSION['email_user'] ?? ('Usuário #' . $userId)))));
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+    $action = trim((string)($_POST['cc_action'] ?? ''));
+    $notes = trim((string)($_POST['observacoes'] ?? ''));
+    if ($action === 'admitir_preventiva') {
+        $ok = cc_admit_preventiva_from_cronico($conn, (int)($_POST['cronico_id'] ?? 0), $userId, $notes);
+        $feedback = $ok ? 'Paciente admitido em Medicina Preventiva.' : 'Não foi possível admitir o paciente em Medicina Preventiva.';
+        $feedbackType = $ok ? 'success' : 'danger';
+    } elseif ($action === 'registrar_monitoramento') {
+        $ok = cc_register_preventiva_followup(
+            $conn,
+            (int)($_POST['preventivo_id'] ?? 0),
+            trim((string)($_POST['proximo_contato'] ?? '')) ?: null,
+            $notes,
+            $responsavelNome,
+            trim((string)($_POST['tipo_acao'] ?? 'monitoramento_telefonico'))
+        );
+        $feedback = $ok ? 'Monitoramento telefônico registrado.' : 'Não foi possível registrar o monitoramento.';
+        $feedbackType = $ok ? 'success' : 'danger';
+    }
+}
+
+$search = trim((string)filter_input(INPUT_GET, 'q', FILTER_UNSAFE_RAW));
 $summary = cc_fetch_preventiva_summary($conn);
-$campaigns = cc_fetch_active_campaigns($conn);
 $elegiveis = cc_fetch_preventiva_elegiveis($conn);
+$monitorados = cc_fetch_preventiva_active($conn, $search);
+$actions = cc_fetch_program_actions($conn, 'preventiva', 12);
 
 function mp_fmt_date(?string $date): string
 {
     if (!$date || $date === '0000-00-00') {
         return '-';
     }
-    $dt = DateTime::createFromFormat('Y-m-d', $date);
+    $dt = DateTime::createFromFormat('Y-m-d', substr((string)$date, 0, 10));
     return $dt ? $dt->format('d/m/Y') : (string)$date;
+}
+
+function mp_fmt_datetime(?string $date): string
+{
+    if (!$date) {
+        return '-';
+    }
+    try {
+        return (new DateTime($date))->format('d/m/Y H:i');
+    } catch (Throwable $e) {
+        return (string)$date;
+    }
+}
+
+function mp_badge_class(string $risk): string
+{
+    if ($risk === 'alto') {
+        return 'danger';
+    }
+    if ($risk === 'moderado') {
+        return 'warning';
+    }
+    return 'secondary';
+}
+
+function mp_action_label(string $action): string
+{
+    $map = [
+        'admissao' => 'Admissão',
+        'monitoramento_telefonico' => 'Monitoramento telefônico',
+        'orientacao' => 'Orientação',
+        'encerramento' => 'Encerramento',
+    ];
+    return $map[$action] ?? ucfirst(str_replace('_', ' ', $action));
 }
 ?>
 <script src="js/timeout.js"></script>
@@ -37,6 +99,10 @@ function mp_fmt_date(?string $date): string
     .mp-hero div {
         color: #fff !important;
     }
+    .mp-mini-note {
+        font-size: .82rem;
+        color: #6b7280;
+    }
 </style>
 
 <div class="mp-shell">
@@ -46,8 +112,8 @@ function mp_fmt_date(?string $date): string
                 <div>
                     <div class="text-uppercase small fw-semibold" style="letter-spacing:.08em;opacity:.85;">Cuidado Continuado</div>
                     <h1 class="h3 mt-2 mb-2">Medicina Preventiva</h1>
-                    <p class="mb-0" style="max-width:780px;opacity:.92;">
-                        Identificação de elegíveis, campanhas preventivas e acompanhamento de adesão a partir da carteira de pacientes crônicos.
+                    <p class="mb-0" style="max-width:840px;opacity:.92;">
+                        A Medicina Preventiva funciona como um monitoramento telefônico estruturado. Os pacientes elegíveis são admitidos no programa e passam a ter rotina de contato, orientação e acompanhamento.
                     </p>
                 </div>
                 <div class="d-flex gap-2 flex-wrap align-items-start">
@@ -57,102 +123,199 @@ function mp_fmt_date(?string $date): string
             </div>
         </div>
 
+        <?php if ($feedback): ?>
+            <div class="alert alert-<?= htmlspecialchars($feedbackType) ?>"><?= htmlspecialchars($feedback) ?></div>
+        <?php endif; ?>
+
         <div class="row g-3 mb-4">
-            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Campanhas</div><div class="fs-3 fw-bold"><?= (int)$summary['campanhas_total'] ?></div></div></div></div>
-            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Ativas</div><div class="fs-3 fw-bold text-success"><?= (int)$summary['campanhas_ativas'] ?></div></div></div></div>
-            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Elegíveis</div><div class="fs-3 fw-bold text-warning"><?= (int)$summary['elegiveis'] ?: count($elegiveis) ?></div></div></div></div>
-            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Concluídos</div><div class="fs-3 fw-bold"><?= (int)$summary['concluidos'] ?></div></div></div></div>
+            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Em monitoramento</div><div class="fs-3 fw-bold"><?= (int)$summary['ativos'] ?></div></div></div></div>
+            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Elegíveis para admissão</div><div class="fs-3 fw-bold text-primary"><?= (int)$summary['elegiveis'] ?></div></div></div></div>
+            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Pendentes de contato</div><div class="fs-3 fw-bold text-warning"><?= (int)$summary['pendentes'] ?></div></div></div></div>
+            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Alto risco</div><div class="fs-3 fw-bold text-danger"><?= (int)$summary['alto_risco'] ?></div></div></div></div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-12 col-xl-7">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
-                            <div>
-                                <h2 class="h5 mb-1">Campanhas preventivas</h2>
-                                <div class="text-muted small">Estrutura pronta para campanhas por condição, risco e periodicidade.</div>
-                            </div>
-                        </div>
-                        <?php if (!$campaigns): ?>
-                            <div class="alert alert-light border mb-0">
-                                Nenhuma campanha cadastrada ainda. A tabela base já foi criada para suportar planejamento, ativação e encerramento.
-                            </div>
-                        <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Campanha</th>
-                                            <th>Status</th>
-                                            <th>Início</th>
-                                            <th>Fim</th>
-                                            <th>Público</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($campaigns as $campaign): ?>
-                                            <tr>
-                                                <td>
-                                                    <div class="fw-semibold"><?= htmlspecialchars((string)$campaign['nome_campanha']) ?></div>
-                                                    <div class="small text-muted"><?= htmlspecialchars((string)($campaign['publico_condicao'] ?: 'Carteira geral')) ?></div>
-                                                </td>
-                                                <td><?= htmlspecialchars((string)$campaign['status_campanha']) ?></td>
-                                                <td><?= htmlspecialchars(mp_fmt_date($campaign['data_inicio'] ?? null)) ?></td>
-                                                <td><?= htmlspecialchars(mp_fmt_date($campaign['data_fim'] ?? null)) ?></td>
-                                                <td>
-                                                    <?= (int)$campaign['total_publico'] ?> paciente(s)
-                                                    <div class="small text-muted"><?= (int)$campaign['total_concluido'] ?> concluído(s)</div>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php endif; ?>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form class="row g-3 align-items-end" method="get">
+                    <div class="col-12 col-lg-10">
+                        <label class="form-label">Pesquisar paciente, matrícula ou foco do monitoramento</label>
+                        <input type="text" name="q" class="form-control" value="<?= htmlspecialchars($search) ?>" placeholder="Ex.: João, diabetes, matrícula">
                     </div>
-                </div>
+                    <div class="col-12 col-lg-2 d-grid">
+                        <button type="submit" class="btn btn-success">Filtrar</button>
+                    </div>
+                </form>
             </div>
-            <div class="col-12 col-xl-5">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
-                            <div>
-                                <h2 class="h5 mb-1">Fila de elegibilidade</h2>
-                                <div class="text-muted small">Pacientes crônicos sem contato preventivo recente.</div>
-                            </div>
-                        </div>
-                        <?php if (!$elegiveis): ?>
-                            <div class="alert alert-light border mb-0">
-                                Ainda não existem elegíveis na base preventiva ou a carteira crônica ainda não foi iniciada.
-                            </div>
-                        <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Paciente</th>
-                                            <th>Condição</th>
-                                            <th>Último contato</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($elegiveis as $row): ?>
-                                            <tr>
-                                                <td>
-                                                    <div class="fw-semibold"><?= htmlspecialchars((string)$row['nome_pac']) ?></div>
-                                                    <div class="small text-muted"><?= htmlspecialchars((string)$row['nivel_risco']) ?></div>
-                                                </td>
-                                                <td><?= htmlspecialchars((string)$row['condicao']) ?></td>
-                                                <td><?= htmlspecialchars(mp_fmt_date($row['ultimo_contato_preventivo'] ?? null)) ?></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php endif; ?>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
+                    <div>
+                        <h2 class="h5 mb-1">Elegíveis para entrar no monitoramento</h2>
+                        <div class="text-muted small">Pacientes já admitidos em crônicos e ainda não acompanhados pela preventiva.</div>
                     </div>
                 </div>
+                <?php if (!$elegiveis): ?>
+                    <div class="alert alert-light border mb-0">
+                        Não há elegíveis pendentes para Medicina Preventiva.
+                    </div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Condição de origem</th>
+                                    <th>Risco</th>
+                                    <th>Próximo contato do crônico</th>
+                                    <th class="text-end">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($elegiveis as $row): ?>
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold"><?= htmlspecialchars((string)$row['nome_pac']) ?></div>
+                                            <div class="small text-muted"><?= htmlspecialchars((string)($row['matricula_pac'] ?: 'Sem matrícula')) ?></div>
+                                        </td>
+                                        <td><?= htmlspecialchars((string)$row['condicao']) ?></td>
+                                        <td><span class="badge bg-<?= mp_badge_class((string)$row['nivel_risco']) ?>"><?= htmlspecialchars((string)$row['nivel_risco']) ?></span></td>
+                                        <td><?= htmlspecialchars(mp_fmt_date($row['proximo_contato_cronico'] ?? null)) ?></td>
+                                        <td class="text-end" style="min-width:280px;">
+                                            <form method="post">
+                                                <input type="hidden" name="cc_action" value="admitir_preventiva">
+                                                <input type="hidden" name="cronico_id" value="<?= (int)$row['id_cronico'] ?>">
+                                                <input type="text" name="observacoes" class="form-control form-control-sm mb-2" placeholder="Observação da admissão">
+                                                <button type="submit" class="btn btn-sm btn-success w-100">Admitir em Medicina Preventiva</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
+                    <div>
+                        <h2 class="h5 mb-1">Pacientes em monitoramento telefônico</h2>
+                        <div class="text-muted small">Ações da preventiva ficam registradas com data, próximo contato e observação.</div>
+                    </div>
+                </div>
+                <?php if (!$monitorados): ?>
+                    <div class="alert alert-light border mb-0">
+                        Nenhum paciente ativo em Medicina Preventiva.
+                    </div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Foco</th>
+                                    <th>Status</th>
+                                    <th>Última ação</th>
+                                    <th>Próximo contato</th>
+                                    <th class="text-end">Registrar monitoramento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($monitorados as $row): ?>
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold"><?= htmlspecialchars((string)$row['nome_pac']) ?></div>
+                                            <div class="small text-muted"><?= htmlspecialchars((string)($row['matricula_pac'] ?: 'Sem matrícula')) ?></div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold"><?= htmlspecialchars((string)$row['foco_monitoramento']) ?></div>
+                                            <span class="badge bg-<?= mp_badge_class((string)$row['nivel_risco']) ?>"><?= htmlspecialchars((string)$row['nivel_risco']) ?></span>
+                                        </td>
+                                        <td>
+                                            <div><?= htmlspecialchars((string)$row['status_monitoramento']) ?></div>
+                                            <div class="small text-muted">Último contato: <?= htmlspecialchars(mp_fmt_date($row['ultima_interacao'] ?? null)) ?></div>
+                                        </td>
+                                        <td>
+                                            <div><?= htmlspecialchars(mp_action_label((string)($row['ultima_acao'] ?? ''))) ?></div>
+                                            <div class="small text-muted"><?= htmlspecialchars(mp_fmt_datetime($row['ultima_acao_em'] ?? null)) ?></div>
+                                        </td>
+                                        <td><?= htmlspecialchars(mp_fmt_date($row['proximo_contato'] ?? null)) ?></td>
+                                        <td class="text-end" style="min-width:330px;">
+                                            <form method="post">
+                                                <input type="hidden" name="cc_action" value="registrar_monitoramento">
+                                                <input type="hidden" name="preventivo_id" value="<?= (int)$row['id_preventivo'] ?>">
+                                                <div class="row g-2">
+                                                    <div class="col-12">
+                                                        <select name="tipo_acao" class="form-select form-select-sm" required>
+                                                            <option value="monitoramento_telefonico">Monitoramento telefônico</option>
+                                                            <option value="orientacao">Orientação</option>
+                                                            <option value="encerramento">Encerrar no programa</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <input type="date" name="proximo_contato" class="form-control form-control-sm" value="<?= htmlspecialchars(date('Y-m-d', strtotime('+15 days'))) ?>">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <input type="text" name="observacoes" class="form-control form-control-sm" placeholder="Resumo da ligação">
+                                                    </div>
+                                                    <div class="col-12 d-grid">
+                                                        <button type="submit" class="btn btn-sm btn-outline-success">Salvar monitoramento</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
+                    <div>
+                        <h2 class="h5 mb-1">Últimos movimentos da preventiva</h2>
+                        <div class="text-muted small">Histórico recente de admissões e monitoramentos telefônicos.</div>
+                    </div>
+                </div>
+                <?php if (!$actions): ?>
+                    <div class="alert alert-light border mb-0">Sem movimentações recentes em Medicina Preventiva.</div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Quando</th>
+                                    <th>Paciente</th>
+                                    <th>Ação</th>
+                                    <th>Foco</th>
+                                    <th>Observações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($actions as $action): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars(mp_fmt_datetime($action['realizado_em'] ?? null)) ?></td>
+                                        <td>
+                                            <div class="fw-semibold"><?= htmlspecialchars((string)$action['nome_pac']) ?></div>
+                                            <div class="small text-muted"><?= htmlspecialchars((string)($action['matricula_pac'] ?: 'Sem matrícula')) ?></div>
+                                        </td>
+                                        <td><?= htmlspecialchars(mp_action_label((string)$action['tipo_acao'])) ?></td>
+                                        <td><?= htmlspecialchars((string)($action['foco'] ?: '-')) ?></td>
+                                        <td class="mp-mini-note"><?= htmlspecialchars((string)($action['observacoes'] ?: '-')) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

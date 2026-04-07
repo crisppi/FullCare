@@ -530,22 +530,39 @@ if ($type === "create") {
     flowLog($flowCtx, 'create.internacao.id', 'INFO', ['id_internacao_novo' => $lastId]);
     internacaoCreateDebugLog('CREATE internacao ok id=' . $lastId);
     try {
-        $cronicosInseridos = cc_upsert_patient_chronics_from_text(
+        $cronicosInseridos = cc_enqueue_chronic_candidates_from_text(
             $conn,
             (int)$fk_paciente_int,
             (string)$rel_int,
-            'relatório da internação'
+            'relatório da internação',
+            [
+                'origem_tipo' => 'relatorio_internacao',
+                'origem_descricao' => 'relatório da internação',
+                'fk_internacao' => $lastId,
+                'resumo_clinico' => (string)$rel_int,
+            ]
         );
-        $cronicosPorAntecedentes = cc_sync_patient_chronics_from_existing_antecedents(
+        $cronicosPorAntecedentes = cc_enqueue_chronic_candidates_from_antecedent_names(
             $conn,
             (int)$fk_paciente_int,
-            'antecedentes já cadastrados do paciente'
+            cc_fetch_patient_antecedent_names($conn, (int)$fk_paciente_int),
+            'antecedentes já cadastrados do paciente',
+            [
+                'origem_tipo' => 'antecedente_paciente',
+                'origem_descricao' => 'antecedentes já cadastrados do paciente',
+                'fk_internacao' => $lastId,
+            ]
         );
-        $cronicosPorAntecedenteSelecionado = cc_upsert_patient_chronics_from_antecedent_id(
+        $cronicosPorAntecedenteSelecionado = cc_enqueue_chronic_candidates_from_antecedent_id(
             $conn,
             (int)$fk_paciente_int,
             (int)$fk_patologia2,
-            'antecedente selecionado na internação'
+            'antecedente selecionado na internação',
+            [
+                'origem_tipo' => 'antecedente_internacao',
+                'origem_descricao' => 'antecedente selecionado na internação',
+                'fk_internacao' => $lastId,
+            ]
         );
         if ($cronicosInseridos) {
             flowLog($flowCtx, 'create.cronicos', 'INFO', ['condicoes' => $cronicosInseridos]);
@@ -1026,22 +1043,39 @@ if ($type == "update") {
     $internacao->id_internacao = $id_internacao;
     $internacaoDao->update($internacao);
     try {
-        $cronicosAtualizados = cc_upsert_patient_chronics_from_text(
+        $cronicosAtualizados = cc_enqueue_chronic_candidates_from_text(
             $conn,
             (int)$fk_paciente_int,
             (string)$rel_int,
-            'edição do relatório da internação'
+            'edição do relatório da internação',
+            [
+                'origem_tipo' => 'relatorio_internacao',
+                'origem_descricao' => 'edição do relatório da internação',
+                'fk_internacao' => (int)$id_internacao,
+                'resumo_clinico' => (string)$rel_int,
+            ]
         );
-        $cronicosPorAntecedentes = cc_sync_patient_chronics_from_existing_antecedents(
+        $cronicosPorAntecedentes = cc_enqueue_chronic_candidates_from_antecedent_names(
             $conn,
             (int)$fk_paciente_int,
-            'antecedentes já cadastrados do paciente'
+            cc_fetch_patient_antecedent_names($conn, (int)$fk_paciente_int),
+            'antecedentes já cadastrados do paciente',
+            [
+                'origem_tipo' => 'antecedente_paciente',
+                'origem_descricao' => 'antecedentes já cadastrados do paciente',
+                'fk_internacao' => (int)$id_internacao,
+            ]
         );
-        $cronicosPorAntecedenteSelecionado = cc_upsert_patient_chronics_from_antecedent_id(
+        $cronicosPorAntecedenteSelecionado = cc_enqueue_chronic_candidates_from_antecedent_id(
             $conn,
             (int)$fk_paciente_int,
             (int)$fk_patologia2,
-            'antecedente selecionado na internação'
+            'antecedente selecionado na internação',
+            [
+                'origem_tipo' => 'antecedente_internacao',
+                'origem_descricao' => 'antecedente selecionado na internação',
+                'fk_internacao' => (int)$id_internacao,
+            ]
         );
         if ($cronicosAtualizados) {
             flowLog($flowCtx, 'update.cronicos', 'INFO', [

@@ -78,7 +78,18 @@ if (!function_exists('cc_process_visita_cronicos')) {
             return [];
         }
 
-        return cc_upsert_patient_chronics_from_text($conn, $patientId, $reportText, $source);
+        return cc_enqueue_chronic_candidates_from_text(
+            $conn,
+            $patientId,
+            $reportText,
+            $source,
+            [
+                'origem_tipo' => 'relatorio_visita',
+                'origem_descricao' => $source,
+                'fk_internacao' => (int)$internacaoId,
+                'resumo_clinico' => (string)$reportText,
+            ]
+        );
     }
 }
 
@@ -95,7 +106,17 @@ if (!function_exists('cc_process_visita_cronicos_from_antecedentes')) {
             return [];
         }
 
-        return cc_sync_patient_chronics_from_existing_antecedents($conn, $patientId, $source);
+        return cc_enqueue_chronic_candidates_from_antecedent_names(
+            $conn,
+            $patientId,
+            cc_fetch_patient_antecedent_names($conn, $patientId),
+            $source,
+            [
+                'origem_tipo' => 'antecedente_paciente',
+                'origem_descricao' => $source,
+                'fk_internacao' => (int)$internacaoId,
+            ]
+        );
     }
 }
 

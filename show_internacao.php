@@ -274,12 +274,34 @@ function pick_visit_auditor($row)
     }
     return '';
 }
+function pick_visit_role($row)
+{
+    $cargo = trim((string)($row['cargo_user'] ?? ''));
+    if ($cargo !== '') {
+        $cargoNorm = mb_strtolower($cargo, 'UTF-8');
+        if (strpos($cargoNorm, 'med') !== false) return 'Médico Auditor';
+        if (strpos($cargoNorm, 'enf') !== false) return 'Enfermeiro Auditor';
+        return $cargo;
+    }
+
+    $flagMed = strtolower(trim((string)($row['visita_med_vis'] ?? '')));
+    $flagEnf = strtolower(trim((string)($row['visita_enf_vis'] ?? '')));
+    if (in_array($flagMed, ['s', 'sim', '1'], true) || !empty($row['visita_auditor_prof_med'])) {
+        return 'Médico Auditor';
+    }
+    if (in_array($flagEnf, ['s', 'sim', '1'], true) || !empty($row['visita_auditor_prof_enf'])) {
+        return 'Enfermeiro Auditor';
+    }
+
+    return '-';
+}
 
 $visitas_norm = [];
 foreach (($visitas ?? []) as $v) {
     $d = pick_visit_date($v);
 
     $nomeAuditor = pick_visit_auditor($v);
+    $cargoAuditor = pick_visit_role($v);
     $registro = $v['auditor_registro'] ?? $v['reg_profissional_user'] ?? '';
 
     if (!empty($registro) && !empty($nomeAuditor)) $nomeExibicao = $nomeAuditor . ' - ' . $registro;
@@ -291,7 +313,9 @@ foreach (($visitas ?? []) as $v) {
         '_time'      => pick_visit_time($v),
         '_text'      => pick_visit_text($v),
         'acomodacao' => pick_visit_acomodacao($v),
+        '_auditor_nome' => $nomeAuditor,
         '_auditor'   => $nomeExibicao,
+        '_cargo'     => $cargoAuditor,
         'retificado' => !empty($v['retificado']) ? 1 : 0,
         '_raw'       => $v,
     ];
@@ -347,6 +371,7 @@ $initTime = '';
 $initText = '—';
 $initId   = null;
 $initAuditor = '';
+$initCargo = '-';
 
 if ($activeVisit) {
     $initDateLabel = date('d/m/Y', strtotime($activeVisit['_date']));
@@ -354,6 +379,7 @@ if ($activeVisit) {
     $initText      = trim($activeVisit['_text']) !== '' ? $activeVisit['_text'] : '—';
     $initId        = (int)$activeVisit['_id'];
     $initAuditor   = $activeVisit['_auditor'];
+    $initCargo     = $activeVisit['_cargo'] ?? '-';
 }
 
 $visitaBtnClass = $initId ? 'btn-success' : 'btn-outline-secondary';
@@ -361,6 +387,7 @@ $visualizarInternacaoUrl = rtrim($BASE_URL, '/') . '/internacoes/visualizar/' . 
 $visitaPdfBase = $BASE_URL . 'process_visita_pdf.php?id_internacao=' . urlencode((string)$id_internacao) . '&id_visita=';
 $visitaPdfHref = $initId ? $visitaPdfBase . urlencode((string)$initId) : '#';
 $visitaRangePdfBase = $BASE_URL . 'process_visita_pdf.php?range=1&id_internacao=' . urlencode((string)$id_internacao);
+$visitaEditBase = $BASE_URL . 'cad_visita.php?id_internacao=' . urlencode((string)$id_internacao) . '&edit_visita=';
 
 // Evita duplicar no layout a visita já destacada no card principal.
 $visitas_recent_exibicao = $visitas_recent;
@@ -531,15 +558,15 @@ $pendenciasCount = count($pendencias);
 $pendenciasTitle = $pendencias ? implode(' • ', $pendencias) : 'Sem pendências operacionais detectadas';
 
 $priorityLevel = 'Normal';
-$priorityIcon = 'fa-solid fa-circle-check';
+$priorityIcon = 'fas fa-check-circle';
 $priorityClass = 'is-normal';
 if (!empty($pr_pendente_label) && empty($visitas_norm)) {
     $priorityLevel = 'Crítico';
-    $priorityIcon = 'fa-solid fa-triangle-exclamation';
+    $priorityIcon = 'fas fa-exclamation-triangle';
     $priorityClass = 'is-critical';
 } elseif (!empty($pr_pendente_label) || !empty($pendenciasCount)) {
     $priorityLevel = 'Atenção';
-    $priorityIcon = 'fa-solid fa-circle-exclamation';
+    $priorityIcon = 'fas fa-exclamation-circle';
     $priorityClass = 'is-warning';
 }
 
@@ -561,11 +588,11 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                     <div>
                         <h4 class="mb-1"><?= e(mb_strtoupper($data['nome_pac'] ?? '-')) ?></h4>
                         <div class="d-flex flex-wrap gap-2 text-secondary small">
-                            <span><i class="fa-solid fa-hospital me-1"></i><?= e($data['nome_hosp'] ?? '-') ?></span>
+                            <span><i class="fas fa-hospital me-1"></i><?= e($data['nome_hosp'] ?? '-') ?></span>
                             <span>•</span>
-                            <span><i class="fa-solid fa-bed-pulse me-1"></i>Internação <?= e($data['id_internacao'] ?? '-') ?></span>
+                            <span><i class="fas fa-procedures me-1"></i>Internação <?= e($data['id_internacao'] ?? '-') ?></span>
                             <span>•</span>
-                            <span><i class="fa-regular fa-calendar me-1"></i>Data da internação: <?= e($data_intern_format) ?></span>
+                            <span><i class="far fa-calendar-alt me-1"></i>Data da internação: <?= e($data_intern_format) ?></span>
                         </div>
                     </div>
                 </div>
@@ -610,7 +637,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                 data-bs-target="#resumo"
                                 type="button" role="tab" aria-controls="resumo"
                                 aria-selected="<?= $abaAtual === 'resumo' ? 'true' : 'false' ?>">
-                                <i class="fa-solid fa-bars me-2"></i>Resumo
+                                <i class="fas fa-bars me-2"></i>Resumo
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -620,7 +647,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                 data-bs-target="#visitas"
                                 type="button" role="tab" aria-controls="visitas"
                                 aria-selected="<?= $abaAtual === 'visitas' ? 'true' : 'false' ?>">
-                                <i class="fa-solid fa-stethoscope me-2"></i>Visitas
+                                <i class="fas fa-stethoscope me-2"></i>Visitas
                                 <span class="ux-tab-count"><?= (int)$visitasCount ?></span>
                             </button>
                         </li>
@@ -631,7 +658,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                 data-bs-target="#prorrog"
                                 type="button" role="tab" aria-controls="prorrog"
                                 aria-selected="<?= $abaAtual === 'prorrog' ? 'true' : 'false' ?>">
-                                <i class="fa-solid fa-clock-rotate-left me-2"></i>Prorrogações
+                                <i class="fas fa-history me-2"></i>Prorrogações
                                 <span class="ux-tab-count"><?= (int)$prorrogCount ?></span>
                             </button>
                         </li>
@@ -642,7 +669,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                 data-bs-target="#tuss"
                                 type="button" role="tab" aria-controls="tuss"
                                 aria-selected="<?= $abaAtual === 'tuss' ? 'true' : 'false' ?>">
-                                <i class="fa-solid fa-list-check me-2"></i>TUSS
+                                <i class="fas fa-tasks me-2"></i>TUSS
                                 <span class="ux-tab-count"><?= (int)$tussCount ?></span>
                             </button>
                         </li>
@@ -653,7 +680,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                 data-bs-target="#neg"
                                 type="button" role="tab" aria-controls="neg"
                                 aria-selected="<?= $abaAtual === 'neg' ? 'true' : 'false' ?>">
-                                <i class="fa-solid fa-handshake me-2"></i>Negociações
+                                <i class="fas fa-handshake me-2"></i>Negociações
                                 <span class="ux-tab-count"><?= (int)$negCount ?></span>
                             </button>
                         </li>
@@ -666,18 +693,18 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                         <?php if (!$isGestorSeguradora): ?>
                             <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white shadow-sm"
                                 style="background-color:#5e2363;border-color:#5e2363;">
-                                <i class="fa-solid fa-plus me-1"></i>Nova Visita
+                                <i class="fas fa-plus me-1"></i>Nova Visita
                             </a>
                             <a href="<?= e($editarInternacaoUrl) ?>" class="btn btn-sm btn-outline-secondary shadow-sm">
-                                <i class="fa-solid fa-pen-to-square me-1"></i>Editar internação
+                                <i class="fas fa-edit me-1"></i>Editar internação
                             </a>
                             <a href="<?= e($gerarAltaUrl) ?>" class="btn btn-sm btn-outline-danger shadow-sm">
-                                <i class="fa-solid fa-file-medical me-1"></i>Gerar alta
+                                <i class="fas fa-file-alt me-1"></i>Gerar alta
                             </a>
                         <?php endif; ?>
                         <a href="<?= !empty($_SERVER['HTTP_REFERER']) ? 'javascript:history.back()' : $BASE_URL . 'list_intenacao.php' ?>"
                             class="btn btn-ghost-brand btn-sm shadow-sm">
-                            <i class="fa-solid fa-arrow-left me-1"></i>Voltar
+                            <i class="fas fa-arrow-left me-1"></i>Voltar
                         </a>
                     </div>
                 </div>
@@ -694,7 +721,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                     style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #5e2363) 6px, #fff 6px);">
                                     <div class="card-body">
                                         <div class="ov-head">
-                                            <div class="ov-icon"><i class="fa-solid fa-bed-pulse"></i></div>
+                                            <div class="ov-icon"><i class="fas fa-procedures"></i></div>
                                             <h6 class="ov-title mb-0">Internação</h6>
                                         </div>
                                         <dl class="details-dl">
@@ -714,7 +741,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                     style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #0f766e) 6px, #fff 6px);">
                                     <div class="card-body">
                                         <div class="ov-head">
-                                            <div class="ov-icon"><i class="fa-solid fa-user-nurse"></i></div>
+                                            <div class="ov-icon"><i class="fas fa-user-md"></i></div>
                                             <h6 class="ov-title mb-0">Detalhes</h6>
                                         </div>
                                         <dl class="details-dl">
@@ -756,7 +783,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                 <?php if (!$isGestorSeguradora): ?>
                                     <div class="mt-2">
                                         <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white" style="background:#5e2363;border-color:#5e2363;">
-                                            <i class="fa-solid fa-plus me-1"></i>Cadastrar visita
+                                            <i class="fas fa-plus me-1"></i>Cadastrar visita
                                         </a>
                                     </div>
                                 <?php endif; ?>
@@ -800,137 +827,89 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                                     <button type="button" id="btnLimparVisitas" class="btn btn-sm btn-outline-secondary">Limpar</button>
                                                 </div>
                                             </form>
-                                            <div class="small text-muted mt-2">As visitas fora do intervalo selecionado são escondidas na linha do tempo.</div>
+                                            <div class="small text-muted mt-2">As visitas fora do intervalo selecionado são escondidas da tabela.</div>
                                         </div>
                                     <?php endif; ?>
 
-                                    <?php
-                                    $spanForWidth = max(1, $spanDays);
-                                    $timelineMarginPct = 3;
-                                    $trackWidthPx = max(800, $countVis * 160, $spanForWidth * 40);
-                                    $labelMinDistancePx = 120;
-                                    $markerPaddingPx = 40;
-                                    $offsetStepPx = 26;
-                                    $markerPositions = [];
-                                    ?>
-
-                                    <div class="ht-container">
-                                        <div class="ht-track" style="width: <?= (int)$trackWidthPx ?>px">
-                                            <div class="ht-bar"></div>
-
-                                            <?php foreach ($visitas_norm as $i => $v):
-                                                $daysFromMin = max(0, (new DateTime($minD ?: $v['_date']))->diff(new DateTime($v['_date']))->days);
-                                                $usablePctRange = 100 - ($timelineMarginPct * 2);
-
-                                                if ($spanDays > 0) $pct = $timelineMarginPct + (($daysFromMin / $spanDays) * $usablePctRange);
-                                                elseif ($countVis > 1) $pct = $timelineMarginPct + (($i / max(1, $countVis - 1)) * $usablePctRange);
-                                                else $pct = 50;
-
-                                                $pct = round(max($timelineMarginPct, min(100 - $timelineMarginPct, $pct)), 2);
-                                                $leftPx = ($pct / 100) * $trackWidthPx;
-
-                                                $finalPx = $leftPx;
-                                                $maxAttempts = 12;
-                                                for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
-                                                    $hasOverlap = false;
-                                                    foreach ($markerPositions as $registeredPos) {
-                                                        if (abs($finalPx - $registeredPos) < $labelMinDistancePx) {
-                                                            $hasOverlap = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (!$hasOverlap) break;
-                                                    $direction = ($attempt % 2 === 0) ? 1 : -1;
-                                                    $steps = (int)ceil(($attempt + 1) / 2);
-                                                    $shift = $direction * $steps * $offsetStepPx;
-                                                    $finalPx = max($markerPaddingPx, min($trackWidthPx - $markerPaddingPx, $leftPx + $shift));
-                                                }
-                                                $markerPositions[] = $finalPx;
-
-                                                $pctPosition = round(($finalPx / $trackWidthPx) * 100, 2);
-                                                $isActive  = ($activeVisit && $activeVisit['_id'] === $v['_id']);
-                                                $dataLabel = date('d/m/Y', strtotime($v['_date']));
-                                                $hora      = $v['_time'] ?: '';
-                                                $texto     = trim($v['_text']) !== '' ? $v['_text'] : '—';
-                                                $auditorNome = $v['_auditor'] ?? '';
-                                            ?>
-                                                <a class="ht-marker<?= $isActive ? ' active' : '' ?>" href="#"
-                                                    style="left: <?= $pctPosition ?>%;"
-                                                    data-dateraw="<?= e($v['_date']) ?>"
-                                                    data-id="<?= (int)$v['_id'] ?>"
-                                                    data-date="<?= e($dataLabel) ?>"
-                                                    data-time="<?= e($hora) ?>"
-                                                    data-text="<?= e($texto) ?>"
-                                                    data-auditor="<?= e($auditorNome) ?>"
-                                                    data-retificado="<?= !empty($v['retificado']) ? '1' : '0' ?>"
-                                                    onclick="(function(m){
-                                                    document.querySelectorAll('#visitas .ht-marker.active').forEach(function(x){x.classList.remove('active');});
-                                                    m.classList.add('active');
-
-                                                    var d=m.dataset.date||'—', t=m.dataset.time||'', x=m.dataset.text||'—', i=m.dataset.id||'', aud=m.dataset.auditor||'';
-                                                    var dEl=document.getElementById('v-rel-date');
-                                                    var tWrap=document.getElementById('v-rel-time-wrap');
-                                                    var tEl=document.getElementById('v-rel-time');
-                                                    var xEl=document.getElementById('v-rel-text');
-                                                    var iWrap=document.getElementById('v-rel-id-wrap');
-                                                    var iEl=document.getElementById('v-rel-id');
-                                                    var audEl=document.getElementById('v-rel-auditor');
-                                                    var audWrap=document.getElementById('v-rel-auditor-wrap');
-                                                    var focoDate=document.getElementById('foco-rel-date');
-                                                    var focoText=document.getElementById('foco-rel-text');
-                                                    var focoAud=document.getElementById('foco-rel-auditor');
-                                                    var focoAudWrap=document.getElementById('foco-rel-auditor-wrap');
-
-                                                    if(dEl) dEl.textContent=d;
-                                                    if(tWrap) tWrap.style.display = t ? '' : 'none';
-                                                    if(tEl) tEl.textContent = t || '';
-                                                    if(xEl) xEl.textContent = x;
-                                                    if(iEl) iEl.textContent = i || '';
-                                                    if(iWrap){ if(i){ iWrap.classList.remove('d-none'); } else { iWrap.classList.add('d-none'); } }
-
-                                                    if(audEl) audEl.textContent = aud;
-                                                    if(audWrap) audWrap.style.display = aud ? 'block' : 'none';
-                                                    if(focoDate) focoDate.textContent = d;
-                                                    if(focoText) focoText.textContent = x;
-                                                    if(focoAud) focoAud.textContent = aud;
-                                                    if(focoAudWrap) focoAudWrap.style.display = aud ? '' : 'none';
-                                                    if(window.updateVisitaDeleteTarget){ window.updateVisitaDeleteTarget(i, m.dataset.retificado); }
-
-                                                    var pdfBtn=document.getElementById('btn-visita-pdf');
-                                                    if(pdfBtn){
-                                                        var base=pdfBtn.getAttribute('data-pdf-base')||'';
-                                                        if(i && base){
-                                                            pdfBtn.href=base + encodeURIComponent(i);
-                                                            pdfBtn.classList.remove('disabled');
-                                                            pdfBtn.classList.remove('btn-outline-secondary');
-                                                            pdfBtn.classList.add('btn-success');
-                                                            pdfBtn.setAttribute('aria-disabled','false');
-                                                        }else{
-                                                            pdfBtn.href='#';
-                                                            pdfBtn.classList.add('disabled');
-                                                            pdfBtn.classList.remove('btn-success');
-                                                            pdfBtn.classList.add('btn-outline-secondary');
-                                                            pdfBtn.setAttribute('aria-disabled','true');
-                                                        }
-                                                        var pdfDate=document.getElementById('btn-visita-date');
-                                                        if(pdfDate){
-                                                            if(i && d){
-                                                                pdfDate.textContent='Data: ' + d;
-                                                                pdfDate.classList.remove('text-muted');
-                                                            }else{
-                                                                pdfDate.textContent='Selecione uma visita';
-                                                                if(!pdfDate.classList.contains('text-muted')) pdfDate.classList.add('text-muted');
-                                                            }
-                                                        }
-                                                    }
-
-                                                    var cont=document.querySelector('#visitas .ht-container');
-                                                    if(cont){ cont.scrollLeft = Math.max(0, m.offsetLeft - cont.clientWidth/2); }
-                                                })(this); return false;">
-                                                    <span class="ht-label"><?= e($dataLabel) ?></span>
-                                                    <span class="ht-dot"></span>
-                                                </a>
-                                            <?php endforeach; ?>
+                                    <div class="visitas-table-wrap mb-3">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle mb-0 visitas-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID visita</th>
+                                                        <th>Usuário</th>
+                                                        <th>Cargo</th>
+                                                        <th>Data da visita</th>
+                                                        <th class="visita-actions-head">Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($visitas_norm as $v):
+                                                        $isActive  = ($activeVisit && $activeVisit['_id'] === $v['_id']);
+                                                        $dataLabel = date('d/m/Y', strtotime($v['_date']));
+                                                        $hora      = $v['_time'] ?: '';
+                                                        $texto     = trim($v['_text']) !== '' ? $v['_text'] : '—';
+                                                        $auditorNome = trim((string)($v['_auditor_nome'] ?? ''));
+                                                        $auditorNomeExib = $auditorNome !== '' ? $auditorNome : trim((string)($v['_auditor'] ?? ''));
+                                                        $auditorNomeExib = $auditorNomeExib !== '' ? $auditorNomeExib : '—';
+                                                        $cargoAuditor = trim((string)($v['_cargo'] ?? '-'));
+                                                        $visitaId = (int)$v['_id'];
+                                                        $deleteRowDisabled = ($countVis <= 1) || !empty($v['retificado']);
+                                                    ?>
+                                                        <tr class="js-visita-select<?= $isActive ? ' active' : '' ?>"
+                                                            role="button" tabindex="0"
+                                                            data-dateraw="<?= e($v['_date']) ?>"
+                                                            data-id="<?= $visitaId ?>"
+                                                            data-date="<?= e($dataLabel) ?>"
+                                                            data-time="<?= e($hora) ?>"
+                                                            data-text="<?= e($texto) ?>"
+                                                            data-auditor="<?= e($v['_auditor'] ?? '') ?>"
+                                                            data-cargo="<?= e($cargoAuditor) ?>"
+                                                            data-retificado="<?= !empty($v['retificado']) ? '1' : '0' ?>"
+                                                            onclick="window.selectVisitaEntry(this); return false;"
+                                                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); window.selectVisitaEntry(this);}">
+                                                            <td class="visita-id-cell">
+                                                                <span class="fw-semibold text-dark">#<?= $visitaId ?></span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="fw-semibold text-dark"><?= e($auditorNomeExib) ?></div>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-dark"><?= e($cargoAuditor !== '' ? $cargoAuditor : '-') ?></span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="fw-semibold"><?= e($dataLabel) ?></div>
+                                                            </td>
+                                                            <td class="visita-actions-cell">
+                                                                <div class="visita-actions">
+                                                                    <a class="btn btn-sm btn-outline-success"
+                                                                        href="<?= e($visitaPdfBase . urlencode((string)$visitaId)) ?>"
+                                                                        target="_blank" rel="noopener"
+                                                                        onclick="event.stopPropagation();">
+                                                                        PDF
+                                                                    </a>
+                                                                    <?php if (!$isGestorSeguradora): ?>
+                                                                        <a class="btn btn-sm btn-outline-primary"
+                                                                            href="<?= e($visitaEditBase . urlencode((string)$visitaId)) ?>"
+                                                                            onclick="event.stopPropagation();">
+                                                                            Editar
+                                                                        </a>
+                                                                        <button type="button"
+                                                                            class="btn btn-sm btn-outline-danger<?= $deleteRowDisabled ? ' disabled' : '' ?>"
+                                                                            onclick="event.stopPropagation(); window.promptDeleteVisitaFromTable(<?= $visitaId ?>, <?= !empty($v['retificado']) ? 'true' : 'false' ?>);"
+                                                                            <?= $deleteRowDisabled ? 'disabled aria-disabled="true"' : '' ?>>
+                                                                            Excluir
+                                                                        </button>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                    <tr id="visitas-empty-row" style="display:none;">
+                                                        <td colspan="5" class="text-center text-muted py-4">Nenhuma visita encontrada no período selecionado.</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
 
@@ -939,21 +918,9 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                             <?php if ($visitas_recent_exibicao_count > 0): ?>
                                                 <button type="button" class="btn btn-sm btn-outline-danger btn-ultimas-visitas btn-visitas-eq"
                                                     data-bs-toggle="modal" data-bs-target="#modalUltimasVisitas">
-                                                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Últimas visitas
+                                                    <i class="fas fa-history me-1"></i> Últimas visitas
                                                 </button>
                                             <?php endif; ?>
-
-                                            <a id="btn-visita-pdf"
-                                                class="btn btn-sm <?= e($visitaBtnClass) ?><?= $initId ? '' : ' disabled' ?> btn-visitas-eq"
-                                                data-pdf-base="<?= e($visitaPdfBase) ?>"
-                                                href="<?= e($visitaPdfHref) ?>"
-                                                target="_blank" rel="noopener"
-                                                aria-disabled="<?= $initId ? 'false' : 'true' ?>">
-                                                <i class="fa-solid fa-file-pdf me-1"></i> Baixar PDF
-                                                <span id="btn-visita-date" class="d-block small mt-1 text-start<?= $initId ? '' : ' text-muted' ?>">
-                                                    <?= e($initId ? 'Data: ' . $initDateLabel : 'Selecione uma visita') ?>
-                                                </span>
-                                            </a>
 
                                             <?php
                                                 $rangeEnabled = !empty($minD) && !empty($maxD);
@@ -966,23 +933,11 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                                 data-base="<?= e($visitaRangePdfBase) ?>" href="<?= e($rangeHref) ?>"
                                                 target="_blank" rel="noopener"
                                                 aria-disabled="<?= $rangeEnabled ? 'false' : 'true' ?>">
-                                                <i class="fa-solid fa-file-pdf me-1"></i> PDF (período)
+                                                <i class="fas fa-file-pdf me-1"></i> PDF (período)
                                                 <span id="btn-visitas-range-info" class="d-block small mt-1 text-start text-muted">
                                                     <?= $rangeEnabled ? ('Período: ' . e($minLabel) . ' — ' . e($maxLabel)) : 'Use o filtro de datas' ?>
                                                 </span>
                                             </a>
-
-                                            <?php if (!$isGestorSeguradora) { ?>
-                                                <?php $disableDeleteBtn = ($countVis <= 1) || !$initId || $activeVisitRet; ?>
-                                                <button type="button" id="btn-visita-delete-main"
-                                                    class="btn btn-sm btn-danger btn-visitas-eq<?= $disableDeleteBtn ? ' disabled' : '' ?>"
-                                                    data-bs-toggle="modal" data-bs-target="#modalDeleteVisitaInternacao"
-                                                    data-delete-visita="<?= $initId ? e($initId) : '' ?>"
-                                                    aria-disabled="<?= $disableDeleteBtn ? 'true' : 'false' ?>"
-                                                    <?= $disableDeleteBtn ? 'disabled' : '' ?>>
-                                                    <i class="fa-solid fa-trash-can me-1"></i> Excluir visita
-                                                </button>
-                                            <?php } ?>
                                         </div>
 
                                         <div class="border-top mt-3 mb-3"></div>
@@ -995,7 +950,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                                 <div class="d-flex align-items-center gap-2">
                                                     <button type="button" id="btn-foco-relatorio" class="btn btn-sm btn-outline-secondary"
                                                         data-bs-toggle="modal" data-bs-target="#modalRelatorioFoco">
-                                                        <i class="fa-solid fa-expand me-1"></i>Modo foco
+                                                        <i class="fas fa-expand-arrows-alt me-1"></i>Modo foco
                                                     </button>
                                                     <span id="v-rel-id-wrap" class="badge bg-secondary-subtle text-secondary-emphasis<?= $initId ? '' : ' d-none' ?>">
                                                         ID <span id="v-rel-id"><?= e($initId ?: '') ?></span>
@@ -1009,9 +964,16 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
 
                                             <div id="v-rel-auditor-wrap"
                                                 style="font-size:0.85rem;color:#5e2363;font-weight:600;margin-top:10px;display:<?= !empty($initAuditor) ? 'block' : 'none' ?>;">
-                                                <i class="fa-solid fa-user-doctor" style="margin-right:5px;"></i>
+                                                <i class="fas fa-user-md" style="margin-right:5px;"></i>
                                                 Visita realizada pelo(a) Auditor(a):
                                                 <span id="v-rel-auditor"><?= e($initAuditor) ?></span>
+                                            </div>
+
+                                            <div id="v-rel-cargo-wrap"
+                                                style="font-size:0.85rem;color:#475467;font-weight:600;margin-top:6px;display:<?= !empty($initCargo) && $initCargo !== '-' ? 'block' : 'none' ?>;">
+                                                <i class="fas fa-briefcase" style="margin-right:5px;"></i>
+                                                Cargo:
+                                                <span id="v-rel-cargo"><?= e($initCargo) ?></span>
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center mt-2">
@@ -1026,7 +988,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                     <div class="card-body">
                                     <div class="ux-recent-header">
                                         <h6 class="ux-recent-title mb-0">
-                                            <i class="fa-solid fa-layer-group me-2"></i>
+                                            <i class="fas fa-layer-group me-2"></i>
                                             Últimas <?= e($visitas_recent_exibicao_count) ?> visitas registradas
                                         </h6>
                                         <form class="ux-recent-controls d-flex flex-wrap align-items-center gap-2" method="get" action="<?= e($_SERVER['PHP_SELF']) ?>#visitas">
@@ -1098,7 +1060,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Remover visita</h5>
+                                            <h5 class="modal-title text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Remover visita</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                                         </div>
                                         <div class="modal-body">
@@ -1177,6 +1139,9 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                                 Data: <strong id="foco-rel-date"><?= e($initDateLabel) ?></strong>
                                                 <span id="foco-rel-auditor-wrap"<?= !empty($initAuditor) ? '' : ' style="display:none;"' ?>>
                                                     • Auditor: <strong id="foco-rel-auditor"><?= e($initAuditor) ?></strong>
+                                                </span>
+                                                <span id="foco-rel-cargo-wrap"<?= (!empty($initCargo) && $initCargo !== '-') ? '' : ' style="display:none;"' ?>>
+                                                    • Cargo: <strong id="foco-rel-cargo"><?= e($initCargo) ?></strong>
                                                 </span>
                                             </div>
                                             <div class="ux-focus-text" id="foco-rel-text"><?= e($initText) ?></div>
@@ -1278,7 +1243,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                         <div class="ux-empty-text">Revise o período de filtro ou edite a internação para lançar prorrogações.</div>
                                         <div class="mt-2">
                                             <a class="btn btn-sm btn-outline-secondary" href="<?= e($editarProrrogUrl) ?>">
-                                                <i class="fa-solid fa-pen-to-square me-1"></i>Editar prorrogações
+                                                <i class="fas fa-edit me-1"></i>Editar prorrogações
                                             </a>
                                         </div>
                                     </div>
@@ -1297,7 +1262,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                     <h6 class="ov-title mb-0">TUSS</h6>
                                     <a class="btn btn-sm btn-outline-secondary ms-auto"
                                         href="<?= e($BASE_URL) ?>edit_internacao.php?id_internacao=<?= (int)$id_internacao ?>&section=tuss#collapseTuss">
-                                        <i class="bi bi-pencil-square me-1"></i>Editar TUSS
+                                        <i class="fas fa-edit me-1"></i>Editar TUSS
                                     </a>
                                 </div>
 
@@ -1376,7 +1341,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                         <div class="ux-empty-text">Ajuste o período ou edite a internação para cadastrar itens TUSS.</div>
                                         <div class="mt-2">
                                             <a class="btn btn-sm btn-outline-secondary" href="<?= e($editarTussUrl) ?>">
-                                                <i class="fa-solid fa-pen-to-square me-1"></i>Editar TUSS
+                                                <i class="fas fa-edit me-1"></i>Editar TUSS
                                             </a>
                                         </div>
                                     </div>
@@ -1396,7 +1361,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                     <h6 class="ov-title mb-0">Negociações</h6>
                                     <a class="btn btn-sm btn-outline-secondary ms-auto"
                                         href="<?= e($BASE_URL) ?>edit_internacao.php?id_internacao=<?= (int)$id_internacao ?>&section=negoc#collapseNegoc">
-                                        <i class="bi bi-pencil-square me-1"></i>Editar Negociações
+                                        <i class="fas fa-edit me-1"></i>Editar Negociações
                                     </a>
                                 </div>
 
@@ -1456,7 +1421,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                                 ?>
                                                     <tr>
                                                         <td class="fw-semibold"><?= $tipo ?></td>
-                                                        <td><?= $de ?> <i class="fa-solid fa-arrow-right-arrow-left mx-1 text-muted"></i> <?= $para ?></td>
+                                                        <td><?= $de ?> <i class="fas fa-exchange-alt mx-1 text-muted"></i> <?= $para ?></td>
                                                         <td class="text-center"><?= $qtd ?></td>
                                                         <td class="text-center"><?= $saving ?></td>
                                                         <td><?= $periodo ?></td>
@@ -1472,7 +1437,7 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                                         <div class="ux-empty-text">Você pode ajustar o filtro ou lançar uma negociação na edição da internação.</div>
                                         <div class="mt-2">
                                             <a class="btn btn-sm btn-outline-secondary" href="<?= e($editarNegocUrl) ?>">
-                                                <i class="fa-solid fa-pen-to-square me-1"></i>Editar negociações
+                                                <i class="fas fa-edit me-1"></i>Editar negociações
                                             </a>
                                         </div>
                                     </div>
@@ -1604,20 +1569,39 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
             var rangeSpan = document.getElementById('vis-periodo-range');
             var visIni = document.getElementById('vis_ini');
             var visFim = document.getElementById('vis_fim');
+            var visitRows = Array.prototype.slice.call(document.querySelectorAll('#visitas .js-visita-select'));
+            var emptyRow = document.getElementById('visitas-empty-row');
 
             function updateDeleteBtn() {
-                if (!deleteBtn) return;
                 var disabled = !currentId || totalVisitas <= 1 || currentRet;
+                if (!deleteBtn) return disabled;
                 deleteBtn.disabled = disabled;
                 deleteBtn.classList.toggle('disabled', disabled);
                 deleteBtn.setAttribute('aria-disabled', disabled ? 'true' : 'false');
                 if (currentId) deleteBtn.setAttribute('data-delete-visita', currentId);
+                return disabled;
             }
 
             window.updateVisitaDeleteTarget = function(id, retFlag) {
                 currentId = id ? parseInt(id, 10) : null;
                 currentRet = (retFlag === true || retFlag === '1' || retFlag === 1);
                 updateDeleteBtn();
+            };
+
+            window.promptDeleteVisitaFromTable = function(id, retFlag) {
+                if (!id) return;
+                currentId = parseInt(id, 10);
+                currentRet = (retFlag === true || retFlag === '1' || retFlag === 1);
+                updateDeleteBtn();
+                if (deleteBtn && deleteBtn.disabled) return;
+                var targetRow = document.querySelector('#visitas .js-visita-select[data-id="' + currentId + '"]');
+                if (targetRow) {
+                    window.selectVisitaEntry(targetRow);
+                }
+                if (modal && window.bootstrap && window.bootstrap.Modal) {
+                    var instance = bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(modal);
+                    instance.show();
+                }
             };
 
             updateDeleteBtn();
@@ -1629,6 +1613,160 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                     return parts[2] + '/' + parts[1] + '/' + parts[0];
                 }
                 return value;
+            }
+
+            function updateVisitPdfButton(id, dateLabel) {
+                var pdfBtn = document.getElementById('btn-visita-pdf');
+                if (!pdfBtn) return;
+                var base = pdfBtn.getAttribute('data-pdf-base') || '';
+                if (id && base) {
+                    pdfBtn.href = base + encodeURIComponent(id);
+                    pdfBtn.classList.remove('disabled');
+                    pdfBtn.classList.remove('btn-outline-secondary');
+                    pdfBtn.classList.add('btn-success');
+                    pdfBtn.setAttribute('aria-disabled', 'false');
+                } else {
+                    pdfBtn.href = '#';
+                    pdfBtn.classList.add('disabled');
+                    pdfBtn.classList.remove('btn-success');
+                    pdfBtn.classList.add('btn-outline-secondary');
+                    pdfBtn.setAttribute('aria-disabled', 'true');
+                }
+
+                var pdfDate = document.getElementById('btn-visita-date');
+                if (!pdfDate) return;
+                if (id && dateLabel) {
+                    pdfDate.textContent = 'Data: ' + dateLabel;
+                    pdfDate.classList.remove('text-muted');
+                } else {
+                    pdfDate.textContent = 'Selecione uma visita';
+                    pdfDate.classList.add('text-muted');
+                }
+            }
+
+            function setVisitDetails(visit) {
+                var dateLabel = visit && visit.date ? visit.date : '—';
+                var textValue = visit && visit.text ? visit.text : '—';
+                var idValue = visit && visit.id ? visit.id : '';
+                var auditorValue = visit && visit.auditor ? visit.auditor : '';
+                var cargoValue = visit && visit.cargo ? visit.cargo : '';
+
+                var dEl = document.getElementById('v-rel-date');
+                var xEl = document.getElementById('v-rel-text');
+                var iWrap = document.getElementById('v-rel-id-wrap');
+                var iEl = document.getElementById('v-rel-id');
+                var audEl = document.getElementById('v-rel-auditor');
+                var audWrap = document.getElementById('v-rel-auditor-wrap');
+                var cargoEl = document.getElementById('v-rel-cargo');
+                var cargoWrap = document.getElementById('v-rel-cargo-wrap');
+                var focoDate = document.getElementById('foco-rel-date');
+                var focoText = document.getElementById('foco-rel-text');
+                var focoAud = document.getElementById('foco-rel-auditor');
+                var focoAudWrap = document.getElementById('foco-rel-auditor-wrap');
+                var focoCargo = document.getElementById('foco-rel-cargo');
+                var focoCargoWrap = document.getElementById('foco-rel-cargo-wrap');
+
+                if (dEl) dEl.textContent = dateLabel;
+                if (xEl) xEl.textContent = textValue;
+                if (iEl) iEl.textContent = idValue || '';
+                if (iWrap) {
+                    if (idValue) iWrap.classList.remove('d-none');
+                    else iWrap.classList.add('d-none');
+                }
+                if (audEl) audEl.textContent = auditorValue;
+                if (audWrap) audWrap.style.display = auditorValue ? 'block' : 'none';
+                if (cargoEl) cargoEl.textContent = cargoValue;
+                if (cargoWrap) cargoWrap.style.display = (cargoValue && cargoValue !== '-') ? 'block' : 'none';
+                if (focoDate) focoDate.textContent = dateLabel;
+                if (focoText) focoText.textContent = textValue;
+                if (focoAud) focoAud.textContent = auditorValue;
+                if (focoAudWrap) focoAudWrap.style.display = auditorValue ? '' : 'none';
+                if (focoCargo) focoCargo.textContent = cargoValue;
+                if (focoCargoWrap) focoCargoWrap.style.display = (cargoValue && cargoValue !== '-') ? '' : 'none';
+
+                updateVisitPdfButton(idValue, dateLabel);
+            }
+
+            function clearVisitSelection() {
+                visitRows.forEach(function(row) {
+                    row.classList.remove('active');
+                });
+                currentId = null;
+                currentRet = false;
+                if (window.updateVisitaDeleteTarget) window.updateVisitaDeleteTarget(null, false);
+                setVisitDetails({
+                    date: 'Nenhuma visita no período',
+                    text: 'Nenhuma visita encontrada para o período selecionado.',
+                    id: '',
+                    auditor: '',
+                    cargo: ''
+                });
+            }
+
+            window.selectVisitaEntry = function(row) {
+                if (!row) return false;
+
+                visitRows.forEach(function(item) {
+                    item.classList.remove('active');
+                });
+                row.classList.add('active');
+
+                var visit = {
+                    id: row.dataset.id || '',
+                    date: row.dataset.date || '—',
+                    text: row.dataset.text || '—',
+                    auditor: row.dataset.auditor || '',
+                    cargo: row.dataset.cargo || '',
+                    retificado: row.dataset.retificado || '0'
+                };
+
+                currentId = visit.id ? parseInt(visit.id, 10) : null;
+                currentRet = (visit.retificado === '1' || visit.retificado === 1 || visit.retificado === true);
+                if (window.updateVisitaDeleteTarget) window.updateVisitaDeleteTarget(visit.id, visit.retificado);
+                setVisitDetails(visit);
+                return false;
+            };
+
+            function filterVisitRows() {
+                if (!visitRows.length) return;
+
+                var iniVal = visIni ? visIni.value : '';
+                var fimVal = visFim ? visFim.value : '';
+                var visibleRows = [];
+
+                visitRows.forEach(function(row) {
+                    var dateRaw = row.dataset.dateraw || '';
+                    var visible = true;
+                    if (iniVal && dateRaw < iniVal) visible = false;
+                    if (fimVal && dateRaw > fimVal) visible = false;
+                    row.style.display = visible ? '' : 'none';
+                    if (visible) visibleRows.push(row);
+                });
+
+                if (emptyRow) {
+                    emptyRow.style.display = visibleRows.length ? 'none' : '';
+                }
+
+                var activeVisible = visitRows.find(function(row) {
+                    return row.classList.contains('active') && row.style.display !== 'none';
+                });
+
+                if (activeVisible) {
+                    setVisitDetails({
+                        id: activeVisible.dataset.id || '',
+                        date: activeVisible.dataset.date || '—',
+                        text: activeVisible.dataset.text || '—',
+                        auditor: activeVisible.dataset.auditor || '',
+                        cargo: activeVisible.dataset.cargo || ''
+                    });
+                    return;
+                }
+
+                if (visibleRows.length) {
+                    window.selectVisitaEntry(visibleRows[visibleRows.length - 1]);
+                } else {
+                    clearVisitSelection();
+                }
             }
 
             function updateRangeBtn() {
@@ -1662,6 +1800,8 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
                         rangeSel.style.display = 'none';
                     }
                 }
+
+                filterVisitRows();
             }
 
             if (rangeBtn) {
@@ -1682,13 +1822,19 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
             var btnAplicar = document.getElementById('btnAplicarVisitas');
             var btnLimpar = document.getElementById('btnLimparVisitas');
             if (btnAplicar) btnAplicar.addEventListener('click', updateRangeBtn);
-            if (btnLimpar) btnLimpar.addEventListener('click', updateRangeBtn);
+            if (btnLimpar) {
+                btnLimpar.addEventListener('click', function() {
+                    if (visIni) visIni.value = visIni.getAttribute('data-default') || '';
+                    if (visFim) visFim.value = visFim.getAttribute('data-default') || '';
+                    updateRangeBtn();
+                });
+            }
             updateRangeBtn();
 
             if (!modal || !confirmBtn) return;
 
             modal.addEventListener('show.bs.modal', function(event) {
-                if (!deleteBtn || deleteBtn.disabled) {
+                if (updateDeleteBtn()) {
                     event.preventDefault();
                     return;
                 }
@@ -2245,103 +2391,111 @@ $editarNegocUrl = $BASE_URL . 'edit_internacao.php?id_internacao=' . (int)$id_in
         }
     }
 
-    /* === TIMELINE === */
-    .ht-container {
-        position: relative;
-        overflow-x: auto;
-        padding: 24px var(--padX) 8px;
-        display: flex;
-        justify-content: center;
-        scroll-snap-type: x mandatory
-    }
-
-    .ht-track {
-        position: relative;
-        height: 110px;
-        margin: 0 auto;
-        min-width: 100%
-    }
-
-    .ht-bar {
-        position: absolute;
-        left: var(--padX);
-        right: var(--padX);
-        top: 56px;
-        height: 6px;
-        background: #eadcf3;
-        border-radius: 999px;
-        box-shadow: inset 0 0 0 1px #e5d8ef
-    }
-
-    .ht-marker {
-        position: absolute;
-        top: 0;
-        transform: translateX(-50%);
-        text-align: center;
-        cursor: pointer;
-        color: inherit;
-        text-decoration: none;
-        scroll-snap-align: center;
-        max-width: 45%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-        overflow: visible
-    }
-
-    .ht-label {
-        display: inline-block;
-        font-size: 12px;
-        color: var(--brand);
-        white-space: nowrap;
-        transition: all .2s ease;
-        padding: 4px 8px;
-        border-radius: 8px;
-        max-width: 220px;
+    .visitas-table-wrap {
+        border: 1px solid #ece7f1;
+        border-radius: 14px;
         overflow: hidden;
-        text-overflow: ellipsis
+        background: #fff;
     }
 
-    .ht-marker:hover .ht-label {
-        background: var(--brand-100);
-        color: var(--brand-800)
+    .visitas-table {
+        margin-bottom: 0;
     }
 
-    .ht-marker.active .ht-label {
-        background: var(--brand);
-        color: #fff;
+    .visitas-table thead th {
+        background: #e7d9f2;
+        color: #4b1c50;
+        font-size: .8rem;
         font-weight: 700;
-        transform: scale(1.02)
+        letter-spacing: .01em;
+        text-transform: uppercase;
+        border-bottom: 1px solid #c9afd9;
+        white-space: nowrap;
+        padding: .82rem 1rem;
+        vertical-align: middle;
     }
 
-    .ht-dot {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: var(--brand);
-        border: 2px solid #fff;
-        box-shadow: 0 0 0 3px var(--brand-100), 0 4px 10px rgba(0, 0, 0, .08);
-        transition: all .2s ease
+    .visitas-table tbody tr {
+        cursor: pointer;
+        transition: background-color .15s ease, box-shadow .15s ease;
     }
 
-    .ht-marker:hover .ht-dot {
-        transform: scale(1.1)
+    .visitas-table tbody tr td {
+        padding-top: .62rem;
+        padding-bottom: .62rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-color: #f0eaf5;
+        border-right: 0;
+        border-left: 0;
+        vertical-align: middle;
     }
 
-    .ht-marker.active .ht-dot {
-        background: var(--brand-800);
-        box-shadow: 0 0 0 4px var(--brand-100), 0 6px 14px rgba(0, 0, 0, .12)
+    .visitas-table tbody tr:hover td,
+    .visitas-table tbody tr:focus td {
+        background: #faf6fd;
     }
 
-    .legend-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--brand);
-        display: inline-block;
-        margin-right: 6px
+    .visitas-table tbody tr.active td {
+        background: #f3ebf9;
+        border-top-color: #e4d6ef;
+        border-bottom-color: #e4d6ef;
+    }
+
+    .visitas-table tbody tr.active td:first-child {
+        box-shadow: inset 4px 0 0 #5e2363;
+    }
+
+    .visitas-table th:first-child,
+    .visitas-table td:first-child {
+        width: 140px;
+    }
+
+    .visitas-table th:nth-child(2),
+    .visitas-table td:nth-child(2) {
+        width: 30%;
+    }
+
+    .visitas-table th:nth-child(3),
+    .visitas-table td:nth-child(3) {
+        width: 22%;
+    }
+
+    .visitas-table th:nth-child(4),
+    .visitas-table td:nth-child(4) {
+        width: 18%;
+    }
+
+    .visitas-table th:nth-child(5),
+    .visitas-table td:nth-child(5) {
+        width: 250px;
+    }
+
+    .visita-id-cell {
+        white-space: nowrap;
+    }
+
+    .visita-actions-cell {
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    .visita-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .4rem;
+        flex-wrap: wrap;
+    }
+
+    .visita-actions .btn {
+        min-height: 30px;
+        padding: .28rem .6rem;
+        line-height: 1.1;
+    }
+
+    .visita-actions-head {
+        text-align: center;
     }
 </style>
 

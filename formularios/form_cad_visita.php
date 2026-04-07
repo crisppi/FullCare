@@ -1057,10 +1057,12 @@ function aumentarTextProgramacao() {
 
 .visita-card__eyebrow {
     text-transform: uppercase;
-    letter-spacing: .3em;
-    font-size: .62rem;
+    letter-spacing: .18em;
+    font-size: .78rem;
     margin: 0;
-    color: #5e2363;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #4b5563;
 }
 
 .visita-card__title {
@@ -1536,6 +1538,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     };
+
+    const params = new URLSearchParams(window.location.search);
+    const editVisitaId = params.get('edit_visita');
+    if (editVisitaId && /^\d+$/.test(editVisitaId)) {
+        window.selecionarVisitaParaEditar(editVisitaId);
+    }
 })();
 
 document.addEventListener('DOMContentLoaded', function() {

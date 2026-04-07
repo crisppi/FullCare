@@ -521,6 +521,7 @@ class visitaDAO
         vi.visita_no_vis, vi.fk_usuario_vis, vi.data_visita_vis, vi.id_visita,
         ho.id_hospital, ho.nome_hosp,
         u.usuario_user AS auditor_nome,
+        u.cargo_user AS cargo_user,
         u.reg_profissional_user AS auditor_registro  -- <--- CAMPO NOVO AQUI
     FROM tb_internacao ac
     LEFT JOIN tb_hospital ho ON ac.fk_hospital_int = ho.id_hospital
