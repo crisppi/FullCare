@@ -493,13 +493,13 @@ if (!empty($sessionIdUsuario)) {
 
                             <?php if ($canSeeFullMenu) { ?>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarMenuDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
                                             class="bi bi-stack edit-icon"></i>
                                         Menu
                                     </a>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="navbarMenuDropdown">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard"><i
                                                     class="bi bi-speedometer2"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
@@ -543,13 +543,13 @@ if (!empty($sessionIdUsuario)) {
                             <?php if ($canSeeFullMenu && ($sessionNivel > 3 || $canSeeUsuariosCadastro)) { ?>
 
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarCadastrosDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
                                             class="bi bi-pencil-square edit-icon"></i>
                                         Cadastros
                                     </a>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="navbarCadastrosDropdown">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>pacientes"><i class="bi bi-person"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
                                                 Pacientes</a></li>
@@ -588,13 +588,13 @@ if (!empty($sessionIdUsuario)) {
                             <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
 
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarProducaoDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
                                             class="bi bi-calendar3 edit-icon"></i>
                                         Produção
                                     </a>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="navbarProducaoDropdown">
 
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/nova"><i
                                                     class="bi bi-calendar2-date"
@@ -653,13 +653,13 @@ if (!empty($sessionIdUsuario)) {
                             <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
 
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarListasDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
                                             class="bi bi-list-ul edit-icon"></i>
                                         Listas
                                     </a>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="navbarListasDropdown">
 
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista"> <i
                                                     class="bi bi-calendar2-date"
@@ -682,13 +682,13 @@ if (!empty($sessionIdUsuario)) {
                             <?php }; ?>
                             <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarGestaoDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
                                             class="bi bi-receipt edit-icon"></i>
                                         Gestão
                                     </a>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="navbarGestaoDropdown">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
                                                     class="bi bi-postcard-heart"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
@@ -774,13 +774,13 @@ if (!empty($sessionIdUsuario)) {
                             <?php }; ?>
                             <?php if ($canSeeBiMenu) { ?>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarBiDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
                                             class="bi bi-bar-chart-line edit-icon"></i>
                                         BI
                                     </a>
-                                    <ul class="dropdown-menu bi-dropdown" aria-labelledby="navbarScrollingDropdown">
+                                    <ul class="dropdown-menu bi-dropdown" aria-labelledby="navbarBiDropdown">
                                         <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/navegacao"><i
                                                     class="bi bi-grid-3x3-gap"
                                                     style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
@@ -841,13 +841,13 @@ if (!empty($sessionIdUsuario)) {
                             <?php }; ?>
                             <?php if ($canSeeInteligenciaMenu) { ?>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
+                                    <a class="nav-link dropdown-toggle " href="#" id="navbarInteligenciaDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                         <i style="font-size: 1rem;margin-right:5px; color:#5e2363;" name="type" value="edite"
                                             class="bi bi-robot edit-icon"></i>
                                         Inteligência Operacional
                                     </a>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="navbarInteligenciaDropdown">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/dashboard-360"><i
                                                     class="bi bi-grid-3x3-gap"
                                                     style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>

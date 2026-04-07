@@ -546,7 +546,7 @@ if (typeof jQuery !== 'undefined') {
             <!-- Botão de Nova Internação -->
             <a class="btn btn-success" href="<?= $BASE_URL ?>internacoes/nova"
                 style="border-radius:10px;background-color:#35bae1;font-family:var(--bs-font-sans-serif);box-shadow:0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
-                <i class="fa-solid fa-plus" style="font-size:1rem;margin-right:5px;"></i>
+                <i class="fas fa-plus" style="font-size:1rem;margin-right:5px;"></i>
                 Nova Internação
             </a>
         </div>
@@ -669,9 +669,7 @@ if (typeof jQuery !== 'undefined') {
                         <div class="filter-inline-actions">
                             <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
                                 style="background-color:#5e2363;width:42px;height:32px;border-color:#5e2363;margin-top:0;">
-                                <span class="material-icons" style="margin-left:-3px;margin-top:-2px;">
-                                    search
-                                </span>
+                                <i class="bi bi-search"></i>
                             </button>
                             <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/lista', ENT_QUOTES, 'UTF-8') ?>"
                                 id="btnClearFiltersIcon"
@@ -1091,12 +1089,12 @@ if (typeof jQuery !== 'undefined') {
 
                             <td class="fc-list-action">
                                 <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown"
+                                    <button class="btn btn-default dropdown-toggle" id="acoesInternacaoDropdown<?= (int)$intern['id_internacao'] ?>"
                                         role="button" data-bs-toggle="dropdown" style="color:#5e2363"
                                         aria-expanded="false">
                                         <i class="bi bi-stack"></i>
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                    <ul class="dropdown-menu" aria-labelledby="acoesInternacaoDropdown<?= (int)$intern['id_internacao'] ?>">
                                         <?php if ($pesqInternado == "s" and $intern['censo_int'] <> "s") { ?>
                                         <li>
                                             <button class="btn btn-default"
@@ -1178,7 +1176,7 @@ if (typeof jQuery !== 'undefined') {
                                                 <button class="btn btn-default"
                                                     onclick="callProcessPdf(<?= $intern['id_internacao'] ?>)"
                                                     style="font-size: .9rem;">
-                                                    <i class="bi-file-earmark-pdf"
+                                                    <i class="bi bi-file-earmark-pdf"
                                                         style="font-size: 1rem; margin-right:5px; color: #ff7043;"></i>
                                                     PDF - Internação
                                                 </button>
@@ -1239,7 +1237,7 @@ if (typeof jQuery !== 'undefined') {
                                     ?>
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($firstPageUrl) ?>">
-                                    <i class="fa-solid fa-angles-left"></i>
+                                    <i class="fas fa-angle-double-left"></i>
                                 </a>
                             </li>
                             <?php endif; ?>
@@ -1253,7 +1251,7 @@ if (typeof jQuery !== 'undefined') {
                                     ?>
                             <li class="page-item">
                                 <a class="page-link" href="<?= htmlspecialchars($prevUrl) ?>">
-                                    <i class="fa-solid fa-angle-left"></i>
+                                    <i class="fas fa-angle-left"></i>
                                 </a>
                             </li>
                             <?php endif; ?>
@@ -1280,7 +1278,7 @@ if (typeof jQuery !== 'undefined') {
                                     ?>
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($nextUrl) ?>">
-                                    <i class="fa-solid fa-angle-right"></i>
+                                    <i class="fas fa-angle-right"></i>
                                 </a>
                             </li>
                             <?php endif; ?>
@@ -1293,7 +1291,7 @@ if (typeof jQuery !== 'undefined') {
                                     ?>
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($lastUrl) ?>">
-                                    <i class="fa-solid fa-angles-right"></i>
+                                    <i class="fas fa-angle-double-right"></i>
                                 </a>
                             </li>
                             <?php endif; ?>
