@@ -185,12 +185,10 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
                 <p id="data-visita-error" style="color: red; display: none;">Data Inválida</p>
             </div>
 
-            <div class="form-group col-sm-3">
+            <div class="form-group col-sm-3 visita-field">
                 <label for="data_lancamento_vis">Data do lançamento</label>
                 <input type="date" value="<?= $agoraLanc; ?>" class="form-control"
-                    id="data_lancamento_vis" name="data_lancamento_vis" readonly tabindex="-1"
-                    onfocus="this.blur();" onkeydown="return false;" style="cursor:not-allowed;">
-                <small class="text-muted">Definida automaticamente pelo sistema.</small>
+                    id="data_lancamento_vis" name="data_lancamento_vis">
             </div>
 
             <div class="form-group col-sm-3">
@@ -1472,6 +1470,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentEditVisitaId = null;
     let isHydratingAdditionalSection = false;
+    let lastSyncedVisitaDate = defaults.dataVisita;
+
+    function syncLancamentoWithVisita(force) {
+        if (!dataVisitaInput || !dataLancInput) return;
+        const dataVisitaValue = dataVisitaInput.value || '';
+        if (force || !dataLancInput.value || dataLancInput.value === lastSyncedVisitaDate) {
+            dataLancInput.value = dataVisitaValue;
+        }
+        lastSyncedVisitaDate = dataVisitaValue;
+    }
 
     function syncVisitaFormMode(isEditMode) {
         if (pageTitleEl) {
@@ -1497,9 +1505,9 @@ document.addEventListener('DOMContentLoaded', function() {
             dataVisitaInput.value = vis.data_visita_vis;
         }
         if (dataLancInput) {
-            const formattedLanc = formatLancamentoDateValue(vis.data_lancamento_vis);
-            dataLancInput.value = formattedLanc || defaults.dataLanc || '';
+            dataLancInput.value = vis.data_visita_vis || defaults.dataVisita || defaults.dataLanc || '';
         }
+        lastSyncedVisitaDate = dataVisitaInput ? (dataVisitaInput.value || '') : '';
         if (relInput) relInput.value = vis.rel_visita_vis || '';
         if (acoesInput) acoesInput.value = vis.acoes_int_vis || '';
         if (examesInput) examesInput.value = vis.exames_enf || '';
@@ -1524,10 +1532,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (programacaoInput) programacaoInput.value = defaults.programacao;
         if (fkVisitaInput) fkVisitaInput.value = defaults.fkVisita;
         if (editIdInput) editIdInput.value = '';
-        if (dataLancInput) dataLancInput.value = defaults.dataLanc;
+        if (dataLancInput) dataLancInput.value = defaults.dataVisita || defaults.dataLanc;
+        lastSyncedVisitaDate = dataVisitaInput ? (dataVisitaInput.value || '') : '';
         currentEditVisitaId = null;
         syncVisitaFormMode(false);
         resetAdditionalTables();
+    }
+
+    if (dataVisitaInput && dataLancInput) {
+        syncLancamentoWithVisita(true);
+        dataVisitaInput.addEventListener('change', function() {
+            syncLancamentoWithVisita(false);
+        });
     }
 
     selectRet.addEventListener('change', function() {
