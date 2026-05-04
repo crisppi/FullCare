@@ -96,9 +96,10 @@ if ($qtdIntItens > $limite) {
 }
 
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
 
 <!--tabela evento-->
-<div class="container-fluid form_container" style="margin-top:12px;">
+<div class="container-fluid form_container listagem-page" style="margin-top:18px;">
     <?php if ($debug): ?>
         <div class="alert alert-warning" style="font-size:0.9rem;">
             <strong>DEBUG list_usuario</strong><br>
@@ -114,17 +115,19 @@ if ($qtdIntItens > $limite) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="./scripts/cadastro/general.js"></script>
 
-    <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
-        <h4 style="margin-top:8px; margin-bottom:8px;" class="page-title">Usuários - Listagem</h4>
-        <div style="margin-left: auto;">
-            <button onclick="openModal('cad_usuario.php')" data-bs-toggle="modal" data-bs-target="#myModal"
-                class="btn btn-success"
-                style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
-                <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Novo Usuário
-            </button>
+    <div class="listagem-hero">
+        <div class="listagem-hero__copy">
+            <div class="listagem-kicker">Cadastros</div>
+            <h1 class="listagem-title">Usuários</h1>
+            <p class="listagem-subtitle">Pesquise pessoas por nome, cargo e departamento com a mesma linguagem visual das demais listas.</p>
+        </div>
+        <div class="listagem-hero__actions">
+            <a href="<?= $BASE_URL ?>cad_usuario.php"
+                class="btn listagem-btn-top listagem-btn-top--blue">
+                <i class="bi bi-plus-lg" style="font-size: 1rem;margin-right:5px;"></i>Novo Usuário
+            </a>
         </div>
     </div>
-    <hr style="margin-top: 5px; margin-bottom: 10px;">
     <div class="complete-table">
         <div id="navbarToggleExternalContent" class="table-filters">
             <div class="row">
@@ -282,26 +285,21 @@ if ($qtdIntItens > $limite) {
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                         <li>
-                                            <button class="btn btn-default" style="font-size: .9rem;"
-                                                onclick="openModal('<?= $BASE_URL ?>show_usuario.php?id_usuario=<?= $id_usuario ?>')"
-                                                data-bs-toggle="modal" data-bs-target="#myModal"><i class="fas fa-eye"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>Ver</button>
+                                            <a class="dropdown-item" style="font-size: .9rem;"
+                                                href="<?= $BASE_URL ?>show_usuario.php?id_usuario=<?= $id_usuario ?>">
+                                                <i class="bi bi-eye"
+                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver</a>
                                         </li>
                                         <li>
-                                            <button class="btn btn-default" style="font-size: .9rem;"
-                                                onclick="openModal('<?= $BASE_URL ?>edit_usuario.php?id_usuario=<?= $id_usuario ?>')"
-                                                data-bs-toggle="modal" data-bs-target="#myModal"><i
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
-                                                    name="type" value="edite"
-                                                    class="far fa-edit edit-icon"></i>Editar</button>
+                                            <a class="dropdown-item" style="font-size: .9rem;"
+                                                href="<?= $BASE_URL ?>edit_usuario.php?id_usuario=<?= $id_usuario ?>">
+                                                <i class="bi bi-pencil-square" style="font-size:1rem;margin-right:8px;color:#3b82f6;"></i>Editar</a>
                                         </li>
                                         <li>
 
-                                            <button onclick="resetSenha('<?= $id_usuario ?>')" class="btn btn-default"
+                                            <button onclick="resetSenha('<?= $id_usuario ?>')" class="dropdown-item"
                                                 style="font-size: .9rem;"><i
-                                                    style="font-size: 1rem;margin-right:5px; color: purple;" name="type"
-                                                    value="edite"
-                                                    class="fa-solid fa-arrow-rotate-left edit-icon"></i>Resetar
+                                                    class="bi bi-arrow-clockwise" style="font-size:1rem;margin-right:8px;color:purple;"></i>Resetar
                                                 Senha</button>
                                         </li>
                                     </ul>
@@ -319,25 +317,6 @@ if ($qtdIntItens > $limite) {
 
                 <!-- paginacao que aparece abaixo da tabela -->
                 <div style="display: flex;margin-top:20px">
-
-                    <!-- Modal para abrir tela de cadastro -->
-                    <div class="modal fade" id="myModal">
-                        <div class="modal-dialog  modal-dialog-centered modal-xl">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="page-title" style="color:white;">Usuário</h4>
-                                    <p class="page-description" style="color:white; margin-top:5px">Adicione
-                                        informações
-                                        sobre o usuário</p>
-                                </div>
-                                <div class="modal-body">
-                                    <div id="content-php"></div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Modal para abrir tela de cadastro -->
 
                     <div class="pagination" style="margin: 0 auto;">
                         <?php if ($total_pages ?? 1 > 1): ?>
@@ -488,21 +467,6 @@ function resetSenha(id_user, evt) {
 // carregamento inicial já vem do servidor, não precisa de AJAX aqui
 </script>
 <style>
-.modal-backdrop {
-    display: none;
-
-}
-
-.modal {
-    background: rgba(0, 0, 0, 0.5);
-
-}
-
-.modal-header {
-    color: white;
-    background: #35bae1;
-}
-
 .table-responsive-page {
     width: 100%;
     max-width: 100%;
