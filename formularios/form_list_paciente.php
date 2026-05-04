@@ -214,18 +214,21 @@
     }
     ?>
 
-    <div class="container-fluid form_container" id="main-container" style="margin-top:8px;">
-        <div class="d-flex justify-content-between align-items-center list-header-row" style="margin-bottom: 0;">
-            <h4 class="page-title" style="margin-top:0;line-height: 1.5;">Pacientes</h4>
-            <div class="list-action-slot" style="margin-left: auto;">
+    <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
+
+    <div class="container-fluid form_container listagem-page" id="main-container" style="margin-top:18px;">
+        <div class="listagem-hero">
+            <div class="listagem-hero__copy">
+                <div class="listagem-kicker">Cadastros</div>
+                <h1 class="listagem-title">Pacientes</h1>
+            </div>
+            <div class="listagem-hero__actions">
                 <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/pacientes/novo', ENT_QUOTES, 'UTF-8') ?>"
-                    class="btn btn-success styled"
-                    style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
+                    class="btn listagem-btn-top listagem-btn-top--blue">
                     <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Novo Paciente
                 </a>
             </div>
         </div>
-        <hr style="margin-top: 1px; margin-bottom: 10px;">
 
         <div class="complete-table">
             <?php if ($isGestorSeguradora): ?>
@@ -411,35 +414,31 @@
                                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
 
                                             <li>
-                                                <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                <a class="dropdown-item" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/pacientes/editar/' . (int) $id_paciente, ENT_QUOTES, 'UTF-8') ?>">
-                                                    <i style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
-                                                        name="type" value="edite"
-                                                        class="far fa-edit edit-icon"></i>Editar
+                                                    <i class="bi bi-pencil-square" style="font-size:1rem;margin-right:8px;color:#3b82f6;"></i>Editar
                                                 </a>
                                             </li>
                                             <li>
-                                                <button class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                <button class="dropdown-item" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     onclick="openModal('<?= $BASE_URL ?>show_paciente_historico.php?id_paciente=<?= $id_paciente ?>')"
                                                     data-bs-toggle="modal" data-bs-target="#myModal"><i
-                                                        style="font-size: 1rem; margin-right:5px; color: rgb(67, 125, 525);"
-                                                        name="type" value="edite"
-                                                        class="fa-solid fa-clock edit-icon"></i>Historico</button>
+                                                        class="bi bi-clock-history" style="font-size:1rem;margin-right:8px;color:#6366f1;"></i>Histórico</button>
                                             </li>
                                             <li>
                                                 <a href="<?= $BASE_URL ?>hub_paciente/paciente<?= $id_paciente ?>"
-                                                    class="btn" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;">
-                                                    <i class="fa-solid fas fa-book-medical"
-                                                        style="font-size: 1rem; margin-right:5px; color: rgb(0, 123, 255);"></i>
+                                                    class="dropdown-item" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;">
+                                                    <i class="bi bi-journal-medical"
+                                                        style="font-size:1rem;margin-right:8px;color:#0ea5e9;"></i>
                                                     Hub Paciente
                                                 </a>
                                             </li>
 
                                             <li>
                                                 <a href="<?= $BASE_URL ?>internacoes/nova?id_paciente=<?= (int)$id_paciente ?>"
-                                                    class="btn" style="font-size:.9rem; font-weight: 400 !important; text-transform: none !important;">
-                                                    <i class="fa-solid fa-notes-medical"
-                                                        style="font-size:1rem;margin-right:5px;color:#007bff;"></i>
+                                                    class="dropdown-item" style="font-size:.9rem; font-weight: 400 !important; text-transform: none !important;">
+                                                    <i class="bi bi-clipboard2-pulse"
+                                                        style="font-size:1rem;margin-right:8px;color:#14b8a6;"></i>
                                                     Internação
                                                 </a>
 
@@ -464,7 +463,7 @@
                     <div style="text-align:right">
                         <input type="hidden" id="qtd" value="<?php echo $qtdIntItens ?>">
                     </div>
-                    <div style="display: flex;margin-top:20px">
+                    <div class="listagem-footer-row">
                         <div class="modal fade" id="myModal">
                             <div class="modal-dialog  modal-lg modal-dialog-centered modal-xl">
                                 <div class="modal-content">
@@ -562,9 +561,8 @@
                             <?php endif; ?>
                         </div>
 
-                        <div>
-                            <p
-                                style="margin-bottom:25px; font-size:1em; font-weight:600; font-family:var(--bs-font-sans-serif); text-align:right">
+                        <div class="listagem-total">
+                            <p>
                                 <?php echo "Total: " . $qtdIntItens ?>
                             </p>
                         </div>

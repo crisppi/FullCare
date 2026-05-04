@@ -93,25 +93,27 @@
     }
     ?>
 
+    <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
+
     <!--filtro evento-->
-    <div class="container-fluid form_container" style="margin-top:-5px;">
-        <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
-            <h4 class="page-title">Hospitais</h4>
-            <div style="margin-left: auto; display:flex; gap:10px; align-items:center;">
+    <div class="container-fluid form_container listagem-page" style="margin-top:18px;">
+        <div class="listagem-hero">
+            <div class="listagem-hero__copy">
+                <div class="listagem-kicker">Cadastros</div>
+                <h1 class="listagem-title">Hospitais</h1>
+                <p class="listagem-subtitle">Gerencie hospitais, acomodações e vínculos operacionais com mais respiro visual.</p>
+            </div>
+            <div class="listagem-hero__actions">
                 <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/list_hospitalUser.php', ENT_QUOTES, 'UTF-8') ?>"
-                    class="btn btn-outline-secondary btn-sm"
-                    style="border-radius:10px;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.08);">
+                    class="btn listagem-btn-top listagem-btn-top--purple">
                     <i class="bi bi-diagram-3" style="font-size: 1rem;margin-right:5px;"></i>Usuários por Hospital
                 </a>
                 <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais/novo', ENT_QUOTES, 'UTF-8') ?>"
-                    class="btn btn-success styled"
-                    style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
-                    <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Novo Hospital
+                    class="btn listagem-btn-top listagem-btn-top--blue">
+                    <i class="bi bi-plus-lg" style='font-size: .95rem;margin-right:5px;'></i>Novo Hospital
                 </a>
             </div>
         </div>
-
-        <hr style="margin-top: 5px; margin-bottom: 10px;">
         <div class="complete-table">
             <div id="navbarToggleExternalContent" class="table-filters">
 
@@ -212,32 +214,28 @@
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                             <li>
-                                                <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                <a class="dropdown-item" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospital_acomodacoes.php?id_hospital=' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>">
-                                                    <i class="fa-solid fa-bed"
-                                                        style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>Acomodações
+                                                    <i class="bi bi-hospital" style="font-size:1rem;margin-right:8px;color:#5e2363;"></i>Acomodações
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                <a class="dropdown-item" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospital_usuarios.php?id_hospital=' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>">
-                                                    <i class="fa-solid fa-users"
-                                                        style="font-size: 1rem;margin-right:5px; color: #5e2363;"></i>Usuários
+                                                    <i class="bi bi-people" style="font-size:1rem;margin-right:8px;color:#5e2363;"></i>Usuários
                                                 </a>
                                             </li>
                                             <li>
-                                                <button class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                <button class="dropdown-item" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     onclick="openModal('<?= $BASE_URL ?>show_hospital.php?id_hospital=<?= $id_hospital ?>')"
                                                     data-bs-toggle="modal" data-bs-target="#myModal"><i
-                                                        class="fas fa-eye"
-                                                        style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>Ver</button>
+                                                        class="bi bi-eye"
+                                                        style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver</button>
                                             </li>
                                             <li>
-                                                <a class="btn btn-default" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
+                                                <a class="dropdown-item" style="font-size: .9rem; font-weight: 400 !important; text-transform: none !important;"
                                                     href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais/editar/' . (int) $id_hospital, ENT_QUOTES, 'UTF-8') ?>">
-                                                    <i style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
-                                                        name="type" value="edite"
-                                                        class="far fa-edit edit-icon"></i>Editar
+                                                    <i class="bi bi-pencil-square" style="font-size:1rem;margin-right:8px;color:#3b82f6;"></i>Editar
                                                 </a>
                                             </li>
 

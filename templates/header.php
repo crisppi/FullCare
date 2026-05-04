@@ -24,8 +24,8 @@ if ($basePathFromBaseUrl === '/' && preg_match('#^/(FullCare|FullConex(?:Aud)?)(
     $BASE_URL = $schemeHeader . '://' . $hostHeader . '/' . trim((string)$mBaseApp[1], '/') . '/';
 }
 
-// Caminho default
-$defaultFoto = $BASE_URL . 'img/user-default.png';
+// Caminho default da foto do usuario
+$defaultFoto = $BASE_URL . 'uploads/usuarios/default-user.jpeg';
 
 // error_reporting(E_ALL);
 
@@ -235,7 +235,7 @@ if (!empty($sessionIdUsuario)) {
             display: flex;
             align-items: center;
             flex-wrap: nowrap;
-            gap: 10px;
+            gap: 8px;
         }
 
         .navbar .navbar-brand {
@@ -243,14 +243,14 @@ if (!empty($sessionIdUsuario)) {
             align-items: center;
             line-height: 1;
             flex: 0 1 auto !important;
-            max-width: 180px;
-            margin-right: 6px;
+            max-width: 165px;
+            margin-right: 4px;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
         .navbar .navbar-brand .logo-novo {
-            height: 40px !important;
+            height: 34px !important;
             width: auto !important;
             max-height: none !important;
             min-height: 0 !important;
@@ -264,45 +264,45 @@ if (!empty($sessionIdUsuario)) {
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 36px !important;
+                height: 31px !important;
             }
         }
 
         @media (max-width: 575.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 32px !important;
+                height: 28px !important;
             }
         }
 
         .navbar .navbar-brand .logo-conex {
-            height: 24px !important;
-            max-width: 105px;
+            height: 20px !important;
+            max-width: 92px;
         }
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-conex {
-                height: 22px !important;
-                max-width: 96px;
+                height: 18px !important;
+                max-width: 84px;
             }
         }
 
         @media (max-width: 575.98px) {
             .navbar .navbar-brand .logo-conex {
-                height: 20px !important;
-                max-width: 88px;
+                height: 17px !important;
+                max-width: 76px;
             }
         }
 
         .navbar .navbar-brand .brand-divider {
             width: 1px;
-            height: 34px;
+            height: 28px;
             background: rgba(94, 35, 99, 0.35);
         }
 
         .navbar .navbar-brand .logo-seguradora {
-            height: 40px;
+            height: 34px;
             width: auto;
-            max-width: 110px;
+            max-width: 96px;
             object-fit: contain;
             display: block;
             flex: 0 1 auto;
@@ -310,19 +310,19 @@ if (!empty($sessionIdUsuario)) {
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-seguradora {
-                height: 34px;
-                max-width: 96px;
+                height: 29px;
+                max-width: 84px;
             }
         }
 
         @media (max-width: 575.98px) {
             .navbar .navbar-brand .brand-divider {
-                height: 30px;
+                height: 24px;
             }
 
             .navbar .navbar-brand .logo-seguradora {
-                height: 28px;
-                max-width: 82px;
+                height: 24px;
+                max-width: 72px;
             }
         }
 
@@ -333,32 +333,33 @@ if (!empty($sessionIdUsuario)) {
 
         .navbar-nav.navbar-nav-scroll {
             flex-wrap: nowrap;
-            gap: 2px;
+            gap: 0;
             min-width: 0;
         }
 
         .navbar-nav.navbar-nav-scroll .nav-link {
             white-space: nowrap;
-            padding: 0.45rem 0.45rem;
-            font-size: 0.94rem;
+            padding: 0.32rem 0.36rem;
+            font-size: 0.84rem;
+            line-height: 1.1;
         }
 
         #navbarGestorListas {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             white-space: nowrap;
         }
 
         .header-actions {
             margin-left: auto !important;
             margin-right: 0 !important;
-            gap: 0.5rem !important;
+            gap: 0.35rem !important;
             flex: 0 0 auto;
         }
 
         .header-actions #global-patient-search {
-            min-width: 220px;
+            min-width: 200px;
             flex: 0 0 auto;
         }
 
@@ -366,6 +367,8 @@ if (!empty($sessionIdUsuario)) {
             border: 1px solid rgba(94, 35, 99, 0.28) !important;
             background: #fff;
             color: #5e2363;
+            font-size: 0.82rem;
+            padding: 0.32rem 0.5rem;
         }
 
         .header-action-btn:hover {
@@ -376,21 +379,22 @@ if (!empty($sessionIdUsuario)) {
         .header-chat-launcher {
             display: inline-flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.25rem;
         }
 
         .header-zoom-actions {
             display: inline-flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.25rem;
         }
 
         .header-zoom-actions .btn {
-            padding: 0.35rem 0.55rem;
+            padding: 0.28rem 0.45rem;
+            font-size: 0.8rem;
         }
 
         .header-chat-launcher .chat-unread-badge {
-            font-size: 0.65rem;
+            font-size: 0.58rem;
         }
 
         #search-results-dropdown {
@@ -411,6 +415,17 @@ if (!empty($sessionIdUsuario)) {
 
         #search-results-dropdown .dropdown-item small {
             color: #5c5c5c;
+        }
+
+        .account-user-trigger::after {
+            display: none !important;
+        }
+
+        .account-user-caret {
+            font-size: 0.8rem;
+            margin-left: 4px;
+            color: #6b7280;
+            vertical-align: middle;
         }
 
         @media (max-width: 991.98px) {
@@ -500,14 +515,16 @@ if (!empty($sessionIdUsuario)) {
                                         Menu
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarMenuDropdown">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>menu_app.php"><i
                                                     class="bi bi-speedometer2"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
                                                 Dashboard</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard_operacional.php"><i
-                                                    class="bi bi-activity"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i>
-                                                Dashboard operacional</a></li>
+                                        <?php if ($isDiretoria) { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard_operacional.php"><i
+                                                        class="bi bi-activity"
+                                                        style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i>
+                                                    Dashboard operacional</a></li>
+                                        <?php } ?>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
                                                 Manual</a></li>
@@ -523,10 +540,18 @@ if (!empty($sessionIdUsuario)) {
                                                     Solicitações (Lista)
                                                 </a></li>
                                         <?php } ?>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/performance-equipes"><i
-                                                    class="bi bi-trophy"
-                                                    style="font-size: 1rem;margin-right:5px; color:#7c3aed;"></i>
-                                                Performance equipes</a></li>
+                                        <?php if ($isDiretoria) { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/performance-equipes"><i
+                                                        class="bi bi-trophy"
+                                                        style="font-size: 1rem;margin-right:5px; color:#7c3aed;"></i>
+                                                    Performance equipes</a></li>
+                                        <?php } ?>
+                                        <?php if (in_array((int)($_SESSION['nivel'] ?? 0), [4, 5], true) || mb_strtolower(trim((string)($_SESSION['email_user'] ?? '')), 'UTF-8') === 'crisppi@fullcare.com.br') { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_audit_log.php">
+                                                    <i class="bi bi-journal-text"
+                                                        style="font-size: 1rem;margin-right:5px; color:#7c5023;"></i>
+                                                    Auditoria</a></li>
+                                        <?php } ?>
                                         <?php if ($sessionNivel > 3) { ?>
                                             <li class="nav-item">
                                                 <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">
@@ -947,6 +972,12 @@ if (!empty($sessionIdUsuario)) {
                                                 <i class="bi bi-clipboard-check"
                                                     style="font-size: 1rem;margin-right:5px; color:#5e2363;"></i>
                                                 Altas</a></li>
+                                        <?php if (in_array((int)($_SESSION['nivel'] ?? 0), [4, 5], true) || mb_strtolower(trim((string)($_SESSION['email_user'] ?? '')), 'UTF-8') === 'crisppi@fullcare.com.br') { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_audit_log.php">
+                                                    <i class="bi bi-journal-text"
+                                                        style="font-size: 1rem;margin-right:5px; color:#7c5023;"></i>
+                                                    Auditoria</a></li>
+                                        <?php } ?>
                                     </ul>
                                 </li>
                             <?php } ?>
@@ -1044,13 +1075,10 @@ if (!empty($sessionIdUsuario)) {
                     <div class="account-item clearfix js-item-menu" style="margin-right:0">
                         <div class="image" style="margin-top:15px">
                             <?php
-                            // imagem padrão
-                            $defaultFoto = $BASE_URL . 'uploads/usuarios/default-user.jpeg';
-
-                            // arquivo da sessão (sanitizado) e checagem no filesystem
+                            // arquivo da sessão (sanitizado) e checagem no filesystem real
                             $sessFoto  = $_SESSION['foto_usuario'] ?? '';
                             $fileName  = $sessFoto ? basename($sessFoto) : '';
-                            $fsPath    = __DIR__ . '/uploads/usuarios/' . $fileName;
+                            $fsPath    = __DIR__ . '/../uploads/usuarios/' . $fileName;
                             $urlFoto   = ($fileName && is_file($fsPath))
                                 ? ($BASE_URL . 'uploads/usuarios/' . $fileName)
                                 : $defaultFoto;
@@ -1059,7 +1087,10 @@ if (!empty($sessionIdUsuario)) {
                                 onerror="this.onerror=null;this.src='<?= $defaultFoto ?>';" />
                         </div>
                         <div class="content">
-                            <a class="js-acc-btn" href="#"><?php print $sessionUsuario ?></a>
+                            <a class="js-acc-btn account-user-trigger" href="#">
+                                <?php print $sessionUsuario ?>
+                                <i class="bi bi-chevron-down account-user-caret" aria-hidden="true"></i>
+                            </a>
                         </div>
                         <div class="account-dropdown js-dropdown">
 
@@ -1223,7 +1254,7 @@ if (!empty($sessionIdUsuario)) {
 <script src="diversos/chartjs/Chart.min.js"></script>
 <script src="./diversos/CoolAdmin-master/vendor/select2/select2.min.js"></script>
 <script src="./scripts/cadastro/general.js"></script>
-<script src="js/stepper.js"></script>
+<script src="<?= $BASE_URL ?>js/stepper.js?v=<?= rawurlencode(defined('APP_VERSION') ? APP_VERSION : '1') ?>"></script>
 <script src="js/show_internacao_visitas.js"></script>
 <script src="<?= $BASE_URL ?>js/contextual-assistant.js"></script>
 </script>

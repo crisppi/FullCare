@@ -5,10 +5,66 @@ require_once("templates/header.php");
 ?>
 <script src="js/timeout.js"></script>
 
-<div style="margin:20px">
+<style>
+    .legacy-menu-shell {
+        margin: 14px;
+    }
 
-    <div class="row"
-        style="margin-top:20px; background-color:#FFFF; box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1); border-radius: 10px;">
+    .legacy-menu-card {
+        margin-top: 14px;
+        background-color: #fff;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .menu_header {
+        min-height: 42px !important;
+        padding: 8px 14px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: center;
+        gap: 8px;
+    }
+
+    .menu_header h4 {
+        margin: 0;
+        font-size: .84rem;
+    }
+
+    .lista_menu {
+        font-size: .82rem;
+    }
+
+    .lista_menu hr {
+        margin: .6rem 0;
+    }
+
+    .lista_menu li a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 0;
+        font-size: .82rem;
+        text-decoration: none;
+    }
+
+    .lista_menu li a i,
+    .lista_menu li a span {
+        font-size: .9rem !important;
+        margin-right: 0 !important;
+    }
+
+    @media (max-width: 900px) {
+        .menu_header {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+</style>
+
+<div class="legacy-menu-shell">
+
+    <div class="row legacy-menu-card">
         <div class="menu_header" style="height: 50px;background-color:#35bae1">
             <h4><i class="bi bi-calendar2-date"></i> Produção</h4>
             <h4><i class="bi bi-person menu_header_i"></i> Administrativo</h4>
@@ -143,6 +199,11 @@ require_once("templates/header.php");
                     ?<?php } ?>><i class="bi bi-person-add"
                         style="font-size: 1rem; margin-right:5px; color: rgb(15, 15, 276);"></i> Relação Usuários por
                     Hospital</a>
+            </li>
+            <li>
+                <a href="list_audit_log.php" <?php if (!in_array((int)($_SESSION['nivel'] ?? 0), [4, 5], true) && mb_strtolower(trim((string)($_SESSION['email_user'] ?? '')), 'UTF-8') !== 'crisppi@fullcare.com.br') { ?> style="pointer-events: none"
+                    ?<?php } ?>><i class="bi bi-journal-text"
+                        style="font-size: 1rem;margin-right:5px; color: rgb(120, 80, 35);"></i> Auditoria</a>
             </li>
             <li>
                 <a href="list_acomodacao.php" <?php if ($_SESSION['nivel'] < 4) { ?> style="pointer-events: none"

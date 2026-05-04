@@ -28,16 +28,22 @@ $biSections = [
         ['label' => 'Qualidade Hospitalar', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=qualidade-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
     ],
     'Clínico' => [
-        ['label' => 'UTI', 'href' => 'bi/uti', 'file' => 'bi_uti.php'],
         ['label' => 'Patologia', 'href' => 'bi/patologia', 'file' => 'bi_patologia.php'],
         ['label' => 'Grupo Patologia', 'href' => 'bi/grupo-patologia', 'file' => 'GrupoPatologia.php'],
         ['label' => 'Antecedente', 'href' => 'bi/antecedente', 'file' => 'Antecedente.php'],
+        ['label' => 'UTI', 'href' => 'bi/uti', 'file' => 'bi_uti.php'],
+        ['label' => 'UTI Suporte', 'href' => 'bi/uti-suporte', 'file' => 'UtiSuporteBI.php'],
+        ['label' => 'Tipo Internação', 'href' => 'bi/tipo-internacao', 'file' => 'TipoInternacaoBI.php'],
         ['label' => 'Longa Permanência', 'href' => 'bi/longa-permanencia', 'file' => 'LongaPermanenciaBI.php'],
-        ['label' => 'Evolução', 'href' => 'bi/evolucao', 'file' => 'EvolucaoBI.php'],
-        ['label' => 'Visita Inicial', 'href' => 'bi/visita-inicial', 'file' => 'VisitaInicialBI.php'],
-        ['label' => 'Clínico Realizado', 'href' => 'bi/clinico-realizado', 'file' => 'ClinicoRealizadoBI.php'],
+        ['label' => 'Evolução', 'href' => 'bi/evolucao', 'file' => 'bi_evolucao.php'],
+        ['label' => 'Visita Inicial', 'href' => 'bi/visita-inicial', 'file' => 'bi_visita_inicial.php'],
         ['label' => 'Estratégia Terapêutica', 'href' => 'bi/estrategia-terapeutica', 'file' => 'EstrategiaTerapeuticaBI.php'],
-        ['label' => 'Médico Titular', 'href' => 'bi/medico-titular', 'file' => 'MedicoTitularBI.php'],
+        ['label' => 'Prorrogações', 'href' => 'bi/prorrogacoes', 'file' => 'BiOperacionalAvancado.php'],
+        ['label' => 'Oportunidades Clínicas', 'href' => 'bi/oportunidades-clinicas', 'file' => 'BiOperacionalAvancado.php'],
+        ['label' => 'Desfechos e Alta', 'href' => 'bi/desfechos-alta', 'file' => 'BiOperacionalAvancado.php'],
+        ['label' => 'Detalhes Clínicos', 'href' => 'bi/detalhes-clinicos', 'file' => 'DetalhesClinicosBI.php'],
+        ['label' => 'Evento Adverso', 'href' => 'bi/evento-adverso', 'file' => 'EventoAdverso.php'],
+        ['label' => 'Segurança e Eventos Abertos', 'href' => 'bi/seguranca-eventos', 'file' => 'BiOperacionalAvancado.php'],
     ],
     'Auditoria' => [
         ['label' => 'Auditor', 'href' => 'bi/auditor', 'file' => 'AuditorBI.php'],
@@ -45,6 +51,7 @@ $biSections = [
         ['label' => 'Auditoria Produtividade', 'href' => 'bi/auditoria-produtividade', 'file' => 'AuditoriaProdutividadeBI.php'],
         ['label' => 'Análise Negociações', 'href' => 'bi/analise-negociacoes', 'file' => 'bi_analise_negociacoes.php'],
         ['label' => 'Negociações Detalhadas', 'href' => 'bi/negociacoes-detalhadas', 'file' => 'bi_negociacoes_detalhadas.php'],
+        ['label' => 'Negociação Avançada', 'href' => 'bi/negociacao-avancada', 'file' => 'BiOperacionalAvancado.php'],
         ['label' => 'Saving por Auditor', 'href' => 'bi/saving-por-auditor', 'file' => 'bi_saving_por_auditor.php'],
         ['label' => 'Saving', 'href' => 'bi/saving', 'file' => 'bi_saving.php'],
     ],
@@ -58,7 +65,7 @@ $biSections = [
         ['label' => 'Home Care', 'href' => 'bi/home-care', 'file' => 'HomeCare.php'],
         ['label' => 'Desospitalização', 'href' => 'bi/desospitalizacao', 'file' => 'Desospitalizacao.php'],
         ['label' => 'OPME', 'href' => 'bi/opme', 'file' => 'Opme.php'],
-        ['label' => 'Evento Adverso', 'href' => 'bi/evento-adverso', 'file' => 'EventoAdverso.php'],
+        ['label' => 'TUSS / Autorizações', 'href' => 'bi/tuss-autorizacoes', 'file' => 'BiOperacionalAvancado.php'],
     ],
     'Rede Hospitalar' => [
         ['label' => 'Comparativa', 'href' => 'bi/rede-comparativa', 'file' => 'bi_rede_comparativa.php'],
@@ -106,7 +113,7 @@ $biSections = [
     ],
     'Anomalias & Fraude' => [
         ['label' => 'Outliers de Permanência', 'href' => 'bi/anomalias-permanencia', 'file' => 'AnomaliasPermanenciaBI.php'],
-        ['label' => 'Negociações Suspeitas', 'href' => 'bi/anomalias-negociacao', 'file' => 'AnomaliasNegociacaoBI.php'],
+        ['label' => 'Padrão de Negociação', 'href' => 'bi/anomalias-negociacao', 'file' => 'AnomaliasNegociacaoBI.php'],
         ['label' => 'OPME sem Justificativa', 'href' => 'bi/anomalias-opme', 'file' => 'AnomaliasOPMEBI.php'],
     ],
     'Conformidade & Auditoria' => [
@@ -137,14 +144,32 @@ $biSections = [
 ];
 
 $currentPage = basename($_SERVER['PHP_SELF'] ?? '');
-$currentPath = trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
+$currentUri = (string)($_SERVER['REQUEST_URI'] ?? '');
+$currentPath = trim((string) parse_url($currentUri, PHP_URL_PATH), '/');
+$currentQuery = (string) parse_url($currentUri, PHP_URL_QUERY);
 $basePath = trim((string) parse_url($BASE_URL ?? '', PHP_URL_PATH), '/');
 if ($basePath !== '' && strpos($currentPath, $basePath) === 0) {
     $currentPath = trim(substr($currentPath, strlen($basePath)), '/');
 }
+$currentRoute = $currentPath . ($currentQuery !== '' ? '?' . $currentQuery : '');
+$currentPanel = trim((string)($_GET['painel'] ?? ''));
+$panelRouteMap = [
+    'prorrogacoes' => 'bi/prorrogacoes',
+    'tuss-autorizacoes' => 'bi/tuss-autorizacoes',
+    'oportunidades-clinicas' => 'bi/oportunidades-clinicas',
+    'desfechos-alta' => 'bi/desfechos-alta',
+    'negociacao-avancada' => 'bi/negociacao-avancada',
+    'seguranca-eventos' => 'bi/seguranca-eventos',
+];
+$currentRouteAliases = array_filter([$currentPath, $currentRoute]);
+if ($currentPage === 'BiOperacionalAvancado.php' && isset($panelRouteMap[$currentPanel])) {
+    $currentRouteAliases[] = $panelRouteMap[$currentPanel];
+}
+$currentRouteAliases = array_values(array_unique($currentRouteAliases));
 $currentSection = '';
 $currentLabel = '';
 $flatPages = [];
+$fileCounts = [];
 $matchedByHref = false;
 $ieSlug = trim((string)($_GET['ie'] ?? ''));
 $ieMap = [
@@ -167,14 +192,21 @@ $ieMap = [
 foreach ($biSections as $section => $items) {
     foreach ($items as $item) {
         $file = $item['file'] ?? $item['href'];
+        $fileCounts[$file] = ($fileCounts[$file] ?? 0) + 1;
+    }
+}
+
+foreach ($biSections as $section => $items) {
+    foreach ($items as $item) {
+        $file = $item['file'] ?? $item['href'];
         $flatPages[] = $file;
         $hrefPath = trim((string) ($item['href'] ?? ''), '/');
-        if ($hrefPath !== '' && $hrefPath === $currentPath) {
+        if ($hrefPath !== '' && in_array($hrefPath, $currentRouteAliases, true)) {
             $currentSection = $section;
             $currentLabel = $item['label'];
             $matchedByHref = true;
         }
-        if ($file === $currentPage) {
+        if (!$matchedByHref && ($fileCounts[$file] ?? 0) === 1 && $file === $currentPage) {
             $currentSection = $section;
             $currentLabel = $item['label'];
         }
@@ -189,11 +221,49 @@ if ($ieSlug !== '' && isset($ieMap[$ieSlug]) && isset($biSections['Indicadores E
 if (!in_array($currentPage, $flatPages, true) && !$matchedByHref && !($ieSlug !== '' && isset($ieMap[$ieSlug]))) {
     return;
 }
+
+$isBiTopbarItemActive = static function (array $item) use ($currentRouteAliases, $currentPage, $currentSection, $ieSlug): bool {
+    $itemFile = (string)($item['file'] ?? ($item['href'] ?? ''));
+    $href = (string)($item['href'] ?? '');
+    $hrefTarget = trim($href, '/');
+    $hrefPath = trim((string)parse_url($href, PHP_URL_PATH), '/');
+    $hrefQuery = parse_url($href, PHP_URL_QUERY);
+
+    if ($hrefTarget !== '' && in_array($hrefTarget, $currentRouteAliases, true)) {
+        return true;
+    }
+
+    if ($hrefQuery === null && $hrefPath !== '' && in_array($hrefPath, $currentRouteAliases, true)) {
+        return true;
+    }
+
+    if ($hrefTarget === '' && $itemFile === $currentPage) {
+        return true;
+    }
+
+    if ($currentSection === 'Indicadores Essenciais' && $ieSlug !== '') {
+        if (strpos($hrefTarget, 'bi/indicadores-essenciais/' . $ieSlug) === 0) {
+            return true;
+        }
+
+        $qp = [];
+        if (is_string($hrefQuery) && $hrefQuery !== '') {
+            parse_str($hrefQuery, $qp);
+        }
+
+        $itemSlug = trim((string)($qp['slug'] ?? ''));
+        if ($itemSlug !== '' && $itemSlug === $ieSlug) {
+            return true;
+        }
+    }
+
+    return false;
+};
 ?>
 
 <style>
 :root {
-    --bi-sidebar-top: 92px;
+    --bi-sidebar-top: 76px;
     --bi-sidebar-width: 308px;
     --bi-sidebar-collapsed-width: 84px;
 }
@@ -209,8 +279,8 @@ body.bi-theme.bi-nav-collapsed {
 
 .bi-side-toggle {
     position: fixed;
-    left: calc(var(--bi-sidebar-width) - 28px);
-    top: calc(var(--bi-sidebar-top) + 8px);
+    left: calc(var(--bi-sidebar-width) - 40px);
+    top: calc(var(--bi-sidebar-top) + 4px);
     z-index: 1202;
     width: 36px;
     height: 36px;
@@ -223,7 +293,7 @@ body.bi-theme.bi-nav-collapsed {
 }
 
 body.bi-theme.bi-nav-collapsed .bi-side-toggle {
-    left: calc(var(--bi-sidebar-collapsed-width) - 28px);
+    left: calc((var(--bi-sidebar-collapsed-width) / 2) - 20px);
 }
 
 .bi-side-toggle:hover {
@@ -268,7 +338,7 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.72rem;
+    font-size: 0.64rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(225, 241, 255, 0.62);
@@ -279,7 +349,7 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     margin-top: 8px;
     color: #f1f8ff;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.86rem;
     line-height: 1.35;
 }
 
@@ -300,7 +370,7 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     border: 1px solid rgba(77, 104, 228, 0.9);
     color: #ffffff;
     text-decoration: none;
-    font-size: 0.82rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -310,10 +380,79 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     background: linear-gradient(135deg, #4b5fd6, #2c3fb6);
 }
 
+.bi-sidebar-search-trigger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: #edf4ff;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.bi-sidebar-search-trigger:hover {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+}
+
+.bi-sidebar-search {
+    margin-top: 10px;
+}
+
+.bi-sidebar-search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+
+.bi-sidebar-search-box:focus-within {
+    border-color: rgba(99, 213, 192, 0.45);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 3px rgba(99, 213, 192, 0.12);
+}
+
+.bi-sidebar-search-box i {
+    color: rgba(237, 244, 255, 0.62);
+    font-size: 0.76rem;
+}
+
+.bi-sidebar-search-input {
+    width: 100%;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #edf4ff;
+    font-size: 0.76rem;
+}
+
+.bi-sidebar-search-input::placeholder {
+    color: rgba(237, 244, 255, 0.42);
+}
+
+.bi-sidebar-search-meta {
+    min-height: 16px;
+    margin-top: 6px;
+    color: rgba(237, 244, 255, 0.5);
+    font-size: 0.66rem;
+    text-align: center;
+}
+
 .bi-sidebar-body {
     flex: 1 1 auto;
     overflow-y: auto;
-    padding: 12px 12px 18px;
+    padding: 12px 12px 132px;
 }
 
 .bi-sidebar-body::-webkit-scrollbar {
@@ -326,10 +465,16 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
 }
 
 .bi-sidebar-group {
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.05);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.038));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     overflow: hidden;
+}
+
+.bi-sidebar-group.is-search-hidden,
+.bi-sidebar-link.is-search-hidden {
+    display: none !important;
 }
 
 .bi-sidebar-group + .bi-sidebar-group {
@@ -343,19 +488,31 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     align-items: center;
     gap: 10px;
     padding: 12px 14px;
-    color: #edf7ff;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: background .15s ease;
+    color: #f6fbff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transition: background .15s ease, color .15s ease;
 }
 
 .bi-sidebar-group summary::-webkit-details-marker {
     display: none;
 }
 
-.bi-sidebar-group[open] summary,
 .bi-sidebar-group summary:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.085);
+    color: #ffffff;
+}
+
+.bi-sidebar-group[open] summary {
+    background: linear-gradient(90deg, rgba(126, 181, 220, 0.18), rgba(255, 255, 255, 0.055));
+    border-bottom: 1px solid rgba(176, 214, 240, 0.14);
+    color: #ffffff;
+}
+
+.bi-sidebar-group[open] summary span:nth-child(2) {
+    color: #f5fbff;
+    text-shadow: 0 1px 10px rgba(118, 177, 219, 0.28);
 }
 
 .bi-sidebar-dot {
@@ -363,17 +520,22 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     width: 10px;
     height: 10px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.28);
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.035);
 }
 
 .bi-sidebar-group.is-active .bi-sidebar-dot {
     background: #63d5c0;
 }
 
+.bi-sidebar-group[open]:not(.is-active) .bi-sidebar-dot {
+    background: #9fc4de;
+    box-shadow: 0 0 0 4px rgba(159, 196, 222, 0.13);
+}
+
 .bi-sidebar-chevron {
     margin-left: auto;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: rgba(237, 247, 255, 0.54);
     transition: transform .15s ease;
 }
@@ -386,26 +548,28 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 0 10px 10px;
+    padding: 4px 10px 10px;
+    background: rgba(5, 18, 32, 0.18);
 }
 
 .bi-sidebar-link {
     display: flex;
     align-items: center;
     min-height: 42px;
-    padding: 8px 10px 8px 14px;
+    padding: 8px 12px 8px 16px;
     border-radius: 12px;
-    color: rgba(238, 247, 255, 0.88);
+    color: rgba(214, 227, 239, 0.9);
     text-decoration: none;
-    font-size: 0.88rem;
+    font-size: 0.74rem;
+    font-weight: 500;
     line-height: 1.25;
-    border: 1px solid transparent;
-    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .bi-sidebar-link:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.09);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.08);
     color: #ffffff;
 }
 
@@ -413,13 +577,19 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     background: linear-gradient(135deg, #63d5c0, #2fa38c);
     border-color: rgba(60, 160, 140, 0.9);
     color: #0f2a25;
+    font-weight: 700;
     box-shadow: 0 10px 20px rgba(23, 103, 94, 0.28);
 }
 
 .bi-sidebar-foot {
-    padding: 12px;
+    padding: 12px 12px 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(6, 20, 34, 0.42);
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    backdrop-filter: blur(10px);
+    min-height: 82px;
 }
 
 .bi-topbar-select {
@@ -427,9 +597,10 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     border-radius: 12px;
     padding: 10px 12px;
     border: 1px solid rgba(255, 255, 255, 0.14);
-    font-size: 0.9rem;
+    font-size: 0.76rem;
     color: #f1f8ff;
     background: rgba(255, 255, 255, 0.08);
+    min-height: 48px;
 }
 
 .bi-topbar-select option,
@@ -439,6 +610,7 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
 
 body.bi-theme.bi-nav-collapsed .bi-crumb,
 body.bi-theme.bi-nav-collapsed .bi-sidebar-navlink,
+body.bi-theme.bi-nav-collapsed .bi-sidebar-search,
 body.bi-theme.bi-nav-collapsed .bi-sidebar-links,
 body.bi-theme.bi-nav-collapsed .bi-sidebar-foot,
 body.bi-theme.bi-nav-collapsed .bi-sidebar-chevron,
@@ -448,9 +620,13 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-group summary span {
     pointer-events: none;
 }
 
+body.bi-theme.bi-nav-collapsed .bi-sidebar-search-trigger {
+    display: inline-flex;
+}
+
 body.bi-theme.bi-nav-collapsed .bi-sidebar-head {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 body.bi-theme.bi-nav-collapsed .bi-sidebar-group {
@@ -468,8 +644,8 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-dot {
 }
 
 body.bi-theme.bi-nav-collapsed .bi-sidebar-body {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .bi-mobile-backdrop {
@@ -484,12 +660,21 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-body {
 
     .bi-side-toggle {
         left: 14px !important;
-        top: calc(var(--bi-sidebar-top) + 8px);
+        top: calc(var(--bi-sidebar-top) + 4px);
     }
 
     .bi-sidebar-shell {
         transform: translateX(-100%);
         width: min(320px, calc(100vw - 28px));
+    }
+
+    .bi-sidebar-body {
+        padding-bottom: 150px;
+    }
+
+    .bi-sidebar-foot {
+        min-height: 94px;
+        padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
     }
 
     body.bi-theme.bi-nav-open .bi-sidebar-shell {
@@ -544,6 +729,23 @@ $navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, 
             href="<?= htmlspecialchars($navUrl, ENT_QUOTES, 'UTF-8') ?>">
             Navegação Geral
         </a>
+        <button type="button" class="bi-sidebar-search-trigger" id="biSidebarSearchTrigger" aria-label="Abrir pesquisa do BI" title="Pesquisar no BI">
+            <i class="bi bi-search"></i>
+        </button>
+        <div class="bi-sidebar-search">
+            <div class="bi-sidebar-search-box">
+                <i class="bi bi-search"></i>
+                <input
+                    type="search"
+                    id="biSidebarSearch"
+                    class="bi-sidebar-search-input"
+                    placeholder="Pesquisar relatório ou módulo"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+            </div>
+            <div class="bi-sidebar-search-meta" id="biSidebarSearchMeta">Exibindo todos os atalhos</div>
+        </div>
     </div>
 
     <div class="bi-sidebar-body">
@@ -560,25 +762,7 @@ $navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, 
             </summary>
             <div class="bi-sidebar-links">
                 <?php foreach ($items as $item): ?>
-                <?php $itemFile = $item['file'] ?? $item['href']; ?>
-                <?php $hrefPath = trim((string) ($item['href'] ?? ''), '/'); ?>
-                <?php
-                $isActiveChip = ($itemFile === $currentPage || $hrefPath === $currentPath);
-                if (!$isActiveChip && $currentSection === 'Indicadores Essenciais' && $ieSlug !== '') {
-                    $isActiveChip = (strpos($hrefPath, 'bi/indicadores-essenciais/' . $ieSlug) === 0);
-                    if (!$isActiveChip) {
-                        $q = (string)parse_url((string)$item['href'], PHP_URL_QUERY);
-                        $qp = [];
-                        if ($q !== '') {
-                            parse_str($q, $qp);
-                        }
-                        $itemSlug = trim((string)($qp['slug'] ?? ''));
-                        if ($itemSlug !== '' && $itemSlug === $ieSlug) {
-                            $isActiveChip = true;
-                        }
-                    }
-                }
-                ?>
+                <?php $isActiveChip = $isBiTopbarItemActive($item); ?>
                 <a class="bi-sidebar-link <?= $isActiveChip ? 'is-active' : '' ?>"
                     href="<?= $BASE_URL . $item['href'] ?>"
                     title="<?= htmlspecialchars($section . ' • ' . $item['label'], ENT_QUOTES, 'UTF-8') ?>">
@@ -597,9 +781,7 @@ $navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, 
             <?php $sectionName = $sectionDisplay[$section] ?? $section; ?>
             <optgroup label="<?= htmlspecialchars($sectionName, ENT_QUOTES, 'UTF-8') ?>">
                 <?php foreach ($items as $item): ?>
-                <?php $itemFile = $item['file'] ?? $item['href']; ?>
-                <?php $hrefPath = trim((string) ($item['href'] ?? ''), '/'); ?>
-                <option value="<?= $BASE_URL . $item['href'] ?>" <?= ($itemFile === $currentPage || $hrefPath === $currentPath) ? 'selected' : '' ?>>
+                <option value="<?= $BASE_URL . $item['href'] ?>" <?= $isBiTopbarItemActive($item) ? 'selected' : '' ?>>
                     <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
                 </option>
                 <?php endforeach; ?>
@@ -614,6 +796,9 @@ $navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, 
     const body = document.body;
     const toggle = document.getElementById('biSideToggle');
     const backdrop = document.getElementById('biMobileBackdrop');
+    const searchInput = document.getElementById('biSidebarSearch');
+    const searchMeta = document.getElementById('biSidebarSearchMeta');
+    const searchTrigger = document.getElementById('biSidebarSearchTrigger');
     const mobileMq = window.matchMedia('(max-width: 1100px)');
     const storageKey = 'bi_sidebar_collapsed';
 
@@ -639,9 +824,69 @@ $navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, 
     syncInitialState();
     toggle?.addEventListener('click', toggleSidebar);
     backdrop?.addEventListener('click', () => body.classList.remove('bi-nav-open'));
+    searchTrigger?.addEventListener('click', () => {
+        if (!mobileMq.matches && body.classList.contains('bi-nav-collapsed')) {
+            body.classList.remove('bi-nav-collapsed');
+            window.localStorage.setItem(storageKey, '0');
+        } else if (mobileMq.matches && !body.classList.contains('bi-nav-open')) {
+            body.classList.add('bi-nav-open');
+        }
+        window.setTimeout(() => searchInput?.focus(), 120);
+    });
     mobileMq.addEventListener('change', () => {
         body.classList.remove('bi-nav-open');
         syncInitialState();
     });
+
+    if (searchInput) {
+        const normalize = (value) => (value || '')
+            .toString()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+
+        const groups = Array.from(document.querySelectorAll('.bi-sidebar-group'));
+        const initiallyOpen = new WeakMap();
+        groups.forEach((group) => {
+            const hasActiveLink = !!group.querySelector('.bi-sidebar-link.is-active');
+            initiallyOpen.set(group, group.hasAttribute('open') || hasActiveLink);
+            group.open = initiallyOpen.get(group);
+        });
+
+        const applySearch = () => {
+            const term = normalize(searchInput.value);
+            let visible = 0;
+
+            groups.forEach((group) => {
+                const title = normalize(group.querySelector('summary span:nth-child(2)')?.textContent || '');
+                const links = Array.from(group.querySelectorAll('.bi-sidebar-link'));
+                let visibleInGroup = 0;
+
+                links.forEach((link) => {
+                    const text = normalize((link.getAttribute('title') || '') + ' ' + (link.textContent || ''));
+                    const match = term === '' || text.includes(term) || title.includes(term);
+                    link.classList.toggle('is-search-hidden', !match);
+                    if (match) {
+                        visible += 1;
+                        visibleInGroup += 1;
+                    }
+                });
+
+                const showGroup = visibleInGroup > 0;
+                group.classList.toggle('is-search-hidden', !showGroup);
+                group.open = term !== '' ? showGroup : !!initiallyOpen.get(group);
+            });
+
+            if (searchMeta) {
+                searchMeta.textContent = term === ''
+                    ? 'Digite para localizar uma tela do BI'
+                    : 'Resultados encontrados: ' + visible;
+            }
+        };
+
+        searchInput.addEventListener('input', applySearch);
+        applySearch();
+    }
 })();
 </script>

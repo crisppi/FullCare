@@ -101,16 +101,143 @@ $sortField = trim((string)listaUtiGetParam('sort_field', ''));
 $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
 
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
+<style>
+    .listagem-page {
+        padding: 4px 4px 14px;
+    }
+
+    .listagem-title {
+        font-size: .96rem;
+        line-height: 1.05;
+    }
+
+    .listagem-subtitle {
+        font-size: .66rem;
+        line-height: 1.25;
+        max-width: 42rem;
+    }
+
+    .listagem-panel {
+        padding: 8px 8px 6px;
+    }
+
+    .listagem-panel .uti-filter-row {
+        flex-wrap: nowrap !important;
+    }
+
+    .listagem-panel .uti-filter-row > [class*="col-"] {
+        max-width: none;
+        min-width: 0;
+    }
+
+    .listagem-panel .uti-filter-hospital {
+        flex: 1.35 1 0;
+    }
+
+    .listagem-panel .uti-filter-paciente {
+        flex: 1.4 1 0;
+    }
+
+    .listagem-panel .uti-filter-matricula {
+        flex: 0.95 1 0;
+    }
+
+    .listagem-panel .uti-filter-internado {
+        flex: 0.95 1 0;
+    }
+
+    .listagem-panel .uti-filter-limit {
+        flex: 0 0 156px;
+        max-width: 156px;
+    }
+
+    .listagem-panel .uti-filter-actions {
+        flex: 0 0 74px;
+        max-width: 74px;
+        display: flex;
+        align-items: stretch;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .listagem-panel .uti-filter-actions .btn {
+        flex: 0 0 32px;
+    }
+
+    .th-sortable {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .th-sortable .sort-icons a {
+        text-decoration: none;
+        font-size: 0.72rem;
+        color: #ffffff;
+        margin-left: 1px;
+        opacity: 0.9;
+        font-weight: 700;
+    }
+
+    .th-sortable .sort-icons a.active {
+        color: #ffd966;
+        opacity: 1;
+        font-weight: 700;
+    }
+
+    #table-content thead th {
+        padding: 7px 10px;
+        font-size: .54rem;
+        letter-spacing: .08em;
+    }
+
+    #table-content tbody td,
+    #table-content tbody th {
+        padding: 6px 10px;
+        font-size: .7rem;
+        vertical-align: middle;
+    }
+
+    #table-content .dropdown-toggle {
+        min-width: 32px;
+        min-height: 28px;
+        padding: 4px 8px;
+        font-size: .68rem;
+    }
+
+    #table-content .dropdown-menu .btn {
+        font-size: .72rem !important;
+    }
+
+    #table-content .dropdown-menu .btn i {
+        font-size: .78rem !important;
+        margin-right: 4px !important;
+    }
+
+    .listagem-panel .pagination {
+        margin-top: 10px !important;
+    }
+
+    .listagem-panel .pagination .page-link,
+    .listagem-panel p[style*="text-align:right"] {
+        font-size: .72rem;
+    }
+</style>
 
 <!-- FORMULARIO DE PESQUISAS -->
-<div class="container-fluid form_container" style="margin-top:-5px;" id='main-container'>
-    <h4 class="page-title">Internação UTI</h4>
-    <hr>
-    <div class="complete-table">
+<div class="container-fluid form_container listagem-page" id='main-container'>
+    <div class="listagem-hero">
+        <div class="listagem-hero__copy">
+            <div class="listagem-kicker">UTI</div>
+            <h1 class="listagem-title">Internações em UTI</h1>
+        </div>
+    </div>
+    <div class="complete-table listagem-panel">
         <div id="navbarToggleExternalContent" class="table-filters">
             <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-            <div class="row">
-                <form action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/uti', ENT_QUOTES, 'UTF-8') ?>" id="select-internacao-form" method="GET">
+            <div>
+                <form action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/uti', ENT_QUOTES, 'UTF-8') ?>" id="select-internacao-form" method="GET" style="width:100%;">
                     <?php $pesquisa_nome = (string)listaUtiGetParam('pesquisa_nome', '');
                     $pesqInternado = (string)listaUtiGetParam('pesqInternado', 's');
                     $limite_pag = (int)listaUtiGetParam('limite_pag', 10);
@@ -118,58 +245,32 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                     $pesquisa_matricula = (string)listaUtiGetParam('pesquisa_matricula', '');
                     $ordenar = (string)listaUtiGetParam('ordenar', '');
                     ?>
-                    <style>
-                    .th-sortable {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.35rem;
-                    }
-
-                    .th-sortable .sort-icons a {
-                        text-decoration: none;
-                        font-size: 0.85rem;
-                        color: #ffffff;
-                        margin-left: 2px;
-                        opacity: 0.9;
-                        font-weight: 700;
-                    }
-
-                    .th-sortable .sort-icons a.active {
-                        color: #ffd966;
-                        opacity: 1;
-                        font-weight: bold;
-                    }
-                    </style>
-                    <div class="row">
-                        <div class="col-sm-3" style="padding:2px !important;padding-left:16px !important;">
-                            <!-- <label>Pesquisa por Hospital</label> -->
+                    <div class="row filter-inline-row uti-filter-row">
+                        <div class="col-sm-3 uti-filter-hospital" style="padding:2px !important;padding-left:16px !important;">
                             <input class="form-control form-control-sm" type="text" name="pesquisa_nome"
-                                style="margin-top:7px;font-size:.8em; color:#878787" placeholder="Hospital" autofocus
+                                placeholder="Hospital" autofocus
                                 value="<?= $pesquisa_nome ?>">
                         </div>
-                        <div class="col-sm-3" style="padding:2px !important">
-                            <!-- <label>Pesquisa por Paciente</label> -->
+                        <div class="col-sm-3 uti-filter-paciente" style="padding:2px !important">
                             <input class="form-control form-control-sm" type="text" name="pesquisa_pac"
-                                style="margin-top:7px;font-size:.8em; color:#878787" placeholder="Paciente"
+                                placeholder="Paciente"
                                 value="<?= $pesquisa_pac ?>">
                         </div>
-                        <div class="col-sm-2" style="padding:2px !important">
+                        <div class="col-sm-2 uti-filter-matricula" style="padding:2px !important">
                             <input class="form-control form-control-sm" type="text" name="pesquisa_matricula"
-                                style="margin-top:7px;font-size:.8em; color:#878787" placeholder="Matrícula"
+                                placeholder="Matrícula"
                                 value="<?= htmlspecialchars((string)$pesquisa_matricula) ?>">
                         </div>
 
-                        <div class="col-sm-2" style="padding:2px !important">
-                            <!-- <label>Internados</label> -->
-                            <select class="form-control sm-3 form-control-sm" id="pesqInternado" name="pesqInternado"
-                                style="margin-top:7px">
+                        <div class="col-sm-2 uti-filter-internado" style="padding:2px !important">
+                            <select class="form-control sm-3 form-control-sm" id="pesqInternado" name="pesqInternado">
                                 <option value="">Busca por Internados</option>
                                 <option value="s" <?= $pesqInternado == 's' ? 'selected' : null ?>>Sim</option>
                                 <option value="n" <?= $pesqInternado == 'n' ? 'selected' : null ?>>Não</option>
                             </select>
                         </div>
-                        <div class="col-sm-1" style="padding:2px !important">
-                            <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="limite"
+                        <div class="col-sm-1 uti-filter-limit" style="padding:2px !important">
+                            <select class="form-control mb-3 form-control-sm" id="limite"
                                 name="limite_pag">
                                 <option value="">Reg por página</option>
                                 <option value="5" <?= $limite_pag == '5' ? 'selected' : null ?>>Reg por pág = 5
@@ -182,15 +283,14 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                                 </option>
                             </select>
                         </div>
-                        <div class="col-sm-1 d-flex align-items-start gap-2" style="padding:2px !important">
-                            <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
-                                style="background-color:#5e2363;width:42px;height:32px;margin-top:7px;border-color:#5e2363"><span
-                                    class="material-icons" style="margin-left:-3px;margin-top:-2px;">
+                        <div class="col-sm-1 uti-filter-actions" style="padding:2px !important">
+                            <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"><span
+                                    class="material-icons">
                                     search
                                 </span></button>
                             <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/uti', ENT_QUOTES, 'UTF-8') ?>"
                                 class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon"
-                                style="margin-top:7px;" title="Limpar filtros" aria-label="Limpar filtros">
+                                title="Limpar filtros" aria-label="Limpar filtros">
                                 <i class="bi bi-x-lg"></i>
                             </a>
                         </div>
@@ -311,10 +411,10 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
         ?>
 
         <div style="margin-top:10px;" id='container'>
-            <div id="table-content">
+            <div id="table-content" class="listagem-table-wrap">
 
                 <!-- <h6 class="page-title">Relatório de internações - UTI</h6> -->
-                <table class="table table-sm table-striped table-hover table-condensed">
+                <table class="table table-sm table-striped table-hover table-condensed uti-list-table">
                     <thead>
                         <tr>
                             <?php
@@ -352,7 +452,7 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                         foreach ($query as $intern):
                             extract($query);
                         ?>
-                        <tr style="font-size:13px">
+                        <tr>
                             <td scope="row" class="col-id">
                                 <?= $intern["id_internacao"] ?>
                             </td>
@@ -380,10 +480,10 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                         <li>
-                                            <button class="btn btn-default" style="font-size: .9rem;"
+                                            <button class="btn btn-default"
                                                 onclick="edit('<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern['id_internacao'] ?>')"><i
                                                     class="fas fa-eye"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>Ver</button>
+                                                    style="color: rgb(27,156, 55);"></i>Ver</button>
                                         </li>
                                         <li>
                                             <form class="d-inline-block delete-form" action="edit_alta_uti.php"
@@ -392,8 +492,8 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                                                 <!-- <input type="hidden" name="alta" value="alta"> -->
                                                 <input type="hidden" name="id_internacao"
                                                     value="<?= $intern["id_internacao"] ?>">
-                                                <button class="btn btn-default" style="font-size: .9rem;"><i
-                                                        style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
+                                                <button class="btn btn-default"><i
+                                                        style="color: rgb(67, 125, 525);"
                                                         class="bi bi-door-open"></i>Alta</button>
                                             </form>
                                         </li>
@@ -404,7 +504,7 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                         <?php endforeach; ?>
                         <?php if ($qtdIntItens == 0): ?>
                         <tr>
-                            <td colspan="8" scope="row" class="col-id" style='font-size:15px'>
+                            <td colspan="8" scope="row" class="col-id">
                                 Não foram encontrados registros
                             </td>
                         </tr>

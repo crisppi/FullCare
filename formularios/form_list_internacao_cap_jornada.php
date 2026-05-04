@@ -67,27 +67,67 @@ if ($pesquisa_pac  !== '') {
 }
 
 if ($faturada === 's') {
-  $condicoes[] = "ca.conta_faturada_cap = 's'";
+  $condicoes[] = "EXISTS (
+    SELECT 1
+      FROM tb_capeante caf
+     WHERE caf.fk_int_capeante = ac.id_internacao
+       AND caf.conta_faturada_cap = 's'
+  )";
 } elseif ($faturada === 'n') {
-  $condicoes[] = "(ca.conta_faturada_cap IS NULL OR ca.conta_faturada_cap='' OR ca.conta_faturada_cap='n')";
+  $condicoes[] = "NOT EXISTS (
+    SELECT 1
+      FROM tb_capeante caf
+     WHERE caf.fk_int_capeante = ac.id_internacao
+       AND caf.conta_faturada_cap = 's'
+  )";
 }
 
 if ($aberta === 's') {
-  $condicoes[] = "ca.aberto_cap = 's'";
+  $condicoes[] = "EXISTS (
+    SELECT 1
+      FROM tb_capeante caa
+     WHERE caa.fk_int_capeante = ac.id_internacao
+       AND caa.aberto_cap = 's'
+  )";
 } elseif ($aberta === 'n') {
-  $condicoes[] = "COALESCE(ca.aberto_cap,'n') <> 's'";
+  $condicoes[] = "NOT EXISTS (
+    SELECT 1
+      FROM tb_capeante caa
+     WHERE caa.fk_int_capeante = ac.id_internacao
+       AND caa.aberto_cap = 's'
+  )";
 }
 
 if ($encerrada === 's') {
-  $condicoes[] = "ca.encerrado_cap = 's'";
+  $condicoes[] = "EXISTS (
+    SELECT 1
+      FROM tb_capeante cae
+     WHERE cae.fk_int_capeante = ac.id_internacao
+       AND cae.encerrado_cap = 's'
+  )";
 } elseif ($encerrada === 'n') {
-  $condicoes[] = "COALESCE(ca.encerrado_cap,'n') <> 's'";
+  $condicoes[] = "NOT EXISTS (
+    SELECT 1
+      FROM tb_capeante cae
+     WHERE cae.fk_int_capeante = ac.id_internacao
+       AND cae.encerrado_cap = 's'
+  )";
 }
 
 if ($auditoria === 's') {
-  $condicoes[] = "(ca.em_auditoria_cap='s' OR ca.med_check='s' OR ca.enfer_check='s' OR ca.adm_check='s')";
+  $condicoes[] = "EXISTS (
+    SELECT 1
+      FROM tb_capeante cau
+     WHERE cau.fk_int_capeante = ac.id_internacao
+       AND (cau.em_auditoria_cap = 's' OR cau.med_check = 's' OR cau.enfer_check = 's' OR cau.adm_check = 's')
+  )";
 } elseif ($auditoria === 'n') {
-  $condicoes[] = "(COALESCE(ca.em_auditoria_cap,'n')<>'s' AND COALESCE(ca.med_check,'n')<>'s' AND COALESCE(ca.enfer_check,'n')<>'s' AND COALESCE(ca.adm_check,'n')<>'s')";
+  $condicoes[] = "NOT EXISTS (
+    SELECT 1
+      FROM tb_capeante cau
+     WHERE cau.fk_int_capeante = ac.id_internacao
+       AND (cau.em_auditoria_cap = 's' OR cau.med_check = 's' OR cau.enfer_check = 's' OR cau.adm_check = 's')
+  )";
 }
 
 $where = implode(' AND ', $condicoes);
@@ -98,11 +138,7 @@ $where = implode(' AND ', $condicoes);
 $baseFromSql = '
   FROM tb_internacao ac
   LEFT JOIN tb_hospital AS ho ON ac.fk_hospital_int = ho.id_hospital
-  LEFT JOIN tb_hospitalUser AS hos ON hos.fk_hospital_user = ho.id_hospital
-  LEFT JOIN tb_user AS se ON se.id_usuario = hos.fk_usuario_hosp
-  LEFT JOIN tb_uti AS ut ON ac.id_internacao = ut.fk_internacao_uti
   LEFT JOIN tb_paciente AS pa ON ac.fk_paciente_int = pa.id_paciente
-  LEFT JOIN tb_capeante AS ca ON ac.id_internacao = ca.fk_int_capeante
 ';
 $whereSql = $where !== '' ? (' WHERE ' . $where) : '';
 
@@ -146,16 +182,46 @@ if ($totalDeItensUnicos > 0) {
 // Busca apenas as linhas necessárias (com todos os capeantes dessas internações da página)
 $linhasFiltradas = [];
 if (!empty($idsDaPagina)) {
-  $wherePagina = $where;
-  $wherePaginaParams = $whereParams;
   $idPlaceholders = [];
   foreach (array_values($idsDaPagina) as $idx => $idPagina) {
     $ph = ':id_pagina_' . $idx;
     $idPlaceholders[] = $ph;
-    $wherePaginaParams[$ph] = (int)$idPagina;
+    $whereParams[$ph] = (int)$idPagina;
   }
-  $wherePagina .= ($wherePagina !== '' ? ' AND ' : '') . 'ac.id_internacao IN (' . implode(',', $idPlaceholders) . ')';
-  $linhasFiltradas = $internacaoDAO->selectAllInternacaoCap($wherePagina, $ordenarSql, null, $wherePaginaParams);
+  $sqlPagina = "
+    SELECT
+      ac.id_internacao,
+      ac.data_intern_int,
+      ho.nome_hosp,
+      pa.nome_pac,
+      ca.id_capeante,
+      ca.senha_finalizada,
+      ca.adm_check,
+      ca.med_check,
+      ca.enfer_check,
+      ca.aberto_cap,
+      ca.em_auditoria_cap,
+      ca.encerrado_cap,
+      ca.conta_faturada_cap
+    FROM tb_internacao ac
+    LEFT JOIN tb_hospital ho ON ac.fk_hospital_int = ho.id_hospital
+    LEFT JOIN tb_paciente pa ON ac.fk_paciente_int = pa.id_paciente
+    LEFT JOIN tb_capeante ca ON ac.id_internacao = ca.fk_int_capeante
+    WHERE ac.id_internacao IN (" . implode(',', $idPlaceholders) . ")
+    ORDER BY " . $ordenarSql;
+  try {
+    $stmtPagina = $conn->prepare($sqlPagina);
+    foreach ($whereParams as $key => $value) {
+      if (str_starts_with((string)$key, ':id_pagina_')) {
+        $stmtPagina->bindValue($key, (int)$value, PDO::PARAM_INT);
+      }
+    }
+    $stmtPagina->execute();
+    $linhasFiltradas = $stmtPagina->fetchAll(PDO::FETCH_ASSOC) ?: [];
+  } catch (Throwable $e) {
+    error_log('[JORNADA][PAGE_ROWS] ' . $e->getMessage());
+    $linhasFiltradas = [];
+  }
 }
 
 // agrega por id_internacao
@@ -431,12 +497,13 @@ th.th-acoes {
     font-weight: bold;
 }
 </style>
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
 
 <div class="container-fluid form_container" style="margin-top:8px;">
     <h4 class="page-title m-0 mb-3" style="color:#3A3A3A;">Capeantes - Jornada da Conta</h4>
 
-    <form action="<?= htmlspecialchars($actionUrl) ?>" id="filtros-form" method="GET">
-        <div class="row g-2 align-items-end">
+    <form action="<?= htmlspecialchars($actionUrl) ?>" id="filtros-form" method="GET" class="listagem-panel">
+        <div class="row legacy-filter-row align-items-end">
             <div class="col-sm-3">
                 <label class="form-label mb-0 small text-muted">Hospital</label>
                 <input class="form-control form-control-sm" type="text" name="pesquisa_nome"
@@ -449,7 +516,7 @@ th.th-acoes {
             </div>
             <div class="col-sm-2">
                 <label class="form-label mb-0 small text-muted">Registros</label>
-                <select class="form-select form-select-sm" name="limite">
+                <select class="form-control form-control-sm" name="limite">
                     <option value="10" <?= $limite == 10 ? 'selected' : '' ?>>10 por pág.</option>
                     <option value="20" <?= $limite == 20 ? 'selected' : '' ?>>20 por pág.</option>
                     <option value="50" <?= $limite == 50 ? 'selected' : '' ?>>50 por pág.</option>
@@ -457,7 +524,7 @@ th.th-acoes {
             </div>
             <div class="col-sm-2">
                 <label class="form-label mb-0 small text-muted">Ordenar</label>
-                <select class="form-select form-select-sm" name="sort_field">
+                <select class="form-control form-control-sm" name="sort_field">
                     <option value="id_internacao" <?= $sortField === 'id_internacao' ? 'selected' : '' ?>>Internação
                     </option>
                     <option value="nome_pac" <?= $sortField === 'nome_pac' ? 'selected' : '' ?>>Paciente</option>
@@ -469,10 +536,10 @@ th.th-acoes {
             </div>
         </div>
 
-        <div class="row g-2 align-items-end mt-1">
+        <div class="row legacy-filter-row align-items-end mt-1">
             <div class="col-sm-2">
                 <label class="form-label mb-0 small text-muted">Abertas</label>
-                <select class="form-select form-select-sm" name="aberta">
+                <select class="form-control form-control-sm" name="aberta">
                     <option value="" <?= $aberta === '' ? 'selected' : '' ?>>Todas</option>
                     <option value="s" <?= $aberta === 's' ? 'selected' : '' ?>>Somente abertas</option>
                     <option value="n" <?= $aberta === 'n' ? 'selected' : '' ?>>Somente não abertas</option>
@@ -480,7 +547,7 @@ th.th-acoes {
             </div>
             <div class="col-sm-2">
                 <label class="form-label mb-0 small text-muted">Em Auditoria</label>
-                <select class="form-select form-select-sm" name="auditoria">
+                <select class="form-control form-control-sm" name="auditoria">
                     <option value="" <?= $auditoria === '' ? 'selected' : '' ?>>Todas</option>
                     <option value="s" <?= $auditoria === 's' ? 'selected' : '' ?>>Somente em auditoria</option>
                     <option value="n" <?= $auditoria === 'n' ? 'selected' : '' ?>>Somente fora de auditoria</option>
@@ -488,7 +555,7 @@ th.th-acoes {
             </div>
             <div class="col-sm-2">
                 <label class="form-label mb-0 small text-muted">Encerradas</label>
-                <select class="form-select form-select-sm" name="encerrada">
+                <select class="form-control form-control-sm" name="encerrada">
                     <option value="" <?= $encerrada === '' ? 'selected' : '' ?>>Todas</option>
                     <option value="s" <?= $encerrada === 's' ? 'selected' : '' ?>>Somente encerradas</option>
                     <option value="n" <?= $encerrada === 'n' ? 'selected' : '' ?>>Somente não encerradas</option>
@@ -496,17 +563,16 @@ th.th-acoes {
             </div>
             <div class="col-sm-2">
                 <label class="form-label mb-0 small text-muted">Faturadas</label>
-                <select class="form-select form-select-sm" name="faturada">
+                <select class="form-control form-control-sm" name="faturada">
                     <option value="" <?= $faturada === '' ? 'selected' : '' ?>>Todas</option>
                     <option value="s" <?= $faturada === 's' ? 'selected' : '' ?>>Somente faturadas</option>
                     <option value="n" <?= $faturada === 'n' ? 'selected' : '' ?>>Somente não faturadas</option>
                 </select>
             </div>
-            <div class="col-sm-1 d-flex align-items-end gap-2">
+            <div class="col-sm-1 filter-actions d-flex align-items-end gap-2">
                 <button type="submit"
-                    class="btn btn-primary btn-sm btn-filtro-buscar d-inline-flex align-items-center justify-content-center btn-filtro-limpar-icon"
-                    style="height:32px;background-color:#5e2363;border-color:#5e2363;">
-                    <span class="material-icons" style="font-size:18px;line-height:1;">search</span>
+                    class="btn btn-primary btn-sm btn-filtro-buscar d-inline-flex align-items-center justify-content-center btn-filtro-limpar-icon">
+                    <span class="material-icons">search</span>
                 </button>
                 <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/list_internacao_cap_jornada.php', ENT_QUOTES, 'UTF-8') ?>"
                     class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon"

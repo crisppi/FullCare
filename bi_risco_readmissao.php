@@ -1,7 +1,8 @@
 <?php
 $pageTitle = 'Alto Risco de Readmissao';
 $pageSlug = 'bi/risco-readmissao';
-require_once("templates/bi_rede_bootstrap.php");
+$clearUrl = 'bi/risco-readmissao';
+require_once("bi_rede_bootstrap.php");
 
 $internFilters = biRedeBuildWhere($filterValues, 'i.data_intern_int', 'i', true);
 $internWhere = $internFilters['where'];
@@ -22,8 +23,8 @@ $rowsStmt->execute();
 $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260111">
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260111"></script>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260501">
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260501"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">
@@ -39,7 +40,7 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         </div>
     </div>
 
-    <?php include "templates/bi_rede_filters.php"; ?>
+    <?php include "bi_rede_filters.php"; ?>
 
     <div class="bi-panel">
         <h3>Pacientes com maior risco</h3>

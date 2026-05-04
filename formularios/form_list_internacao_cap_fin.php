@@ -55,10 +55,23 @@ $data_intern_int = filter_input(INPUT_GET, 'data_intern_int') ?: null;
 $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
 
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
+<style>
+    .listagem-page { padding: 4px 4px 14px; }
+    .listagem-title { font-size: .96rem; line-height: 1.05; }
+    .listagem-panel { padding: 8px 8px 6px; }
+    #table-content thead th { padding:7px 10px; font-size:.54rem; letter-spacing:.08em; }
+    #table-content tbody td, #table-content tbody th { padding:6px 10px; font-size:.7rem; vertical-align:middle; }
+</style>
 <!-- FORMULARIO DE PESQUISAS -->
-<div class="container-fluid" id="main-container" style="margin-top:-5px">
-    <h4 class="page-title"> Capeantes - Contas Finalizadas</h4>
-    <hr>
+<div class="container-fluid listagem-page" id="main-container">
+    <div class="listagem-hero">
+        <div class="listagem-hero__copy">
+            <div class="listagem-kicker">Capeantes</div>
+            <h1 class="listagem-title">Contas finalizadas</h1>
+        </div>
+    </div>
+    <div class="complete-table listagem-panel">
     <div id="navbarToggleExternalContent">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script src="./js/ajaxNav.js"></script>
@@ -80,25 +93,25 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
             $pesquisa_pac = filter_input(INPUT_GET, 'pesquisa_pac');
             $ordenar = filter_input(INPUT_GET, 'ordenar');
             ?>
-            <div class="form-group row">
+            <div class="form-group row filter-inline-row">
                 <div class="form-group col-sm-3" style="padding:2px !important;padding-left:16px !important;">
-                    <input class="form-control form-control-sm" style="font-size:.8em; color:#878787" type="text"
+                    <input class="form-control form-control-sm" type="text"
                         name="pesquisa_nome" placeholder="Selecione o Hospital" value="<?= $pesquisa_nome ?>">
                 </div>
                 <div class="form-group col-sm-3" style="padding:2px !important">
-                    <input class="form-control form-control-sm" style="font-size:.8em; color:#878787" type="text"
+                    <input class="form-control form-control-sm" type="text"
                         name="pesquisa_pac" placeholder="Selecione o Paciente" value="<?= $pesquisa_pac ?>">
                 </div>
                 <div class="form-group col-sm-2" style="padding:2px !important">
-                    <input class="form-control form-control-sm" style="font-size:.8em; color:#878787" type="text"
+                    <input class="form-control form-control-sm" type="text"
                         name="senha_int" placeholder="Digite a Senha" value="<?= $pesquisa_pac ?>">
                 </div>
                 <div class="form-group col-sm-1" style="padding:2px !important">
-                    <input class="form-control form-control-sm" style="font-size:.8em; color:#878787" type="text"
+                    <input class="form-control form-control-sm" type="text"
                         name="lote" placeholder="Digite o lote" value="<?= $lote ?>">
                 </div>
                 <div class="col-sm-1" style="padding:2px !important">
-                    <select class="form-control mb-3 form-control-sm" style="font-size:.8em; color:#878787" id="limite"
+                    <select class="form-control mb-3 form-control-sm" id="limite"
                         name="limite">
                         <option value="">Reg por pag</option>
                         <option value="5" <?= $limite == '5' ? 'selected' : null ?>>Reg por pág = 5
@@ -112,7 +125,7 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
                     </select>
                 </div>
                 <div class="form-group col-sm-1" style="padding:2px !important">
-                    <select class="form-control mb-3 form-control-sm" style="font-size:.8em; color:#878787" id="ordenar"
+                    <select class="form-control mb-3 form-control-sm" id="ordenar"
                         name="ordenar">
                         <option value="">Classificar por</option>
                         <option value="id_internacao" <?= $ordenar == 'id_internacao' ? 'selected' : null ?>>Internação
@@ -126,7 +139,7 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
             </div>
             <div style="margin-top:-18px" class="row">
                 <div class="form-group col-sm-1" style="padding:2px !important;padding-left:16px !important;">
-                    <select class="form-control mb-3 form-control-sm" style="font-size:.8em; color:#878787"
+                    <select class="form-control mb-3 form-control-sm"
                         id="med_check" name="med_check">
                         <option value="">Médico</option>
                         <option value="s" <?= $med_check == 's' ? 'selected' : null ?>>Sim</option>
@@ -136,7 +149,7 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
                     </select>
                 </div>
                 <div class="form-group col-sm-1" style="padding:2px !important">
-                    <select class="form-control mb-3 form-control-sm" style="font-size:.8em; color:#878787"
+                    <select class="form-control mb-3 form-control-sm"
                         id="enf_check" name="enf_check">
                         <option value="">Enferm</option>
                         <option value="s" <?= $enf_check == 's' ? 'selected' : null ?>>Sim</option>
@@ -146,7 +159,7 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
                     </select>
                 </div>
                 <div class="form-group col-sm-1" style="padding:2px !important">
-                    <select class="form-control mb-3 form-control-sm" style="font-size:.8em; color:#878787"
+                    <select class="form-control mb-3 form-control-sm"
                         id="adm_check" name="adm_check">
                         <option value="">Adm </option>
                         <option value="s" <?= $adm_check == 's' ? 'selected' : null ?>>Sim</option>
@@ -156,11 +169,11 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
                     </select>
                 </div>
                 <div class="form-group col-sm-2 mb-0" style="padding:2px !important">
-                    <input class="form-control form-control-sm" type="date" style="font-size:.8em; color:#878787"
+                    <input class="form-control form-control-sm" type="date"
                         name="data_intern_int" placeholder="Data Internação Min" value="<?= $data_intern_int ?>">
                 </div>
                 <div class="form-group col-sm-2 mb-0">
-                    <input class="form-control form-control-sm" type="date" style="font-size:.8em; color:#878787"
+                    <input class="form-control form-control-sm" type="date"
                         name="data_intern_int_max" placeholder="Data Internação Max"
                         value="<?= $data_intern_int_max ?>">
                 </div>
@@ -270,7 +283,7 @@ if ($qtdIntItens > $limite) {
 
 ?>
 <div>
-    <div id="table-content">
+    <div id="table-content" class="listagem-table-wrap">
         <table class="table table-sm table-striped  table-hover table-condensed">
             <thead>
                 <tr>
@@ -291,7 +304,7 @@ if ($qtdIntItens > $limite) {
                     extract($intern);
 
                 ?>
-                <tr style="font-size:13px">
+                <tr>
                     <td scope="row" class="col-id">
                         <?= $intern["id_capeante"]; ?>
                     </td>
@@ -358,7 +371,7 @@ if ($qtdIntItens > $limite) {
                 <?php endforeach; ?>
                 <?php if ($qtdIntItens == 0) : ?>
                 <tr>
-                    <td colspan="12" scope="row" class="col-id" style='font-size:15px'>
+                    <td colspan="12" scope="row" class="col-id">
                         Não foram encontrados registros
                     </td>
                 </tr>

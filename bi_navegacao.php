@@ -43,16 +43,22 @@ $navGroups = [
         'title' => 'Clínico',
         'key' => 'clinico',
         'items' => [
-            ['label' => 'UTI', 'href' => 'bi/uti'],
             ['label' => 'Patologia', 'href' => 'bi/patologia'],
             ['label' => 'Grupo Patologia', 'href' => 'bi/grupo-patologia'],
             ['label' => 'Antecedente', 'href' => 'bi/antecedente'],
+            ['label' => 'UTI', 'href' => 'bi/uti'],
+            ['label' => 'UTI Suporte', 'href' => 'bi/uti-suporte'],
+            ['label' => 'Tipo Internação', 'href' => 'bi/tipo-internacao'],
             ['label' => 'Longa Permanência', 'href' => 'bi/longa-permanencia'],
             ['label' => 'Evolução', 'href' => 'bi/evolucao'],
             ['label' => 'Visita Inicial', 'href' => 'bi/visita-inicial'],
             ['label' => 'Estratégia Terapêutica', 'href' => 'bi/estrategia-terapeutica'],
-            ['label' => 'Médico Titular', 'href' => 'bi/medico-titular'],
-            ['label' => 'Clínico Realizado', 'href' => 'bi/clinico-realizado'],
+            ['label' => 'Prorrogações', 'href' => 'bi/prorrogacoes'],
+            ['label' => 'Oportunidades Clínicas', 'href' => 'bi/oportunidades-clinicas'],
+            ['label' => 'Desfechos e Alta', 'href' => 'bi/desfechos-alta'],
+            ['label' => 'Detalhes Clínicos', 'href' => 'bi/detalhes-clinicos'],
+            ['label' => 'Evento Adverso', 'href' => 'bi/evento-adverso'],
+            ['label' => 'Segurança e Eventos Abertos', 'href' => 'bi/seguranca-eventos'],
         ],
     ],
     [
@@ -64,6 +70,7 @@ $navGroups = [
             ['label' => 'Auditoria Produtividade', 'href' => 'bi/auditoria-produtividade'],
             ['label' => 'Análise Negociações', 'href' => 'bi/analise-negociacoes'],
             ['label' => 'Negociações Detalhadas', 'href' => 'bi/negociacoes-detalhadas'],
+            ['label' => 'Negociação Avançada', 'href' => 'bi/negociacao-avancada'],
             ['label' => 'Saving por Auditor', 'href' => 'bi/saving-por-auditor'],
             ['label' => 'Saving', 'href' => 'bi/saving'],
         ],
@@ -81,7 +88,7 @@ $navGroups = [
             ['label' => 'Home Care', 'href' => 'bi/home-care'],
             ['label' => 'Desospitalizacao', 'href' => 'bi/desospitalizacao'],
             ['label' => 'OPME', 'href' => 'bi/opme'],
-            ['label' => 'Evento Adverso', 'href' => 'bi/evento-adverso'],
+            ['label' => 'TUSS / Autorizações', 'href' => 'bi/tuss-autorizacoes'],
         ],
     ],
     [
@@ -153,7 +160,7 @@ $navGroups = [
         'key' => 'anomalias',
         'items' => [
             ['label' => 'Outliers de Permanência', 'href' => 'bi/anomalias-permanencia'],
-            ['label' => 'Negociações Suspeitas', 'href' => 'bi/anomalias-negociacao'],
+            ['label' => 'Padrão de Negociação', 'href' => 'bi/anomalias-negociacao'],
             ['label' => 'OPME sem Justificativa', 'href' => 'bi/anomalias-opme'],
         ],
     ],
@@ -215,9 +222,9 @@ $navGroups = [
 ];
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260110">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260501">
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi-navegacao.css?v=20260110">
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260110"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260501"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme', 'bi-navegacao'));</script>
 
 <div class="bi-wrapper bi-theme">
@@ -232,17 +239,38 @@ $navGroups = [
     </div>
 
     <div class="bi-panel">
+        <div class="bi-nav-search-wrap">
+            <label class="bi-nav-search-label" for="bi-nav-search">Navegação geral</label>
+            <div class="bi-nav-search-box">
+                <i class="bi bi-search"></i>
+                <input
+                    type="search"
+                    id="bi-nav-search"
+                    class="bi-nav-search-input"
+                    placeholder="Pesquisar por nome, módulo ou tema"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+            </div>
+            <div class="bi-nav-search-meta">
+                <span id="bi-nav-search-count">Exibindo todos os atalhos</span>
+            </div>
+        </div>
         <div class="bi-nav-groups-grid">
             <?php foreach ($navGroups as $idx => $group): ?>
                 <?php $isOpen = $idx < 4; ?>
-                <details class="bi-nav-group" data-theme="<?= e($group['key']) ?>" <?= $isOpen ? 'open' : '' ?>>
+                <details class="bi-nav-group" data-theme="<?= e($group['key']) ?>" data-group-title="<?= e($group['title']) ?>" <?= $isOpen ? 'open' : '' ?>>
                     <summary class="bi-nav-group-summary">
                         <span class="bi-nav-group-title"><?= e($group['title']) ?></span>
                         <span class="bi-nav-group-count"><?= count($group['items']) ?></span>
                     </summary>
                     <div class="bi-nav-grid">
                         <?php foreach ($group['items'] as $link): ?>
-                            <a class="bi-nav-card" href="<?= $BASE_URL . e($link['href']) ?>">
+                            <a
+                                class="bi-nav-card"
+                                href="<?= $BASE_URL . e($link['href']) ?>"
+                                data-search-text="<?= e(mb_strtolower($group['title'] . ' ' . $link['label'], 'UTF-8')) ?>"
+                            >
                                 <?= e($link['label']) ?>
                             </a>
                         <?php endforeach; ?>

@@ -38,26 +38,58 @@ $canSeeBiLink = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_acce
 </footer>
 
 <style>
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 84px;
+}
+
+body.bi-theme {
+    padding-bottom: 0;
+}
+
+body.bi-theme #myFooterSimple {
+    display: none !important;
+}
+
 #myFooterSimple {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
     width: 100%;
-    margin-top: 20px;
-    background: linear-gradient(90deg, #2f1640 0%, #5e2363 52%, #2e92be 100%);
-    box-shadow: 0 -6px 18px rgba(26, 9, 39, 0.18);
+    background: linear-gradient(90deg, #f2ecfb 0%, #ebe5f7 52%, #e8f1fb 100%);
+    box-shadow: 0 -8px 22px rgba(95, 69, 148, 0.08);
+    border-top: 1px solid rgba(116, 100, 137, 0.14);
 }
 
 #myFooterSimple .footer-simple-inner {
     position: relative;
 }
 
-#myFooterSimple .footer-simple-topline {
-    height: 1px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08));
+#myFooterSimple::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -14px;
+    height: 14px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(225, 218, 242, 0.6) 100%);
+    pointer-events: none;
 }
 
 #myFooterSimple .footer-simple-main {
-    min-height: 54px;
-    padding: 8px 14px;
-    display: flex;
+    min-height: 44px;
+    padding: 6px 18px;
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr);
     align-items: center;
     gap: 16px;
 }
@@ -67,17 +99,18 @@ $canSeeBiLink = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_acce
     align-items: center;
     gap: 8px;
     text-decoration: none;
+    justify-self: start;
 }
 
 #myFooterSimple .footer-simple-brand img {
-    width: 64px;
+    width: 50px;
     max-width: 100%;
     height: auto;
 }
 
 #myFooterSimple .footer-simple-brand-text {
-    color: rgba(244, 238, 255, 0.92);
-    font-size: 0.7rem;
+    color: #6a5b84;
+    font-size: 0.64rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -87,70 +120,85 @@ $canSeeBiLink = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_acce
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    margin: 0 auto;
+    justify-self: center;
 }
 
 #myFooterSimple .footer-simple-links a {
-    color: rgba(246, 242, 255, 0.94);
+    color: #6a587f;
     text-decoration: none;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.02em;
 }
 
 #myFooterSimple .footer-simple-links a:hover {
-    color: #ffffff;
+    color: #4f3674;
     text-decoration: underline;
-    text-decoration-color: rgba(255, 255, 255, 0.55);
+    text-decoration-color: rgba(79, 54, 116, 0.32);
 }
 
 #myFooterSimple .footer-simple-meta {
-    margin-left: auto;
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    justify-self: end;
 }
 
 #myFooterSimple .footer-simple-copy,
 #myFooterSimple .footer-simple-version {
-    color: rgba(246, 242, 255, 0.95);
-    font-size: 0.66rem;
+    color: #746489;
+    font-size: 0.62rem;
     font-weight: 600;
     letter-spacing: 0.03em;
     white-space: nowrap;
 }
 
 @media (max-width: 920px) {
+    body {
+        padding-bottom: 96px;
+    }
+
     #myFooterSimple .footer-simple-main {
         flex-wrap: wrap;
+        display: flex;
         justify-content: center;
         row-gap: 6px;
     }
 
+    #myFooterSimple .footer-simple-brand,
+    #myFooterSimple .footer-simple-links,
     #myFooterSimple .footer-simple-meta {
-        margin-left: 0;
+        justify-self: auto;
+    }
+
+    #myFooterSimple .footer-simple-meta {
+        justify-self: center;
     }
 }
 
 @media (max-width: 640px) {
+    body {
+        padding-bottom: 98px;
+    }
+
     #myFooterSimple .footer-simple-main {
-        min-height: 64px;
-        padding: 9px 10px;
+        min-height: 52px;
+        padding: 7px 10px;
         gap: 8px;
     }
 
     #myFooterSimple .footer-simple-brand img {
-        width: 56px;
+        width: 44px;
     }
 
     #myFooterSimple .footer-simple-brand-text,
     #myFooterSimple .footer-simple-links a,
     #myFooterSimple .footer-simple-copy {
-        font-size: 0.6rem;
+        font-size: 0.56rem;
     }
 
     #myFooterSimple .footer-simple-version {
-        font-size: 0.58rem;
+        font-size: 0.54rem;
     }
 }
 </style>

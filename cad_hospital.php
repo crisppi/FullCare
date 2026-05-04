@@ -18,7 +18,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
 <style>
     #main-container.internacao-page {
         margin: 2px 0 0 !important;
-        padding-inline: 5px !important;
+        padding-inline: 2px !important;
         padding-top: 0 !important;
         width: auto !important;
         max-width: 100% !important;
@@ -26,7 +26,15 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
     }
 
     #main-container.internacao-page .internacao-page__hero {
-        margin: 0 0 6px !important;
+        min-height: 58px !important;
+        margin: 0 0 5px !important;
+        padding: 14px 14px !important;
+        border-radius: 18px !important;
+    }
+
+    #main-container.internacao-page .internacao-page__hero h1 {
+        font-size: 1.2rem !important;
+        line-height: 1.1 !important;
     }
 
     #main-container.internacao-page .hero-actions {
@@ -39,10 +47,10 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         border-radius: 999px;
         border: 1px solid #d9c3f4;
         color: #5e2363;
-        padding: 7px 14px;
+        padding: 6px 12px;
         text-decoration: none;
         font-weight: 600;
-        font-size: .85rem;
+        font-size: .78rem;
         background: #f4ecfb;
     }
 
@@ -55,20 +63,102 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         font-weight: 700 !important;
     }
 
+    #main-container.internacao-page .internacao-page__content {
+        display: block !important;
+    }
+
+    #main-container.internacao-page .internacao-page__tag,
+    #main-container.internacao-page .internacao-card__tag,
+    #main-container.internacao-page .entity-step-badge {
+        padding: 4px 8px !important;
+        font-size: .6rem !important;
+    }
+
+    #main-container.internacao-page .internacao-card {
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+
+    #main-container.internacao-page .internacao-card__header {
+        padding: 8px 8px 2px !important;
+        border-bottom: 0 !important;
+    }
+
+    #main-container.internacao-page .internacao-card__title {
+        font-size: .9rem !important;
+        line-height: 1.1 !important;
+    }
+
+    #main-container.internacao-page .internacao-card__body {
+        padding: 4px 8px 10px !important;
+        gap: 5px !important;
+        background: transparent !important;
+    }
+
+    #main-container.internacao-page .entity-step-card {
+        padding: 7px 8px 8px !important;
+        border-radius: 0 !important;
+        border: 0 !important;
+        border-top: 1px solid rgba(94, 35, 99, 0.12) !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    #main-container.internacao-page .entity-step-card::before {
+        display: none !important;
+    }
+
+    #main-container.internacao-page .entity-step-card + .entity-step-card {
+        margin-top: 3px !important;
+    }
+
+    #main-container.internacao-page .entity-step-header {
+        align-items: center !important;
+        margin-bottom: 7px !important;
+    }
+
+    #main-container.internacao-page .entity-step-kicker {
+        margin-bottom: 1px !important;
+        font-size: .52rem !important;
+    }
+
+    #main-container.internacao-page .entity-step-title {
+        font-size: .92rem !important;
+        line-height: 1.1 !important;
+    }
+
+    #main-container.internacao-page .entity-form .form-group,
+    #main-container.internacao-page .entity-form [class*="col-md-"].form-group {
+        margin-bottom: 8px !important;
+    }
+
+    #main-container.internacao-page .entity-form .form-group label {
+        margin-bottom: 3px !important;
+        font-size: .7rem !important;
+        line-height: 1.1 !important;
+    }
+
     #multi-step-form .form-control {
-        min-height: 42px;
-        border-radius: 8px;
+        min-height: 40px !important;
+        height: 40px !important;
+        border-radius: 9px;
+        font-size: .78rem !important;
+        padding-top: 5px !important;
+        padding-bottom: 5px !important;
     }
 
     #multi-step-form select.form-control {
-        height: 42px;
+        height: 40px !important;
+        min-height: 40px !important;
     }
 
     #acomodacao-inline-card {
         background: #f7f5fb;
         border: 1px solid #e8def1;
-        border-radius: 14px;
-        padding: 14px;
+        border-radius: 10px;
+        padding: 9px;
     }
 
     #acomodacoesTable th,
@@ -79,12 +169,12 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
     .inline-manager-card {
         background: #f7f5fb;
         border: 1px solid #e8def1;
-        border-radius: 14px;
-        padding: 14px;
+        border-radius: 10px;
+        padding: 9px;
     }
 </style>
 
-<div class="internacao-page" id="main-container">
+<div class="internacao-page cadastro-layout" id="main-container">
     <div class="internacao-page__hero">
         <div>
             <h1>Cadastrar hospital</h1>
@@ -100,19 +190,28 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
     </div>
     <div class="internacao-page__content">
         <form action="<?= $BASE_URL ?>process_hospital.php" id="multi-step-form" method="POST" enctype="multipart/form-data"
-            class="needs-validation visible" novalidate>
+            class="needs-validation visible entity-form" novalidate>
             <div class="internacao-card internacao-card--general">
                 <div class="internacao-card__header">
                     <div>
-                        <p class="internacao-card__eyebrow">Dados do hospital</p>
+                        <p class="internacao-card__eyebrow">Etapa 1</p>
+                        <h2 class="internacao-card__title">Dados do hospital</h2>
                     </div>
+                    <span class="internacao-card__tag internacao-card__tag--critical">Cadastro institucional</span>
                 </div>
                 <div class="internacao-card__body">
         <input type="hidden" name="type" value="create">
         <input type="hidden" name="deletado_hosp" value="n">
 
         <!-- Step 1: Informações Básicas -->
-        <div id="step-1" class="step">
+        <div id="step-1" class="step entity-step-card">
+            <div class="entity-step-header">
+                <div class="entity-step-copy">
+                    <div class="entity-step-kicker">Passo 1</div>
+                    <h3 class="entity-step-title">Identificação do hospital</h3>
+                </div>
+                <span class="entity-step-badge">Dados base</span>
+            </div>
             <div class="row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="cnpj_hosp">CNPJ</label>
@@ -131,8 +230,14 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         </div>
 
         <!-- Step 2: Endereço e Localização -->
-        <div id="step-2" class="step">
-            <p class="internacao-card__eyebrow mb-3">Dados de endereço</p>
+        <div id="step-2" class="step entity-step-card">
+            <div class="entity-step-header">
+                <div class="entity-step-copy">
+                    <div class="entity-step-kicker">Passo 2</div>
+                    <h3 class="entity-step-title">Endereços</h3>
+                </div>
+                <span class="entity-step-badge">Localização</span>
+            </div>
             <div class="row">
                 <div class="form-group col-md-4 mb-3">
                     <label for="cep_hosp">CEP</label>
@@ -246,8 +351,14 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         </div>
 
         <!-- Step 3: Contato -->
-        <div id="step-3" class="step">
-            <p class="internacao-card__eyebrow mb-3">Dados de contato</p>
+        <div id="step-3" class="step entity-step-card">
+            <div class="entity-step-header">
+                <div class="entity-step-copy">
+                    <div class="entity-step-kicker">Passo 3</div>
+                    <h3 class="entity-step-title">Contato operacional</h3>
+                </div>
+                <span class="entity-step-badge">Comunicação</span>
+            </div>
             <div class="row">
                 <div class="form-group col-md-3 mb-3">
                     <label for="email01_hosp">Email Principal</label>
@@ -390,8 +501,14 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         </div>
 
         <!-- Step 4: Coordenadas e Responsáveis -->
-        <div id="step-4" class="step">
-            <p class="internacao-card__eyebrow mb-3">Dados complementares</p>
+        <div id="step-4" class="step entity-step-card">
+            <div class="entity-step-header">
+                <div class="entity-step-copy">
+                    <div class="entity-step-kicker">Passo 4</div>
+                    <h3 class="entity-step-title">Dados complementares</h3>
+                </div>
+                <span class="entity-step-badge">Estrutura</span>
+            </div>
             <div class="row">
                 <div class="form-group col-md-4 mb-3">
                     <label for="coordenador_medico_hosp">Coordenador Médico</label>
@@ -473,10 +590,11 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 <div id="acomodacoesHiddenContainer"></div>
             </div>
 
-            <hr>
-            <button type="submit" class="btn btn-success">
-                <i class="fas fa-check"></i> Cadastrar
-            </button>
+            <div class="entity-actions-bar">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Cadastrar
+                </button>
+            </div>
         </div>
                 </div>
             </div>

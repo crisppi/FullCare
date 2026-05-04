@@ -25,6 +25,9 @@ include_once("dao/hospitalDao.php");
 include_once("dao/hospitalUserDao.php");
 
 include_once("models/pagination.php");
+?>
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
+<?php
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -214,10 +217,122 @@ try {
 } catch (Throwable $th) {
     $hospitalOptions = [];
 }
+
+$seguradoraOptions = [];
+try {
+    $stmtSegOptions = $conn->query("SELECT seguradora_seg FROM tb_seguradora WHERE seguradora_seg IS NOT NULL AND seguradora_seg <> '' ORDER BY seguradora_seg");
+    $rawSeguradoras = $stmtSegOptions->fetchAll(PDO::FETCH_COLUMN) ?: [];
+    foreach ($rawSeguradoras as $nomeSeg) {
+        $nome = trim((string)$nomeSeg);
+        if ($nome !== '' && !isset($seguradoraOptions[$nome])) {
+            $seguradoraOptions[$nome] = $nome;
+        }
+    }
+} catch (Throwable $th) {
+    $seguradoraOptions = [];
+}
 ?>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
 <style>
+.internacao-list-page {
+    padding: 4px 4px 14px;
+}
+
+.internacao-list-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 4px;
+    padding-left: 8px;
+}
+
+.internacao-list-hero__copy {
+    min-width: 0;
+}
+
+.internacao-list-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1px;
+    color: #7b5a9a;
+    font-size: .5rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.internacao-list-kicker::before {
+    content: "";
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.internacao-list-title {
+    margin: 0;
+    color: #2d203d;
+    font-size: .96rem;
+    font-weight: 800;
+    letter-spacing: -.03em;
+}
+
+.internacao-list-subtitle {
+    margin: 1px 0 0;
+    color: #7b7b8d;
+    font-size: .66rem;
+}
+
+.internacao-list-hero__actions {
+    display: flex;
+    align-items: center;
+    align-self: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    padding-bottom: 2px;
+}
+
+.btn-list-top {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    border: none;
+    border-radius: 10px;
+    padding: 0 10px;
+    font-weight: 700;
+    font-size: .7rem;
+    box-shadow: 0 8px 16px rgba(46, 27, 78, 0.10);
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.btn-list-top.btn-export {
+    background: linear-gradient(135deg, #3d915b 0%, #58ab74 100%);
+}
+
+.btn-list-top.btn-new {
+    background: linear-gradient(135deg, #35bae1 0%, #5dc8ea 100%);
+}
+
+.complete-table {
+    border-radius: 18px;
+    border: 1px solid rgba(94, 35, 99, 0.10);
+    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,244,253,0.96) 100%);
+    box-shadow: 0 10px 22px rgba(45, 18, 70, 0.06);
+    padding: 8px 8px 6px;
+    overflow: hidden;
+}
+
+.table-filters {
+    padding: 0;
+}
+
 /* Chips roxos para seleção de campos (modal export) */
 /* Pills lilás maiores, com ícones brancos */
 .export-pill {
@@ -268,7 +383,7 @@ try {
 
 .th-sortable .sort-icons a {
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     color: #ffffff;
     margin-left: 2px;
     opacity: 0.7;
@@ -309,29 +424,33 @@ try {
 }
 
 .filter-intel-wrapper {
-    border: 1px solid #ebe2f3;
+    border: 1px solid #e7dcf1;
     border-radius: 14px;
-    padding: 12px 16px;
-    margin-bottom: 12px;
-    background: #fdfbff;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    background:
+        radial-gradient(circle at top right, rgba(83, 196, 226, 0.10), transparent 26%),
+        linear-gradient(180deg, #fefcff 0%, #f8f3fd 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .filter-intel-wrapper h6 {
     font-weight: 800;
     color: #5e2363;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
+    font-size: .68rem;
 }
 
 .filter-intel-wrapper small {
     color: #7a6b84;
     display: block;
+    font-size: .62rem;
 }
 
 .filter-intel-grid {
     display: flex;
     flex-wrap: nowrap;
-    gap: 12px;
+    gap: 5px;
     align-items: center;
 }
 
@@ -341,7 +460,7 @@ try {
 }
 
 .filter-intel-grid label {
-    font-size: .82rem;
+    font-size: .62rem;
     font-weight: 700;
     color: #7a6b84;
 }
@@ -349,14 +468,37 @@ try {
 .filter-intel-grid .input-group {
     display: flex;
     gap: 6px;
+    align-items: stretch;
+}
+
+.filter-intel-grid .input-group .form-control,
+.filter-intel-grid .input-group .btn {
+    min-height: 32px;
+    height: 32px;
+    border-radius: 9px !important;
+    font-size: .72rem;
+    line-height: 1.1;
+    box-sizing: border-box;
+}
+
+.filter-intel-grid .input-group .btn {
+    padding-inline: 10px;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-weight: 700;
+}
+
+.filter-intel-grid .input-group .form-control {
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .smart-search-feedback {
     display: none;
     margin-top: 6px;
     border-radius: 8px;
-    padding: 6px 10px;
-    font-size: .78rem;
+    padding: 5px 8px;
+    font-size: .72rem;
     font-weight: 600;
 }
 
@@ -371,10 +513,10 @@ try {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin: 0 0 10px 16px;
-    padding: 6px 12px;
+    margin: 0 0 4px;
+    padding: 4px 7px;
     border-radius: 999px;
-    font-size: 0.82rem;
+    font-size: 0.62rem;
     font-weight: 700;
     background: #f3edff;
     border: 1px solid #d6c5f7;
@@ -404,12 +546,12 @@ try {
 
 .filter-memory-actions button {
     border-radius: 999px;
-    font-size: .82rem;
+    font-size: .64rem;
     font-weight: 600;
     border: 1px solid #bfa3d1;
     background: #fff;
     color: #5e2363;
-    padding: 6px 14px;
+    padding: 3px 7px;
     transition: all .15s ease;
 }
 
@@ -418,19 +560,24 @@ try {
     color: #fff;
 }
 
-.filter-inline-row {
+.listagem-panel .filter-inline-row {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+    padding: 5px 6px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #ece4f4;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
 }
 
-.filter-inline-row > .filter-inline-field {
+.listagem-panel .filter-inline-row > .filter-inline-field {
     flex: 1 1 0;
     min-width: 80px;
 }
 
-.filter-inline-row > .filter-inline-field:last-child {
+.listagem-panel .filter-inline-row > .filter-inline-field:last-child {
     flex: 0 0 auto;
 }
 
@@ -457,17 +604,34 @@ try {
     gap: 6px;
 }
 
+.listagem-panel .filter-inline-row input[type="date"] {
+    color: #c4c4c4;
+}
+
+.listagem-panel .filter-inline-row input[type="date"]:invalid::-webkit-datetime-edit,
+.listagem-panel .filter-inline-row input[type="date"]:invalid::-webkit-datetime-edit-text,
+.listagem-panel .filter-inline-row input[type="date"]:invalid::-webkit-datetime-edit-month-field,
+.listagem-panel .filter-inline-row input[type="date"]:invalid::-webkit-datetime-edit-day-field,
+.listagem-panel .filter-inline-row input[type="date"]:invalid::-webkit-datetime-edit-year-field {
+    color: #c4c4c4 !important;
+}
+
+.listagem-panel .filter-inline-row input[type="date"]:focus,
+.listagem-panel .filter-inline-row input[type="date"]:valid {
+    color: #212529;
+}
+
 @media (max-width: 1199.98px) {
-    .filter-inline-row {
+    .listagem-panel .filter-inline-row {
         flex-wrap: wrap;
     }
 }
 
 .filter-favorites {
-    margin-top: 10px;
+    margin-top: 6px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 .filter-favorite-chip {
@@ -475,8 +639,8 @@ try {
     align-items: center;
     gap: 6px;
     border-radius: 999px;
-    padding: 4px 12px;
-    font-size: .78rem;
+    padding: 3px 8px;
+    font-size: .66rem;
     font-weight: 600;
     border: 1px solid #ffcad9;
     color: #a03a5e;
@@ -495,8 +659,71 @@ try {
 }
 
 .filter-empty-hint {
-    font-size: .78rem;
+    font-size: .66rem;
     color: #a690b3;
+}
+
+#table-content {
+    margin-top: 8px !important;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #ebe3f3;
+    background: #fff;
+}
+
+#table-content .table {
+    margin-bottom: 0;
+}
+
+#table-content thead th {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    background: linear-gradient(90deg, #5e2363 0%, #69407f 100%);
+    border-bottom: none;
+    color: #fff;
+    font-size: .54rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+#table-content tbody td {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-size: .7rem;
+    vertical-align: middle;
+    border-top: 1px solid #f1ebf7;
+}
+
+#table-content tbody tr:nth-child(even) {
+    background: #fbf8fe;
+}
+
+#table-content tbody tr:hover {
+    background: #f3ecfb !important;
+}
+
+.fc-list-action .dropdown-toggle {
+    border: 1px solid #dccceb;
+    border-radius: 10px;
+    min-width: 32px;
+    min-height: 28px;
+    background: #fff;
+    font-size: .68rem;
+}
+
+@media (max-width: 991.98px) {
+    .internacao-list-hero {
+        flex-direction: column;
+    }
+
+    .internacao-list-hero__actions {
+        width: 100%;
+        justify-content: flex-start;
+        align-self: auto;
+        padding-bottom: 0;
+    }
 }
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -518,12 +745,13 @@ if (typeof jQuery !== 'undefined') {
 <!-- <script src="js/ajaxNav.js"></script> -->
 
 <!-- FORMULARIO DE PESQUISAS -->
-<div class="container-fluid" id='main-container'>
+<div class="container-fluid internacao-list-page" id='main-container'>
 
-    <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 10px;">
-        <h4 class="page-title" style="color: #3A3A3A;">
-            <?= $onlySemSenha ? 'Internações com senha pendente' : 'Listagem - Internação' ?>
-        </h4>
+    <div class="internacao-list-hero">
+        <div class="internacao-list-hero__copy">
+            <div class="internacao-list-kicker">Internações</div>
+            <h1 class="internacao-list-title"><?= $onlySemSenha ? 'Internações com senha pendente' : 'Listagem de internações' ?></h1>
+        </div>
 
         <?php
         // valores default para montagem de URL / filtros
@@ -537,24 +765,21 @@ if (typeof jQuery !== 'undefined') {
         $pesquisa_seguradora = $pesquisa_seguradora ?? '';
         ?>
 
-        <div class="d-flex">
+        <div class="internacao-list-hero__actions">
             <!-- Botão de Exportar para Excel (abre modal) -->
-            <a href="#" id="btn-exportar-excel" class="btn btn-success" style="border-radius:10px; margin-right: 10px;">
+            <a href="#" id="btn-exportar-excel" class="btn btn-success btn-list-top btn-export">
                 Exportar para Excel
             </a>
 
             <!-- Botão de Nova Internação -->
-            <a class="btn btn-success" href="<?= $BASE_URL ?>internacoes/nova"
-                style="border-radius:10px;background-color:#35bae1;font-family:var(--bs-font-sans-serif);box-shadow:0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
+            <a class="btn btn-success btn-list-top btn-new" href="<?= $BASE_URL ?>internacoes/nova">
                 <i class="fas fa-plus" style="font-size:1rem;margin-right:5px;"></i>
                 Nova Internação
             </a>
         </div>
     </div>
 
-    <hr style="margin-top: 1px; margin-bottom: 10px;">
-
-    <div class="complete-table">
+    <div class="complete-table listagem-panel">
         <?php if ($isGestorSeguradora): ?>
             <div class="scope-badge">
                 Escopo: Seguradora <?= htmlspecialchars($seguradoraUserNome !== '' ? $seguradoraUserNome : ('#' . $seguradoraUserId), ENT_QUOTES, 'UTF-8') ?>
@@ -789,13 +1014,8 @@ if (typeof jQuery !== 'undefined') {
                   FROM tb_internacao ac
              LEFT JOIN tb_hospital AS ho ON ac.fk_hospital_int = ho.id_hospital
              LEFT JOIN tb_hospitalUser AS hos ON hos.fk_hospital_user = ho.id_hospital
-             LEFT JOIN tb_user AS se ON se.id_usuario = hos.fk_usuario_hosp
-             LEFT JOIN tb_uti AS ut ON ac.id_internacao = ut.fk_internacao_uti
              LEFT JOIN tb_paciente AS pa ON ac.fk_paciente_int = pa.id_paciente
              LEFT JOIN tb_seguradora AS s ON pa.fk_seguradora_pac = s.id_seguradora
-             LEFT JOIN tb_visita AS vi ON ac.id_internacao = vi.fk_internacao_vis
-             LEFT JOIN tb_capeante AS ca ON ac.id_internacao = ca.fk_int_capeante
-             LEFT JOIN tb_intern_antec AS an ON ac.id_internacao = fk_internacao_ant_int
                 {$whereCount}
             ";
             $stmtCount = $conn->prepare($sqlCount);
@@ -984,7 +1204,7 @@ if (typeof jQuery !== 'undefined') {
                             $diasIntern     = $dataIntern->diff($atual);
                             $countVisitas   = (int)($resumoVisita['total_visitas'] ?? 0);
                         ?>
-                        <tr style="font-size:13px">
+                        <tr>
                             <td scope="row" class="col-id">
                                 <?= $intern["id_internacao"] ?>
                             </td>
@@ -1190,7 +1410,7 @@ if (typeof jQuery !== 'undefined') {
 
                         <?php if ($qtdIntItens == 0): ?>
                         <tr>
-                            <td colspan="14" scope="row" class="col-id" style="font-size:15px">
+                            <td colspan="14" scope="row" class="col-id" style="font-size:.82rem">
                                 Sem registros para os filtros aplicados.<?= $isGestorSeguradora ? ' Você está visualizando somente dados da sua seguradora.' : '' ?>
                             </td>
                         </tr>
@@ -1300,7 +1520,7 @@ if (typeof jQuery !== 'undefined') {
                     </div>
 
                     <div class="table-counter">
-                        <p style="margin-bottom:25px;font-size:1em; font-weight:600;
+                        <p style="margin-bottom:18px;font-size:.82rem; font-weight:600;
                                   font-family:var(--bs-font-sans-serif); text-align:right">
                             <?= "Total: " . (int)$qtdIntItens ?>
                         </p>
@@ -1826,6 +2046,7 @@ if (typeof window.paginateInternacao !== 'function') {
     const smartFeedback = document.getElementById('smartSearchFeedback');
     const isSeguradoraRole = <?= $isGestorSeguradora ? 'true' : 'false' ?>;
     const seguradoraNomeEscopo = <?= json_encode((string)$seguradoraUserNome, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const smartSeguradoraOptions = <?= json_encode(array_values($seguradoraOptions), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
     const fieldNames = [
         'pesquisa_nome',
@@ -2033,6 +2254,51 @@ if (typeof window.paginateInternacao !== 'function') {
         submitFiltersWithoutRefresh();
     }
 
+    function normalizeSmartTerm(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+    }
+
+    function escapeRegex(value) {
+        return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function findKnownSeguradora(phrase) {
+        const normalizedPhrase = ` ${normalizeSmartTerm(phrase)} `;
+        if (!normalizedPhrase.trim()) return null;
+
+        const ordered = smartSeguradoraOptions
+            .map((label) => ({
+                label,
+                normalized: normalizeSmartTerm(label)
+            }))
+            .filter((item) => item.normalized.length >= 3)
+            .sort((a, b) => b.normalized.length - a.normalized.length);
+
+        for (const item of ordered) {
+            if (normalizedPhrase.includes(` ${item.normalized} `)) {
+                return item.label;
+            }
+        }
+        return null;
+    }
+
+    function removeKnownTermFromPhrase(phrase, term) {
+        const termWords = normalizeSmartTerm(term).split(' ').filter(Boolean);
+        if (!termWords.length) return phrase;
+
+        let result = String(phrase || '');
+        termWords.forEach((word) => {
+            if (word.length < 3) return;
+            result = result.replace(new RegExp(`\\b${escapeRegex(word)}\\b`, 'ig'), ' ');
+        });
+        return result.replace(/\s+/g, ' ').trim();
+    }
+
     function parseSmartPhrase(phrase) {
         if (!phrase) return null;
         const cleaned = phrase.trim();
@@ -2054,13 +2320,15 @@ if (typeof window.paginateInternacao !== 'function') {
         };
         const result = {};
         const lower = cleaned.toLowerCase();
+        const knownSeguradora = !isSeguradoraRole ? findKnownSeguradora(cleaned) : null;
+        const cleanedForTextFields = knownSeguradora ? removeKnownTermFromPhrase(cleaned, knownSeguradora) : cleaned;
 
         let monthInfo = null;
         Object.keys(months).some((name) => {
             const regex = new RegExp(name, 'i');
-            const match = cleaned.match(regex);
+            const match = cleanedForTextFields.match(regex);
             if (match) {
-                const yearMatch = cleaned.match(/20\d{2}/);
+                const yearMatch = cleanedForTextFields.match(/20\d{2}/);
                 const year = yearMatch ? parseInt(yearMatch[0], 10) : new Date().getFullYear();
                 const monthNum = parseInt(months[name], 10);
                 const start = `${year}-${String(monthNum).padStart(2, '0')}-01`;
@@ -2080,17 +2348,17 @@ if (typeof window.paginateInternacao !== 'function') {
 
         const hospRegex =
             /(?:contas|hospital|hosp)\s+([^0-9]+?)(?=(?:janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|paciente|\d{4}|$))/i;
-        const hospMatch = cleaned.match(hospRegex);
+        const hospMatch = cleanedForTextFields.match(hospRegex);
         if (hospMatch) {
             result.pesquisa_nome = hospMatch[1].trim();
         } else if (monthInfo && monthInfo.index > 0) {
-            const possible = cleaned.slice(0, monthInfo.index).replace(/^(contas|hospital|hosp)\s+/i, '').trim();
+            const possible = cleanedForTextFields.slice(0, monthInfo.index).replace(/^(contas|hospital|hosp)\s+/i, '').trim();
             if (possible) result.pesquisa_nome = possible;
         }
 
         const pacRegex =
             /paciente\s+([^0-9]+?)(?=(?:contas|hospital|hosp|janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|\d{4}|$))/i;
-        const pacMatch = cleaned.match(pacRegex);
+        const pacMatch = cleanedForTextFields.match(pacRegex);
         if (pacMatch) {
             result.pesquisa_pac = pacMatch[1].trim();
         }
@@ -2100,6 +2368,8 @@ if (typeof window.paginateInternacao !== 'function') {
         const segMatch = cleaned.match(segRegex);
         if (segMatch) {
             result.pesquisa_seguradora = segMatch[1].trim();
+        } else if (knownSeguradora) {
+            result.pesquisa_seguradora = knownSeguradora;
         }
 
         const senhaMatch = cleaned.match(/senha\s+([\w-]+)/i);
@@ -2110,6 +2380,13 @@ if (typeof window.paginateInternacao !== 'function') {
         const matriculaMatch = cleaned.match(/matr[íi]cula\s+([\w.-]+)/i);
         if (matriculaMatch) {
             result.pesquisa_matricula = matriculaMatch[1];
+        }
+
+        if (knownSeguradora && !result.pesquisa_pac && !result.pesquisa_nome && !result.senha_int && !result.pesquisa_matricula) {
+            const remainingTerm = cleanedForTextFields.replace(/\b(paciente|seguradora|operadora|convenio|conv[êe]nio)\b/ig, '').trim();
+            if (remainingTerm.length >= 3) {
+                result.pesquisa_pac = remainingTerm;
+            }
         }
 
         // Fallback: texto simples sem chave vira seguradora (ex.: "Bradesco")

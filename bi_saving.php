@@ -18,16 +18,8 @@ $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: nul
 
 $hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
     ->fetchAll(PDO::FETCH_ASSOC);
-$savingExpr = "COALESCE(
-    NULLIF(ng.saving, 0),
-    CASE
-        WHEN UPPER(COALESCE(ng.tipo_negociacao, '')) LIKE 'TROCA%' THEN (COALESCE(aco_de.valor_aco, 0) - COALESCE(aco_para.valor_aco, 0)) * COALESCE(ng.qtd, 0)
-        WHEN UPPER(COALESCE(ng.tipo_negociacao, '')) = 'ALTA TARDIA APTO' THEN COALESCE(NULLIF(aco_para.valor_aco, 0), COALESCE(aco_de.valor_aco, 0)) * COALESCE(NULLIF(ng.qtd, 0), 1)
-        WHEN UPPER(COALESCE(ng.tipo_negociacao, '')) LIKE '%1/2 DIARIA%' THEN (COALESCE(aco_de.valor_aco, 0) / 2) * COALESCE(ng.qtd, 0)
-        ELSE COALESCE(aco_de.valor_aco, 0) * COALESCE(ng.qtd, 0)
-    END,
-    0
-)";
+$negociacaoRealClause = "UPPER(COALESCE(ng.tipo_negociacao, '')) <> 'PRORROGACAO_AUTOMATICA'";
+$savingExpr = "COALESCE(ng.saving, 0)";
 
 if ($ano === null && !filter_has_var(INPUT_GET, 'ano')) {
     $stmtAno = $conn->query("SELECT MAX(YEAR(data_inicio_neg)) AS ano FROM tb_negociacao WHERE data_inicio_neg IS NOT NULL AND data_inicio_neg <> '0000-00-00'");
@@ -38,6 +30,9 @@ if ($ano === null && !filter_has_var(INPUT_GET, 'ano')) {
 $whereBase = "ng.data_inicio_neg IS NOT NULL
     AND ng.data_inicio_neg <> '0000-00-00'
     AND ng.saving IS NOT NULL
+    AND COALESCE(ng.fk_usuario_neg, 0) > 0
+    AND {$negociacaoRealClause}
+    AND COALESCE(ng.saving, 0) <> 0
     AND YEAR(ng.data_inicio_neg) = :ano";
 $paramsBase = [':ano' => $ano];
 
@@ -56,13 +51,9 @@ if ($mes > 0) {
 $sqlTot = "
     SELECT
         SUM({$savingExpr}) AS total_saving,
-        COUNT(*) AS total_registros
+        COUNT(DISTINCT ng.id_negociacao) AS total_registros
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    LEFT JOIN tb_acomodacao aco_de ON aco_de.fk_hospital = i.fk_hospital_int
-        AND LOWER(TRIM(aco_de.acomodacao_aco)) = LOWER(TRIM(IF(LOCATE('-', ng.troca_de) > 0, SUBSTRING_INDEX(ng.troca_de, '-', -1), ng.troca_de)))
-    LEFT JOIN tb_acomodacao aco_para ON aco_para.fk_hospital = i.fk_hospital_int
-        AND LOWER(TRIM(aco_para.acomodacao_aco)) = LOWER(TRIM(IF(LOCATE('-', ng.troca_para) > 0, SUBSTRING_INDEX(ng.troca_para, '-', -1), ng.troca_para)))
     WHERE {$whereTot}
 ";
 $stmt = $conn->prepare($sqlTot);
@@ -78,14 +69,11 @@ $sqlHosp = "
     SELECT
         COALESCE(h.nome_hosp, 'Sem hospital') AS hospital,
         SUM({$savingExpr}) AS total_saving,
-        COUNT(*) AS total_registros
+        COUNT(DISTINCT ng.id_negociacao) AS total_registros,
+        SUM(COALESCE(ng.qtd, 0)) AS total_qtd
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
     LEFT JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int
-    LEFT JOIN tb_acomodacao aco_de ON aco_de.fk_hospital = i.fk_hospital_int
-        AND LOWER(TRIM(aco_de.acomodacao_aco)) = LOWER(TRIM(IF(LOCATE('-', ng.troca_de) > 0, SUBSTRING_INDEX(ng.troca_de, '-', -1), ng.troca_de)))
-    LEFT JOIN tb_acomodacao aco_para ON aco_para.fk_hospital = i.fk_hospital_int
-        AND LOWER(TRIM(aco_para.acomodacao_aco)) = LOWER(TRIM(IF(LOCATE('-', ng.troca_para) > 0, SUBSTRING_INDEX(ng.troca_para, '-', -1), ng.troca_para)))
     WHERE {$whereTot}
     GROUP BY h.id_hospital, h.nome_hosp
     ORDER BY total_saving DESC
@@ -104,10 +92,6 @@ $sqlMensal = "
         SUM({$savingExpr}) AS total_saving
     FROM tb_negociacao ng
     INNER JOIN tb_internacao i ON i.id_internacao = ng.fk_id_int
-    LEFT JOIN tb_acomodacao aco_de ON aco_de.fk_hospital = i.fk_hospital_int
-        AND LOWER(TRIM(aco_de.acomodacao_aco)) = LOWER(TRIM(IF(LOCATE('-', ng.troca_de) > 0, SUBSTRING_INDEX(ng.troca_de, '-', -1), ng.troca_de)))
-    LEFT JOIN tb_acomodacao aco_para ON aco_para.fk_hospital = i.fk_hospital_int
-        AND LOWER(TRIM(aco_para.acomodacao_aco)) = LOWER(TRIM(IF(LOCATE('-', ng.troca_para) > 0, SUBSTRING_INDEX(ng.troca_para, '-', -1), ng.troca_para)))
     WHERE {$whereBase}
     GROUP BY mes
     ORDER BY mes
@@ -133,11 +117,12 @@ $savingMensal = array_values($savingMensalMap);
 $labelsHosp = array_map(fn($r) => $r['hospital'] ?: 'Sem hospital', $hospRows);
 $savingHosp = array_map(fn($r) => (float)$r['total_saving'], $hospRows);
 $countHosp = array_map(fn($r) => (int)$r['total_registros'], $hospRows);
+$qtdDiariasHosp = array_map(fn($r) => (int)($r['total_qtd'] ?? 0), $hospRows);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260411d">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260501">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260411d"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260501"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme bi-ie-page">
@@ -209,6 +194,10 @@ $countHosp = array_map(fn($r) => (int)$r['total_registros'], $hospRows);
         <div class="bi-chart ie-chart-sm"><canvas id="chartQtdeHospital"></canvas></div>
     </div>
     <div class="bi-panel">
+        <h3>Quantidade de diárias trocadas por hospital</h3>
+        <div class="bi-chart ie-chart-sm"><canvas id="chartDiariasHospital"></canvas></div>
+    </div>
+    <div class="bi-panel">
         <h3>Evolução mensal do saving (ano completo)</h3>
         <div class="bi-chart ie-chart-md"><canvas id="chartSavingEvolucao"></canvas></div>
     </div>
@@ -218,8 +207,59 @@ $countHosp = array_map(fn($r) => (int)$r['total_registros'], $hospRows);
 const labelsHosp = <?= json_encode($labelsHosp) ?>;
 const savingHosp = <?= json_encode($savingHosp) ?>;
 const countHosp = <?= json_encode($countHosp) ?>;
+const qtdDiariasHosp = <?= json_encode($qtdDiariasHosp) ?>;
 const labelsMes = <?= json_encode($labelsMes) ?>;
 const savingMensal = <?= json_encode($savingMensal) ?>;
+
+const biValueLabelPlugin = {
+    afterDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        ctx.save();
+
+        chart.data.datasets.forEach(function(dataset, datasetIndex) {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (!meta || meta.hidden) return;
+
+            meta.data.forEach(function(element, index) {
+                const rawValue = Number(dataset.data[index] || 0);
+                if (!Number.isFinite(rawValue)) return;
+
+                const isMoney = !!dataset.isMoney;
+                const label = isMoney
+                    ? formatMoneyCompact(rawValue)
+                    : Number(rawValue).toLocaleString('pt-BR');
+
+                ctx.font = '600 12px Poppins, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = isMoney ? '#f4fbff' : '#f6e6ff';
+                ctx.shadowColor = 'rgba(8, 20, 38, 0.35)';
+                ctx.shadowBlur = 6;
+
+                if (chart.config.type === 'line') {
+                    ctx.fillText(label, element._model.x, element._model.y - 10);
+                } else {
+                    const topY = Math.min(element._model.base, element._model.y);
+                    ctx.fillText(label, element._model.x, topY - 8);
+                }
+            });
+        });
+
+        ctx.restore();
+    }
+};
+
+function formatMoney(value) {
+    return 'R$ ' + Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatMoneyCompact(value) {
+    const absValue = Math.abs(Number(value || 0));
+    if (absValue >= 1000) {
+        return 'R$ ' + Number(value || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+    }
+    return formatMoney(value);
+}
 
 function barChart(ctx, labels, data, color) {
     const scales = window.biChartScales ? window.biChartScales() : undefined;
@@ -230,16 +270,22 @@ function barChart(ctx, labels, data, color) {
     }
     return new Chart(ctx, {
         type: 'bar',
-        data: { labels, datasets: [{ data, backgroundColor: color }] },
+        data: { labels, datasets: [{ data, backgroundColor: color, isMoney: true }] },
+        plugins: [biValueLabelPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 26
+                }
+            },
             legend: { display: false },
             scales: scales,
             tooltips: {
                 callbacks: {
                     label: function (tooltipItem) {
-                        return window.biMoneyTick ? window.biMoneyTick(tooltipItem.yLabel) : ('R$ ' + Number(tooltipItem.yLabel || 0).toLocaleString('pt-BR'));
+                        return window.biMoneyTick ? window.biMoneyTick(tooltipItem.yLabel) : formatMoney(tooltipItem.yLabel);
                     }
                 }
             }
@@ -272,27 +318,58 @@ function lineChart(ctx, labels, data, color, money = true) {
         data: {
             labels,
             datasets: [{
+                label: 'Saving',
                 data,
                 borderColor: color,
                 backgroundColor: 'rgba(0, 0, 0, 0)',
                 borderWidth: 2,
                 pointBackgroundColor: color,
-                pointRadius: 3,
+                pointRadius: 4,
                 tension: 0.35,
-                fill: false
+                fill: false,
+                isMoney: money
             }]
         },
-        options: opts
+        plugins: [biValueLabelPlugin],
+        options: Object.assign({}, opts, {
+            layout: {
+                padding: {
+                    top: 22
+                }
+            }
+        })
     });
 }
 
 barChart(document.getElementById('chartSavingHospital'), labelsHosp, savingHosp, 'rgba(141, 208, 255, 0.7)');
 new Chart(document.getElementById('chartQtdeHospital'), {
     type: 'bar',
-    data: { labels: labelsHosp, datasets: [{ data: countHosp, backgroundColor: 'rgba(208, 113, 176, 0.7)' }] },
+    data: { labels: labelsHosp, datasets: [{ data: countHosp, backgroundColor: 'rgba(208, 113, 176, 0.7)', isMoney: false }] },
+    plugins: [biValueLabelPlugin],
     options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+            padding: {
+                top: 24
+            }
+        },
+        legend: { display: false },
+        scales: window.biChartScales ? window.biChartScales() : undefined
+    }
+});
+new Chart(document.getElementById('chartDiariasHospital'), {
+    type: 'bar',
+    data: { labels: labelsHosp, datasets: [{ data: qtdDiariasHosp, backgroundColor: 'rgba(112, 214, 168, 0.72)', isMoney: false }] },
+    plugins: [biValueLabelPlugin],
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: {
+                top: 24
+            }
+        },
         legend: { display: false },
         scales: window.biChartScales ? window.biChartScales() : undefined
     }

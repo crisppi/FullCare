@@ -16,14 +16,9 @@ $pesquisa_nome = filter_input(INPUT_GET, 'pesquisa_nome', FILTER_SANITIZE_SPECIA
 $buscaAtivo = filter_input(INPUT_GET, 'ativo_pac');
 $limite = filter_input(INPUT_GET, 'limite') ? filter_input(INPUT_GET, 'limite') : 10;
 $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar') : '';
-$estipulanteInicio = ' 1 ';
-
-
 $condicoes = [
     strlen($busca) ? 'nome_est LIKE "%' . $busca . '%"' : null,
     strlen($buscaAtivo) ? 'ativo_est = "' . $buscaAtivo . '"' : null,
-    strlen($estipulanteInicio) ? 'id_estipulante > ' . $estipulanteInicio . ' ' : NULL,
-
 ];
 $condicoes = array_filter($condicoes);
 
@@ -88,23 +83,26 @@ if ($qtdIntItens > $limite) {
     $current_block = reset($block_pages)["bloco"];
 }
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
 
 <!--tabela evento-->
-<div class="container-fluid  form_container" style="margin-top:-5px;">
+<div class="container-fluid form_container listagem-page" style="margin-top:18px;">
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="./scripts/cadastro/general.js"></script>
-    <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0;">
-        <h4 class="page-title">Estipulantes</h4>
-        <div style="margin-left: auto;">
+    <div class="listagem-hero">
+        <div class="listagem-hero__copy">
+            <div class="listagem-kicker">Cadastros</div>
+            <h1 class="listagem-title">Estipulantes</h1>
+            <p class="listagem-subtitle">Acesse estipulantes com um título mais forte e melhor separado do header.</p>
+        </div>
+        <div class="listagem-hero__actions">
             <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/estipulantes/novo', ENT_QUOTES, 'UTF-8') ?>"
-                class="btn btn-success styled"
-                style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
-                <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Novo Estipulante
+                class="btn listagem-btn-top listagem-btn-top--blue">
+                <i class="bi bi-plus-lg" style='font-size: .95rem;margin-right:5px;'></i>Novo Estipulante
             </a>
         </div>
     </div>
-    <hr style="margin-top: 5px; margin-bottom: 10px;">
 
     <div class="complete-table">
         <div id="navbarToggleExternalContent" class="table-filters">
@@ -204,17 +202,15 @@ if ($qtdIntItens > $limite) {
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                         <li>
-                                            <button class="btn btn-default" style="font-size: .9rem;"
+                                            <button class="dropdown-item" style="font-size: .9rem;"
                                                 onclick="openModal('<?= $BASE_URL ?>show_estipulante.php?id_estipulante=<?= $id_estipulante ?>')"
-                                                data-bs-toggle="modal" data-bs-target="#myModal"><i class="fas fa-eye"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>Ver</button>
+                                                data-bs-toggle="modal" data-bs-target="#myModal"><i class="bi bi-eye"
+                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver</button>
                                         </li>
                                         <li>
-                                            <a class="btn btn-default" style="font-size: .9rem;"
+                                            <a class="dropdown-item" style="font-size: .9rem;"
                                                 href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/estipulantes/editar/' . (int) $id_estipulante, ENT_QUOTES, 'UTF-8') ?>">
-                                                <i style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"
-                                                    name="type" value="edite"
-                                                    class="far fa-edit edit-icon"></i>Editar
+                                                <i class="bi bi-pencil-square" style="font-size:1rem;margin-right:8px;color:#3b82f6;"></i>Editar
                                             </a>
                                         </li>
                                         <!-- <a href="<?= $BASE_URL ?>show_paciente.php?id_paciente=<?= $id_paciente ?>"><i style="color:red; margin-left:10px" name="type" value="edite" class="d-inline-block bi bi-x-square-fill delete-icon"></i></a> -->
