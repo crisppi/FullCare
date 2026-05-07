@@ -844,6 +844,17 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-shield-check"
                                                     style="font-size: 1rem;margin-right:5px; color:#198754;"></i>
                                                 Medicina Preventiva</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>longa_permanencia_gestao.php"><i
+                                                    class="bi bi-hourglass-split"
+                                                    style="font-size: 1rem;margin-right:5px; color:#7c3aed;"></i>
+                                                Longa Permanência</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>home_care_gestao.php"><i
+                                                    class="bi bi-house-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
+                                                Home Care</a></li>
                                     </ul>
                                 </li>
                             <?php }; ?>
@@ -911,6 +922,17 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-exclamation-octagon"
                                                     style="font-size: 1rem;margin-right:5px; color:#b897ff;"></i>
                                                 Qualidade &amp; Desfecho</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>longa_permanencia_gestao.php"><i
+                                                    class="bi bi-hourglass-split"
+                                                    style="font-size: 1rem;margin-right:5px; color:#c084fc;"></i>
+                                                Gestão Longa Permanência</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>home_care_gestao.php"><i
+                                                    class="bi bi-house-heart"
+                                                    style="font-size: 1rem;margin-right:5px; color:#7dd3fc;"></i>
+                                                Gestão Home Care</a></li>
                                     </ul>
                                 </li>
                             <?php }; ?>

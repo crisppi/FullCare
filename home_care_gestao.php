@@ -3,7 +3,7 @@ include_once("check_logado.php");
 require_once("globals.php");
 require_once("db.php");
 require_once("templates/header.php");
-require_once("dao/longaPermanenciaDao.php");
+require_once("dao/homeCareDao.php");
 
 if (!function_exists('e')) {
     function e($value)
@@ -12,14 +12,16 @@ if (!function_exists('e')) {
     }
 }
 
-$dao = new LongaPermanenciaDAO($conn, $BASE_URL);
+$dao = new HomeCareDAO($conn, $BASE_URL);
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 $seguradoraId = filter_input(INPUT_GET, 'seguradora_id', FILTER_VALIDATE_INT) ?: null;
 $status = trim((string)(filter_input(INPUT_GET, 'status') ?? ''));
-$escalonamento = trim((string)(filter_input(INPUT_GET, 'escalonamento') ?? ''));
+$modalidade = trim((string)(filter_input(INPUT_GET, 'modalidade') ?? ''));
 $semAtualizacao = filter_input(INPUT_GET, 'sem_atualizacao', FILTER_VALIDATE_INT) ?: null;
 $queue = [];
 $statusOptions = $dao->getStatusOptions();
+$modalidadeOptions = $dao->getModalidadeOptions();
+$barreiraOptions = $dao->getBarreiraOptions();
 $hospitais = [];
 $seguradoras = [];
 $pageError = '';
@@ -29,32 +31,31 @@ try {
         'hospital_id' => $hospitalId,
         'seguradora_id' => $seguradoraId,
         'status' => $status,
-        'escalonamento' => $escalonamento,
+        'modalidade' => $modalidade,
         'sem_atualizacao' => $semAtualizacao,
     ]);
-
     $hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")->fetchAll(PDO::FETCH_ASSOC) ?: [];
     $seguradoras = $conn->query("SELECT id_seguradora, seguradora_seg FROM tb_seguradora ORDER BY seguradora_seg")->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (Throwable $e) {
-    $pageError = 'Nao foi possivel carregar a fila de longa permanencia agora.';
-    error_log('[LONGA_PERMANENCIA][GESTAO][ERROR] ' . $e->getMessage());
+    $pageError = 'Nao foi possivel carregar a fila de Home Care agora.';
+    error_log('[HOME_CARE][GESTAO][ERROR] ' . $e->getMessage());
 }
 
 $totais = [
     'casos' => count($queue),
-    'sem_status' => 0,
-    'escalonados' => 0,
+    'elegiveis' => 0,
+    'implantacao' => 0,
     'sem_revisao' => 0,
 ];
 foreach ($queue as $row) {
-    if (empty($row['status_lp'])) {
-        $totais['sem_status']++;
+    if (($row['nead_elegivel_hc'] ?? 'n') === 's') {
+        $totais['elegiveis']++;
     }
-    if (($row['necessita_escalonamento_lp'] ?? 'n') === 's') {
-        $totais['escalonados']++;
+    if (in_array((string)($row['status_hc'] ?? ''), ['elegivel', 'implantacao'], true)) {
+        $totais['implantacao']++;
     }
-    $ultimaAtualizacao = !empty($row['data_atualizacao_lp']) ? strtotime((string)$row['data_atualizacao_lp']) : false;
-    if (!$ultimaAtualizacao || $ultimaAtualizacao < strtotime('-7 days')) {
+    $ultimaAtualizacao = !empty($row['data_atualizacao_hc']) ? strtotime((string)$row['data_atualizacao_hc']) : false;
+    if (!$ultimaAtualizacao || $ultimaAtualizacao < strtotime('-5 days')) {
         $totais['sem_revisao']++;
     }
 }
@@ -90,8 +91,8 @@ if ($seguradoraId) {
 if ($status !== '') {
     $activeFilters[] = 'Status: ' . ($status === '__sem_status__' ? 'Sem status' : ($statusOptions[$status] ?? $status));
 }
-if ($escalonamento !== '') {
-    $activeFilters[] = 'Escalonamento: ' . ($escalonamento === 's' ? 'Necessita escalonamento' : 'Sem escalonamento');
+if ($modalidade !== '') {
+    $activeFilters[] = 'Modalidade: ' . ($modalidadeOptions[$modalidade] ?? $modalidade);
 }
 if ($semAtualizacaoLabel !== '') {
     $activeFilters[] = 'Sem revisão: ' . $semAtualizacaoLabel;
@@ -99,145 +100,141 @@ if ($semAtualizacaoLabel !== '') {
 ?>
 
 <style>
-.lp-shell {
-    --lp-ink: #2f2042;
-    --lp-muted: #726884;
-    --lp-border: rgba(92, 45, 112, 0.12);
-    --lp-panel: rgba(255, 255, 255, 0.78);
-    --lp-purple: #6b2d73;
-    --lp-purple-2: #8d4ca0;
-    --lp-rose: #ffe4ea;
-    --lp-gold: #fff1d1;
-    --lp-mint: #e8f8ef;
+.hc-shell {
+    --hc-ink: #1f3150;
+    --hc-muted: #6c7b91;
+    --hc-border: rgba(34, 88, 148, 0.12);
+    --hc-panel: rgba(255, 255, 255, 0.8);
+    --hc-blue: #2a78c2;
+    --hc-blue-2: #58a0eb;
+    --hc-gold: #fff2da;
+    --hc-mint: #e6f7ec;
     padding: 18px 18px 28px;
     min-height: calc(100vh - 100px);
     background:
-        radial-gradient(circle at top left, rgba(166, 115, 190, 0.16), transparent 30%),
-        radial-gradient(circle at top right, rgba(127, 177, 233, 0.14), transparent 32%),
-        linear-gradient(180deg, #f6f1fb 0%, #eff4f8 100%);
+        radial-gradient(circle at top left, rgba(88, 160, 235, 0.14), transparent 30%),
+        radial-gradient(circle at top right, rgba(42, 120, 194, 0.12), transparent 32%),
+        linear-gradient(180deg, #f4f9fd 0%, #eef4fb 100%);
 }
 
-.lp-hero {
+.hc-hero {
     display: grid;
     grid-template-columns: minmax(0, 1.7fr) minmax(280px, .9fr);
     gap: 12px;
     margin-bottom: 12px;
 }
 
-.lp-hero__main,
-.lp-hero__side,
-.lp-card,
-.lp-kpi {
+.hc-hero__main,
+.hc-hero__side,
+.hc-card,
+.hc-kpi {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
 
-.lp-hero__main {
+.hc-hero__main {
     position: relative;
     padding: 20px 22px;
     border-radius: 22px;
     overflow: hidden;
-    background:
-        linear-gradient(135deg, rgba(78, 28, 100, 0.96), rgba(127, 88, 168, 0.9)),
-        #5d256a;
+    background: linear-gradient(135deg, rgba(26, 104, 175, 0.96), rgba(88, 160, 235, 0.9)), #236ead;
     color: #fff;
-    box-shadow: 0 28px 60px rgba(58, 22, 80, 0.24);
+    box-shadow: 0 24px 50px rgba(32, 82, 138, 0.2);
 }
 
-.lp-hero__main::after {
+.hc-hero__main::after {
     content: "";
     position: absolute;
     inset: auto -60px -80px auto;
     width: 220px;
     height: 220px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,0));
+    background: radial-gradient(circle, rgba(255,255,255,.24), rgba(255,255,255,0));
 }
 
-.lp-eyebrow {
+.hc-eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
     padding: 5px 10px;
     border-radius: 999px;
-    background: rgba(255,255,255,.14);
+    background: rgba(255,255,255,.15);
     font-size: .66rem;
     font-weight: 700;
     letter-spacing: .08em;
     text-transform: uppercase;
 }
 
-.lp-hero h1 {
+.hc-hero h1 {
     margin: 10px 0 6px;
     font-size: 1.72rem;
     line-height: 1.1;
     color: #fff;
 }
 
-.lp-hero p {
+.hc-hero p {
     margin: 0;
     max-width: 760px;
     color: rgba(255,255,255,.82);
     font-size: .9rem;
 }
 
-.lp-hero__metrics {
+.hc-hero__metrics {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     margin-top: 14px;
 }
 
-.lp-hero__metric {
+.hc-hero__metric {
     padding: 10px 12px;
     border-radius: 14px;
     background: rgba(255,255,255,.12);
     border: 1px solid rgba(255,255,255,.12);
 }
 
-.lp-hero__metric strong {
+.hc-hero__metric strong {
     display: block;
     font-size: 1.08rem;
     line-height: 1;
 }
 
-.lp-hero__metric span {
+.hc-hero__metric span {
     display: block;
     margin-top: 4px;
-    color: rgba(255,255,255,.72);
+    color: rgba(255,255,255,.74);
     font-size: .72rem;
 }
 
-.lp-hero__side {
+.hc-hero__side {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 10px;
     padding: 16px;
     border-radius: 22px;
-    background: var(--lp-panel);
+    background: var(--hc-panel);
     border: 1px solid rgba(255,255,255,.5);
-    box-shadow: 0 22px 48px rgba(49, 34, 68, 0.12);
+    box-shadow: 0 18px 38px rgba(39, 78, 120, 0.12);
 }
 
-.lp-hero__side h2 {
+.hc-hero__side h2 {
     margin: 0;
     font-size: .92rem;
-    color: var(--lp-ink);
+    color: var(--hc-ink);
 }
 
-.lp-hero__side p {
-    color: var(--lp-muted);
+.hc-hero__side p {
+    color: var(--hc-muted);
     font-size: .78rem;
 }
 
-.lp-top-actions {
+.hc-top-actions {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-.lp-btn {
+.hc-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -245,209 +242,195 @@ if ($semAtualizacaoLabel !== '') {
     min-height: 36px;
     padding: 0 13px;
     border-radius: 12px;
-    border: 1px solid var(--lp-border);
+    border: 1px solid var(--hc-border);
     background: rgba(255,255,255,.92);
-    color: #4e2a62;
+    color: #29507d;
     font-weight: 700;
     text-decoration: none;
-    transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
 }
 
-.lp-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 24px rgba(56, 34, 76, 0.12);
-    color: #4e2a62;
-}
-
-.lp-btn--primary {
-    border: none;
-    background: linear-gradient(135deg, var(--lp-purple), var(--lp-purple-2));
+.hc-btn--primary {
+    background: linear-gradient(135deg, var(--hc-blue), var(--hc-blue-2));
     color: #fff;
-    box-shadow: 0 16px 28px rgba(107, 45, 115, 0.22);
+    border: none;
+    box-shadow: 0 14px 24px rgba(42, 120, 194, 0.2);
 }
 
-.lp-kpis {
+.hc-kpis {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
     margin-bottom: 12px;
 }
 
-.lp-kpi {
+.hc-kpi {
     position: relative;
     padding: 12px 14px 14px;
     border-radius: 18px;
-    background: var(--lp-panel);
+    background: var(--hc-panel);
     border: 1px solid rgba(255,255,255,.45);
-    box-shadow: 0 18px 38px rgba(53, 34, 73, 0.1);
+    box-shadow: 0 16px 30px rgba(39, 78, 120, 0.1);
     overflow: hidden;
 }
 
-.lp-kpi::before {
+.hc-kpi::before {
     content: "";
     position: absolute;
     inset: 0 0 auto 0;
     height: 4px;
-    background: linear-gradient(90deg, rgba(107,45,115,.95), rgba(141,76,160,.35));
+    background: linear-gradient(90deg, rgba(42,120,194,.95), rgba(88,160,235,.35));
 }
 
-.lp-kpi small {
+.hc-kpi small {
     display: block;
     margin-bottom: 6px;
-    color: #7f748f;
+    color: #728198;
     text-transform: uppercase;
-    letter-spacing: .11em;
+    letter-spacing: .09em;
     font-size: .66rem;
     font-weight: 700;
 }
 
-.lp-kpi strong {
+.hc-kpi strong {
     display: block;
     font-size: 1.5rem;
     line-height: 1;
-    color: var(--lp-ink);
+    color: var(--hc-ink);
 }
 
-.lp-kpi span {
+.hc-kpi span {
     display: block;
     margin-top: 5px;
-    color: var(--lp-muted);
+    color: var(--hc-muted);
     font-size: .72rem;
 }
 
-.lp-grid {
+.hc-grid {
     display: grid;
     grid-template-columns: 320px minmax(0, 1fr);
     gap: 12px;
     align-items: start;
 }
 
-.lp-card {
-    background: var(--lp-panel);
+.hc-card {
+    background: var(--hc-panel);
     border: 1px solid rgba(255,255,255,.5);
     border-radius: 20px;
-    box-shadow: 0 22px 44px rgba(49, 34, 68, 0.11);
+    box-shadow: 0 18px 34px rgba(39, 78, 120, 0.1);
     overflow: hidden;
 }
 
-.lp-card__head {
+.hc-card__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
     padding: 14px 16px;
-    border-bottom: 1px solid rgba(99, 71, 122, 0.08);
+    border-bottom: 1px solid rgba(34,88,148,.08);
 }
 
-.lp-card__head h2 {
+.hc-card__head h2 {
     margin: 0;
     font-size: 1rem;
-    color: var(--lp-ink);
+    color: var(--hc-ink);
 }
 
-.lp-card__head p {
+.hc-card__head p {
     margin: 4px 0 0;
-    color: var(--lp-muted);
+    color: var(--hc-muted);
     font-size: .74rem;
 }
 
-.lp-card__body {
+.hc-card__body {
     padding: 14px 16px 16px;
 }
 
-.lp-filters {
+.hc-filters {
     position: sticky;
     top: 18px;
 }
 
-.lp-filter {
+.hc-filter {
     margin-bottom: 10px;
 }
 
-.lp-filter label {
+.hc-filter label {
     display: block;
     margin-bottom: 4px;
     font-size: .72rem;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: .11em;
-    color: #6c617e;
+    letter-spacing: .09em;
+    color: #6a7890;
 }
 
-.lp-filter select,
-.lp-filter input {
+.hc-filter select,
+.hc-filter input {
     width: 100%;
     min-height: 38px;
     border-radius: 12px;
-    border: 1px solid #d9d1e5;
+    border: 1px solid #d7e1ef;
     padding: 8px 12px;
     font-size: .84rem;
-    color: #342944;
+    color: #27405d;
     background: rgba(255,255,255,.94);
     outline: none;
 }
 
-.lp-filter select:focus,
-.lp-filter input:focus {
-    border-color: rgba(107,45,115,.45);
-    box-shadow: 0 0 0 4px rgba(107,45,115,.08);
-}
-
-.lp-filter-actions {
+.hc-filter-actions {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
     margin-top: 8px;
 }
 
-.lp-filter-actions .lp-btn {
+.hc-filter-actions .hc-btn {
     flex: 1 1 120px;
 }
 
-.lp-filter-note {
+.hc-filter-note {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px dashed rgba(99, 71, 122, 0.16);
-    color: var(--lp-muted);
+    border-top: 1px dashed rgba(34,88,148,.14);
+    color: var(--hc-muted);
     font-size: .75rem;
 }
 
-.lp-sub {
-    color: var(--lp-muted);
+.hc-sub {
+    color: var(--hc-muted);
     font-size: .72rem;
 }
 
-.lp-active-filters {
+.hc-active-filters {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
 
-.lp-active-filter {
+.hc-active-filter {
     display: inline-flex;
     align-items: center;
     padding: 5px 10px;
     border-radius: 999px;
-    background: rgba(107,45,115,.08);
-    color: #5b376d;
+    background: rgba(42,120,194,.08);
+    color: #29507d;
     font-size: .72rem;
     font-weight: 700;
 }
 
-.lp-list {
+.hc-list {
     display: grid;
     gap: 10px;
 }
 
-.lp-case {
+.hc-case {
     padding: 12px 14px;
     border-radius: 16px;
     background: rgba(255,255,255,.86);
-    border: 1px solid rgba(95, 57, 118, 0.1);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+    border: 1px solid rgba(42,120,194,.09);
 }
 
-.lp-case__top {
+.hc-case__top {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -455,73 +438,73 @@ if ($semAtualizacaoLabel !== '') {
     margin-bottom: 10px;
 }
 
-.lp-case__title h3 {
+.hc-case__title h3 {
     margin: 0;
     font-size: .95rem;
-    color: var(--lp-ink);
+    color: var(--hc-ink);
 }
 
-.lp-case__title p {
+.hc-case__title p {
     margin: 3px 0 0;
-    color: var(--lp-muted);
+    color: var(--hc-muted);
     font-size: .76rem;
 }
 
-.lp-case__days {
+.hc-case__days {
     min-width: 150px;
     padding: 8px 10px;
     border-radius: 14px;
-    background: linear-gradient(135deg, rgba(107,45,115,.08), rgba(187,145,203,.14));
+    background: linear-gradient(135deg, rgba(42,120,194,.08), rgba(88,160,235,.14));
     text-align: right;
 }
 
-.lp-case__days strong {
+.hc-case__days strong {
     display: block;
     font-size: 1.08rem;
     line-height: 1;
-    color: var(--lp-ink);
+    color: var(--hc-ink);
 }
 
-.lp-case__days span {
+.hc-case__days span {
     display: block;
     margin-top: 3px;
-    color: #705f80;
+    color: #6481a0;
     font-size: .7rem;
 }
 
-.lp-case__meta {
+.hc-case__meta {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 8px;
 }
 
-.lp-meta {
+.hc-meta {
     padding: 9px 10px;
     border-radius: 12px;
-    background: rgba(245, 241, 251, 0.88);
+    background: rgba(243, 248, 255, 0.9);
 }
 
-.lp-meta label {
+.hc-meta label {
     display: block;
     margin-bottom: 5px;
-    color: #796e8b;
+    color: #70839c;
     font-size: .68rem;
     font-weight: 800;
-    letter-spacing: .09em;
+    letter-spacing: .08em;
     text-transform: uppercase;
 }
 
-.lp-meta strong,
-.lp-meta div {
-    color: var(--lp-ink);
+.hc-meta strong,
+.hc-meta div {
+    color: var(--hc-ink);
     font-size: .82rem;
 }
 
-.lp-meta strong {
+.hc-meta strong {
     font-size: .88rem;
 }
 
-.lp-case__foot {
+.hc-case__foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -529,7 +512,7 @@ if ($semAtualizacaoLabel !== '') {
     margin-top: 10px;
 }
 
-.lp-chip {
+.hc-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -539,136 +522,113 @@ if ($semAtualizacaoLabel !== '') {
     font-weight: 800;
 }
 
-.lp-chip--warn { background: var(--lp-gold); color: #946200; }
-.lp-chip--critical { background: #ffe2e5; color: #a23247; }
-.lp-chip--ok { background: var(--lp-mint); color: #256b43; }
-.lp-chip--neutral { background: #eee6f7; color: #65437b; }
+.hc-chip--warn { background: var(--hc-gold); color: #946200; }
+.hc-chip--critical { background: #ffe1e1; color: #a82b2b; }
+.hc-chip--ok { background: var(--hc-mint); color: #2b7a46; }
+.hc-chip--neutral { background: #eef5ff; color: #315b8d; }
 
-.lp-empty {
-    padding: 36px 18px;
+.hc-empty {
+    padding: 28px 16px;
     text-align: center;
-    color: var(--lp-muted);
+    color: #7d8ba0;
 }
 
-.lp-alert {
-    margin-bottom: 16px;
-    padding: 15px 16px;
-    border-radius: 16px;
+.hc-alert {
+    margin-bottom: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
     background: #fff0f0;
     border: 1px solid #f2c7c7;
     color: #8a2f2f;
-    box-shadow: 0 10px 24px rgba(138,47,47,.08);
 }
 
 @media (max-width: 1280px) {
-    .lp-hero { grid-template-columns: 1fr; }
-    .lp-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .lp-grid { grid-template-columns: 1fr; }
-    .lp-filters { position: static; }
+    .hc-hero { grid-template-columns: 1fr; }
+    .hc-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hc-grid { grid-template-columns: 1fr; }
+    .hc-filters { position: static; }
 }
 
-@media (max-width: 860px) {
-    .lp-hero__metrics,
-    .lp-case__meta {
-        grid-template-columns: 1fr;
-    }
-
-    .lp-case__top,
-    .lp-case__foot {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .lp-case__days {
-        min-width: 0;
-        text-align: left;
+@media (max-width: 980px) {
+    .hc-case__meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 680px) {
-    .lp-shell { padding: 16px 12px 30px; }
-    .lp-hero__main,
-    .lp-hero__side,
-    .lp-card,
-    .lp-kpi,
-    .lp-case {
-        border-radius: 20px;
+    .hc-shell { padding: 16px 12px 28px; }
+    .hc-hero__metrics,
+    .hc-case__meta {
+        grid-template-columns: 1fr;
     }
-    .lp-hero h1 { font-size: 1.45rem; }
-    .lp-kpis { grid-template-columns: 1fr; }
+    .hc-case__top,
+    .hc-case__foot {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .hc-case__days {
+        min-width: 0;
+        text-align: left;
+    }
+    .hc-hero h1 { font-size: 1.45rem; }
+    .hc-kpis { grid-template-columns: 1fr; }
 }
 </style>
 
-<div class="lp-shell">
-    <div class="lp-hero">
-        <section class="lp-hero__main">
-            <div class="lp-eyebrow">Cuidado continuado</div>
-            <h1>Gestão de Longa Permanência</h1>
-            <p>Priorize revisão clínica, barreiras de alta e plano de ação dos casos com maior permanência excedente.</p>
-            <div class="lp-hero__metrics">
-                <div class="lp-hero__metric">
+<div class="hc-shell">
+    <div class="hc-hero">
+        <section class="hc-hero__main">
+            <div class="hc-eyebrow">Cuidado domiciliar</div>
+            <h1>Gestão de Home Care</h1>
+            <p>Priorize elegibilidade NEAD, implantação e transição segura do cuidado domiciliar com foco nos casos em atraso.</p>
+            <div class="hc-hero__metrics">
+                <div class="hc-hero__metric">
                     <strong><?= number_format($totais['casos'], 0, ',', '.') ?></strong>
-                    <span>casos monitorados agora</span>
+                    <span>casos monitorados</span>
                 </div>
-                <div class="lp-hero__metric">
+                <div class="hc-hero__metric">
+                    <strong><?= number_format($totais['elegiveis'], 0, ',', '.') ?></strong>
+                    <span>elegíveis NEAD</span>
+                </div>
+                <div class="hc-hero__metric">
                     <strong><?= number_format($totais['sem_revisao'], 0, ',', '.') ?></strong>
                     <span>sem revisão recente</span>
                 </div>
-                <div class="lp-hero__metric">
-                    <strong><?= number_format($totais['escalonados'], 0, ',', '.') ?></strong>
-                    <span>pedindo escalonamento</span>
-                </div>
             </div>
         </section>
-        <aside class="lp-hero__side">
+        <aside class="hc-hero__side">
             <div>
                 <h2>Leitura rápida da fila</h2>
-                <p>Foque nos casos sem status e sem revisão recente.</p>
+                <p>Foque nos casos sem status definido e nos pacientes com implantação sem revisão há mais de 5 dias.</p>
             </div>
-            <div class="lp-top-actions">
-                <a class="lp-btn" href="<?= $BASE_URL ?>bi/longa-permanencia">Voltar ao BI</a>
+            <div class="hc-top-actions">
+                <a class="hc-btn" href="<?= $BASE_URL ?>bi/home-care">Voltar ao BI</a>
             </div>
         </aside>
     </div>
 
     <?php if ($pageError !== ''): ?>
-        <div class="lp-alert"><?= e($pageError) ?></div>
+        <div class="hc-alert"><?= e($pageError) ?></div>
     <?php endif; ?>
 
-    <div class="lp-kpis">
-        <div class="lp-kpi">
-            <small>Casos na fila</small>
-            <strong><?= number_format($totais['casos'], 0, ',', '.') ?></strong>
-            <span>Total após filtros.</span>
-        </div>
-        <div class="lp-kpi">
-            <small>Sem status</small>
-            <strong><?= number_format($totais['sem_status'], 0, ',', '.') ?></strong>
-            <span>Ainda sem enquadramento.</span>
-        </div>
-        <div class="lp-kpi">
-            <small>Escalonados</small>
-            <strong><?= number_format($totais['escalonados'], 0, ',', '.') ?></strong>
-            <span>Pedem apoio imediato.</span>
-        </div>
-        <div class="lp-kpi">
-            <small>Sem revisão &gt; 7d</small>
-            <strong><?= number_format($totais['sem_revisao'], 0, ',', '.') ?></strong>
-            <span>Acompanhamento atrasado.</span>
-        </div>
+    <div class="hc-kpis">
+        <div class="hc-kpi"><small>Casos na fila</small><strong><?= number_format($totais['casos'], 0, ',', '.') ?></strong><span>Total após filtros.</span></div>
+        <div class="hc-kpi"><small>Elegíveis NEAD</small><strong><?= number_format($totais['elegiveis'], 0, ',', '.') ?></strong><span>Prontos para decisão.</span></div>
+        <div class="hc-kpi"><small>Em implantação</small><strong><?= number_format($totais['implantacao'], 0, ',', '.') ?></strong><span>Transição em andamento.</span></div>
+        <div class="hc-kpi"><small>Sem revisão &gt; 5d</small><strong><?= number_format($totais['sem_revisao'], 0, ',', '.') ?></strong><span>Acompanhamento atrasado.</span></div>
     </div>
 
-    <div class="lp-grid">
-        <aside class="lp-card lp-filters">
-            <div class="lp-card__head">
+    <div class="hc-grid">
+        <aside class="hc-card hc-filters">
+            <div class="hc-card__head">
                 <div>
                     <h2>Filtros</h2>
                     <p>Refine a fila.</p>
                 </div>
             </div>
-            <div class="lp-card__body">
+            <div class="hc-card__body">
                 <form method="get">
-                    <div class="lp-filter">
+                    <div class="hc-filter">
                         <label>Hospital</label>
                         <select name="hospital_id">
                             <option value="">Todos</option>
@@ -677,7 +637,7 @@ if ($semAtualizacaoLabel !== '') {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="lp-filter">
+                    <div class="hc-filter">
                         <label>Seguradora</label>
                         <select name="seguradora_id">
                             <option value="">Todas</option>
@@ -686,7 +646,7 @@ if ($semAtualizacaoLabel !== '') {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="lp-filter">
+                    <div class="hc-filter">
                         <label>Status</label>
                         <select name="status">
                             <option value="">Todos</option>
@@ -696,28 +656,29 @@ if ($semAtualizacaoLabel !== '') {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="lp-filter">
-                        <label>Escalonamento</label>
-                        <select name="escalonamento">
-                            <option value="">Todos</option>
-                            <option value="s" <?= $escalonamento === 's' ? 'selected' : '' ?>>Necessita escalonamento</option>
-                            <option value="n" <?= $escalonamento === 'n' ? 'selected' : '' ?>>Sem escalonamento</option>
+                    <div class="hc-filter">
+                        <label>Modalidade</label>
+                        <select name="modalidade">
+                            <option value="">Todas</option>
+                            <?php foreach ($modalidadeOptions as $key => $label): ?>
+                                <option value="<?= e($key) ?>" <?= $modalidade === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="lp-filter">
+                    <div class="hc-filter">
                         <label>Sem revisão há</label>
                         <select name="sem_atualizacao">
                             <option value="">Todos</option>
+                            <option value="3" <?= (int)$semAtualizacao === 3 ? 'selected' : '' ?>>3 dias</option>
+                            <option value="5" <?= (int)$semAtualizacao === 5 ? 'selected' : '' ?>>5 dias</option>
                             <option value="7" <?= (int)$semAtualizacao === 7 ? 'selected' : '' ?>>7 dias</option>
-                            <option value="15" <?= (int)$semAtualizacao === 15 ? 'selected' : '' ?>>15 dias</option>
-                            <option value="30" <?= (int)$semAtualizacao === 30 ? 'selected' : '' ?>>30 dias</option>
                         </select>
                     </div>
-                    <div class="lp-filter-actions">
-                        <button class="lp-btn lp-btn--primary" type="submit">Aplicar</button>
-                        <a class="lp-btn" href="<?= $BASE_URL ?>longa_permanencia_gestao.php">Limpar</a>
+                    <div class="hc-filter-actions">
+                        <button class="hc-btn hc-btn--primary" type="submit">Aplicar</button>
+                        <a class="hc-btn" href="<?= $BASE_URL ?>home_care_gestao.php">Limpar</a>
                     </div>
-                    <div class="lp-filter-note">
+                    <div class="hc-filter-note">
                         <strong>Visão atual:</strong> <?= e($selectedHospitalLabel) ?><br>
                         <strong>Seguradora:</strong> <?= e($selectedSeguradoraLabel) ?>
                     </div>
@@ -725,39 +686,35 @@ if ($semAtualizacaoLabel !== '') {
             </div>
         </aside>
 
-        <section class="lp-card">
-            <div class="lp-card__head">
+        <section class="hc-card">
+            <div class="hc-card__head">
                 <div>
                     <h2>Fila de casos</h2>
                     <p><?= number_format(count($queue), 0, ',', '.') ?> caso(s) na visão atual.</p>
                 </div>
                 <?php if ($activeFilters): ?>
-                    <div class="lp-active-filters">
+                    <div class="hc-active-filters">
                         <?php foreach ($activeFilters as $filterLabel): ?>
-                            <span class="lp-active-filter"><?= e($filterLabel) ?></span>
+                            <span class="hc-active-filter"><?= e($filterLabel) ?></span>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
             </div>
-            <div class="lp-card__body">
+            <div class="hc-card__body">
                 <?php if (!$queue): ?>
-                    <div class="lp-empty">Nenhum caso de longa permanência encontrado para os filtros atuais.</div>
+                    <div class="hc-empty">Nenhum caso de Home Care encontrado para os filtros atuais.</div>
                 <?php else: ?>
-                    <div class="lp-list">
+                    <div class="hc-list">
                         <?php foreach ($queue as $row): ?>
                             <?php
-                            $excesso = max(0, (int)$row['diarias'] - (int)$row['limiar']);
-                            $ultimaAtualizacaoTs = !empty($row['data_atualizacao_lp']) ? strtotime((string)$row['data_atualizacao_lp']) : false;
-                            $reviewChip = !$ultimaAtualizacaoTs || $ultimaAtualizacaoTs < strtotime('-7 days')
-                                ? 'lp-chip lp-chip--critical'
-                                : 'lp-chip lp-chip--ok';
-                            $reviewLabel = !$ultimaAtualizacaoTs || $ultimaAtualizacaoTs < strtotime('-7 days')
-                                ? 'Revisão atrasada'
-                                : 'Atualizado';
+                            $ultimaAtualizacaoTs = !empty($row['data_atualizacao_hc']) ? strtotime((string)$row['data_atualizacao_hc']) : false;
+                            $reviewChip = !$ultimaAtualizacaoTs || $ultimaAtualizacaoTs < strtotime('-5 days') ? 'hc-chip hc-chip--critical' : 'hc-chip hc-chip--ok';
+                            $reviewLabel = !$ultimaAtualizacaoTs || $ultimaAtualizacaoTs < strtotime('-5 days') ? 'Revisão atrasada' : 'Atualizado';
+                            $statusChip = !empty($row['status_hc']) ? 'hc-chip hc-chip--neutral' : 'hc-chip hc-chip--warn';
                             ?>
-                            <article class="lp-case">
-                                <div class="lp-case__top">
-                                    <div class="lp-case__title">
+                            <article class="hc-case">
+                                <div class="hc-case__top">
+                                    <div class="hc-case__title">
                                         <h3><?= e($row['nome_pac'] ?? 'Sem nome') ?></h3>
                                         <p>
                                             Seguradora: <?= e($row['seguradora_seg'] ?? 'Sem seguradora') ?>
@@ -766,45 +723,51 @@ if ($semAtualizacaoLabel !== '') {
                                             <?php endif; ?>
                                         </p>
                                     </div>
-                                    <div class="lp-case__days">
-                                        <strong><?= number_format((int)$row['diarias'], 0, ',', '.') ?>d</strong>
-                                        <span>Limiar <?= number_format((int)$row['limiar'], 0, ',', '.') ?>d · excesso <?= number_format($excesso, 0, ',', '.') ?>d</span>
+                                    <div class="hc-case__days">
+                                        <strong><?= number_format((int)($row['diarias'] ?? 0), 0, ',', '.') ?>d</strong>
+                                        <span>Dias internado</span>
                                     </div>
                                 </div>
 
-                                <div class="lp-case__meta">
-                                    <div class="lp-meta">
+                                <div class="hc-case__meta">
+                                    <div class="hc-meta">
                                         <label>Hospital</label>
                                         <strong><?= e($row['nome_hosp'] ?? 'Sem hospital') ?></strong>
-                                    </div>
-                                    <div class="lp-meta">
-                                        <label>Status atual</label>
-                                        <div class="lp-chip <?= !empty($row['status_lp']) ? 'lp-chip--neutral' : 'lp-chip--warn' ?>">
-                                            <?= e($statusOptions[$row['status_lp']] ?? 'Sem status') ?>
-                                        </div>
-                                        <?php if (!empty($row['motivo_principal_lp'])): ?>
-                                            <div class="lp-sub" style="margin-top:8px;"><?= e($row['motivo_principal_lp']) ?></div>
+                                        <?php if (($row['sinalizado_hc'] ?? 'n') === 's'): ?>
+                                            <div class="hc-sub" style="margin-top:6px;color:#2a78c2;font-weight:700;">Sinalizado em gestão</div>
                                         <?php endif; ?>
                                     </div>
-                                    <div class="lp-meta">
-                                        <label>Próxima revisão</label>
+                                    <div class="hc-meta">
+                                        <label>NEAD</label>
+                                        <div class="hc-chip <?= ($row['nead_elegivel_hc'] ?? 'n') === 's' ? 'hc-chip--ok' : 'hc-chip--warn' ?>">
+                                            <?= ($row['nead_elegivel_hc'] ?? 'n') === 's' ? 'Elegível' : 'Pendente / não elegível' ?>
+                                        </div>
+                                        <div class="hc-sub" style="margin-top:6px;">Score: <?= number_format((int)($row['nead_pontuacao_hc'] ?? 0), 0, ',', '.') ?></div>
+                                    </div>
+                                    <div class="hc-meta">
+                                        <label>Status</label>
+                                        <div class="<?= $statusChip ?>"><?= e($statusOptions[$row['status_hc']] ?? 'Sem status') ?></div>
+                                        <div class="hc-sub" style="margin-top:6px;"><?= e($row['modalidade_aprovada_hc'] ?? $modalidadeOptions[$row['modalidade_sugerida_hc']] ?? 'Sem modalidade') ?></div>
+                                    </div>
+                                    <div class="hc-meta">
+                                        <label>Implantação</label>
                                         <div class="<?= $reviewChip ?>"><?= e($reviewLabel) ?></div>
-                                        <div class="lp-sub" style="margin-top:8px;">
-                                            <?= !empty($row['proxima_revisao_lp']) ? e(date('d/m/Y', strtotime((string)$row['proxima_revisao_lp']))) : 'Sem data definida' ?>
+                                        <div class="hc-sub" style="margin-top:6px;">
+                                            <?= !empty($row['previsao_implantacao_hc']) ? 'Prev. ' . e(date('d/m/Y', strtotime((string)$row['previsao_implantacao_hc']))) : 'Sem previsão' ?>
                                         </div>
                                     </div>
-                                    <div class="lp-meta">
-                                        <label>Responsável</label>
-                                        <div><?= e($row['responsavel_lp'] ?? '-') ?></div>
-                                        <?php if (($row['necessita_escalonamento_lp'] ?? 'n') === 's'): ?>
-                                            <div class="lp-sub" style="margin-top:8px;color:#a23247;font-weight:700;">Necessita escalonamento</div>
+                                    <div class="hc-meta">
+                                        <label>Barreira</label>
+                                        <div><?= e($barreiraOptions[$row['barreira_principal_hc']] ?? ($row['barreira_principal_hc'] ?? '-')) ?></div>
+                                        <?php if (!empty($row['fornecedor_hc'])): ?>
+                                            <div class="hc-sub" style="margin-top:6px;">Fornecedor: <?= e($row['fornecedor_hc']) ?></div>
                                         <?php endif; ?>
                                     </div>
                                 </div>
 
-                                <div class="lp-case__foot">
-                                    <div class="lp-sub">Ação clínica e plano de alta.</div>
-                                    <a class="lp-btn lp-btn--primary" href="<?= $BASE_URL ?>longa_permanencia_editar.php?id_internacao=<?= (int)$row['id_internacao'] ?>">Gerir caso</a>
+                                <div class="hc-case__foot">
+                                    <div class="hc-sub">Decisão assistencial, barreiras e implantação.</div>
+                                    <a class="hc-btn hc-btn--primary" href="<?= $BASE_URL ?>home_care_avaliacao.php?id_internacao=<?= (int)$row['id_internacao'] ?>">Avaliar caso</a>
                                 </div>
                             </article>
                         <?php endforeach; ?>
