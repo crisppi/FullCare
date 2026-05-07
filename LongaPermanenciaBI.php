@@ -111,7 +111,7 @@ $stmtHosp->execute($params);
 $hospRows = $stmtHosp->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
 $sqlTable = "
-    SELECT diarias, nome_hosp, data_intern_int,
+    SELECT id_internacao, diarias, nome_hosp, data_intern_int,
            COALESCE(NULLIF(rel_int,''), 'Sem relatório') AS relatorio
     FROM ({$sqlLonga}) x
     ORDER BY diarias DESC
@@ -193,6 +193,7 @@ $lpChartHeight = max(220, count($labelsHosp) * 34);
             <div style="color: var(--bi-muted); font-size: 0.95rem;">Internações acima do limiar da seguradora ou do parâmetro selecionado.</div>
         </div>
         <div class="bi-header-actions">
+            <a class="bi-btn bi-btn-secondary" href="<?= $BASE_URL ?>longa_permanencia_gestao.php">Gestão clínica</a>
             <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
@@ -316,12 +317,13 @@ $lpChartHeight = max(220, count($labelsHosp) * 34);
                                 <th>Hospital</th>
                                 <th>Data Internação</th>
                                 <th>Relatório</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (!$tableRows): ?>
                                 <tr>
-                                    <td colspan="4">Sem informações</td>
+                                    <td colspan="5">Sem informações</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($tableRows as $row): ?>
@@ -336,6 +338,9 @@ $lpChartHeight = max(220, count($labelsHosp) * 34);
                                             <?php endif; ?>
                                         </td>
                                         <td><?= e($row['relatorio'] ?? 'Sem relatório') ?></td>
+                                        <td style="white-space:nowrap;">
+                                            <a class="bi-btn bi-btn-secondary" href="<?= $BASE_URL ?>longa_permanencia_editar.php?id_internacao=<?= (int)($row['id_internacao'] ?? 0) ?>">Gerir caso</a>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
