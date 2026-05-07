@@ -93,6 +93,125 @@ if (!function_exists('ensure_internacao_forecast_columns')) {
     }
 }
 
+if (!function_exists('ensure_internacao_core_columns')) {
+    function ensure_internacao_core_columns(PDO $conn): void
+    {
+        static $checked = false;
+        if ($checked) return;
+        $checked = true;
+
+        try {
+            $stmt = $conn->query(" 
+                SELECT COUNT(*)
+                  FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = 'tb_internacao'
+                   AND COLUMN_NAME = 'fk_cid_int'
+            ");
+            $hasFkCid = (int)$stmt->fetchColumn() > 0;
+            if ($hasFkCid) {
+                return;
+            }
+
+            $stmtPos = $conn->query(" 
+                SELECT COUNT(*)
+                  FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = 'tb_internacao'
+                   AND COLUMN_NAME = 'fk_patologia_int'
+            ");
+            $hasFkPatologia = (int)$stmtPos->fetchColumn() > 0;
+
+            if ($hasFkPatologia) {
+                $conn->exec(" 
+                    ALTER TABLE tb_internacao
+                    ADD COLUMN fk_cid_int INT NULL DEFAULT NULL AFTER fk_patologia_int
+                ");
+            } else {
+                $conn->exec(" 
+                    ALTER TABLE tb_internacao
+                    ADD COLUMN fk_cid_int INT NULL DEFAULT NULL
+                ");
+            }
+        } catch (Throwable $e) {
+            error_log('[SCHEMA][internacao:fk_cid_int] ' . $e->getMessage());
+        }
+    }
+}
+
+if (!function_exists('ensure_visita_faturamento_columns')) {
+    function ensure_visita_faturamento_columns(PDO $conn): void
+    {
+        static $checked = false;
+        if ($checked) return;
+        $checked = true;
+
+        try {
+            $stmtFat = $conn->query(" 
+                SELECT COUNT(*)
+                  FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = 'tb_visita'
+                   AND COLUMN_NAME = 'faturado_vis'
+            ");
+            $hasFaturado = (int)$stmtFat->fetchColumn() > 0;
+            if (!$hasFaturado) {
+                $stmtAfter = $conn->query(" 
+                    SELECT COUNT(*)
+                      FROM information_schema.COLUMNS
+                     WHERE TABLE_SCHEMA = DATABASE()
+                       AND TABLE_NAME = 'tb_visita'
+                       AND COLUMN_NAME = 'data_lancamento_vis'
+                ");
+                $hasLancamento = (int)$stmtAfter->fetchColumn() > 0;
+                if ($hasLancamento) {
+                    $conn->exec(" 
+                        ALTER TABLE tb_visita
+                        ADD COLUMN faturado_vis VARCHAR(5) NULL DEFAULT 'n' AFTER data_lancamento_vis
+                    ");
+                } else {
+                    $conn->exec(" 
+                        ALTER TABLE tb_visita
+                        ADD COLUMN faturado_vis VARCHAR(5) NULL DEFAULT 'n'
+                    ");
+                }
+            }
+
+            $stmtDataFat = $conn->query(" 
+                SELECT COUNT(*)
+                  FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = 'tb_visita'
+                   AND COLUMN_NAME = 'data_faturamento_vis'
+            ");
+            $hasDataFaturamento = (int)$stmtDataFat->fetchColumn() > 0;
+            if (!$hasDataFaturamento) {
+                $stmtAfterFat = $conn->query(" 
+                    SELECT COUNT(*)
+                      FROM information_schema.COLUMNS
+                     WHERE TABLE_SCHEMA = DATABASE()
+                       AND TABLE_NAME = 'tb_visita'
+                       AND COLUMN_NAME = 'faturado_vis'
+                ");
+                $hasFaturadoNow = (int)$stmtAfterFat->fetchColumn() > 0;
+                if ($hasFaturadoNow) {
+                    $conn->exec(" 
+                        ALTER TABLE tb_visita
+                        ADD COLUMN data_faturamento_vis DATE NULL AFTER faturado_vis
+                    ");
+                } else {
+                    $conn->exec(" 
+                        ALTER TABLE tb_visita
+                        ADD COLUMN data_faturamento_vis DATE NULL
+                    ");
+                }
+            }
+        } catch (Throwable $e) {
+            error_log('[SCHEMA][visita:faturamento] ' . $e->getMessage());
+        }
+    }
+}
+
 if (!function_exists('ensure_schema_version_table')) {
     function ensure_schema_version_table(PDO $conn): void
     {
@@ -151,14 +270,14 @@ if (!function_exists('ensure_password_reset_table')) {
                 CREATE TABLE tb_user_password_reset (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_id INT NOT NULL,
-                    email VARCHAR(255) NOT NULL,
+                    email VARCHAR(191) NOT NULL,
                     token_hash CHAR(64) NOT NULL,
                     code_hash CHAR(64) NOT NULL,
                     expires_at DATETIME NOT NULL,
                     used_at DATETIME NULL DEFAULT NULL,
                     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     request_ip VARCHAR(64) NULL DEFAULT NULL,
-                    user_agent VARCHAR(255) NULL DEFAULT NULL,
+                    user_agent VARCHAR(191) NULL DEFAULT NULL,
                     UNIQUE KEY uq_token_hash (token_hash),
                     KEY idx_user_id (user_id),
                     KEY idx_email (email),
@@ -534,6 +653,77 @@ if (!function_exists('ensure_hospital_related_tables')) {
                     KEY idx_seg_contato_fk (fk_seguradora),
                     CONSTRAINT fk_seg_contato_seg
                         FOREIGN KEY (fk_seguradora) REFERENCES tb_seguradora(id_seguradora)
+                        ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ",
+            'tb_paciente_endereco' => "
+                CREATE TABLE tb_paciente_endereco (
+                    id_paciente_endereco INT AUTO_INCREMENT PRIMARY KEY,
+                    fk_paciente INT NOT NULL,
+                    tipo_endereco VARCHAR(60) NULL,
+                    cep_endereco VARCHAR(20) NULL,
+                    endereco_endereco VARCHAR(255) NULL,
+                    numero_endereco VARCHAR(30) NULL,
+                    bairro_endereco VARCHAR(120) NULL,
+                    cidade_endereco VARCHAR(120) NULL,
+                    estado_endereco VARCHAR(10) NULL,
+                    complemento_endereco VARCHAR(120) NULL,
+                    principal_endereco TINYINT(1) NOT NULL DEFAULT 0,
+                    ativo_endereco CHAR(1) NOT NULL DEFAULT 's',
+                    data_create_endereco DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    KEY idx_pac_endereco_fk (fk_paciente),
+                    CONSTRAINT fk_pac_endereco_paciente
+                        FOREIGN KEY (fk_paciente) REFERENCES tb_paciente(id_paciente)
+                        ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ",
+            'tb_paciente_telefone' => "
+                CREATE TABLE tb_paciente_telefone (
+                    id_paciente_telefone INT AUTO_INCREMENT PRIMARY KEY,
+                    fk_paciente INT NOT NULL,
+                    tipo_telefone VARCHAR(40) NULL,
+                    numero_telefone VARCHAR(20) NULL,
+                    ramal_telefone VARCHAR(20) NULL,
+                    contato_telefone VARCHAR(120) NULL,
+                    principal_telefone TINYINT(1) NOT NULL DEFAULT 0,
+                    ativo_telefone CHAR(1) NOT NULL DEFAULT 's',
+                    data_create_telefone DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    KEY idx_pac_telefone_fk (fk_paciente),
+                    CONSTRAINT fk_pac_telefone_paciente
+                        FOREIGN KEY (fk_paciente) REFERENCES tb_paciente(id_paciente)
+                        ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ",
+            'tb_paciente_email' => "
+                CREATE TABLE tb_paciente_email (
+                    id_paciente_email INT AUTO_INCREMENT PRIMARY KEY,
+                    fk_paciente INT NOT NULL,
+                    tipo_email VARCHAR(40) NULL,
+                    email_email VARCHAR(150) NULL,
+                    principal_email TINYINT(1) NOT NULL DEFAULT 0,
+                    ativo_email CHAR(1) NOT NULL DEFAULT 's',
+                    data_create_email DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    KEY idx_pac_email_fk (fk_paciente),
+                    CONSTRAINT fk_pac_email_paciente
+                        FOREIGN KEY (fk_paciente) REFERENCES tb_paciente(id_paciente)
+                        ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ",
+            'tb_paciente_contato' => "
+                CREATE TABLE tb_paciente_contato (
+                    id_paciente_contato INT AUTO_INCREMENT PRIMARY KEY,
+                    fk_paciente INT NOT NULL,
+                    nome_contato VARCHAR(150) NULL,
+                    parentesco_contato VARCHAR(80) NULL,
+                    email_contato VARCHAR(150) NULL,
+                    telefone_contato VARCHAR(20) NULL,
+                    observacao_contato VARCHAR(255) NULL,
+                    principal_contato TINYINT(1) NOT NULL DEFAULT 0,
+                    ativo_contato CHAR(1) NOT NULL DEFAULT 's',
+                    data_create_contato DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    KEY idx_pac_contato_fk (fk_paciente),
+                    CONSTRAINT fk_pac_contato_paciente
+                        FOREIGN KEY (fk_paciente) REFERENCES tb_paciente(id_paciente)
                         ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ",

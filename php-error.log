@@ -205,3 +205,27 @@ Stack trace:
 #2 /Applications/AMPPS/www/FullConex/list_internacao_cap_jornada.php(20): include_once('/Applications/A...')
 #3 {main}
   thrown in /Applications/AMPPS/www/FullConex/dao/internacaoDao.php on line 1312
+[05-May-2026 01:43:11 UTC] PHP Warning:  Undefined variable $conn in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19
+[05-May-2026 01:43:11 UTC] PHP Warning:  Undefined variable $BASE_URL in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19
+[05-May-2026 01:43:11 UTC] PHP Fatal error:  Uncaught TypeError: internacaoDAO::__construct(): Argument #1 ($conn) must be of type PDO, null given, called in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19 and defined in /Applications/AMPPS/www/FullCare/dao/internacaoDao.php:19
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php(19): internacaoDAO->__construct(NULL, NULL)
+#1 /Applications/AMPPS/www/FullCare/list_internacao_cap_jornada.php(20): include_once('/Applications/A...')
+#2 {main}
+  thrown in /Applications/AMPPS/www/FullCare/dao/internacaoDao.php on line 19
+[05-May-2026 01:43:41 UTC] PHP Warning:  Undefined variable $conn in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19
+[05-May-2026 01:43:41 UTC] PHP Warning:  Undefined variable $BASE_URL in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19
+[05-May-2026 01:43:41 UTC] PHP Fatal error:  Uncaught TypeError: internacaoDAO::__construct(): Argument #1 ($conn) must be of type PDO, null given, called in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19 and defined in /Applications/AMPPS/www/FullCare/dao/internacaoDao.php:19
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php(19): internacaoDAO->__construct(NULL, NULL)
+#1 /Applications/AMPPS/www/FullCare/list_internacao_cap_jornada.php(20): include_once('/Applications/A...')
+#2 {main}
+  thrown in /Applications/AMPPS/www/FullCare/dao/internacaoDao.php on line 19
+[05-May-2026 01:44:00 UTC] PHP Warning:  Undefined variable $conn in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19
+[05-May-2026 01:44:00 UTC] PHP Warning:  Undefined variable $BASE_URL in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19
+[05-May-2026 01:44:00 UTC] PHP Fatal error:  Uncaught TypeError: internacaoDAO::__construct(): Argument #1 ($conn) must be of type PDO, null given, called in /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php on line 19 and defined in /Applications/AMPPS/www/FullCare/dao/internacaoDao.php:19
+Stack trace:
+#0 /Applications/AMPPS/www/FullCare/formularios/form_list_internacao_cap_jornada.php(19): internacaoDAO->__construct(NULL, NULL)
+#1 /Applications/AMPPS/www/FullCare/list_internacao_cap_jornada.php(20): include_once('/Applications/A...')
+#2 {main}
+  thrown in /Applications/AMPPS/www/FullCare/dao/internacaoDao.php on line 19

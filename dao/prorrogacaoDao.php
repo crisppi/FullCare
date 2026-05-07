@@ -25,62 +25,125 @@ class prorrogacaoDAO implements prorrogacaoDAOInterface
     {
         $prorrogacao = new prorrogacao();
 
-        // $prorrogacao->id_prorrogacao = $data["id_prorrogacao"];
+        if (!is_array($data) || empty($data)) {
+            return $prorrogacao;
+        }
 
-        $prorrogacao->acomod1_pror = $data["acomod1_pror"];
-        $prorrogacao->isol_1_pror = $data["isol_1_pror"];
-        $prorrogacao->prorrog1_ini_pror = $data["prorrog1_ini_pror"];
-        $prorrogacao->prorrog1_fim_pror = $data["prorrog1_fim_pror"];
-        $prorrogacao->diarias_1 = $data["diarias_1"];
+        $prorrogacao->id_prorrogacao = $data["id_prorrogacao"] ?? null;
 
-        $prorrogacao->fk_internacao_pror = $data["fk_internacao_pror"];
-        $prorrogacao->fk_usuario_pror = $data["fk_usuario_pror"];
-        $prorrogacao->fk_visita_pror = $data["fk_visita_pror"];
+        $prorrogacao->acomod1_pror = $data["acomod1_pror"] ?? null;
+        $prorrogacao->isol_1_pror = $data["isol_1_pror"] ?? null;
+        $prorrogacao->prorrog1_ini_pror = $data["prorrog1_ini_pror"] ?? null;
+        $prorrogacao->prorrog1_fim_pror = $data["prorrog1_fim_pror"] ?? null;
+        $prorrogacao->diarias_1 = $data["diarias_1"] ?? null;
+
+        $prorrogacao->fk_internacao_pror = $data["fk_internacao_pror"] ?? null;
+        $prorrogacao->fk_usuario_pror = $data["fk_usuario_pror"] ?? null;
+        $prorrogacao->fk_visita_pror = $data["fk_visita_pror"] ?? null;
 
         return $prorrogacao;
     }
+
+    private function normalizeDateOnly($value): ?string
+    {
+        $value = trim((string)($value ?? ''));
+        if ($value === '') {
+            return null;
+        }
+        $ts = strtotime(substr($value, 0, 10));
+        return $ts ? date('Y-m-d', $ts) : null;
+    }
+
+    private function assertNoPeriodConflict(prorrogacao $prorrogacao, int $excludeId = 0): void
+    {
+        $fkInternacao = (int)($prorrogacao->fk_internacao_pror ?? 0);
+        $ini = $this->normalizeDateOnly($prorrogacao->prorrog1_ini_pror ?? null);
+        $fim = $this->normalizeDateOnly($prorrogacao->prorrog1_fim_pror ?? null);
+
+        if ($fkInternacao <= 0 || !$ini || !$fim) {
+            return;
+        }
+
+        if (strtotime($fim) <= strtotime($ini)) {
+            throw new RuntimeException('A data final da prorrogação precisa ser maior que a data inicial.');
+        }
+
+        $sql = "
+            SELECT id_prorrogacao, prorrog1_ini_pror, prorrog1_fim_pror
+            FROM tb_prorrogacao
+            WHERE fk_internacao_pror = :fk
+              AND prorrog1_ini_pror IS NOT NULL
+              AND prorrog1_fim_pror IS NOT NULL
+              AND DATE(prorrog1_ini_pror) < :fim
+              AND DATE(prorrog1_fim_pror) > :ini
+        ";
+
+        if ($excludeId > 0) {
+            $sql .= " AND id_prorrogacao <> :exclude_id";
+        }
+
+        $sql .= " LIMIT 1";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':fk', $fkInternacao, PDO::PARAM_INT);
+        $stmt->bindValue(':ini', $ini);
+        $stmt->bindValue(':fim', $fim);
+        if ($excludeId > 0) {
+            $stmt->bindValue(':exclude_id', $excludeId, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        $conflict = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($conflict) {
+            $iniBr = date('d/m/Y', strtotime((string)$conflict['prorrog1_ini_pror']));
+            $fimBr = date('d/m/Y', strtotime((string)$conflict['prorrog1_fim_pror']));
+            throw new RuntimeException("Já existe prorrogação cadastrada no período {$iniBr} a {$fimBr}.");
+        }
+    }
+
     public function create(prorrogacao $prorrogacao)
     {
-
-        try {
-            $stmt = $this->conn->prepare("INSERT INTO tb_prorrogacao (
-                fk_internacao_pror,
-                fk_visita_pror,
-                acomod1_pror, 
-                isol_1_pror, 
-                prorrog1_fim_pror,
-                prorrog1_ini_pror,
-                fk_usuario_pror,
-                diarias_1
-            ) VALUES (
-                :fk_internacao_pror,
-                :fk_visita_pror,
-                :acomod1_pror, 
-                :isol_1_pror, 
-                :prorrog1_fim_pror, 
-                :prorrog1_ini_pror,
-                :fk_usuario_pror,
-                :diarias_1
-            )");
-
-            $stmt->bindParam(":acomod1_pror", $prorrogacao->acomod1_pror);
-            $stmt->bindParam(":isol_1_pror", $prorrogacao->isol_1_pror);
-            $stmt->bindParam(":prorrog1_ini_pror", $prorrogacao->prorrog1_ini_pror);
-            $stmt->bindParam(":prorrog1_fim_pror", $prorrogacao->prorrog1_fim_pror);
-            $stmt->bindParam(":fk_internacao_pror", $prorrogacao->fk_internacao_pror);
-            $stmt->bindParam(":fk_visita_pror", $prorrogacao->fk_visita_pror);
-            $stmt->bindParam(":fk_usuario_pror", $prorrogacao->fk_usuario_pror);
-            $stmt->bindParam(":diarias_1", $prorrogacao->diarias_1);
-
-            $stmt->execute();
-            // Mensagem de sucesso em JavaScript
-
-        } catch (PDOException $e) {
-            // Mensagem de erro em JavaScript
-
+        if (($prorrogacao->fk_usuario_pror ?? null) !== null && (int)$prorrogacao->fk_usuario_pror > 0) {
+            $stmtUser = $this->conn->prepare("SELECT 1 FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtUser->bindValue(':id', (int)$prorrogacao->fk_usuario_pror, PDO::PARAM_INT);
+            $stmtUser->execute();
+            if (!(bool)$stmtUser->fetchColumn()) {
+                $prorrogacao->fk_usuario_pror = null;
+            }
         }
-        // Mensagem de sucesso por adicionar filme
-        $this->message->setMessage("Prorrogação adicionado com sucesso!", "success", "cad_internacao_niveis.php");
+
+        $this->assertNoPeriodConflict($prorrogacao);
+
+        $stmt = $this->conn->prepare("INSERT INTO tb_prorrogacao (
+            fk_internacao_pror,
+            fk_visita_pror,
+            acomod1_pror, 
+            isol_1_pror, 
+            prorrog1_fim_pror,
+            prorrog1_ini_pror,
+            fk_usuario_pror,
+            diarias_1
+        ) VALUES (
+            :fk_internacao_pror,
+            :fk_visita_pror,
+            :acomod1_pror, 
+            :isol_1_pror, 
+            :prorrog1_fim_pror, 
+            :prorrog1_ini_pror,
+            :fk_usuario_pror,
+            :diarias_1
+        )");
+
+        $stmt->bindParam(":acomod1_pror", $prorrogacao->acomod1_pror);
+        $stmt->bindParam(":isol_1_pror", $prorrogacao->isol_1_pror);
+        $stmt->bindParam(":prorrog1_ini_pror", $prorrogacao->prorrog1_ini_pror);
+        $stmt->bindParam(":prorrog1_fim_pror", $prorrogacao->prorrog1_fim_pror);
+        $stmt->bindParam(":fk_internacao_pror", $prorrogacao->fk_internacao_pror);
+        $stmt->bindParam(":fk_visita_pror", $prorrogacao->fk_visita_pror);
+        $stmt->bindParam(":fk_usuario_pror", $prorrogacao->fk_usuario_pror);
+        $stmt->bindParam(":diarias_1", $prorrogacao->diarias_1);
+
+        $stmt->execute();
     }
     public function joinprorrogacaoHospital()
     {
@@ -181,44 +244,38 @@ class prorrogacaoDAO implements prorrogacaoDAOInterface
 
     public function update($prorrogacao)
     {
+        if (($prorrogacao->fk_usuario_pror ?? null) !== null && (int)$prorrogacao->fk_usuario_pror > 0) {
+            $stmtUser = $this->conn->prepare("SELECT 1 FROM tb_user WHERE id_usuario = :id LIMIT 1");
+            $stmtUser->bindValue(':id', (int)$prorrogacao->fk_usuario_pror, PDO::PARAM_INT);
+            $stmtUser->execute();
+            if (!(bool)$stmtUser->fetchColumn()) {
+                $prorrogacao->fk_usuario_pror = null;
+            }
+        }
+
+        $this->assertNoPeriodConflict($prorrogacao, (int)($prorrogacao->id_prorrogacao ?? 0));
 
         $stmt = $this->conn->prepare("UPDATE tb_prorrogacao SET
         fk_internacao_pror = :fk_internacao_pror,
-        alto_custo_pror = :alto_custo_pror,
-        rel_alto_custo_pror = :rel_alto_custo_pror,
-        evento_adverso_pror = :evento_adverso_pror,
-        rel_evento_adverso_pror = :rel_evento_adverso_pror,
-        tipo_evento_adverso_prort = :tipo_evento_adverso_prort,
-        opme_pror = :opme_pror,
-        rel_opme_pror = :rel_opme_pror,
-        home_care_pror = :home_care_pror,
-        rel_home_care_pror = :rel_home_care_pror,
-        desospitalizacao_pror = :desospitalizacao_pror,
-        rel_desospitalizacao_pror = :rel_desospitalizacao_pror,
+        acomod1_pror = :acomod1_pror,
+        isol_1_pror = :isol_1_pror,
+        prorrog1_ini_pror = :prorrog1_ini_pror,
+        prorrog1_fim_pror = :prorrog1_fim_pror,
+        fk_usuario_pror = :fk_usuario_pror,
         diarias_1 = :diarias_1
-
-        WHERE id_prorrogacao = :id_prorrogacao 
+        WHERE id_prorrogacao = :id_prorrogacao
       ");
 
         $stmt->bindParam(":fk_internacao_pror", $prorrogacao->fk_internacao_pror);
-        $stmt->bindParam(":alto_custo_pror", $prorrogacao->alto_custo_pror);
-        $stmt->bindParam(":rel_alto_custo_pror", $prorrogacao->rel_alto_custo_pror);
-        $stmt->bindParam(":evento_adverso_pror", $prorrogacao->evento_adverso_pror);
-        $stmt->bindParam(":rel_evento_adverso_pror", $prorrogacao->rel_evento_adverso_pror);
-        $stmt->bindParam(":tipo_evento_adverso_prort", $prorrogacao->tipo_evento_adverso_prort);
-        $stmt->bindParam(":opme_pror", $prorrogacao->opme_pror);
-        $stmt->bindParam(":rel_opme_pror", $prorrogacao->rel_opme_pror);
-        $stmt->bindParam(":home_care_pror", $prorrogacao->home_care_pror);
-        $stmt->bindParam(":rel_home_care_pror", $prorrogacao->rel_home_care_pror);
-        $stmt->bindParam(":rel_desospitalizacao_pror", $prorrogacao->rel_desospitalizacao_pror);
+        $stmt->bindParam(":acomod1_pror", $prorrogacao->acomod1_pror);
+        $stmt->bindParam(":isol_1_pror", $prorrogacao->isol_1_pror);
+        $stmt->bindParam(":prorrog1_ini_pror", $prorrogacao->prorrog1_ini_pror);
+        $stmt->bindParam(":prorrog1_fim_pror", $prorrogacao->prorrog1_fim_pror);
+        $stmt->bindParam(":fk_usuario_pror", $prorrogacao->fk_usuario_pror);
         $stmt->bindParam(":diarias_1", $prorrogacao->diarias_1);
-        $stmt->bindParam(":desospitalizacao_pror", $prorrogacao->desospitalizacao_pror);
-
         $stmt->bindParam(":id_prorrogacao", $prorrogacao->id_prorrogacao);
         $stmt->execute();
 
-        // Mensagem de sucesso por editar prorrogacao
-        $this->message->setMessage("prorrogacao atualizado com sucesso!", "success", "list_prorrogacao.php");
     }
     public function findByIdUpdate($prorrogacao)
     {
@@ -268,8 +325,6 @@ class prorrogacaoDAO implements prorrogacaoDAOInterface
 
         $stmt->execute();
 
-        // Mensagem de sucesso por remover filme
-        $this->message->setMessage("prorrogacao removido com sucesso!", "success", "list_prorrogacao.php");
     }
 
 

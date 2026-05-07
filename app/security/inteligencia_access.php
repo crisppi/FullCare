@@ -34,6 +34,16 @@ if (!function_exists('fullcare_is_diretoria_inteligencia')) {
     }
 }
 
+if (!function_exists('fullcare_has_inteligencia_override')) {
+    function fullcare_has_inteligencia_override(): bool
+    {
+        $email = mb_strtolower(trim((string)($_SESSION['email_user'] ?? '')), 'UTF-8');
+        return in_array($email, [
+            'crisppi@fullcare.com.br',
+        ], true);
+    }
+}
+
 if (!function_exists('fullcare_is_inteligencia_request')) {
     function fullcare_is_inteligencia_request(): bool
     {
@@ -70,10 +80,29 @@ if (!function_exists('fullcare_is_inteligencia_request')) {
     }
 }
 
+if (!function_exists('fullcare_is_bi_inteligencia_page')) {
+    function fullcare_is_bi_inteligencia_page(): bool
+    {
+        $uriPath = strtolower((string)(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: ''));
+        if ($uriPath !== '' && preg_match('#/bi/inteligencia/?$#', $uriPath)) {
+            return true;
+        }
+
+        $script = strtolower((string)basename((string)($_SERVER['SCRIPT_NAME'] ?? '')));
+        return $script === 'bi_inteligencia.php';
+    }
+}
+
 if (!function_exists('fullcare_enforce_inteligencia_access')) {
     function fullcare_enforce_inteligencia_access(): void
     {
         if (!fullcare_is_inteligencia_request()) {
+            return;
+        }
+        if (fullcare_is_bi_inteligencia_page() && function_exists('fullcare_has_bi_access') && fullcare_has_bi_access()) {
+            return;
+        }
+        if (fullcare_has_inteligencia_override()) {
             return;
         }
         if (fullcare_is_diretoria_inteligencia()) {
@@ -85,8 +114,7 @@ if (!function_exists('fullcare_enforce_inteligencia_access')) {
         }
         $_SESSION['mensagem'] = 'Acesso à Inteligência Operacional permitido somente para diretoria.';
         $_SESSION['mensagem_tipo'] = 'danger';
-        header('Location: dashboard', true, 303);
+        header('Location: menu_app.php', true, 303);
         exit;
     }
 }
-

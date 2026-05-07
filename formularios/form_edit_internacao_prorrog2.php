@@ -35,47 +35,49 @@ function daysExclusive(int $startTs, int $endTs): int
 }
 function computeCoverageAndGaps(array $intervals, int $startTs, int $endTs): array
 {
-    if (!$intervals) {
-        return [0, daysExclusive($startTs, $endTs), [[date('d/m/Y', $startTs), date('d/m/Y', $endTs)]]];
+    $totalDays = daysExclusive($startTs, $endTs);
+    if ($totalDays <= 0) {
+        return [0, 0, []];
     }
+
+    if (!$intervals) {
+        return [0, $totalDays, [[date('d/m/Y', $startTs), date('d/m/Y', $endTs - 86400)]]];
+    }
+
     usort($intervals, fn($a, $b) => $a['s'] <=> $b['s']);
-    $coveredDays = 0;
-    $gaps = [];
-    $curS = $intervals[0]['s'];
-    $curE = $intervals[0]['e'];
-    foreach ($intervals as $idx => $it) {
-        if ($idx === 0) continue;
-        if ($it['s'] <= $curE) {
-            if ($it['e'] > $curE) $curE = $it['e'];
+    $merged = [];
+    foreach ($intervals as $it) {
+        if (empty($merged)) {
+            $merged[] = $it;
             continue;
         }
-        if ($curS > $startTs) {
-            $gapStart = $startTs;
-            $gapEnd = $curS;
-            if ($gapEnd > $gapStart) {
-                $gaps[] = [date('d/m/Y', $gapStart), date('d/m/Y', $gapEnd)];
+        $lastIdx = count($merged) - 1;
+        if ($it['s'] <= $merged[$lastIdx]['e']) {
+            if ($it['e'] > $merged[$lastIdx]['e']) {
+                $merged[$lastIdx]['e'] = $it['e'];
             }
+            continue;
         }
-        $coveredDays += daysExclusive($curS, $curE);
-        $curS = $it['s'];
-        $curE = $it['e'];
+        $merged[] = $it;
     }
-    if ($curS > $startTs) {
-        $gapStart = $startTs;
-        $gapEnd = $curS;
-        if ($gapEnd > $gapStart) {
-            $gaps[] = [date('d/m/Y', $gapStart), date('d/m/Y', $gapEnd)];
+
+    $coveredDays = 0;
+    $gaps = [];
+    $cursor = $startTs;
+    foreach ($merged as $range) {
+        if ($range['s'] > $cursor) {
+            $gaps[] = [date('d/m/Y', $cursor), date('d/m/Y', $range['s'] - 86400)];
         }
-    }
-    $coveredDays += daysExclusive($curS, $curE);
-    if ($curE < $endTs) {
-        $gapStart = $curE;
-        $gapEnd = $endTs;
-        if ($gapEnd > $gapStart) {
-            $gaps[] = [date('d/m/Y', $gapStart), date('d/m/Y', $gapEnd)];
+        $coveredDays += daysExclusive($range['s'], $range['e']);
+        if ($range['e'] > $cursor) {
+            $cursor = $range['e'];
         }
     }
-    $totalDays = daysExclusive($startTs, $endTs);
+
+    if ($cursor < $endTs) {
+        $gaps[] = [date('d/m/Y', $cursor), date('d/m/Y', $endTs - 86400)];
+    }
+
     $missingDays = max(0, $totalDays - $coveredDays);
     return [$coveredDays, $missingDays, $gaps];
 }
@@ -115,18 +117,35 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
     foreach ($prorList as $p) {
         $iniTs = dateToTs($p['ini'] ?? null);
         if (!$iniTs) continue;
-        $fimTs = dateToTs($p['fim'] ?? null) ?: $internEndTs;
+        $fimBaseTs = dateToTs($p['fim'] ?? null) ?: ($internEndTs - 86400);
+        $fimTs = $fimBaseTs + 86400;
         if ($fimTs <= $internStartTs || $iniTs >= $internEndTs) continue;
         $iniTs = max($iniTs, $internStartTs);
         $fimTs = min($fimTs, $internEndTs);
         $intervals[] = ['s' => $iniTs, 'e' => $fimTs];
     }
-    [$coveredDays, $missingDays, $gaps] = computeCoverageAndGaps($intervals, $internStartTs, $internEndTs);
+    $coverageStartTs = $intervals ? min(array_column($intervals, 's')) : $internStartTs;
+    [$coveredDays, $missingDays, $gaps] = computeCoverageAndGaps($intervals, $coverageStartTs, $internEndTs);
     if ($missingDays > 0) {
         $parts = array_map(fn($g) => $g[0] . ' → ' . $g[1], $gaps);
         $pr_pendente_label = $missingDays . ' dias | ' . implode(' • ', $parts);
     }
 }
+$dadosAltaProrrog = [];
+if (isset($dados_alta) && is_array($dados_alta)) {
+    $dadosAltaProrrog = $dados_alta;
+    sort($dadosAltaProrrog, SORT_ASC);
+}
+$prorrogAltaDataValue = '';
+if (!empty($altaDataHoraValue)) {
+    $prorrogAltaDataValue = (string)$altaDataHoraValue;
+} elseif (!empty($altaAtual['data_alta_alt'])) {
+    $tsAltaProrrog = strtotime((string)$altaAtual['data_alta_alt']);
+    if ($tsAltaProrrog) {
+        $prorrogAltaDataValue = date('Y-m-d\TH:i', $tsAltaProrrog);
+    }
+}
+$prorrogAltaAtiva = $prorrogAltaDataValue !== '' || !empty($altaAtual['tipo_alta_alt']);
 ?>
 <style>
 /* ===================== PRORROGAÇÕES — ESTILO ===================== */
@@ -134,25 +153,16 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
 @media (min-width: 768px) {
     .pror-row .form-grid {
         display: grid;
-        grid-template-columns:
-            clamp(180px, 24vw, 320px)
-            /* Acomodação com largura controlada */
-            160px
-            /* Data inicial */
-            160px
-            /* Data final   */
-            110px
-            /* Diárias      */
-            140px
-            /* Isolamento   */
-            110px;
-        /* Botões       */
-        column-gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
         align-items: end;
+        width: 100%;
     }
 
     .pror-row .form-group {
         margin: 0 !important;
+        width: 100% !important;
+        min-width: 0 !important;
     }
 
     .pror-row .form-control,
@@ -165,8 +175,9 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
     }
 
     .pror-row .w-btns>.btn-group {
-        display: flex;
+        display: inline-flex;
         gap: 8px;
+        width: auto;
     }
 }
 
@@ -195,6 +206,45 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
     text-align: center;
     font-weight: 700;
     background: #f1f3f5;
+}
+
+.pror-row .w-btns {
+    width: auto !important;
+    min-width: 92px !important;
+}
+
+.pror-row .w-btns .btn-group {
+    display: inline-flex;
+    gap: 8px;
+    width: auto;
+}
+
+.pror-row .w-btns .btn {
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px !important;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.pror-row .pror-row-error {
+    display: none;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border: 1px solid #f5c2c7;
+    border-radius: 6px;
+    background: #f8d7da;
+    color: #8b1e25;
+    font-size: .85rem;
+    line-height: 1.25;
 }
 
 /* Popup rápido */
@@ -283,6 +333,52 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
     top: 0;
     right: 0;
 }
+.prorrog-inline-alta {
+    margin-top: 16px;
+    padding: 16px 18px;
+    border: 1px solid #e6dced;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fcf9ff 0%, #f7f2fb 100%);
+}
+.prorrog-inline-alta__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.prorrog-inline-alta__title {
+    margin: 0;
+    color: #3a184f;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.prorrog-inline-alta__hint {
+    margin: 4px 0 0;
+    color: #6f5a7e;
+    font-size: .84rem;
+}
+.prorrog-inline-alta__toggle {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.prorrog-inline-alta__toggle .btn {
+    min-width: 84px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+.prorrog-inline-alta__toggle .btn.is-active {
+    background: #5e2363;
+    border-color: #5e2363;
+    color: #fff;
+}
+.prorrog-inline-alta__fields {
+    display: none;
+}
+.prorrog-inline-alta__fields.is-visible {
+    display: block;
+}
 @media (max-width: 991.98px) {
     .prorrog-head {
         min-height: 0;
@@ -310,14 +406,18 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
     <input type="hidden" name="type" value="edit_prorrogacao">
     <input type="hidden" id="fk_internacao_pror" name="fk_internacao_pror" value="<?= (int)$intern['id_internacao'] ?>">
     <input type="hidden" id="fk_usuario_pror" name="fk_usuario_pror" value="<?= (int)($_SESSION['id_usuario'] ?? 0) ?>">
-    <input type="hidden" name="select_prorrog" id="select_prorrog" value="s">
+    <input type="hidden" name="select_prorrog" id="select_prorrog_hidden" value="s">
 
     <!-- JSON oculto -->
     <input type="hidden" id="prorrogacoes_json" name="prorrogacoes_json">
+    <input type="hidden" id="prorrog_gerar_alta" name="prorrog_gerar_alta" value="<?= $prorrogAltaAtiva ? 's' : 'n' ?>">
+    <input type="hidden" id="prorrog_fk_usuario_alt" name="prorrog_fk_usuario_alt" value="<?= (int)($_SESSION['id_usuario'] ?? 0) ?>">
+    <input type="hidden" id="prorrog_usuario_alt" name="prorrog_usuario_alt" value="<?= htmlspecialchars((string)($_SESSION['email_user'] ?? 'sistema'), ENT_QUOTES, 'UTF-8') ?>">
 
     <div id="prorContainer">
         <?php foreach ($prorList as $i => $p): $idx = (int)$i; ?>
         <div class="pror-row rounded p-3 mb-2">
+            <input type="hidden" name="pror[<?= $idx ?>][id_prorrogacao]" value="<?= (int)($p['id_prorrogacao'] ?? 0) ?>">
             <div class="form-grid">
                 <div class="form-group w-acom">
                     <label>Acomodação</label>
@@ -367,8 +467,43 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
                     </div>
                 </div>
             </div>
+            <div class="pror-row-error" role="alert"></div>
         </div>
         <?php endforeach; ?>
+    </div>
+
+    <div class="prorrog-inline-alta">
+        <div class="prorrog-inline-alta__header">
+            <div>
+                <h5 class="prorrog-inline-alta__title">Paciente teve alta nesta prorrogação?</h5>
+                <p class="prorrog-inline-alta__hint">Se sim, já salvamos a alta junto da atualização da internação.</p>
+            </div>
+            <div class="prorrog-inline-alta__toggle" role="group" aria-label="Paciente teve alta">
+                <button type="button" class="btn btn-outline-secondary<?= !$prorrogAltaAtiva ? ' is-active' : '' ?>" data-prorrog-inline-alta="n">Não</button>
+                <button type="button" class="btn btn-outline-primary<?= $prorrogAltaAtiva ? ' is-active' : '' ?>" data-prorrog-inline-alta="s">Sim</button>
+            </div>
+        </div>
+        <div class="prorrog-inline-alta__fields<?= $prorrogAltaAtiva ? ' is-visible' : '' ?>" id="prorrog-inline-alta-fields">
+            <div class="row g-2">
+                <div class="form-group col-sm-3">
+                    <label class="control-label" for="prorrog_data_alta_alt">Data/Hora Alta</label>
+                    <input type="datetime-local" class="form-control form-control-sm" id="prorrog_data_alta_alt"
+                        name="prorrog_data_alta_alt" step="60"
+                        value="<?= htmlspecialchars($prorrogAltaDataValue, ENT_QUOTES, 'UTF-8') ?>">
+                </div>
+                <div class="form-group col-sm-4">
+                    <label class="control-label" for="prorrog_tipo_alta_alt">Motivo Alta</label>
+                    <select class="form-control form-control-sm" id="prorrog_tipo_alta_alt" name="prorrog_tipo_alta_alt">
+                        <option value="">Selecione o motivo da alta</option>
+                        <?php foreach ($dadosAltaProrrog as $altaMotivo): ?>
+                            <option value="<?= htmlspecialchars((string)$altaMotivo, ENT_QUOTES, 'UTF-8') ?>" <?= (($altaAtual['tipo_alta_alt'] ?? '') === $altaMotivo) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars((string)$altaMotivo, ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
 
     <hr>
@@ -434,11 +569,155 @@ function diffDays(d1, d2) {
     return Math.ceil((new Date(d2) - new Date(d1)) / 86400000);
 }
 
+function parseDateOnly(value) {
+    const raw = (value || '').toString().trim();
+    if (!raw) return null;
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const [y, m, d] = raw.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+        const [d, m, y] = raw.split('/').map(Number);
+        return new Date(y, m - 1, d);
+    }
+
+    const normalized = raw.length >= 10 ? raw.slice(0, 10) : raw;
+    const fallback = new Date(normalized + 'T00:00:00');
+    return Number.isNaN(fallback.getTime()) ? null : fallback;
+}
+
+function formatDateBR(value) {
+    const raw = (value || '').toString().trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const parts = raw.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return raw;
+}
+
+function setProrRowError($row, message) {
+    const $err = $row.find('.pror-row-error');
+    if (!$err.length) return;
+    $err.text(message || '');
+    $err.toggle(!!message);
+}
+
+function validateProrrogOverlapsEdit() {
+    const rows = [];
+    $('#prorContainer .pror-row').each(function(index) {
+        const $row = $(this);
+        const $err = $row.find('.pror-row-error');
+        if ($err.data('overlap') === 1) {
+            $err.text('').hide().removeData('overlap');
+        }
+
+        const ini = $row.find('[name$="[ini]"]').val() || '';
+        const fim = $row.find('[name$="[fim]"]').val() || '';
+        const iniDate = parseDateOnly(ini);
+        const fimDate = parseDateOnly(fim);
+        if (!iniDate || !fimDate || fimDate <= iniDate) return;
+
+        rows.push({ index, $row, ini, fim, iniDate, fimDate });
+    });
+
+    let valid = true;
+    for (let i = 0; i < rows.length; i += 1) {
+        for (let j = i + 1; j < rows.length; j += 1) {
+            const a = rows[i];
+            const b = rows[j];
+            if (a.iniDate < b.fimDate && b.iniDate < a.fimDate) {
+                a.$row.find('.pror-row-error').data('overlap', 1);
+                b.$row.find('.pror-row-error').data('overlap', 1);
+                setProrRowError(a.$row, `Período já informado em outra linha (${formatDateBR(b.ini)} a ${formatDateBR(b.fim)}).`);
+                setProrRowError(b.$row, `Período já informado em outra linha (${formatDateBR(a.ini)} a ${formatDateBR(a.fim)}).`);
+                valid = false;
+            }
+        }
+    }
+    return valid;
+}
+
+function formatLocalDateTimeNow() {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    const tzOffset = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
+}
+
+function formatDateToLocalDateTime(dateValue) {
+    const base = (dateValue || '').toString().trim();
+    if (!base) return '';
+    return `${base}T12:00`;
+}
+
+function getSuggestedAltaDateFromProrrog() {
+    const rows = Array.from(document.querySelectorAll('#prorContainer .pror-row'));
+    for (let i = rows.length - 1; i >= 0; i -= 1) {
+        const fim = rows[i].querySelector('[name$="[fim]"]')?.value || '';
+        if (fim) return formatDateToLocalDateTime(fim);
+        const ini = rows[i].querySelector('[name$="[ini]"]')?.value || '';
+        if (ini) return formatDateToLocalDateTime(ini);
+    }
+    const internDate = getInternacaoDateForProrrog();
+    if (!(internDate instanceof Date) || Number.isNaN(internDate.getTime())) {
+        return '';
+    }
+    return formatDateToLocalDateTime(internDate.toISOString().split('T')[0]);
+}
+
+function syncProrrogInlineAltaBounds() {
+    const dataInput = document.getElementById('prorrog_data_alta_alt');
+    if (!dataInput) return;
+
+    const internDate = getInternacaoDateForProrrog();
+    dataInput.max = formatLocalDateTimeNow();
+    if (internDate instanceof Date && !Number.isNaN(internDate.getTime())) {
+        dataInput.min = formatDateToLocalDateTime(internDate.toISOString().split('T')[0]);
+    } else {
+        dataInput.removeAttribute('min');
+    }
+}
+
+function syncProrrogInlineAlta(flag) {
+    const hidden = document.getElementById('prorrog_gerar_alta');
+    const fields = document.getElementById('prorrog-inline-alta-fields');
+    const btnNao = document.querySelector('[data-prorrog-inline-alta="n"]');
+    const btnSim = document.querySelector('[data-prorrog-inline-alta="s"]');
+    const dataInput = document.getElementById('prorrog_data_alta_alt');
+    const motivoInput = document.getElementById('prorrog_tipo_alta_alt');
+    const enabled = flag === 's';
+
+    if (hidden) hidden.value = enabled ? 's' : 'n';
+    if (fields) fields.classList.toggle('is-visible', enabled);
+    if (btnNao) btnNao.classList.toggle('is-active', !enabled);
+    if (btnSim) btnSim.classList.toggle('is-active', enabled);
+    if (dataInput) {
+        dataInput.required = enabled;
+        syncProrrogInlineAltaBounds();
+        if (!enabled) {
+            dataInput.value = '';
+        } else if (!dataInput.value) {
+            dataInput.value = getSuggestedAltaDateFromProrrog() || formatLocalDateTimeNow();
+        }
+    }
+    if (motivoInput) {
+        motivoInput.required = enabled;
+        if (!enabled) {
+            motivoInput.value = '';
+        }
+    }
+}
+
 function getInternacaoDateForProrrog() {
     const internDateField = document.getElementById('data_intern_int');
     if (!internDateField || !internDateField.value) return null;
-    const internDate = new Date(internDateField.value + 'T00:00:00');
-    return Number.isNaN(internDate.getTime()) ? null : internDate;
+    const internDate = parseDateOnly(internDateField.value);
+    if (!(internDate instanceof Date) || Number.isNaN(internDate.getTime())) {
+        return null;
+    }
+    return internDate;
 }
 
 function setFirstProrrogationDate() {
@@ -464,6 +743,7 @@ function syncJson() {
     $('#prorContainer .pror-row').each(function() {
         const $r = $(this);
         linhas.push({
+            id_prorrogacao: parseInt($r.find('[name$="[id_prorrogacao]"]').val() || '0', 10) || 0,
             acomod: $r.find('[name$="[acomod]"]').val() || '',
             ini: $r.find('[name$="[ini]"]').val() || '',
             fim: $r.find('[name$="[fim]"]').val() || '',
@@ -472,6 +752,7 @@ function syncJson() {
         });
     });
     $('#prorrogacoes_json').val(JSON.stringify(linhas));
+    validateProrrogOverlapsEdit();
 }
 
 function recalcRow($row, changedName) {
@@ -486,8 +767,8 @@ function recalcRow($row, changedName) {
     }
 
     if (internDate && ini) {
-        const initialDate = new Date(ini + 'T00:00:00');
-        if (Number.isNaN(initialDate.getTime()) || initialDate < internDate) {
+        const initialDate = parseDateOnly(ini);
+        if (!(initialDate instanceof Date) || Number.isNaN(initialDate.getTime()) || initialDate < internDate) {
             openErrorDialog('A data inicial da prorrogação não pode ser menor que a data de internação.');
             $row.find('[name$="[ini]"]').val('').focus();
             $dia.val('');
@@ -496,14 +777,18 @@ function recalcRow($row, changedName) {
         }
     }
 
-    if (maxDate && ini && new Date(ini) > new Date(maxDate)) {
+    const iniDate = ini ? parseDateOnly(ini) : null;
+    const fimDate = fim ? parseDateOnly(fim) : null;
+    const maxAllowedDate = maxDate ? parseDateOnly(maxDate) : null;
+
+    if (maxAllowedDate && iniDate && iniDate > maxAllowedDate) {
         openErrorDialog('Não é permitido prorrogar após a data atual/alta.');
         $row.find('[name$="[ini]"]').val('');
         $dia.val('');
         syncJson();
         return;
     }
-    if (maxDate && fim && new Date(fim) > new Date(maxDate)) {
+    if (maxAllowedDate && fimDate && fimDate > maxAllowedDate) {
         openErrorDialog('Não é permitido prorrogar após a data atual/alta.');
         $row.find('[name$="[fim]"]').val('');
         $dia.val('');
@@ -511,7 +796,7 @@ function recalcRow($row, changedName) {
         return;
     }
 
-    if (ini && fim && new Date(fim) >= new Date(ini)) {
+    if (iniDate && fimDate && fimDate >= iniDate) {
         const dias = diffDays(ini, fim);
         if (dias > 15) {
             askOver15().then(ok => {
@@ -531,8 +816,10 @@ function recalcRow($row, changedName) {
             return;
         }
         $dia.val(dias);
+        validateProrrogOverlapsEdit();
     } else {
         $dia.val('');
+        validateProrrogOverlapsEdit();
     }
     syncJson();
 }
@@ -540,6 +827,13 @@ function recalcRow($row, changedName) {
 /* Inicialização */
 $(function() {
     const $container = $('#prorContainer');
+    document.querySelectorAll('[data-prorrog-inline-alta]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            syncProrrogInlineAlta(this.getAttribute('data-prorrog-inline-alta') || 'n');
+        });
+    });
+    syncProrrogInlineAltaBounds();
+
     function getSuggestedIni() {
         let last = '';
         $container.find('.pror-row').each(function() {
@@ -555,6 +849,7 @@ $(function() {
     // change das datas com cálculo e popup
     $container.on('change', 'input[type="date"]', function() {
         recalcRow($(this).closest('.pror-row'), this.name);
+        syncProrrogInlineAltaBounds();
     });
 
     // adicionar linha
@@ -626,5 +921,16 @@ $(function() {
         else if (ini) last = ini;
     });
     syncJson();
+    syncProrrogInlineAlta(document.getElementById('prorrog_gerar_alta')?.value || 'n');
+
+    $(document).on('submit', 'form', function(event) {
+        if (!$(this).find('#prorContainer').length) return;
+        if (!validateProrrogOverlapsEdit()) {
+            event.preventDefault();
+            openErrorDialog('Existem prorrogações com período repetido ou sobreposto. Ajuste as datas antes de salvar.');
+            const firstError = document.querySelector('#prorContainer .pror-row-error[style*="block"]');
+            if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
 });
 </script>

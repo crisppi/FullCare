@@ -24,6 +24,24 @@ if ($basePathFromBaseUrl === '/' && preg_match('#^/(FullCare|FullConex(?:Aud)?)(
     $BASE_URL = $schemeHeader . '://' . $hostHeader . '/' . trim((string)$mBaseApp[1], '/') . '/';
 }
 
+$currentScriptName = strtolower((string)basename((string)($_SERVER['SCRIPT_NAME'] ?? '')));
+$isOperationalIntelligencePage =
+    preg_match('#/inteligencia(/|$)#i', $requestUriPath) === 1
+    || in_array($currentScriptName, [
+        'dashboard_operacional.php',
+        'faturamento_previsao.php',
+        'dashboard_mensal.php',
+        'inteligencia_operadora.php',
+        'relatorio_tmp.php',
+        'relatorio_motivos_prorrogacao.php',
+        'relatorio_backlog_autorizacoes.php',
+        'explicabilidade_insights.php',
+        'risco_glosa.php',
+        'clusterizacao_clinica.php',
+        'dashboard_performance.php',
+        'inteligencia_logs_usuario.php',
+    ], true);
+
 // Caminho default da foto do usuario
 $defaultFoto = $BASE_URL . 'uploads/usuarios/default-user.jpeg';
 
@@ -222,11 +240,11 @@ if (!empty($sessionIdUsuario)) {
     <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/css/theme.css" rel="stylesheet" media="all">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css">
-    <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/legendas.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/style.css?v=<?= @filemtime(__DIR__ . '/../css/style.css') ?>" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/legendas.css?v=<?= @filemtime(__DIR__ . '/../css/legendas.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/styleMenu.css?v=<?= @filemtime(__DIR__ . '/../css/styleMenu.css') ?>" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/style_show_internacao.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/table_style.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/style_show_internacao.css?v=<?= @filemtime(__DIR__ . '/../css/style_show_internacao.css') ?>" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/table_style.css?v=<?= @filemtime(__DIR__ . '/../css/table_style.css') ?>" rel="stylesheet">
     <script defer src="<?= $BASE_URL ?>js/lista_header_sort.js"></script>
 
     <!-- ======= APENAS DESIGN (logos alinhados e simétricos) ======= -->
@@ -238,19 +256,25 @@ if (!empty($sessionIdUsuario)) {
             gap: 8px;
         }
 
+        .navbar.nav_bar_custom.fixed-top {
+            min-height: 50px;
+            padding-top: 0.18rem !important;
+            padding-bottom: 0.18rem !important;
+        }
+
         .navbar .navbar-brand {
             display: inline-flex !important;
             align-items: center;
             line-height: 1;
             flex: 0 1 auto !important;
-            max-width: 165px;
+            max-width: 150px;
             margin-right: 4px;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
         .navbar .navbar-brand .logo-novo {
-            height: 34px !important;
+            height: 30px !important;
             width: auto !important;
             max-height: none !important;
             min-height: 0 !important;
@@ -264,7 +288,7 @@ if (!empty($sessionIdUsuario)) {
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 31px !important;
+                height: 28px !important;
             }
         }
 
@@ -339,8 +363,8 @@ if (!empty($sessionIdUsuario)) {
 
         .navbar-nav.navbar-nav-scroll .nav-link {
             white-space: nowrap;
-            padding: 0.32rem 0.36rem;
-            font-size: 0.84rem;
+            padding: 0.24rem 0.3rem;
+            font-size: 0.78rem;
             line-height: 1.1;
         }
 
@@ -354,21 +378,29 @@ if (!empty($sessionIdUsuario)) {
         .header-actions {
             margin-left: auto !important;
             margin-right: 0 !important;
-            gap: 0.35rem !important;
+            gap: 0.25rem !important;
             flex: 0 0 auto;
         }
 
         .header-actions #global-patient-search {
-            min-width: 200px;
+            min-width: 170px;
             flex: 0 0 auto;
+        }
+
+        .header-actions #global-patient-search .form-control,
+        .header-actions #global-patient-search input,
+        .header-actions #global-patient-search .btn {
+            min-height: 34px !important;
+            height: 34px !important;
+            font-size: 0.78rem !important;
         }
 
         .header-action-btn {
             border: 1px solid rgba(94, 35, 99, 0.28) !important;
             background: #fff;
             color: #5e2363;
-            font-size: 0.82rem;
-            padding: 0.32rem 0.5rem;
+            font-size: 0.76rem;
+            padding: 0.22rem 0.42rem;
         }
 
         .header-action-btn:hover {
@@ -380,17 +412,6 @@ if (!empty($sessionIdUsuario)) {
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-        }
-
-        .header-zoom-actions {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .header-zoom-actions .btn {
-            padding: 0.28rem 0.45rem;
-            font-size: 0.8rem;
         }
 
         .header-chat-launcher .chat-unread-badge {
@@ -456,9 +477,6 @@ if (!empty($sessionIdUsuario)) {
                 flex: 1 0 auto;
             }
 
-            .header-zoom-actions {
-                display: none !important;
-            }
         }
 
         @media (max-width: 575.98px) {
@@ -471,6 +489,38 @@ if (!empty($sessionIdUsuario)) {
                 width: 100%;
             }
         }
+
+<?php if ($isOperationalIntelligencePage): ?>
+        .report-header h1,
+        .forecast-hero h1,
+        .dash-hero h1 {
+            font-size: clamp(1.2rem, 1.7vw, 1.65rem) !important;
+            line-height: 1.08 !important;
+            margin-bottom: 0.2rem !important;
+        }
+
+        .container-fluid h2.fw-semibold,
+        .container-fluid h2.mb-0.fw-semibold {
+            font-size: clamp(1.05rem, 1.45vw, 1.35rem) !important;
+            line-height: 1.08 !important;
+        }
+
+        .container-fluid h4,
+        .dashboard-wrapper h4 {
+            font-size: clamp(0.95rem, 1.2vw, 1.12rem) !important;
+            line-height: 1.12 !important;
+        }
+
+        .report-header .text-muted,
+        .forecast-hero .text-muted,
+        .dash-hero p,
+        .container-fluid > .row .text-muted,
+        .container-fluid .alert,
+        .container-fluid .alert strong {
+            font-size: clamp(0.78rem, 1vw, 0.92rem) !important;
+            line-height: 1.3 !important;
+        }
+<?php endif; ?>
     </style>
 </head>
 
@@ -1036,16 +1086,6 @@ if (!empty($sessionIdUsuario)) {
             </div>
 
             <div class="d-flex align-items-center gap-2 ms-auto header-actions pe-3">
-                <div class="header-zoom-actions" role="group" aria-label="Zoom da página">
-                    <button type="button" class="btn btn-outline-secondary header-action-btn" id="zoom-out-btn"
-                        title="Diminuir zoom">
-                        <i class="bi bi-zoom-out"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary header-action-btn" id="zoom-in-btn"
-                        title="Aumentar zoom">
-                        <i class="bi bi-zoom-in"></i>
-                    </button>
-                </div>
                 <a href="<?= htmlspecialchars($chatAssistantLink) ?>"
                     class="btn btn-outline-secondary position-relative header-chat-launcher header-action-btn"
                     title="Chat interno e Assistente Virtual">
@@ -1183,49 +1223,10 @@ if (!empty($sessionIdUsuario)) {
 <script src="js/fix-header.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var root = document.documentElement;
-        var minZoom = 0.8;
-        var maxZoom = 1.3;
-        var step = 0.1;
-
-        function clampZoom(value) {
-            return Math.min(maxZoom, Math.max(minZoom, value));
-        }
-
-        function getCurrentZoom() {
-            var current = parseFloat(root.style.zoom || '1');
-            if (Number.isNaN(current)) return 1;
-            return current;
-        }
-
-        function applyZoom(value) {
-            var next = clampZoom(value);
-            root.style.zoom = next;
-            try {
-                localStorage.setItem('fcx_zoom', String(next));
-            } catch (e) {}
-        }
-
         try {
-            var saved = parseFloat(localStorage.getItem('fcx_zoom') || '');
-            if (!Number.isNaN(saved)) {
-                applyZoom(saved);
-            }
+            localStorage.removeItem('fcx_zoom');
         } catch (e) {}
-
-        var zoomOut = document.getElementById('zoom-out-btn');
-        var zoomIn = document.getElementById('zoom-in-btn');
-
-        if (zoomOut) {
-            zoomOut.addEventListener('click', function() {
-                applyZoom(getCurrentZoom() - step);
-            });
-        }
-        if (zoomIn) {
-            zoomIn.addEventListener('click', function() {
-                applyZoom(getCurrentZoom() + step);
-            });
-        }
+        document.documentElement.style.zoom = '';
     });
 </script>
 

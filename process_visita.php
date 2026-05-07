@@ -3,6 +3,8 @@
 // process_visita.php  (refatorado, sem alterar métodos existentes)
 // ======================================================================
 
+require_once(__DIR__ . '/utils/audit_logger.php');
+
 // Debug local opcional (somente quando APP_DEBUG=1 no ambiente)
 $__DEBUG = in_array(strtolower((string)getenv('APP_DEBUG')), ['1', 'true', 'on', 'yes'], true);
 if ($__DEBUG) {
@@ -15,6 +17,205 @@ function dbg(...$args)
     echo "<pre style='background:#111;color:#0f0;padding:10px;border-radius:6px;line-height:1.25;'>"
         . htmlspecialchars(print_r(count($args) === 1 ? $args[0] : $args, true), ENT_QUOTES, 'UTF-8')
         . "</pre>";
+}
+
+function fullcareUserExists(PDO $conn, ?int $userId): bool
+{
+    if ($userId === null || $userId <= 0) {
+        return false;
+    }
+
+    static $cache = [];
+    if (array_key_exists($userId, $cache)) {
+        return $cache[$userId];
+    }
+
+    $stmt = $conn->prepare("SELECT 1 FROM tb_user WHERE id_usuario = :id LIMIT 1");
+    $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $cache[$userId] = (bool)$stmt->fetchColumn();
+}
+
+function fullcareResolveUserId(PDO $conn, ?int ...$candidates): ?int
+{
+    foreach ($candidates as $candidate) {
+        $candidate = ($candidate !== null && $candidate > 0) ? (int)$candidate : null;
+        if ($candidate !== null && fullcareUserExists($conn, $candidate)) {
+            return $candidate;
+        }
+    }
+
+    $sessionId = isset($_SESSION['id_usuario']) ? (int)$_SESSION['id_usuario'] : 0;
+    if ($sessionId > 0 && fullcareUserExists($conn, $sessionId)) {
+        return $sessionId;
+    }
+
+    return null;
+}
+
+function fullcareNormalizeVisitResponsible(array $payload): array
+{
+    $cargoSessao = (string)($_SESSION['cargo'] ?? ($_SESSION['cargo_user'] ?? ''));
+    $cargoNorm = mb_strtolower(str_replace([' ', '-'], '_', $cargoSessao), 'UTF-8');
+    $isMedSessao = strpos($cargoNorm, 'med') === 0;
+    $isEnfSessao = strpos($cargoNorm, 'enf') === 0;
+
+    $resolvedUsuarioVis = (int)($payload['fk_usuario_vis'] ?? 0);
+    $auditorMed = trim((string)($payload['visita_auditor_prof_med'] ?? ''));
+    $auditorEnf = trim((string)($payload['visita_auditor_prof_enf'] ?? ''));
+
+    if ($auditorMed !== '') {
+        $payload['visita_med_vis'] = 's';
+        $payload['visita_enf_vis'] = 'n';
+        if ($auditorEnf !== '') {
+            $payload['visita_auditor_prof_enf'] = '';
+        }
+        return $payload;
+    }
+
+    if ($auditorEnf !== '') {
+        $payload['visita_med_vis'] = 'n';
+        $payload['visita_enf_vis'] = 's';
+        return $payload;
+    }
+
+    if ($resolvedUsuarioVis > 0 && $isMedSessao) {
+        $payload['visita_auditor_prof_med'] = (string)$resolvedUsuarioVis;
+        $payload['visita_auditor_prof_enf'] = '';
+        $payload['visita_med_vis'] = 's';
+        $payload['visita_enf_vis'] = 'n';
+        return $payload;
+    }
+
+    if ($resolvedUsuarioVis > 0 && $isEnfSessao) {
+        $payload['visita_auditor_prof_med'] = '';
+        $payload['visita_auditor_prof_enf'] = (string)$resolvedUsuarioVis;
+        $payload['visita_med_vis'] = 'n';
+        $payload['visita_enf_vis'] = 's';
+        return $payload;
+    }
+
+    return $payload;
+}
+function fullcareNormalizeNegotiationAcomodacao(?string $value): string
+{
+    $value = trim((string)$value);
+    if ($value === '') {
+        return '';
+    }
+    if (strpos($value, '-') !== false) {
+        [, $value] = array_pad(explode('-', $value, 2), 2, '');
+    }
+    return mb_strtolower(trim($value), 'UTF-8');
+}
+
+function fullcareResolveNegotiationAcomodacao(PDO $conn, int $internacaoId, ?string $value): string
+{
+    $value = trim((string)$value);
+    if ($value === '') {
+        return '';
+    }
+
+    if (!ctype_digit($value)) {
+        return $value;
+    }
+
+    static $cache = [];
+    $hospitalId = fullcareInternacaoHospitalId($conn, $internacaoId);
+    if ($hospitalId <= 0) {
+        return $value;
+    }
+
+    if (!isset($cache[$hospitalId])) {
+        $stmt = $conn->prepare("SELECT id_acomodacao, acomodacao_aco FROM tb_acomodacao WHERE fk_hospital = :id");
+        $stmt->bindValue(':id', $hospitalId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $map = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+            $map[(string)($row['id_acomodacao'] ?? '')] = (string)($row['acomodacao_aco'] ?? '');
+        }
+        $cache[$hospitalId] = $map;
+    }
+
+    return trim((string)($cache[$hospitalId][$value] ?? $value));
+}
+
+function fullcareInternacaoHospitalId(PDO $conn, int $internacaoId): int
+{
+    static $cache = [];
+    if ($internacaoId <= 0) {
+        return 0;
+    }
+    if (isset($cache[$internacaoId])) {
+        return $cache[$internacaoId];
+    }
+
+    $stmt = $conn->prepare("SELECT fk_hospital_int FROM tb_internacao WHERE id_internacao = :id LIMIT 1");
+    $stmt->bindValue(':id', $internacaoId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $cache[$internacaoId] = (int)($stmt->fetchColumn() ?: 0);
+}
+
+function fullcareCalcNegotiationSaving(PDO $conn, int $internacaoId, ?string $tipo, ?string $trocaDe, ?string $trocaPara, int $qtd): float
+{
+    static $cache = [];
+    $hospitalId = fullcareInternacaoHospitalId($conn, $internacaoId);
+    if ($hospitalId <= 0 || $qtd <= 0) {
+        return 0.0;
+    }
+    if (!isset($cache[$hospitalId])) {
+        $stmt = $conn->prepare("SELECT acomodacao_aco, valor_aco FROM tb_acomodacao WHERE fk_hospital = :id");
+        $stmt->bindValue(':id', $hospitalId, PDO::PARAM_INT);
+        $stmt->execute();
+        $map = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+            $map[fullcareNormalizeNegotiationAcomodacao($row['acomodacao_aco'] ?? '')] = (float)($row['valor_aco'] ?? 0);
+        }
+        $cache[$hospitalId] = $map;
+    }
+
+    $map = $cache[$hospitalId];
+    $de = (float)($map[fullcareNormalizeNegotiationAcomodacao($trocaDe)] ?? 0);
+    $para = (float)($map[fullcareNormalizeNegotiationAcomodacao($trocaPara)] ?? 0);
+    $tipoNorm = mb_strtoupper(trim((string)$tipo), 'UTF-8');
+
+    if (strpos($tipoNorm, 'TROCA') === 0) {
+        return ($de - $para) * $qtd;
+    }
+    if (strpos($tipoNorm, '1/2 DIARIA') !== false) {
+        return ($de / 2) * $qtd;
+    }
+    return $de * $qtd;
+}
+function fullcareNegotiationDefaults(?string $tipo): array
+{
+    $tipo = mb_strtoupper(trim((string)$tipo), 'UTF-8');
+    if ($tipo === 'TROCA UTI/APTO') return ['troca_de' => 'UTI', 'troca_para' => 'Apto'];
+    if ($tipo === 'TROCA UTI/SEMI') return ['troca_de' => 'UTI', 'troca_para' => 'Semi'];
+    if ($tipo === 'TROCA SEMI/APTO') return ['troca_de' => 'Semi', 'troca_para' => 'Apto'];
+    if ($tipo === 'GLOSA UTI' || $tipo === 'TARDIA UTI') return ['troca_de' => 'UTI', 'troca_para' => 'UTI'];
+    if ($tipo === 'GLOSA SEMI') return ['troca_de' => 'Semi', 'troca_para' => 'Semi'];
+    if (in_array($tipo, ['GLOSA APTO', '1/2 DIARIA APTO', 'TARDIA APTO', 'DIARIA ADM'], true)) {
+        return ['troca_de' => 'Apto', 'troca_para' => 'Apto'];
+    }
+    return ['troca_de' => '', 'troca_para' => ''];
+}
+
+function fullcareHydrateNegotiationAcomodacoes(?string $tipo, ?string $trocaDe, ?string $trocaPara): array
+{
+    $trocaDe = trim((string)$trocaDe);
+    $trocaPara = trim((string)$trocaPara);
+    $defaults = fullcareNegotiationDefaults($tipo);
+    if ($trocaDe === '' && $defaults['troca_de'] !== '') {
+        $trocaDe = $defaults['troca_de'];
+    }
+    if ($trocaPara === '' && $defaults['troca_para'] !== '') {
+        $trocaPara = $defaults['troca_para'];
+    }
+    return [$trocaDe, $trocaPara];
 }
 
 // ======================================================================
@@ -53,6 +254,8 @@ require_once("dao/usuarioDao.php");
 require_once("models/message.php");
 require_once("utils/flow_logger.php");
 require_once(__DIR__ . "/app/cuidadoContinuado.php");
+require_once(__DIR__ . "/app/prorrog_alta_helper.php");
+require_once(__DIR__ . "/app/services/TextSecurityService.php");
 
 $message                = new Message($BASE_URL);
 $userDao                = new UserDAO($conn, $BASE_URL);
@@ -141,6 +344,31 @@ function strOrNull($v)
     return $v === '' ? null : $v;
 }
 
+function fullcareValidateVisitTextSecurity(array $fields, array $flowCtx): void
+{
+    $security = new TextSecurityService();
+    foreach ($fields as $fieldName => $value) {
+        $value = trim((string)$value);
+        if ($value === '') {
+            continue;
+        }
+
+        $assessment = $security->assess($value, $fieldName, true);
+        if ($security->shouldBlock($assessment)) {
+            flowLog($flowCtx, 'text_security.blocked', 'WARN', [
+                'field' => $fieldName,
+                'assessment' => $assessment,
+            ]);
+            $message = $GLOBALS['message'] ?? null;
+            if ($message instanceof Message) {
+                $message->setMessage("Conteúdo suspeito no relatório da visita. Revise o texto antes de salvar.", "error", "back");
+            }
+            echo 'conteudo_suspeito';
+            exit;
+        }
+    }
+}
+
 function normalizeDateTimeInput($value)
 {
     if ($value === null) return null;
@@ -182,41 +410,67 @@ function buildAutoNegociacoesFromProrrog(
     ?string $prorrogJsonRaw,
     ?int $fkUsuarioPadrao
 ): array {
-    if ($flagProrrog !== 's') return [];
-    $decoded = decodeJsonArray($prorrogJsonRaw);
-    if (!is_array($decoded) || !isset($decoded['prorrogations']) || !is_array($decoded['prorrogations'])) {
+    if ($flagProrrog !== 's') {
         return [];
     }
 
-    $auto = [];
-    foreach ($decoded['prorrogations'] as $row) {
-        if (!is_array($row)) continue;
-        $dataIni = strOrNull($row['prorrog1_ini_pror'] ?? null);
-        $dataFim = strOrNull($row['prorrog1_fim_pror'] ?? null);
-        $acomodLiberada = strOrNull($row['acomod1_pror'] ?? null);
-        if (!$dataIni || !$dataFim || !$acomodLiberada) continue;
+    $decoded = decodeJsonArray($prorrogJsonRaw);
+    $rows = is_array($decoded['prorrogations'] ?? null) ? $decoded['prorrogations'] : [];
+    if (count($rows) < 2) {
+        return [];
+    }
 
-        $qtd = toIntOrNull($row['diarias_1'] ?? null);
-        if ($qtd === null && $dataIni && $dataFim) {
-            $iniTs = strtotime($dataIni);
+    usort($rows, static function ($a, $b) {
+        $aDate = strtotime((string)($a['prorrog1_ini_pror'] ?? '')) ?: 0;
+        $bDate = strtotime((string)($b['prorrog1_ini_pror'] ?? '')) ?: 0;
+        return $aDate <=> $bDate;
+    });
+
+    $tipoFromAcomodacoes = static function (?string $de, ?string $para): ?string {
+        $deNorm = fullcareNormalizeNegotiationAcomodacao($de);
+        $paraNorm = fullcareNormalizeNegotiationAcomodacao($para);
+        if ($deNorm === 'uti' && $paraNorm === 'apto') return 'TROCA UTI/APTO';
+        if ($deNorm === 'uti' && $paraNorm === 'semi') return 'TROCA UTI/SEMI';
+        if ($deNorm === 'semi' && $paraNorm === 'apto') return 'TROCA SEMI/APTO';
+        return null;
+    };
+
+    $auto = [];
+    for ($i = 1; $i < count($rows); $i++) {
+        $prev = is_array($rows[$i - 1]) ? $rows[$i - 1] : [];
+        $current = is_array($rows[$i]) ? $rows[$i] : [];
+        $trocaDe = strOrNull($prev['acomod1_pror'] ?? null);
+        $trocaPara = strOrNull($current['acomod1_pror'] ?? null);
+        $tipo = $tipoFromAcomodacoes($trocaDe, $trocaPara);
+        if (!$tipo) {
+            continue;
+        }
+
+        $dataInicio = strOrNull($current['prorrog1_ini_pror'] ?? null);
+        $dataFim = strOrNull($current['prorrog1_fim_pror'] ?? null);
+        $qtd = toIntOrNull($current['diarias_1'] ?? null);
+        if (!$qtd && $dataInicio && $dataFim) {
+            $iniTs = strtotime($dataInicio);
             $fimTs = strtotime($dataFim);
             if ($iniTs && $fimTs && $fimTs >= $iniTs) {
                 $qtd = (int)ceil(($fimTs - $iniTs) / 86400);
             }
         }
-        if ($qtd === null || $qtd <= 0) continue;
+        if (!$dataInicio || !$dataFim || !$qtd || $qtd <= 0) {
+            continue;
+        }
 
         $auto[] = [
-            'tipo_negociacao' => strOrNull($row['tipo_negociacao_pror'] ?? null) ?: 'PRORROGACAO_AUTOMATICA',
-            'data_inicio_negoc' => $dataIni,
-            'data_fim_negoc' => $dataFim,
-            'troca_de' => strOrNull($row['acomod_solicitada_pror'] ?? null) ?: $acomodLiberada,
-            'troca_para' => $acomodLiberada,
+            'tipo_negociacao' => $tipo,
+            'data_inicio_negoc' => substr($dataInicio, 0, 10),
+            'data_fim_negoc' => substr($dataFim, 0, 10),
+            'troca_de' => $trocaDe,
+            'troca_para' => $trocaPara,
             'qtd' => $qtd,
-            'saving' => toFloatOrNull($row['saving_estimado_pror'] ?? null) ?? 0.0,
-            'fk_usuario_neg' => toIntOrNull($row['fk_usuario_pror'] ?? null) ?? $fkUsuarioPadrao,
+            'fk_usuario_neg' => $fkUsuarioPadrao,
         ];
     }
+
     return $auto;
 }
 
@@ -257,6 +511,7 @@ function processNegociacoesEntries(
     int $visitaId,
     int $fkInternacao,
     negociacaoDAO $negociacaoDao,
+    PDO $conn,
     ?int $fkUsuarioNeg,
     array $autoNegociacoes = []
 ): void {
@@ -266,21 +521,49 @@ function processNegociacoesEntries(
     $decoded = decodeJsonArray($jsonRaw);
     if (!is_array($decoded)) $decoded = [];
     $rows = array_merge($decoded, $autoNegociacoes);
+    $seenRows = [];
     foreach ($rows as $row) {
         if (!is_array($row)) continue;
         $tipo = strOrNull($row['tipo_negociacao'] ?? null);
         if (!$tipo) continue;
+        $trocaDe = strOrNull($row['troca_de'] ?? null);
+        $trocaPara = strOrNull($row['troca_para'] ?? null);
+        $trocaDe = fullcareResolveNegotiationAcomodacao($conn, $fkInternacao, $trocaDe);
+        $trocaPara = fullcareResolveNegotiationAcomodacao($conn, $fkInternacao, $trocaPara);
+        [$trocaDe, $trocaPara] = fullcareHydrateNegotiationAcomodacoes($tipo, $trocaDe, $trocaPara);
+        $qtd = toIntOrNull($row['qtd'] ?? null);
+        $auditorId = fullcareResolveUserId(
+            $conn,
+            toIntOrNull($row['fk_usuario_neg'] ?? null),
+            $fkUsuarioNeg
+        );
+        $saving = fullcareCalcNegotiationSaving($conn, $fkInternacao, $tipo, $trocaDe, $trocaPara, (int)$qtd);
+        if (!$trocaDe || !$trocaPara || !$qtd || $qtd <= 0 || !$auditorId || $saving <= 0) {
+            continue;
+        }
+        $rowKey = implode('|', [
+            mb_strtoupper($tipo, 'UTF-8'),
+            mb_strtoupper($trocaDe, 'UTF-8'),
+            mb_strtoupper($trocaPara, 'UTF-8'),
+            (string)$qtd,
+            substr((string)($row['data_inicio_negoc'] ?? ''), 0, 10),
+            substr((string)($row['data_fim_negoc'] ?? ''), 0, 10),
+        ]);
+        if (isset($seenRows[$rowKey])) {
+            continue;
+        }
+        $seenRows[$rowKey] = true;
         $negociacao = new negociacao();
         $negociacao->fk_id_int = $fkInternacao;
         $negociacao->fk_visita_neg = $visitaId;
         $negociacao->tipo_negociacao = $tipo;
         $negociacao->data_inicio_neg = strOrNull($row['data_inicio_negoc'] ?? null);
         $negociacao->data_fim_neg = strOrNull($row['data_fim_negoc'] ?? null);
-        $negociacao->troca_de = strOrNull($row['troca_de'] ?? null);
-        $negociacao->troca_para = strOrNull($row['troca_para'] ?? null);
-        $negociacao->qtd = toIntOrNull($row['qtd'] ?? null);
-        $negociacao->saving = toFloatOrNull($row['saving'] ?? null);
-        $negociacao->fk_usuario_neg = toIntOrNull($row['fk_usuario_neg'] ?? $fkUsuarioNeg);
+        $negociacao->troca_de = $trocaDe;
+        $negociacao->troca_para = $trocaPara;
+        $negociacao->qtd = $qtd;
+        $negociacao->saving = $saving;
+        $negociacao->fk_usuario_neg = $auditorId;
         $negociacaoDao->create($negociacao);
     }
 }
@@ -441,6 +724,8 @@ function processProrrogacoesEntries(
     int $visitaId,
     int $fkInternacao,
     prorrogacaoDAO $prorrogacaoDao,
+    PDO $conn,
+    ?int $fallbackUserId = null,
     bool $clearExisting = false
 ): void {
     if ($visitaId <= 0) return;
@@ -454,7 +739,11 @@ function processProrrogacoesEntries(
         if (!is_array($row)) continue;
         $pr = new prorrogacao();
         $pr->fk_internacao_pror = $fkInternacao;
-        $pr->fk_usuario_pror = toIntOrNull($row['fk_usuario_pror'] ?? null);
+        $pr->fk_usuario_pror = fullcareResolveUserId(
+            $conn,
+            toIntOrNull($row['fk_usuario_pror'] ?? null),
+            $fallbackUserId
+        );
         $pr->acomod1_pror = strOrNull($row['acomod1_pror'] ?? null);
         $pr->prorrog1_ini_pror = strOrNull($row['prorrog1_ini_pror'] ?? null);
         $pr->prorrog1_fim_pror = strOrNull($row['prorrog1_fim_pror'] ?? null);
@@ -537,6 +826,20 @@ if ($type === "delete") {
         $usuarioId = $_SESSION['id_usuario'] ?? null;
         $usuarioNome = $_SESSION['nome_user'] ?? ($_SESSION['email_user'] ?? null);
         $visitaDao->logAlteracao($visitaAtual, $novoEstado, $usuarioId ? (int)$usuarioId : null, $usuarioNome);
+        fullcareAuditLog($conn, [
+            'action' => 'delete',
+            'entity_type' => 'visita',
+            'entity_id' => (int)$idVisitaDelete,
+            'summary' => 'Visita marcada como retificada.',
+            'before' => $visitaAtual,
+            'after' => $novoEstado,
+            'context' => [
+                'fk_internacao_vis' => $visitaAtual['fk_internacao_vis'] ?? null,
+                'retificado' => 1,
+            ],
+            'trace_id' => $flowCtx['trace_id'] ?? null,
+            'source' => 'process_visita.php',
+        ], $BASE_URL);
 
         $_SESSION['mensagem'] = "Visita removida com sucesso.";
         $_SESSION['mensagem_tipo'] = "success";
@@ -579,6 +882,12 @@ if ($type === "create") {
     $oportunidades_enf           = strOrNull($_POST['oportunidades_enf'] ?? null);
     $programacao_enf             = strOrNull($_POST['programacao_enf'] ?? null);
 
+    fullcareValidateVisitTextSecurity([
+        'rel_visita_vis' => $rel_visita_vis,
+        'acoes_int_vis' => $acoes_int_vis,
+        'programacao_enf' => $programacao_enf,
+    ], $flowCtx);
+
     // retificar (ATENÇÃO: precisa ser número de visita, não data)
     $retificou                   = toIntOrNull($_POST['retificou'] ?? null);
     $id_visita_edit              = toIntOrNull($_POST['id_visita_edit'] ?? null);
@@ -603,6 +912,20 @@ if ($type === "create") {
     // ------------------- IDs auxiliares usados por você ----------------
     $fk_int_visita               = toIntOrNull($_POST['fk_int_visita'] ?? null); // você já envia "próximo id" no form
     $fk_usuario_neg_form         = toIntOrNull($_POST['fk_usuario_neg'] ?? null);
+    $resolvedUsuarioVis          = fullcareResolveUserId($conn, $fk_usuario_vis);
+    [
+        'visita_auditor_prof_med' => $visita_auditor_prof_med,
+        'visita_auditor_prof_enf' => $visita_auditor_prof_enf,
+        'visita_med_vis' => $visita_med_vis,
+        'visita_enf_vis' => $visita_enf_vis,
+    ] = fullcareNormalizeVisitResponsible([
+        'fk_usuario_vis' => $resolvedUsuarioVis,
+        'visita_auditor_prof_med' => $visita_auditor_prof_med,
+        'visita_auditor_prof_enf' => $visita_auditor_prof_enf,
+        'visita_med_vis' => $visita_med_vis,
+        'visita_enf_vis' => $visita_enf_vis,
+    ]);
+    $resolvedUsuarioNeg          = fullcareResolveUserId($conn, $fk_usuario_neg_form, $resolvedUsuarioVis);
 
     // ------------------- Sanidade mínima ------------------------------
     if (!$fk_internacao_vis) {
@@ -672,11 +995,34 @@ if ($type === "create") {
             $novoRegistro = array_merge($visitaEmEdicao, $dadosAtualizados);
             $usuarioNomeLog = $_SESSION['nome_user'] ?? ($_SESSION['email_user'] ?? null);
             $visitaDao->logAlteracao($visitaEmEdicao, $novoRegistro, $fk_usuario_vis, $usuarioNomeLog);
-            processTussEntries($select_tuss ?? '', $tussJsonRaw, $id_visita_edit, $fk_internacao_vis, $tussDao, $fk_usuario_vis);
-            processProrrogacoesEntries($select_prorrog ?? '', $prorrogacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $prorrogacaoDao, true);
-            $autoNegociacoesProrrog = buildAutoNegociacoesFromProrrog($select_prorrog ?? '', $prorrogacoesJsonRaw, $fk_usuario_neg_form ?? $fk_usuario_vis);
+            fullcareAuditLog($conn, [
+                'action' => 'update',
+                'entity_type' => 'visita',
+                'entity_id' => (int)$id_visita_edit,
+                'summary' => 'Visita atualizada.',
+                'before' => $visitaEmEdicao,
+                'after' => $novoRegistro,
+                'context' => [
+                    'fk_internacao_vis' => $fk_internacao_vis,
+                    'edit_mode' => true,
+                ],
+                'trace_id' => $flowCtx['trace_id'] ?? null,
+                'source' => 'process_visita.php',
+            ], $BASE_URL);
+            processTussEntries($select_tuss ?? '', $tussJsonRaw, $id_visita_edit, $fk_internacao_vis, $tussDao, $resolvedUsuarioVis);
+            processProrrogacoesEntries($select_prorrog ?? '', $prorrogacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $prorrogacaoDao, $conn, $resolvedUsuarioVis, true);
+            $prorrogAltaPayload = fullcare_prorrog_alta_payload_from_post(
+                $_POST,
+                'normalizeDateTimeInput',
+                $resolvedUsuarioVis,
+                $_SESSION['email_user'] ?? $usuario_create ?? null
+            );
+            if (($select_prorrog ?? '') === 's' && $prorrogAltaPayload) {
+                fullcare_upsert_prorrog_alta($conn, (int)$fk_internacao_vis, $prorrogAltaPayload);
+            }
+            $autoNegociacoesProrrog = buildAutoNegociacoesFromProrrog($select_prorrog ?? '', $prorrogacoesJsonRaw, $resolvedUsuarioNeg ?? $resolvedUsuarioVis);
             $processaNegociacoes = (($select_negoc ?? '') === 's' || !empty($autoNegociacoesProrrog)) ? 's' : 'n';
-            processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $negociacaoDao, $fk_usuario_neg_form ?? $fk_usuario_vis, $autoNegociacoesProrrog);
+            processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $negociacaoDao, $conn, $resolvedUsuarioNeg ?? $resolvedUsuarioVis, $autoNegociacoesProrrog);
             processGestaoData($select_gestao ?? '', $gestaoPostData, $id_visita_edit, $fk_internacao_vis, $gestaoDao, true);
             processUtiData($select_uti ?? '', $utiPostData, $id_visita_edit, $fk_internacao_vis, $utiDao, true);
             $cronicosAtualizados = cc_process_visita_cronicos($conn, $internacaoDao, $fk_internacao_vis, $rel_visita_vis, 'edição do relatório da visita');
@@ -720,7 +1066,7 @@ if ($type === "create") {
     $visita->visita_med_vis           = $visita_med_vis;
     $visita->visita_auditor_prof_enf  = $visita_auditor_prof_enf;
     $visita->visita_auditor_prof_med  = $visita_auditor_prof_med;
-    $visita->fk_usuario_vis           = $fk_usuario_vis;
+    $visita->fk_usuario_vis           = $resolvedUsuarioVis;
     $visita->faturado_vis             = 'n';
 
     // enfermagem (texto)
@@ -732,11 +1078,32 @@ if ($type === "create") {
     // ------------------- Persistência VISITA --------------------------
     try {
         $novoIdVisita = $visitaDao->create($visita);
-        processTussEntries($select_tuss ?? '', $tussJsonRaw, $novoIdVisita, $fk_internacao_vis, $tussDao, $fk_usuario_vis);
-        processProrrogacoesEntries($select_prorrog ?? '', $prorrogacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $prorrogacaoDao);
-        $autoNegociacoesProrrog = buildAutoNegociacoesFromProrrog($select_prorrog ?? '', $prorrogacoesJsonRaw, $fk_usuario_neg_form ?? $fk_usuario_vis);
+        fullcareAuditLog($conn, [
+            'action' => 'create',
+            'entity_type' => 'visita',
+            'entity_id' => (int)$novoIdVisita,
+            'summary' => 'Visita criada.',
+            'after' => array_merge(get_object_vars($visita), ['id_visita' => $novoIdVisita]),
+            'context' => [
+                'fk_internacao_vis' => $fk_internacao_vis,
+            ],
+            'trace_id' => $flowCtx['trace_id'] ?? null,
+            'source' => 'process_visita.php',
+        ], $BASE_URL);
+        processTussEntries($select_tuss ?? '', $tussJsonRaw, $novoIdVisita, $fk_internacao_vis, $tussDao, $resolvedUsuarioVis);
+        processProrrogacoesEntries($select_prorrog ?? '', $prorrogacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $prorrogacaoDao, $conn, $resolvedUsuarioVis);
+        $prorrogAltaPayload = fullcare_prorrog_alta_payload_from_post(
+            $_POST,
+            'normalizeDateTimeInput',
+            $resolvedUsuarioVis,
+            $_SESSION['email_user'] ?? $usuario_create ?? null
+        );
+        if (($select_prorrog ?? '') === 's' && $prorrogAltaPayload) {
+            fullcare_upsert_prorrog_alta($conn, (int)$fk_internacao_vis, $prorrogAltaPayload);
+        }
+        $autoNegociacoesProrrog = buildAutoNegociacoesFromProrrog($select_prorrog ?? '', $prorrogacoesJsonRaw, $resolvedUsuarioNeg ?? $resolvedUsuarioVis);
         $processaNegociacoes = (($select_negoc ?? '') === 's' || !empty($autoNegociacoesProrrog)) ? 's' : 'n';
-        processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $negociacaoDao, $fk_usuario_neg_form ?? $fk_usuario_vis, $autoNegociacoesProrrog);
+        processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $negociacaoDao, $conn, $resolvedUsuarioNeg ?? $resolvedUsuarioVis, $autoNegociacoesProrrog);
         processGestaoData($select_gestao ?? '', $gestaoPostData, $novoIdVisita, $fk_internacao_vis, $gestaoDao);
         processUtiData($select_uti ?? '', $utiPostData, $novoIdVisita, $fk_internacao_vis, $utiDao);
         $cronicosCriados = cc_process_visita_cronicos($conn, $internacaoDao, $fk_internacao_vis, $rel_visita_vis, 'relatório da visita');
@@ -784,7 +1151,8 @@ if ($type === "create") {
         dbg("CREATE concluído. Redirecionamento suprimido no debug.");
         exit;
     }
-    header("Location: internacoes/lista");
+    $redirectNovoLancamento = rtrim((string)$BASE_URL, '/') . '/cad_visita.php?id_internacao=' . urlencode((string)$fk_internacao_vis) . '&novo_lancamento_prompt=1';
+    header("Location: " . $redirectNovoLancamento);
     exit;
 }
 

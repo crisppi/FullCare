@@ -29,6 +29,7 @@
     // ...
     $id_paciente_get = filter_input(INPUT_GET, 'id_paciente', FILTER_VALIDATE_INT) ?: 0;
     // ...
+    $pacientePrefill = null;
 
     /* === UsuarioDAO: usar somente findMedicosEnfermeiros() === */
     include_once("dao/usuarioDao.php");
@@ -191,7 +192,7 @@
     }
     ?>
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/form_cad_internacao.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
     <style>
         .assist-select-clear {
             position: relative;
@@ -262,7 +263,8 @@
 
     <div class="internacao-page">
         <div class="internacao-page__hero">
-            <div>
+            <div class="internacao-page__hero-main">
+                <p class="internacao-page__eyebrow">Fluxo assistencial</p>
                 <h1>Cadastrar internação</h1>
             </div>
             <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
@@ -272,15 +274,17 @@
                 enctype="multipart/form-data">
                 <div class="internacao-card internacao-card--general">
                     <div class="internacao-card__header">
-                        <div>
-                            <p class="internacao-card__eyebrow">Dados essenciais</p>
+                        <div class="internacao-card__title-wrap">
+                            <p class="internacao-card__eyebrow">Etapa 1</p>
+                            <h2 class="internacao-card__title">Dados da internação</h2>
                         </div>
+                        <span class="internacao-card__tag internacao-card__tag--critical">Campos principais</span>
                     </div>
                     <div class="internacao-card__body">
-                        <div class="internacao-head-row internacao-head-grid" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;">
+                        <div class="internacao-head-row internacao-head-grid">
                             <input type="hidden" value="" name="fk_hospital_int" id="fk_hospital_int">
 
-                            <div class="form-group hospital-col" style="flex:2.2 1 300px;min-width:260px;">
+                            <div class="form-group hospital-col">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="control-label mb-0" for="hospital_selected">
                                         <span style="color:red;">*</span> Hospital
@@ -310,14 +314,20 @@
                                 </div>
                             </div>
 
-                            <div class="form-group patient-col" style="flex:2.2 1 300px;min-width:260px;">
+                            <div class="form-group patient-col">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="control-label mb-0" for="fk_paciente_int">
                                         <span style="color:red;">*</span> Paciente
                                     </label>
-                                    <button type="button" id="patientInsightToggle" class="patient-insight-inline-btn"
-                                        style="display:none;"
-                                        title="Mostrar resumo do paciente" aria-expanded="false">i</button>
+                                    <div class="patient-label-actions">
+                                        <a class="patient-inline-link"
+                                            href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/pacientes/novo', ENT_QUOTES, 'UTF-8') ?>">
+                                            <i class="far fa-edit edit-icon"></i> Novo Paciente
+                                        </a>
+                                        <button type="button" id="patientInsightToggle" class="patient-insight-inline-btn"
+                                            style="display:none;"
+                                            title="Mostrar resumo do paciente" aria-expanded="false">i</button>
+                                    </div>
                                 </div>
                                 <select data-size="10" data-live-search="true" data-live-search-placeholder="Pesquisa por nome"
                                     data-style="input-lg-fullcare" data-width="100%"
@@ -348,8 +358,12 @@
                                         $matriculaPac = trim((string) ($paciente["matricula_pac"] ?? ""));
                                         $pacienteLabel = $paciente["nome_pac"];
                                         $careData = $patientCareProgramMap[$pacienteId] ?? ['programas' => [], 'condicoes' => ''];
+                                        if ($id_paciente_get > 0 && $pacienteId === $id_paciente_get) {
+                                            $pacientePrefill = $paciente;
+                                        }
                                         ?>
                                         <option value="<?= $pacienteId ?>"
+                                            <?= $id_paciente_get > 0 && $pacienteId === $id_paciente_get ? 'selected' : '' ?>
                                             data-matricula="<?= htmlspecialchars($matriculaPac) ?>"
                                             data-care-programs="<?= htmlspecialchars(json_encode(array_values($careData['programas']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>"
                                             data-care-condicoes="<?= htmlspecialchars((string) $careData['condicoes']) ?>"
@@ -357,13 +371,26 @@
                                             <?= htmlspecialchars($pacienteLabel) ?>
                                         </option>
                                     <?php endforeach; ?>
+                                    <?php
+                                    if ($id_paciente_get > 0 && !$pacientePrefill) {
+                                        $pacientePrefillData = $pacienteDao->findById($id_paciente_get);
+                                        if (is_array($pacientePrefillData) && !empty($pacientePrefillData[0])) {
+                                            $pacientePrefill = $pacientePrefillData[0];
+                                            $careData = $patientCareProgramMap[$id_paciente_get] ?? ['programas' => [], 'condicoes' => ''];
+                                            ?>
+                                            <option value="<?= (int)$id_paciente_get ?>"
+                                                selected
+                                                data-matricula="<?= htmlspecialchars(trim((string)($pacientePrefill['matricula_pac'] ?? ''))) ?>"
+                                                data-care-programs="<?= htmlspecialchars(json_encode(array_values($careData['programas']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>"
+                                                data-care-condicoes="<?= htmlspecialchars((string)$careData['condicoes']) ?>"
+                                                data-tokens="<?= htmlspecialchars(trim((string)($pacientePrefill['nome_pac'] ?? ''))) ?>">
+                                                <?= htmlspecialchars((string)($pacientePrefill['nome_pac'] ?? ('Paciente #' . $id_paciente_get))) ?>
+                                            </option>
+                                            <?php
+                                        }
+                                    }
+                                    ?>
                                 </select>
-                                <div style="display:flex;justify-content:space-between;align-items:center;">
-                                    <a style="font-size:.8em;margin-left:7px;color:blue;"
-                                        href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/pacientes/novo', ENT_QUOTES, 'UTF-8') ?>">
-                                        <i style="color:blue;margin-bottom:7px;" class="far fa-edit edit-icon"></i> Novo Paciente
-                                    </a>
-                                </div>
                                 <div id="patientCareProgramAlert" class="patient-care-program-alert" style="display:none;" role="status" aria-live="polite"></div>
                                 <div class="patient-insight-card" id="patientInsightCard"
                                     data-hub-base="<?= $BASE_URL ?>hub_paciente.php?id_paciente=" style="display:none;">
@@ -396,10 +423,11 @@
                                 })();
                             </script>
 
-                            <div class="form-group essential-medium" style="flex:1.2 1 180px;min-width:160px;">
+                            <div class="form-group essential-medium">
                                 <label class="control-label" for="matricula_paciente_display">Matrícula</label>
                                 <input type="text" class="form-control input-lg-fullcare" id="matricula_paciente_display"
-                                    placeholder="Digite para pesquisar por matrícula" list="matricula_list">
+                                    placeholder="Digite para pesquisar por matrícula" list="matricula_list"
+                                    value="<?= htmlspecialchars(trim((string)($pacientePrefill['matricula_pac'] ?? '')), ENT_QUOTES, 'UTF-8') ?>">
                                 <datalist id="matricula_list">
                                     <?php foreach ($pacientes as $paciente): ?>
                                         <?php $matriculaPac = trim((string) ($paciente["matricula_pac"] ?? "")); ?>
@@ -409,7 +437,7 @@
                                 </datalist>
                             </div>
 
-                            <div class="form-group essential-medium" style="flex:1.2 1 180px;min-width:160px;">
+                            <div class="form-group essential-medium">
                                 <label class="control-label" for="data_intern_int_dt"><span style="color:red;">*</span> Data
                                     Internação</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_intern_int_dt" required
@@ -418,20 +446,20 @@
                                 <input type="hidden" id="hora_intern_int" name="hora_intern_int" value="">
                             </div>
 
-                            <div class="form-group essential-small" style="flex:0.9 1 140px;min-width:130px;">
+                            <div class="form-group essential-small">
                                 <label class="control-label" for="data_lancamento_int">Data lançamento</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_lancamento_int"
                                     name="data_lancamento_int" value="<?= $agoraLanc ?>">
                             </div>
 
-                            <div class="form-group essential-small" style="flex:0.9 1 140px;min-width:130px;">
+                            <div class="form-group essential-small">
                                 <label for="data_visita_int">Data Visita</label>
                                 <input type="date" value='<?= $dataAtual; ?>' class="form-control input-lg-fullcare" id="data_visita_int"
                                     name="data_visita_int">
                                 <p id="error-message" style="color:red;display:none;font-size:.6em;"></p>
                             </div>
 
-                            <div class="form-group essential-small" style="flex:0.8 1 120px;min-width:110px;">
+                            <div class="form-group essential-small">
                                 <label class="control-label" for="internado_int">Internado</label>
                                 <select class="input-lg-fullcare form-control" id="internado_int" name="internado_int">
                                     <option value="s">Sim</option>
@@ -510,8 +538,7 @@
                     <div id="cadastro-central-wrapper" class="internacao-card internacao-card--central">
                         <div class="internacao-card__header">
                             <div>
-                                <p class="internacao-card__eyebrow">Cadastro Central</p>
-                                <!-- título removido conforme solicitado -->
+                                <h3 class="internacao-card__title">Responsável pela visita</h3>
                             </div>
                             <span class="internacao-card__tag">
                                 <?php if ($cadastroCentralObrigatorio): ?>
@@ -566,10 +593,11 @@
 
                 <div class="internacao-card internacao-card--fields">
                     <div class="internacao-card__header">
-                        <div>
-                            <p class="internacao-card__eyebrow">Dados assistenciais</p>
-                            <!-- título removido conforme solicitado -->
+                        <div class="internacao-card__title-wrap">
+                            <p class="internacao-card__eyebrow">Etapa 2</p>
+                            <h3 class="internacao-card__title">Dados assistenciais</h3>
                         </div>
+                        <span class="internacao-card__tag">Classificação clínica</span>
                     </div>
                     <div class="internacao-card__body">
                         <div class="row">
@@ -759,14 +787,21 @@
 
         <div class="internacao-card internacao-card--notes">
             <div class="internacao-card__header">
-                <div>
-                    <p class="internacao-card__eyebrow">Auditoria</p>
-                    <!-- título removido conforme solicitado -->
+                <div class="internacao-card__title-wrap">
+                    <p class="internacao-card__eyebrow">Etapa 3</p>
+                    <h3 class="internacao-card__title">Relatórios e observações</h3>
                 </div>
+                <span class="internacao-card__tag">Registro clínico</span>
             </div>
             <div class="internacao-card__body">
-                <div>
-                    <label for="rel_int">Relatório de Auditoria</label>
+                <div class="clinical-text-field">
+                    <div class="clinical-text-field__head">
+                        <label for="rel_int">Relatório da Auditoria</label>
+                        <div class="clinical-text-field__actions">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="rel_int">Limpar formatação</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_int">Organizar com IA</button>
+                        </div>
+                    </div>
                     <div id="cronicos-relatorio-alert"
                         style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff3cd,#ffe3a3);border:1px solid #f0c36d;color:#6a4a00;box-shadow:0 8px 20px rgba(240,195,109,.18);"
                         hidden>
@@ -782,6 +817,9 @@
                     </div>
                     <textarea data-saude-autocomplete="true" maxlength="5000" style="resize:none" rows="2"
                         onclick="aumentarText('rel_int')" class="form-control" id="rel_int" name="rel_int"></textarea>
+                    <div class="d-flex justify-content-end mt-1">
+                        <small class="text-muted" data-counter-for="rel_int">0/5000</small>
+                    </div>
                 </div>
 
                 <!-- Chat Widget -->
@@ -801,28 +839,92 @@
                         </div>
                     </div> -->
 
-                <div>
-                    <label for="acoes_int">Ações da Auditoria</label>
+                <div class="clinical-text-field">
+                    <div class="clinical-text-field__head">
+                        <label for="acoes_int">Ações da Auditoria</label>
+                        <div class="clinical-text-field__actions">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="acoes_int">Limpar formatação</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="acoes_int">Organizar com IA</button>
+                        </div>
+                    </div>
                     <textarea data-saude-autocomplete="true" rows="2" style="resize:none"
                         onclick="aumentarText('acoes_int')" class="form-control" maxlength="5000" id="acoes_int"
                         name="acoes_int"></textarea>
+                    <div class="d-flex justify-content-end mt-1">
+                        <small class="text-muted" data-counter-for="acoes_int">0/5000</small>
+                    </div>
                 </div>
 
-                <div>
-                    <label for="programacao_int">Programação Terapêutica</label>
+                <div class="clinical-text-field">
+                    <div class="clinical-text-field__head">
+                        <label for="programacao_int">Programação Terapêutica</label>
+                        <div class="clinical-text-field__actions">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="programacao_int">Limpar formatação</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="programacao_int">Organizar com IA</button>
+                        </div>
+                    </div>
                     <textarea data-saude-autocomplete="true" style="resize:none" maxlength="5000" rows="2"
                         onclick="aumentarText('programacao_int')" class="form-control" id="programacao_int"
                         name="programacao_int"></textarea>
+                    <div class="d-flex justify-content-end mt-1">
+                        <small class="text-muted" data-counter-for="programacao_int">0/5000</small>
+                    </div>
+                </div>
+
+                <div class="ia-highlight-box">
+                    <div class="ia-highlight-box__header">
+                        <div class="ia-highlight-box__title-wrap">
+                            <div>
+                                <p class="ia-highlight-box__eyebrow">Inteligência Artificial</p>
+                                <h3 class="ia-highlight-box__title">Assistente de parecer clínico</h3>
+                            </div>
+                            <span class="parecer-ia-powered">
+                                <i class="bi bi-stars"></i>
+                                IA conectada
+                            </span>
+                        </div>
+                        <div class="auditoria-actions auditoria-actions--ia">
+                            <input type="file" id="pdf-auditoria-input" accept="application/pdf,.pdf,image/png,image/jpeg,image/jpg,.png,.jpg,.jpeg" hidden>
+                            <button type="button" class="btn btn-sm btn-outline-secondary auditoria-action-btn" id="btn-ler-pdf-auditoria">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                                LER PDF/IMAGEM
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary auditoria-action-btn" id="btn-checklist-auditoria">
+                                <i class="bi bi-card-checklist"></i>
+                                Checklist Auditoria
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary auditoria-action-btn" id="btn-executar-prompt-uti">
+                                <i class="bi bi-cpu"></i>
+                                Executar Prompt UTI
+                            </button>
+                        </div>
+                    </div>
+                    <div class="parecer-ia-card">
+                        <div class="parecer-ia-card__header">
+                            <div class="parecer-ia-title-wrap">
+                                <h4>Parecer IA</h4>
+                            </div>
+                            <button type="button" class="parecer-ia-toggle" id="btn-toggle-parecer-ia" aria-expanded="false" aria-controls="parecer-ia-body">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div id="parecer-ia-status" class="parecer-ia-status" hidden></div>
+                        <div class="parecer-ia-card__body" id="parecer-ia-body" hidden>
+                            <div id="parecer-ia-content" class="parecer-ia-content">
+                                <p class="parecer-ia-empty">Nenhum parecer gerado.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
             <div class="tabelas-adicionais-card">
                 <div class="tabelas-adicionais-card__header">
-                    <h4 class="tabelas-adicionais-card__title">
-                        <span class="tabelas-adicionais-card__marker"></span>
-                        Tabelas Adicionais
-                    </h4>
+                    <div>
+                        <p class="tabelas-adicionais-card__eyebrow">Tabelas adicionais</p>
+                        <h3 class="tabelas-adicionais-card__title">Complementos da visita</h3>
+                    </div>
                 </div>
 
             <div class="tabelas-selects d-flex flex-wrap justify-content-between align-items-end">
@@ -883,11 +985,14 @@
                     </div>
                 <?php } ?>
                 </div>
+
+                <?php include_once('formularios/form_cad_internacao_detalhes.php'); ?>
+                <?php include_once('formularios/form_cad_internacao_tuss.php'); ?>
+                <?php include_once('formularios/form_cad_internacao_gestao.php'); ?>
+                <?php include_once('formularios/form_cad_internacao_uti.php'); ?>
+                <?php include_once('formularios/form_cad_internacao_prorrog.php'); ?>
+                <?php include_once('formularios/form_cad_internacao_negoc.php'); ?>
             </div>
-
-            <div id="tabelas-dynamic-stack"></div>
-
-            <?php include_once('formularios/form_cad_internacao_detalhes.php'); ?>
 
         <input type="hidden" class="form-control" value="<?= ($ultimoReg + 1) ?>" id="fk_int_capeante"
             name="fk_int_capeante">
@@ -895,12 +1000,6 @@
         <input type="hidden" class="form-control" value="s" id="aberto_cap" name="aberto_cap">
         <input type="hidden" class="form-control" value="n" id="em_auditoria_cap" name="em_auditoria_cap">
         <input type="hidden" class="form-control" value="n" id="senha_finalizada" name="senha_finalizada">
-
-        <?php include_once('formularios/form_cad_internacao_tuss.php'); ?>
-        <?php include_once('formularios/form_cad_internacao_gestao.php'); ?>
-        <?php include_once('formularios/form_cad_internacao_uti.php'); ?>
-        <?php include_once('formularios/form_cad_internacao_prorrog.php'); ?>
-        <?php include_once('formularios/form_cad_internacao_negoc.php'); ?>
 
         <div class="row">
             <div class="form-group col-md-6">
@@ -920,7 +1019,7 @@
             </div>
 
             <button type="submit" class="btn btn-success btn-lg fixed-submit btn-submit-standard">
-                <i class="fa-solid fa-check edit-icon" style="font-size:1rem;margin-right:8px;"></i>
+                <i class="fas fa-save edit-icon" style="font-size:1rem;margin-right:8px;"></i>
                 Cadastrar
             </button>
 
@@ -984,9 +1083,18 @@
 
     <script>
         window.hospitalUsuariosMap = <?= json_encode($hospitalUsuariosMap, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+        window.formInternacaoConfig = Object.assign({}, window.formInternacaoConfig || {}, {
+            baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+            prefillPacienteId: <?= $id_paciente_get > 0 ? (int)$id_paciente_get : 'null' ?>,
+            idSessao: <?= json_encode((string) $idSessao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+            cargoSessao: <?= json_encode((string) $cargoSessao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
+        });
     </script>
-    <script src="<?= $BASE_URL ?>js/form_cad_internacao.js"></script>
+    <script src="<?= $BASE_URL ?>js/form_cad_internacao.js?v=<?= filemtime(__DIR__ . '/../js/form_cad_internacao.js') ?>"></script>
     <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="<?= $BASE_URL ?>js/uti_audit_ai.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             function syncAssistClearButtons() {

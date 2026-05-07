@@ -28,6 +28,7 @@ require_once("models/hospital.php");
 require_once("models/message.php");
 require_once("dao/usuarioDao.php");
 require_once("dao/hospitalDao.php");
+require_once("utils/audit_logger.php");
 
 $message = new Message($BASE_URL);
 $userDao = new UserDAO($conn, $BASE_URL);
@@ -50,6 +51,36 @@ function postArray(string $key): array
 {
     $values = filter_input(INPUT_POST, $key, FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
     return is_array($values) ? $values : [];
+}
+
+function ensureHospitalUserLink(PDO $conn, int $hospitalId, int $userId): void
+{
+    if ($hospitalId <= 0 || $userId <= 0) {
+        return;
+    }
+
+    $stmtCheck = $conn->prepare("
+        SELECT id_hospitalUser
+          FROM tb_hospitalUser
+         WHERE fk_hospital_user = :hospital
+           AND fk_usuario_hosp = :user
+         LIMIT 1
+    ");
+    $stmtCheck->bindValue(':hospital', $hospitalId, PDO::PARAM_INT);
+    $stmtCheck->bindValue(':user', $userId, PDO::PARAM_INT);
+    $stmtCheck->execute();
+
+    if ($stmtCheck->fetchColumn()) {
+        return;
+    }
+
+    $stmtInsert = $conn->prepare("
+        INSERT INTO tb_hospitalUser (fk_usuario_hosp, fk_hospital_user)
+        VALUES (:user, :hospital)
+    ");
+    $stmtInsert->bindValue(':user', $userId, PDO::PARAM_INT);
+    $stmtInsert->bindValue(':hospital', $hospitalId, PDO::PARAM_INT);
+    $stmtInsert->execute();
 }
 
 function insertHospitalRelatedRows(PDO $conn, int $idHospital, array $enderecos, array $telefones, array $contatos): void
@@ -166,7 +197,7 @@ if ($type === "create") {
 
     $numero_hosp = filter_input(INPUT_POST, "numero_hosp");
     $bairro_hosp = filter_input(INPUT_POST, "bairro_hosp");
-    $fk_usuario_hosp = filter_input(INPUT_POST, "fk_usuario_hosp");
+    $fk_usuario_hosp = filter_input(INPUT_POST, "fk_usuario_hosp", FILTER_VALIDATE_INT);
     $usuario_create_hosp = filter_input(INPUT_POST, "usuario_create_hosp");
     $data_create_hosp = filter_input(INPUT_POST, "data_create_hosp");
     $longitude_hosp = filter_input(INPUT_POST, "longitude_hosp");
@@ -195,9 +226,13 @@ if ($type === "create") {
         $hospital->telefone02_hosp = $telefone02_hosp;
         $hospital->numero_hosp = $numero_hosp;
         $hospital->bairro_hosp = $bairro_hosp;
-        $hospital->fk_usuario_hosp = $fk_usuario_hosp;
-        $hospital->usuario_create_hosp = $usuario_create_hosp;
-        $hospital->data_create_hosp = $data_create_hosp;
+        $creatorUserId = (int) ($fk_usuario_hosp ?: ($_SESSION['id_usuario'] ?? 0));
+        $creatorUserLabel = trim((string) ($usuario_create_hosp ?: ($_SESSION['usuario_user'] ?? $_SESSION['email_user'] ?? '')));
+        $creatorDate = trim((string) ($data_create_hosp ?: date('Y-m-d H:i:s')));
+
+        $hospital->fk_usuario_hosp = $creatorUserId > 0 ? $creatorUserId : null;
+        $hospital->usuario_create_hosp = $creatorUserLabel;
+        $hospital->data_create_hosp = $creatorDate;
         $hospital->longitude_hosp = $longitude_hosp;
         $hospital->latitude_hosp = $latitude_hosp;
         $hospital->coordenador_medico_hosp = $coordenador_medico_hosp;
@@ -208,6 +243,7 @@ if ($type === "create") {
         $hospitalDao->create($hospital);
 
         $id_hospital_novo = (int) $conn->lastInsertId();
+        ensureHospitalUserLink($conn, $id_hospital_novo, $creatorUserId);
 
         $enderecos = [];
         $endTipo = postArray("end_tipo");
@@ -342,14 +378,29 @@ if ($type === "create") {
                     $stmtAco->bindValue(':acomodacao_aco', $nomeAco);
                     $stmtAco->bindValue(':fk_hospital', $id_hospital_novo, PDO::PARAM_INT);
                     $stmtAco->bindValue(':valor_aco', $valorAco);
-                    $stmtAco->bindValue(':fk_usuario_acomodacao', (int) ($fk_usuario_hosp ?: ($_SESSION['id_usuario'] ?? 0)), PDO::PARAM_INT);
-                    $stmtAco->bindValue(':usuario_create_acomodacao', (string) ($usuario_create_hosp ?: ($_SESSION['email_user'] ?? '')));
-                    $stmtAco->bindValue(':data_create_acomodacao', (string) ($data_create_hosp ?: date('Y-m-d H:i:s')));
+                    $stmtAco->bindValue(':fk_usuario_acomodacao', $creatorUserId, PDO::PARAM_INT);
+                    $stmtAco->bindValue(':usuario_create_acomodacao', $creatorUserLabel);
+                    $stmtAco->bindValue(':data_create_acomodacao', $creatorDate);
                     $stmtAco->bindValue(':data_contrato_aco', $dataContrato);
                     $stmtAco->execute();
                 }
             }
         }
+        $hospitalCriado = $id_hospital_novo > 0 ? $hospitalDao->findById($id_hospital_novo) : null;
+        fullcareAuditLog($conn, [
+            'action' => 'create',
+            'entity_type' => 'hospital',
+            'entity_id' => $id_hospital_novo > 0 ? $id_hospital_novo : null,
+            'summary' => 'Hospital criado.',
+            'after' => $hospitalCriado ?: $hospital,
+            'context' => [
+                'enderecos' => count($enderecos),
+                'telefones' => count($telefones),
+                'contatos' => count($contatos),
+            ],
+            'trace_id' => isset($__flowCtxAuto) ? ($__flowCtxAuto['trace_id'] ?? null) : null,
+            'source' => 'process_hospital.php',
+        ], $BASE_URL);
     }
     header("Location: " . $BASE_URL . "hospitais");
     exit;
@@ -393,6 +444,7 @@ if ($type === "update") {
     $id_hospital = filter_input(INPUT_POST, "id_hospital");
 
     $hospitalData = $hospitalDao->findById($id_hospital);
+    $hospitalAntes = $hospitalData ? clone $hospitalData : null;
 
     $hospitalData->id_hospital = $id_hospital;
     $hospitalData->nome_hosp = $nome_hosp;
@@ -575,6 +627,23 @@ if ($type === "update") {
         }
     }
 
+    $hospitalDepois = $hospitalDao->findById((int)$id_hospital);
+    fullcareAuditLog($conn, [
+        'action' => 'update',
+        'entity_type' => 'hospital',
+        'entity_id' => (int)$id_hospital,
+        'summary' => 'Hospital atualizado.',
+        'before' => $hospitalAntes,
+        'after' => $hospitalDepois,
+        'context' => [
+            'enderecos' => count($enderecos),
+            'telefones' => count($telefones),
+            'contatos' => count($contatos),
+        ],
+        'trace_id' => isset($__flowCtxAuto) ? ($__flowCtxAuto['trace_id'] ?? null) : null,
+        'source' => 'process_hospital.php',
+    ], $BASE_URL);
+
     header("Location: " . $BASE_URL . "hospitais");
     exit;
 }
@@ -586,11 +655,22 @@ if ($type === "delUpdate") {
     $id_hospital = filter_input(INPUT_POST, "id_hospital");
     $deletado_hosp = 's';
     $hospitalData = $hospitalDao->findById($id_hospital);
+    $hospitalAntesSoftDelete = $hospitalData ? clone $hospitalData : null;
 
     $hospitalData->id_hospital = $id_hospital;
     $hospitalData->deletado_hosp = $deletado_hosp;
 
     $hospitalDao->deletarUpdate($hospitalData);
+    $hospitalDepoisSoftDelete = $hospitalDao->findById((int)$id_hospital);
+    fullcareAuditLog($conn, [
+        'action' => 'soft_delete',
+        'entity_type' => 'hospital',
+        'entity_id' => (int)$id_hospital,
+        'summary' => 'Hospital marcado como deletado.',
+        'before' => $hospitalAntesSoftDelete,
+        'after' => $hospitalDepoisSoftDelete,
+        'source' => 'process_hospital.php',
+    ], $BASE_URL);
 
     header("Location: " . $BASE_URL . "hospitais");
     exit;
@@ -605,8 +685,16 @@ if ($type === "delete") {
     $hospital = $hospitalDao->findById($id_hospital);
 
     if (3 < 4) {
-
+        $hospitalAntesDelete = $hospital ? clone $hospital : null;
         $hospitalDao->destroy($id_hospital);
+        fullcareAuditLog($conn, [
+            'action' => 'delete',
+            'entity_type' => 'hospital',
+            'entity_id' => (int)$id_hospital,
+            'summary' => 'Hospital excluído.',
+            'before' => $hospitalAntesDelete,
+            'source' => 'process_hospital.php',
+        ], $BASE_URL);
 
         header("Location: " . $BASE_URL . "hospitais");
         exit;

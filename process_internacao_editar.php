@@ -38,12 +38,17 @@ require_once 'models/uti.php';
 require_once 'dao/utiDao.php';
 require_once 'models/negociacao.php';
 require_once 'dao/negociacaoDao.php';
+require_once 'models/acomodacao.php';
+require_once 'dao/acomodacaoDao.php';
 require_once 'models/prorrogacao.php';
 require_once 'dao/prorrogacaoDao.php';
 require_once 'models/tuss.php';
 require_once 'dao/tussDao.php';
 require_once 'models/gestao.php';
 require_once 'dao/gestaoDao.php';
+require_once 'utils/audit_logger.php';
+require_once __DIR__ . '/app/prorrog_alta_helper.php';
+require_once __DIR__ . '/app/services/TextSecurityService.php';
 
 /*──────── helpers ────────*/
 if (!function_exists('decodeArray')) {
@@ -54,10 +59,45 @@ if (!function_exists('decodeArray')) {
         return is_array($arr) ? $arr : [];
     }
 }
+if (!function_exists('postArrayValues')) {
+    function postArrayValues(string $key): array
+    {
+        $val = $_POST[$key] ?? [];
+        if (is_array($val)) {
+            return $val;
+        }
+        if ($val === null || $val === '') {
+            return [];
+        }
+        return [$val];
+    }
+}
 function limpa(?string $t, int $lim = 5000): string
 {
     $t = htmlspecialchars($t ?? '', ENT_QUOTES, 'UTF-8');
     return substr($t, 0, $lim);
+}
+if (!function_exists('validateInternacaoEditTextSecurity')) {
+    function validateInternacaoEditTextSecurity(array $fields): void
+    {
+        $security = new TextSecurityService();
+        foreach ($fields as $fieldName => $value) {
+            $value = trim((string)$value);
+            if ($value === '') {
+                continue;
+            }
+
+            $assessment = $security->assess($value, $fieldName, true);
+            if ($security->shouldBlock($assessment)) {
+                internacaoEditarDebugLog('TEXT_SECURITY blocked field=' . $fieldName . ' assessment=' . json_encode($assessment, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                $_SESSION['msg'] = 'Conteúdo suspeito no relatório da internação. Revise o texto antes de salvar.';
+                $_SESSION['type'] = 'error';
+                $redirect = $_SERVER['HTTP_REFERER'] ?? 'internacoes/lista';
+                header('Location: ' . $redirect);
+                exit;
+            }
+        }
+    }
 }
 if (!function_exists('normalizeDateTimeInput')) {
     function normalizeDateTimeInput($value)
@@ -89,11 +129,208 @@ if (!function_exists('normalizeDateTimeInput')) {
     }
 }
 
+if (!function_exists('internacaoUserExists')) {
+    function internacaoUserExists(PDO $conn, ?int $userId): bool
+    {
+        if ($userId === null || $userId <= 0) {
+            return false;
+        }
+
+        static $cache = [];
+        if (array_key_exists($userId, $cache)) {
+            return $cache[$userId];
+        }
+
+        $stmt = $conn->prepare("SELECT 1 FROM tb_user WHERE id_usuario = :id LIMIT 1");
+        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $cache[$userId] = (bool)$stmt->fetchColumn();
+    }
+}
+
+if (!function_exists('resolveInternacaoEditUserId')) {
+    function resolveInternacaoEditUserId(PDO $conn, ?int $postedUserId, ?int $currentUserId, ?int $sessionUserId): ?int
+    {
+        $candidates = [
+            'post' => $postedUserId,
+            'current' => $currentUserId,
+            'session' => $sessionUserId,
+        ];
+
+        foreach ($candidates as $source => $candidate) {
+            $candidate = ($candidate !== null && $candidate > 0) ? (int)$candidate : null;
+            if ($candidate !== null && internacaoUserExists($conn, $candidate)) {
+                if ($source !== 'post' && $postedUserId !== null && $postedUserId > 0 && $postedUserId !== $candidate) {
+                    internacaoEditarDebugLog(
+                        'FK_USUARIO fallback source=' . $source
+                        . ' posted=' . (int)$postedUserId
+                        . ' resolved=' . $candidate
+                    );
+                }
+                return $candidate;
+            }
+        }
+
+        if ($postedUserId !== null && $postedUserId > 0) {
+            internacaoEditarDebugLog('FK_USUARIO invalid posted=' . (int)$postedUserId . ' resolved=NULL');
+        }
+
+        return null;
+    }
+}
+
 if (!function_exists('internacaoEditarDebugLog')) {
     function internacaoEditarDebugLog(string $message): void
     {
         $line = '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL;
         @file_put_contents(__DIR__ . '/logs/process_internacao_editar.debug.log', $line, FILE_APPEND);
+    }
+}
+if (!function_exists('normalizeAcomodacaoNegociacao')) {
+    function normalizeAcomodacaoNegociacao(?string $value): string
+    {
+        $value = trim((string)$value);
+        if ($value === '') {
+            return '';
+        }
+        if (strpos($value, '-') !== false) {
+            [, $value] = array_pad(explode('-', $value, 2), 2, '');
+        }
+        return mb_strtolower(trim($value), 'UTF-8');
+    }
+}
+if (!function_exists('calcNegotiationSavingValue')) {
+    function calcNegotiationSavingValue(PDO $conn, int $hospitalId, ?string $tipo, ?string $trocaDe, ?string $trocaPara, int $qtd): float
+    {
+        static $cache = [];
+        if ($hospitalId <= 0 || $qtd <= 0) {
+            return 0.0;
+        }
+        if (!isset($cache[$hospitalId])) {
+            $stmt = $conn->prepare("SELECT acomodacao_aco, valor_aco FROM tb_acomodacao WHERE fk_hospital = :id");
+            $stmt->bindValue(':id', $hospitalId, PDO::PARAM_INT);
+            $stmt->execute();
+            $map = [];
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+                $map[normalizeAcomodacaoNegociacao($row['acomodacao_aco'] ?? '')] = (float)($row['valor_aco'] ?? 0);
+            }
+            $cache[$hospitalId] = $map;
+        }
+        $map = $cache[$hospitalId];
+        $de = (float)($map[normalizeAcomodacaoNegociacao($trocaDe)] ?? 0);
+        $para = (float)($map[normalizeAcomodacaoNegociacao($trocaPara)] ?? 0);
+        $tipoNorm = mb_strtoupper(trim((string)$tipo), 'UTF-8');
+
+        if (strpos($tipoNorm, 'TROCA') === 0) {
+            return ($de - $para) * $qtd;
+        }
+        if (strpos($tipoNorm, '1/2 DIARIA') !== false) {
+            return ($de / 2) * $qtd;
+        }
+        return $de * $qtd;
+    }
+}
+if (!function_exists('internacaoEditNegotiationDefaults')) {
+    function internacaoEditNegotiationDefaults(?string $tipo): array
+    {
+        $tipo = mb_strtoupper(trim((string)$tipo), 'UTF-8');
+        if ($tipo === 'TROCA UTI/APTO') return ['troca_de' => 'UTI', 'troca_para' => 'Apto'];
+        if ($tipo === 'TROCA UTI/SEMI') return ['troca_de' => 'UTI', 'troca_para' => 'Semi'];
+        if ($tipo === 'TROCA SEMI/APTO') return ['troca_de' => 'Semi', 'troca_para' => 'Apto'];
+        if ($tipo === 'GLOSA UTI' || $tipo === 'TARDIA UTI') return ['troca_de' => 'UTI', 'troca_para' => 'UTI'];
+        if ($tipo === 'GLOSA SEMI') return ['troca_de' => 'Semi', 'troca_para' => 'Semi'];
+        if (in_array($tipo, ['GLOSA APTO', '1/2 DIARIA APTO', 'TARDIA APTO', 'DIARIA ADM'], true)) {
+            return ['troca_de' => 'Apto', 'troca_para' => 'Apto'];
+        }
+        return ['troca_de' => '', 'troca_para' => ''];
+    }
+}
+if (!function_exists('internacaoEditHydrateNegotiationAcomodacoes')) {
+    function internacaoEditHydrateNegotiationAcomodacoes(?string $tipo, ?string $trocaDe, ?string $trocaPara): array
+    {
+        $trocaDe = trim((string)$trocaDe);
+        $trocaPara = trim((string)$trocaPara);
+        $defaults = internacaoEditNegotiationDefaults($tipo);
+        if ($trocaDe === '' && $defaults['troca_de'] !== '') {
+            $trocaDe = $defaults['troca_de'];
+        }
+        if ($trocaPara === '' && $defaults['troca_para'] !== '') {
+            $trocaPara = $defaults['troca_para'];
+        }
+        return [$trocaDe, $trocaPara];
+    }
+}
+if (!function_exists('internacaoEditNegotiationInvalidReasons')) {
+    function internacaoEditNegotiationInvalidReasons(?string $tipo, ?string $trocaDe, ?string $trocaPara, int $qtd, float $saving): array
+    {
+        $reasons = [];
+        if (trim((string)$tipo) === '') {
+            $reasons[] = 'tipo_vazio';
+        }
+        if (trim((string)$trocaDe) === '') {
+            $reasons[] = 'troca_de_vazia';
+        }
+        if (trim((string)$trocaPara) === '') {
+            $reasons[] = 'troca_para_vazia';
+        }
+        if ($qtd <= 0) {
+            $reasons[] = 'qtd_invalida';
+        }
+        if ($saving <= 0) {
+            $reasons[] = 'saving_invalido';
+        }
+        return $reasons;
+    }
+}
+if (!function_exists('shouldPersistNegotiation')) {
+    function shouldPersistNegotiation(?string $tipo, ?string $trocaDe, ?string $trocaPara, int $qtd, float $saving): bool
+    {
+        if (trim((string)$tipo) === '') {
+            return false;
+        }
+        if (trim((string)$trocaDe) === '' || trim((string)$trocaPara) === '') {
+            return false;
+        }
+        if ($qtd <= 0) {
+            return false;
+        }
+        return $saving > 0;
+    }
+}
+if (!function_exists('internacaoEditDateOnlyTs')) {
+    function internacaoEditDateOnlyTs($value): ?int
+    {
+        $value = trim((string)($value ?? ''));
+        if ($value === '') {
+            return null;
+        }
+        $ts = strtotime(substr($value, 0, 10));
+        return $ts ? (int)$ts : null;
+    }
+}
+if (!function_exists('internacaoEditProrrogInvalidReasons')) {
+    function internacaoEditProrrogInvalidReasons(array $row): array
+    {
+        $reasons = [];
+        $acomod = trim((string)($row['acomod'] ?? ''));
+        $ini = internacaoEditDateOnlyTs($row['ini'] ?? null);
+        $fim = internacaoEditDateOnlyTs($row['fim'] ?? null);
+
+        if ($acomod === '') {
+            $reasons[] = 'acomodacao_vazia';
+        }
+        if (!$ini) {
+            $reasons[] = 'data_inicial_invalida';
+        }
+        if (!$fim) {
+            $reasons[] = 'data_final_invalida';
+        }
+        if ($ini && $fim && $fim <= $ini) {
+            $reasons[] = 'periodo_invalido';
+        }
+
+        return $reasons;
     }
 }
 
@@ -121,6 +358,12 @@ internacaoEditarDebugLog(
     . ' evento_adverso_ges=' . (string)($_POST['evento_adverso_ges'] ?? '')
     . ' id_gestao=' . (string)($_POST['id_gestao'] ?? '')
 );
+
+validateInternacaoEditTextSecurity([
+    'rel_int' => $_POST['rel_int'] ?? '',
+    'acoes_int' => $_POST['acoes_int'] ?? '',
+    'programacao_int' => $_POST['programacao_int'] ?? '',
+]);
 
 try {
     $conn->beginTransaction();
@@ -197,9 +440,13 @@ try {
     $int->visita_auditor_prof_enf = filter_input(INPUT_POST, 'visita_auditor_prof_enf') ?? $int->visita_auditor_prof_enf;
 
     $fkUsuario = filter_input(INPUT_POST, 'fk_usuario_int', FILTER_VALIDATE_INT);
-    if ($fkUsuario !== null && $fkUsuario !== false) {
-        $int->fk_usuario_int = $fkUsuario;
-    }
+    $resolvedFkUsuario = resolveInternacaoEditUserId(
+        $conn,
+        ($fkUsuario !== false ? $fkUsuario : null),
+        isset($currentIntern->fk_usuario_int) ? (int)$currentIntern->fk_usuario_int : null,
+        isset($_SESSION['id_usuario']) ? (int)$_SESSION['id_usuario'] : null
+    );
+    $int->fk_usuario_int = $resolvedFkUsuario;
 
     $int->censo_int             = filter_input(INPUT_POST, 'censo_int')             ?? $int->censo_int;
     $int->origem_int            = filter_input(INPUT_POST, 'origem_int')            ?? $int->origem_int;
@@ -217,7 +464,17 @@ try {
         $int->timer_int = max(0, $timerRaw);
     }
 
+    $beforeInternacao = clone $currentIntern;
     $internacaoDao->update($int);
+    $afterInternacao = $internacaoDao->findById($idInt);
+    fullcareAuditLog($conn, [
+        'action' => 'update',
+        'entity_type' => 'internacao',
+        'entity_id' => (int)$idInt,
+        'before' => $beforeInternacao,
+        'after' => $afterInternacao ?: $int,
+        'source' => 'process_internacao_editar.php',
+    ], $BASE_URL);
 
     /*──────── DETALHES ────────*/
     if (filter_input(INPUT_POST, 'select_detalhes') === 's') {
@@ -259,8 +516,25 @@ try {
         if (!$idDetalhes) {
             unset($d->id_detalhes);
             $detalhesDao->create($d);
+            $idDetalhesNovo = (int)$conn->lastInsertId();
+            fullcareAuditLog($conn, [
+                'action' => 'create',
+                'entity_type' => 'detalhes',
+                'entity_id' => $idDetalhesNovo > 0 ? $idDetalhesNovo : null,
+                'after' => array_merge(get_object_vars($d), ['id_detalhes' => $idDetalhesNovo > 0 ? $idDetalhesNovo : null]),
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
         } else {
+            $beforeDetalhes = $detalhesDao->findByIdDetalhes($idDetalhes);
             $detalhesDao->update($d);
+            fullcareAuditLog($conn, [
+                'action' => 'update',
+                'entity_type' => 'detalhes',
+                'entity_id' => (int)$idDetalhes,
+                'before' => $beforeDetalhes,
+                'after' => $d,
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
         }
     }
 
@@ -282,9 +556,26 @@ try {
         $u->internado_uti       = filter_input(INPUT_POST, 'internado_uti');
 
         if (!empty($u->id_uti)) {
+            $beforeUti = $utiDao->findById((int)$u->id_uti);
             $utiDao->update($u);
+            fullcareAuditLog($conn, [
+                'action' => 'update',
+                'entity_type' => 'uti',
+                'entity_id' => (int)$u->id_uti,
+                'before' => $beforeUti,
+                'after' => $u,
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
         } else {
             $utiDao->create($u);
+            $idUtiNovo = (int)$conn->lastInsertId();
+            fullcareAuditLog($conn, [
+                'action' => 'create',
+                'entity_type' => 'uti',
+                'entity_id' => $idUtiNovo > 0 ? $idUtiNovo : null,
+                'after' => array_merge(get_object_vars($u), ['id_uti' => $idUtiNovo > 0 ? $idUtiNovo : null]),
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
         }
     }
 
@@ -341,10 +632,27 @@ try {
         }
 
         if ($idGestao) {
+            $beforeGestao = $gestaoDao->findById((int)$idGestao);
             $gestaoDao->update($gestao);
+            fullcareAuditLog($conn, [
+                'action' => 'update',
+                'entity_type' => 'gestao',
+                'entity_id' => (int)$idGestao,
+                'before' => $beforeGestao,
+                'after' => $gestao,
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
             internacaoEditarDebugLog('GESTAO update ok id_int=' . (int)$idInt . ' id_gestao=' . (int)$idGestao . ' evento=' . (string)$gestao->evento_adverso_ges);
         } else {
             $gestaoDao->create($gestao);
+            $idGestaoNovo = (int)$conn->lastInsertId();
+            fullcareAuditLog($conn, [
+                'action' => 'create',
+                'entity_type' => 'gestao',
+                'entity_id' => $idGestaoNovo > 0 ? $idGestaoNovo : null,
+                'after' => array_merge(get_object_vars($gestao), ['id_gestao' => $idGestaoNovo > 0 ? $idGestaoNovo : null]),
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
             internacaoEditarDebugLog('GESTAO create ok id_int=' . (int)$idInt . ' evento=' . (string)$gestao->evento_adverso_ges);
         }
     } else {
@@ -354,38 +662,192 @@ try {
     /*──────── NEGOCIAÇÕES (UPDATE/CREATE/DELETE) ────────*/
     if (filter_input(INPUT_POST, 'select_negoc') === 's') {
         $existing    = $negDao->findByInternacao($idInt);
+        $existingById = [];
+        foreach ($existing as $row) {
+            $existingById[(int)$row['id_negociacao']] = $row;
+        }
         $existingIds = array_map(fn(array $r) => (int) $r['id_negociacao'], $existing);
 
         $negArray    = decodeArray($_POST['negociacoes_json'] ?? null);  // sempre array
+        if (!$negArray) {
+            $ids = postArrayValues('neg_id');
+            $tipos = postArrayValues('tipo_negociacao');
+            $inicios = postArrayValues('data_inicio_neg');
+            $fins = postArrayValues('data_fim_neg');
+            $trocasDe = postArrayValues('troca_de');
+            $trocasPara = postArrayValues('troca_para');
+            $qtds = postArrayValues('qtd');
+            $savings = postArrayValues('saving');
+            $rows = max(
+                count($ids),
+                count($tipos),
+                count($inicios),
+                count($fins),
+                count($trocasDe),
+                count($trocasPara),
+                count($qtds),
+                count($savings)
+            );
+            for ($i = 0; $i < $rows; $i++) {
+                $tipoLinha = trim((string)($tipos[$i] ?? ''));
+                $deLinha = trim((string)($trocasDe[$i] ?? ''));
+                $paraLinha = trim((string)($trocasPara[$i] ?? ''));
+                $qtdLinha = (int)($qtds[$i] ?? 0);
+                if ($tipoLinha === '' && $deLinha === '' && $paraLinha === '' && $qtdLinha <= 0) {
+                    continue;
+                }
+                $negArray[] = [
+                    'id' => (int)($ids[$i] ?? 0),
+                    'tipo_negociacao' => $tipoLinha,
+                    'data_inicio_neg' => $inicios[$i] ?? null,
+                    'data_fim_neg' => $fins[$i] ?? null,
+                    'troca_de' => $deLinha,
+                    'troca_para' => $paraLinha,
+                    'qtd' => $qtdLinha,
+                    'saving' => (float)($savings[$i] ?? 0),
+                ];
+            }
+            internacaoEditarDebugLog('NEGOC fallback post rows=' . count($negArray) . ' id_int=' . (int)$idInt);
+        } else {
+            internacaoEditarDebugLog('NEGOC json rows=' . count($negArray) . ' id_int=' . (int)$idInt);
+        }
+
+        $deleteIds = [];
+        $deleteArray = decodeArray($_POST['negociacoes_delete_ids'] ?? null);
+        foreach ($deleteArray as $deleteId) {
+            $deleteId = (int)$deleteId;
+            if ($deleteId > 0) {
+                $deleteIds[$deleteId] = $deleteId;
+            }
+        }
+        foreach ((array)($_POST['neg_delete_ids'] ?? []) as $deleteId) {
+            $deleteId = (int)$deleteId;
+            if ($deleteId > 0) {
+                $deleteIds[$deleteId] = $deleteId;
+            }
+        }
+
+        $validNegArray = [];
+        foreach ($negArray as $nData) {
+            $negIdAtual = !empty($nData['id']) ? (int)$nData['id'] : 0;
+            $tipoAtual = trim((string)($nData['tipo_negociacao'] ?? ''));
+            $trocaDeAtual = trim((string)($nData['troca_de'] ?? ''));
+            $trocaParaAtual = trim((string)($nData['troca_para'] ?? ''));
+            [$trocaDeAtual, $trocaParaAtual] = internacaoEditHydrateNegotiationAcomodacoes(
+                $tipoAtual,
+                $trocaDeAtual,
+                $trocaParaAtual
+            );
+            $qtdAtual = (int)($nData['qtd'] ?? 0);
+            $savingAtual = calcNegotiationSavingValue(
+                $conn,
+                (int)($currentIntern->fk_hospital_int ?? 0),
+                $tipoAtual,
+                $trocaDeAtual,
+                $trocaParaAtual,
+                $qtdAtual
+            );
+
+            if (!shouldPersistNegotiation($tipoAtual, $trocaDeAtual, $trocaParaAtual, $qtdAtual, $savingAtual)) {
+                internacaoEditarDebugLog(
+                    'NEGOC skip id_int=' . (int)$idInt
+                    . ' id_neg=' . $negIdAtual
+                    . ' reasons=' . implode(',', internacaoEditNegotiationInvalidReasons(
+                        $tipoAtual,
+                        $trocaDeAtual,
+                        $trocaParaAtual,
+                        $qtdAtual,
+                        $savingAtual
+                    ))
+                    . ' tipo=' . $tipoAtual
+                    . ' troca_de=' . $trocaDeAtual
+                    . ' troca_para=' . $trocaParaAtual
+                    . ' qtd=' . $qtdAtual
+                    . ' saving=' . number_format($savingAtual, 2, '.', '')
+                );
+                if ($negIdAtual > 0) {
+                    $deleteIds[$negIdAtual] = $negIdAtual;
+                }
+                continue;
+            }
+
+            $nData['id'] = $negIdAtual;
+            $nData['tipo_negociacao'] = $tipoAtual;
+            $nData['troca_de'] = $trocaDeAtual;
+            $nData['troca_para'] = $trocaParaAtual;
+            $nData['qtd'] = $qtdAtual;
+            $nData['saving'] = $savingAtual;
+            $validNegArray[] = $nData;
+        }
+        $negArray = $validNegArray;
 
         $postedIds = [];
         foreach ($negArray as $n) {
             if (!empty($n['id'])) $postedIds[] = (int) $n['id'];
         }
 
-        $toDelete = array_diff($existingIds, $postedIds);
+        $toDelete = array_unique(array_merge(
+            array_diff($existingIds, $postedIds),
+            array_values($deleteIds)
+        ));
         foreach ($toDelete as $delId) {
+            $beforeNeg = $existingById[(int)$delId] ?? null;
             $negDao->destroy($delId);
+            fullcareAuditLog($conn, [
+                'action' => 'delete',
+                'entity_type' => 'negociacao',
+                'entity_id' => (int)$delId,
+                'before' => $beforeNeg,
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
             error_log("[NEGOCIAÇÃO] Deletada ID $delId");
         }
 
         foreach ($negArray as $nData) {
+            $negIdAtual = !empty($nData['id']) ? (int)$nData['id'] : 0;
+            if ($negIdAtual > 0 && isset($deleteIds[$negIdAtual])) {
+                continue;
+            }
+
             $neg = new negociacao();
-            if (!empty($nData['id'])) $neg->id_negociacao = (int) $nData['id'];
+            if ($negIdAtual > 0) $neg->id_negociacao = $negIdAtual;
 
             $neg->fk_id_int       = $idInt;
+            $neg->fk_usuario_neg  = resolveInternacaoEditUserId(
+                $conn,
+                isset($nData['fk_usuario_neg']) ? (int)$nData['fk_usuario_neg'] : null,
+                isset($currentIntern->fk_usuario_int) ? (int)$currentIntern->fk_usuario_int : null,
+                isset($_SESSION['id_usuario']) ? (int)$_SESSION['id_usuario'] : null
+            );
             $neg->troca_de        = $nData['troca_de']        ?? '';
             $neg->troca_para      = $nData['troca_para']      ?? '';
             $neg->qtd             = (int)($nData['qtd']       ?? 0);
-            $neg->saving          = (float)($nData['saving']  ?? 0);
+            $neg->saving          = (float)($nData['saving'] ?? 0);
             $neg->data_inicio_neg = $nData['data_inicio_neg'] ?? null;
             $neg->data_fim_neg    = $nData['data_fim_neg']    ?? null;
             $neg->tipo_negociacao = $nData['tipo_negociacao'] ?? '';
 
             if (!empty($neg->id_negociacao)) {
+                $beforeNeg = $existingById[(int)$neg->id_negociacao] ?? null;
                 $negDao->update($neg);
+                fullcareAuditLog($conn, [
+                    'action' => 'update',
+                    'entity_type' => 'negociacao',
+                    'entity_id' => (int)$neg->id_negociacao,
+                    'before' => $beforeNeg,
+                    'after' => $neg,
+                    'source' => 'process_internacao_editar.php',
+                ], $BASE_URL);
             } else {
                 $negDao->create($neg);
+                $idNegNovo = (int)$conn->lastInsertId();
+                fullcareAuditLog($conn, [
+                    'action' => 'create',
+                    'entity_type' => 'negociacao',
+                    'entity_id' => $idNegNovo > 0 ? $idNegNovo : null,
+                    'after' => array_merge(get_object_vars($neg), ['id_negociacao' => $idNegNovo > 0 ? $idNegNovo : null]),
+                    'source' => 'process_internacao_editar.php',
+                ], $BASE_URL);
             }
         }
     }
@@ -393,9 +855,41 @@ try {
     /*──────── PRORROGAÇÕES (UPDATE/CREATE/DELETE) ────────*/
     if (filter_input(INPUT_POST, 'select_prorrog') === 's') {
         $existing    = $prorrogDao->selectInternacaoProrrog($idInt);
+        $existingById = [];
+        foreach ($existing as $row) {
+            $existingById[(int)$row['id_prorrogacao']] = $row;
+        }
         $existingIds = array_map(fn($r) => (int) $r['id_prorrogacao'], $existing);
 
-        $prArray     = decodeArray($_POST['prorrogacoes_json'] ?? null); // sempre array
+        $prArrayRaw  = decodeArray($_POST['prorrogacoes_json'] ?? null); // sempre array
+        internacaoEditarDebugLog('PRORROG input id_int=' . (int)$idInt . ' rows=' . count($prArrayRaw));
+
+        $prArray = [];
+        foreach ($prArrayRaw as $p) {
+            $idPror = !empty($p['id_prorrogacao']) ? (int)$p['id_prorrogacao'] : 0;
+            $isBlankNewRow = $idPror <= 0
+                && trim((string)($p['acomod'] ?? '')) === ''
+                && trim((string)($p['ini'] ?? '')) === ''
+                && trim((string)($p['fim'] ?? '')) === '';
+
+            if ($isBlankNewRow) {
+                continue;
+            }
+
+            $invalidReasons = internacaoEditProrrogInvalidReasons($p);
+            if ($invalidReasons) {
+                internacaoEditarDebugLog(
+                    'PRORROG skip invalid id_int=' . (int)$idInt
+                    . ' id_pror=' . $idPror
+                    . ' reasons=' . implode(',', $invalidReasons)
+                    . ' ini=' . (string)($p['ini'] ?? '')
+                    . ' fim=' . (string)($p['fim'] ?? '')
+                );
+                continue;
+            }
+
+            $prArray[] = $p;
+        }
 
         $postedIds = [];
         foreach ($prArray as $p) {
@@ -404,8 +898,32 @@ try {
 
         $toDelete = array_diff($existingIds, $postedIds);
         foreach ($toDelete as $delId) {
+            $beforePror = $existingById[(int)$delId] ?? null;
             $prorrogDao->destroy($delId);
+            fullcareAuditLog($conn, [
+                'action' => 'delete',
+                'entity_type' => 'prorrogacao',
+                'entity_id' => (int)$delId,
+                'before' => $beforePror,
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
             error_log("[PRORROGAÇÃO] Deletada ID $delId");
+        }
+
+        foreach ($negDao->findByInternacao($idInt) as $negExist) {
+            if ((string)($negExist['tipo_negociacao'] ?? '') !== 'PRORROGACAO_AUTOMATICA') {
+                continue;
+            }
+            $idNegAuto = (int)($negExist['id_negociacao'] ?? 0);
+            $negDao->destroy($idNegAuto);
+            fullcareAuditLog($conn, [
+                'action' => 'delete',
+                'entity_type' => 'negociacao',
+                'entity_id' => $idNegAuto,
+                'before' => $negExist,
+                'summary' => 'Negociação automática de prorrogação removida.',
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
         }
 
         foreach ($prArray as $p) {
@@ -413,6 +931,13 @@ try {
             if (!empty($p['id_prorrogacao'])) $pr->id_prorrogacao = (int) $p['id_prorrogacao'];
 
             $pr->fk_internacao_pror  = $idInt;
+            $pr->fk_usuario_pror     = resolveInternacaoEditUserId(
+                $conn,
+                isset($p['fk_usuario_pror']) ? (int)$p['fk_usuario_pror'] : null,
+                isset($currentIntern->fk_usuario_int) ? (int)$currentIntern->fk_usuario_int : null,
+                isset($_SESSION['id_usuario']) ? (int)$_SESSION['id_usuario'] : null
+            );
+            $pr->fk_visita_pror      = !empty($p['fk_visita_pror']) ? (int)$p['fk_visita_pror'] : null;
             $pr->acomod1_pror        = $p['acomod']     ?? '';
             $pr->isol_1_pror         = $p['isolamento'] ?? 'n';
             $pr->prorrog1_ini_pror   = $p['ini']        ?: null;
@@ -420,30 +945,41 @@ try {
             $pr->diarias_1           = (int)($p['diarias'] ?? 0);
 
             if (!empty($pr->id_prorrogacao)) {
+                $beforePror = $existingById[(int)$pr->id_prorrogacao] ?? null;
                 $prorrogDao->update($pr);
+                fullcareAuditLog($conn, [
+                    'action' => 'update',
+                    'entity_type' => 'prorrogacao',
+                    'entity_id' => (int)$pr->id_prorrogacao,
+                    'before' => $beforePror,
+                    'after' => $pr,
+                    'source' => 'process_internacao_editar.php',
+                ], $BASE_URL);
+                internacaoEditarDebugLog('PRORROG update ok id_int=' . (int)$idInt . ' id_pror=' . (int)$pr->id_prorrogacao);
             } else {
                 $prorrogDao->create($pr);
+                $idProrNovo = (int)$conn->lastInsertId();
+                fullcareAuditLog($conn, [
+                    'action' => 'create',
+                    'entity_type' => 'prorrogacao',
+                    'entity_id' => $idProrNovo > 0 ? $idProrNovo : null,
+                    'after' => array_merge(get_object_vars($pr), ['id_prorrogacao' => $idProrNovo > 0 ? $idProrNovo : null]),
+                    'source' => 'process_internacao_editar.php',
+                ], $BASE_URL);
+                internacaoEditarDebugLog('PRORROG create ok id_int=' . (int)$idInt . ' ini=' . (string)$pr->prorrog1_ini_pror . ' fim=' . (string)$pr->prorrog1_fim_pror);
             }
 
-            $dataIni = $p['ini'] ?? null;
-            $dataFim = $p['fim'] ?? null;
-            $acomod = $p['acomod'] ?? '';
-            $diarias = (int)($p['diarias'] ?? 0);
-            if (!empty($dataIni) && !empty($dataFim) && !empty($acomod) && $diarias > 0) {
-                $negAuto = new negociacao();
-                $negAuto->fk_id_int = $idInt;
-                $negAuto->tipo_negociacao = 'PRORROGACAO_AUTOMATICA';
-                $negAuto->data_inicio_neg = $dataIni;
-                $negAuto->data_fim_neg = $dataFim;
-                $negAuto->troca_de = $p['acomod_solicitada'] ?? $acomod;
-                $negAuto->troca_para = $acomod;
-                $negAuto->qtd = $diarias;
-                $negAuto->saving = (float)($p['saving_estimado'] ?? 0);
-                $negAuto->fk_usuario_neg = (int)($_SESSION['id_usuario'] ?? 0);
-                if (!$negDao->existeNegociacao($negAuto)) {
-                    $negDao->create($negAuto);
-                }
-            }
+        }
+
+        $prorrogAltaPayload = fullcare_prorrog_alta_payload_from_post(
+            $_POST,
+            'normalizeDateTimeInput',
+            isset($_SESSION['id_usuario']) ? (int)$_SESSION['id_usuario'] : null,
+            $_SESSION['email_user'] ?? null
+        );
+        if ($prorrogAltaPayload) {
+            fullcare_upsert_prorrog_alta($conn, (int)$idInt, $prorrogAltaPayload);
+            internacaoEditarDebugLog('PRORROG alta inline ok id_int=' . (int)$idInt);
         }
     }
 
@@ -454,6 +990,13 @@ try {
 
         // existentes
         $existentes  = $tussDao->findByIdIntern($idInternacao);
+        $existentesById = [];
+        foreach ($existentes as $row) {
+            $rowId = (int)($row['id_tuss'] ?? $row->id_tuss ?? 0);
+            if ($rowId > 0) {
+                $existentesById[$rowId] = $row;
+            }
+        }
         $existIds    = array_map(fn($r) => (int) ($r['id_tuss'] ?? $r->id_tuss), $existentes);
 
         // ids vindos no form
@@ -466,6 +1009,13 @@ try {
         $toDelete = array_diff($existIds, $incomingIds);
         foreach ($toDelete as $delId) {
             $tussDao->destroy($delId);
+            fullcareAuditLog($conn, [
+                'action' => 'delete',
+                'entity_type' => 'tuss',
+                'entity_id' => (int)$delId,
+                'before' => $existentesById[(int)$delId] ?? null,
+                'source' => 'process_internacao_editar.php',
+            ], $BASE_URL);
         }
 
         // create/update
@@ -486,9 +1036,26 @@ try {
             $tuss->glosa_tuss            = null;
 
             if (!empty($tuss->id_tuss)) {
+                $beforeTuss = $existentesById[(int)$tuss->id_tuss] ?? null;
                 $tussDao->update($tuss);
+                fullcareAuditLog($conn, [
+                    'action' => 'update',
+                    'entity_type' => 'tuss',
+                    'entity_id' => (int)$tuss->id_tuss,
+                    'before' => $beforeTuss,
+                    'after' => $tuss,
+                    'source' => 'process_internacao_editar.php',
+                ], $BASE_URL);
             } else {
                 $tussDao->create($tuss);
+                $idTussNovo = (int)$conn->lastInsertId();
+                fullcareAuditLog($conn, [
+                    'action' => 'create',
+                    'entity_type' => 'tuss',
+                    'entity_id' => $idTussNovo > 0 ? $idTussNovo : null,
+                    'after' => array_merge(get_object_vars($tuss), ['id_tuss' => $idTussNovo > 0 ? $idTussNovo : null]),
+                    'source' => 'process_internacao_editar.php',
+                ], $BASE_URL);
             }
         }
     }

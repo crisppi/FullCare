@@ -1,8 +1,12 @@
 <?php
+ob_start();
+
 // ===== DEV ONLY (remova em produção) =====
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/../php-error.log');
 error_reporting(E_ALL);
+
+require_once("templates/header.php");
 
 require_once(__DIR__ . "/../dao/internacaoDao.php");
 require_once(__DIR__ . "/../dao/capeanteDao.php");

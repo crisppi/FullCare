@@ -13,6 +13,8 @@
 
     include_once("models/hospital.php");
     include_once("dao/hospitalDao.php");
+    include_once("models/acomodacao.php");
+    include_once("dao/acomodacaoDao.php");
 
     include_once("models/patologia.php");
     include_once("dao/patologiaDao.php");
@@ -248,6 +250,10 @@
     $int_detalhes = $detalhesDao->findById($intern['id_internacao']);
     $ctl_detalhes = $detalhesDao->findById($intern['id_internacao']);
     $int_hospital = $hospital_geral->findById($intern['fk_hospital_int']);
+    if (!isset($acomodacoesNegoc) || !is_array($acomodacoesNegoc) || !$acomodacoesNegoc) {
+        $acomodacaoDaoEdit = new acomodacaoDAO($conn, $BASE_URL);
+        $acomodacoesNegoc = $acomodacaoDaoEdit->findGeralByHospital((int)($intern['fk_hospital_int'] ?? 0));
+    }
     $tussInt = $tuss_int->findByIdIntern($intern['id_internacao'] ?? 0);
     $int_gestao = $gestao->findByIdInt($intern['id_internacao']);
 
@@ -305,13 +311,17 @@
             || trim((string)($row['saida'] ?? '')) !== ''
             || trim((string)($row['motivo_uti'] ?? '')) !== ''
             || trim((string)($row['internado_uti'] ?? '')) !== '';
-    }))) || (($intern['acomodacao_int'] ?? '') === 'UTI');
+    })));
     $hasProrrogReg = !empty(array_filter($prorList ?? [], static function ($row) {
         $row = (array)$row;
         return trim((string)($row['acomod'] ?? '')) !== ''
             || trim((string)($row['ini'] ?? '')) !== ''
             || trim((string)($row['fim'] ?? '')) !== '';
     }));
+    $activeEditSection = strtolower(trim((string)($_GET['section'] ?? '')));
+    $forceGestaoSection = ($activeEditSection === 'gestao');
+    $forceProrrogSection = ($activeEditSection === 'prorrog');
+    $forceNegocSection = ($activeEditSection === 'negoc');
     $hasNegocReg = !empty(array_filter($negociacoesInt ?? [], static function ($row) {
         $row = (array)$row;
         return trim((string)($row['tipo_negociacao'] ?? '')) !== ''
@@ -320,11 +330,65 @@
             || trim((string)($row['troca_para'] ?? '')) !== '';
     }));
 
+    if (!function_exists('savedIndicator')) {
+        function savedIndicator(bool $hasData, string $label): string
+        {
+            if (!$hasData) {
+                return '';
+            }
+            return '<span class="saved-dot" title="' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '"></span>';
+        }
+    }
+
     ?>
 
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/form_cad_internacao.css" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
     <style>
+        .edit-head-grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 14px 12px;
+            align-items: start;
+            width: 100%;
+        }
+
+        .edit-head-grid .form-group {
+            min-width: 0;
+            margin-bottom: 0 !important;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 12px 12px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.58);
+            border: 1px solid rgba(111, 69, 162, 0.08);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+        }
+
+        .edit-head-grid .form-group label {
+            min-height: 28px;
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 4px !important;
+        }
+
+        .edit-head-hospital,
+        .edit-head-patient {
+            grid-column: span 3;
+        }
+
+        .edit-head-medium {
+            grid-column: span 2;
+        }
+
+        .edit-head-small {
+            grid-column: span 1;
+        }
+
+        .edit-head-launch {
+            grid-column: span 3;
+        }
+
         .edit-primary-row {
             display: grid;
             grid-template-columns: 1.1fr 1fr 1.5fr 1.5fr 1.7fr 0.8fr 1.2fr 1.2fr;
@@ -349,6 +413,8 @@
             width: 100%;
         }
 
+        .edit-head-grid .form-control,
+        .edit-head-grid .form-control-sm,
         .edit-primary-row .form-control,
         .edit-primary-row .form-control-sm,
         .edit-top-row .form-control,
@@ -405,19 +471,124 @@
             color: #4b1850;
         }
 
+        .saved-dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            margin-left: 6px;
+            border-radius: 999px;
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.18);
+            vertical-align: middle;
+            cursor: help;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao[style*="block"] {
+            display: block !important;
+            width: 100%;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao > .form-group.row {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px;
+            align-items: end;
+            width: 100%;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-uti[style*="block"] > .form-group.row,
+        #tabelas-adicionais-paineis-edit #container-uti[style*="block"] .form-group.row {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            align-items: end;
+            width: 100%;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao .form-group[class*="col-"],
+        #tabelas-adicionais-paineis-edit #container-uti .form-group[class*="col-"] {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao textarea.form-control,
+        #tabelas-adicionais-paineis-edit #container-uti textarea.form-control,
+        #tabelas-adicionais-paineis-edit #container-prorrog textarea.form-control,
+        #tabelas-adicionais-paineis-edit #container-negoc textarea.form-control {
+            min-height: 92px !important;
+            height: auto !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao [id^="div_rel_"],
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento,
+        #tabelas-adicionais-paineis-edit #container-uti .form-group.col-sm-12 {
+            grid-column: 1 / -1;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento > .form-group.row {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px;
+            align-items: end;
+            width: 100%;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
         @media (max-width: 991.98px) {
+            .edit-head-grid,
             .edit-primary-row,
             .edit-secondary-row,
-            .edit-alta-row {
+            .edit-alta-row,
+            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] .form-group.row {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .edit-head-hospital,
+            .edit-head-patient {
+                grid-column: span 2;
+            }
+
+            .edit-head-medium,
+            .edit-head-small,
+            .edit-head-launch {
+                grid-column: span 1;
             }
         }
 
         @media (max-width: 575.98px) {
+            .edit-head-grid,
             .edit-primary-row,
             .edit-secondary-row,
-            .edit-alta-row {
+            .edit-alta-row,
+            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] .form-group.row {
                 grid-template-columns: 1fr;
+            }
+
+            .edit-head-hospital,
+            .edit-head-patient,
+            .edit-head-medium,
+            .edit-head-small,
+            .edit-head-launch {
+                grid-column: span 1;
             }
         }
     </style>
@@ -433,9 +604,11 @@
         <div class="internacao-page__content">
             <div class="internacao-card internacao-card--general">
                 <div class="internacao-card__header">
-                    <div>
-                        <p class="internacao-card__eyebrow">Dados essenciais</p>
+                    <div class="internacao-card__title-wrap">
+                        <p class="internacao-card__eyebrow">Etapa 1</p>
+                        <h2 class="internacao-card__title">Dados da internação</h2>
                     </div>
+                    <span class="internacao-card__tag internacao-card__tag--critical">Campos principais</span>
                 </div>
                 <div class="internacao-card__body">
                     <form class="visible" action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/process_internacao_editar.php', ENT_QUOTES, 'UTF-8') ?>" id="myForm" method="POST"
@@ -447,11 +620,12 @@
 
                 <p style="display:none" id="proximoId_int">0</p>
                 <input type="hidden" value="n" id="censo_int" name="censo_int">
-                <input type="hidden" value="<?= $_SESSION["id_usuario"] ?>" id="fk_usuario_int" name="fk_usuario_int">
-                <div class="form-group row align-items-end edit-top-row">
+                <?php $responsavelInternacao = (int)($intern['fk_usuario_int'] ?? 0); ?>
+                <input type="hidden" value="<?= $responsavelInternacao > 0 ? $responsavelInternacao : (int)($_SESSION["id_usuario"] ?? 0) ?>" id="fk_usuario_int" name="fk_usuario_int">
+                <div class="edit-head-grid">
 
                     <!-- Hospital (Somente leitura) -->
-                    <div class="form-group col-sm-3 mb-2">
+                    <div class="form-group edit-head-hospital">
                         <label class="control-label">Hospital</label>
                         <input type="text" class="form-control form-control-sm" readonly value="<?php
                                                                                                 foreach ($hospitals as $hospital) {
@@ -465,7 +639,7 @@
                     </div>
 
                     <!-- Paciente (Somente leitura) -->
-                    <div class="form-group col-sm-3 mb-2">
+                    <div class="form-group edit-head-patient">
                         <label class="control-label">Paciente</label>
                         <input type="text" class="form-control form-control-sm" readonly value="<?php
                                                                                                 foreach ($pacientes as $paciente) {
@@ -479,7 +653,7 @@
                     </div>
 
                     <!-- Data Internação -->
-                    <div class="form-group col-sm-2 mb-2">
+                    <div class="form-group edit-head-medium">
                         <label class="control-label" for="data_intern_int">
                             <span style="color: red;">*</span> Data Internação
                         </label>
@@ -488,13 +662,13 @@
                     </div>
 
                     <!-- Hora -->
-                    <div class="form-group col-sm-1 mb-2">
+                    <div class="form-group edit-head-small">
                         <label class="control-label" for="hora_intern_int">Hora</label>
                         <input type="time" class="form-control form-control-sm" id="hora_intern_int"
                             name="hora_intern_int" value="<?= date('H:i', strtotime($intern['hora_intern_int'])); ?>">
                     </div>
 
-                    <div class="form-group col-sm-2 mb-2">
+                    <div class="form-group edit-head-launch">
                         <label class="control-label" for="data_lancamento_int">Data lançamento</label>
                         <input type="datetime-local" class="form-control form-control-sm" id="data_lancamento_int"
                             name="data_lancamento_int" value="<?= $dataLancamentoAtual ?>" readonly tabindex="-1"
@@ -761,25 +935,88 @@
                 <div class="form-group" style="margin-left:0px; margin-top:-15px">
                     <div>
                         <label for="rel_int">Relatório de Auditoria</label>
+                        <div class="d-flex justify-content-end flex-wrap gap-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="rel_int">Limpar formatação</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_int">Organizar com IA</button>
+                        </div>
                         <textarea id="rel_int" name="rel_int" maxlength="5000" class="form-control" style="resize:none"
                             rows="2" onclick="aumentarText('rel_int')" onblur="reduzirText('rel_int', 2)"><?= htmlspecialchars($intern['rel_int'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
 </textarea>
+                        <div class="d-flex justify-content-end mt-1">
+                            <small class="text-muted" data-counter-for="rel_int">0/5000</small>
+                        </div>
                     </div>
 
                     <div style="margin-top: 10px;">
                         <label for="acoes_int">Ações da Auditoria</label>
+                        <div class="d-flex justify-content-end flex-wrap gap-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="acoes_int">Limpar formatação</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="acoes_int">Organizar com IA</button>
+                        </div>
                         <textarea id="acoes_int" name="acoes_int" rows="2" maxlength="5000" class="form-control"
                             style="resize:none" onclick="aumentarText('acoes_int')"
                             onblur="reduzirText('acoes_int', 2)"><?= htmlspecialchars($intern['acoes_int'] ?? ''); ?></textarea>
+                        <div class="d-flex justify-content-end mt-1">
+                            <small class="text-muted" data-counter-for="acoes_int">0/5000</small>
+                        </div>
                     </div>
 
 
                     <div style="margin-top: 10px;">
                         <label for="programacao_int">Programação Terapêutica</label>
+                        <div class="d-flex justify-content-end flex-wrap gap-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="programacao_int">Limpar formatação</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="programacao_int">Organizar com IA</button>
+                        </div>
                         <textarea type="textarea" style="resize:none" maxlength="5000" rows="2"
                             onclick="aumentarText('programacao_int')" onblur="reduzirText('programacao_int', 2)"
                             class="form-control" id="programacao_int"
                             name="programacao_int"><?= htmlspecialchars($intern['programacao_int'] ?? ''); ?></textarea>
+                        <div class="d-flex justify-content-end mt-1">
+                            <small class="text-muted" data-counter-for="programacao_int">0/5000</small>
+                        </div>
+                    </div>
+
+                    <div class="ia-highlight-box">
+                        <div class="ia-highlight-box__header">
+                            <div class="ia-highlight-box__title-wrap">
+                                <div>
+                                    <p class="ia-highlight-box__eyebrow">Inteligência Artificial</p>
+                                    <h3 class="ia-highlight-box__title">Assistente de parecer clínico</h3>
+                                </div>
+                                <span class="parecer-ia-powered">
+                                    <i class="bi bi-stars"></i>
+                                    IA conectada
+                                </span>
+                            </div>
+                            <div class="auditoria-actions auditoria-actions--ia">
+                                <input type="file" id="pdf-auditoria-input" accept="application/pdf,.pdf,image/png,image/jpeg,image/jpg,.png,.jpg,.jpeg" hidden>
+                                <button type="button" class="btn btn-sm btn-outline-secondary auditoria-action-btn" id="btn-ler-pdf-auditoria">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                    LER PDF/IMAGEM
+                                </button>
+                                <button type="button" class="btn btn-sm btn-primary auditoria-action-btn" id="btn-executar-prompt-uti">
+                                    <i class="bi bi-cpu"></i>
+                                    Executar Prompt UTI
+                                </button>
+                            </div>
+                        </div>
+                        <div class="parecer-ia-card">
+                            <div class="parecer-ia-card__header">
+                                <div class="parecer-ia-title-wrap">
+                                    <h4>Parecer IA</h4>
+                                </div>
+                                <button type="button" class="parecer-ia-toggle" id="btn-toggle-parecer-ia" aria-expanded="false" aria-controls="parecer-ia-body">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div id="parecer-ia-status" class="parecer-ia-status" hidden></div>
+                            <div class="parecer-ia-card__body" id="parecer-ia-body" hidden>
+                                <div id="parecer-ia-content" class="parecer-ia-content">
+                                    <p class="parecer-ia-empty">Nenhum parecer gerado.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div><br></div>
@@ -802,51 +1039,51 @@
                         </div>
                         <div class="tabelas-selects d-flex flex-wrap justify-content-between align-items-end">
                             <div class="form-group tabelas-col">
-                                <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório detalhado</label>
+                                <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório detalhado<?= savedIndicator($hasDetalhesReg, 'Existem dados salvos em Relatório detalhado') ?></label>
                                 <select class="input-lg-fullcare form-control detail-select" id="relatorio-detalhado" name="relatorio-detalhado">
                                     <option value="">Selecione</option>
-                                    <option value="s" <?= $hasDetalhesReg ? 'selected' : '' ?>>Sim</option>
-                                    <option value="n" <?= !$hasDetalhesReg ? 'selected' : '' ?>>Não</option>
+                                    <option value="s">Sim</option>
+                                    <option value="n" selected>Não</option>
                                 </select>
                             </div>
                             <div class="form-group tabelas-col">
-                                <label class="control-label" style="font-weight: bold;" for="select_tuss">Tuss</label>
+                                <label class="control-label" style="font-weight: bold;" for="select_tuss">Tuss<?= savedIndicator($hasTussReg, 'Existem dados salvos em Tuss') ?></label>
                                 <select class="input-lg-fullcare form-control select-purple" id="select_tuss" name="select_tuss">
                                     <option value="">Selecione</option>
-                                    <option value="s" <?= $hasTussReg ? 'selected' : '' ?>>Sim</option>
-                                    <option value="n" <?= !$hasTussReg ? 'selected' : '' ?>>Não</option>
+                                    <option value="s">Sim</option>
+                                    <option value="n" selected>Não</option>
                                 </select>
                             </div>
                             <div class="form-group tabelas-col">
-                                <label class="control-label" style="font-weight: bold;" for="select_prorrog">Prorrogação</label>
+                                <label class="control-label" style="font-weight: bold;" for="select_prorrog">Prorrogação<?= savedIndicator($hasProrrogReg, 'Existem dados salvos em Prorrogação') ?></label>
                                 <select class="input-lg-fullcare form-control select-purple" id="select_prorrog" name="select_prorrog">
                                     <option value="">Selecione</option>
-                                    <option value="s" <?= $hasProrrogReg ? 'selected' : '' ?>>Sim</option>
-                                    <option value="n" <?= !$hasProrrogReg ? 'selected' : '' ?>>Não</option>
+                                    <option value="s" <?= $forceProrrogSection ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$forceProrrogSection ? 'selected' : '' ?>>Não</option>
                                 </select>
                             </div>
                             <div class="form-group tabelas-col">
-                                <label class="control-label" style="font-weight: bold;" for="select_gestao">Gestão Assistencial</label>
+                                <label class="control-label" style="font-weight: bold;" for="select_gestao">Gestão Assistencial<?= savedIndicator($hasGestaoReg, 'Existem dados salvos em Gestão Assistencial') ?></label>
                                 <select class="input-lg-fullcare form-control select-purple" id="select_gestao" name="select_gestao">
                                     <option value="">Selecione</option>
-                                    <option value="s" <?= $hasGestaoReg ? 'selected' : '' ?>>Sim</option>
-                                    <option value="n" <?= !$hasGestaoReg ? 'selected' : '' ?>>Não</option>
+                                    <option value="s" <?= $forceGestaoSection ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$forceGestaoSection ? 'selected' : '' ?>>Não</option>
                                 </select>
                             </div>
                             <div class="form-group tabelas-col">
-                                <label class="control-label" style="font-weight: bold;" for="select_uti">UTI</label>
+                                <label class="control-label" style="font-weight: bold;" for="select_uti">UTI<?= savedIndicator($hasUtiReg, 'Existem dados salvos em UTI') ?></label>
                                 <select class="input-lg-fullcare form-control select-purple" id="select_uti" name="select_uti">
                                     <option value="">Selecione</option>
-                                    <option value="s" <?= $hasUtiReg ? 'selected' : '' ?>>Sim</option>
-                                    <option value="n" <?= !$hasUtiReg ? 'selected' : '' ?>>Não</option>
+                                    <option value="s">Sim</option>
+                                    <option value="n" selected>Não</option>
                                 </select>
                             </div>
                             <div class="form-group tabelas-col">
-                                <label class="control-label" style="font-weight: bold;" for="select_negoc">Negociações</label>
+                                <label class="control-label" style="font-weight: bold;" for="select_negoc">Negociações<?= savedIndicator($hasNegocReg, 'Existem dados salvos em Negociações') ?></label>
                                 <select class="input-lg-fullcare form-control select-purple" id="select_negoc" name="select_negoc">
                                     <option value="">Selecione</option>
-                                    <option value="s" <?= $hasNegocReg ? 'selected' : '' ?>>Sim</option>
-                                    <option value="n" <?= !$hasNegocReg ? 'selected' : '' ?>>Não</option>
+                                    <option value="s" <?= $forceNegocSection ? 'selected' : '' ?>>Sim</option>
+                                    <option value="n" <?= !$forceNegocSection ? 'selected' : '' ?>>Não</option>
                                 </select>
                             </div>
                         </div>
@@ -854,6 +1091,21 @@
                     <div class="form-group col-sm-3">
                         <?php $agora = date('Y-m-d'); ?> <input type="hidden" id="data_create_int"
                             value='<?= $agora; ?>' name="data_create_int">
+                    </div>
+                </div>
+                <div id="tabelas-adicionais-paineis-edit">
+                    <div id="container-tuss" style="display:none; margin:5px;">
+                        <?php include_once('formularios/form_edit_internacao_tuss2.php'); ?>
+                    </div>
+                    <?php include_once('formularios/form_edit_internacao_gestao2.php'); ?>
+                    <?php include_once('formularios/form_edit_internacao_uti2.php'); ?>
+                    <div id="container-prorrog" style="display:none; margin:5px;">
+                        <div id="edit-prorrog-focus"></div>
+                        <?php include_once('formularios/form_edit_internacao_prorrog2.php'); ?>
+                    </div>
+                    <div id="container-negoc" style="display:none; margin:5px;">
+                        <div id="edit-negoc-focus"></div>
+                        <?php include_once('formularios/form_edit_internacao_negoc2.php'); ?>
                     </div>
                 </div>
                 <div id="detalhes-card-wrapper" style="display:none;">
@@ -1169,22 +1421,11 @@
                 </div>
                 </div>
 
-                <div id="tabelas-dynamic-stack-edit">
-                    <div id="container-tuss" style="display:none; margin:5px;">
-                        <?php include_once('formularios/form_edit_internacao_tuss2.php'); ?>
-                    </div>
-                    <?php include_once('formularios/form_edit_internacao_gestao2.php'); ?>
-                    <?php include_once('formularios/form_edit_internacao_uti2.php'); ?>
-                    <div id="container-prorrog" style="display:none; margin:5px;">
-                        <?php include_once('formularios/form_edit_internacao_prorrog2.php'); ?>
-                    </div>
-                    <div id="container-negoc" style="display:none; margin:5px;">
-                        <?php include_once('formularios/form_edit_internacao_negoc2.php'); ?>
-                    </div>
-                </div>
-
-
                 <br>
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                    <small id="clinical-autosave-status" class="text-muted">Rascunho automático: ativo</small>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-clinical-draft="fields">Limpar rascunho</button>
+                </div>
                 <button type="submit" class="btn btn-success btn-submit-standard">
                     <i class="fas fa-check edit-icon" style="font-size:1rem;margin-right:8px;"></i>
                     Atualizar
@@ -1217,57 +1458,125 @@
             document.getElementById(textareaId).rows = originalRows;
         }
         document.addEventListener('DOMContentLoaded', function() {
-            function setupToggle(selectId, containerId) {
-                var selectEl = document.getElementById(selectId);
-                var containerEl = document.getElementById(containerId);
-                if (!selectEl || !containerEl) return;
-
-                function aplicar() {
-                    containerEl.style.display = selectEl.value === 's' ? 'block' : 'none';
+            var additionalSections = [{
+                    selectId: 'relatorio-detalhado',
+                    containerId: 'detalhes-card-wrapper',
+                    bodyId: 'div-detalhado',
+                    display: 'flex'
+                },
+                {
+                    selectId: 'select_tuss',
+                    containerId: 'container-tuss'
+                },
+                {
+                    selectId: 'select_prorrog',
+                    containerId: 'container-prorrog'
+                },
+                {
+                    selectId: 'select_gestao',
+                    containerId: 'container-gestao'
+                },
+                {
+                    selectId: 'select_uti',
+                    containerId: 'container-uti'
+                },
+                {
+                    selectId: 'select_negoc',
+                    containerId: 'container-negoc'
                 }
+            ];
 
-                aplicar();
-                selectEl.addEventListener('change', aplicar);
+            function setAdditionalSection(section, show) {
+                var containerEl = document.getElementById(section.containerId);
+                var bodyEl = section.bodyId ? document.getElementById(section.bodyId) : null;
+                if (containerEl) {
+                    containerEl.style.display = show ? 'block' : 'none';
+                }
+                if (bodyEl) {
+                    bodyEl.style.display = show ? (section.display || 'block') : 'none';
+                }
             }
 
-            function setupDetalhesToggle() {
-                var selectDet = document.getElementById('relatorio-detalhado');
-                var wrapperDet = document.getElementById('detalhes-card-wrapper');
-                var divDet = document.getElementById('div-detalhado');
-                if (!selectDet || !wrapperDet || !divDet) return;
-
-                function aplicarDetalhes() {
-                    var show = selectDet.value === 's';
-                    wrapperDet.style.display = show ? 'block' : 'none';
-                    divDet.style.display = show ? 'flex' : 'none';
-                }
-
-                aplicarDetalhes();
-                selectDet.addEventListener('change', aplicarDetalhes);
+            function showOnlyAdditional(activeSelectId) {
+                additionalSections.forEach(function(section) {
+                    var selectEl = document.getElementById(section.selectId);
+                    var show = section.selectId === activeSelectId && selectEl && selectEl.value === 's';
+                    setAdditionalSection(section, show);
+                });
             }
 
-            setupToggle('select_tuss', 'container-tuss');
-            setupToggle('select_prorrog', 'container-prorrog');
-            setupToggle('select_gestao', 'container-gestao');
-            setupToggle('select_negoc', 'container-negoc');
-            setupDetalhesToggle();
+            additionalSections.forEach(function(section) {
+                var selectEl = document.getElementById(section.selectId);
+                if (!selectEl) return;
+                selectEl.addEventListener('change', function() {
+                    showOnlyAdditional(section.selectId);
+                });
+            });
 
-            (function() {
-                var selectUti = document.getElementById('select_uti');
-                var acomEl = document.getElementById('acomodacao_int');
-                var containerUti = document.getElementById('container-uti');
-                if (!containerUti) return;
-
-                function aplicarUti() {
-                    var viaSelect = selectUti && selectUti.value === 's';
-                    var viaAcomod = acomEl && acomEl.value === 'UTI';
-                    containerUti.style.display = (viaSelect || viaAcomod) ? 'block' : 'none';
+            var activeEditSection = <?= json_encode($activeEditSection, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+            if (activeEditSection === 'negoc') {
+                var selectNegoc = document.getElementById('select_negoc');
+                if (selectNegoc) {
+                    selectNegoc.value = 's';
                 }
+                showOnlyAdditional('select_negoc');
+                var containerNegoc = document.getElementById('container-negoc');
 
-                aplicarUti();
-                if (selectUti) selectUti.addEventListener('change', aplicarUti);
-                if (acomEl) acomEl.addEventListener('change', aplicarUti);
-            })();
+                window.requestAnimationFrame(function() {
+                    window.setTimeout(function() {
+                        var target = document.getElementById('edit-negoc-focus') || containerNegoc;
+                        if (!target) return;
+                        target.scrollIntoView({
+                            behavior: 'auto',
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }, 140);
+                });
+            }
+
+            if (activeEditSection === 'prorrog') {
+                var selectProrrog = document.getElementById('select_prorrog');
+                if (selectProrrog) {
+                    selectProrrog.value = 's';
+                }
+                showOnlyAdditional('select_prorrog');
+                var containerProrrog = document.getElementById('container-prorrog');
+
+                window.requestAnimationFrame(function() {
+                    window.setTimeout(function() {
+                        var target = document.getElementById('edit-prorrog-focus') || containerProrrog;
+                        if (!target) return;
+                        target.scrollIntoView({
+                            behavior: 'auto',
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }, 140);
+                });
+            }
+
+            if (activeEditSection === 'gestao') {
+                var selectGestao = document.getElementById('select_gestao');
+                if (selectGestao) {
+                    selectGestao.value = 's';
+                }
+                showOnlyAdditional('select_gestao');
+            }
+
+            if (activeEditSection !== 'negoc' && activeEditSection !== 'prorrog' && activeEditSection !== 'gestao') {
+                var initiallyOpen = additionalSections.find(function(section) {
+                    var selectEl = document.getElementById(section.selectId);
+                    return selectEl && selectEl.value === 's';
+                });
+                if (initiallyOpen) {
+                    showOnlyAdditional(initiallyOpen.selectId);
+                } else {
+                    additionalSections.forEach(function(section) {
+                        setAdditionalSection(section, false);
+                    });
+                }
+            }
         });
     </script>
     <script>
@@ -1298,21 +1607,29 @@
             });
         });
     </script>
+    <script>
+        window.formInternacaoConfig = Object.assign({}, window.formInternacaoConfig || {}, {
+            baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="<?= $BASE_URL ?>js/uti_audit_ai.js"></script>
 
     <!-- <script src="js/scriptDataInt.js"></script> -->
     <script src="<?= $BASE_URL ?>js/text_cad_internacao.js"></script>
-    <script src="js/select_internacao.js"></script>
+    <script>
+        window.clinicalTextToolsConfig = {
+            baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+            draftKey: <?= json_encode('fullcare:edit-internacao:' . (string)($intern['id_internacao'] ?? ($_GET['id_internacao'] ?? 'local')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+            fields: ['rel_int', 'acoes_int', 'programacao_int'],
+            autosaveStatusId: 'clinical-autosave-status'
+        };
+    </script>
+    <script src="<?= $BASE_URL ?>js/clinical_text_tools.js?v=<?= filemtime(__DIR__ . '/../js/clinical_text_tools.js') ?>"></script>
+    <script src="<?= $BASE_URL ?>js/select_internacao.js?v=<?= filemtime(__DIR__ . '/../js/select_internacao.js') ?>"></script>
 
     <script>
-        // mostrar div de uti caso alterar acaomodacao int para UTI
-        document.getElementById("acomodacao_int").addEventListener("change", function() {
-            var divUti = document.querySelector("#container-uti");
-            if (this.value === "UTI") {
-                divUti.style.display = "block";
-            } else {
-                divUti.style.display = "none";
-            }
-        });
         let pacienteStatus = null; // Variável global para armazenar o status do paciente
 
         function teste() {
@@ -1387,6 +1704,8 @@
 
     <script>
         $(document).ready(function() {
+            const currentHospitalId = <?= (int)($intern['fk_hospital_int'] ?? 0) ?>;
+
             // Evento de mudança para o hospital selecionado
             $('#hospital_selected').on('change', function() {
 
@@ -1434,20 +1753,101 @@
 
             // Função para popular os selects "troca_de" e "troca_para" com as acomodações recebidas
             function populateSelects(acomodacoes) {
+                function normalizeAcomod(v) {
+                    const raw = (v || '').toString().trim();
+                    if (!raw) return '';
+                    const parts = raw.split('-');
+                    return (parts.length > 1 ? parts.slice(1).join('-') : raw).trim().toLowerCase();
+                }
+
+                function resolveValueByLabel(label) {
+                    const raw = (label || '').toString().trim();
+                    if (!raw) return 0;
+
+                    if (typeof window.resolveNegotiationValueByLabel === 'function') {
+                        return parseFloat(window.resolveNegotiationValueByLabel(raw)) || 0;
+                    }
+
+                    const wanted = normalizeAcomod(raw);
+                    const exact = (acomodacoes || []).find(ac => normalizeAcomod(ac && ac.acomodacao_aco) === wanted);
+                    if (exact) {
+                        return parseFloat(String(exact.valor_aco || '0').replace(',', '.')) || 0;
+                    }
+
+                    if (wanted === 'apto') {
+                        const apto = (acomodacoes || []).find(ac => {
+                            const nome = normalizeAcomod(ac && ac.acomodacao_aco);
+                            return nome === 'apto' || nome === 'apartamento';
+                        });
+                        if (apto) {
+                            return parseFloat(String(apto.valor_aco || '0').replace(',', '.')) || 0;
+                        }
+                    }
+
+                    return 0;
+                }
+
+                window.fcNegValMap = window.fcNegValMap || {};
+
                 let options = '<option value="">Selecione a Acomodação</option>';
                 acomodacoes.forEach(ac => {
-                    options +=
-                        `<option value="${ac.id_acomodacao}-${ac.acomodacao_aco}" data-valor="${ac.valor_aco}">${ac.acomodacao_aco}</option>`;
+                    const value = `${ac.id_acomodacao}-${ac.acomodacao_aco}`;
+                    const label = `${ac.acomodacao_aco || ''}`;
+                    const valor = `${ac.valor_aco || 0}`;
+                    options += `<option value="${value}" data-valor="${valor}">${label}</option>`;
+
+                    const norm = normalizeAcomod(label);
+                    const valorNum = parseFloat(String(ac.valor_aco || '0').replace(',', '.')) || 0;
+                    if (window.fcNegValMap['UTI'] <= 0 && norm === 'uti') window.fcNegValMap['UTI'] = valorNum;
+                    if (window.fcNegValMap['Apto'] <= 0 && (norm === 'apto' || norm === 'apartamento')) {
+                        window.fcNegValMap['Apto'] = valorNum;
+                    }
+                    if (window.fcNegValMap['Semi'] <= 0 && norm === 'semi') {
+                        window.fcNegValMap['Semi'] = valorNum;
+                    }
                 });
 
-                // Atualiza os selects com as novas opções
-                $('select[name="troca_de"]').html(options);
-                $('select[name="troca_para"]').html(options);
+                acomodacoes.forEach(ac => {
+                    const label = `${ac.acomodacao_aco || ''}`;
+                    const norm = normalizeAcomod(label);
+                    const valorNum = parseFloat(String(ac.valor_aco || '0').replace(',', '.')) || 0;
+                    if (window.fcNegValMap['UTI'] <= 0 && norm.indexOf('uti') !== -1) window.fcNegValMap['UTI'] = valorNum;
+                    if (window.fcNegValMap['Apto'] <= 0 && (norm.indexOf('apto') !== -1 || norm.indexOf('apart') !== -1 || norm.indexOf('enferm') !== -1)) {
+                        window.fcNegValMap['Apto'] = valorNum;
+                    }
+                    if (window.fcNegValMap['Semi'] <= 0 && norm.indexOf('semi') !== -1) {
+                        window.fcNegValMap['Semi'] = valorNum;
+                    }
+                });
 
-                // Limpa os campos relacionados
-                $('input[name="saving"]').val('');
-                $('input[name="qtd"]').val('');
-                $('input[name="saving_show"]').val('').css('color', '');
+                $('select[name="troca_de"], select[name="troca_para"]').each(function() {
+                    const $select = $(this);
+                    const currentRaw = ($select.val() || $select.data('current') || '').toString().trim();
+                    const currentNorm = normalizeAcomod(currentRaw);
+
+                    $select.html(options);
+
+                    if (currentNorm) {
+                        const $match = $select.find('option').filter(function() {
+                            const optionValue = ($(this).val() || '').toString().trim();
+                            const optionText = ($(this).text() || '').toString().trim();
+                            return normalizeAcomod(optionValue) === currentNorm
+                                || normalizeAcomod(optionText) === currentNorm;
+                        }).first();
+
+                        if ($match.length) {
+                            $select.val($match.val());
+                        }
+                    }
+                });
+
+                if (typeof window.genJSON === 'function') {
+                    window.genJSON();
+                }
+            }
+
+            if (currentHospitalId > 0) {
+                fetchAcomodacoes(currentHospitalId);
             }
 
             // Função para calcular savings ao alterar os selects ou a quantidade
@@ -1462,9 +1862,10 @@
                 const trocaDeOption = container.find('select[name="troca_de"] option:selected');
                 const trocaParaOption = container.find('select[name="troca_para"] option:selected');
 
-                // Extrai os valores do atributo 'data-valor'
-                const trocaDe = parseFloat(trocaDeOption.data('valor')) || 0;
-                const trocaPara = parseFloat(trocaParaOption.data('valor')) || 0;
+                const trocaDeLabel = (trocaDeOption.text() || trocaDeOption.val() || '').toString().trim();
+                const trocaParaLabel = (trocaParaOption.text() || trocaParaOption.val() || '').toString().trim();
+                const trocaDe = resolveValueByLabel(trocaDeLabel);
+                const trocaPara = resolveValueByLabel(trocaParaLabel);
 
                 // Carrega os valores nos inputs correspondentes
                 container.find('input[name="troca_de"]').val(trocaDe);
@@ -1479,9 +1880,10 @@
                 const trocaParaOption = container.find('select[name="troca_para"] option:selected');
                 const quantidadeInput = container.find('input[name="qtd"]');
 
-                // Extraímos o valor correto do atributo 'data-valor'
-                const trocaDeValor = parseFloat(trocaDeOption.attr('data-valor')) || 0;
-                const trocaParaValor = parseFloat(trocaParaOption.attr('data-valor')) || 0;
+                const trocaDeLabel = (trocaDeOption.text() || trocaDeOption.val() || '').toString().trim();
+                const trocaParaLabel = (trocaParaOption.text() || trocaParaOption.val() || '').toString().trim();
+                const trocaDeValor = resolveValueByLabel(trocaDeLabel);
+                const trocaParaValor = resolveValueByLabel(trocaParaLabel);
                 const quantidade = parseInt(quantidadeInput.val(), 10) || 0;
 
                 // Se algum valor estiver inválido, apenas limpamos o campo e saímos
@@ -1505,29 +1907,6 @@
 
 
 
-
-        // Exibe o container apenas quando select_prorrog for "s"
-        document.addEventListener("DOMContentLoaded", function() {
-            const selectProrrog = document.getElementById("select_prorrog");
-            const containerProrrog = document.getElementById("container-prorrog");
-
-            if (selectProrrog) {
-                selectProrrog.addEventListener("change", function() {
-                    if (this.value === "s") {
-                        containerProrrog.style.display = "block";
-                    } else {
-                        containerProrrog.style.display = "none";
-                    }
-                });
-
-                // Verifica o valor inicial
-                if (selectProrrog.value === "s") {
-                    containerProrrog.style.display = "block";
-                } else {
-                    containerProrrog.style.display = "none";
-                }
-            }
-        });
 
         // Mostrar/ocultar Data/Hora Alta e Motivo Alta conforme "Internado"
         document.addEventListener("DOMContentLoaded", function() {

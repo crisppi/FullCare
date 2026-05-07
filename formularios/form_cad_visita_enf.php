@@ -1,4 +1,181 @@
 <div class="row">
+    <style>
+        .auditoria-action-btn {
+            min-height: 36px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+        }
+
+        .ia-highlight-box {
+            margin: 8px 0 20px;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid #bfdbfe;
+            background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 48%, #f8fafc 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 14px 30px rgba(37,99,235,.08);
+        }
+
+        .ia-highlight-box__header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .ia-highlight-box__title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ia-highlight-box__eyebrow {
+            margin: 0 0 2px;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: #1d4ed8;
+        }
+
+        .ia-highlight-box__title {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .auditoria-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .auditoria-actions--ia {
+            justify-content: flex-start;
+        }
+
+        .parecer-ia-card {
+            border: 1px solid #c7d2fe;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.10);
+        }
+
+        .parecer-ia-card__header {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #dbeafe 0%, #eef2ff 50%, #ecfeff 100%);
+            border-bottom: 1px solid #c7d2fe;
+        }
+
+        .parecer-ia-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .parecer-ia-card__header h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .parecer-ia-powered {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 28px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.78);
+            border: 1px solid rgba(99,102,241,.22);
+            color: #1d4ed8;
+            font-size: .76rem;
+            font-weight: 800;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+        }
+
+        .parecer-ia-toggle {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            color: #374151;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .parecer-ia-card__body {
+            padding: 12px;
+        }
+
+        .parecer-ia-status {
+            margin: 10px 12px 0;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: .88rem;
+        }
+
+        .parecer-ia-status--info { background: #e0f2fe; color: #075985; }
+        .parecer-ia-status--success { background: #dcfce7; color: #166534; }
+        .parecer-ia-status--error { background: #fee2e2; color: #991b1b; }
+
+        .parecer-ia-result-head { margin-bottom: 10px; }
+        .parecer-ia-chip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .parecer-ia-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: .78rem;
+            font-weight: 800;
+            letter-spacing: .04em;
+        }
+
+        .parecer-ia-badge--ok { background: #dcfce7; color: #166534; }
+        .parecer-ia-badge--bad { background: #fee2e2; color: #991b1b; }
+        .parecer-ia-badge--neutral { background: #fef3c7; color: #92400e; }
+        .parecer-ia-badge--danger { background: #fee2e2; color: #b91c1c; }
+        .parecer-ia-badge--warn { background: #ffedd5; color: #c2410c; }
+        .parecer-ia-badge--info { background: #dbeafe; color: #1d4ed8; }
+
+        .parecer-ia-section { margin-top: 10px; color: #1f2937; }
+        .parecer-ia-section p,
+        .parecer-ia-section ul { margin: 4px 0 0; }
+        .parecer-ia-section ul { padding-left: 18px; }
+        .parecer-ia-empty { margin: 0; color: #6b7280; }
+
+        .parecer-ia-final-alert {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid #fecaca;
+            background: linear-gradient(135deg, #fff1f2, #fee2e2);
+            color: #b91c1c;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+    </style>
     <?php
     // calculo de dias da internacao e dias da ultima visita
     $hoje = date('Y-m-d');
@@ -64,6 +241,10 @@
 
             <div>
                 <label for="rel_visita_vis">Relatório Auditoria</label>
+                <div class="d-flex justify-content-end flex-wrap gap-2 mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="rel_visita_vis">Limpar formatação</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_visita_vis">Organizar com IA</button>
+                </div>
                 <div id="cronicos-relatorio-alert"
                     style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff3cd,#ffe3a3);border:1px solid #f0c36d;color:#6a4a00;box-shadow:0 8px 20px rgba(240,195,109,.18);"
                     hidden>
@@ -79,11 +260,74 @@
                 </div>
                 <textarea type="textarea" rows="2" onclick="aumentarTextAudit()" class="form-control"
                     id="rel_visita_vis" name="rel_visita_vis"></textarea>
+                <div class="d-flex justify-content-end mt-1">
+                    <small class="text-muted" data-counter-for="rel_visita_vis">0/5000</small>
+                </div>
             </div>
             <div style="margin-bottom:20px">
                 <label for="acoes_int_vis">Ações Auditoria</label>
+                <div class="d-flex justify-content-end flex-wrap gap-2 mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="acoes_int_vis">Limpar formatação</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="acoes_int_vis">Organizar com IA</button>
+                </div>
                 <textarea type="textarea" rows="2" onclick="aumentarTextAcoes()" class="form-control" id="acoes_int_vis"
                     name="acoes_int_vis" placeholder="Ações de auditoria"></textarea>
+                <div class="d-flex justify-content-end mt-1">
+                    <small class="text-muted" data-counter-for="acoes_int_vis">0/5000</small>
+                </div>
+            </div>
+            <div style="margin-bottom:20px">
+                <label for="programacao_enf">Programação Terapêutica</label>
+                <div class="d-flex justify-content-end flex-wrap gap-2 mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="programacao_enf">Limpar formatação</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="programacao_enf">Organizar com IA</button>
+                </div>
+                <textarea type="textarea" rows="2" class="form-control" id="programacao_enf"
+                    name="programacao_enf" placeholder="Programação terapêutica"></textarea>
+                <div class="d-flex justify-content-end mt-1">
+                    <small class="text-muted" data-counter-for="programacao_enf">0/5000</small>
+                </div>
+            </div>
+            <div class="ia-highlight-box">
+                <div class="ia-highlight-box__header">
+                    <div class="ia-highlight-box__title-wrap">
+                        <div>
+                            <p class="ia-highlight-box__eyebrow">Inteligência Artificial</p>
+                            <h3 class="ia-highlight-box__title">Assistente de parecer clínico</h3>
+                        </div>
+                        <span class="parecer-ia-powered">
+                            <i class="bi bi-stars"></i>
+                            IA conectada
+                        </span>
+                    </div>
+                    <div class="auditoria-actions auditoria-actions--ia">
+                        <input type="file" id="pdf-visita-input" accept="application/pdf,.pdf,image/png,image/jpeg,image/jpg,.png,.jpg,.jpeg" hidden>
+                        <button type="button" class="btn btn-sm btn-outline-secondary auditoria-action-btn" id="btn-ler-pdf-visita">
+                            <i class="bi bi-file-earmark-pdf"></i>
+                            LER PDF/IMAGEM
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary auditoria-action-btn" id="btn-executar-prompt-uti-visita">
+                            <i class="bi bi-cpu"></i>
+                            Executar Prompt UTI
+                        </button>
+                    </div>
+                </div>
+                <div class="parecer-ia-card">
+                    <div class="parecer-ia-card__header">
+                        <div class="parecer-ia-title-wrap">
+                            <h4>Parecer IA</h4>
+                        </div>
+                        <button type="button" class="parecer-ia-toggle" id="btn-toggle-parecer-visita-ia" aria-expanded="false" aria-controls="parecer-visita-ia-body">
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div id="parecer-visita-ia-status" class="parecer-ia-status" hidden></div>
+                    <div class="parecer-ia-card__body" id="parecer-visita-ia-body" hidden>
+                        <div id="parecer-visita-ia-content" class="parecer-ia-content">
+                            <p class="parecer-ia-empty">Nenhum parecer gerado.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <hr>
             <!-- ENTRADA DE DADOS AUTOMATICOS NO INPUT-->
@@ -231,9 +475,67 @@
 
             <!-- <FORMULARO DE NEGOCIACOES -->
             <?php include_once('formularios/form_cad_visita_negoc.php'); ?>
+            <style>
+                #container-tuss .form-group.row > .form-group.row,
+                #container-gestao form > .form-group.row > .form-group.row,
+                #container-uti > .form-group.row,
+                #container-prorrog > .form-group.row,
+                #container-negoc .form-group.row {
+                    display: grid !important;
+                    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+                    gap: 14px;
+                    align-items: end;
+                    width: 100%;
+                }
+
+                #container-tuss .form-group.row > .form-group.row > .form-group[class*="col-"],
+                #container-gestao form > .form-group.row > .form-group.row > .form-group[class*="col-"],
+                #container-uti > .form-group.row > .form-group[class*="col-"],
+                #container-prorrog > .form-group.row > .form-group[class*="col-"],
+                #container-negoc .form-group.row > .form-group[class*="col-"] {
+                    width: 100% !important;
+                    min-width: 0 !important;
+                    max-width: none !important;
+                    padding-left: 0 !important;
+                    padding-right: 0 !important;
+                    margin-bottom: 0 !important;
+                }
+
+                #container-tuss .form-control,
+                #container-gestao .form-control,
+                #container-uti .form-control,
+                #container-prorrog .form-control,
+                #container-negoc .form-control {
+                    width: 100% !important;
+                    min-height: 42px !important;
+                }
+
+                #container-tuss textarea.form-control,
+                #container-gestao textarea.form-control,
+                #container-uti textarea.form-control,
+                #container-prorrog textarea.form-control,
+                #container-negoc textarea.form-control {
+                    min-height: 92px !important;
+                    height: auto !important;
+                }
+
+                @media (max-width: 768px) {
+                    #container-tuss .form-group.row > .form-group.row,
+                    #container-gestao form > .form-group.row > .form-group.row,
+                    #container-uti > .form-group.row,
+                    #container-prorrog > .form-group.row,
+                    #container-negoc .form-group.row {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
             <br>
 
             <div>
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                    <small id="clinical-autosave-status" class="text-muted">Rascunho automático: ativo</small>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-clinical-draft="fields">Limpar rascunho</button>
+                </div>
                 <button style="margin:10px" type="submit" class="btn-sm btn-success btn-int-niveis">Cadastrar</button>
             </div>
     </form>
@@ -303,7 +605,24 @@
 
 <script src="js/text_cad_visita.js"></script>
 <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
-<script src="js/select_visita.js"></script>
+<script>
+window.clinicalTextToolsConfig = {
+    baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+    draftKey: <?= json_encode('fullcare:visita-enf:' . (string)($id_internacao ?? ($_GET['id_internacao'] ?? 'local')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+    fields: ['rel_visita_vis', 'acoes_int_vis', 'programacao_enf'],
+    autosaveStatusId: 'clinical-autosave-status'
+};
+</script>
+<script src="<?= $BASE_URL ?>js/clinical_text_tools.js?v=<?= filemtime(__DIR__ . '/../js/clinical_text_tools.js') ?>"></script>
+<script>
+window.visitaAiConfig = Object.assign({}, window.visitaAiConfig || {}, {
+    baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="<?= $BASE_URL ?>js/uti_audit_ai_visita.js"></script>
+<script src="<?= $BASE_URL ?>js/select_visita.js?v=<?= filemtime(__DIR__ . '/../js/select_visita.js') ?>"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">

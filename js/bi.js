@@ -2,6 +2,8 @@ if (typeof Chart !== 'undefined') {
   if (Chart.defaults.global) {
     Chart.defaults.global.defaultFontColor = '#eaf6ff';
     Chart.defaults.global.legend.labels.fontColor = '#eaf6ff';
+    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.maintainAspectRatio = false;
   }
   if (Chart.defaults.scale && Chart.defaults.scale.ticks) {
     Chart.defaults.scale.ticks.fontColor = '#eaf6ff';
@@ -159,4 +161,56 @@ document.addEventListener('DOMContentLoaded', () => {
       actions.appendChild(resetBtn);
     }
   });
+
+  const navSearchInput = document.getElementById('bi-nav-search');
+  const navSearchCount = document.getElementById('bi-nav-search-count');
+  if (navSearchInput) {
+    const groups = Array.from(document.querySelectorAll('.bi-nav-group'));
+    const normalize = (value) => (value || '')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+    const updateNavSearch = () => {
+      const term = normalize(navSearchInput.value);
+      let visibleCards = 0;
+
+      groups.forEach((group) => {
+        const cards = Array.from(group.querySelectorAll('.bi-nav-card'));
+        let visibleInGroup = 0;
+
+        cards.forEach((card) => {
+          const haystack = normalize(card.dataset.searchText || card.textContent || '');
+          const match = term === '' || haystack.includes(term);
+          card.classList.toggle('is-hidden', !match);
+          if (match) {
+            visibleCards += 1;
+            visibleInGroup += 1;
+          }
+        });
+
+        const count = group.querySelector('.bi-nav-group-count');
+        if (count) {
+          count.textContent = String(visibleInGroup);
+        }
+
+        const shouldShowGroup = visibleInGroup > 0;
+        group.classList.toggle('is-hidden', !shouldShowGroup);
+        if (term !== '' && shouldShowGroup) {
+          group.open = true;
+        }
+      });
+
+      if (navSearchCount) {
+        navSearchCount.textContent = term === ''
+          ? 'Exibindo todos os atalhos'
+          : 'Resultados encontrados: ' + visibleCards;
+      }
+    };
+
+    navSearchInput.addEventListener('input', updateNavSearch);
+    updateNavSearch();
+  }
 });

@@ -190,6 +190,30 @@ if ($id_internacao) {
         }
     }
 }
+
+$editVisitaIdParam = filter_input(INPUT_GET, 'edit_visita', FILTER_VALIDATE_INT);
+$editVisitaIdReal = $editVisitaIdParam ?: 0;
+if ($editVisitaIdParam && empty($prorrogPorVisita[$editVisitaIdReal])) {
+    foreach ((array)$visitasAntigas as $visitaAntiga) {
+        if (!is_array($visitaAntiga)) {
+            continue;
+        }
+        if ((int)($visitaAntiga['visita_no_vis'] ?? 0) === $editVisitaIdParam) {
+            $editVisitaIdReal = (int)($visitaAntiga['id_visita'] ?? 0);
+            break;
+        }
+    }
+}
+$prorrogEditRows = ($editVisitaIdReal && !empty($prorrogPorVisita[$editVisitaIdReal]))
+    ? $prorrogPorVisita[$editVisitaIdReal]
+    : [];
+$editAdditionalSelects = [
+    'tuss' => ($editVisitaIdReal && !empty($tussPorVisita[$editVisitaIdReal])) ? 's' : '',
+    'prorrog' => ($editVisitaIdReal && !empty($prorrogPorVisita[$editVisitaIdReal])) ? 's' : '',
+    'gestao' => ($editVisitaIdReal && !empty($gestaoPorVisita[$editVisitaIdReal])) ? 's' : '',
+    'uti' => ($editVisitaIdReal && !empty($utiPorVisita[$editVisitaIdReal])) ? 's' : '',
+    'negoc' => ($editVisitaIdReal && (!empty($negPorVisita[$editVisitaIdReal]) || !empty($negPorInternacao[(int)$id_internacao]))) ? 's' : '',
+];
 extract($internacaoList);
 
 $ultimaVis = end($internacaoList);

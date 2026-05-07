@@ -38,6 +38,24 @@
     color: white;
 }
 
+.btn-trash-negoc-inline {
+    background: linear-gradient(180deg, #fff7f7 0%, #ffe9eb 100%);
+    color: #b42318;
+    border: 1px solid rgba(180, 35, 24, 0.18);
+    font-size: 0.85rem;
+}
+
+.btn-trash-negoc-inline:hover {
+    background: linear-gradient(180deg, #ffecef 0%, #ffd9de 100%);
+    color: #912018;
+}
+
+.negotiation-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
 #container-negoc .adicional-card {
     background: #f5f5f9;
     border-radius: 22px;
@@ -67,11 +85,106 @@
     margin-right: 12px;
     background: linear-gradient(180deg, #b169d9, #d199ff);
 }
+
+#container-negoc .adicional-card .negotiation-field-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 14px;
+    align-items: end;
+    width: 100%;
+}
+
+#container-negoc .adicional-card .negotiation-field-container > .form-group[class*="col-"] {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+#container-negoc .adicional-card .negotiation-field-container > [style*="display:none"] {
+    display: none !important;
+}
+
+#container-negoc .adicional-card .form-control,
+#container-negoc .adicional-card .form-control-sm.form-control {
+    width: 100% !important;
+    min-height: 42px !important;
+    height: 42px !important;
+}
+
+@media (max-width: 768px) {
+    #container-negoc .adicional-card .negotiation-field-container {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 
 <?php
 if (!isset($dados_acomodacao) || !is_array($dados_acomodacao)) {
     $dados_acomodacao = [];
+}
+
+if (!function_exists('negocNormAcomod')) {
+    function negocNormAcomod(string $value): string
+    {
+        $value = trim($value);
+        if (function_exists('mb_strtolower')) {
+            $value = mb_strtolower($value, 'UTF-8');
+        } else {
+            $value = strtolower($value);
+        }
+        $value = preg_replace('/^\d+\s*-\s*/', '', $value);
+        $value = str_replace(
+            ['á', 'à', 'â', 'ã', 'ä', 'é', 'è', 'ê', 'ë', 'í', 'ì', 'î', 'ï', 'ó', 'ò', 'ô', 'õ', 'ö', 'ú', 'ù', 'û', 'ü', 'ç'],
+            ['a', 'a', 'a', 'a', 'a', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'c'],
+            $value
+        );
+        return trim($value);
+    }
+}
+
+if (!function_exists('negocValorAcomod')) {
+    function negocValorAcomod(string $acomod, array $map): float
+    {
+        $norm = negocNormAcomod($acomod);
+        if (isset($map[$norm]) && is_numeric($map[$norm])) {
+            return (float)$map[$norm];
+        }
+        return 0.0;
+    }
+}
+
+if (!function_exists('negocParseValorAcomod')) {
+    function negocParseValorAcomod($valor): ?float
+    {
+        if ($valor === null || $valor === '') {
+            return null;
+        }
+        if (is_numeric($valor)) {
+            return (float)$valor;
+        }
+        $valor = trim((string)$valor);
+        $valor = str_replace(['R$', ' '], '', $valor);
+        if (strpos($valor, ',') !== false) {
+            $valor = str_replace('.', '', $valor);
+            $valor = str_replace(',', '.', $valor);
+        }
+        return is_numeric($valor) ? (float)$valor : null;
+    }
+}
+
+$negocAcomodValorMap = [];
+if (isset($acomodacao) && is_array($acomodacao)) {
+    foreach ($acomodacao as $row) {
+        if (!is_array($row)) continue;
+        $nome = (string)($row['acomodacao_aco'] ?? $row['acomodacao'] ?? '');
+        $valor = negocParseValorAcomod($row['valor_aco'] ?? $row['valor'] ?? null);
+        if ($nome !== '' && $valor !== null) {
+            $negocAcomodValorMap[negocNormAcomod($nome)] = $valor;
+        }
+    }
 }
 ?>
 
@@ -132,7 +245,7 @@ if (!isset($dados_acomodacao) || !is_array($dados_acomodacao)) {
                         <option value=""> </option>
                         <?php sort($dados_acomodacao, SORT_ASC);
                         foreach ($dados_acomodacao as $acomd) { ?>
-                        <option value="<?= $acomd; ?>"><?= $acomd; ?></option>
+                        <option value="<?= $acomd; ?>" data-valor="<?= htmlspecialchars((string)negocValorAcomod((string)$acomd, $negocAcomodValorMap), ENT_QUOTES, 'UTF-8'); ?>"><?= $acomd; ?></option>
                         <?php } ?>
                     </select>
                 </div>
@@ -143,7 +256,7 @@ if (!isset($dados_acomodacao) || !is_array($dados_acomodacao)) {
                         <option value=""> </option>
                         <?php sort($dados_acomodacao, SORT_ASC);
                         foreach ($dados_acomodacao as $acomd) { ?>
-                        <option value="<?= $acomd; ?>"><?= $acomd; ?></option>
+                        <option value="<?= $acomd; ?>" data-valor="<?= htmlspecialchars((string)negocValorAcomod((string)$acomd, $negocAcomodValorMap), ENT_QUOTES, 'UTF-8'); ?>"><?= $acomd; ?></option>
                         <?php } ?>
                     </select>
                 </div>
@@ -161,8 +274,9 @@ if (!isset($dados_acomodacao) || !is_array($dados_acomodacao)) {
                 </div>
 
                 <div class="form-group col-sm-1" style="margin-top:25px;">
-                    <!-- SOMENTE "+" na primeira linha -->
-                    <button type="button" class="btn btn-add" onclick="addNegotiationField()">+</button>
+                    <div class="negotiation-actions">
+                        <button type="button" class="btn btn-add">+</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -174,6 +288,8 @@ if (!isset($dados_acomodacao) || !is_array($dados_acomodacao)) {
 </div>
 
 <script>
+window.__NEG_ACOMOD_VALOR_MAP = <?= json_encode($negocAcomodValorMap, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+
 // ========= Helpers (JS) =========
 function jsNorm(s) {
     return (s || '')
@@ -268,10 +384,33 @@ function setTrocaFromTipo($container) {
 }
 
 // ========= Saving =========
+function getNegotiationAcomodValue($select) {
+    const selected = $select.find('option:selected');
+    const fromOption = parseFloat(selected.data('valor') || selected.attr('data-valor') || 'NaN');
+    if (!Number.isNaN(fromOption)) {
+        return fromOption;
+    }
+
+    const map = window.__NEG_ACOMOD_VALOR_MAP || {};
+    const normKey = (v) => (v || '')
+        .toString()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/^\d+\s*-\s*/, '')
+        .trim();
+    const byValue = normKey($select.val());
+    const byText = normKey(selected.text());
+    const fromValue = parseFloat(map[byValue] ?? 'NaN');
+    const fromText = parseFloat(map[byText] ?? 'NaN');
+
+    if (!Number.isNaN(fromValue)) return fromValue;
+    if (!Number.isNaN(fromText)) return fromText;
+    return 0;
+}
+
 function calculateSaving(container) {
-    // Se quiser valores por acomodação, adicione data-valor nas <option>. Sem isso, saving fica 0.
-    const trocaDe = parseFloat(container.find('select[name="troca_de"] option:selected').data('valor') || 0);
-    const trocaPara = parseFloat(container.find('select[name="troca_para"] option:selected').data('valor') || 0);
+    const trocaDe = getNegotiationAcomodValue(container.find('select[name="troca_de"]'));
+    const trocaPara = getNegotiationAcomodValue(container.find('select[name="troca_para"]'));
     const quantidade = parseInt(container.find('input[name="qtd"]').val(), 10) || 0;
 
     const tipoNegociacao = (container.find('select[name="tipo_negociacao"] option:selected').text() || '')
@@ -333,7 +472,7 @@ function addNegotiationField() {
           <option value=""> </option>
           <?php sort($dados_acomodacao, SORT_ASC);
             foreach ($dados_acomodacao as $acomd) { ?>
-            <option value="<?= $acomd; ?>"><?= $acomd; ?></option>
+            <option value="<?= $acomd; ?>" data-valor="<?= htmlspecialchars((string)negocValorAcomod((string)$acomd, $negocAcomodValorMap), ENT_QUOTES, 'UTF-8'); ?>"><?= $acomd; ?></option>
           <?php } ?>
         </select>
       </div>
@@ -344,7 +483,7 @@ function addNegotiationField() {
           <option value=""> </option>
           <?php sort($dados_acomodacao, SORT_ASC);
             foreach ($dados_acomodacao as $acomd) { ?>
-            <option value="<?= $acomd; ?>"><?= $acomd; ?></option>
+            <option value="<?= $acomd; ?>" data-valor="<?= htmlspecialchars((string)negocValorAcomod((string)$acomd, $negocAcomodValorMap), ENT_QUOTES, 'UTF-8'); ?>"><?= $acomd; ?></option>
           <?php } ?>
         </select>
       </div>
@@ -361,8 +500,11 @@ function addNegotiationField() {
       </div>
 
       <div class="form-group col-sm-1" style="margin-top:25px;">
-        <button type="button" class="btn btn-add" onclick="addNegotiationField()">+</button>
-        <button type="button" class="btn btn-remove" onclick="removeNegotiationField(this)">-</button>
+        <div class="negotiation-actions">
+          <button type="button" class="btn btn-add">+</button>
+          <button type="button" class="btn btn-remove">-</button>
+          <button type="button" class="btn btn-trash-negoc-inline" title="Remover negociação" aria-label="Remover negociação"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>
+        </div>
       </div>
     </div>`;
     negotiationContainer.append(newField);
@@ -449,87 +591,7 @@ function isDowngradeFromProrrogRow(row) {
 }
 
 window.syncNegociacoesFromProrrog = function syncNegociacoesFromProrrog(prorrogRows) {
-    const container = document.getElementById('negotiationFieldsContainer');
-    if (!container || !Array.isArray(prorrogRows)) return;
-
-    // remove somente linhas automáticas anteriores
-    container.querySelectorAll('.negotiation-field-container[data-auto-prorrog="1"]').forEach(el => el.remove());
-
-    const validRows = prorrogRows.filter(row => {
-        if (!row) return false;
-        const acomodSolic = row.acomod_solicitada_pror || row.acomod1_pror || '';
-        const acomodLib = row.acomod1_pror || '';
-        const ini = row.prorrog1_ini_pror || '';
-        const fim = row.prorrog1_fim_pror || '';
-        return acomodSolic && acomodLib && ini && fim && isDowngradeFromProrrogRow(row);
-    });
-
-    validRows.forEach((row) => {
-        addNegotiationField();
-        const currentRows = container.querySelectorAll('.negotiation-field-container');
-        const negRow = currentRows[currentRows.length - 1];
-        if (!negRow) return;
-        negRow.setAttribute('data-auto-prorrog', '1');
-
-        const tipoSel = negRow.querySelector('[name="tipo_negociacao"]');
-        const deSel = negRow.querySelector('[name="troca_de"]');
-        const paraSel = negRow.querySelector('[name="troca_para"]');
-        const iniEl = negRow.querySelector('[name="data_inicio_negoc"]');
-        const fimEl = negRow.querySelector('[name="data_fim_negoc"]');
-        const qtdEl = negRow.querySelector('[name="qtd"]');
-        const savingEl = negRow.querySelector('[name="saving"]');
-
-        const acomodSolic = row.acomod_solicitada_pror || row.acomod1_pror || '';
-        const acomodLib = row.acomod1_pror || '';
-
-        if (tipoSel) tipoSel.value = inferTipoTroca(acomodSolic, acomodLib);
-        if (deSel) setSelectByTextOrValue(deSel, acomodSolic);
-        if (paraSel) setSelectByTextOrValue(paraSel, acomodLib);
-        if (iniEl) iniEl.value = row.prorrog1_ini_pror || '';
-        if (fimEl) fimEl.value = row.prorrog1_fim_pror || '';
-
-        let qtd = parseInt(row.diarias_1 || '0', 10);
-        if (!Number.isFinite(qtd) || qtd <= 0) {
-            qtd = diasEntreDatas(row.prorrog1_ini_pror || '', row.prorrog1_fim_pror || '');
-        }
-        if (qtdEl) qtdEl.value = Number.isFinite(qtd) && qtd > 0 ? String(qtd) : '';
-
-        const savingNum = parseFloat(row.saving_estimado_pror || '0');
-        if (savingEl && !Number.isNaN(savingNum)) {
-            savingEl.value = savingNum.toFixed(2);
-            const showEl = negRow.querySelector('[name="saving_show"]');
-            if (showEl) {
-                showEl.value = savingNum >= 0 ? `R$ ${savingNum.toFixed(2)}` : `-R$ ${Math.abs(savingNum).toFixed(2)}`;
-                showEl.style.color = savingNum >= 0 ? 'green' : 'red';
-            }
-        }
-
-        const deOpt = deSel?.options?.[deSel.selectedIndex];
-        const paraOpt = paraSel?.options?.[paraSel.selectedIndex];
-        const deValor = parseFloat(deOpt?.getAttribute('data-valor') || '0');
-        const paraValor = parseFloat(paraOpt?.getAttribute('data-valor') || '0');
-        if (!Number.isNaN(deValor) && !Number.isNaN(paraValor) && (deValor > 0 || paraValor > 0)) {
-            const $negRow = $(negRow);
-            calculateSaving($negRow);
-        }
-    });
-
-    // Remove linha inicial vazia quando já houver linhas automáticas da prorrogação
-    if (validRows.length > 0) {
-        const initialRow = container.querySelector('.negotiation-field-container[data-initial="true"]');
-        if (initialRow) {
-            const hasAnyValue = Array.from(initialRow.querySelectorAll('input, select')).some((el) => {
-                const name = (el.getAttribute('name') || '').trim();
-                if (name === 'fk_id_int' || name === 'fk_usuario_neg' || name === 'negociacoes_json') return false;
-                return (el.value || '').trim() !== '';
-            });
-            if (!hasAnyValue) {
-                initialRow.remove();
-            }
-        }
-    }
-
-    generateNegotiationsJSON();
+    return;
 };
 
 // ========= JSON / validações =========
@@ -584,14 +646,32 @@ function exibirAlerta(msg) {
     }, 4000);
 }
 
+function parseDateOnly(value) {
+    const raw = (value || '').toString().trim();
+    if (!raw) return null;
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const [y, m, d] = raw.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+        const [d, m, y] = raw.split('/').map(Number);
+        return new Date(y, m - 1, d);
+    }
+
+    const fallback = new Date(raw + 'T00:00:00');
+    return Number.isNaN(fallback.getTime()) ? null : fallback;
+}
+
 function calcularDiariasEntreDatas(dataInicioStr, dataFimStr) {
     if (!dataInicioStr || !dataFimStr) return null;
-    const inicio = new Date(dataInicioStr + 'T00:00:00');
-    const fim = new Date(dataFimStr + 'T00:00:00');
-    if (Number.isNaN(inicio.getTime()) || Number.isNaN(fim.getTime())) return null;
+    const inicio = parseDateOnly(dataInicioStr);
+    const fim = parseDateOnly(dataFimStr);
+    if (!inicio || !fim || Number.isNaN(inicio.getTime()) || Number.isNaN(fim.getTime())) return null;
     if (fim < inicio) return null;
     const umDiaMs = 24 * 60 * 60 * 1000;
-    return Math.floor((fim - inicio) / umDiaMs); // exclusivo do dia final
+    return Math.max(1, Math.floor((fim - inicio) / umDiaMs));
 }
 
 function syncQuantidadeFromDates(container) {
@@ -609,7 +689,8 @@ function syncQuantidadeFromDates(container) {
 function validarTodasDatas() {
     const dataInternEl = document.getElementById("data_intern_int");
     if (!dataInternEl || !dataInternEl.value) return true;
-    const dataInternacao = new Date(dataInternEl.value);
+    const dataInternacao = parseDateOnly(dataInternEl.value);
+    if (!dataInternacao) return true;
     let valido = true;
 
     document.querySelectorAll(".negotiation-field-container").forEach(container => {
@@ -617,8 +698,8 @@ function validarTodasDatas() {
         const dataFimEl = container.querySelector('[name="data_fim_negoc"]');
         if (!dataInicioEl || !dataFimEl) return;
 
-        const dataInicio = dataInicioEl.value ? new Date(dataInicioEl.value) : null;
-        const dataFim = dataFimEl.value ? new Date(dataFimEl.value) : null;
+        const dataInicio = dataInicioEl.value ? parseDateOnly(dataInicioEl.value) : null;
+        const dataFim = dataFimEl.value ? parseDateOnly(dataFimEl.value) : null;
 
         if (dataInicio && dataInicio < dataInternacao) {
             exibirAlerta("A data de início não pode ser anterior à data de internação.");
@@ -681,6 +762,16 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(clearNegotiationFields, 1000);
         });
     }
+});
+
+$(document).on('click', '#negotiationFieldsContainer .btn-add', function(event) {
+    event.preventDefault();
+    addNegotiationField();
+});
+
+$(document).on('click', '#negotiationFieldsContainer .btn-remove, #negotiationFieldsContainer .btn-trash-negoc-inline', function(event) {
+    event.preventDefault();
+    removeNegotiationField(this);
 });
 
 // Mantém só a 1ª linha após envio
