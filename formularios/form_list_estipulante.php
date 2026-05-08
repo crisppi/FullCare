@@ -99,7 +99,8 @@ if ($qtdIntItens > $limite) {
         <div class="listagem-hero__actions">
             <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/estipulantes/novo', ENT_QUOTES, 'UTF-8') ?>"
                 class="btn listagem-btn-top listagem-btn-top--blue">
-                <i class="bi bi-plus-lg" style='font-size: .95rem;margin-right:5px;'></i>Novo Estipulante
+                <i class="bi bi-person-vcard-fill listagem-btn-top__icon" aria-hidden="true"></i>
+                <span>Novo Estipulante</span>
             </a>
         </div>
     </div>
@@ -149,8 +150,9 @@ if ($qtdIntItens > $limite) {
                     </div>
                     <div class="col-sm-2" style="padding:2px !important">
                         <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/estipulantes', ENT_QUOTES, 'UTF-8') ?>"
-                            class="btn btn-outline-secondary btn-sm btn-filtro-limpar" style="margin-top:7px;">
-                            Limpar filtros
+                            class="btn btn-outline-secondary btn-sm btn-filtro-limpar" style="margin-top:7px;"
+                            title="Limpar filtros" aria-label="Limpar filtros">
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>
