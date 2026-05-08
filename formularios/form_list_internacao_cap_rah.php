@@ -509,7 +509,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                 id="btnRahClearFiltersIcon"
                                 class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon"
                                 style="margin-top:7px;" title="Limpar filtros" aria-label="Limpar filtros">
-                                <i class="bi bi-x-lg"></i>
+                                <i class="bi bi-trash3"></i>
                             </a>
                         </div>
                     </div>

@@ -86,7 +86,7 @@ sort($dadosAlta);
                 </div>
                 <div class="col-md-2 d-flex align-items-end gap-2">
                     <button class="btn btn-sm btn-primary" type="submit" style="background:#5e2363;border:none;">Filtrar</button>
-                    <a href="list_internacao_gerar_alta.php" class="btn btn-sm btn-outline-secondary btn-filtro-limpar">Limpar</a>
+                    <a href="list_internacao_gerar_alta.php" class="btn btn-sm btn-outline-secondary btn-filtro-limpar"><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Limpar</a>
                 </div>
             </form>
         </div>
