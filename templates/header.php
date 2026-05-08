@@ -257,9 +257,9 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .navbar.nav_bar_custom.fixed-top {
-            min-height: 50px;
-            padding-top: 0.18rem !important;
-            padding-bottom: 0.18rem !important;
+            min-height: 58px;
+            padding-top: 0.32rem !important;
+            padding-bottom: 0.32rem !important;
         }
 
         .navbar .navbar-brand {
@@ -378,13 +378,15 @@ if (!empty($sessionIdUsuario)) {
         .header-actions {
             margin-left: auto !important;
             margin-right: 0 !important;
-            gap: 0.25rem !important;
+            gap: 0.7rem !important;
             flex: 0 0 auto;
+            align-items: center;
         }
 
         .header-actions #global-patient-search {
             min-width: 170px;
             flex: 0 0 auto;
+            margin-right: 0.2rem;
         }
 
         .header-actions #global-patient-search .form-control,
@@ -395,12 +397,22 @@ if (!empty($sessionIdUsuario)) {
             font-size: 0.78rem !important;
         }
 
+        .header-actions #global-patient-search .input-group-text {
+            min-height: 34px !important;
+            height: 34px !important;
+            padding: 0 0.8rem !important;
+            display: inline-flex;
+            align-items: center;
+        }
+
         .header-action-btn {
             border: 1px solid rgba(94, 35, 99, 0.28) !important;
             background: #fff;
             color: #5e2363;
             font-size: 0.76rem;
-            padding: 0.22rem 0.42rem;
+            min-height: 34px !important;
+            height: 34px !important;
+            padding: 0 0.75rem !important;
         }
 
         .header-action-btn:hover {
@@ -442,11 +454,62 @@ if (!empty($sessionIdUsuario)) {
             display: none !important;
         }
 
+        .header-actions .account-wrap,
+        .header-actions .account-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .header-actions .account-wrap {
+            padding: 3px 10px 3px 8px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(247, 243, 251, .96));
+            border: 1px solid rgba(94, 35, 99, 0.12);
+            box-shadow: 0 8px 18px rgba(57, 73, 111, 0.12);
+        }
+
+        .header-actions .account-item {
+            flex-direction: row-reverse;
+            gap: 0.35rem;
+        }
+
+        .header-actions .account-item .image {
+            display: flex;
+            align-items: center;
+            margin-top: 0 !important;
+        }
+
+        .header-actions .account-item .content {
+            display: flex;
+            align-items: center;
+            margin-left: 0 !important;
+            padding: 0 !important;
+        }
+
+        .header-actions .account-item .image img {
+            display: block;
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(93, 63, 140, 0.18);
+        }
+
         .account-user-caret {
             font-size: 0.8rem;
             margin-left: 4px;
             color: #6b7280;
             vertical-align: middle;
+        }
+
+        .account-user-trigger {
+            display: inline-flex;
+            align-items: center;
+            min-height: 38px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #28354d;
         }
 
         @media (max-width: 991.98px) {
@@ -470,6 +533,7 @@ if (!empty($sessionIdUsuario)) {
                 overflow-x: auto;
                 padding: 0 12px 10px;
                 margin-top: 6px;
+                gap: 0.5rem !important;
             }
 
             .header-actions #global-patient-search {
@@ -1135,7 +1199,7 @@ if (!empty($sessionIdUsuario)) {
 
                 <div class="account-wrap">
                     <div class="account-item clearfix js-item-menu" style="margin-right:0">
-                        <div class="image" style="margin-top:15px">
+                        <div class="image">
                             <?php
                             // arquivo da sessão (sanitizado) e checagem no filesystem real
                             $sessFoto  = $_SESSION['foto_usuario'] ?? '';
