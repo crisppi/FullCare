@@ -94,7 +94,6 @@ if ($qtdIntItens > $limite) {
         <div class="listagem-hero__copy">
             <div class="listagem-kicker">Cadastros</div>
             <h1 class="listagem-title">Estipulantes</h1>
-            <p class="listagem-subtitle">Acesse estipulantes com um título mais forte e melhor separado do header.</p>
         </div>
         <div class="listagem-hero__actions">
             <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/estipulantes/novo', ENT_QUOTES, 'UTF-8') ?>"

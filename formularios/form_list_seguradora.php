@@ -96,7 +96,6 @@
             <div class="listagem-hero__copy">
                 <div class="listagem-kicker">Cadastros</div>
                 <h1 class="listagem-title">Seguradoras</h1>
-                <p class="listagem-subtitle">Consulte operadoras e parâmetros com o mesmo acabamento das outras listas do sistema.</p>
             </div>
             <div class="listagem-hero__actions">
                 <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/seguradoras/nova', ENT_QUOTES, 'UTF-8') ?>"

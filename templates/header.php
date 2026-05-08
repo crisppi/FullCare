@@ -274,7 +274,7 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .navbar .navbar-brand .logo-novo {
-            height: 30px !important;
+            height: 34px !important;
             width: auto !important;
             max-height: none !important;
             min-height: 0 !important;
@@ -288,13 +288,13 @@ if (!empty($sessionIdUsuario)) {
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 28px !important;
+                height: 31px !important;
             }
         }
 
         @media (max-width: 575.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 28px !important;
+                height: 30px !important;
             }
         }
 

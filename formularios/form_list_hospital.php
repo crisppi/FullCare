@@ -101,7 +101,6 @@
             <div class="listagem-hero__copy">
                 <div class="listagem-kicker">Cadastros</div>
                 <h1 class="listagem-title">Hospitais</h1>
-                <p class="listagem-subtitle">Gerencie hospitais, acomodações e vínculos operacionais com mais respiro visual.</p>
             </div>
             <div class="listagem-hero__actions">
                 <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/list_hospitalUser.php', ENT_QUOTES, 'UTF-8') ?>"
