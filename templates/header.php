@@ -994,7 +994,7 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-bar-chart-line"
                                                     style="font-size: 1rem;margin-right:5px; color:#72d2ff;"></i>
                                                 Negociação &amp; Rede</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/qualidade-eventos"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/qualidade-desfecho"><i
                                                     class="bi bi-exclamation-octagon"
                                                     style="font-size: 1rem;margin-right:5px; color:#b897ff;"></i>
                                                 Qualidade &amp; Desfecho</a></li>

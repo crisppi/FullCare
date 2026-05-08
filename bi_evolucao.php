@@ -3,7 +3,7 @@ include_once("check_logado.php");
 require_once("templates/header.php");
 
 if (!isset($conn) || !($conn instanceof PDO)) {
-    die("Conexao invalida.");
+    die("Conexão inválida.");
 }
 
 function e($v)
@@ -86,9 +86,9 @@ foreach ($rows as $row) {
     if (!isset($internacoes[$id])) {
         $internacoes[$id] = [
             'paciente' => $row['paciente'] ?? 'Paciente',
-            'hospital' => $row['hospital'] ?? 'Sem informacoes',
+            'hospital' => $row['hospital'] ?? 'Sem informações',
             'data_internacao' => $row['data_intern_int'] ?? '',
-            'acomodacao' => $row['acomodacao_int'] ?? 'Sem informacoes',
+            'acomodacao' => $row['acomodacao_int'] ?? 'Sem informações',
             'visitas' => [],
         ];
     }
@@ -108,11 +108,11 @@ foreach ($rows as $row) {
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
         <div>
-            <h1 class="bi-title">Evolucao</h1>
-            <div style="color: var(--bi-muted); font-size: 0.95rem;">Historico de visitas e relatorios por internacao.</div>
+            <h1 class="bi-title">Evolução</h1>
+            <div style="color: var(--bi-muted); font-size: 0.95rem;">Histórico de visitas e relatórios por internação.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
@@ -125,7 +125,7 @@ foreach ($rows as $row) {
                 <select name="internado">
                     <option value="" <?= $internado === '' ? 'selected' : '' ?>>Todos</option>
                     <option value="s" <?= $internado === 's' ? 'selected' : '' ?>>Sim</option>
-                    <option value="n" <?= $internado === 'n' ? 'selected' : '' ?>>Nao</option>
+                    <option value="n" <?= $internado === 'n' ? 'selected' : '' ?>>Não</option>
                 </select>
             </div>
             <div class="bi-filter">
@@ -140,7 +140,7 @@ foreach ($rows as $row) {
                 </select>
             </div>
             <div class="bi-filter">
-                <label>Mes</label>
+                <label>Mês</label>
                 <select name="mes">
                     <option value="">Todos</option>
                     <?php for ($m = 1; $m <= 12; $m++): ?>
@@ -177,24 +177,24 @@ foreach ($rows as $row) {
     </form>
 
     <div class="bi-panel">
-        <h3>Relatorio de visitas</h3>
+        <h3>Relatório de visitas</h3>
         <?php if (!$internacoes): ?>
-            <div class="bi-empty" style="padding:16px;">Sem informacoes com os filtros atuais.</div>
+            <div class="bi-empty" style="padding:16px;">Sem informações com os filtros atuais.</div>
         <?php else: ?>
             <?php foreach ($internacoes as $internacao): ?>
                 <div class="bi-panel" style="margin-bottom:16px;">
                     <div style="font-weight:600; margin-bottom:8px;">
                         Paciente: <?= e($internacao['paciente']) ?> |
-                        Data Internacao: <?= $internacao['data_internacao'] ? e(date('d/m/Y', strtotime($internacao['data_internacao']))) : '-' ?> |
-                        Acomodacao: <?= e($internacao['acomodacao']) ?> |
+                        Data de internação: <?= $internacao['data_internacao'] ? e(date('d/m/Y', strtotime($internacao['data_internacao']))) : '-' ?> |
+                        Acomodação: <?= e($internacao['acomodacao']) ?> |
                         Hospital: <?= e($internacao['hospital']) ?>
                     </div>
                     <?php foreach ($internacao['visitas'] as $visita): ?>
                         <div style="border-top:1px solid rgba(255,255,255,0.15); padding-top:10px; margin-top:10px;">
-                            <div style="font-weight:600;">Data Visita: <?= $visita['data'] ? e(date('d/m/Y', strtotime($visita['data']))) : '-' ?></div>
-                            <div><strong>Relatorio:</strong> <?= e($visita['relatorio']) ?></div>
-                            <div><strong>Acoes Auditoria:</strong> <?= e($visita['acoes']) ?></div>
-                            <div><strong>Programacao Terapeutica:</strong> <?= e($visita['programacao']) ?></div>
+                            <div style="font-weight:600;">Data da visita: <?= $visita['data'] ? e(date('d/m/Y', strtotime($visita['data']))) : '-' ?></div>
+                            <div><strong>Relatório:</strong> <?= e($visita['relatorio']) ?></div>
+                            <div><strong>Ações de auditoria:</strong> <?= e($visita['acoes']) ?></div>
+                            <div><strong>Programação terapêutica:</strong> <?= e($visita['programacao']) ?></div>
                         </div>
                     <?php endforeach; ?>
                 </div>

@@ -22,9 +22,9 @@ $biSections = [
         ['label' => 'Custo por Patologia', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=custo-patologia', 'file' => 'IndicadoresEssenciaisItemBI.php'],
         ['label' => 'Custo por Antecedente', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=custo-antecedente', 'file' => 'IndicadoresEssenciaisItemBI.php'],
         ['label' => 'Custo por UTI', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=custo-uti', 'file' => 'IndicadoresEssenciaisItemBI.php'],
-        ['label' => '% Internacao UTI', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=percentual-internacao-uti', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => '% Internação UTI', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=percentual-internacao-uti', 'file' => 'IndicadoresEssenciaisItemBI.php'],
         ['label' => 'Eventos Adversos por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=eventos-adversos-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
-        ['label' => 'Obitos por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=obitos-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
+        ['label' => 'Óbitos por Hospital', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=obitos-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
         ['label' => 'Qualidade Hospitalar', 'href' => 'IndicadoresEssenciaisItemBI.php?slug=qualidade-hospital', 'file' => 'IndicadoresEssenciaisItemBI.php'],
     ],
     'Clínico' => [
@@ -138,8 +138,9 @@ $biSections = [
         ['label' => 'Elasticidade de Preço', 'href' => 'bi/rede-elasticidade', 'file' => 'RedeElasticidadeBI.php'],
     ],
     'Qualidade & Desfecho' => [
+        ['label' => 'Visão geral', 'href' => 'bi/qualidade-desfecho', 'file' => 'QualidadeDesfechoBI.php'],
         ['label' => 'Eventos Adversos', 'href' => 'bi/qualidade-eventos', 'file' => 'QualidadeEventosBI.php'],
-        ['label' => 'Óbitos', 'href' => 'QualidadeObitosBI.php', 'file' => 'QualidadeObitosBI.php'],
+        ['label' => 'Óbitos', 'href' => 'bi/qualidade-obitos', 'file' => 'QualidadeObitosBI.php'],
     ],
 ];
 
@@ -183,9 +184,9 @@ $ieMap = [
     'custo-patologia' => 'Custo por Patologia',
     'custo-antecedente' => 'Custo por Antecedente',
     'custo-uti' => 'Custo por UTI',
-    'percentual-internacao-uti' => '% Internacao UTI',
+    'percentual-internacao-uti' => '% Internação UTI',
     'eventos-adversos-hospital' => 'Eventos Adversos por Hospital',
-    'obitos-hospital' => 'Obitos por Hospital',
+    'obitos-hospital' => 'Óbitos por Hospital',
     'qualidade-hospital' => 'Qualidade Hospitalar',
 ];
 

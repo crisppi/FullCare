@@ -3,7 +3,7 @@ include_once("check_logado.php");
 require_once("templates/header.php");
 
 if (!isset($conn) || !($conn instanceof PDO)) {
-    die("Conexao invalida.");
+    die("Conexão inválida.");
 }
 
 function e($v)
@@ -35,17 +35,43 @@ if (!empty($mes)) {
     $params[':mes'] = (int)$mes;
 }
 
+$costExpr = "COALESCE(ca.valor_final_capeante, 0)";
+
 $sql = "
     SELECT
-        h.nome_hosp,
-        COUNT(DISTINCT i.id_internacao) AS internacoes,
-        SUM(ca.valor_final_capeante) AS total_custo,
-        AVG(ca.valor_final_capeante) AS custo_medio
-    FROM tb_capeante ca
-    INNER JOIN tb_internacao i ON i.id_internacao = ca.fk_int_capeante
-    LEFT JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int
-    WHERE {$where}
-    GROUP BY h.nome_hosp
+        nome_hosp,
+        COUNT(*) AS internacoes,
+        SUM(custo_internacao) AS total_custo,
+        SUM(diarias) AS total_diarias,
+        CASE
+            WHEN COUNT(*) > 0
+            THEN SUM(custo_internacao) / COUNT(*)
+            ELSE 0
+        END AS custo_medio,
+        CASE
+            WHEN SUM(diarias) > 0
+            THEN SUM(custo_internacao) / SUM(diarias)
+            ELSE 0
+        END AS custo_medio_diaria
+    FROM (
+        SELECT
+            i.id_internacao,
+            h.id_hospital,
+            h.nome_hosp,
+            SUM({$costExpr}) AS custo_internacao,
+            GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1) AS diarias
+        FROM tb_capeante ca
+        INNER JOIN tb_internacao i ON i.id_internacao = ca.fk_int_capeante
+        LEFT JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int
+        LEFT JOIN (
+            SELECT fk_id_int_alt, MAX(data_alta_alt) AS data_alta_alt
+            FROM tb_alta
+            GROUP BY fk_id_int_alt
+        ) al ON al.fk_id_int_alt = i.id_internacao
+        WHERE {$where}
+        GROUP BY i.id_internacao, h.id_hospital, h.nome_hosp, al.data_alta_alt, i.data_intern_int
+    ) base
+    GROUP BY id_hospital, nome_hosp
     ORDER BY total_custo DESC
 ";
 $stmt = $conn->prepare($sql);
@@ -103,12 +129,13 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         <th>Internações</th>
                         <th>Custo total</th>
                         <th>Custo médio</th>
+                        <th>Custo médio diária</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!$rows): ?>
                         <tr>
-                            <td colspan="4">Sem informações</td>
+                            <td colspan="5">Sem informações</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($rows as $row): ?>
@@ -117,6 +144,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                                 <td><?= number_format((int)($row['internacoes'] ?? 0), 0, ',', '.') ?></td>
                                 <td>R$ <?= number_format((float)($row['total_custo'] ?? 0), 2, ',', '.') ?></td>
                                 <td>R$ <?= number_format((float)($row['custo_medio'] ?? 0), 2, ',', '.') ?></td>
+                                <td>R$ <?= number_format((float)($row['custo_medio_diaria'] ?? 0), 2, ',', '.') ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

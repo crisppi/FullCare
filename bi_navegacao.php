@@ -205,8 +205,9 @@ $navGroups = [
         'title' => 'Qualidade & Desfecho',
         'key' => 'qualidade',
         'items' => [
+            ['label' => 'Visão geral', 'href' => 'bi/qualidade-desfecho'],
             ['label' => 'Eventos Adversos', 'href' => 'bi/qualidade-eventos'],
-            ['label' => 'Óbitos', 'href' => 'QualidadeObitosBI.php'],
+            ['label' => 'Óbitos', 'href' => 'bi/qualidade-obitos'],
         ],
     ],
     [
