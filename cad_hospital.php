@@ -607,19 +607,8 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         var backLink = document.querySelector('.js-friendly-back');
         if (!backLink) return;
         var fallbackUrl = backLink.getAttribute('data-default-return') || backLink.href;
-        var returnUrl = null;
-        try {
-            returnUrl = sessionStorage.getItem('return_flow_url');
-        } catch (e) {
-            returnUrl = null;
-        }
-        if (returnUrl && returnUrl !== window.location.href) {
-            backLink.href = returnUrl;
-            backLink.textContent = 'Voltar ao fluxo anterior';
-        } else {
-            backLink.href = fallbackUrl;
-            backLink.textContent = 'Voltar para lista';
-        }
+        backLink.href = fallbackUrl;
+        backLink.textContent = 'Voltar para lista';
     });
 
     (function () {

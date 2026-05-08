@@ -614,19 +614,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var backLink = document.querySelector('.js-friendly-back');
     if (!backLink) return;
     var fallbackUrl = backLink.getAttribute('data-default-return') || backLink.href;
-    var returnUrl = null;
-    try {
-        returnUrl = sessionStorage.getItem('return_flow_url');
-    } catch (e) {
-        returnUrl = null;
-    }
-    if (returnUrl && returnUrl !== window.location.href) {
-        backLink.href = returnUrl;
-        backLink.textContent = 'Voltar ao fluxo anterior';
-    } else {
-        backLink.href = fallbackUrl;
-        backLink.textContent = 'Voltar para lista';
-    }
+    backLink.href = fallbackUrl;
+    backLink.textContent = 'Voltar para lista';
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>

@@ -361,6 +361,22 @@ if (!empty($sessionIdUsuario)) {
             min-width: 0;
         }
 
+        .navbar .nav-tabs {
+            border-bottom: 0 !important;
+        }
+
+        .navbar .nav-tabs .nav-link {
+            border: 0 !important;
+            border-bottom: 0 !important;
+            border-radius: 8px;
+        }
+
+        .navbar .nav-tabs .nav-link:hover,
+        .navbar .nav-tabs .nav-link:focus,
+        .navbar .nav-tabs .nav-link.active {
+            border-color: transparent !important;
+        }
+
         .navbar-nav.navbar-nav-scroll .nav-link {
             white-space: nowrap;
             padding: 0.24rem 0.3rem;
@@ -589,10 +605,6 @@ if (!empty($sessionIdUsuario)) {
 </head>
 
 <body>
-    <button type="button" id="return-flow-btn"
-        style="display:none;position:fixed;bottom:24px;right:24px;z-index:1100;padding:0.65rem 1.2rem;border:none;border-radius:999px;background:#5e2363;color:#fff;font-weight:600;box-shadow:0 12px 25px rgba(94,35,99,0.35);cursor:pointer;">
-        Voltar ao fluxo anterior
-    </button>
     <div class="col-md-12" style="padding:0 !important">
         <nav class="navbar navbar-expand-lg navbar-light bg-light nav_bar_custom fixed-top">
             <div class="bar_color" style="position:fixed;top:0;z-index:1000;width:100%;height:5px;background-image: linear-gradient(to right, #5e2363,#5bd9f3);
@@ -1649,7 +1661,7 @@ if (!empty($sessionIdUsuario)) {
 
     function navigateWithReturn(url) {
         try {
-            sessionStorage.setItem('return_flow_url', window.location.href);
+            sessionStorage.removeItem('return_flow_url');
         } catch (e) {}
         try {
             const draft = collectFormDraft();
@@ -1831,30 +1843,9 @@ if (!empty($sessionIdUsuario)) {
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('return-flow-btn');
-        let target = null;
         try {
-            target = sessionStorage.getItem('return_flow_url');
-        } catch (e) {
-            target = null;
-        }
-        if (target && window.location.href === target) {
-            try {
-                sessionStorage.removeItem('return_flow_url');
-            } catch (_) {}
-            target = null;
-        }
-        if (target && btn) {
-            btn.style.display = 'flex';
-            btn.addEventListener('click', function() {
-                try {
-                    sessionStorage.removeItem('return_flow_url');
-                } catch (_) {}
-                window.location.href = target;
-            });
-        } else if (btn) {
-            btn.style.display = 'none';
-        }
+            sessionStorage.removeItem('return_flow_url');
+        } catch (_) {}
         restoreFormDraft();
     });
 </script>

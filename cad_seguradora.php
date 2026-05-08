@@ -317,23 +317,12 @@ $id_seguradora = filter_input(INPUT_GET, "id_seguradora");
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var backLink = document.querySelector('.js-friendly-back');
-        if (!backLink) return;
-        var fallbackUrl = backLink.getAttribute('data-default-return') || backLink.href;
-        var returnUrl = null;
-        try {
-            returnUrl = sessionStorage.getItem('return_flow_url');
-        } catch (e) {
-            returnUrl = null;
-        }
-        if (returnUrl && returnUrl !== window.location.href) {
-            backLink.href = returnUrl;
-            backLink.textContent = 'Voltar ao fluxo anterior';
-        } else {
-            backLink.href = fallbackUrl;
-            backLink.textContent = 'Voltar para lista';
-        }
-    });
+    var backLink = document.querySelector('.js-friendly-back');
+    if (!backLink) return;
+    var fallbackUrl = backLink.getAttribute('data-default-return') || backLink.href;
+    backLink.href = fallbackUrl;
+    backLink.textContent = 'Voltar para lista';
+});
 
     const imagem = document.querySelector("#logo_seg");
 
