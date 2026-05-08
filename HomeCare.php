@@ -151,6 +151,13 @@ if ($uti !== '') {
 .hc-bi-shell {
     --hcbi-border: rgba(255,255,255,.2);
     --hcbi-soft: rgba(255,255,255,.08);
+    --hcbi-text: rgba(255,255,255,.92);
+    --hcbi-text-soft: rgba(255,255,255,.76);
+    --hcbi-ink: #f4f8ff;
+    --hcbi-cyan: #7fe4ff;
+    --hcbi-mint: #8df0c7;
+    --hcbi-amber: #ffd48a;
+    --hcbi-rose: #ff9fc0;
 }
 
 .hc-bi-hero {
@@ -182,6 +189,7 @@ if ($uti !== '') {
 
 .hc-bi-hero-main .bi-title {
     margin: 10px 0 6px;
+    color: var(--hcbi-ink);
 }
 
 .hc-bi-copy {
@@ -205,10 +213,23 @@ if ($uti !== '') {
     border: 1px solid rgba(255,255,255,.1);
 }
 
+.hc-bi-mini-kpi:nth-child(1) {
+    background: linear-gradient(135deg, rgba(119, 232, 255, .18), rgba(255,255,255,.08));
+}
+
+.hc-bi-mini-kpi:nth-child(2) {
+    background: linear-gradient(135deg, rgba(255, 212, 138, .18), rgba(255,255,255,.08));
+}
+
+.hc-bi-mini-kpi:nth-child(3) {
+    background: linear-gradient(135deg, rgba(255, 159, 192, .18), rgba(255,255,255,.08));
+}
+
 .hc-bi-mini-kpi strong {
     display: block;
     font-size: 1.05rem;
     line-height: 1;
+    color: #fff;
 }
 
 .hc-bi-mini-kpi span {
@@ -269,6 +290,7 @@ if ($uti !== '') {
 
 .hc-bi-topline h3 {
     margin: 0;
+    color: var(--hcbi-ink);
 }
 
 .hc-bi-active-filters {
@@ -327,6 +349,22 @@ if ($uti !== '') {
     font-size: .72rem;
 }
 
+.hc-bi-kpi:nth-child(1) {
+    background: linear-gradient(135deg, rgba(111, 204, 255, .2), rgba(255,255,255,.06));
+}
+
+.hc-bi-kpi:nth-child(2) {
+    background: linear-gradient(135deg, rgba(141, 240, 199, .18), rgba(255,255,255,.06));
+}
+
+.hc-bi-kpi:nth-child(3) {
+    background: linear-gradient(135deg, rgba(255, 212, 138, .18), rgba(255,255,255,.06));
+}
+
+.hc-bi-kpi:nth-child(4) {
+    background: linear-gradient(135deg, rgba(255, 159, 192, .18), rgba(255,255,255,.06));
+}
+
 .hc-bi-grid {
     display: grid;
     grid-template-columns: 1.05fr 1.05fr .95fr;
@@ -343,6 +381,16 @@ if ($uti !== '') {
 
 .hc-bi-card h3 {
     margin: 0 0 10px;
+    color: var(--hcbi-ink);
+    font-size: 1.05rem;
+}
+
+.hc-bi-card--hospital {
+    background: linear-gradient(135deg, rgba(127, 228, 255, .14), rgba(255,255,255,.06));
+}
+
+.hc-bi-card--event {
+    background: linear-gradient(135deg, rgba(141, 240, 199, .14), rgba(255,255,255,.06));
 }
 
 .hc-bi-list {
@@ -361,10 +409,19 @@ if ($uti !== '') {
     color: rgba(255,255,255,.88);
 }
 
+.hc-bi-card--hospital .hc-bi-list-item {
+    background: linear-gradient(135deg, rgba(127, 228, 255, .14), rgba(255,255,255,.05));
+}
+
+.hc-bi-card--event .hc-bi-list-item {
+    background: linear-gradient(135deg, rgba(141, 240, 199, .14), rgba(255,255,255,.05));
+}
+
 .hc-bi-list-item span:last-child {
     min-width: 28px;
     text-align: right;
     font-weight: 700;
+    color: #fff;
 }
 
 .hc-bi-focus {
@@ -374,9 +431,21 @@ if ($uti !== '') {
     min-height: 100%;
     padding: 18px;
     border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.08));
+    background: linear-gradient(135deg, rgba(255, 212, 138, .16), rgba(255, 159, 192, .12), rgba(255,255,255,.08));
     border: 1px solid var(--hcbi-border);
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hc-bi-focus::after {
+    content: "";
+    position: absolute;
+    inset: auto -40px -50px auto;
+    width: 150px;
+    height: 150px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,0) 70%);
 }
 
 .hc-bi-focus small {
@@ -393,12 +462,16 @@ if ($uti !== '') {
     font-size: 2rem;
     line-height: 1;
     color: #fff;
+    position: relative;
+    z-index: 1;
 }
 
 .hc-bi-focus span {
     margin-top: 8px;
     color: rgba(255,255,255,.74);
     font-size: .76rem;
+    position: relative;
+    z-index: 1;
 }
 
 .hc-bi-table-wrap {
@@ -416,6 +489,14 @@ if ($uti !== '') {
 .hc-bi-table-head h3,
 .hc-bi-table-head p {
     margin: 0;
+}
+
+.hc-bi-table-head h3 {
+    color: var(--hcbi-ink);
+}
+
+.hc-bi-table-head p {
+    color: rgba(255,255,255,.68) !important;
 }
 
 @media (max-width: 1300px) {
@@ -568,7 +649,7 @@ if ($uti !== '') {
     </div>
 
     <div class="hc-bi-grid">
-        <div class="hc-bi-card">
+        <div class="hc-bi-card hc-bi-card--hospital">
             <h3>Hospitais</h3>
             <div class="hc-bi-list">
                 <?php if (!$hospRows): ?>
@@ -582,7 +663,7 @@ if ($uti !== '') {
                 <?php endforeach; ?>
             </div>
         </div>
-        <div class="hc-bi-card">
+        <div class="hc-bi-card hc-bi-card--event">
             <h3>Tipo do evento</h3>
             <div class="hc-bi-list">
                 <?php foreach ($tipoRows as $row): ?>
@@ -604,7 +685,7 @@ if ($uti !== '') {
         <div class="hc-bi-table-head">
             <div>
                 <h3>Relatorios de Home Care</h3>
-                <p class="text-muted mb-0"><?= count($rowsTable) ?> registro(s) exibidos.</p>
+                <p><?= count($rowsTable) ?> registro(s) exibidos.</p>
             </div>
             <a class="bi-btn bi-btn-secondary" href="<?= $BASE_URL ?>home_care_gestao.php">Abrir tela operacional</a>
         </div>
