@@ -435,18 +435,34 @@ $comparisons = [
     gap: 12px;
 }
 .bi-compare-card {
-    background: rgba(10, 32, 52, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 14px;
-    padding: 12px 14px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(145deg, rgba(17, 48, 73, 0.78), rgba(18, 78, 105, 0.46));
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    padding: 14px 15px 13px;
+    box-shadow: 0 12px 24px rgba(5, 28, 47, 0.18);
+}
+.bi-compare-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: rgba(255, 255, 255, 0.2);
 }
 .bi-compare-card.is-better {
     border-color: rgba(90, 224, 138, 0.85);
-    box-shadow: 0 0 0 1px rgba(90, 224, 138, 0.25);
+    box-shadow: 0 0 0 1px rgba(90, 224, 138, 0.22), 0 12px 24px rgba(5, 28, 47, 0.18);
+}
+.bi-compare-card.is-better::before {
+    background: #5ae08a;
 }
 .bi-compare-card.is-worse {
     border-color: rgba(255, 120, 120, 0.85);
-    box-shadow: 0 0 0 1px rgba(255, 120, 120, 0.25);
+    box-shadow: 0 0 0 1px rgba(255, 120, 120, 0.22), 0 12px 24px rgba(5, 28, 47, 0.18);
+}
+.bi-compare-card.is-worse::before {
+    background: #ff7a7a;
 }
 .bi-compare-title {
     font-weight: 600;
@@ -456,6 +472,7 @@ $comparisons = [
 .bi-compare-values {
     display: flex;
     justify-content: space-between;
+    gap: 12px;
     font-size: 0.85rem;
     color: rgba(234, 246, 255, 0.85);
 }
@@ -469,6 +486,76 @@ $comparisons = [
 }
 .bi-compare-delta.is-worse {
     color: #ff7a7a;
+}
+.bi-strategy-summary {
+    align-items: stretch;
+}
+.bi-strategy-card {
+    padding: 14px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.055));
+}
+.bi-strategy-card-selected {
+    border-color: rgba(126, 215, 218, 0.52);
+}
+.bi-strategy-card-global {
+    border-color: rgba(255, 174, 201, 0.48);
+}
+.bi-strategy-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px !important;
+    text-align: left !important;
+    letter-spacing: 0.02em;
+}
+.bi-strategy-heading::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    margin-left: 12px;
+    background: linear-gradient(90deg, rgba(234, 246, 255, 0.28), transparent);
+}
+.bi-strategy-kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px;
+    justify-items: stretch !important;
+}
+.bi-strategy-kpi.bi-kpi.kpi-compact {
+    position: relative;
+    max-width: none;
+    min-height: 78px;
+    padding: 12px 12px 11px;
+    text-align: left;
+    border-radius: 10px;
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 10px 20px rgba(6, 31, 51, 0.18);
+}
+.bi-strategy-card-selected .bi-strategy-kpi {
+    background: linear-gradient(145deg, rgba(46, 94, 176, 0.92), rgba(42, 158, 155, 0.42));
+}
+.bi-strategy-card-global .bi-strategy-kpi {
+    background: linear-gradient(145deg, rgba(139, 58, 88, 0.9), rgba(89, 55, 126, 0.48));
+}
+.bi-strategy-kpi small {
+    color: rgba(234, 246, 255, 0.68);
+    font-size: 0.56rem;
+    line-height: 1.25;
+}
+.bi-strategy-kpi strong {
+    color: #ffffff;
+    font-size: clamp(0.98rem, 1.15vw, 1.18rem);
+    line-height: 1.15;
+    margin-top: 8px;
+}
+@media (max-width: 1320px) {
+    .bi-strategy-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 760px) {
+    .bi-strategy-kpis {
+        grid-template-columns: 1fr !important;
+    }
 }
 </style>
 
@@ -619,31 +706,31 @@ $comparisons = [
         </div>
     </div>
 
-    <div class="bi-grid fixed-2" style="margin-top:16px;">
-        <div class="bi-panel">
-            <h3 class="text-center">Selecionado</h3>
-            <div class="bi-kpis kpi-compact">
-                <div class="bi-kpi kpi-indigo kpi-compact"><small>Total internações</small><strong><?= fmt_num($selInternacao['total_internacoes'], 0) ?></strong></div>
-                <div class="bi-kpi kpi-indigo kpi-compact"><small>Custo médio diária</small><strong><?= fmt_money($selCustoMedioDiaria) ?></strong></div>
-                <div class="bi-kpi kpi-indigo kpi-compact"><small>MP</small><strong><?= fmt_num($selInternacao['mp'], 2) ?></strong></div>
-                <div class="bi-kpi kpi-indigo kpi-compact"><small>Custo médio diária UTI</small><strong><?= fmt_money($selCustoMedioDiariaUti) ?></strong></div>
-                <div class="bi-kpi kpi-indigo kpi-compact"><small>Internação UTI</small><strong><?= fmt_num($selUti['total_internacoes'], 0) ?></strong></div>
-                <div class="bi-kpi kpi-indigo kpi-compact"><small>Custo médio por conta</small><strong><?= fmt_money($selCustoMedioConta) ?></strong></div>
-                <div class="bi-kpi kpi-indigo kpi-compact"><small>Média permanência UTI</small><strong><?= fmt_num($selUti['mp'], 2) ?></strong></div>
-                <div class="bi-kpi kpi-indigo kpi-compact"><small>Valor apresentado</small><strong><?= fmt_money($selFinanceiro['valor_apresentado']) ?></strong></div>
+    <div class="bi-grid fixed-2 bi-strategy-summary" style="margin-top:16px;">
+        <div class="bi-panel bi-strategy-card bi-strategy-card-selected">
+            <h3 class="bi-strategy-heading">Selecionado</h3>
+            <div class="bi-kpis kpi-compact bi-strategy-kpis">
+                <div class="bi-kpi kpi-indigo kpi-compact bi-strategy-kpi"><small>Total internações</small><strong><?= fmt_num($selInternacao['total_internacoes'], 0) ?></strong></div>
+                <div class="bi-kpi kpi-indigo kpi-compact bi-strategy-kpi"><small>Custo médio diária</small><strong><?= fmt_money($selCustoMedioDiaria) ?></strong></div>
+                <div class="bi-kpi kpi-indigo kpi-compact bi-strategy-kpi"><small>MP</small><strong><?= fmt_num($selInternacao['mp'], 2) ?></strong></div>
+                <div class="bi-kpi kpi-indigo kpi-compact bi-strategy-kpi"><small>Custo médio diária UTI</small><strong><?= fmt_money($selCustoMedioDiariaUti) ?></strong></div>
+                <div class="bi-kpi kpi-indigo kpi-compact bi-strategy-kpi"><small>Internação UTI</small><strong><?= fmt_num($selUti['total_internacoes'], 0) ?></strong></div>
+                <div class="bi-kpi kpi-indigo kpi-compact bi-strategy-kpi"><small>Custo médio por conta</small><strong><?= fmt_money($selCustoMedioConta) ?></strong></div>
+                <div class="bi-kpi kpi-indigo kpi-compact bi-strategy-kpi"><small>Média permanência UTI</small><strong><?= fmt_num($selUti['mp'], 2) ?></strong></div>
+                <div class="bi-kpi kpi-indigo kpi-compact bi-strategy-kpi"><small>Valor apresentado</small><strong><?= fmt_money($selFinanceiro['valor_apresentado']) ?></strong></div>
             </div>
         </div>
-        <div class="bi-panel">
-            <h3 class="text-center">Global</h3>
-            <div class="bi-kpis kpi-compact">
-                <div class="bi-kpi kpi-rose kpi-compact"><small>Total internações</small><strong><?= fmt_num($globalInternacao['total_internacoes'], 0) ?></strong></div>
-                <div class="bi-kpi kpi-rose kpi-compact"><small>Custo médio diária</small><strong><?= fmt_money($globalCustoMedioDiaria) ?></strong></div>
-                <div class="bi-kpi kpi-rose kpi-compact"><small>MP</small><strong><?= fmt_num($globalInternacao['mp'], 2) ?></strong></div>
-                <div class="bi-kpi kpi-rose kpi-compact"><small>Custo médio diária UTI</small><strong><?= fmt_money($globalCustoMedioDiariaUti) ?></strong></div>
-                <div class="bi-kpi kpi-rose kpi-compact"><small>Internação UTI</small><strong><?= fmt_num($globalUti['total_internacoes'], 0) ?></strong></div>
-                <div class="bi-kpi kpi-rose kpi-compact"><small>Custo médio por conta</small><strong><?= fmt_money($globalCustoMedioConta) ?></strong></div>
-                <div class="bi-kpi kpi-rose kpi-compact"><small>Média permanência UTI</small><strong><?= fmt_num($globalUti['mp'], 2) ?></strong></div>
-                <div class="bi-kpi kpi-rose kpi-compact"><small>Valor apresentado</small><strong><?= fmt_money($globalFinanceiro['valor_apresentado']) ?></strong></div>
+        <div class="bi-panel bi-strategy-card bi-strategy-card-global">
+            <h3 class="bi-strategy-heading">Global</h3>
+            <div class="bi-kpis kpi-compact bi-strategy-kpis">
+                <div class="bi-kpi kpi-rose kpi-compact bi-strategy-kpi"><small>Total internações</small><strong><?= fmt_num($globalInternacao['total_internacoes'], 0) ?></strong></div>
+                <div class="bi-kpi kpi-rose kpi-compact bi-strategy-kpi"><small>Custo médio diária</small><strong><?= fmt_money($globalCustoMedioDiaria) ?></strong></div>
+                <div class="bi-kpi kpi-rose kpi-compact bi-strategy-kpi"><small>MP</small><strong><?= fmt_num($globalInternacao['mp'], 2) ?></strong></div>
+                <div class="bi-kpi kpi-rose kpi-compact bi-strategy-kpi"><small>Custo médio diária UTI</small><strong><?= fmt_money($globalCustoMedioDiariaUti) ?></strong></div>
+                <div class="bi-kpi kpi-rose kpi-compact bi-strategy-kpi"><small>Internação UTI</small><strong><?= fmt_num($globalUti['total_internacoes'], 0) ?></strong></div>
+                <div class="bi-kpi kpi-rose kpi-compact bi-strategy-kpi"><small>Custo médio por conta</small><strong><?= fmt_money($globalCustoMedioConta) ?></strong></div>
+                <div class="bi-kpi kpi-rose kpi-compact bi-strategy-kpi"><small>Média permanência UTI</small><strong><?= fmt_num($globalUti['mp'], 2) ?></strong></div>
+                <div class="bi-kpi kpi-rose kpi-compact bi-strategy-kpi"><small>Valor apresentado</small><strong><?= fmt_money($globalFinanceiro['valor_apresentado']) ?></strong></div>
             </div>
         </div>
     </div>
