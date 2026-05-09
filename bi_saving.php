@@ -275,6 +275,7 @@ function barChart(ctx, labels, data, color) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            biValueLabels: false,
             layout: {
                 padding: {
                     top: 26
@@ -349,6 +350,7 @@ new Chart(document.getElementById('chartQtdeHospital'), {
     options: {
         responsive: true,
         maintainAspectRatio: false,
+        biValueLabels: false,
         layout: {
             padding: {
                 top: 24
@@ -365,6 +367,7 @@ new Chart(document.getElementById('chartDiariasHospital'), {
     options: {
         responsive: true,
         maintainAspectRatio: false,
+        biValueLabels: false,
         layout: {
             padding: {
                 top: 24

@@ -108,6 +108,7 @@ $optionFilters = [
 
 $hospitais = evolucaoFetchOptions($conn, 'h.id_hospital', 'h.nome_hosp', 'JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int', $optionFilters, ['hospital_id']);
 $anos = array_column(evolucaoFetchOptions($conn, 'YEAR(v.data_visita_vis)', 'YEAR(v.data_visita_vis)', '', $optionFilters, ['ano']), 'value');
+rsort($anos, SORT_NUMERIC);
 $pacientes = evolucaoFetchOptions($conn, 'pa.id_paciente', 'pa.nome_pac', 'JOIN tb_paciente pa ON pa.id_paciente = i.fk_paciente_int', $optionFilters, ['paciente_id']);
 
 $where = "v.data_visita_vis IS NOT NULL";
@@ -181,7 +182,7 @@ $totalVisitas = count($rows);
 $totalInternacoes = count($internacoes);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-evolucao-layout">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-evolucao-layout-2">
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260509-filter-icons"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
@@ -213,8 +214,8 @@ $totalInternacoes = count($internacoes);
                 <select name="hospital_id">
                     <option value="">Todos</option>
                     <?php foreach ($hospitais as $h): ?>
-                        <option value="<?= (int)$h['id_hospital'] ?>" <?= $hospitalId == $h['id_hospital'] ? 'selected' : '' ?>>
-                            <?= e($h['nome_hosp']) ?>
+                        <option value="<?= (int)$h['value'] ?>" <?= $hospitalId == $h['value'] ? 'selected' : '' ?>>
+                            <?= e($h['label']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -244,41 +245,97 @@ $totalInternacoes = count($internacoes);
                 <select name="paciente_id">
                     <option value="">Todos</option>
                     <?php foreach ($pacientes as $p): ?>
-                        <option value="<?= (int)$p['id_paciente'] ?>" <?= $pacienteId == $p['id_paciente'] ? 'selected' : '' ?>>
-                            <?= e($p['nome_pac']) ?>
+                        <option value="<?= (int)$p['value'] ?>" <?= $pacienteId == $p['value'] ? 'selected' : '' ?>>
+                            <?= e($p['label']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="bi-actions">
                 <button class="bi-btn" type="submit">Aplicar filtros</button>
+                <a class="bi-btn bi-btn-reset" href="<?= $BASE_URL ?>bi/evolucao">Limpar filtros</a>
             </div>
         </div>
     </form>
 
-    <div class="bi-panel">
-        <h3>Relatório de visitas</h3>
+    <section class="bi-evolution-summary">
+        <div class="bi-evolution-stat">
+            <span class="bi-evolution-stat-icon"><i class="bi bi-clipboard2-pulse"></i></span>
+            <div>
+                <small>Internações</small>
+                <strong><?= number_format($totalInternacoes, 0, ',', '.') ?></strong>
+            </div>
+        </div>
+        <div class="bi-evolution-stat">
+            <span class="bi-evolution-stat-icon"><i class="bi bi-journal-medical"></i></span>
+            <div>
+                <small>Visitas registradas</small>
+                <strong><?= number_format($totalVisitas, 0, ',', '.') ?></strong>
+            </div>
+        </div>
+        <div class="bi-evolution-stat">
+            <span class="bi-evolution-stat-icon"><i class="bi bi-calendar3"></i></span>
+            <div>
+                <small>Período</small>
+                <strong><?= $mes ? str_pad((string)$mes, 2, '0', STR_PAD_LEFT) . '/' : '' ?><?= $ano ?: 'Todos' ?></strong>
+            </div>
+        </div>
+    </section>
+
+    <div class="bi-panel bi-evolution-panel">
+        <div class="bi-evolution-panel-head">
+            <div>
+                <h3>Relatório de visitas</h3>
+                <p>Histórico agrupado por internação, com evolução assistencial e programação registrada.</p>
+            </div>
+        </div>
         <?php if (!$internacoes): ?>
             <div class="bi-empty" style="padding:16px;">Sem informações com os filtros atuais.</div>
         <?php else: ?>
-            <?php foreach ($internacoes as $internacao): ?>
-                <div class="bi-panel" style="margin-bottom:16px;">
-                    <div style="font-weight:600; margin-bottom:8px;">
-                        Paciente: <?= e($internacao['paciente']) ?> |
-                        Data de internação: <?= $internacao['data_internacao'] ? e(date('d/m/Y', strtotime($internacao['data_internacao']))) : '-' ?> |
-                        Acomodação: <?= e($internacao['acomodacao']) ?> |
-                        Hospital: <?= e($internacao['hospital']) ?>
-                    </div>
-                    <?php foreach ($internacao['visitas'] as $visita): ?>
-                        <div style="border-top:1px solid rgba(255,255,255,0.15); padding-top:10px; margin-top:10px;">
-                            <div style="font-weight:600;">Data da visita: <?= $visita['data'] ? e(date('d/m/Y', strtotime($visita['data']))) : '-' ?></div>
-                            <div><strong>Relatório:</strong> <?= e($visita['relatorio']) ?></div>
-                            <div><strong>Ações de auditoria:</strong> <?= e($visita['acoes']) ?></div>
-                            <div><strong>Programação terapêutica:</strong> <?= e($visita['programacao']) ?></div>
+            <div class="bi-evolution-list">
+                <?php foreach ($internacoes as $internacao): ?>
+                    <article class="bi-evolution-card">
+                        <header class="bi-evolution-card-head">
+                            <div class="bi-evolution-patient-title">
+                                <span class="bi-evolution-eyebrow">Paciente</span>
+                                <strong><?= e($internacao['paciente']) ?></strong>
+                            </div>
+                            <span class="bi-evolution-count"><?= count($internacao['visitas']) ?> visita<?= count($internacao['visitas']) === 1 ? '' : 's' ?></span>
+                        </header>
+                        <div class="bi-evolution-meta">
+                            <span><i class="bi bi-calendar-event"></i> Internação: <?= e(fmtDateBr($internacao['data_internacao'])) ?></span>
+                            <span><i class="bi bi-door-open"></i> Acomodação: <?= e(visitText($internacao['acomodacao'])) ?></span>
+                            <span><i class="bi bi-hospital"></i> <?= e($internacao['hospital']) ?></span>
                         </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endforeach; ?>
+                        <div class="bi-evolution-visits">
+                            <?php foreach ($internacao['visitas'] as $visita): ?>
+                                <section class="bi-evolution-visit">
+                                    <div class="bi-evolution-visit-date">
+                                        <i class="bi bi-calendar-check"></i>
+                                        <span><?= e(fmtDateBr($visita['data'])) ?></span>
+                                    </div>
+                                    <div class="bi-evolution-visit-content">
+                                        <div class="bi-evolution-field bi-evolution-field-main">
+                                            <small>Relatório</small>
+                                            <p><?= visitTextHtml($visita['relatorio']) ?></p>
+                                        </div>
+                                        <div class="bi-evolution-field-grid">
+                                            <div class="bi-evolution-field">
+                                                <small>Ações de auditoria</small>
+                                                <p><?= visitTextHtml($visita['acoes']) ?></p>
+                                            </div>
+                                            <div class="bi-evolution-field">
+                                                <small>Programação terapêutica</small>
+                                                <p><?= visitTextHtml($visita['programacao']) ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            <?php endforeach; ?>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
     </div>
 </div>
