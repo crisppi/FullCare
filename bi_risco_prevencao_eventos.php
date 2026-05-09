@@ -3,7 +3,7 @@ include_once("check_logado.php");
 require_once("templates/header.php");
 
 if (!isset($conn) || !($conn instanceof PDO)) {
-    die("Conexao invalida.");
+    die("Conexão inválida.");
 }
 
 if (!function_exists('e')) {
@@ -199,22 +199,38 @@ $tableRows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     <div class="bi-panel">
         <h3>Indicadores-chave</h3>
-        <div class="bi-kpis kpi-grid-4">
-            <div class="bi-kpi kpi-compact">
-                <small>Internacoes analisadas</small>
+        <div class="bi-kpis kpi-dashboard-v2">
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-1">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-hospital"></i></span>
+                    <small>Internações analisadas</small>
+                </div>
                 <strong><?= fmtInt($totalInternacoes) ?></strong>
+                <span class="kpi-trend kpi-trend-neutral">Período filtrado</span>
             </div>
-            <div class="bi-kpi kpi-compact">
-                <small>Internacoes com evento</small>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-2">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-exclamation-octagon"></i></span>
+                    <small>Internações com evento</small>
+                </div>
                 <strong><?= fmtInt($internacoesEvento) ?></strong>
+                <span class="kpi-trend kpi-trend-neutral">Com evento adverso</span>
             </div>
-            <div class="bi-kpi kpi-compact">
-                <small>Taxa de evento</small>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-3">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-percent"></i></span>
+                    <small>Taxa de evento</small>
+                </div>
                 <strong><?= fmtPct($eventoPct, 1) ?></strong>
+                <span class="kpi-trend kpi-trend-neutral">Sobre internações</span>
             </div>
-            <div class="bi-kpi kpi-compact">
-                <small>Total de eventos</small>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-4">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-clipboard2-pulse"></i></span>
+                    <small>Total de eventos</small>
+                </div>
                 <strong><?= fmtInt($totalEventos) ?></strong>
+                <span class="kpi-trend kpi-trend-neutral">Registros no recorte</span>
             </div>
         </div>
     </div>
