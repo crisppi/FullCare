@@ -1238,6 +1238,21 @@ table.bi-table::after,
   box-shadow: 0 12px 26px rgba(8, 31, 59, 0.24), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
+.bi-evolution-stat:nth-child(1) {
+  background: linear-gradient(140deg, rgba(16, 89, 145, 0.72), rgba(43, 88, 170, 0.58));
+  border-color: rgba(137, 220, 255, 0.4);
+}
+
+.bi-evolution-stat:nth-child(2) {
+  background: linear-gradient(140deg, rgba(18, 119, 111, 0.66), rgba(32, 84, 143, 0.54));
+  border-color: rgba(118, 238, 218, 0.36);
+}
+
+.bi-evolution-stat:nth-child(3) {
+  background: linear-gradient(140deg, rgba(115, 73, 159, 0.62), rgba(45, 82, 146, 0.56));
+  border-color: rgba(206, 166, 255, 0.34);
+}
+
 .bi-evolution-stat-icon {
   width: 38px;
   height: 38px;
@@ -1250,6 +1265,14 @@ table.bi-table::after,
   border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 1.05rem;
   flex: 0 0 auto;
+}
+
+.bi-evolution-stat:nth-child(2) .bi-evolution-stat-icon {
+  color: #8ff4dc;
+}
+
+.bi-evolution-stat:nth-child(3) .bi-evolution-stat-icon {
+  color: #d6b7ff;
 }
 
 .bi-evolution-stat small {
@@ -1301,8 +1324,8 @@ table.bi-table::after,
 
 .bi-evolution-card {
   border-radius: 13px;
-  border: 1px solid rgba(194, 230, 255, 0.3);
-  background: linear-gradient(155deg, rgba(78, 129, 175, 0.58), rgba(49, 91, 137, 0.42));
+  border: 1px solid rgba(194, 230, 255, 0.34);
+  background: linear-gradient(155deg, rgba(78, 129, 175, 0.58), rgba(44, 91, 137, 0.42));
   box-shadow: 0 12px 26px rgba(8, 31, 59, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   overflow: hidden;
 }
@@ -1313,8 +1336,8 @@ table.bi-table::after,
   justify-content: space-between;
   gap: 14px;
   padding: 17px 19px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(7, 35, 68, 0.1);
+  border-bottom: 1px solid rgba(139, 232, 255, 0.18);
+  background: linear-gradient(90deg, rgba(8, 44, 82, 0.34), rgba(25, 86, 123, 0.18));
 }
 
 .bi-evolution-card-head > div {
@@ -1361,9 +1384,9 @@ table.bi-table::after,
   min-width: 74px;
   padding: 7px 10px;
   border-radius: 999px;
-  color: #dff9ff;
-  background: rgba(6, 34, 65, 0.28);
-  border: 1px solid rgba(161, 231, 255, 0.28);
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(42, 141, 151, 0.78), rgba(57, 96, 178, 0.72));
+  border: 1px solid rgba(153, 240, 255, 0.42);
   font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
@@ -1389,8 +1412,31 @@ table.bi-table::after,
   font-size: 0.78rem;
 }
 
+.bi-evolution-meta span:nth-child(1) {
+  border-color: rgba(125, 218, 255, 0.28);
+  background: rgba(29, 111, 164, 0.2);
+}
+
+.bi-evolution-meta span:nth-child(2) {
+  border-color: rgba(144, 239, 216, 0.28);
+  background: rgba(21, 119, 104, 0.18);
+}
+
+.bi-evolution-meta span:nth-child(3) {
+  border-color: rgba(213, 176, 255, 0.24);
+  background: rgba(93, 62, 143, 0.17);
+}
+
 .bi-evolution-meta i {
   color: #92e4ff;
+}
+
+.bi-evolution-meta span:nth-child(2) i {
+  color: #8ff4dc;
+}
+
+.bi-evolution-meta span:nth-child(3) i {
+  color: #d6b7ff;
 }
 
 .bi-evolution-visits {
@@ -1405,8 +1451,8 @@ table.bi-table::after,
   gap: 14px;
   padding: 14px;
   border-radius: 11px;
-  background: rgba(7, 35, 68, 0.24);
-  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(91, 143, 190, 0.18);
+  border: 1px solid rgba(206, 237, 255, 0.18);
 }
 
 .bi-evolution-visit-date {
@@ -1438,12 +1484,24 @@ table.bi-table::after,
   min-width: 0;
   padding: 11px 12px;
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(180, 218, 248, 0.12);
+  border: 1px solid rgba(222, 242, 255, 0.16);
+  border-left: 3px solid rgba(124, 220, 255, 0.72);
 }
 
 .bi-evolution-field-main {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(130, 193, 237, 0.18);
+  border-left-color: rgba(125, 218, 255, 0.9);
+}
+
+.bi-evolution-field-grid .bi-evolution-field:nth-child(1) {
+  background: rgba(124, 217, 199, 0.16);
+  border-left-color: rgba(132, 244, 215, 0.86);
+}
+
+.bi-evolution-field-grid .bi-evolution-field:nth-child(2) {
+  background: rgba(190, 164, 238, 0.16);
+  border-left-color: rgba(210, 173, 255, 0.82);
 }
 
 .bi-evolution-field small {
