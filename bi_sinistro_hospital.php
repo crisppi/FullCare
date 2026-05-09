@@ -15,27 +15,31 @@ $internWhere = $internFilters['where'];
 $internParams = $internFilters['params'];
 $internJoins = $internFilters['joins'];
 
-$labelPat = "COALESCE(NULLIF(i.grupo_patologia_int,''), p.patologia_pat, 'Sem informações')";
+$labelPat = "COALESCE(NULLIF(CONCAT_WS(' - ', NULLIF(c.cat, ''), NULLIF(c.descricao, '')), ''), 'Sem informações')";
 $costExpr = "COALESCE(NULLIF(ca.valor_final_capeante,0), ca.valor_apresentado_capeante, 0)";
 
-$patologiaFiltro = trim((string)(filter_input(INPUT_GET, 'patologia') ?? ''));
+$patologiaFiltro = filter_input(INPUT_GET, 'patologia', FILTER_VALIDATE_INT) ?: null;
 $extraWhere = '';
 $params = $internParams;
-if ($patologiaFiltro !== '') {
-    $extraWhere = " AND {$labelPat} = :patologia";
-    $params[':patologia'] = $patologiaFiltro;
+if ($patologiaFiltro) {
+    $extraWhere = " AND i.fk_cid_int = :patologia";
+    $params[':patologia'] = (int)$patologiaFiltro;
 }
 
 $optStmt = $conn->prepare("
-    SELECT DISTINCT {$labelPat} AS label
+    SELECT DISTINCT
+        c.id_cid AS value,
+        {$labelPat} AS label
     FROM tb_internacao i
-    LEFT JOIN tb_patologia p ON p.id_patologia = i.fk_patologia_int
+    INNER JOIN tb_cid c ON c.id_cid = i.fk_cid_int
     {$internJoins}
     WHERE {$internWhere}
+      AND i.fk_cid_int IS NOT NULL
+      AND i.fk_cid_int <> 0
     ORDER BY label
 ");
 $optStmt->execute($internParams);
-$patologiaOptions = $optStmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
+$patologiaOptions = $optStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
 $summaryStmt = $conn->prepare("
     SELECT
@@ -117,12 +121,12 @@ $topHospital = $rows[0]['hospital'] ?? '-';
                 </select>
             </div>
             <div class="bi-filter">
-                <label for="patologia">Patologia</label>
+                <label for="patologia">CID</label>
                 <select id="patologia" name="patologia">
                     <option value="">Todas</option>
                     <?php foreach ($patologiaOptions as $opt): ?>
-                        <option value="<?= e($opt) ?>" <?= $patologiaFiltro === $opt ? 'selected' : '' ?>>
-                            <?= e($opt) ?>
+                        <option value="<?= (int)$opt['value'] ?>" <?= (int)$patologiaFiltro === (int)$opt['value'] ? 'selected' : '' ?>>
+                            <?= e($opt['label']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
