@@ -426,6 +426,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  const iconizeFilterActionButtons = (root) => {
+    const normalize = (value) => (value || '')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+    root.querySelectorAll('.bi-actions .bi-btn, .bi-filter-actions .bi-filter-btn').forEach((button) => {
+      if (button.dataset.biIconized === '1') {
+        return;
+      }
+
+      const text = normalize(button.textContent);
+      const isReset = button.classList.contains('bi-btn-reset') || /limpar/.test(text);
+      const isSubmit = button.tagName === 'BUTTON' && (button.getAttribute('type') || 'submit').toLowerCase() === 'submit';
+      const isApply = isSubmit || /aplicar|atualizar/.test(text);
+
+      if (!isReset && !isApply) {
+        return;
+      }
+
+      const label = isReset ? 'Limpar filtros' : 'Aplicar filtros';
+      const icon = isReset ? 'bi-trash3' : 'bi-search';
+      button.dataset.biIconized = '1';
+      button.classList.add('bi-icon-action');
+      button.classList.toggle('bi-icon-action-reset', isReset);
+      button.classList.toggle('bi-icon-action-apply', !isReset);
+      button.setAttribute('aria-label', label);
+      button.setAttribute('title', label);
+      button.innerHTML = '<i class="bi ' + icon + '" aria-hidden="true"></i>';
+    });
+  };
+
   document.querySelectorAll('.bi-panel.bi-filters').forEach((panel) => {
     const isWrap = panel.classList.contains('bi-filters-wrap');
     if (!isWrap) {
@@ -456,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const resetBtn = document.createElement('button');
       resetBtn.type = 'button';
       resetBtn.className = 'bi-btn bi-btn-secondary bi-btn-reset';
-      resetBtn.textContent = 'Limpar';
+      resetBtn.textContent = 'Limpar filtros';
       resetBtn.addEventListener('click', () => {
         const url = new URL(window.location.href);
         url.search = '';
@@ -464,6 +498,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       actions.appendChild(resetBtn);
     }
+
+    iconizeFilterActionButtons(panel);
   });
 
   document.querySelectorAll('.bi-filter-card').forEach((card) => {
@@ -481,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const resetBtn = document.createElement('button');
       resetBtn.type = 'button';
       resetBtn.className = 'bi-filter-btn bi-filter-btn-secondary bi-btn-reset';
-      resetBtn.textContent = 'Limpar';
+      resetBtn.textContent = 'Limpar filtros';
       resetBtn.addEventListener('click', () => {
         const url = new URL(window.location.href);
         url.search = '';
@@ -489,6 +525,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       actions.appendChild(resetBtn);
     }
+
+    iconizeFilterActionButtons(card);
   });
 
   const navSearchInput = document.getElementById('bi-nav-search');

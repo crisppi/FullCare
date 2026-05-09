@@ -82,8 +82,8 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 $topHospital = $rows[0]['hospital'] ?? '-';
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-bi-layout-2">
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-chart-theme"></script>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-filter-icons">
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-filter-icons"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">

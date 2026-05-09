@@ -11,6 +11,79 @@ function e($v)
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
 
+function fmtDateBr($value): string
+{
+    if (!$value) {
+        return '-';
+    }
+    $timestamp = strtotime((string)$value);
+    return $timestamp ? date('d/m/Y', $timestamp) : '-';
+}
+
+function visitText($value): string
+{
+    $text = trim((string)$value);
+    return $text !== '' ? $text : 'Sem registro.';
+}
+
+function visitTextHtml($value): string
+{
+    return nl2br(e(visitText($value)));
+}
+
+function evolucaoOptionScope(array $filters, array $exclude = []): array
+{
+    $skip = array_fill_keys($exclude, true);
+    $where = ["v.data_visita_vis IS NOT NULL"];
+    $params = [];
+
+    if (empty($skip['ano']) && !empty($filters['ano'])) {
+        $where[] = "YEAR(v.data_visita_vis) = :opt_ano";
+        $params[':opt_ano'] = (int)$filters['ano'];
+    }
+    if (empty($skip['mes']) && !empty($filters['mes'])) {
+        $where[] = "MONTH(v.data_visita_vis) = :opt_mes";
+        $params[':opt_mes'] = (int)$filters['mes'];
+    }
+    if (empty($skip['internado']) && ($filters['internado'] ?? '') !== '') {
+        $where[] = "i.internado_int = :opt_internado";
+        $params[':opt_internado'] = $filters['internado'];
+    }
+    if (empty($skip['hospital_id']) && !empty($filters['hospital_id'])) {
+        $where[] = "i.fk_hospital_int = :opt_hospital_id";
+        $params[':opt_hospital_id'] = (int)$filters['hospital_id'];
+    }
+    if (empty($skip['paciente_id']) && !empty($filters['paciente_id'])) {
+        $where[] = "i.fk_paciente_int = :opt_paciente_id";
+        $params[':opt_paciente_id'] = (int)$filters['paciente_id'];
+    }
+
+    return [$where, $params];
+}
+
+function evolucaoFetchOptions(PDO $conn, string $valueExpr, string $labelExpr, string $joins, array $filters, array $exclude = []): array
+{
+    [$where, $params] = evolucaoOptionScope($filters, $exclude);
+    $sql = "
+        SELECT {$valueExpr} AS value, {$labelExpr} AS label, COUNT(DISTINCT v.id_visita) AS total
+        FROM tb_visita v
+        JOIN tb_internacao i ON i.id_internacao = v.fk_internacao_vis
+        {$joins}
+        WHERE " . implode(' AND ', $where) . "
+          AND {$valueExpr} IS NOT NULL
+          AND {$labelExpr} IS NOT NULL
+          AND {$labelExpr} <> ''
+        GROUP BY value, label
+        ORDER BY label
+    ";
+    $stmt = $conn->prepare($sql);
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+    }
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
 $internado = trim((string)(filter_input(INPUT_GET, 'internado') ?? ''));
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 $mesInput = filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT);
@@ -25,12 +98,17 @@ if ($internado === '' && !filter_has_var(INPUT_GET, 'internado')) {
 }
 $pacienteId = filter_input(INPUT_GET, 'paciente_id', FILTER_VALIDATE_INT) ?: null;
 
-$hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
-    ->fetchAll(PDO::FETCH_ASSOC);
-$anos = $conn->query("SELECT DISTINCT YEAR(data_visita_vis) AS ano FROM tb_visita WHERE data_visita_vis IS NOT NULL ORDER BY ano DESC")
-    ->fetchAll(PDO::FETCH_COLUMN);
-$pacientes = $conn->query("SELECT id_paciente, nome_pac FROM tb_paciente ORDER BY nome_pac")
-    ->fetchAll(PDO::FETCH_ASSOC);
+$optionFilters = [
+    'internado' => $internado,
+    'hospital_id' => $hospitalId,
+    'mes' => $mes,
+    'ano' => $ano,
+    'paciente_id' => $pacienteId,
+];
+
+$hospitais = evolucaoFetchOptions($conn, 'h.id_hospital', 'h.nome_hosp', 'JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int', $optionFilters, ['hospital_id']);
+$anos = array_column(evolucaoFetchOptions($conn, 'YEAR(v.data_visita_vis)', 'YEAR(v.data_visita_vis)', '', $optionFilters, ['ano']), 'value');
+$pacientes = evolucaoFetchOptions($conn, 'pa.id_paciente', 'pa.nome_pac', 'JOIN tb_paciente pa ON pa.id_paciente = i.fk_paciente_int', $optionFilters, ['paciente_id']);
 
 $where = "v.data_visita_vis IS NOT NULL";
 $params = [];
@@ -99,10 +177,12 @@ foreach ($rows as $row) {
         'programacao' => $row['programacao_enf'] ?? '',
     ];
 }
+$totalVisitas = count($rows);
+$totalInternacoes = count($internacoes);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-bi-layout-2">
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-chart-theme"></script>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-evolucao-layout">
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-filter-icons"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">

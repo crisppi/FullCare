@@ -32,13 +32,6 @@ if (!$dataIni || !$dataFim) {
     $dataFim = $dataFim ?: ($maxDt ?: $hoje);
 }
 
-$fonteConexao = $GLOBALS['fonte_conexao'] ?? '';
-$utiCount = 0;
-try {
-    $utiCount = (int)$conn->query("SELECT COUNT(*) FROM tb_uti")->fetchColumn();
-} catch (Throwable $e) {
-    $utiCount = 0;
-}
 $internado = trim((string)(filter_input(INPUT_GET, 'internado') ?? ''));
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 $tipoInternação = trim((string)(filter_input(INPUT_GET, 'tipo_internacao') ?? ''));
@@ -170,18 +163,15 @@ function labelsAndValues(array $rows): array
 [$labelsIdade, $valuesIdade] = labelsAndValues($rowsIdade);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-bi-layout-2">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-filter-icons">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-chart-theme"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-filter-icons"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
         <h1 class="bi-title">Dashboard UTI</h1>
         <div class="bi-header-actions">
-            <div class="text-end text-muted" style="font-size:0.75rem;">
-                <?= e($fonteConexao) ?> · UTI: <?= (int)$utiCount ?>
-            </div>
             <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>

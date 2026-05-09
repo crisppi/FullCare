@@ -1,6 +1,7 @@
 <?php
 include_once("check_logado.php");
 require_once("templates/header.php");
+require_once __DIR__ . "/app/bi_cid_options.php";
 
 if (!isset($conn) || !($conn instanceof PDO)) {
     die("Conexao invalida.");
@@ -17,8 +18,14 @@ $dataFim = filter_input(INPUT_GET, 'data_fim') ?: $hoje;
 $internado = trim((string)(filter_input(INPUT_GET, 'internado') ?? ''));
 $hospitalId = filter_input(INPUT_GET, 'hospital_id', FILTER_VALIDATE_INT) ?: null;
 
-$hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
-    ->fetchAll(PDO::FETCH_ASSOC);
+$filterScope = [
+    'internado' => $internado,
+    'hospital_id' => $hospitalId,
+    'data_inicio' => $dataIni,
+    'data_fim' => $dataFim,
+];
+
+$hospitais = bi_fetch_filter_options($conn, 'hospital', $filterScope, ['date_expr' => 'i.data_intern_int']);
 
 $where = "i.data_intern_int BETWEEN :data_ini AND :data_fim";
 $params = [':data_ini' => $dataIni, ':data_fim' => $dataFim];
@@ -86,9 +93,9 @@ $mp = $internacoes > 0 ? $diarias / $internacoes : 0;
 [$labelsTipoCusto, $valuesTipoCusto] = labelsValues($rowsTipoCusto);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-bi-layout-2">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-filter-icons">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-chart-theme"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-filter-icons"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">
@@ -113,21 +120,52 @@ $mp = $internacoes > 0 ? $diarias / $internacoes : 0;
             <select name="hospital_id">
                 <option value="">Todos</option>
                 <?php foreach ($hospitais as $h): ?>
-                    <option value="<?= (int)$h['id_hospital'] ?>" <?= $hospitalId == $h['id_hospital'] ? 'selected' : '' ?>><?= e($h['nome_hosp']) ?></option>
+                    <option value="<?= (int)$h['value'] ?>" <?= $hospitalId == $h['value'] ? 'selected' : '' ?>><?= e($h['label']) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
         <div class="bi-filter"><label>Data Internação</label><input type="date" name="data_ini" value="<?= e($dataIni) ?>"></div>
         <div class="bi-filter"><label>Data Final</label><input type="date" name="data_fim" value="<?= e($dataFim) ?>"></div>
-        <div class="bi-actions"><button class="bi-btn" type="submit">Aplicar</button></div>
+        <div class="bi-actions">
+            <button class="bi-btn" type="submit">Aplicar</button>
+            <a class="bi-btn bi-btn-reset" href="<?= $BASE_URL ?>bi/tipo-internacao">Limpar</a>
+        </div>
     </form>
 
     <div class="bi-panel" style="margin-top:16px;">
-        <div class="bi-kpis kpi-compact">
-            <div class="bi-kpi kpi-indigo kpi-compact"><small>Internações</small><strong><?= number_format($internacoes, 0, ',', '.') ?></strong></div>
-            <div class="bi-kpi kpi-teal kpi-compact"><small>Diárias</small><strong><?= number_format($diarias, 0, ',', '.') ?></strong></div>
-            <div class="bi-kpi kpi-amber kpi-compact"><small>MP</small><strong><?= number_format($mp, 1, ',', '.') ?></strong></div>
-            <div class="bi-kpi kpi-rose kpi-compact"><small>Custo</small><strong>R$ <?= number_format((float)($kpi['custo'] ?? 0), 2, ',', '.') ?></strong></div>
+        <div class="bi-kpis kpi-dashboard-v2">
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-1">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-hospital"></i></span>
+                    <small>Internações</small>
+                </div>
+                <strong><?= number_format($internacoes, 0, ',', '.') ?></strong>
+                <span class="kpi-trend">Casos no período</span>
+            </div>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-2">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-calendar2-week"></i></span>
+                    <small>Diárias</small>
+                </div>
+                <strong><?= number_format($diarias, 0, ',', '.') ?></strong>
+                <span class="kpi-trend">Total acumulado</span>
+            </div>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-3">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-clock-history"></i></span>
+                    <small>MP</small>
+                </div>
+                <strong><?= number_format($mp, 1, ',', '.') ?></strong>
+                <span class="kpi-trend">Média de permanência</span>
+            </div>
+            <div class="bi-kpi kpi-card-v2 kpi-card-v2-4">
+                <div class="kpi-card-v2-head">
+                    <span class="kpi-card-v2-icon"><i class="bi bi-currency-dollar"></i></span>
+                    <small>Custo</small>
+                </div>
+                <strong>R$ <?= number_format((float)($kpi['custo'] ?? 0), 2, ',', '.') ?></strong>
+                <span class="kpi-trend">Valor final</span>
+            </div>
         </div>
     </div>
 

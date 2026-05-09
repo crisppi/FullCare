@@ -329,6 +329,10 @@ body.bi-theme,
 }
 
 .bi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   border-radius: 8px;
   padding: 6px 12px;
   border: none;
@@ -347,6 +351,36 @@ body.bi-theme,
 
 .bi-btn.bi-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.12);
+}
+
+.bi-panel.bi-filters .bi-actions .bi-btn.bi-icon-action,
+.bi-filter-card .bi-filter-btn.bi-icon-action {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 1rem;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.bi-panel.bi-filters .bi-actions .bi-btn.bi-icon-action i,
+.bi-filter-card .bi-filter-btn.bi-icon-action i {
+  line-height: 1;
+}
+
+.bi-panel.bi-filters .bi-actions .bi-btn.bi-icon-action-reset,
+.bi-filter-card .bi-filter-btn.bi-icon-action-reset {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  color: var(--bi-text);
+}
+
+.bi-panel.bi-filters .bi-actions .bi-btn.bi-icon-action-reset:hover,
+.bi-filter-card .bi-filter-btn.bi-icon-action-reset:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.62);
 }
 
 .bi-grid,
