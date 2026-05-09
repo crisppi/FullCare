@@ -1,4 +1,146 @@
 if (typeof Chart !== 'undefined') {
+  const biChartPalette = {
+    internacao: '#76d5ff',
+    diaria: '#56d6d0',
+    custo: '#ff9a7a',
+    glosa: '#f184b5',
+    permanencia: '#79e6c4',
+    percentual: '#ffd166',
+    readmissao: '#b8a7ff',
+    qualidade: '#8be9a8',
+    auditoria: '#9cc8ff',
+    default: '#8dd0ff',
+    sequence: ['#76d5ff', '#79e6c4', '#ffd166', '#f184b5', '#b8a7ff', '#ff9a7a', '#56d6d0']
+  };
+
+  window.biChartPalette = biChartPalette;
+
+  const biHexToRgb = function (hex) {
+    const clean = String(hex || '').replace('#', '');
+    const full = clean.length === 3
+      ? clean.split('').map(function (char) { return char + char; }).join('')
+      : clean;
+    const num = parseInt(full, 16);
+    if (!Number.isFinite(num)) {
+      return [141, 208, 255];
+    }
+    return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+  };
+
+  const biRgba = function (hex, alpha) {
+    const rgb = biHexToRgb(hex);
+    return 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', ' + alpha + ')';
+  };
+
+  const biMetricColor = function (context, index) {
+    const text = String(context || '').toLowerCase();
+    if (/(glosa|recurso|contest)/i.test(text)) return biChartPalette.glosa;
+    if (/(custo|valor|financeiro|saving|sinistro|provis|ticket|realizado|apresentado|final)/i.test(text)) return biChartPalette.custo;
+    if (/(diaria|diárias|diaria|diarias)/i.test(text)) return biChartPalette.diaria;
+    if (/(mp|m[ée]dia perman|perman[êe]ncia|permanencia)/i.test(text)) return biChartPalette.permanencia;
+    if (/(uti|%|percentual|taxa|indice|índice)/i.test(text)) return biChartPalette.percentual;
+    if (/(readmiss|reintern)/i.test(text)) return biChartPalette.readmissao;
+    if (/(qualidade|óbito|obito|infecc|evento)/i.test(text)) return biChartPalette.qualidade;
+    if (/(auditor|visita|conta)/i.test(text)) return biChartPalette.auditoria;
+    if (/(internac|internação|internacoes|internações|paciente|hospital)/i.test(text)) return biChartPalette.internacao;
+    return biChartPalette.sequence[Math.abs(index || 0) % biChartPalette.sequence.length] || biChartPalette.default;
+  };
+
+  window.biMetricColor = biMetricColor;
+  window.biRgba = biRgba;
+
+  const biBarGradient = function (chart, color) {
+    const area = chart && chart.chartArea;
+    const ctx = chart && chart.ctx;
+    if (!ctx || !area || area.top === undefined || area.bottom === undefined) {
+      return biRgba(color, 0.82);
+    }
+    const gradient = ctx.createLinearGradient(0, area.top, 0, area.bottom);
+    gradient.addColorStop(0, biRgba(color, 0.98));
+    gradient.addColorStop(0.58, biRgba(color, 0.78));
+    gradient.addColorStop(1, biRgba(color, 0.58));
+    return gradient;
+  };
+
+  const biStyleBars = function (chart) {
+    const type = chart.config && chart.config.type;
+    if (!['bar', 'horizontalBar'].includes(type) || (chart.options && chart.options.biBarTheme === false)) {
+      return;
+    }
+
+    const chartId = chart.canvas ? String(chart.canvas.id || '') : '';
+    const labels = chart.data && chart.data.labels ? chart.data.labels : [];
+    chart.data.datasets.forEach(function (dataset, datasetIndex) {
+      const meta = chart.getDatasetMeta(datasetIndex);
+      if (!meta || meta.hidden) {
+        return;
+      }
+      const datasetContext = [chartId, dataset.label || ''].join(' ');
+      const datasetColor = biMetricColor(datasetContext, datasetIndex);
+
+      if (!dataset.borderWidth) {
+        dataset.borderWidth = 1.5;
+      }
+      dataset.borderSkipped = dataset.borderSkipped || 'bottom';
+
+      meta.data.forEach(function (element, index) {
+        if (!element || !element._model) {
+          return;
+        }
+        const labelContext = datasetContext + ' ' + (labels[index] || '');
+        const color = dataset.data && dataset.data.length > 1 && chart.data.datasets.length === 1
+          ? biMetricColor(labelContext, index)
+          : datasetColor;
+
+        element._model.backgroundColor = biBarGradient(chart, color);
+        element._model.borderColor = biRgba(color, 0.95);
+        element._model.borderWidth = 1.5;
+        element._model.hoverBackgroundColor = biRgba(color, 0.98);
+        element._model.hoverBorderColor = 'rgba(255,255,255,0.78)';
+      });
+    });
+  };
+
+  const biApplyScaleTheme = function (chart) {
+    const options = chart && chart.options ? chart.options : {};
+    if (options.biGridTheme === false || !options.scales) {
+      return;
+    }
+
+    const xAxes = options.scales.xAxes || [];
+    const yAxes = options.scales.yAxes || [];
+
+    xAxes.forEach(function (axis) {
+      axis.ticks = Object.assign({
+        fontColor: '#eaf6ff',
+        padding: 8,
+        maxRotation: 48,
+        minRotation: 0
+      }, axis.ticks || {});
+      axis.gridLines = Object.assign({}, axis.gridLines || {}, {
+        display: false,
+        drawBorder: false,
+        zeroLineColor: 'rgba(235,246,255,0.16)'
+      });
+    });
+
+    yAxes.forEach(function (axis) {
+      axis.ticks = Object.assign({
+        fontColor: '#eaf6ff',
+        padding: 8,
+        beginAtZero: true,
+        autoSkip: true,
+        maxTicksLimit: 6
+      }, axis.ticks || {});
+      axis.gridLines = Object.assign({}, axis.gridLines || {}, {
+        color: 'rgba(235,246,255,0.08)',
+        zeroLineColor: 'rgba(235,246,255,0.2)',
+        drawBorder: false,
+        lineWidth: 1
+      });
+    });
+  };
+
   if (Chart.defaults.global) {
     Chart.defaults.global.defaultFontColor = '#eaf6ff';
     Chart.defaults.global.legend.labels.fontColor = '#eaf6ff';
@@ -14,10 +156,20 @@ if (typeof Chart !== 'undefined') {
     Chart.defaults.scale.ticks.minRotation = 0;
   }
   if (Chart.defaults.scale && Chart.defaults.scale.gridLines) {
-    Chart.defaults.scale.gridLines.color = 'rgba(255,255,255,0.12)';
+    Chart.defaults.scale.gridLines.color = 'rgba(235,246,255,0.08)';
+    Chart.defaults.scale.gridLines.zeroLineColor = 'rgba(235,246,255,0.18)';
+    Chart.defaults.scale.gridLines.drawBorder = false;
   }
   if (Chart.defaults.global && Chart.defaults.global.layout) {
     Chart.defaults.global.layout.padding = { left: 18, right: 16, top: 14, bottom: 8 };
+  }
+  if (Chart.defaults.global && Chart.defaults.global.elements && Chart.defaults.global.elements.rectangle) {
+    Chart.defaults.global.elements.rectangle.borderWidth = 1.5;
+    Chart.defaults.global.elements.rectangle.borderSkipped = 'bottom';
+  }
+  if (Chart.defaults.global && Chart.defaults.global.elements && Chart.defaults.global.elements.arc) {
+    Chart.defaults.global.elements.arc.borderColor = 'rgba(7, 36, 64, 0.55)';
+    Chart.defaults.global.elements.arc.borderWidth = 1.5;
   }
 
   window.biFormatChartValue = function (value, chart, dataset) {
@@ -51,6 +203,39 @@ if (typeof Chart !== 'undefined') {
     return num.toLocaleString('pt-BR', { maximumFractionDigits: Number.isInteger(num) ? 0 : 1 });
   };
 
+  if (Chart.plugins && !Chart._biBarThemeRegistered) {
+    Chart._biBarThemeRegistered = true;
+    Chart.plugins.register({
+      beforeDatasetsDraw: function (chart) {
+        biStyleBars(chart);
+      },
+      beforeInit: function (chart) {
+        biApplyScaleTheme(chart);
+      },
+      beforeUpdate: function (chart) {
+        biApplyScaleTheme(chart);
+      },
+      beforeDatasetDraw: function (chart) {
+        const type = chart.config && chart.config.type;
+        if (!['bar', 'horizontalBar'].includes(type) || (chart.options && chart.options.biBarTheme === false)) {
+          return;
+        }
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.shadowColor = 'rgba(5, 20, 38, 0.28)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 4;
+      },
+      afterDatasetDraw: function (chart) {
+        const type = chart.config && chart.config.type;
+        if (!['bar', 'horizontalBar'].includes(type) || (chart.options && chart.options.biBarTheme === false)) {
+          return;
+        }
+        chart.ctx.restore();
+      }
+    });
+  }
+
   if (Chart.plugins && !Chart._biValueLabelsRegistered) {
     Chart._biValueLabelsRegistered = true;
     Chart.plugins.register({
@@ -68,8 +253,8 @@ if (typeof Chart !== 'undefined') {
         ctx.font = '600 10px Poppins, Arial, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(4, 20, 36, 0.34)';
-        ctx.shadowBlur = 2;
+        ctx.shadowColor = 'rgba(4, 20, 36, 0.42)';
+        ctx.shadowBlur = 3;
         ctx.shadowOffsetY = 1;
 
         chart.data.datasets.forEach(function (dataset, datasetIndex) {
@@ -143,12 +328,21 @@ if (typeof Chart !== 'undefined') {
 window.biChartScales = function () {
   return {
     xAxes: [{
-      ticks: { fontColor: '#eaf6ff', display: true, padding: 6, autoSkip: false, maxRotation: 50, minRotation: 0 },
-      gridLines: { color: 'rgba(255,255,255,0.12)' }
+      ticks: { fontColor: '#eaf6ff', display: true, padding: 8, autoSkip: false, maxRotation: 48, minRotation: 0 },
+      gridLines: {
+        display: false,
+        drawBorder: false,
+        zeroLineColor: 'rgba(235,246,255,0.16)'
+      }
     }],
     yAxes: [{
-      ticks: { fontColor: '#eaf6ff', display: true, padding: 6, beginAtZero: true, autoSkip: false },
-      gridLines: { color: 'rgba(255,255,255,0.12)' }
+      ticks: { fontColor: '#eaf6ff', display: true, padding: 8, beginAtZero: true, autoSkip: true, maxTicksLimit: 6 },
+      gridLines: {
+        color: 'rgba(235,246,255,0.08)',
+        zeroLineColor: 'rgba(235,246,255,0.2)',
+        drawBorder: false,
+        lineWidth: 1
+      }
     }]
   };
 };
@@ -157,6 +351,19 @@ window.biLegendWhite = { labels: { fontColor: '#eaf6ff' } };
 
 window.biMoneyTick = function (value) {
   const num = Number(value || 0);
+  const abs = Math.abs(num);
+  if (abs >= 1000000) {
+    return 'R$ ' + (num / 1000000).toLocaleString('pt-BR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1
+    }) + ' mi';
+  }
+  if (abs >= 1000) {
+    return 'R$ ' + (num / 1000).toLocaleString('pt-BR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }) + ' mil';
+  }
   return 'R$ ' + num.toLocaleString('pt-BR', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0

@@ -248,9 +248,9 @@ $title = $modo === 'glosa' ? 'Glosa por Auditor' : 'Contas Auditadas por Auditor
 $ieSlug = $modo === 'glosa' ? 'glosa-auditor' : 'contas-auditadas-auditor';
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260501">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-bi-layout-2">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260501"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260509-chart-theme"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme bi-ie-page bi-auditor-page">

@@ -271,15 +271,16 @@ $isBiTopbarItemActive = static function (array $item) use ($currentRouteAliases,
     --bi-sidebar-top: 76px;
     --bi-sidebar-width: 308px;
     --bi-sidebar-collapsed-width: 84px;
+    --bi-sidebar-content-gap: 18px;
 }
 
 body.bi-theme {
     transition: padding-left .22s ease;
-    padding-left: var(--bi-sidebar-width);
+    padding-left: calc(var(--bi-sidebar-width) + var(--bi-sidebar-content-gap));
 }
 
 body.bi-theme.bi-nav-collapsed {
-    padding-left: var(--bi-sidebar-collapsed-width);
+    padding-left: calc(var(--bi-sidebar-collapsed-width) + var(--bi-sidebar-content-gap));
 }
 
 .bi-side-toggle {

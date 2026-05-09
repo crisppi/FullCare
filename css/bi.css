@@ -346,6 +346,18 @@ body.bi-theme,
   justify-content: flex-start;
 }
 
+.bi-panel + .bi-grid,
+.bi-panel + .bi-row,
+.bi-table + .bi-grid,
+.bi-table + .bi-row {
+  margin-top: 18px;
+}
+
+.bi-panel.bi-filters + .bi-panel,
+form + .bi-panel {
+  margin-top: 18px;
+}
+
 .bi-grid > .bi-panel,
 .bi-row > .bi-panel {
   margin-top: 0;
@@ -1008,6 +1020,22 @@ button.bi-filter-pill.active {
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
+}
+
+.bi-ranking-top-grid,
+.bi-ranking-patologia-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.bi-ranking-top-grid > .bi-panel,
+.bi-ranking-patologia-grid > .bi-panel {
+  margin-top: 0;
+}
+
+.bi-ranking-top-wide,
+.bi-ranking-patologia-wide {
+  grid-column: 1 / -1;
 }
 
 .bi-ie-page .bi-header {
