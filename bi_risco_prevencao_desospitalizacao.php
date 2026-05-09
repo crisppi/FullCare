@@ -152,11 +152,11 @@ $earlyPct = $totalAltas > 0 ? ($totalEarly / $totalAltas) * 100 : 0.0;
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
         <div>
-            <h1 class="bi-title">Desospitalizacao Precoce</h1>
-            <div style="color: var(--bi-muted); font-size: 0.95rem;">Regra: alta 2 dias antes da media do hospital no periodo.</div>
+            <h1 class="bi-title">Desospitalização Precoce</h1>
+            <div style="color: var(--bi-muted); font-size: 0.95rem;">Regra: alta 2 dias antes da media do hospital no período.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
@@ -228,7 +228,7 @@ $earlyPct = $totalAltas > 0 ? ($totalEarly / $totalAltas) * 100 : 0.0;
                 <tr>
                     <th>Paciente</th>
                     <th>Hospital</th>
-                    <th>Data internacao</th>
+                    <th>Data internação</th>
                     <th>Data alta</th>
                     <th>Dias</th>
                     <th>Media hospital</th>
@@ -248,8 +248,8 @@ $earlyPct = $totalAltas > 0 ? ($totalEarly / $totalAltas) * 100 : 0.0;
                         $diff = $media > 0 ? $media - $dias : 0;
                         ?>
                         <tr>
-                            <td><?= e($row['nome_pac'] ?? 'Sem informacoes') ?></td>
-                            <td><?= e($row['nome_hosp'] ?? 'Sem informacoes') ?></td>
+                            <td><?= e($row['nome_pac'] ?? 'Sem informações') ?></td>
+                            <td><?= e($row['nome_hosp'] ?? 'Sem informações') ?></td>
                             <td><?= !empty($row['data_intern_int']) ? e(date('d/m/Y', strtotime($row['data_intern_int']))) : '-' ?></td>
                             <td><?= !empty($row['data_alta_alt']) ? e(date('d/m/Y', strtotime($row['data_alta_alt']))) : '-' ?></td>
                             <td><?= fmtInt($dias) ?></td>

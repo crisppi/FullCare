@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Outliers de Permanencia';
+$pageTitle = 'Outliers de Permanência';
 $pageSlug = 'bi/anomalias-permanencia';
 require_once("templates/bi_rede_bootstrap.php");
 
@@ -41,11 +41,11 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
         <div>
-            <h1 class="bi-title">Outliers de Permanencia</h1>
-            <div style="color: var(--bi-muted); font-size: 0.95rem;">Casos com tempo de internacao acima do padrao.</div>
+            <h1 class="bi-title">Outliers de Permanência</h1>
+            <div style="color: var(--bi-muted); font-size: 0.95rem;">Casos com tempo de internação acima do padrão.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
@@ -95,8 +95,8 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                     <?php foreach ($rows as $row): ?>
                         <?php $dias = (int)($row['dias'] ?? 0); ?>
                         <tr>
-                            <td><?= e($row['paciente'] ?? 'Sem informacoes') ?></td>
-                            <td><?= e($row['hospital'] ?? 'Sem informacoes') ?></td>
+                            <td><?= e($row['paciente'] ?? 'Sem informações') ?></td>
+                            <td><?= e($row['hospital'] ?? 'Sem informações') ?></td>
                             <td><?= fmtInt($dias) ?></td>
                             <td><?= fmtInt((int)max(0, $dias - $mediaDias)) ?></td>
                         </tr>

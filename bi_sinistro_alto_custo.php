@@ -84,7 +84,7 @@ $rows = $listStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
             <div style="color: var(--bi-muted); font-size: 0.95rem;">Concentracao de gasto nos pacientes de maior custo.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>

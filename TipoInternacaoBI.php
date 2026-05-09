@@ -56,13 +56,13 @@ function chartRows(PDO $conn, string $labelExpr, string $sqlBase, array $params,
 function labelsValues(array $rows): array
 {
     return [
-        array_map(fn($r) => $r['label'] ?? 'Sem informacoes', $rows),
+        array_map(fn($r) => $r['label'] ?? 'Sem informações', $rows),
         array_map(fn($r) => (float)($r['total'] ?? 0), $rows),
     ];
 }
 
-$labelTipo = "COALESCE(NULLIF(i.tipo_admissao_int,''), 'Sem informacoes')";
-$labelModo = "COALESCE(NULLIF(i.modo_internacao_int,''), 'Sem informacoes')";
+$labelTipo = "COALESCE(NULLIF(i.tipo_admissao_int,''), 'Sem informações')";
+$labelModo = "COALESCE(NULLIF(i.modo_internacao_int,''), 'Sem informações')";
 $rowsTipo = chartRows($conn, $labelTipo, $sqlBase, $params, "COUNT(DISTINCT i.id_internacao)", 12);
 $rowsModo = chartRows($conn, $labelModo, $sqlBase, $params, "COUNT(DISTINCT i.id_internacao)", 12);
 $rowsTipoMp = chartRows($conn, $labelTipo, $sqlBase, $params, "ROUND(AVG(GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1)), 1)", 12);

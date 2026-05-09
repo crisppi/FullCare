@@ -285,6 +285,15 @@ body.bi-theme,
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
 }
 
+.bi-panel.bi-filters.bi-strategy-filters {
+  grid-template-columns: repeat(6, minmax(158px, 1fr));
+}
+
+.bi-panel.bi-filters.bi-strategy-filters .bi-actions {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 @media (max-width: 1400px) {
   .bi-panel.bi-filters.bi-filters-compact {
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -294,6 +303,10 @@ body.bi-theme,
 @media (max-width: 1200px) {
   .bi-panel.bi-filters.bi-filters-wrap {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .bi-panel.bi-filters.bi-strategy-filters .bi-actions {
+    grid-column: auto;
   }
 }
 

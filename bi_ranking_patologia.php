@@ -42,7 +42,7 @@ function topMetric(array $rows, string $metric, int $limit = 8): array
         return (float)($b[$metric] ?? 0) <=> (float)($a[$metric] ?? 0);
     });
     $slice = array_slice($sorted, 0, $limit);
-    $labels = array_map(fn($r) => shortLabel((string)($r['label'] ?? 'Sem informacoes')), $slice);
+    $labels = array_map(fn($r) => shortLabel((string)($r['label'] ?? 'Sem informações')), $slice);
     $values = array_map(fn($r) => round((float)($r[$metric] ?? 0), 2), $slice);
     return [$labels, $values];
 }
@@ -80,7 +80,7 @@ if ($hospitalId) {
 
 $sql = "
     SELECT
-        COALESCE(NULLIF(i.grupo_patologia_int,''), p.patologia_pat, 'Sem informacoes') AS label,
+        COALESCE(NULLIF(i.grupo_patologia_int,''), p.patologia_pat, 'Sem informações') AS label,
         COUNT(DISTINCT i.id_internacao) AS internacoes,
         SUM(GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1)) AS total_diarias,
         SUM(COALESCE(ca.valor_final, 0)) AS custo_total
@@ -132,7 +132,7 @@ unset($row);
             <div style="color: var(--bi-muted); font-size: 0.95rem;">Internações, MP e custo por patologia.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
@@ -203,7 +203,7 @@ unset($row);
                 <?php else: ?>
                     <?php foreach ($rows as $row): ?>
                         <tr>
-                            <td><?= e($row['label'] ?? 'Sem informacoes') ?></td>
+                            <td><?= e($row['label'] ?? 'Sem informações') ?></td>
                             <td><?= fmtInt($row['internacoes'] ?? 0) ?></td>
                             <td><?= fmtFloat($row['mp'] ?? 0) ?></td>
                             <td><?= fmtMoney($row['custo_total'] ?? 0) ?></td>

@@ -244,13 +244,13 @@ function internacao_stats(PDO $conn, array $filters): array
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $totalInternações = (int)($row['total_internacoes'] ?? 0);
-    $totalDiárias = (int)($row['total_diarias'] ?? 0);
-    $mp = $totalInternações > 0 ? ($totalDiárias / $totalInternações) : 0.0;
+    $totalInternacoes = (int)($row['total_internacoes'] ?? 0);
+    $totalDiarias = (int)($row['total_diarias'] ?? 0);
+    $mp = $totalInternacoes > 0 ? ($totalDiarias / $totalInternacoes) : 0.0;
 
     return [
-        'total_internacoes' => $totalInternações,
-        'total_diarias' => $totalDiárias,
+        'total_internacoes' => $totalInternacoes,
+        'total_diarias' => $totalDiarias,
         'mp' => $mp,
     ];
 }
@@ -289,13 +289,13 @@ function uti_stats(PDO $conn, array $filters): array
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $totalInternações = (int)($row['total_internacoes_uti'] ?? 0);
-    $totalDiárias = (int)($row['total_diarias_uti'] ?? 0);
-    $mp = $totalInternações > 0 ? ($totalDiárias / $totalInternações) : 0.0;
+    $totalInternacoes = (int)($row['total_internacoes_uti'] ?? 0);
+    $totalDiarias = (int)($row['total_diarias_uti'] ?? 0);
+    $mp = $totalInternacoes > 0 ? ($totalDiarias / $totalInternacoes) : 0.0;
 
     return [
-        'total_internacoes' => $totalInternações,
-        'total_diarias' => $totalDiárias,
+        'total_internacoes' => $totalInternacoes,
+        'total_diarias' => $totalDiarias,
         'mp' => $mp,
     ];
 }
@@ -389,7 +389,7 @@ if ($ano !== null) {
     $prevUti = ['total_internacoes' => 0, 'total_diarias' => 0, 'mp' => 0.0];
 }
 
-$varInternações = $selInternação['total_internacoes'] - $prevInternação['total_internacoes'];
+$varInternacoes = $selInternação['total_internacoes'] - $prevInternação['total_internacoes'];
 $varDiárias = $selInternação['total_diarias'] - $prevInternação['total_diarias'];
 $varMp = $selInternação['mp'] - $prevInternação['mp'];
 $varUtiInt = $selUti['total_internacoes'] - $prevUti['total_internacoes'];
@@ -575,7 +575,7 @@ $custoMedioConta = $selFinanceiro['total_contas'] > 0 ? ($selFinanceiro['valor_a
                 <div class="bi-panel">
                     <h3 class="text-center">Variação</h3>
                     <div class="bi-stack">
-                        <div class="bi-kpi kpi-steel"><small>Total internações</small><strong><?= fmt_delta($varInternações, 0) ?></strong></div>
+                        <div class="bi-kpi kpi-steel"><small>Total internações</small><strong><?= fmt_delta($varInternacoes, 0) ?></strong></div>
                         <div class="bi-kpi kpi-steel"><small>Total de diárias</small><strong><?= fmt_delta($varDiárias, 0) ?></strong></div>
                         <div class="bi-kpi kpi-steel"><small>Media de permanencia</small><strong><?= fmt_delta($varMp, 2) ?></strong></div>
                         <div class="bi-kpi kpi-steel"><small>Internação UTI</small><strong><?= fmt_delta($varUtiInt, 0) ?></strong></div>

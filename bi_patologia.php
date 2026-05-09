@@ -142,7 +142,7 @@ function labelsAndValues(array $rows, bool $formatMoney = false): array
 [$labelsAcom, $valuesAcom] = labelsAndValues($rowsAcom);
 [$labelsCusto, $valuesCusto] = labelsAndValues($rowsCusto);
 [$labelsIntern, $valuesIntern] = labelsAndValues($rowsIntern);
-[$labelsDiárias, $valuesDiárias] = labelsAndValues($rowsDiárias);
+[$labelsDiarias, $valuesDiarias] = labelsAndValues($rowsDiárias);
 [$labelsMp, $valuesMp] = labelsAndValues($rowsMp);
 [$labelsCustoMedio, $valuesCustoMedio] = labelsAndValues($rowsCustoMedio);
 ?>
@@ -266,7 +266,7 @@ function labelsAndValues(array $rows, bool $formatMoney = false): array
 
     <div class="bi-panel" style="margin-top:16px;">
         <h3>Diárias por patologia</h3>
-        <div class="bi-chart bi-patologia-chart-sm"><canvas id="chartDiárias"></canvas></div>
+        <div class="bi-chart bi-patologia-chart-sm"><canvas id="chartDiarias"></canvas></div>
     </div>
 </div>
 
@@ -281,8 +281,8 @@ function labelsAndValues(array $rows, bool $formatMoney = false): array
     const valuesIntern = <?= json_encode($valuesIntern) ?>;
     const labelsMp = <?= json_encode($labelsMp) ?>;
     const valuesMp = <?= json_encode($valuesMp) ?>;
-    const labelsDiárias = <?= json_encode($labelsDiárias) ?>;
-    const valuesDiárias = <?= json_encode($valuesDiárias) ?>;
+    const labelsDiarias = <?= json_encode($labelsDiarias) ?>;
+    const valuesDiarias = <?= json_encode($valuesDiarias) ?>;
 
     function buildScales(yTickCallback) {
         const scales = window.biChartScales ? window.biChartScales() : {
@@ -392,7 +392,7 @@ function labelsAndValues(array $rows, bool $formatMoney = false): array
     barChart(document.getElementById('chartCustoMedio'), labelsCustoMedio, valuesCustoMedio, 'rgba(208, 113, 176, 0.7)', window.biMoneyTick);
     barChart(document.getElementById('chartIntern'), labelsIntern, valuesIntern, 'rgba(121, 199, 255, 0.7)');
     barChart(document.getElementById('chartMp'), labelsMp, valuesMp, 'rgba(111, 223, 194, 0.7)');
-    barChart(document.getElementById('chartDiárias'), labelsDiárias, valuesDiárias, 'rgba(255, 198, 108, 0.7)');
+    barChart(document.getElementById('chartDiarias'), labelsDiarias, valuesDiarias, 'rgba(255, 198, 108, 0.7)');
 </script>
 
 <?php require_once("templates/footer.php"); ?>

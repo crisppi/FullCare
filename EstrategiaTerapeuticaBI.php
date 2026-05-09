@@ -393,7 +393,7 @@ $comparisons = [
 ];
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-bi-layout-2">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-bi-layout-3">
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260509-chart-theme"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 <style>
@@ -463,10 +463,10 @@ $comparisons = [
 
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
-        <h1 class="bi-title">Estrategia Terapeutica</h1>
+        <h1 class="bi-title">Estratégia Terapêutica</h1>
         <div class="bi-header-actions bi-header-floating">
             <div class="text-end text-muted"></div>
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação">
                 <svg viewBox="0 0 16 16" aria-hidden="true">
                     <circle cx="3" cy="3" r="1.2"></circle>
                     <circle cx="8" cy="3" r="1.2"></circle>
@@ -482,7 +482,7 @@ $comparisons = [
         </div>
     </div>
 
-    <form class="bi-panel bi-filters bi-filters-wrap bi-filters-compact" method="get">
+    <form class="bi-panel bi-filters bi-filters-wrap bi-filters-compact bi-strategy-filters" method="get">
         <div class="bi-filter">
             <label>Hospital</label>
             <select name="hospital_id">
@@ -588,7 +588,7 @@ $comparisons = [
             </select>
         </div>
         <div class="bi-filter">
-            <label>Mes</label>
+            <label>Mês</label>
             <select name="mes">
                 <option value="">Todos</option>
                 <?php for ($m = 1; $m <= 12; $m++): ?>
@@ -596,7 +596,9 @@ $comparisons = [
                 <?php endfor; ?>
             </select>
         </div>
-        <div class="bi-actions"><button class="bi-btn" type="submit">Aplicar</button></div>
+        <div class="bi-actions">
+            <button class="bi-btn" type="submit">Aplicar</button>
+        </div>
     </form>
 
     <div class="bi-panel" style="margin-top:16px; text-align:center;">

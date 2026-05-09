@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Desospitalizacao Precoce';
+$pageTitle = 'Desospitalização Precoce';
 $pageSlug = 'bi/risco-desospitalizacao';
 require_once("templates/bi_rede_bootstrap.php");
 
@@ -30,11 +30,11 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
         <div>
-            <h1 class="bi-title">Desospitalizacao Precoce</h1>
+            <h1 class="bi-title">Desospitalização Precoce</h1>
             <div style="color: var(--bi-muted); font-size: 0.95rem;">Casos com sinalizacao de desospitalizacao.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
@@ -65,7 +65,7 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     </div>
 
     <div class="bi-panel">
-        <h3>Hospitais com maior incidencia</h3>
+        <h3>Hospitais com maior incidência</h3>
         <table class="bi-table">
             <thead>
                 <tr>
@@ -88,7 +88,7 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         $rate = $total > 0 ? ($flag / $total) * 100 : 0.0;
                         ?>
                         <tr>
-                            <td><?= e($row['hospital'] ?? 'Sem informacoes') ?></td>
+                            <td><?= e($row['hospital'] ?? 'Sem informações') ?></td>
                             <td><?= fmtInt($total) ?></td>
                             <td><?= fmtInt($flag) ?></td>
                             <td><?= fmtPct($rate, 1) ?></td>

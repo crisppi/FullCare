@@ -31,10 +31,10 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     <div class="bi-header">
         <div>
             <h1 class="bi-title">Taxa de Obito</h1>
-            <div style="color: var(--bi-muted); font-size: 0.95rem;">Obitos intra-hospitalares registrados na alta.</div>
+            <div style="color: var(--bi-muted); font-size: 0.95rem;">Óbitos intra-hospitalares registrados na alta.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
@@ -50,7 +50,7 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                 <strong><?= fmtPct($obitoPct, 1) ?></strong>
             </div>
             <div class="bi-kpi kpi-compact">
-                <small>Obitos</small>
+                <small>Óbitos</small>
                 <strong><?= fmtInt($obitos) ?></strong>
             </div>
             <div class="bi-kpi kpi-compact">
@@ -70,7 +70,7 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
             <thead>
                 <tr>
                     <th>Hospital</th>
-                    <th>Obitos</th>
+                    <th>Óbitos</th>
                     <th>Altas</th>
                     <th>Taxa</th>
                 </tr>
@@ -88,7 +88,7 @@ $rows = $rowsStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
                         $rate = $total > 0 ? ($obi / $total) * 100 : 0.0;
                         ?>
                         <tr>
-                            <td><?= e($row['hospital'] ?? 'Sem informacoes') ?></td>
+                            <td><?= e($row['hospital'] ?? 'Sem informações') ?></td>
                             <td><?= fmtInt($obi) ?></td>
                             <td><?= fmtInt($total) ?></td>
                             <td><?= fmtPct($rate, 1) ?></td>

@@ -136,14 +136,14 @@ $labels = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','De
     <div class="bi-panel">
         <h3>Total internações</h3>
         <div class="bi-chart">
-            <canvas id="chartInternações"></canvas>
+            <canvas id="chartInternacoes"></canvas>
         </div>
     </div>
 
     <div class="bi-panel">
         <h3>Total diárias</h3>
         <div class="bi-chart">
-            <canvas id="chartDiárias"></canvas>
+            <canvas id="chartDiarias"></canvas>
         </div>
     </div>
 
@@ -195,8 +195,8 @@ function lineChart(ctx, key) {
     });
 }
 
-lineChart(document.getElementById('chartInternações'), 'internacoes');
-lineChart(document.getElementById('chartDiárias'), 'diarias');
+lineChart(document.getElementById('chartInternacoes'), 'internacoes');
+lineChart(document.getElementById('chartDiarias'), 'diarias');
 lineChart(document.getElementById('chartMp'), 'mp');
 </script>
 

@@ -95,8 +95,8 @@ $stmt = $conn->prepare($sqlStats);
 $stmt->execute($params);
 $stats = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-$totalInternações = (int)($stats['total_internacoes'] ?? 0);
-$totalDiárias = (int)($stats['total_diarias'] ?? 0);
+$totalInternacoes = (int)($stats['total_internacoes'] ?? 0);
+$totalDiarias = (int)($stats['total_diarias'] ?? 0);
 $maiorPermanencia = (int)($stats['maior_permanencia'] ?? 0);
 $mp = (float)($stats['mp'] ?? 0);
 
@@ -268,7 +268,7 @@ $lpChartHeight = max(220, count($labelsHosp) * 34);
                         <span class="kpi-card-v2-icon"><i class="bi bi-hospital"></i></span>
                         <small>Internações</small>
                     </div>
-                    <strong><?= number_format($totalInternações, 0, ',', '.') ?></strong>
+                    <strong><?= number_format($totalInternacoes, 0, ',', '.') ?></strong>
                     <span class="kpi-trend kpi-trend-neutral"><i class="bi bi-clipboard2-pulse"></i>Casos no recorte</span>
                 </div>
                 <div class="bi-kpi kpi-card-v2 kpi-card-v2-2">
@@ -276,7 +276,7 @@ $lpChartHeight = max(220, count($labelsHosp) * 34);
                         <span class="kpi-card-v2-icon"><i class="bi bi-calendar2-week"></i></span>
                         <small>Diárias</small>
                     </div>
-                    <strong><?= number_format($totalDiárias, 0, ',', '.') ?></strong>
+                    <strong><?= number_format($totalDiarias, 0, ',', '.') ?></strong>
                     <span class="kpi-trend kpi-trend-neutral"><i class="bi bi-clock-history"></i>Total acumulado</span>
                 </div>
                 <div class="bi-kpi kpi-card-v2 kpi-card-v2-3">

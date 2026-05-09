@@ -15,7 +15,7 @@ $internWhere = $internFilters['where'];
 $internParams = $internFilters['params'];
 $internJoins = $internFilters['joins'];
 
-$labelPat = "COALESCE(NULLIF(i.grupo_patologia_int,''), p.patologia_pat, 'Sem informacoes')";
+$labelPat = "COALESCE(NULLIF(i.grupo_patologia_int,''), p.patologia_pat, 'Sem informações')";
 $costExpr = "COALESCE(NULLIF(ca.valor_final_capeante,0), ca.valor_apresentado_capeante, 0)";
 
 $summaryStmt = $conn->prepare("
@@ -67,7 +67,7 @@ $topPatologia = $rows[0]['patologia'] ?? '-';
             <div style="color: var(--bi-muted); font-size: 0.95rem;">Diagnosticos que concentram o maior custo.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
@@ -87,7 +87,7 @@ $topPatologia = $rows[0]['patologia'] ?? '-';
                 <strong><?= e($topPatologia) ?></strong>
             </div>
             <div class="bi-kpi kpi-compact">
-                <small>Custo medio por caso</small>
+                <small>Custo médio por caso</small>
                 <strong><?= fmtMoney($custoMedio) ?></strong>
             </div>
             <div class="bi-kpi kpi-compact">
@@ -121,7 +121,7 @@ $topPatologia = $rows[0]['patologia'] ?? '-';
                 <tr>
                     <th>Patologia</th>
                     <th>Custo total</th>
-                    <th>Custo medio</th>
+                    <th>Custo médio</th>
                     <th>Casos</th>
                     <th>% do total</th>
                 </tr>
@@ -140,7 +140,7 @@ $topPatologia = $rows[0]['patologia'] ?? '-';
                         $rowPct = $custoTotal > 0 ? ($rowTotal / $custoTotal) * 100 : 0.0;
                         ?>
                         <tr>
-                            <td><?= e($row['patologia'] ?? 'Sem informacoes') ?></td>
+                            <td><?= e($row['patologia'] ?? 'Sem informações') ?></td>
                             <td><?= fmtMoney($rowTotal) ?></td>
                             <td><?= fmtMoney($rowMedio) ?></td>
                             <td><?= fmtInt($rowCasos) ?></td>

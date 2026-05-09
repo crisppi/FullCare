@@ -39,12 +39,12 @@ if ($hospitalId) {
 $auditorExpr = "
     CASE
         WHEN NULLIF(v.visita_auditor_prof_med,'') IS NOT NULL
-            THEN CONCAT(COALESCE(u_med.usuario_user, v.visita_auditor_prof_med), ' (Medico)')
+            THEN CONCAT(COALESCE(u_med.usuario_user, v.visita_auditor_prof_med), ' (Médico)')
         WHEN NULLIF(v.visita_auditor_prof_enf,'') IS NOT NULL
             THEN CONCAT(COALESCE(u_enf.usuario_user, v.visita_auditor_prof_enf), ' (Enfermagem)')
         WHEN u.usuario_user IS NOT NULL
             THEN CONCAT(u.usuario_user, ' (Auditor)')
-        ELSE 'Sem informacoes'
+        ELSE 'Sem informações'
     END
 ";
 
@@ -101,7 +101,7 @@ $prodVals = array_map(fn($r) => (float)$r['visitas_dia'], $prodRows);
             </select>
         </div>
         <div class="bi-filter">
-            <label>Data inicio</label>
+            <label>Data início</label>
             <input type="date" name="data_inicio" value="<?= e($startStr) ?>">
         </div>
         <div class="bi-filter">

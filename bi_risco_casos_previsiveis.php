@@ -55,7 +55,7 @@ if ($topHospIds && $topPatIds) {
             <div style="color: var(--bi-muted); font-size: 0.95rem;">Combinacao de patologia e hospital com alto custo medio.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao BI">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>
@@ -82,9 +82,9 @@ if ($topHospIds && $topPatIds) {
                 <?php else: ?>
                     <?php foreach ($rows as $row): ?>
                         <tr>
-                            <td><?= e($row['paciente'] ?? 'Sem informacoes') ?></td>
-                            <td><?= e($row['hospital'] ?? 'Sem informacoes') ?></td>
-                            <td><?= e($row['patologia'] ?? 'Sem informacoes') ?></td>
+                            <td><?= e($row['paciente'] ?? 'Sem informações') ?></td>
+                            <td><?= e($row['hospital'] ?? 'Sem informações') ?></td>
+                            <td><?= e($row['patologia'] ?? 'Sem informações') ?></td>
                             <td><?= fmtMoney((float)($row['custo'] ?? 0)) ?></td>
                         </tr>
                     <?php endforeach; ?>
