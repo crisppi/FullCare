@@ -128,7 +128,7 @@ foreach ($params as $key => $value) {
 $stmt->execute();
 $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-$allocLabels = ['Diárias', 'Mat/med', 'Honorários', 'Oxigênio', 'Taxas', 'SADT'];
+$allocLabels = ['Diárias', 'Mat/Med', 'Honorários', 'Oxigênio', 'Taxas', 'SADT'];
 $allocValues = [
     (float)($row['valor_diarias'] ?? 0),
     (float)($row['valor_matmed'] ?? 0),
@@ -138,7 +138,7 @@ $allocValues = [
     (float)($row['valor_sadt'] ?? 0),
 ];
 
-$glosaLabels = ['Glosa Honorários', 'Glosa Diárias', 'Glosa Mat/med', 'Glosa Oxigênio', 'Glosa SADT', 'Glosa Taxas'];
+$glosaLabels = ['Glosa Honorários', 'Glosa Diárias', 'Glosa Mat/Med', 'Glosa Oxigênio', 'Glosa SADT', 'Glosa Taxas'];
 $glosaValues = [
     (float)($row['glosa_honorarios'] ?? 0),
     (float)($row['glosa_diaria'] ?? 0),
@@ -154,26 +154,16 @@ $barValues = [
     (float)($row['glosa_total'] ?? 0),
     (float)($row['valor_final'] ?? 0),
 ];
+$perfilColors = ['#7cc4ff', '#c06ea3', '#5fd3b5', '#ffc56c', '#a2b5ff', '#ff8fb1'];
+$allocTotal = array_sum($allocValues);
+$glosaTotalBreakdown = array_sum($glosaValues);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260501">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260508-perfil-sinistro">
 <script src="diversos/chartjs/Chart.min.js"></script>
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260501"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
-<style>
-    .bi-perfil-sinistro-chart {
-        min-height: 240px !important;
-        height: 240px !important;
-        max-height: 240px !important;
-    }
-
-    .bi-perfil-sinistro-chart canvas {
-        height: 240px !important;
-        max-height: 240px !important;
-    }
-</style>
-
-<div class="bi-wrapper bi-theme">
+<div class="bi-wrapper bi-theme bi-perfil-sinistro-page">
     <div class="bi-header">
         <h1 class="bi-title">Dashboard Perfil Sinistro</h1>
         <div class="bi-header-actions">
@@ -181,7 +171,7 @@ $barValues = [
         </div>
     </div>
 
-    <form class="bi-panel bi-filters" method="get">
+    <form class="bi-panel bi-filters bi-filters-wrap bi-filters-compact bi-perfil-sinistro-filters" method="get">
         <div class="bi-filter">
             <label>Hospital</label>
             <select name="hospital_id">
@@ -268,30 +258,64 @@ $barValues = [
         </div>
     </form>
 
-    <div class="bi-panel" style="margin-top:16px;">
-        <h3>Alocação dos custos</h3>
-        <div class="bi-chart bi-perfil-sinistro-chart" style="height:240px;max-height:240px;"><canvas id="chartAlloc" height="240" style="height:240px !important;"></canvas></div>
-    </div>
-
-    <div class="bi-panel">
-        <h3>Análise da glosa</h3>
-        <div class="bi-chart bi-perfil-sinistro-chart" style="height:240px;max-height:240px;"><canvas id="chartGlosa" height="240" style="height:240px !important;"></canvas></div>
-    </div>
-
-    <div class="bi-panel">
-        <h3>Valores consolidados</h3>
-        <div class="bi-chart bi-perfil-sinistro-chart" style="height:240px;max-height:240px;"><canvas id="chartValores" height="240" style="height:240px !important;"></canvas></div>
-    </div>
-
-    <div class="bi-panel">
-        <div class="bi-kpis">
-            <div class="bi-kpi"><small>Valor apresentado</small><strong>R$ <?= number_format((float)($row['valor_apresentado'] ?? 0), 2, ',', '.') ?></strong></div>
-            <div class="bi-kpi"><small>Glosa med total</small><strong>R$ <?= number_format((float)($row['glosa_med'] ?? 0), 2, ',', '.') ?></strong></div>
-            <div class="bi-kpi"><small>Glosa enf total</small><strong>R$ <?= number_format((float)($row['glosa_enf'] ?? 0), 2, ',', '.') ?></strong></div>
-            <div class="bi-kpi"><small>Glosa total</small><strong>R$ <?= number_format((float)($row['glosa_total'] ?? 0), 2, ',', '.') ?></strong></div>
-            <div class="bi-kpi"><small>Valor final</small><strong>R$ <?= number_format((float)($row['valor_final'] ?? 0), 2, ',', '.') ?></strong></div>
+    <section class="bi-perfil-sinistro-grid">
+        <div class="bi-panel bi-perfil-chart-panel">
+            <h3>Alocação dos Custos</h3>
+            <div class="bi-perfil-chart-body">
+                <div class="bi-chart bi-perfil-sinistro-chart"><canvas id="chartAlloc"></canvas></div>
+                <div class="bi-perfil-chart-values">
+                    <?php foreach ($allocLabels as $idx => $label): ?>
+                        <?php
+                            $value = (float)($allocValues[$idx] ?? 0);
+                            $pct = $allocTotal > 0 ? ($value / $allocTotal * 100) : 0;
+                        ?>
+                        <div class="bi-perfil-chart-value">
+                            <span class="bi-perfil-chart-dot" style="background: <?= e($perfilColors[$idx] ?? '#7cc4ff') ?>"></span>
+                            <span class="bi-perfil-chart-label"><?= e($label) ?></span>
+                            <strong>R$ <?= number_format($value, 2, ',', '.') ?></strong>
+                            <em><?= number_format($pct, 1, ',', '.') ?>%</em>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div class="bi-panel bi-perfil-chart-panel">
+            <h3>Análise da Glosa</h3>
+            <div class="bi-perfil-chart-body">
+                <div class="bi-chart bi-perfil-sinistro-chart"><canvas id="chartGlosa"></canvas></div>
+                <div class="bi-perfil-chart-values">
+                    <?php foreach ($glosaLabels as $idx => $label): ?>
+                        <?php
+                            $value = (float)($glosaValues[$idx] ?? 0);
+                            $pct = $glosaTotalBreakdown > 0 ? ($value / $glosaTotalBreakdown * 100) : 0;
+                        ?>
+                        <div class="bi-perfil-chart-value">
+                            <span class="bi-perfil-chart-dot" style="background: <?= e($perfilColors[$idx] ?? '#7cc4ff') ?>"></span>
+                            <span class="bi-perfil-chart-label"><?= e($label) ?></span>
+                            <strong>R$ <?= number_format($value, 2, ',', '.') ?></strong>
+                            <em><?= number_format($pct, 1, ',', '.') ?>%</em>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="bi-panel bi-perfil-chart-panel bi-perfil-values-panel">
+            <h3>Valores Consolidados</h3>
+            <div class="bi-chart bi-perfil-values-chart"><canvas id="chartValores"></canvas></div>
+        </div>
+
+        <div class="bi-panel bi-perfil-kpi-panel">
+            <div class="bi-kpis bi-perfil-kpis">
+                <div class="bi-kpi kpi-finance kpi-finance-primary"><small>Valor apresentado</small><strong>R$ <?= number_format((float)($row['valor_apresentado'] ?? 0), 2, ',', '.') ?></strong></div>
+                <div class="bi-kpi kpi-finance"><small>Glosa med total</small><strong>R$ <?= number_format((float)($row['glosa_med'] ?? 0), 2, ',', '.') ?></strong></div>
+                <div class="bi-kpi kpi-finance"><small>Glosa enf total</small><strong>R$ <?= number_format((float)($row['glosa_enf'] ?? 0), 2, ',', '.') ?></strong></div>
+                <div class="bi-kpi kpi-finance"><small>Glosa total</small><strong>R$ <?= number_format((float)($row['glosa_total'] ?? 0), 2, ',', '.') ?></strong></div>
+                <div class="bi-kpi kpi-finance"><small>Valor final</small><strong>R$ <?= number_format((float)($row['valor_final'] ?? 0), 2, ',', '.') ?></strong></div>
+            </div>
+        </div>
+    </section>
 </div>
 
 <script>
@@ -301,7 +325,9 @@ const glosaLabels = <?= json_encode($glosaLabels) ?>;
 const glosaValues = <?= json_encode($glosaValues) ?>;
 const barLabels = <?= json_encode($barLabels) ?>;
 const barValues = <?= json_encode($barValues) ?>;
-
+const perfilColors = <?= json_encode($perfilColors) ?>;
+const perfilTextColor = '#eef7ff';
+const perfilGridColor = 'rgba(235, 246, 255, 0.16)';
 function doughnut(ctx, labels, data) {
     return new Chart(ctx, {
         type: 'doughnut',
@@ -309,20 +335,20 @@ function doughnut(ctx, labels, data) {
             labels,
             datasets: [{
                 data,
-                backgroundColor: ['#7cc4ff','#c06ea3','#5fd3b5','#ffc56c','#a2b5ff','#ff8fb1']
+                backgroundColor: perfilColors,
+                borderColor: 'rgba(7, 32, 52, 0.18)',
+                borderWidth: 1,
+                hoverBorderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            legend: window.biLegendWhite || {},
-            plugins: {
-                labelsRenderer: {
-                    valueType: 'money'
-                }
-            }
-        },
-        plugins: [labelsRenderer()]
+            cutoutPercentage: 68,
+            legend: { display: false },
+            layout: { padding: { left: 12, right: 12, top: 8, bottom: 0 } },
+            biValueLabels: false
+        }
     });
 }
 
@@ -334,66 +360,29 @@ function bar(ctx, labels, data) {
             responsive: true,
             maintainAspectRatio: false,
             legend: { display: false },
-            scales: window.biChartScales ? window.biChartScales() : undefined,
-            plugins: {
-                labelsRenderer: {
-                    valueType: 'money'
-                }
-            }
-        },
-        plugins: [labelsRenderer()]
+            layout: { padding: { left: 10, right: 18, top: 8, bottom: 0 } },
+            scales: {
+                xAxes: [{
+                    ticks: { fontColor: perfilTextColor, maxRotation: 0, autoSkip: false },
+                    gridLines: { display: false }
+                }],
+                yAxes: [{
+                    ticks: {
+                        fontColor: perfilTextColor,
+                        beginAtZero: true,
+                        callback: (value) => window.biMoneyTick ? window.biMoneyTick(value) : value
+                    },
+                    gridLines: { color: perfilGridColor, zeroLineColor: perfilGridColor }
+                }]
+            },
+            tooltips: { mode: 'index', intersect: false }
+        }
     });
 }
 
 doughnut(document.getElementById('chartAlloc'), allocLabels, allocValues);
 doughnut(document.getElementById('chartGlosa'), glosaLabels, glosaValues);
 bar(document.getElementById('chartValores'), barLabels, barValues);
-
-function formatMoney(value) {
-    return 'R$ ' + Number(value || 0).toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}
-
-function formatPercent(value, total) {
-    if (!total) return '0%';
-    return ((value / total) * 100).toFixed(1).replace('.', ',') + '%';
-}
-
-function labelsRenderer() {
-    return {
-        afterDatasetsDraw: function(chart) {
-            const cfg = (chart.options.plugins && chart.options.plugins.labelsRenderer) || {};
-            const valueType = cfg.valueType || 'number';
-            const ctx = chart.chart.ctx;
-            ctx.save();
-            ctx.fillStyle = '#eaf6ff';
-            ctx.font = '11px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            chart.data.datasets.forEach((dataset, i) => {
-                const meta = chart.getDatasetMeta(i);
-                if (meta.hidden) {
-                    return;
-                }
-                const total = dataset.data.reduce((sum, v) => sum + (Number(v) || 0), 0);
-                meta.data.forEach((element, index) => {
-                    const value = Number(dataset.data[index] || 0);
-                    if (!value) return;
-
-                    const pos = element.tooltipPosition();
-                    const labelValue = valueType === 'money' ? formatMoney(value) : value.toLocaleString('pt-BR');
-                    const label = labelValue + ' (' + formatPercent(value, total) + ')';
-
-                    ctx.fillText(label, pos.x, pos.y - 10);
-                });
-            });
-            ctx.restore();
-        }
-    };
-}
 
 </script>
 

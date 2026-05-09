@@ -409,7 +409,7 @@ $custoMedioConta = $selFinanceiro['total_contas'] > 0 ? ($selFinanceiro['valor_a
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260501"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
-<div class="bi-wrapper bi-theme">
+<div class="bi-wrapper bi-theme bi-consolidado-page">
     <div class="bi-header">
         <h1 class="bi-title">Consolidado Gestão Cards</h1>
         <div class="bi-header-actions">
@@ -420,7 +420,7 @@ $custoMedioConta = $selFinanceiro['total_contas'] > 0 ? ($selFinanceiro['valor_a
         </div>
     </div>
 
-    <form class="bi-panel bi-filters bi-filters-wrap bi-filters-compact" method="get">
+    <form class="bi-panel bi-filters bi-filters-wrap bi-filters-compact bi-consolidado-filters" method="get">
         <div class="bi-filter">
             <label>Hospital</label>
             <select name="hospital_id">

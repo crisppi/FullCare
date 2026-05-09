@@ -284,7 +284,7 @@ const biBarValueLabelPlugin = {
 
             meta.data.forEach(function(element, index) {
                 const value = Number(dataset.data[index] || 0);
-                if (!Number.isFinite(value)) return;
+                if (!Number.isFinite(value) || value === 0) return;
 
                 const labelFormatter = dataset.valueFormatter || function(v) {
                     return Number(v || 0).toLocaleString('pt-BR');
@@ -333,9 +333,10 @@ function buildBarChart(canvasId, labels, values, tickFormatter) {
             maintainAspectRatio: false,
             layout: {
                 padding: {
-                    top: 24
+                    top: 28
                 }
             },
+            biValueLabels: false,
             legend: { display: false },
             scales: scales,
             tooltips: {

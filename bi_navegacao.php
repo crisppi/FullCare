@@ -113,12 +113,17 @@ $navGroups = [
             ['label' => 'Sinistro BI', 'href' => 'bi/sinistro'],
             ['label' => 'Perfil Sinistro', 'href' => 'bi/perfil-sinistro'],
             ['label' => 'Sinistro YTD', 'href' => 'bi/sinistro-ytd'],
-            ['label' => 'Producao BI', 'href' => 'bi/producao'],
-            ['label' => 'Producao YTD', 'href' => 'bi/producao-ytd'],
             ['label' => 'Pacientes', 'href' => 'bi/pacientes'],
             ['label' => 'Hospitais', 'href' => 'bi/hospitais'],
             ['label' => 'Sinistro', 'href' => 'bi/sinistro-bi'],
-            ['label' => 'Inteligencia Artificial', 'href' => 'bi/inteligencia'],
+        ],
+    ],
+    [
+        'title' => 'Produção',
+        'key' => 'producao',
+        'items' => [
+            ['label' => 'Produção BI', 'href' => 'bi/producao'],
+            ['label' => 'Produção YTD', 'href' => 'bi/producao-ytd'],
         ],
     ],
     [
@@ -214,6 +219,7 @@ $navGroups = [
         'title' => 'Inteligência',
         'key' => 'inteligencia',
         'items' => [
+            ['label' => 'Inteligência Artificial', 'href' => 'bi/inteligencia'],
             ['label' => 'Tempo Médio Permanência', 'href' => 'inteligencia/tmp'],
             ['label' => 'Prorrogacao x Alta', 'href' => 'inteligencia/prorrogacao-vs-alta'],
             ['label' => 'Motivos Prorrogacao', 'href' => 'inteligencia/motivos-prorrogacao'],

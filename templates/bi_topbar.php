@@ -82,12 +82,13 @@ $biSections = [
         ['label' => 'Perfil Sinistro', 'href' => 'bi/perfil-sinistro', 'file' => 'bi_perfil_sinistro.php'],
         ['label' => 'Sinistro YTD', 'href' => 'bi/sinistro-ytd', 'file' => 'bi_sinistro_ytd.php'],
         ['label' => 'Financeiro Realizado', 'href' => 'bi/financeiro-realizado', 'file' => 'FinanceiroRealizadoBI.php'],
-        ['label' => 'Produção', 'href' => 'bi/producao', 'file' => 'Producao.php'],
-        ['label' => 'Produção YTD', 'href' => 'bi/producao-ytd', 'file' => 'bi_producao_ytd.php'],
         ['label' => 'Pacientes', 'href' => 'bi/pacientes', 'file' => 'bi_pacientes.php'],
         ['label' => 'Hospitais', 'href' => 'bi/hospitais', 'file' => 'bi_hospitais.php'],
-        ['label' => 'Inteligência Artificial', 'href' => 'bi/inteligencia', 'file' => 'bi_inteligencia.php'],
         ['label' => 'Sinistro BI', 'href' => 'bi/sinistro-bi', 'file' => 'bi_sinistro.php'],
+    ],
+    'Produção' => [
+        ['label' => 'Produção', 'href' => 'bi/producao', 'file' => 'Producao.php'],
+        ['label' => 'Produção YTD', 'href' => 'bi/producao-ytd', 'file' => 'bi_producao_ytd.php'],
     ],
     'Tops' => [
         ['label' => 'Hospitais', 'href' => 'bi/tops-hospitais', 'file' => 'bi_ranking_hospitais.php'],
@@ -141,6 +142,9 @@ $biSections = [
         ['label' => 'Visão geral', 'href' => 'bi/qualidade-desfecho', 'file' => 'QualidadeDesfechoBI.php'],
         ['label' => 'Eventos Adversos', 'href' => 'bi/qualidade-eventos', 'file' => 'QualidadeEventosBI.php'],
         ['label' => 'Óbitos', 'href' => 'bi/qualidade-obitos', 'file' => 'QualidadeObitosBI.php'],
+    ],
+    'Inteligência' => [
+        ['label' => 'Inteligência Artificial', 'href' => 'bi/inteligencia', 'file' => 'bi_inteligencia.php'],
     ],
 ];
 

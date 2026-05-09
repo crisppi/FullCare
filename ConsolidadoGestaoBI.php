@@ -752,15 +752,15 @@ $glosaSeries = [
         <section class="bi-main bi-stack bi-consolidado-main">
             <div class="bi-consolidado-chart-grid">
                 <div class="bi-panel bi-chart-panel">
-                    <h3>Alocacao dos Custos</h3>
+                    <h3>Alocação dos Custos</h3>
                     <div class="bi-chart bi-chart-wide"><canvas id="chartAlocacao"></canvas></div>
                 </div>
                 <div class="bi-panel bi-chart-panel">
-                    <h3>Composicao do Custo (%)</h3>
+                    <h3>Composição do Custo (%)</h3>
                     <div class="bi-chart bi-chart-donut"><canvas id="chartComposicao"></canvas></div>
                 </div>
                 <div class="bi-panel bi-chart-panel">
-                    <h3>Analise da Glosa</h3>
+                    <h3>Análise da Glosa</h3>
                     <div class="bi-chart bi-chart-donut"><canvas id="chartGlosa"></canvas></div>
                 </div>
                 <div class="bi-panel bi-chart-panel">
