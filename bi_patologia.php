@@ -168,9 +168,6 @@ function labelsAndValues(array $rows, bool $formatMoney = false): array
     <div class="bi-header">
         <h1 class="bi-title">Dashboard Patologia</h1>
         <div class="bi-header-actions">
-            <div class="text-end text-muted small">
-                <?= isset($fonte_conexao) ? 'Fonte: ' . e($fonte_conexao) : '' ?>
-            </div>
             <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>

@@ -132,10 +132,7 @@ function labelsAndValues(array $rows): array
     <div class="bi-header">
         <h1 class="bi-title">Dashboard Grupo Patologia</h1>
         <div class="bi-header-actions">
-            <div class="text-end text-muted small">
-                <?= isset($fonte_conexao) ? 'Fonte: ' . e($fonte_conexao) : '' ?>
-            </div>
-            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegacao">
+            <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
         </div>

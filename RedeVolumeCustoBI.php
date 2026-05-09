@@ -18,24 +18,29 @@ $mes = ($mesInput !== null && $mesInput !== false) ? (int)$mesInput : 0;
 
 $hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
     ->fetchAll(PDO::FETCH_ASSOC);
-$anos = $conn->query("SELECT DISTINCT YEAR(data_intern_int) AS ano FROM tb_internacao WHERE data_intern_int IS NOT NULL AND data_intern_int <> '0000-00-00' ORDER BY ano DESC")
+$anos = $conn->query("SELECT DISTINCT YEAR(data_alta_alt) AS ano FROM tb_alta WHERE data_alta_alt IS NOT NULL AND data_alta_alt <> '0000-00-00' AND data_alta_alt <= CURDATE() ORDER BY ano DESC")
     ->fetchAll(PDO::FETCH_COLUMN);
 if ($ano === null && !filter_has_var(INPUT_GET, 'ano')) {
     $ano = !empty($anos) ? (int)$anos[0] : (int)date('Y');
 }
 
-$where = "i.data_intern_int IS NOT NULL";
+$where = "al.data_alta_alt IS NOT NULL
+    AND al.data_alta_alt <> '0000-00-00'
+    AND al.data_alta_alt <= CURDATE()
+    AND i.data_intern_int IS NOT NULL
+    AND i.data_intern_int <> '0000-00-00'
+    AND DATEDIFF(al.data_alta_alt, i.data_intern_int) >= 0";
 $params = [];
 if (!empty($ano)) {
-    $where .= " AND YEAR(i.data_intern_int) = :ano";
+    $where .= " AND YEAR(al.data_alta_alt) = :ano";
     $params[':ano'] = (int)$ano;
 }
 if (!empty($mes)) {
-    $where .= " AND MONTH(i.data_intern_int) = :mes";
+    $where .= " AND MONTH(al.data_alta_alt) = :mes";
     $params[':mes'] = (int)$mes;
 }
 
-$costExpr = "COALESCE(ca.valor_final_capeante, 0)";
+$costExpr = "COALESCE(NULLIF(ca.valor_final_capeante, 0), ca.valor_apresentado_capeante, 0)";
 
 $sql = "
     SELECT
@@ -59,7 +64,7 @@ $sql = "
             h.id_hospital,
             h.nome_hosp,
             SUM({$costExpr}) AS custo_internacao,
-            GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1) AS diarias
+            GREATEST(1, DATEDIFF(al.data_alta_alt, i.data_intern_int) + 1) AS diarias
         FROM tb_capeante ca
         INNER JOIN tb_internacao i ON i.id_internacao = ca.fk_int_capeante
         LEFT JOIN tb_hospital h ON h.id_hospital = i.fk_hospital_int
@@ -70,6 +75,7 @@ $sql = "
         ) al ON al.fk_id_int_alt = i.id_internacao
         WHERE {$where}
         GROUP BY i.id_internacao, h.id_hospital, h.nome_hosp, al.data_alta_alt, i.data_intern_int
+        HAVING custo_internacao > 0
     ) base
     GROUP BY id_hospital, nome_hosp
     ORDER BY total_custo DESC

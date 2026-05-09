@@ -610,7 +610,7 @@ $glosaSeries = [
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260501"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
-<div class="bi-wrapper bi-theme">
+<div class="bi-wrapper bi-theme bi-consolidado-page">
     <div class="bi-header">
         <h1 class="bi-title">Consolidado Gestão</h1>
         <div class="bi-header-actions">
@@ -621,7 +621,7 @@ $glosaSeries = [
         </div>
     </div>
 
-    <form class="bi-panel bi-filters bi-filters-wrap bi-filters-compact" method="get">
+    <form class="bi-panel bi-filters bi-filters-wrap bi-filters-compact bi-consolidado-filters" method="get">
         <div class="bi-filter">
             <label>Hospital</label>
             <select name="hospital_id">
@@ -748,58 +748,55 @@ $glosaSeries = [
         </div>
     </form>
 
-    <div class="bi-layout" style="margin-top:16px;">
-        <section class="bi-main bi-stack">
-            <div class="bi-grid fixed-2">
-                <div class="bi-panel">
+    <div class="bi-layout bi-consolidado-layout">
+        <section class="bi-main bi-stack bi-consolidado-main">
+            <div class="bi-consolidado-chart-grid">
+                <div class="bi-panel bi-chart-panel">
                     <h3>Alocacao dos Custos</h3>
-                    <div class="bi-chart"><canvas id="chartAlocacao"></canvas></div>
+                    <div class="bi-chart bi-chart-wide"><canvas id="chartAlocacao"></canvas></div>
                 </div>
-                <div class="bi-panel">
+                <div class="bi-panel bi-chart-panel">
                     <h3>Composicao do Custo (%)</h3>
-                    <div class="bi-chart"><canvas id="chartComposicao"></canvas></div>
+                    <div class="bi-chart bi-chart-donut"><canvas id="chartComposicao"></canvas></div>
                 </div>
-            </div>
-
-            <div class="bi-grid fixed-2">
-                <div class="bi-panel">
+                <div class="bi-panel bi-chart-panel">
                     <h3>Analise da Glosa</h3>
-                    <div class="bi-chart"><canvas id="chartGlosa"></canvas></div>
+                    <div class="bi-chart bi-chart-donut"><canvas id="chartGlosa"></canvas></div>
                 </div>
-                <div class="bi-panel">
+                <div class="bi-panel bi-chart-panel">
                     <h3>Glosa</h3>
-                    <div class="bi-panel-compact" style="min-height:220px;">
+                    <div class="bi-panel-compact bi-empty-state">
                         <div class="text-muted">Sem dados para exibir</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <aside class="bi-sidebar bi-stack">
-            <div class="bi-kpi kpi-berry">
+        <aside class="bi-sidebar bi-stack bi-consolidado-sidebar">
+            <div class="bi-kpi kpi-finance kpi-finance-primary">
                 <small>Valor apresentado</small>
                 <strong class="bi-kpi-big"><?= fmt_money($selFinanceiro['valor_apresentado']) ?></strong>
             </div>
-            <div class="bi-kpi kpi-berry with-badge">
+            <div class="bi-kpi kpi-finance with-badge">
                 <small>Glosa medica</small>
                 <strong><?= fmt_money($selFinanceiro['glosa_med']) ?></strong>
                 <span class="bi-kpi-badge"><?= fmt_num($glosaMedPct, 2) ?>%</span>
             </div>
-            <div class="bi-kpi kpi-berry with-badge">
+            <div class="bi-kpi kpi-finance with-badge">
                 <small>Glosa enfermagem</small>
                 <strong><?= fmt_money($selFinanceiro['glosa_enf']) ?></strong>
                 <span class="bi-kpi-badge"><?= fmt_num($glosaEnfPct, 2) ?>%</span>
             </div>
-            <div class="bi-kpi kpi-berry with-badge">
+            <div class="bi-kpi kpi-finance with-badge">
                 <small>Glosa total</small>
                 <strong><?= fmt_money($selFinanceiro['glosa_total']) ?></strong>
                 <span class="bi-kpi-badge"><?= fmt_num($glosaTotalPct, 2) ?>%</span>
             </div>
-            <div class="bi-kpi kpi-berry">
+            <div class="bi-kpi kpi-finance">
                 <small>Valor final</small>
                 <strong><?= fmt_money($selFinanceiro['valor_final']) ?></strong>
             </div>
-            <div class="bi-kpi kpi-berry">
+            <div class="bi-kpi kpi-finance">
                 <small>Custo médio diária</small>
                 <strong><?= fmt_money($custoMedioDiaria) ?></strong>
             </div>
@@ -812,30 +809,51 @@ const alocSeries = <?= json_encode($alocSeries, JSON_UNESCAPED_UNICODE) ?>;
 const compSeries = <?= json_encode($compSeries, JSON_UNESCAPED_UNICODE) ?>;
 const compPercents = <?= json_encode($compPercents, JSON_UNESCAPED_UNICODE) ?>;
 const glosaSeries = <?= json_encode($glosaSeries, JSON_UNESCAPED_UNICODE) ?>;
+const chartTextColor = '#eef7ff';
+const chartGridColor = 'rgba(235, 246, 255, 0.16)';
+const chartBorderColor = 'rgba(7, 32, 52, 0.18)';
+const legendConfig = {
+  labels: {
+    fontColor: chartTextColor,
+    boxWidth: 14,
+    padding: 14,
+    usePointStyle: true
+  }
+};
 
 new Chart(document.getElementById('chartAlocacao'), {
   type: 'bar',
   data: {
-    labels: ['Custos'],
-    datasets: alocSeries.map(item => ({
-      label: item.label,
-      data: [item.value],
-      backgroundColor: item.color
-    }))
+    labels: alocSeries.map(item => item.label),
+    datasets: [{
+      label: 'Custos',
+      data: alocSeries.map(item => item.value),
+      backgroundColor: alocSeries.map(item => item.color),
+      borderColor: 'rgba(255,255,255,0.18)',
+      borderWidth: 1,
+      maxBarThickness: 58
+    }]
   },
   options: {
-    plugins: { legend: { labels: { color: '#e8f1ff' } } },
+    responsive: true,
+    maintainAspectRatio: false,
+    legend: { display: false },
+    layout: { padding: { left: 10, right: 18, top: 8, bottom: 0 } },
     scales: {
-      x: { stacked: true, ticks: { color: '#e8f1ff' }, grid: { display: false } },
-      y: {
-        stacked: true,
+      xAxes: [{
+        ticks: { fontColor: chartTextColor, maxRotation: 0, autoSkip: false },
+        gridLines: { display: false }
+      }],
+      yAxes: [{
         ticks: {
-          color: '#e8f1ff',
+          fontColor: chartTextColor,
+          beginAtZero: true,
           callback: (value) => window.biMoneyTick ? window.biMoneyTick(value) : value
         },
-        grid: { color: 'rgba(255,255,255,0.1)' }
-      }
-    }
+        gridLines: { color: chartGridColor, zeroLineColor: chartGridColor }
+      }]
+    },
+    tooltips: { mode: 'index', intersect: false }
   }
 });
 
@@ -845,11 +863,19 @@ new Chart(document.getElementById('chartComposicao'), {
     labels: compSeries.map(item => item.label),
     datasets: [{
       data: compPercents,
-      backgroundColor: compSeries.map(item => item.color)
+      backgroundColor: compSeries.map(item => item.color),
+      borderColor: chartBorderColor,
+      borderWidth: 1,
+      hoverBorderWidth: 1
     }]
   },
   options: {
-    plugins: { legend: { position: 'left', labels: { color: '#e8f1ff' } } }
+    responsive: true,
+    maintainAspectRatio: false,
+    cutoutPercentage: 68,
+    rotation: -0.5 * Math.PI,
+    legend: Object.assign({ position: 'bottom' }, legendConfig),
+    layout: { padding: { left: 12, right: 12, top: 8, bottom: 4 } }
   }
 });
 
@@ -859,11 +885,19 @@ new Chart(document.getElementById('chartGlosa'), {
     labels: glosaSeries.map(item => item.label),
     datasets: [{
       data: glosaSeries.map(item => item.value),
-      backgroundColor: glosaSeries.map(item => item.color)
+      backgroundColor: glosaSeries.map(item => item.color),
+      borderColor: chartBorderColor,
+      borderWidth: 1,
+      hoverBorderWidth: 1
     }]
   },
   options: {
-    plugins: { legend: { position: 'left', labels: { color: '#e8f1ff' } } }
+    responsive: true,
+    maintainAspectRatio: false,
+    cutoutPercentage: 68,
+    rotation: -0.5 * Math.PI,
+    legend: Object.assign({ position: 'bottom' }, legendConfig),
+    layout: { padding: { left: 12, right: 12, top: 8, bottom: 4 } }
   }
 });
 </script>

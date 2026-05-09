@@ -51,7 +51,7 @@ $biSections = [
         ['label' => 'Auditoria Produtividade', 'href' => 'bi/auditoria-produtividade', 'file' => 'AuditoriaProdutividadeBI.php'],
         ['label' => 'Análise Negociações', 'href' => 'bi/analise-negociacoes', 'file' => 'bi_analise_negociacoes.php'],
         ['label' => 'Negociações Detalhadas', 'href' => 'bi/negociacoes-detalhadas', 'file' => 'bi_negociacoes_detalhadas.php'],
-        ['label' => 'Negociação Avançada', 'href' => 'bi/negociacao-avancada', 'file' => 'BiOperacionalAvancado.php'],
+        ['label' => 'Negociação Avançada', 'href' => 'bi/negociacao-avancada', 'file' => 'bi_analise_negociacoes.php'],
         ['label' => 'Saving por Auditor', 'href' => 'bi/saving-por-auditor', 'file' => 'bi_saving_por_auditor.php'],
         ['label' => 'Saving', 'href' => 'bi/saving', 'file' => 'bi_saving.php'],
     ],
@@ -65,7 +65,7 @@ $biSections = [
         ['label' => 'Home Care', 'href' => 'bi/home-care', 'file' => 'HomeCare.php'],
         ['label' => 'Desospitalização', 'href' => 'bi/desospitalizacao', 'file' => 'Desospitalizacao.php'],
         ['label' => 'OPME', 'href' => 'bi/opme', 'file' => 'Opme.php'],
-        ['label' => 'TUSS / Autorizações', 'href' => 'bi/tuss-autorizacoes', 'file' => 'BiOperacionalAvancado.php'],
+        ['label' => 'TUSS / Autorizações', 'href' => 'bi/tuss-autorizacoes', 'file' => 'relatorio_backlog_autorizacoes.php'],
     ],
     'Rede Hospitalar' => [
         ['label' => 'Comparativa', 'href' => 'bi/rede-comparativa', 'file' => 'bi_rede_comparativa.php'],

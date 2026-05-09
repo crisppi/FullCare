@@ -1336,7 +1336,15 @@ table.bi-table::after,
 .bi-theme .bi-panel h3,
 .bi-theme .bi-panel h4,
 .bi-theme .bi-panel h5 {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  margin: -12px -14px 12px;
+  padding: 8px 14px;
+  border-radius: 12px 12px 0 0;
   color: #f8fbff;
+  background: linear-gradient(90deg, rgba(18, 54, 84, 0.68), rgba(26, 78, 115, 0.32));
+  border-bottom: 1px solid rgba(218, 239, 255, 0.22);
   text-shadow: 0 1px 0 rgba(6, 25, 45, 0.28);
 }
 
@@ -1448,4 +1456,213 @@ table.bi-table::after,
 
 .bi-nav-group[data-theme="inteligencia"] .bi-nav-card {
   background: linear-gradient(135deg, #5b6de3, #3340a8);
+}
+
+.bi-consolidado-page {
+  --cg-panel-bg: linear-gradient(180deg, rgba(239, 248, 255, 0.16), rgba(207, 230, 247, 0.08));
+  --cg-panel-border: rgba(221, 241, 255, 0.34);
+}
+
+.bi-consolidado-page .bi-header {
+  margin-bottom: 10px;
+}
+
+.bi-consolidado-page .bi-title {
+  font-size: clamp(1.08rem, 1.9vw, 1.42rem);
+}
+
+.bi-consolidado-filters.bi-panel {
+  padding: 14px 16px;
+  gap: 10px;
+}
+
+.bi-consolidado-filters.bi-panel.bi-filters-wrap {
+  grid-template-columns: repeat(7, minmax(140px, 1fr));
+}
+
+.bi-consolidado-filters.bi-panel.bi-filters-wrap .bi-actions {
+  grid-column: span 2;
+  justify-self: stretch;
+  justify-content: flex-end;
+  margin-left: 0;
+}
+
+.bi-consolidado-filters .bi-filter select,
+.bi-consolidado-filters .bi-filter input {
+  min-height: 38px;
+}
+
+.bi-consolidado-layout {
+  align-items: stretch;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.bi-consolidado-main {
+  gap: 14px;
+}
+
+.bi-consolidado-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(382px, auto);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.bi-consolidado-page .bi-chart-panel {
+  min-height: 382px;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px 16px;
+  background: var(--cg-panel-bg);
+  border-color: var(--cg-panel-border);
+  border-radius: 10px;
+}
+
+.bi-consolidado-page .bi-chart-panel h3 {
+  min-height: 0;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #f7fbff;
+  font-size: 0.92rem;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+.bi-consolidado-page .bi-chart {
+  height: 324px;
+  min-height: 324px;
+  flex: 1 1 auto;
+  overflow: visible;
+}
+
+.bi-consolidado-page .bi-chart-donut {
+  height: 324px;
+  min-height: 324px;
+}
+
+.bi-consolidado-page .bi-empty-state {
+  min-height: 324px;
+  flex: 1 1 auto;
+  color: rgba(234, 246, 255, 0.64);
+  border: 1px dashed rgba(225, 242, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(15, 55, 88, 0.14);
+}
+
+.bi-consolidado-sidebar {
+  flex: 0 0 252px;
+  max-width: 252px;
+  gap: 10px;
+}
+
+.bi-kpi.kpi-finance {
+  min-height: 82px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(246, 251, 255, 0.18), rgba(218, 236, 249, 0.1));
+  border-color: rgba(226, 243, 255, 0.34);
+  box-shadow: 0 12px 24px rgba(6, 27, 48, 0.18);
+  color: #f8fbff;
+}
+
+.bi-kpi.kpi-finance.kpi-finance-primary {
+  min-height: 90px;
+  background: linear-gradient(135deg, rgba(25, 96, 139, 0.7), rgba(33, 123, 156, 0.46));
+}
+
+.bi-kpi.kpi-finance small {
+  color: rgba(232, 244, 255, 0.74);
+  font-size: 0.62rem;
+}
+
+.bi-kpi.kpi-finance strong {
+  margin-top: 7px;
+  font-size: 1.16rem;
+  line-height: 1.12;
+}
+
+.bi-kpi.kpi-finance .bi-kpi-big {
+  font-size: 1.34rem;
+}
+
+.bi-kpi.kpi-finance.with-badge {
+  padding-right: 74px;
+}
+
+.bi-kpi.kpi-finance.with-badge .bi-kpi-badge {
+  top: 14px;
+  right: 14px;
+  background: rgba(238, 247, 255, 0.94);
+  color: #26384a;
+  box-shadow: 0 4px 12px rgba(7, 27, 45, 0.16);
+}
+
+@media (max-width: 1200px) {
+  .bi-consolidado-filters.bi-panel.bi-filters-wrap {
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+  }
+
+  .bi-consolidado-layout {
+    flex-direction: column;
+  }
+
+  .bi-consolidado-sidebar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .bi-consolidado-filters.bi-panel.bi-filters-wrap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bi-consolidado-chart-grid,
+  .bi-consolidado-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .bi-consolidado-page .bi-chart-panel {
+    min-height: auto;
+    height: auto;
+  }
+
+  .bi-consolidado-page .bi-chart,
+  .bi-consolidado-page .bi-chart-donut,
+  .bi-consolidado-page .bi-empty-state {
+    min-height: 250px;
+    height: 250px;
+  }
+
+  .bi-kpi.kpi-finance,
+  .bi-kpi.kpi-finance.kpi-finance-primary {
+    min-height: 76px;
+  }
+}
+
+@media (max-width: 520px) {
+  .bi-consolidado-filters.bi-panel.bi-filters-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .bi-consolidado-filters.bi-panel.bi-filters-wrap .bi-actions {
+    grid-column: 1;
+    justify-content: stretch;
+  }
+
+  .bi-consolidado-filters .bi-actions .bi-btn {
+    flex: 1 1 auto;
+  }
 }

@@ -9,23 +9,145 @@ if (typeof Chart !== 'undefined') {
     Chart.defaults.scale.ticks.fontColor = '#eaf6ff';
     Chart.defaults.scale.ticks.display = true;
     Chart.defaults.scale.ticks.padding = 6;
+    Chart.defaults.scale.ticks.autoSkip = false;
+    Chart.defaults.scale.ticks.maxRotation = 50;
+    Chart.defaults.scale.ticks.minRotation = 0;
   }
   if (Chart.defaults.scale && Chart.defaults.scale.gridLines) {
     Chart.defaults.scale.gridLines.color = 'rgba(255,255,255,0.12)';
   }
   if (Chart.defaults.global && Chart.defaults.global.layout) {
-    Chart.defaults.global.layout.padding = { left: 18, right: 8, top: 6, bottom: 6 };
+    Chart.defaults.global.layout.padding = { left: 18, right: 16, top: 14, bottom: 8 };
+  }
+
+  window.biFormatChartValue = function (value, chart, dataset) {
+    const num = Number(value || 0);
+    const canvasId = chart && chart.canvas ? String(chart.canvas.id || '') : '';
+    const label = dataset ? String(dataset.label || '') : '';
+    const context = (canvasId + ' ' + label).toLowerCase();
+    const isMoney = /(custo|valor|glosa|saving|sinistro|provis|financeiro|diaria|diárias|money|ticket)/i.test(context);
+
+    if (!Number.isFinite(num)) {
+      return '';
+    }
+
+    if (isMoney) {
+      const abs = Math.abs(num);
+      if (abs >= 1000000) {
+        return 'R$ ' + (num / 1000000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mi';
+      }
+      if (abs >= 1000) {
+        return 'R$ ' + (num / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) + ' mil';
+      }
+      return 'R$ ' + num.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+    }
+
+    if (Math.abs(num) >= 1000000) {
+      return (num / 1000000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mi';
+    }
+    if (Math.abs(num) >= 1000) {
+      return (num / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil';
+    }
+    return num.toLocaleString('pt-BR', { maximumFractionDigits: Number.isInteger(num) ? 0 : 1 });
+  };
+
+  if (Chart.plugins && !Chart._biValueLabelsRegistered) {
+    Chart._biValueLabelsRegistered = true;
+    Chart.plugins.register({
+      afterDatasetsDraw: function (chart) {
+        const type = chart.config && chart.config.type;
+        if (chart.options && chart.options.biValueLabels === false) {
+          return;
+        }
+        if (!['bar', 'horizontalBar', 'pie', 'doughnut'].includes(type)) {
+          return;
+        }
+
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.font = '600 10px Poppins, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(4, 20, 36, 0.34)';
+        ctx.shadowBlur = 2;
+        ctx.shadowOffsetY = 1;
+
+        chart.data.datasets.forEach(function (dataset, datasetIndex) {
+          const meta = chart.getDatasetMeta(datasetIndex);
+          if (!meta || meta.hidden) {
+            return;
+          }
+
+          const values = dataset.data || [];
+
+          if (type === 'pie' || type === 'doughnut') {
+            ctx.fillStyle = '#ffffff';
+
+            meta.data.forEach(function (arc, index) {
+              const value = Number(values[index] || 0);
+              if (!arc || arc.hidden || value === 0) {
+                return;
+              }
+              const model = arc._model || {};
+              const angle = (model.startAngle + model.endAngle) / 2;
+              const radius = ((model.innerRadius || 0) + (model.outerRadius || 0)) / 2;
+              const x = model.x + Math.cos(angle) * radius;
+              const y = model.y + Math.sin(angle) * radius;
+              const text = window.biFormatChartValue(value, chart, dataset);
+
+              if (!text) {
+                return;
+              }
+              ctx.fillText(text, x, y);
+            });
+            return;
+          }
+
+          meta.data.forEach(function (bar, index) {
+            const value = Number(values[index] || 0);
+            if (!bar || bar.hidden || value === 0) {
+              return;
+            }
+            const model = bar._model || {};
+            const text = window.biFormatChartValue(value, chart, dataset);
+            if (!text) {
+              return;
+            }
+
+            let x = model.x;
+            let y = model.y;
+            ctx.fillStyle = '#f8fbff';
+
+            if (type === 'horizontalBar') {
+              const base = Number(model.base || 0);
+              const direction = model.x >= base ? 1 : -1;
+              x = model.x + (direction * 22);
+              y = model.y;
+              ctx.textAlign = direction > 0 ? 'left' : 'right';
+            } else {
+              x = model.x;
+              y = model.y - 10;
+              ctx.textAlign = 'center';
+            }
+
+            ctx.fillText(text, x, y);
+          });
+        });
+
+        ctx.restore();
+      }
+    });
   }
 }
 
 window.biChartScales = function () {
   return {
     xAxes: [{
-      ticks: { fontColor: '#eaf6ff', display: true, padding: 6 },
+      ticks: { fontColor: '#eaf6ff', display: true, padding: 6, autoSkip: false, maxRotation: 50, minRotation: 0 },
       gridLines: { color: 'rgba(255,255,255,0.12)' }
     }],
     yAxes: [{
-      ticks: { fontColor: '#eaf6ff', display: true, padding: 6, beginAtZero: true },
+      ticks: { fontColor: '#eaf6ff', display: true, padding: 6, beginAtZero: true, autoSkip: false },
       gridLines: { color: 'rgba(255,255,255,0.12)' }
     }]
   };
