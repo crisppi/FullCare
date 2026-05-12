@@ -426,7 +426,7 @@
                             <div class="form-group essential-medium">
                                 <label class="control-label" for="matricula_paciente_display">Matrícula</label>
                                 <input type="text" class="form-control input-lg-fullcare" id="matricula_paciente_display"
-                                    placeholder="Digite para pesquisar por matrícula" list="matricula_list"
+                                    placeholder="Pesquisa por matrícula" list="matricula_list"
                                     value="<?= htmlspecialchars(trim((string)($pacientePrefill['matricula_pac'] ?? '')), ENT_QUOTES, 'UTF-8') ?>">
                                 <datalist id="matricula_list">
                                     <?php foreach ($pacientes as $paciente): ?>
@@ -1133,6 +1133,32 @@
             });
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            function syncNativeDatePlaceholderState(field) {
+                if (!field) return;
+                field.classList.toggle('is-empty-date', !field.value);
+            }
+
+            var nativeDateFields = document.querySelectorAll(
+                '.entity-form input[type="date"], .entity-form input[type="datetime-local"]'
+            );
+
+            nativeDateFields.forEach(function(field) {
+                syncNativeDatePlaceholderState(field);
+                field.addEventListener('change', function() {
+                    syncNativeDatePlaceholderState(field);
+                });
+                field.addEventListener('input', function() {
+                    syncNativeDatePlaceholderState(field);
+                });
+                field.addEventListener('blur', function() {
+                    syncNativeDatePlaceholderState(field);
+                });
+            });
+
+            window.syncNativeDatePlaceholderState = syncNativeDatePlaceholderState;
+        });
+
         (function() {
             var dataInternDt = document.getElementById('data_intern_int_dt');
             var dataIntern = document.getElementById('data_intern_int');
@@ -1183,6 +1209,9 @@
                     dataInternDt.value = '';
                     if (dataIntern) dataIntern.value = '';
                     if (horaIntern) horaIntern.value = '';
+                    if (window.syncNativeDatePlaceholderState) {
+                        window.syncNativeDatePlaceholderState(dataInternDt);
+                    }
                     dataInternDt.focus();
                     return false;
                 }

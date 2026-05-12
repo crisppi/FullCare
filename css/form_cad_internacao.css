@@ -1836,6 +1836,48 @@
             letter-spacing: 0 !important;
         }
 
+        /* Placeholder visual dos campos nativos de data/hora quando vazios */
+        .entity-form input[type="date"].is-empty-date,
+        .entity-form input[type="datetime-local"].is-empty-date {
+            color: #c4c4c4 !important;
+            font-size: .78rem !important;
+            font-weight: 500 !important;
+            font-family: "Poppins", sans-serif !important;
+            letter-spacing: 0 !important;
+        }
+
+        .entity-form input[type="date"].is-empty-date::-webkit-datetime-edit,
+        .entity-form input[type="datetime-local"].is-empty-date::-webkit-datetime-edit,
+        .entity-form input[type="date"].is-empty-date::-webkit-datetime-edit-text,
+        .entity-form input[type="datetime-local"].is-empty-date::-webkit-datetime-edit-text,
+        .entity-form input[type="date"].is-empty-date::-webkit-datetime-edit-day-field,
+        .entity-form input[type="datetime-local"].is-empty-date::-webkit-datetime-edit-day-field,
+        .entity-form input[type="date"].is-empty-date::-webkit-datetime-edit-month-field,
+        .entity-form input[type="datetime-local"].is-empty-date::-webkit-datetime-edit-month-field,
+        .entity-form input[type="date"].is-empty-date::-webkit-datetime-edit-year-field,
+        .entity-form input[type="datetime-local"].is-empty-date::-webkit-datetime-edit-year-field,
+        .entity-form input[type="datetime-local"].is-empty-date::-webkit-datetime-edit-hour-field,
+        .entity-form input[type="datetime-local"].is-empty-date::-webkit-datetime-edit-minute-field {
+            color: #c4c4c4 !important;
+            font-size: .78rem !important;
+            font-weight: 500 !important;
+            font-family: "Poppins", sans-serif !important;
+            letter-spacing: 0 !important;
+        }
+
+        /* Ajuste fino: datetime-local vazio ainda renderiza mais forte no navegador */
+        .entity-form #data_intern_int_dt.is-empty-date,
+        .entity-form #data_intern_int_dt.is-empty-date::-webkit-datetime-edit,
+        .entity-form #data_intern_int_dt.is-empty-date::-webkit-datetime-edit-text,
+        .entity-form #data_intern_int_dt.is-empty-date::-webkit-datetime-edit-day-field,
+        .entity-form #data_intern_int_dt.is-empty-date::-webkit-datetime-edit-month-field,
+        .entity-form #data_intern_int_dt.is-empty-date::-webkit-datetime-edit-year-field,
+        .entity-form #data_intern_int_dt.is-empty-date::-webkit-datetime-edit-hour-field,
+        .entity-form #data_intern_int_dt.is-empty-date::-webkit-datetime-edit-minute-field {
+            color: #d2d2d2 !important;
+            font-weight: 400 !important;
+        }
+
         /* Texto “placeholder” dos selects */
         .bootstrap-select>.dropdown-toggle.bs-placeholder,
         .bootstrap-select>.dropdown-toggle.bs-placeholder .filter-option,
