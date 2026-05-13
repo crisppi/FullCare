@@ -257,9 +257,9 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .navbar.nav_bar_custom.fixed-top {
-            min-height: 58px;
-            padding-top: 0.32rem !important;
-            padding-bottom: 0.32rem !important;
+            min-height: 68px;
+            padding-top: 0.44rem !important;
+            padding-bottom: 0.44rem !important;
         }
 
         .navbar .navbar-brand {
@@ -267,14 +267,14 @@ if (!empty($sessionIdUsuario)) {
             align-items: center;
             line-height: 1;
             flex: 0 1 auto !important;
-            max-width: 150px;
+            max-width: 260px;
             margin-right: 4px;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
         .navbar .navbar-brand .logo-novo {
-            height: 34px !important;
+            height: 42px !important;
             width: auto !important;
             max-height: none !important;
             min-height: 0 !important;
@@ -288,13 +288,13 @@ if (!empty($sessionIdUsuario)) {
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 31px !important;
+                height: 38px !important;
             }
         }
 
         @media (max-width: 575.98px) {
             .navbar .navbar-brand .logo-novo {
-                height: 30px !important;
+                height: 34px !important;
             }
         }
 
@@ -324,9 +324,9 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .navbar .navbar-brand .logo-seguradora {
-            height: 34px;
+            height: 38px;
             width: auto;
-            max-width: 96px;
+            max-width: 108px;
             object-fit: contain;
             display: block;
             flex: 0 1 auto;
@@ -334,8 +334,8 @@ if (!empty($sessionIdUsuario)) {
 
         @media (max-width: 1199.98px) {
             .navbar .navbar-brand .logo-seguradora {
-                height: 29px;
-                max-width: 84px;
+                height: 34px;
+                max-width: 96px;
             }
         }
 
