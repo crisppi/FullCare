@@ -535,7 +535,13 @@
         }
 
         .internacao-central-inline .form-group {
-            margin-bottom: 2px !important;
+            margin-bottom: 0 !important;
+        }
+
+        .internacao-central-inline label,
+        .internacao-central-inline .control-label {
+            margin-bottom: 1px !important;
+            line-height: 1.1 !important;
         }
 
         /* Cadastro central (internacao): remove halo azul dos selects de responsavel */
@@ -1096,11 +1102,11 @@
             min-height: auto;
             display: flex;
             align-items: flex-end;
-            margin-bottom: 2px !important;
+            margin-bottom: 1px !important;
         }
 
         .internacao-head-grid > .form-group > label {
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         .internacao-head-grid > .hospital-col,

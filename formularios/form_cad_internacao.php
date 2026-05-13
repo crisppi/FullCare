@@ -275,7 +275,6 @@
                 <div class="internacao-card internacao-card--general">
                     <div class="internacao-card__header">
                         <div class="internacao-card__title-wrap">
-                            <p class="internacao-card__eyebrow">Etapa 1</p>
                             <h2 class="internacao-card__title">Dados da internação</h2>
                         </div>
                         <span class="internacao-card__tag internacao-card__tag--critical">Campos principais</span>
@@ -591,7 +590,6 @@
                 <div class="internacao-card internacao-card--fields">
                     <div class="internacao-card__header">
                         <div class="internacao-card__title-wrap">
-                            <p class="internacao-card__eyebrow">Etapa 2</p>
                             <h3 class="internacao-card__title">Dados assistenciais</h3>
                         </div>
                         <span class="internacao-card__tag">Classificação clínica</span>
@@ -785,7 +783,6 @@
         <div class="internacao-card internacao-card--notes">
             <div class="internacao-card__header">
                 <div class="internacao-card__title-wrap">
-                    <p class="internacao-card__eyebrow">Etapa 3</p>
                     <h3 class="internacao-card__title">Relatórios e observações</h3>
                 </div>
                 <span class="internacao-card__tag">Registro clínico</span>
