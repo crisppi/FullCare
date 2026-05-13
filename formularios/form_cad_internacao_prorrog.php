@@ -90,7 +90,7 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
 }
 
 .prorrogacao-container .form-group label {
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     font-weight: 400;
 }
 

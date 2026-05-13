@@ -1524,7 +1524,7 @@
         .tabelas-selects label {
             font-size: .74rem !important;
             font-weight: 400 !important;
-            margin-bottom: 4px !important;
+            margin-bottom: 2px !important;
             line-height: 1.15;
         }
 
@@ -1562,7 +1562,7 @@
         }
 
         .tabelas-selects > .tabelas-col label {
-            margin-bottom: 4px !important;
+            margin-bottom: 2px !important;
             font-size: .74rem !important;
             font-weight: 400 !important;
             color: #3f4654 !important;
@@ -1626,7 +1626,7 @@
             min-height: 18px;
             display: flex;
             align-items: flex-end;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             font-weight: 400;
             font-size: .74rem !important;
             line-height: 1.15;
@@ -1791,7 +1791,7 @@
             min-height: 18px;
             display: flex;
             align-items: flex-end;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             font-weight: 400;
             font-size: .74rem !important;
             line-height: 1.15;
@@ -2112,7 +2112,7 @@
         }
 
         .entity-form .form-group label {
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             font-weight: 400;
             color: #3b2b4b;
             font-size: .68rem;
@@ -2340,7 +2340,7 @@
         }
 
         #main-container.internacao-page.cadastro-layout .entity-form .form-group label {
-            margin-bottom: 3px !important;
+            margin-bottom: 2px !important;
             font-weight: 400 !important;
             font-size: .7rem !important;
             line-height: 1.1 !important;
