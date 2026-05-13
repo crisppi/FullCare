@@ -12,7 +12,7 @@
 
 .form-group label {
     margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: 400;
 }
 
 .form-control {

@@ -1449,7 +1449,7 @@
         .internacao-card label,
         .tabelas-adicionais-card label,
         .detalhes-card label {
-            font-weight: 700;
+            font-weight: 400;
             color: #4a4b57;
         }
 
@@ -1523,7 +1523,7 @@
         .tabelas-selects .control-label,
         .tabelas-selects label {
             font-size: .74rem !important;
-            font-weight: 600 !important;
+            font-weight: 400 !important;
             margin-bottom: 4px !important;
             line-height: 1.15;
         }
@@ -1564,7 +1564,7 @@
         .tabelas-selects > .tabelas-col label {
             margin-bottom: 4px !important;
             font-size: .74rem !important;
-            font-weight: 600 !important;
+            font-weight: 400 !important;
             color: #3f4654 !important;
             line-height: 1.15;
         }
@@ -1627,7 +1627,7 @@
             display: flex;
             align-items: flex-end;
             margin-bottom: 4px;
-            font-weight: 600;
+            font-weight: 400;
             font-size: .74rem !important;
             line-height: 1.15;
         }
@@ -1792,6 +1792,7 @@
             display: flex;
             align-items: flex-end;
             margin-bottom: 4px;
+            font-weight: 400;
             font-size: .74rem !important;
             line-height: 1.15;
         }
@@ -2112,7 +2113,7 @@
 
         .entity-form .form-group label {
             margin-bottom: 3px;
-            font-weight: 600;
+            font-weight: 400;
             color: #3b2b4b;
             font-size: .68rem;
         }
@@ -2340,8 +2341,10 @@
 
         #main-container.internacao-page.cadastro-layout .entity-form .form-group label {
             margin-bottom: 3px !important;
+            font-weight: 400 !important;
             font-size: .7rem !important;
             line-height: 1.1 !important;
+            color: #3b2b4b !important;
         }
 
         #main-container.internacao-page.cadastro-layout #multi-step-form .form-control,

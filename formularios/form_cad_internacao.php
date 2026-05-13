@@ -923,7 +923,7 @@
 
             <div class="tabelas-selects d-flex flex-wrap justify-content-between align-items-end">
                 <div class="form-group tabelas-col">
-                    <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório detalhado</label>
+                    <label class="control-label" for="relatorio-detalhado">Relatório detalhado</label>
                     <select class="input-lg-fullcare form-control detail-select" id="relatorio-detalhado" name="relatorio-detalhado">
                         <option value="">Selecione</option>
                         <option value="s">Sim</option>
@@ -932,7 +932,7 @@
                 </div>
                 <?php if ($cargoSessao === 'Med_auditor' || $cargoSessao === 'Diretoria') { ?>
                     <div class="form-group tabelas-col">
-                        <label class="control-label" style="font-weight: bold;" for="select_tuss">Tuss</label>
+                        <label class="control-label" for="select_tuss">Tuss</label>
                         <select class="input-lg-fullcare form-control select-purple" id="select_tuss" name="select_tuss">
                             <option value="">Selecione</option>
                             <option value="s">Sim</option>
@@ -940,7 +940,7 @@
                         </select>
                     </div>
                     <div class="form-group tabelas-col">
-                        <label class="control-label" style="font-weight: bold;" for="select_prorrog">Prorrogação</label>
+                        <label class="control-label" for="select_prorrog">Prorrogação</label>
                         <select class="input-lg-fullcare form-control select-purple" id="select_prorrog"
                             name="select_prorrog">
                             <option value="">Selecione</option>
@@ -951,7 +951,7 @@
                 <?php } ?>
 
                 <div class="form-group tabelas-col">
-                    <label class="control-label" style="font-weight: bold;" for="select_gestao">Gestão Assistencial</label>
+                    <label class="control-label" for="select_gestao">Gestão Assistencial</label>
                     <select class="input-lg-fullcare form-control select-purple" id="select_gestao" name="select_gestao">
                         <option value="">Selecione</option>
                         <option value="s">Sim</option>
@@ -960,7 +960,7 @@
                 </div>
 
                 <div class="form-group tabelas-col">
-                    <label class="control-label" style="font-weight: bold;" for="select_uti">UTI</label>
+                    <label class="control-label" for="select_uti">UTI</label>
                     <select class="input-lg-fullcare form-control select-purple" id="select_uti" name="select_uti">
                         <option value="">Selecione</option>
                         <option value="s">Sim</option>
@@ -970,7 +970,7 @@
 
                 <?php if ($cargoSessao === 'Med_auditor' || $cargoSessao === 'Diretoria') { ?>
                     <div class="form-group tabelas-col">
-                        <label class="control-label" style="font-weight: bold;" for="select_negoc">Negociações</label>
+                        <label class="control-label" for="select_negoc">Negociações</label>
                         <select class="input-lg-fullcare form-control select-purple" id="select_negoc" name="select_negoc">
                             <option value="">Selecione</option>
                             <option value="s">Sim</option>
