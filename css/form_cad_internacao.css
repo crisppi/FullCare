@@ -497,6 +497,47 @@
             height: 42px !important;
         }
 
+        .internacao-central-inline {
+            margin-top: 2px !important;
+            padding-top: 6px;
+            border-top: 1px solid rgba(111, 69, 162, 0.10);
+        }
+
+        .internacao-central-inline__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        .internacao-central-inline__title {
+            margin: 0;
+            font-size: .76rem;
+            color: #2a1b43;
+            font-weight: 800;
+        }
+
+        .internacao-central-inline__tag {
+            background: #f1ebfb;
+            color: #5c3687;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: .56rem;
+            border: 1px solid #e2d4f6;
+        }
+
+        .internacao-central-inline__grid {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .internacao-central-inline .form-group {
+            margin-bottom: 2px !important;
+        }
+
         /* Cadastro central (internacao): remove halo azul dos selects de responsavel */
         #cadastro-central-wrapper #resp_tipo,
         #cadastro-central-wrapper #resp_tipo:focus,
@@ -587,6 +628,12 @@
             padding-top: 8px !important;
             padding-bottom: 8px !important;
             line-height: 24px !important;
+        }
+
+        @media (max-width: 991px) {
+            .internacao-central-inline__header {
+                align-items: flex-start;
+            }
         }
 
         .internacao-page {
