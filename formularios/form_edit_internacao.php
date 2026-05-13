@@ -603,9 +603,8 @@
         </div>
         <div class="internacao-page__content">
             <div class="internacao-card internacao-card--general">
-                <div class="internacao-card__header">
+                    <div class="internacao-card__header">
                     <div class="internacao-card__title-wrap">
-                        <p class="internacao-card__eyebrow">Etapa 1</p>
                         <h2 class="internacao-card__title">Dados da internação</h2>
                     </div>
                     <span class="internacao-card__tag internacao-card__tag--critical">Campos principais</span>
