@@ -470,11 +470,49 @@ const tipoLineDatasets = <?= json_encode($tipoLineDatasets, JSON_UNESCAPED_UNICO
 const tipoCountLineDatasets = <?= json_encode($tipoCountLineDatasets, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 const tipoPalette = <?= json_encode($tipoPalette) ?>;
 
+const biValueLabelPlugin = {
+    afterDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        ctx.save();
+
+        chart.data.datasets.forEach(function(dataset, datasetIndex) {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (!meta || meta.hidden) return;
+
+            meta.data.forEach(function(element, index) {
+                const rawValue = Number(dataset.data[index] || 0);
+                if (!Number.isFinite(rawValue)) return;
+
+                const isMoney = !!dataset.isMoney;
+                const label = isMoney
+                    ? (window.biMoneyTick ? window.biMoneyTick(rawValue) : ('R$ ' + Number(rawValue || 0).toLocaleString('pt-BR')))
+                    : Number(rawValue).toLocaleString('pt-BR');
+
+                ctx.font = '600 12px Poppins, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = isMoney ? '#f4fbff' : '#f6e6ff';
+                ctx.shadowColor = 'rgba(8, 20, 38, 0.35)';
+                ctx.shadowBlur = 6;
+
+                if (chart.config.type === 'line') {
+                    ctx.fillText(label, element._model.x, element._model.y - 10);
+                } else {
+                    const topY = Math.min(element._model.base, element._model.y);
+                    ctx.fillText(label, element._model.x, topY - 8);
+                }
+            });
+        });
+
+        ctx.restore();
+    }
+};
+
 function lineChart(ctx, labels, datasets) {
     const scales = window.biChartScales ? window.biChartScales() : undefined;
     if (scales && scales.yAxes && scales.yAxes[0] && scales.yAxes[0].ticks) {
         scales.yAxes[0].ticks.callback = function (value) {
-            return window.biMoneyTick ? window.biMoneyTick(value) : ('R$ ' + Number(value || 0).toLocaleString('pt-BR'));
+            return Number(value || 0).toLocaleString('pt-BR');
         };
     }
     return new Chart(ctx, {
@@ -489,7 +527,7 @@ function lineChart(ctx, labels, datasets) {
                     label: function (tooltipItem, data) {
                         const ds = data.datasets[tooltipItem.datasetIndex] || {};
                         const label = ds.label ? ds.label + ': ' : '';
-                        const value = window.biMoneyTick ? window.biMoneyTick(tooltipItem.yLabel) : ('R$ ' + Number(tooltipItem.yLabel || 0).toLocaleString('pt-BR'));
+                        const value = Number(tooltipItem.yLabel || 0).toLocaleString('pt-BR');
                         return label + value;
                     }
                 }
@@ -498,26 +536,41 @@ function lineChart(ctx, labels, datasets) {
     });
 }
 
-function doughnutChart(ctx, labels, data, isMoney) {
+function categoryBarChart(ctx, labels, data, isMoney) {
+    const scales = window.biChartScales ? window.biChartScales() : undefined;
+    if (scales && scales.yAxes && scales.yAxes[0] && scales.yAxes[0].ticks) {
+        scales.yAxes[0].ticks.callback = function (value) {
+            return isMoney
+                ? (window.biMoneyTick ? window.biMoneyTick(value) : ('R$ ' + Number(value || 0).toLocaleString('pt-BR')))
+                : Number(value || 0).toLocaleString('pt-BR');
+        };
+    }
     return new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
             labels,
             datasets: [{
                 data,
                 backgroundColor: tipoPalette,
                 borderColor: 'rgba(11, 24, 39, 0.15)',
-                borderWidth: 1
+                borderWidth: 1,
+                isMoney: isMoney
             }]
         },
+        plugins: [biValueLabelPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutoutPercentage: 58,
-            legend: {
-                position: 'bottom',
-                labels: { fontColor: '#eaf6ff', boxWidth: 14 }
+            biValueLabels: false,
+            layout: {
+                padding: {
+                    top: 18
+                }
             },
+            legend: {
+                display: false
+            },
+            scales: scales,
             tooltips: {
                 callbacks: {
                     label: function (tooltipItem, chartData) {
@@ -570,11 +623,11 @@ if (timelineCanvas) {
 }
 const tipoValorCanvas = document.getElementById('chartTipoSavingValor');
 if (tipoValorCanvas) {
-    doughnutChart(tipoValorCanvas, tipoLabels, tipoSavingValues, true);
+    categoryBarChart(tipoValorCanvas, tipoLabels, tipoSavingValues, false);
 }
 const tipoQuantidadeCanvas = document.getElementById('chartTipoSavingQuantidade');
 if (tipoQuantidadeCanvas) {
-    doughnutChart(tipoQuantidadeCanvas, tipoLabels, tipoCountValues, false);
+    categoryBarChart(tipoQuantidadeCanvas, tipoLabels, tipoCountValues, false);
 }
 const tipoMensalCanvas = document.getElementById('chartTipoSavingMensal');
 if (tipoMensalCanvas) {

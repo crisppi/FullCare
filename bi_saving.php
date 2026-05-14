@@ -398,7 +398,8 @@ const biValueLabelPlugin = {
                 if (!Number.isFinite(rawValue)) return;
 
                 const isMoney = !!dataset.isMoney;
-                const label = isMoney
+                const valueMode = String(dataset.valueMode || (isMoney ? 'money' : 'count'));
+                const label = valueMode === 'money'
                     ? formatMoneyCompact(rawValue)
                     : Number(rawValue).toLocaleString('pt-BR');
 
@@ -515,26 +516,42 @@ function lineChart(ctx, labels, data, color, money = true) {
     });
 }
 
-function doughnutChart(ctx, labels, data, isMoney) {
+function categoryBarChart(ctx, labels, data, isMoney) {
+    const scales = window.biChartScales ? window.biChartScales() : undefined;
+    if (scales && scales.yAxes && scales.yAxes[0] && scales.yAxes[0].ticks) {
+        scales.yAxes[0].ticks.callback = function (value) {
+            return isMoney
+                ? (window.biMoneyTick ? window.biMoneyTick(value) : formatMoneyCompact(value))
+                : Number(value || 0).toLocaleString('pt-BR');
+        };
+    }
     return new Chart(ctx, {
-        type: 'doughnut',
+        type: 'bar',
         data: {
             labels,
             datasets: [{
                 data,
                 backgroundColor: tipoPalette,
                 borderColor: 'rgba(11, 24, 39, 0.15)',
-                borderWidth: 1
+                borderWidth: 1,
+                isMoney: isMoney,
+                valueMode: isMoney ? 'money' : 'count'
             }]
         },
+        plugins: [biValueLabelPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutoutPercentage: 58,
-            legend: {
-                position: 'bottom',
-                labels: { fontColor: '#eaf6ff', boxWidth: 14 }
+            biValueLabels: false,
+            layout: {
+                padding: {
+                    top: 18
+                }
             },
+            legend: {
+                display: false
+            },
+            scales: scales,
             tooltips: {
                 callbacks: {
                     label: function (tooltipItem, chartData) {
@@ -555,7 +572,7 @@ function multiLineChart(ctx, labels, datasets) {
     const scales = window.biChartScales ? window.biChartScales() : undefined;
     if (scales && scales.yAxes && scales.yAxes[0] && scales.yAxes[0].ticks) {
         scales.yAxes[0].ticks.callback = function (value) {
-            return window.biMoneyTick ? window.biMoneyTick(value) : formatMoneyCompact(value);
+            return Number(value || 0).toLocaleString('pt-BR');
         };
     }
     return new Chart(ctx, {
@@ -573,7 +590,7 @@ function multiLineChart(ctx, labels, datasets) {
                 callbacks: {
                     label: function (tooltipItem, data) {
                         const ds = data.datasets[tooltipItem.datasetIndex] || {};
-                        return (ds.label ? ds.label + ': ' : '') + formatMoney(tooltipItem.yLabel || 0);
+                        return (ds.label ? ds.label + ': ' : '') + Number(tooltipItem.yLabel || 0).toLocaleString('pt-BR');
                     }
                 }
             }
@@ -647,8 +664,8 @@ new Chart(document.getElementById('chartDiariasHospital'), {
     }
 });
 lineChart(document.getElementById('chartSavingEvolucao'), labelsMes, savingMensal, 'rgba(255, 205, 86, 0.85)');
-doughnutChart(document.getElementById('chartTipoSavingValor'), tipoLabels, tipoSavingValues, true);
-doughnutChart(document.getElementById('chartTipoSavingQuantidade'), tipoLabels, tipoCountValues, false);
+categoryBarChart(document.getElementById('chartTipoSavingValor'), tipoLabels, tipoSavingValues, false);
+categoryBarChart(document.getElementById('chartTipoSavingQuantidade'), tipoLabels, tipoCountValues, false);
 multiLineChart(document.getElementById('chartTipoSavingMensal'), labelsMes, tipoLineDatasets);
 multiLineCountChart(document.getElementById('chartTipoSavingMensalQuantidade'), labelsMes, tipoCountLineDatasets);
 </script>
