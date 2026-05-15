@@ -70,8 +70,10 @@
         justify-content: center;
         background: rgba(255, 255, 255, .94);
         border: 1px solid rgba(255, 255, 255, .78);
-        border-radius: 2px;
-        box-shadow: 0 28px 60px rgba(50, 68, 94, .2);
+        border-radius: 22px;
+        box-shadow:
+            0 34px 76px rgba(37, 49, 72, .24),
+            0 12px 28px rgba(37, 49, 72, .12);
         backdrop-filter: none;
         position: relative;
         overflow: hidden;
@@ -84,8 +86,8 @@
         height: 430px;
         left: -170px;
         top: -240px;
-        border-radius: 46%;
-        background: rgba(44, 132, 126, .92);
+        border-radius: 42% 58% 48% 52%;
+        background: rgba(45, 99, 166, .88);
         transform: rotate(-14deg);
         pointer-events: none;
     }
@@ -97,8 +99,8 @@
         height: 300px;
         right: -190px;
         top: 20px;
-        border-radius: 42%;
-        background: rgba(244, 194, 0, .95);
+        border-radius: 58% 42% 48% 52%;
+        background: rgba(94, 38, 112, .9);
         transform: rotate(-12deg);
         pointer-events: none;
     }
@@ -108,13 +110,15 @@
     =============================== */
     .login-form {
         padding: 42px 36px 38px;
-        border-radius: 10px;
+        border-radius: 22px;
         width: auto;
         height: auto;
         min-height: 0;
-        background: rgba(238, 245, 245, .96);
-        border: 1px solid rgba(223, 234, 235, .95);
-        box-shadow: 0 18px 42px rgba(71, 88, 106, .1);
+        background: rgba(255, 255, 255, .97);
+        border: 1px solid rgba(232, 236, 244, .96);
+        box-shadow:
+            0 32px 68px rgba(42, 57, 82, .22),
+            0 14px 30px rgba(42, 57, 82, .1);
         backdrop-filter: none;
         display: flex;
         flex-direction: column;
@@ -123,6 +127,15 @@
         position: relative;
         z-index: 2;
         transform: none;
+    }
+
+    .login-form::after {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border: 1px solid rgba(45, 99, 166, .08);
+        border-radius: 16px;
+        pointer-events: none;
     }
 
     .login-form::before {
@@ -284,7 +297,9 @@
         height: auto;
         object-fit: contain;
         margin: 0 auto 18px;
-        filter: drop-shadow(0 18px 24px rgba(45, 31, 78, .25));
+        filter:
+            drop-shadow(0 28px 30px rgba(45, 31, 78, .32))
+            drop-shadow(0 10px 12px rgba(45, 31, 78, .18));
     }
 
     .side-panel h3,
@@ -379,13 +394,14 @@
 
         .login-container {
             width: 100%;
-            max-width: 790px;
-            gap: 30px;
-            grid-template-columns: 320px minmax(330px, 1fr);
+            max-width: 860px;
+            gap: 34px;
+            grid-template-columns: 310px minmax(330px, 1fr);
+            padding: 38px 42px;
         }
 
         .form-content {
-            width: min(100%, 285px);
+            width: min(100%, 268px);
         }
     }
 
@@ -394,10 +410,11 @@
             flex-direction: column;
             display: flex;
             border-radius: 16px;
-            overflow: visible;
+            overflow: hidden;
             min-height: 0;
-            background: transparent;
+            background: rgba(255, 255, 255, .94);
             gap: 26px;
+            padding: 34px 24px;
         }
 
         .login-form,
@@ -519,7 +536,7 @@
 <body>
     <div class="login-container">
         <div class="login-form">
-            <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/logo_branco.svg" alt="Login Form Logo" class="login-form-logo" />
+            <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/LogoFullCare.png" alt="FullCare Gestao em Saude" class="login-form-logo" />
             <div class="form-content">
                 <form action="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/check_login.php" method="post" autocomplete="off">
                     <div class="input-container">
