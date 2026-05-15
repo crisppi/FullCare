@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php $currentAppVersion = app_latest_version($conn); ?>
-<html lang="en">
+<html lang="pt-BR">
 <?php $assetBase = rtrim($BASE_URL, '/'); ?>
 
 <head>
@@ -17,13 +17,17 @@
     =============================== */
     body {
         margin: 0;
-        padding: 0;
+        padding: 24px;
+        box-sizing: border-box;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
         font-family: 'Inter', sans-serif;
-        background-image: linear-gradient(135deg, rgba(247, 244, 255, 0.55) 0%, rgba(226, 243, 255, 0.55) 60%, rgba(212, 240, 255, 0.55) 100%);
+        background:
+            radial-gradient(circle at 18% 18%, rgba(82, 154, 218, .24), transparent 28%),
+            radial-gradient(circle at 88% 20%, rgba(92, 38, 118, .22), transparent 26%),
+            linear-gradient(135deg, #edf5fb 0%, #dfe9f3 44%, #f0edf7 100%);
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -38,7 +42,7 @@
         position: fixed;
         inset: 0;
         background: url("<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/17450.jpg") center / cover no-repeat;
-        opacity: 0.25;
+        opacity: 0.18;
         z-index: -1;
         pointer-events: none;
     }
@@ -54,104 +58,163 @@
     }
 
     .login-container {
-        display: flex;
-        border-radius: 10px;
-        overflow: visible;
-        width: 990px;
+        display: grid;
+        grid-template-columns: 330px minmax(390px, 1fr);
+        gap: 56px;
+        width: 920px;
         max-width: 95vw;
+        min-height: 500px;
+        padding: 46px 54px;
+        box-sizing: border-box;
         align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, .94);
+        border: 1px solid rgba(255, 255, 255, .78);
+        border-radius: 2px;
+        box-shadow: 0 28px 60px rgba(50, 68, 94, .2);
+        backdrop-filter: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-container::before {
+        content: "";
+        position: absolute;
+        width: 430px;
+        height: 430px;
+        left: -170px;
+        top: -240px;
+        border-radius: 46%;
+        background: rgba(44, 132, 126, .92);
+        transform: rotate(-14deg);
+        pointer-events: none;
+    }
+
+    .login-container::after {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        right: -190px;
+        top: 20px;
+        border-radius: 42%;
+        background: rgba(244, 194, 0, .95);
+        transform: rotate(-12deg);
+        pointer-events: none;
     }
 
     /* ===============================
        Bloco Azul (formulário)
     =============================== */
     .login-form {
-        padding: 12px 22px 16px;
-        border-top-left-radius: 10px;
-        border-bottom-left-radius: 10px;
-        width: 42%;
-        height: 400px;
+        padding: 42px 36px 38px;
+        border-radius: 10px;
+        width: auto;
+        height: auto;
         min-height: 0;
-        background: linear-gradient(160deg, #2d63a6, #92bee2);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, .2);
+        background: rgba(238, 245, 245, .96);
+        border: 1px solid rgba(223, 234, 235, .95);
+        box-shadow: 0 18px 42px rgba(71, 88, 106, .1);
+        backdrop-filter: none;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         position: relative;
+        z-index: 2;
+        transform: none;
+    }
+
+    .login-form::before {
+        content: none;
     }
 
     .login-form-logo {
         width: 100%;
-        max-width: 256px;
-        margin-bottom: 12px;
+        max-width: 172px;
+        margin-bottom: 34px;
         display: block;
     }
 
     .form-content {
-        width: 60%;
+        width: min(100%, 268px);
     }
 
     .input-container {
         position: relative;
-        margin: 20px 0;
+        margin: 19px 0;
         width: 100%;
     }
 
     .input-container input {
         width: 100%;
-        padding: 10px 0;
-        border: none;
-        border-bottom: 2px solid #fff;
-        background: transparent;
-        font-size: 13px;
+        padding: 10px 0 !important;
+        border: 0 !important;
+        border-bottom: 1px solid rgba(47, 132, 128, .58) !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+        box-sizing: border-box;
+        color: #263241;
+        font-size: 13px !important;
+        font-weight: 500;
         outline: none;
+        box-shadow: none;
+        transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .input-container input:focus {
+        background: transparent !important;
+        border-color: #421849 !important;
+        box-shadow: 0 6px 0 -5px rgba(66, 24, 73, .7);
     }
 
     .input-container label {
         position: absolute;
-        top: 10px;
+        top: -16px;
         left: 0;
-        color: rgba(255, 255, 255, .7);
+        color: #2f8480;
         pointer-events: none;
-        transition: all .3s ease;
-        font-size: 13px;
+        transition: color .2s ease;
+        font-size: 11px;
+        font-weight: 700;
     }
 
     .input-container input:focus+label,
     .input-container input:not(:placeholder-shown)+label {
         top: -20px;
         font-size: 11px;
-        color: #fff;
+        color: #421849;
     }
 
     .login-btn {
         width: 100%;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.15);
+        padding: 12px;
+        background: linear-gradient(135deg, #5f2769, #3f174d);
         color: #fff;
-        border: 2px solid rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(255, 255, 255, .22);
         cursor: pointer;
-        font-size: 18px;
-        border-radius: 30px;
-        margin-top: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
-        transition: all .3s ease;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 8px;
+        margin-top: 18px;
+        box-shadow: 0 10px 24px rgba(49, 18, 62, .23);
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
     }
 
     .login-btn:hover {
-        box-shadow: 0 6px 12px rgba(0, 0, 0, .2);
-        background: #5e2363;
+        box-shadow: 0 13px 28px rgba(49, 18, 62, .28);
+        background: linear-gradient(135deg, #6d2e78, #451954);
+        transform: translateY(-1px);
     }
 
     .forgot-password {
-        color: #fff;
+        color: #485565;
         text-align: center;
         margin-top: 20px;
     }
 
     .forgot-password a {
-        color: #fff;
+        color: #485565;
         text-decoration: none;
     }
 
@@ -159,12 +222,12 @@
         width: 100%;
         display: flex;
         justify-content: flex-end;
-        margin: -6px 0 10px;
+        margin: -6px 0 6px;
     }
 
     .login-links a {
         font-size: 12px;
-        color: #f3f7ff;
+        color: #485565;
         text-decoration: none;
         font-weight: 600;
     }
@@ -189,31 +252,39 @@
        Bloco Lilás (lado direito)
     =============================== */
     .side-panel {
-        padding: 22px;
-        background: linear-gradient(160deg, #4b2f70, #612f7d 80%);
-        color: #fff;
-        width: 58%;
-        max-height: 500px;
+        padding: 0;
+        background: transparent;
+        color: #421849;
+        width: auto;
+        max-height: none;
         min-height: 0;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+        box-shadow: none;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
-        border-radius: 10px;
-        margin-top: 0;
-        margin-bottom: -20px;
+        justify-content: center;
+        border-radius: 0;
+        margin: 0;
         text-align: center;
         position: relative;
+        overflow: visible;
+        z-index: 2;
     }
 
     .side-panel-content {
-        margin-top: 22px;
+        margin-top: 0;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .side-panel img.monitor-image {
-        width: 70%;
+        width: min(100%, 430px);
         height: auto;
         object-fit: contain;
+        margin: 0 auto 18px;
+        filter: drop-shadow(0 18px 24px rgba(45, 31, 78, .25));
     }
 
     .side-panel h3,
@@ -223,9 +294,21 @@
     }
 
     .side-panel p {
-        margin-bottom: 10px;
+        margin: 8px auto 0;
+        max-width: 360px;
         line-height: 1.5;
-        color: #c9c9c9;
+        color: rgba(55, 46, 78, .68);
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    .side-panel h3 {
+        margin-top: 0;
+        font-size: 16px;
+        line-height: 1.2;
+        letter-spacing: 0;
+        font-weight: 600;
+        color: #421849;
     }
 
     .side-panel .email-btn {
@@ -240,20 +323,11 @@
     }
 
     .side-panel::before {
-        content: "SISTEMA FULLCARE";
-        position: absolute;
-        top: 18px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: .08em;
-        color: #E9EDF2;
-        opacity: .95;
-        text-transform: uppercase;
-        text-shadow: 0 1px 0 rgba(0, 0, 0, .10);
-        pointer-events: none;
-        white-space: nowrap;
+        content: none;
+    }
+
+    .side-panel::after {
+        content: none;
     }
 
     /* ===============================
@@ -299,75 +373,97 @@
     =============================== */
     @media (max-width: 1024px) {
         body {
-            padding: 24px 16px;
+            padding: 20px 16px;
             height: auto;
         }
 
         .login-container {
             width: 100%;
-            max-width: 860px;
+            max-width: 790px;
+            gap: 30px;
+            grid-template-columns: 320px minmax(330px, 1fr);
         }
 
         .form-content {
-            width: 70%;
+            width: min(100%, 285px);
         }
     }
 
     @media (max-width: 900px) {
         .login-container {
             flex-direction: column;
+            display: flex;
             border-radius: 16px;
-            overflow: hidden;
+            overflow: visible;
+            min-height: 0;
+            background: transparent;
+            gap: 26px;
         }
 
         .login-form,
         .side-panel {
             width: 100%;
-            border-radius: 0;
             height: auto;
         }
 
-    .login-form {
-            padding: 16px 20px 18px;
+        .login-form {
+            padding: 32px 28px 30px;
             min-height: 0;
+            width: min(100%, 360px);
+            margin: 0 auto;
+            transform: none;
+        }
+
+        .login-form::before {
+            content: none;
         }
 
         .side-panel {
             min-height: 0;
             margin: 0;
-            padding: 28px 24px 32px;
+            padding: 0 24px 10px;
+        }
+
+        .side-panel::after {
+            content: none;
         }
 
         .side-panel-content {
-            margin-top: calc(var(--conex-side-top) + var(--conex-side-h) + var(--conex-tagline-gap) + 24px);
+            margin-top: 0;
         }
     }
 
     @media (max-width: 600px) {
-    .side-panel {
+        .side-panel {
             display: none;
         }
 
         body {
-            min-height: 600px;
+            min-height: 520px;
             align-items: flex-start;
         }
 
         .login-container {
             align-items: flex-start;
-            height: 600px;
+            height: auto;
         }
 
         .login-form {
-            padding: 6px 10px 6px;
+            padding: 30px 22px 26px;
             min-height: 0;
-            height: 600px;
-            max-height: 600px;
+            height: auto;
+            max-height: none;
+            border-radius: 14px;
+            transform: none;
+        }
+
+        .login-form::before {
+            content: none;
         }
 
         .login-form-logo {
-            max-width: 150px;
-            margin-bottom: 3px;
+            max-width: 165px;
+            margin-bottom: 28px;
         }
 
         .form-content {
@@ -375,27 +471,27 @@
         }
 
         .input-container {
-            margin: 4px 0;
+            margin: 22px 0;
         }
 
         .input-container input {
-            padding: 4px 0 !important;
-            font-size: 11px !important;
+            padding: 11px 13px !important;
+            font-size: 13px !important;
         }
 
         .input-container label {
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .input-container input:focus+label,
         .input-container input:not(:placeholder-shown)+label {
-            top: -13px;
-            font-size: 9px;
+            top: -20px;
+            font-size: 12px;
         }
 
         .login-btn {
-            padding: 6px;
-            margin-top: 4px;
+            padding: 12px;
+            margin-top: 18px;
             font-size: 14px;
         }
     }
@@ -427,14 +523,12 @@
             <div class="form-content">
                 <form action="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/check_login.php" method="post" autocomplete="off">
                     <div class="input-container">
-                        <input type="email" name="email_login" autocomplete="off" id="email_login" required
-                            style="border-radius:10px; border:1px solid #ccc; padding:10px; font-size:14px; width:100%; box-sizing:border-box; background-color: rgba(255,255,255,.6);" />
+                        <input type="email" name="email_login" autocomplete="off" id="email_login" required />
                         <label for="email_login">Email</label>
                     </div>
 
                     <div class="input-container">
-                        <input type="password" id="senha_login" autocomplete="off" name="senha_login" required
-                            style="border-radius:10px; border:1px solid #ccc; padding:10px; font-size:14px; width:100%; box-sizing:border-box; background-color: rgba(255,255,255,.6);" />
+                        <input type="password" id="senha_login" autocomplete="off" name="senha_login" required />
                         <label for="senha_login">Senha</label>
                     </div>
 
@@ -465,7 +559,7 @@
 
         <div class="side-panel">
             <div class="side-panel-content">
-                <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/notebook_full.svg" alt="Exciting News Image" class="monitor-image" />
+                <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/producao_preview.svg" alt="Preview do dashboard de producao" class="monitor-image" />
                 <h3>Novidades!</h3>
                 <p>Decisões melhores começam com dados claros. Veja internações e contas evoluindo em tempo real.
 

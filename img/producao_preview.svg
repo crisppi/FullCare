@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 390" role="img" aria-labelledby="title desc">
+  <title id="title">Preview do dashboard Producao FullCare</title>
+  <desc id="desc">Tela de dashboard de producao com graficos e indicadores.</desc>
+  <defs>
+    <linearGradient id="screenBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f9fcff"/>
+      <stop offset="1" stop-color="#edf4fb"/>
+    </linearGradient>
+    <linearGradient id="topbar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#421849"/>
+      <stop offset="1" stop-color="#67327a"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".78"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="145%">
+      <feDropShadow dx="0" dy="18" stdDeviation="17" flood-color="#170b28" flood-opacity=".27"/>
+    </filter>
+    <filter id="chipShadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#170b28" flood-opacity=".18"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <rect x="99" y="58" width="562" height="274" rx="28" fill="#121826"/>
+    <rect x="112" y="71" width="536" height="248" rx="18" fill="url(#screenBg)"/>
+    <rect x="112" y="71" width="536" height="39" rx="18" fill="url(#topbar)"/>
+    <path d="M112 94h536v18H112z" fill="#5e2a71"/>
+
+    <circle cx="136" cy="90" r="5" fill="#79c7ff"/>
+    <circle cx="153" cy="90" r="5" fill="#ffc66c"/>
+    <circle cx="170" cy="90" r="5" fill="#6fdfc2"/>
+    <text x="196" y="94" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#fff">Dashboard Producao</text>
+    <text x="520" y="94" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="700" fill="#eadff1">FULLCARE BI</text>
+
+    <g font-family="Inter, Arial, sans-serif">
+      <rect x="132" y="128" width="496" height="38" rx="12" fill="#fff" stroke="#dce5ee"/>
+      <rect x="146" y="139" width="67" height="16" rx="5" fill="#f1f5f9"/>
+      <rect x="224" y="139" width="82" height="16" rx="5" fill="#f1f5f9"/>
+      <rect x="317" y="139" width="78" height="16" rx="5" fill="#f1f5f9"/>
+      <rect x="406" y="139" width="84" height="16" rx="5" fill="#f1f5f9"/>
+      <rect x="536" y="136" width="72" height="22" rx="7" fill="#421849"/>
+      <text x="158" y="151" font-size="7" font-weight="700" fill="#5b6778">Internado</text>
+      <text x="239" y="151" font-size="7" font-weight="700" fill="#5b6778">Hospitais</text>
+      <text x="334" y="151" font-size="7" font-weight="700" fill="#5b6778">Periodo</text>
+      <text x="556" y="150" font-size="8" font-weight="700" fill="#fff">Aplicar</text>
+    </g>
+
+    <g font-family="Inter, Arial, sans-serif">
+      <rect x="132" y="184" width="234" height="106" rx="14" fill="#fff" stroke="#dce5ee"/>
+      <text x="150" y="207" font-size="11" font-weight="800" fill="#253044">Internacoes</text>
+      <path d="M151 261 C181 231, 206 248, 236 225 S290 241, 326 210 S343 217, 348 207" fill="none" stroke="#79c7ff" stroke-width="5" stroke-linecap="round"/>
+      <path d="M151 261 C181 231, 206 248, 236 225 S290 241, 326 210 S343 217, 348 207 L348 276 L151 276 Z" fill="#79c7ff" opacity=".12"/>
+      <g fill="#79c7ff">
+        <circle cx="151" cy="261" r="3.5"/><circle cx="236" cy="225" r="3.5"/><circle cx="326" cy="210" r="3.5"/>
+      </g>
+
+      <rect x="394" y="184" width="234" height="106" rx="14" fill="#fff" stroke="#dce5ee"/>
+      <text x="412" y="207" font-size="11" font-weight="800" fill="#253044">Valor final</text>
+      <rect x="415" y="247" width="18" height="27" rx="4" fill="#8dd0ff"/>
+      <rect x="446" y="231" width="18" height="43" rx="4" fill="#8dd0ff"/>
+      <rect x="477" y="219" width="18" height="55" rx="4" fill="#8dd0ff"/>
+      <rect x="508" y="237" width="18" height="37" rx="4" fill="#8dd0ff"/>
+      <rect x="539" y="212" width="18" height="62" rx="4" fill="#8dd0ff"/>
+      <rect x="570" y="226" width="18" height="48" rx="4" fill="#8dd0ff"/>
+      <path d="M414 226 C451 204, 485 211, 516 194 S560 199, 590 184" fill="none" stroke="#ffc66c" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif" filter="url(#chipShadow)">
+    <g transform="translate(72 205)">
+      <rect width="108" height="54" rx="14" fill="url(#glass)" stroke="#dce5ee"/>
+      <text x="16" y="22" font-size="9" font-weight="700" fill="#5b6778">MP</text>
+      <text x="16" y="40" font-size="18" font-weight="800" fill="#421849">4,8</text>
+      <path d="M71 39 l8 -8 l8 5 l9 -13" fill="none" stroke="#6fdfc2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g transform="translate(586 125)">
+      <rect width="112" height="58" rx="14" fill="url(#glass)" stroke="#dce5ee"/>
+      <text x="16" y="23" font-size="9" font-weight="700" fill="#5b6778">Diarias</text>
+      <text x="16" y="42" font-size="18" font-weight="800" fill="#421849">1.284</text>
+      <circle cx="89" cy="31" r="13" fill="#ffc66c" opacity=".25"/>
+      <path d="M82 32h14M89 25v14" stroke="#d49a37" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
