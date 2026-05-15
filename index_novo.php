@@ -153,8 +153,9 @@
         background: rgba(255, 255, 255, .97);
         border: 1px solid rgba(232, 236, 244, .96);
         box-shadow:
-            0 32px 68px rgba(42, 57, 82, .22),
-            0 14px 30px rgba(42, 57, 82, .1);
+            0 38px 82px rgba(42, 57, 82, .26),
+            0 18px 38px rgba(42, 57, 82, .14),
+            0 2px 0 rgba(255, 255, 255, .9) inset;
         backdrop-filter: none;
         display: flex;
         flex-direction: column;
@@ -169,7 +170,7 @@
         content: "";
         position: absolute;
         inset: 12px;
-        border: 1px solid rgba(45, 99, 166, .08);
+        border: 1px solid rgba(45, 99, 166, .045);
         border-radius: 16px;
         pointer-events: none;
     }
@@ -187,8 +188,12 @@
 
     .input-container {
         position: relative;
-        margin: 19px 0;
+        margin: 24px 0;
         width: 100%;
+    }
+
+    .input-container + .input-container {
+        margin-top: 42px;
     }
 
     .input-container input {
@@ -282,15 +287,17 @@
     }
 
     .login-attempts-notice {
-        margin: 8px 0 0;
-        padding: 10px 12px;
-        border-radius: 10px;
-        background: rgba(255, 243, 205, 0.22);
-        border: 1px solid rgba(255, 232, 163, 0.45);
-        color: #fff5d6;
-        font-size: 13px;
+        margin: 12px 0 0;
+        padding: 9px 11px;
+        border-radius: 8px;
+        background: #fff8e6;
+        border: 1px solid #f1d894;
+        border-left: 4px solid #d6a82d;
+        color: #705519;
+        font-size: 12px;
         line-height: 1.35;
         text-align: left;
+        box-shadow: 0 8px 18px rgba(87, 69, 28, .08);
     }
 
     /* ===============================
@@ -325,10 +332,10 @@
     }
 
     .side-panel img.monitor-image {
-        width: min(100%, 430px);
+        width: min(100%, 500px);
         height: auto;
         object-fit: contain;
-        margin: 0 auto 18px;
+        margin: 0 auto 10px;
         filter:
             drop-shadow(0 28px 30px rgba(45, 31, 78, .32))
             drop-shadow(0 10px 12px rgba(45, 31, 78, .18));
@@ -378,19 +385,19 @@
     =============================== */
     .error-message {
         position: fixed;
-        bottom: 24px;
+        bottom: 26px;
         left: 50%;
         transform: translateX(-50%);
-        width: min(92vw, 560px);
-        padding: 12px 14px;
-        background: rgba(156, 28, 28, 0.92);
-        border: 1px solid rgba(255, 255, 255, .18);
-        border-left: 5px solid #ffb3b3;
-        border-radius: 10px;
+        width: min(88vw, 420px);
+        padding: 12px 14px 12px 16px;
+        background: rgba(255, 255, 255, .96);
+        border: 1px solid rgba(180, 55, 55, .18);
+        border-left: 4px solid #b43737;
+        border-radius: 12px;
         text-align: left;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, .22);
-        color: #fff;
-        font-size: 15px;
+        box-shadow: 0 18px 42px rgba(72, 48, 58, .18);
+        color: #673030;
+        font-size: 13px;
         line-height: 1.4;
         animation: fadeIn .3s ease-in-out;
         z-index: 1000;
@@ -398,10 +405,11 @@
 
     .error-message strong {
         display: block;
-        font-size: 13px;
+        font-size: 11px;
         letter-spacing: .03em;
-        margin-bottom: 2px;
-        opacity: .9;
+        margin-bottom: 3px;
+        color: #9f2f2f;
+        opacity: 1;
         text-transform: uppercase;
     }
 
@@ -516,7 +524,11 @@
         }
 
         .input-container {
-            margin: 22px 0;
+            margin: 24px 0;
+        }
+
+        .input-container + .input-container {
+            margin-top: 40px;
         }
 
         .input-container input {
@@ -604,11 +616,11 @@
 
         <div class="side-panel">
             <div class="side-panel-content">
-                <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/producao_preview.svg" alt="Preview do dashboard de producao" class="monitor-image" />
+                <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/producao_preview.png?v=20260514-login-preview-png" alt="Preview do dashboard de producao" class="monitor-image" />
                 <h3>Novidades!</h3>
-                <p>Decisões melhores começam com dados claros. Veja internações e contas evoluindo em tempo real.
+                <p>BI e IA transformam dados assistenciais em visão clara para gestão.
 
-                    Mais visão, menos suposição: indicadores que conectam cuidado e eficiência.</p>
+                    Acompanhe internações, contas e indicadores em tempo real, com mais precisão para decidir.</p>
             </div>
         </div>
     </div>
