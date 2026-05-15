@@ -82,27 +82,63 @@
     .login-container::before {
         content: "";
         position: absolute;
-        width: 430px;
-        height: 430px;
-        left: -170px;
-        top: -240px;
-        border-radius: 42% 58% 48% 52%;
-        background: rgba(45, 99, 166, .88);
-        transform: rotate(-14deg);
+        width: 520px;
+        height: 330px;
+        left: -210px;
+        top: -120px;
+        border-radius: 36% 64% 68% 32% / 44% 52% 48% 56%;
+        background:
+            radial-gradient(circle at 76% 70%, rgba(255, 255, 255, .22), transparent 0 32%, rgba(255, 255, 255, 0) 33%),
+            linear-gradient(135deg, rgba(45, 99, 166, .92), rgba(83, 137, 187, .72));
+        transform: rotate(-9deg);
         pointer-events: none;
     }
 
     .login-container::after {
         content: "";
         position: absolute;
-        width: 300px;
+        width: 360px;
+        height: 460px;
+        right: -246px;
+        top: 34px;
+        border-radius: 64% 36% 28% 72% / 42% 38% 62% 58%;
+        background:
+            radial-gradient(circle at 18% 24%, rgba(255, 255, 255, .28), transparent 0 20%, rgba(255, 255, 255, 0) 21%),
+            linear-gradient(160deg, rgba(94, 38, 112, .78), rgba(66, 24, 73, .58));
+        transform: rotate(-4deg);
+        box-shadow:
+            inset 22px 0 42px rgba(255, 255, 255, .14),
+            -18px 24px 46px rgba(66, 24, 73, .16);
+        pointer-events: none;
+    }
+
+    .side-panel::before {
+        content: "";
+        position: absolute;
+        width: 190px;
         height: 300px;
-        right: -190px;
-        top: 20px;
-        border-radius: 58% 42% 48% 52%;
-        background: rgba(94, 38, 112, .9);
+        right: -98px;
+        top: 116px;
+        border-radius: 64% 36% 44% 56% / 50% 36% 64% 50%;
+        background: linear-gradient(170deg, rgba(94, 38, 112, .28), rgba(66, 24, 73, .08));
+        border-left: 1px solid rgba(255, 255, 255, .24);
+        transform: rotate(-6deg);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .login-form::before {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 220px;
+        left: -138px;
+        top: -78px;
+        border-radius: 52% 48% 68% 32% / 48% 56% 44% 52%;
+        background: rgba(45, 99, 166, .07);
         transform: rotate(-12deg);
         pointer-events: none;
+        z-index: -1;
     }
 
     /* ===============================
@@ -136,10 +172,6 @@
         border: 1px solid rgba(45, 99, 166, .08);
         border-radius: 16px;
         pointer-events: none;
-    }
-
-    .login-form::before {
-        content: none;
     }
 
     .login-form-logo {
@@ -335,10 +367,6 @@
         text-decoration: none;
         font-size: 16px;
         border-radius: 5px;
-    }
-
-    .side-panel::before {
-        content: none;
     }
 
     .side-panel::after {
