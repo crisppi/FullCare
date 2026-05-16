@@ -1,6 +1,6 @@
 :root {
-  --bi-bg: #117bb2;
-  --bi-bg-2: #1c93cc;
+  --bi-bg: #197fac;
+  --bi-bg-2: #2f9ec6;
   --bi-panel: rgba(255, 255, 255, 0.1);
   --bi-panel-strong: rgba(255, 255, 255, 0.15);
   --bi-border: rgba(255, 255, 255, 0.4);
@@ -17,8 +17,8 @@
 
 body.bi-theme,
 .bi-theme {
-  background: radial-gradient(circle at 10% 20%, rgba(72, 177, 228, 0.28), transparent 45%),
-              radial-gradient(circle at 90% 10%, rgba(207, 139, 183, 0.18), transparent 40%),
+  background: radial-gradient(circle at 10% 20%, rgba(126, 203, 236, 0.24), transparent 45%),
+              radial-gradient(circle at 90% 10%, rgba(216, 153, 196, 0.14), transparent 40%),
               linear-gradient(120deg, var(--bi-bg), var(--bi-bg-2));
   color: var(--bi-text);
   font-family: 'Poppins', sans-serif;
@@ -1714,13 +1714,13 @@ table.bi-table::after,
 /* BI contrast refresh. Reference before this change:
    css/bi.css.reference-before-contrast-20260508.css */
 .bi-theme .bi-panel:not(.bi-report) {
-  background: linear-gradient(180deg, rgba(248, 252, 255, 0.2), rgba(229, 242, 250, 0.12));
-  border-color: rgba(220, 240, 252, 0.5);
-  box-shadow: 0 12px 24px rgba(5, 27, 48, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, rgba(14, 68, 106, 0.38), rgba(13, 58, 93, 0.26));
+  border-color: rgba(220, 240, 252, 0.46);
+  box-shadow: 0 12px 24px rgba(5, 27, 48, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
 .bi-theme .bi-panel.bi-filters {
-  background: linear-gradient(135deg, rgba(241, 249, 255, 0.22), rgba(172, 202, 228, 0.14));
+  background: linear-gradient(135deg, rgba(22, 82, 121, 0.42), rgba(16, 66, 104, 0.26));
   border-color: rgba(228, 242, 252, 0.52);
 }
 

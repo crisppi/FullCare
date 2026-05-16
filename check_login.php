@@ -26,7 +26,7 @@ if (!function_exists('fullcare_post_login_target')) {
             return $baseUrl . 'list_internacao_cap_fin.php';
         }
 
-        return $baseUrl . 'menu_app.php';
+        return $baseUrl . 'inicio';
     }
 }
 

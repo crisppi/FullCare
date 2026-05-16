@@ -83,62 +83,103 @@ function makeShadow(int $w, int $h, int $x, int $y, int $rw, int $rh, int $r, in
     return $shadow;
 }
 
-// Notebook body and screen.
-imagecopy($img, makeShadow($w, $h, 205, 105, 1230, 520, 52, 72), 0, 0, 0, 0, $w, $h);
-roundedRect($img, 208, 96, 1224, 572, 50, rgba($img, 19, 24, 39));
-roundedRect($img, 236, 124, 1168, 516, 28, rgba($img, 248, 252, 255));
-roundedRect($img, 236, 124, 1168, 74, 28, rgba($img, 66, 24, 73));
-imagefilledrectangle($img, 236, 175, 1404, 204, rgba($img, 92, 42, 112));
+// Notebook body and screen with a more professional BI preview.
+imagecopy($img, makeShadow($w, $h, 222, 112, 1196, 498, 28, 88), 0, 0, 0, 0, $w, $h);
+roundedRect($img, 226, 108, 1188, 526, 28, rgba($img, 18, 24, 36));
+roundedRect($img, 238, 120, 1164, 502, 14, rgba($img, 242, 247, 252));
 
-foreach ([[288, 162, 121, 199, 255], [326, 162, 255, 198, 108], [364, 162, 111, 223, 194]] as $dot) {
-    imagefilledellipse($img, $dot[0], $dot[1], 20, 20, rgba($img, $dot[2], $dot[3], $dot[4]));
+// App chrome.
+roundedRect($img, 238, 120, 1164, 58, 14, rgba($img, 44, 18, 58));
+imagefilledrectangle($img, 238, 154, 1402, 182, rgba($img, 44, 18, 58));
+foreach ([[286, 151, 121, 199, 255], [322, 151, 255, 198, 108], [358, 151, 111, 223, 194]] as $dot) {
+    imagefilledellipse($img, $dot[0], $dot[1], 16, 16, rgba($img, $dot[2], $dot[3], $dot[4]));
 }
-textOrBar($img, $fontBold, 24, 420, 171, 'Dashboard Produção', rgba($img, 255, 255, 255), 260);
-textOrBar($img, $fontSemi, 14, 1192, 171, 'FULLCARE BI', rgba($img, 239, 228, 243), 150);
+textOrBar($img, $fontBold, 18, 410, 158, 'FullCare BI', rgba($img, 255, 255, 255), 145);
+textOrBar($img, $fontSemi, 11, 1168, 158, 'GESTÃO ASSISTENCIAL', rgba($img, 227, 215, 235), 168);
 
-// Filters row.
-roundedRect($img, 280, 248, 1080, 88, 24, rgba($img, 255, 255, 255));
-strokeRoundedRect($img, 280, 248, 1080, 88, 24, rgba($img, 220, 229, 238), 2);
-foreach ([[316, 274, 152], [498, 274, 184], [712, 274, 176], [918, 274, 204]] as $pill) {
-    roundedRect($img, $pill[0], $pill[1], $pill[2], 34, 15, rgba($img, 238, 243, 248));
-}
-roundedRect($img, 1188, 266, 128, 50, 15, rgba($img, 66, 24, 73));
-textOrBar($img, $fontSemi, 13, 350, 296, 'Internado', rgba($img, 81, 95, 115), 72);
-textOrBar($img, $fontSemi, 13, 538, 296, 'Hospitais', rgba($img, 81, 95, 115), 82);
-textOrBar($img, $fontSemi, 13, 756, 296, 'Periodo', rgba($img, 81, 95, 115), 70);
-textOrBar($img, $fontSemi, 13, 980, 296, 'Todos', rgba($img, 81, 95, 115), 56);
-textOrBar($img, $fontBold, 13, 1228, 297, 'Aplicar', rgba($img, 255, 255, 255), 58);
-
-// Chart cards.
-roundedRect($img, 280, 380, 500, 184, 28, rgba($img, 255, 255, 255));
-strokeRoundedRect($img, 280, 380, 500, 184, 28, rgba($img, 220, 229, 238), 2);
-textOrBar($img, $fontBold, 20, 320, 426, 'Internações', rgba($img, 37, 48, 68), 160);
-textOrBar($img, $fontRegular, 12, 322, 450, 'Evolução mensal', rgba($img, 104, 117, 137), 120);
-imagefilledrectangle($img, 320, 486, 720, 540, rgba($img, 121, 199, 255, 112));
-linePath($img, [[324, 534], [374, 506], [434, 518], [500, 490], [590, 502], [682, 458], [726, 476]], rgba($img, 121, 199, 255), 9);
-linePath($img, [[334, 500], [360, 482], [386, 494], [418, 466]], rgba($img, 111, 223, 194), 7);
-
-roundedRect($img, 860, 380, 500, 184, 28, rgba($img, 255, 255, 255));
-strokeRoundedRect($img, 860, 380, 500, 184, 28, rgba($img, 220, 229, 238), 2);
-textOrBar($img, $fontBold, 20, 900, 426, 'Valor final', rgba($img, 37, 48, 68), 140);
-textOrBar($img, $fontRegular, 12, 902, 450, 'Produção acumulada', rgba($img, 104, 117, 137), 140);
-linePath($img, [[904, 498], [982, 476], [1060, 484], [1130, 462], [1220, 470], [1300, 452]], rgba($img, 255, 198, 108), 7);
-foreach ([[914, 508, 36, 38], [980, 486, 36, 60], [1046, 470, 36, 76], [1112, 500, 36, 46], [1178, 462, 36, 84], [1244, 482, 36, 64]] as $bar) {
-    roundedRect($img, $bar[0], $bar[1], $bar[2], $bar[3], 8, rgba($img, 141, 208, 255));
-}
-
-// Bottom screen shine and notebook base.
-imagefilledrectangle($img, 236, 612, 1404, 640, rgba($img, 237, 244, 251));
-roundedRect($img, 208, 668, 1224, 22, 11, rgba($img, 207, 213, 223, 24));
-$base = [
-    208, 668,
-    1432, 668,
-    1372, 706,
-    268, 706,
+// Sidebar.
+imagefilledrectangle($img, 238, 180, 430, 622, rgba($img, 30, 46, 68));
+textOrBar($img, $fontBold, 11, 272, 232, 'NAVEGAÇÃO BI', rgba($img, 180, 208, 223), 106);
+$menuItems = [
+    [266, 270, 'Resumo', true],
+    [266, 312, 'Hospitais', false],
+    [266, 354, 'Contas', false],
+    [266, 396, 'Glosas', false],
+    [266, 438, 'Rede', false],
 ];
-imagefilledpolygon($img, $base, 4, rgba($img, 192, 199, 211, 26));
-roundedRect($img, 260, 704, 1120, 18, 9, rgba($img, 137, 147, 161, 86));
-roundedRect($img, 716, 672, 208, 18, 9, rgba($img, 171, 180, 191, 44));
+foreach ($menuItems as $item) {
+    roundedRect($img, $item[0], $item[1], 132, 28, 8, $item[3] ? rgba($img, 104, 201, 185, 12) : rgba($img, 255, 255, 255, 116));
+    textOrBar($img, $fontSemi, 10, $item[0] + 16, $item[1] + 19, $item[2], $item[3] ? rgba($img, 20, 58, 67) : rgba($img, 182, 198, 215), 70);
+}
+
+// Content header and filters.
+textOrBar($img, $fontBold, 20, 462, 230, 'Painel Executivo', rgba($img, 33, 47, 70), 190);
+textOrBar($img, $fontRegular, 11, 464, 252, 'Indicadores de produção, contas e rede hospitalar', rgba($img, 107, 122, 142), 255);
+roundedRect($img, 1058, 212, 270, 36, 14, rgba($img, 255, 255, 255));
+strokeRoundedRect($img, 1058, 212, 270, 36, 14, rgba($img, 214, 224, 236), 1);
+textOrBar($img, $fontSemi, 10, 1078, 235, 'Período: últimos 6 meses', rgba($img, 82, 96, 116), 170);
+
+// KPI cards.
+$kpis = [
+    [462, 286, 'Internações', '1.248', 77, 151, 214],
+    [670, 286, 'Contas auditadas', '252', 94, 123, 255],
+    [878, 286, 'Glosa total', 'R$ 289k', 118, 207, 196],
+    [1086, 286, 'MP médio', '4,8 dias', 192, 110, 163],
+];
+foreach ($kpis as $kpi) {
+    roundedRect($img, $kpi[0], $kpi[1], 178, 92, 18, rgba($img, 255, 255, 255));
+    strokeRoundedRect($img, $kpi[0], $kpi[1], 178, 92, 18, rgba($img, 217, 227, 239), 1);
+    roundedRect($img, $kpi[0] + 16, $kpi[1] + 18, 28, 28, 9, rgba($img, $kpi[4], $kpi[5], $kpi[6], 18));
+    textOrBar($img, $fontSemi, 9, $kpi[0] + 54, $kpi[1] + 35, $kpi[2], rgba($img, 105, 119, 138), 92);
+    textOrBar($img, $fontBold, 19, $kpi[0] + 54, $kpi[1] + 66, $kpi[3], rgba($img, 31, 43, 63), 88);
+}
+
+// Main line chart.
+roundedRect($img, 462, 410, 534, 178, 18, rgba($img, 255, 255, 255));
+strokeRoundedRect($img, 462, 410, 534, 178, 18, rgba($img, 217, 227, 239), 1);
+textOrBar($img, $fontBold, 14, 486, 442, 'Evolução mensal', rgba($img, 33, 47, 70), 130);
+foreach ([480, 518, 556] as $gy) {
+    imageline($img, 488, $gy, 966, $gy, rgba($img, 222, 230, 239, 42));
+}
+linePath($img, [[494, 548], [560, 520], [626, 532], [694, 494], [758, 506], [826, 472], [906, 484], [954, 456]], rgba($img, 77, 151, 214), 6);
+linePath($img, [[494, 536], [560, 500], [626, 512], [694, 478], [758, 488], [826, 466], [906, 438], [954, 448]], rgba($img, 118, 207, 196), 5);
+foreach ([[504, 568, 72], [608, 552, 96], [712, 532, 120], [816, 518, 146], [920, 494, 164]] as $bar) {
+    roundedRect($img, $bar[0], $bar[1] - $bar[2] / 2, 28, (int)($bar[2] / 2), 6, rgba($img, 141, 208, 255, 34));
+}
+
+// Bar chart and compact table.
+roundedRect($img, 1024, 410, 304, 178, 18, rgba($img, 255, 255, 255));
+strokeRoundedRect($img, 1024, 410, 304, 178, 18, rgba($img, 217, 227, 239), 1);
+textOrBar($img, $fontBold, 14, 1048, 442, 'Auditoria por hospital', rgba($img, 33, 47, 70), 154);
+foreach ([[1056, 526, 34, 40], [1110, 502, 34, 64], [1164, 482, 34, 84], [1218, 510, 34, 56], [1272, 462, 34, 104]] as $bar) {
+    roundedRect($img, $bar[0], $bar[1], $bar[2], $bar[3], 7, rgba($img, 77, 151, 214, 10));
+}
+linePath($img, [[1054, 506], [1118, 486], [1180, 496], [1240, 466], [1304, 454]], rgba($img, 255, 198, 108), 5);
+
+// Compact bottom activity strip.
+roundedRect($img, 462, 604, 866, 32, 12, rgba($img, 255, 255, 255));
+strokeRoundedRect($img, 462, 604, 866, 32, 12, rgba($img, 217, 227, 239), 1);
+foreach ([[486, 'Rede Alpha', 202], [724, 'Contas liberadas', 172], [938, 'Glosa monitorada', 168], [1148, 'Status OK', 126]] as $strip) {
+    roundedRect($img, $strip[0], 613, $strip[2], 14, 7, rgba($img, 235, 242, 248));
+    textOrBar($img, $fontSemi, 8, $strip[0] + 10, 624, $strip[1], rgba($img, 91, 108, 128), 70);
+}
+
+// Bottom screen edge and monitor pedestal.
+imagefilledrectangle($img, 238, 610, 1402, 622, rgba($img, 229, 237, 246));
+roundedRect($img, 226, 622, 1188, 12, 0, rgba($img, 16, 22, 35));
+imagefilledellipse($img, 820, 632, 18, 18, rgba($img, 70, 82, 100, 24));
+
+$stand = [
+    764, 640,
+    876, 640,
+    912, 706,
+    728, 706,
+];
+imagefilledpolygon($img, $stand, 4, rgba($img, 178, 187, 200, 32));
+imagefilledpolygon($img, [780, 640, 860, 640, 884, 698, 756, 698], 4, rgba($img, 218, 225, 234, 38));
+roundedRect($img, 704, 704, 232, 24, 12, rgba($img, 176, 185, 198, 34));
+roundedRect($img, 646, 722, 348, 16, 8, rgba($img, 126, 138, 154, 82));
+roundedRect($img, 724, 710, 192, 10, 5, rgba($img, 231, 236, 243, 42));
 
 imagepng($img, $out, 9);
 imagedestroy($img);

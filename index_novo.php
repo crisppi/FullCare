@@ -60,8 +60,8 @@
     .login-container {
         display: grid;
         grid-template-columns: 330px minmax(390px, 1fr);
-        gap: 56px;
-        width: 920px;
+        gap: 34px;
+        width: 900px;
         max-width: 95vw;
         min-height: 500px;
         padding: 46px 54px;
@@ -99,7 +99,7 @@
         position: absolute;
         width: 360px;
         height: 460px;
-        right: -246px;
+        right: -286px;
         top: 34px;
         border-radius: 64% 36% 28% 72% / 42% 38% 62% 58%;
         background:
@@ -117,7 +117,7 @@
         position: absolute;
         width: 190px;
         height: 300px;
-        right: -98px;
+        right: -132px;
         top: 116px;
         border-radius: 64% 36% 44% 56% / 50% 36% 64% 50%;
         background: linear-gradient(170deg, rgba(94, 38, 112, .28), rgba(66, 24, 73, .08));
@@ -329,16 +329,114 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
+        width: min(100%, 560px);
+        margin-inline: auto;
     }
 
     .side-panel img.monitor-image {
-        width: min(100%, 500px);
+        width: min(100%, 530px);
         height: auto;
         object-fit: contain;
-        margin: 0 auto 10px;
+        margin: 14px auto -8px;
         filter:
-            drop-shadow(0 28px 30px rgba(45, 31, 78, .32))
-            drop-shadow(0 10px 12px rgba(45, 31, 78, .18));
+            drop-shadow(0 20px 24px rgba(45, 31, 78, .24))
+            drop-shadow(0 7px 10px rgba(45, 31, 78, .14));
+    }
+
+    .login-insight-row {
+        width: min(100%, 430px);
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin: 14px auto 4px;
+    }
+
+    .login-insight-card {
+        min-height: 58px;
+        padding: 10px 11px;
+        border-radius: 13px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(246, 249, 255, .72));
+        border: 1px solid rgba(117, 143, 174, .15);
+        box-shadow: 0 14px 28px rgba(59, 66, 92, .08);
+        text-align: left;
+    }
+
+    .login-insight-card small {
+        display: block;
+        color: rgba(66, 24, 73, .58);
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        line-height: 1.1;
+    }
+
+    .login-insight-card strong {
+        display: block;
+        margin-top: 7px;
+        color: #421849;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
+    .login-side-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 10px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        background: rgba(66, 24, 73, .07);
+        border: 1px solid rgba(66, 24, 73, .1);
+        color: rgba(66, 24, 73, .74);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .login-side-kicker::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #76cfc4;
+        box-shadow: 0 0 0 4px rgba(118, 207, 196, .16);
+    }
+
+    .login-flow-strip {
+        width: min(100%, 380px);
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        align-items: center;
+        gap: 8px;
+        margin: 16px auto -2px;
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .login-flow-strip span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(94, 38, 112, .92), rgba(66, 24, 73, .9));
+        border: 1px solid rgba(255, 255, 255, .22);
+        box-shadow: 0 10px 20px rgba(66, 24, 73, .14);
+        white-space: nowrap;
+    }
+
+    .login-flow-strip i {
+        width: 20px;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(94, 38, 112, .12), rgba(94, 38, 112, .42), rgba(94, 38, 112, .12));
     }
 
     .side-panel h3,
@@ -349,7 +447,7 @@
 
     .side-panel p {
         margin: 8px auto 0;
-        max-width: 360px;
+        max-width: 350px;
         line-height: 1.5;
         color: rgba(55, 46, 78, .68);
         font-size: 12px;
@@ -357,11 +455,11 @@
     }
 
     .side-panel h3 {
-        margin-top: 0;
-        font-size: 16px;
+        margin: 0;
+        font-size: 20px;
         line-height: 1.2;
         letter-spacing: 0;
-        font-weight: 600;
+        font-weight: 800;
         color: #421849;
     }
 
@@ -431,7 +529,7 @@
         .login-container {
             width: 100%;
             max-width: 860px;
-            gap: 34px;
+            gap: 24px;
             grid-template-columns: 310px minmax(330px, 1fr);
             padding: 38px 42px;
         }
@@ -483,6 +581,14 @@
 
         .side-panel-content {
             margin-top: 0;
+        }
+
+        .login-insight-row {
+            width: min(100%, 420px);
+        }
+
+        .login-flow-strip {
+            width: min(100%, 360px);
         }
     }
 
@@ -616,11 +722,31 @@
 
         <div class="side-panel">
             <div class="side-panel-content">
-                <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/producao_preview.png?v=20260514-login-preview-png" alt="Preview do dashboard de producao" class="monitor-image" />
-                <h3>Novidades!</h3>
-                <p>BI e IA transformam dados assistenciais em visão clara para gestão.
-
-                    Acompanhe internações, contas e indicadores em tempo real, com mais precisão para decidir.</p>
+                <div class="login-side-kicker">FullCare inteligência</div>
+                <h3>Sistema inteligente de auditoria médica</h3>
+                <p>BI e IA transformam dados assistenciais em acompanhamento objetivo de internações, contas e indicadores.</p>
+                <div class="login-insight-row" aria-label="Indicadores em destaque">
+                    <div class="login-insight-card">
+                        <small>BI</small>
+                        <strong>Dados em tempo real</strong>
+                    </div>
+                    <div class="login-insight-card">
+                        <small>IA</small>
+                        <strong>Leitura assistencial</strong>
+                    </div>
+                    <div class="login-insight-card">
+                        <small>Gestão</small>
+                        <strong>Decisão mais rápida</strong>
+                    </div>
+                </div>
+                <div class="login-flow-strip" aria-label="Fluxo de auditoria">
+                    <span>Internação</span>
+                    <i aria-hidden="true"></i>
+                    <span>Auditoria</span>
+                    <i aria-hidden="true"></i>
+                    <span>Resultado</span>
+                </div>
+                <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/producao_preview.png?v=20260516-login-preview-pro" alt="Preview do dashboard de producao" class="monitor-image" />
             </div>
         </div>
     </div>
