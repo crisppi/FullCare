@@ -1,4 +1,4 @@
-package com.example.mobile_app
+package br.com.fullcare.audit
 
 import io.flutter.embedding.android.FlutterActivity
 
