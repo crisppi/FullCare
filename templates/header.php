@@ -950,6 +950,25 @@ if (!empty($sessionIdUsuario)) {
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
+                                        <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/resultados"><i
+                                                    class="bi bi-graph-up-arrow"
+                                                    style="font-size: 1rem;margin-right:5px; color:#7ee3c8;"></i>
+                                                BI Resultados</a></li>
+                                        <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/produtividade"><i
+                                                    class="bi bi-clipboard2-check"
+                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
+                                                BI Produtividade</a></li>
+                                        <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/qualidade-360"><i
+                                                    class="bi bi-award"
+                                                    style="font-size: 1rem;margin-right:5px; color:#b897ff;"></i>
+                                                BI Qualidade</a></li>
+                                        <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/preditivo"><i
+                                                    class="bi bi-bullseye"
+                                                    style="font-size: 1rem;margin-right:5px; color:#ffd36e;"></i>
+                                                BI Preditivo</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/indicadores"><i
                                                     class="bi bi-speedometer2"
                                                     style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
