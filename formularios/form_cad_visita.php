@@ -11,12 +11,14 @@ function fmtDmy(?string $s): string
 
 $idSessao = (int)($_SESSION['id_usuario'] ?? 0);
 $cargoSessao = $_SESSION['cargo'] ?? ($_SESSION['cargo_user'] ?? '');
+$emailSessao = mb_strtolower(trim((string)($_SESSION['email_user'] ?? '')), 'UTF-8');
 
 include_once("dao/usuarioDao.php");
 $usuarioDao = new UserDAO($conn, $BASE_URL);
 
 $normCargoSessao = mb_strtolower(str_replace([' ', '-'], '_', (string)$cargoSessao), 'UTF-8');
-$isMedSessao = strpos($normCargoSessao, 'med') === 0;
+$isCrisppiSessao = $emailSessao === 'crisppi@fullcare.com.br';
+$isMedSessao = strpos($normCargoSessao, 'med') === 0 || $isCrisppiSessao;
 $isEnfSessao = strpos($normCargoSessao, 'enf') === 0;
 $mostrarCadastroCentral = !($isMedSessao || $isEnfSessao);
 

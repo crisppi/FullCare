@@ -59,15 +59,32 @@
     $emailSessao = $_SESSION['email_user'] ?? '';
     $nivelSessaoRaw = (string) ($_SESSION['nivel'] ?? '');
     $nivelSessaoInt = (int) $nivelSessaoRaw;
-    $normCargoSessao = mb_strtolower(str_replace([' ', '-'], '_', (string) $cargoSessao), 'UTF-8');
-    $isMedOuEnf = in_array($normCargoSessao, ['med_auditor', 'medico_auditor', 'enf_auditor', 'enfer_auditor'], true);
+    $normalizeCargoSessao = static function ($cargo): string {
+        $cargo = mb_strtolower((string) $cargo, 'UTF-8');
+        $cargo = strtr($cargo, [
+            'á' => 'a', 'à' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a',
+            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
+            'ç' => 'c',
+        ]);
+        $cargo = preg_replace('/[^a-z0-9]+/', '_', $cargo);
+        return trim((string) $cargo, '_');
+    };
+    $normCargoSessao = $normalizeCargoSessao($cargoSessao);
+    $isCrisppiSessao = mb_strtolower(trim((string)$emailSessao), 'UTF-8') === 'crisppi@fullcare.com.br';
+    $isMedSessao = strpos($normCargoSessao, 'med') === 0 || strpos($normCargoSessao, 'medico') === 0 || $isCrisppiSessao;
+    $isEnfSessao = strpos($normCargoSessao, 'enf') === 0 || strpos($normCargoSessao, 'enfer') === 0;
+    $isMedOuEnf = $isMedSessao || $isEnfSessao;
     $cargoSessaoLower = mb_strtolower((string) $cargoSessao, 'UTF-8');
     $isDiretorSessao = (mb_stripos($cargoSessaoLower, 'diretor') !== false)
         || (mb_stripos($cargoSessaoLower, 'diretoria') !== false)
         || in_array($nivelSessaoRaw, ['1', '-1'], true);
     $isCadastroCentralUser = (mb_stripos($cargoSessaoLower, 'analista') !== false);
-    $cadastroCentralObrigatorio = $isDiretorSessao || $isCadastroCentralUser;
-    $mostrarCadastroCentral = $cadastroCentralObrigatorio || !$isMedOuEnf;
+    $usaUsuarioSessaoComoResponsavel = $isMedOuEnf || $isDiretorSessao || $isCrisppiSessao;
+    $cadastroCentralObrigatorio = $isCadastroCentralUser && !$usaUsuarioSessaoComoResponsavel;
+    $mostrarCadastroCentral = $cadastroCentralObrigatorio || !$usaUsuarioSessaoComoResponsavel;
 
     $dataAtual = date('Y-m-d');
     $agora = date('Y-m-d');
@@ -576,10 +593,10 @@
                             <input type="hidden" value="0" id="visita_no_int" name="visita_no_int">
 
                             <!-- Flags do responsável (atualizadas pelo JS unificado) -->
-                            <input type="hidden" id="visita_enf_int" name="visita_enf_int" value="n">
-                            <input type="hidden" id="visita_med_int" name="visita_med_int" value="n">
-                            <input type="hidden" id="visita_auditor_prof_enf" name="visita_auditor_prof_enf" value="">
-                            <input type="hidden" id="visita_auditor_prof_med" name="visita_auditor_prof_med" value="">
+                            <input type="hidden" id="visita_enf_int" name="visita_enf_int" value="<?= $isEnfSessao ? 's' : 'n' ?>">
+                            <input type="hidden" id="visita_med_int" name="visita_med_int" value="<?= ($isMedSessao || $isDiretorSessao || $isCrisppiSessao) ? 's' : 'n' ?>">
+                            <input type="hidden" id="visita_auditor_prof_enf" name="visita_auditor_prof_enf" value="<?= $isEnfSessao ? htmlspecialchars((string) $idSessao) : '' ?>">
+                            <input type="hidden" id="visita_auditor_prof_med" name="visita_auditor_prof_med" value="<?= ($isMedSessao || $isDiretorSessao || $isCrisppiSessao) ? htmlspecialchars((string) $idSessao) : '' ?>">
                             <input type="hidden" id="cad_central_obrigatorio" name="cad_central_obrigatorio"
                                 value="<?= $cadastroCentralObrigatorio ? '1' : '0' ?>">
                         </div>
@@ -1084,7 +1101,9 @@
             baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
             prefillPacienteId: <?= $id_paciente_get > 0 ? (int)$id_paciente_get : 'null' ?>,
             idSessao: <?= json_encode((string) $idSessao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
-            cargoSessao: <?= json_encode((string) $cargoSessao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
+            cargoSessao: <?= json_encode((string) $cargoSessao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+            cargoSessaoNorm: <?= json_encode((string) $normCargoSessao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+            emailSessao: <?= json_encode((string) $emailSessao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
         });
     </script>
     <script src="<?= $BASE_URL ?>js/form_cad_internacao.js?v=<?= filemtime(__DIR__ . '/../js/form_cad_internacao.js') ?>"></script>
