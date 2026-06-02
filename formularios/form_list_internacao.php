@@ -366,6 +366,53 @@ try {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
+.filter-intel-details {
+    margin-bottom: 6px;
+}
+
+.filter-intel-details > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 32px;
+    padding: 0 11px;
+    border-radius: 999px;
+    border: 1px solid #c8deeb;
+    background: #f4faff;
+    color: #2f6f9f;
+    cursor: pointer;
+    font-size: .68rem;
+    font-weight: 800;
+    list-style: none;
+    user-select: none;
+}
+
+.filter-intel-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.filter-intel-details > summary::before {
+    content: "+";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: #2f6f9f;
+    color: #fff;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.filter-intel-details[open] > summary {
+    margin-bottom: 6px;
+}
+
+.filter-intel-details[open] > summary::before {
+    content: "-";
+}
+
 .filter-intel-wrapper h6 {
     font-weight: 800;
     color: #24384f;
@@ -645,6 +692,11 @@ try {
     font-size: .68rem;
 }
 
+.visit-age {
+    font-weight: 500;
+    font-size: .68rem;
+}
+
 @media (max-width: 991.98px) {
     .internacao-list-hero {
         flex-direction: column;
@@ -679,10 +731,10 @@ if (typeof jQuery !== 'undefined') {
 <!-- FORMULARIO DE PESQUISAS -->
 <div class="container-fluid internacao-list-page" id='main-container'>
 
-    <div class="listagem-hero listagem-hero--cadastro internacao-list-hero">
-        <div class="listagem-hero__copy internacao-list-hero__copy">
-            <div class="listagem-kicker internacao-list-kicker">Internações</div>
-            <h1 class="listagem-title internacao-list-title"><?= $onlySemSenha ? 'Senha pendente' : 'Listagem de internações' ?></h1>
+    <div class="fc-module-header internacao-list-hero">
+        <div class="fc-module-header__copy internacao-list-hero__copy">
+            <p class="fc-module-header__kicker">Internações</p>
+            <h1 class="fc-module-header__title"><?= $onlySemSenha ? 'Senha pendente' : 'Listagem de internações' ?></h1>
         </div>
 
         <?php
@@ -697,7 +749,7 @@ if (typeof jQuery !== 'undefined') {
         $pesquisa_seguradora = $pesquisa_seguradora ?? '';
         ?>
 
-        <div class="listagem-hero__actions internacao-list-hero__actions">
+        <div class="fc-module-header__actions internacao-list-hero__actions">
             <!-- Botão de Exportar para Excel (abre modal) -->
             <a href="#" id="btn-exportar-excel" class="btn btn-success btn-list-top btn-export">
                 Exportar para Excel
@@ -734,30 +786,33 @@ if (typeof jQuery !== 'undefined') {
                     $pesquisa_seguradora = $seguradoraUserNome !== '' ? $seguradoraUserNome : $pesquisa_seguradora;
                 }
                 ?>
-                <div class="filter-intel-wrapper">
-                    <h6>Memória de filtros e busca inteligente</h6>
-                    <div class="filter-intel-grid">
-                        <div class="smart-search-group">
-                            <label for="smartSearchPhrase">Busca em linguagem natural</label>
-                            <div class="input-group">
-                                <input type="text" id="smartSearchPhrase" class="form-control form-control-sm"
-                                    placeholder='Ex.: "contas Einstein outubro 2023" ou "paciente Ana maio"'>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnApplySmartSearch">
-                                    Aplicar frase
-                                </button>
+                <details class="filter-intel-details">
+                    <summary>Busca inteligente</summary>
+                    <div class="filter-intel-wrapper">
+                        <h6>Memória de filtros</h6>
+                        <div class="filter-intel-grid">
+                            <div class="smart-search-group">
+                                <label for="smartSearchPhrase">Busca em linguagem natural</label>
+                                <div class="input-group">
+                                    <input type="text" id="smartSearchPhrase" class="form-control form-control-sm"
+                                        placeholder='Ex.: "contas Einstein outubro 2023" ou "paciente Ana maio"'>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnApplySmartSearch">
+                                        Aplicar frase
+                                    </button>
+                                </div>
+                                <div id="smartSearchFeedback" class="smart-search-feedback" role="alert" aria-live="polite"></div>
+                                <small>Tente combinar hospital, paciente, seguradora, mês/ano ou senha em uma frase única.</small>
                             </div>
-                            <div id="smartSearchFeedback" class="smart-search-feedback" role="alert" aria-live="polite"></div>
-                            <small>Tente combinar hospital, paciente, seguradora, mês/ano ou senha em uma frase única.</small>
+                            <div class="filter-memory-actions">
+                                <button type="button" id="btnApplyLastFilter">Aplicar último filtro</button>
+                                <button type="button" id="btnSaveFavFilter">Salvar como favorito</button>
+                                <button type="button" id="btnClearFilters" class="btn-filtro-limpar"><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Limpar filtros</button>
+                            </div>
                         </div>
-                        <div class="filter-memory-actions">
-                            <button type="button" id="btnApplyLastFilter">Aplicar último filtro</button>
-                            <button type="button" id="btnSaveFavFilter">Salvar como favorito</button>
-                            <button type="button" id="btnClearFilters" class="btn-filtro-limpar"><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Limpar filtros</button>
-                        </div>
+                        <div class="filter-favorites" id="filterFavorites"></div>
+                        <div class="filter-empty-hint" id="filterFavoritesHint">Nenhum favorito salvo ainda.</div>
                     </div>
-                    <div class="filter-favorites" id="filterFavorites"></div>
-                    <div class="filter-empty-hint" id="filterFavoritesHint">Nenhum favorito salvo ainda.</div>
-                </div>
+                </details>
                 <div class="form-group row filter-inline-row" style="margin-bottom:14px;">
                     <div class="form-group col-sm-2 filter-inline-field filter-inline--wide" style="padding:2px;padding-left:16px !important;">
                         <input class="form-control form-control-sm" type="text" style="color:#878787;margin-top:0;"
@@ -1184,7 +1239,7 @@ if (typeof jQuery !== 'undefined') {
                                             $cor   = 'red';
                                             $icone = '<i class="fas fa-times-circle" style="color: red; margin-right: 5px;"></i>';
                                         }
-                                        echo "$icone<span style='color: $cor; font-weight: bold;'>{$dias} dias</span>";
+                                        echo "$icone<span class='visit-age' style='color: $cor;'>{$dias} dias</span>";
                                     } else {
                                         echo "<span style='color: gray;'>--</span>";
                                     }
@@ -1208,7 +1263,7 @@ if (typeof jQuery !== 'undefined') {
                                             $cor   = 'red';
                                             $icone = '<i class="fas fa-times-circle" style="color: red; margin-right: 5px;"></i>';
                                         }
-                                        echo "$icone<span style='color: $cor; font-weight: bold;'>{$diasEnf} dias</span>";
+                                        echo "$icone<span class='visit-age' style='color: $cor;'>{$diasEnf} dias</span>";
                                     } else {
                                         echo "<span style='color: gray;'>--</span>";
                                     }

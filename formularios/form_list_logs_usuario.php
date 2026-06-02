@@ -295,8 +295,12 @@ $acessosRows = array_slice($acessosRows, 0, 30);
 ?>
 
 <div class="container-fluid form_container" style="margin-top:15px;">
-    <h4 class="page-title">Logs por Usuário</h4>
-    <hr style="margin-top:5px;margin-bottom:10px;">
+    <div class="fc-module-header">
+        <div class="fc-module-header__copy">
+            <p class="fc-module-header__kicker">Gestão</p>
+            <h1 class="fc-module-header__title">Logs por Usuário</h1>
+        </div>
+    </div>
 
     <div class="alert alert-info py-2 mb-3">
         <strong>Arquivo:</strong> <code><?= eLogUser($logFile) ?></code>
@@ -347,7 +351,7 @@ $acessosRows = array_slice($acessosRows, 0, 30);
                 </div>
                 <div class="fc-filter-item w-actions">
                     <button type="submit" class="btn btn-primary"
-                        style="background-color:#5e2363;width:42px;height:32px;border-color:#5e2363">
+                        style="background-color:#2f6f9f;width:42px;height:32px;border-color:#2f6f9f">
                         <span class="material-icons" style="margin-left:-3px;margin-top:-2px;">search</span>
                     </button>
                     <a href="<?= eLogUser($BASE_URL) ?>inteligencia/logs-usuarios" class="btn btn-light btn-sm" title="Limpar filtros">

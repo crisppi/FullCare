@@ -15,6 +15,11 @@
 
 .table thead th {
     text-align: center;
+    height: 30px;
+    min-height: 30px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    line-height: 1.15;
 }
 
 .table thead {

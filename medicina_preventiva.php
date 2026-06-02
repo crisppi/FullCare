@@ -169,16 +169,16 @@ function mp_action_label(string $action): string
 
 <div class="mp-shell">
     <div class="container-fluid">
-        <div class="mp-hero mb-4">
+        <div class="fc-module-header mb-4">
             <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
-                <div>
-                    <div class="text-uppercase small fw-semibold" style="letter-spacing:.08em;opacity:.85;">Cuidado Continuado</div>
-                    <h1 class="h3 mt-2 mb-2">Medicina Preventiva</h1>
-                    <p class="mb-0" style="max-width:840px;opacity:.92;">
+                <div class="fc-module-header__copy">
+                    <p class="fc-module-header__kicker">Cuidado Continuado</p>
+                    <h1 class="fc-module-header__title">Medicina Preventiva</h1>
+                    <p class="fc-module-header__subtitle">
                         A Medicina Preventiva funciona como um monitoramento telefônico estruturado. Os pacientes elegíveis são admitidos no programa e passam a ter rotina de contato, orientação e acompanhamento.
                     </p>
                 </div>
-                <div class="d-flex gap-2 flex-wrap align-items-start">
+                <div class="fc-module-header__actions">
                     <a class="btn btn-light" href="<?= htmlspecialchars($BASE_URL . 'cuidado-continuado') ?>">Dashboard</a>
                     <a class="btn btn-outline-light" href="<?= htmlspecialchars($BASE_URL . 'cuidado-continuado/cronicos') ?>">Gestão de Crônicos</a>
                 </div>
