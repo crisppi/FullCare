@@ -48,11 +48,29 @@ include_once("templates/header.php");
             display: inline-flex;
             align-items: center;
             background: #eef7fc;
-            color: #4b1c50;
+            color: #24384f;
             font-size: 0.76rem;
             border-radius: 999px;
             padding: 0.18rem 0.62rem;
             margin: 0.15rem;
+        }
+        .insight-card .table tbody tr:nth-child(odd),
+        .insight-card .table tbody tr:nth-child(odd) > * {
+            background: #fff !important;
+            --bs-table-bg: #fff !important;
+            --bs-table-accent-bg: #fff !important;
+        }
+        .insight-card .table tbody tr:nth-child(even),
+        .insight-card .table tbody tr:nth-child(even) > * {
+            background: #f4faff !important;
+            --bs-table-bg: #f4faff !important;
+            --bs-table-accent-bg: #f4faff !important;
+        }
+        .insight-card .table-hover tbody tr:hover,
+        .insight-card .table-hover tbody tr:hover > * {
+            background: #e8f4fb !important;
+            --bs-table-bg: #e8f4fb !important;
+            --bs-table-accent-bg: #e8f4fb !important;
         }
     </style>
 </head>

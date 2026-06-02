@@ -702,6 +702,24 @@ if (!empty($sessionIdUsuario)) {
             color: #3f3b46 !important;
         }
 
+        .table tbody tr:nth-child(odd),
+        .table tbody tr:nth-child(odd) > *,
+        .perf-table tbody tr:nth-child(odd),
+        .perf-table tbody tr:nth-child(odd) > * {
+            background: #ffffff !important;
+            --bs-table-bg: #ffffff !important;
+            --bs-table-accent-bg: #ffffff !important;
+        }
+
+        .table tbody tr:nth-child(even),
+        .table tbody tr:nth-child(even) > *,
+        .perf-table tbody tr:nth-child(even),
+        .perf-table tbody tr:nth-child(even) > * {
+            background: #f4faff !important;
+            --bs-table-bg: #f4faff !important;
+            --bs-table-accent-bg: #f4faff !important;
+        }
+
         .table-striped > tbody > tr:nth-of-type(odd) > * {
             --bs-table-accent-bg: #f4faff !important;
             color: #3f3b46 !important;
