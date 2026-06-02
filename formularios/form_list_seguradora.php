@@ -92,7 +92,7 @@
     <!--tabela evento-->
     <div class="container-fluid form_container listagem-page" style="margin-top:18px;">
 
-        <div class="listagem-hero">
+        <div class="listagem-hero listagem-hero--cadastro">
             <div class="listagem-hero__copy">
                 <div class="listagem-kicker">Cadastros</div>
                 <h1 class="listagem-title">Seguradoras</h1>

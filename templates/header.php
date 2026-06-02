@@ -25,9 +25,10 @@ if ($basePathFromBaseUrl === '/' && preg_match('#^/(FullCare|FullConex(?:Aud)?)(
 }
 
 $currentScriptName = strtolower((string)basename((string)($_SERVER['SCRIPT_NAME'] ?? '')));
+$isBiRequestPath = preg_match('#/bi(/|$)#i', $requestUriPath) === 1;
 $isOperationalIntelligencePage =
     preg_match('#/inteligencia(/|$)#i', $requestUriPath) === 1
-    || in_array($currentScriptName, [
+    || (!$isBiRequestPath && in_array($currentScriptName, [
         'dashboard_operacional.php',
         'dashboard_performance.php',
         'faturamento_previsao.php',
@@ -44,7 +45,7 @@ $isOperationalIntelligencePage =
         'clusterizacao_clinica.php',
         'text_automation.php',
         'inteligencia_logs_usuario.php',
-    ], true);
+    ], true));
 
 // Caminho default da foto do usuario
 $defaultFoto = $BASE_URL . 'uploads/usuarios/default-user.jpeg';
@@ -688,6 +689,8 @@ if (!empty($sessionIdUsuario)) {
         .table thead th,
         .report-wrapper .table thead th,
         .insight-card .table thead th,
+        .forecast-table th,
+        .dash-table-card th,
         .perf-table th {
             background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%) !important;
             color: #ffffff !important;
@@ -696,7 +699,52 @@ if (!empty($sessionIdUsuario)) {
             letter-spacing: .04em !important;
         }
 
+        .table,
+        .forecast-table,
+        .dash-table-card table,
+        .perf-table {
+            border-collapse: collapse !important;
+            font-size: .78rem !important;
+        }
+
+        .table thead th,
+        .table tbody td,
+        .forecast-table th,
+        .forecast-table td,
+        .dash-table-card th,
+        .dash-table-card td,
+        .perf-table th,
+        .perf-table td {
+            height: 34px !important;
+            min-height: 34px !important;
+            padding: 7px 12px !important;
+            line-height: 1.25 !important;
+            vertical-align: middle !important;
+        }
+
+        .table tbody td,
+        .forecast-table td,
+        .dash-table-card td,
+        .perf-table td {
+            white-space: nowrap !important;
+        }
+
+        .table-sm > :not(caption) > * > * {
+            padding: 7px 12px !important;
+        }
+
+        .table thead th,
+        .forecast-table th,
+        .dash-table-card th,
+        .perf-table th {
+            height: 38px !important;
+            min-height: 38px !important;
+            white-space: nowrap !important;
+        }
+
         .table td,
+        .forecast-table td,
+        .dash-table-card td,
         .perf-table td {
             border-color: #e0edf5 !important;
             color: #3f3b46 !important;
@@ -1223,7 +1271,7 @@ if (!empty($sessionIdUsuario)) {
                                                 Previsão faturamento</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/painel-mensal"><i
                                                     class="bi bi-graph-up-arrow"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i>
+                                                    style="font-size: 1rem;margin-right:5px; color:#1d9ad8;"></i>
                                                 Painel Mensal</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/inteligencia-operadora"><i
                                                     class="bi bi-shield-check"
@@ -1448,10 +1496,26 @@ if (!empty($sessionIdUsuario)) {
             </div>
         </nav>
         <?php
-        if (empty($hideBIMenu ?? false)) {
+        $shouldRenderBISidebar = empty($hideBIMenu ?? false)
+            && !$isOperationalIntelligencePage
+            && function_exists('fullcare_is_bi_request')
+            && fullcare_is_bi_request();
+        if ($shouldRenderBISidebar) {
             include_once(__DIR__ . '/bi_topbar.php');
         }
         ?>
+        <?php if ($isOperationalIntelligencePage): ?>
+            <script>
+                (function () {
+                    const cleanupBiSidebar = () => {
+                        document.body.classList.remove('bi-theme', 'bi-nav-open', 'bi-nav-collapsed', 'bi-navegacao');
+                        document.querySelectorAll('.bi-sidebar-shell, .bi-side-toggle, .bi-mobile-backdrop').forEach((el) => el.remove());
+                    };
+                    cleanupBiSidebar();
+                    document.addEventListener('DOMContentLoaded', cleanupBiSidebar);
+                })();
+            </script>
+        <?php endif; ?>
 
         <!-- notification message -->
         <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start(); ?>

@@ -90,7 +90,7 @@ if ($qtdIntItens > $limite) {
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="./scripts/cadastro/general.js"></script>
-    <div class="listagem-hero">
+    <div class="listagem-hero listagem-hero--cadastro">
         <div class="listagem-hero__copy">
             <div class="listagem-kicker">Cadastros</div>
             <h1 class="listagem-title">Estipulantes</h1>

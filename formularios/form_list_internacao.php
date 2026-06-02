@@ -239,63 +239,6 @@ try {
     padding: 4px 4px 14px;
 }
 
-.internacao-list-hero {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 6px;
-    margin-bottom: 4px;
-    padding-left: 8px;
-}
-
-.internacao-list-hero__copy {
-    min-width: 0;
-}
-
-.internacao-list-kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 1px;
-    color: #7b5a9a;
-    font-size: .5rem;
-    font-weight: 800;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-
-.internacao-list-kicker::before {
-    content: "";
-    width: 18px;
-    height: 2px;
-    border-radius: 999px;
-    background: currentColor;
-}
-
-.internacao-list-title {
-    margin: 0;
-    color: #2d203d;
-    font-size: .96rem;
-    font-weight: 800;
-    letter-spacing: -.03em;
-}
-
-.internacao-list-subtitle {
-    margin: 1px 0 0;
-    color: #7b7b8d;
-    font-size: .66rem;
-}
-
-.internacao-list-hero__actions {
-    display: flex;
-    align-items: center;
-    align-self: flex-end;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    padding-bottom: 2px;
-}
-
 .btn-list-top {
     display: inline-flex;
     align-items: center;
@@ -306,7 +249,7 @@ try {
     padding: 0 10px;
     font-weight: 700;
     font-size: .7rem;
-    box-shadow: 0 8px 16px rgba(46, 27, 78, 0.10);
+    box-shadow: 0 8px 16px rgba(35, 102, 147, 0.12);
     line-height: 1;
     text-align: center;
     white-space: nowrap;
@@ -322,9 +265,9 @@ try {
 
 .complete-table {
     border-radius: 18px;
-    border: 1px solid rgba(94, 35, 99, 0.10);
-    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,244,253,0.96) 100%);
-    box-shadow: 0 10px 22px rgba(45, 18, 70, 0.06);
+    border: 1px solid rgba(76, 142, 187, 0.16);
+    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(244,250,255,0.96) 100%);
+    box-shadow: 0 10px 22px rgba(35, 102, 147, 0.07);
     padding: 8px 8px 6px;
     overflow: hidden;
 }
@@ -333,21 +276,15 @@ try {
     padding: 0;
 }
 
-/* Chips roxos para seleção de campos (modal export) */
-/* Pills lilás maiores, com ícones brancos */
 .export-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 6px 20px;
-    /* mais “gordinho” */
     border-radius: 999px;
-    background-color: #5e2363;
-    /* roxo cheio */
+    background-color: #2f6f9f;
     color: #ffffff;
-    /* texto branco */
     font-size: 0.95rem;
-    /* fonte um pouco maior */
     font-weight: 600;
     border: none;
     cursor: pointer;
@@ -355,24 +292,19 @@ try {
     white-space: nowrap;
 }
 
-/* Estado desativado (contorno) */
 .export-pill.inactive {
     background-color: #ffffff;
-    color: #5e2363;
-    border: 1px solid #5e2363;
+    color: #2f6f9f;
+    border: 1px solid #2f6f9f;
 }
 
-/* Ícones sempre brancos nas pills ativas */
 .export-pill i {
     color: #ffffff;
-    /* ícones brancos */
     font-size: 1rem;
-    /* maior que antes */
 }
 
-/* Ícones roxos quando a pill está desativada */
 .export-pill.inactive i {
-    color: #5e2363;
+    color: #2f6f9f;
 }
 
 .th-sortable {
@@ -424,19 +356,19 @@ try {
 }
 
 .filter-intel-wrapper {
-    border: 1px solid #e7dcf1;
+    border: 1px solid #d7e8f3;
     border-radius: 14px;
     padding: 6px 8px;
     margin-bottom: 6px;
     background:
         radial-gradient(circle at top right, rgba(83, 196, 226, 0.10), transparent 26%),
-        linear-gradient(180deg, #fefcff 0%, #f8f3fd 100%);
+        linear-gradient(180deg, #ffffff 0%, #f4faff 100%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .filter-intel-wrapper h6 {
     font-weight: 800;
-    color: #5e2363;
+    color: #24384f;
     margin-bottom: 3px;
     font-size: .68rem;
 }
@@ -518,9 +450,9 @@ try {
     border-radius: 999px;
     font-size: 0.62rem;
     font-weight: 700;
-    background: #f3edff;
-    border: 1px solid #d6c5f7;
-    color: #5e2363;
+    background: #f4faff;
+    border: 1px solid #c8deeb;
+    color: #2f6f9f;
 }
 
 .filter-intel-grid input[type="text"] {
@@ -548,15 +480,15 @@ try {
     border-radius: 999px;
     font-size: .64rem;
     font-weight: 600;
-    border: 1px solid #bfa3d1;
+    border: 1px solid #c8deeb;
     background: #fff;
-    color: #5e2363;
+    color: #2f6f9f;
     padding: 3px 7px;
     transition: all .15s ease;
 }
 
 .filter-memory-actions button:hover {
-    background: #5e2363;
+    background: #2f6f9f;
     color: #fff;
 }
 
@@ -568,7 +500,7 @@ try {
     padding: 5px 6px;
     border-radius: 10px;
     background: #fff;
-    border: 1px solid #ece4f4;
+    border: 1px solid #d7e8f3;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
 }
 
@@ -667,7 +599,7 @@ try {
     margin-top: 8px !important;
     border-radius: 14px;
     overflow: hidden;
-    border: 1px solid #ebe3f3;
+    border: 1px solid #d7e8f3;
     background: #fff;
 }
 
@@ -678,7 +610,7 @@ try {
 #table-content thead th {
     padding-top: 7px;
     padding-bottom: 7px;
-    background: linear-gradient(90deg, #5e2363 0%, #69407f 100%);
+    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%) !important;
     border-bottom: none;
     color: #fff;
     font-size: .54rem;
@@ -693,19 +625,19 @@ try {
     padding-bottom: 6px;
     font-size: .7rem;
     vertical-align: middle;
-    border-top: 1px solid #f1ebf7;
+    border-top: 1px solid #e0edf5;
 }
 
 #table-content tbody tr:nth-child(even) {
-    background: #fbf8fe;
+    background: #f4faff;
 }
 
 #table-content tbody tr:hover {
-    background: #f3ecfb !important;
+    background: #e8f4fb !important;
 }
 
 .fc-list-action .dropdown-toggle {
-    border: 1px solid #dccceb;
+    border: 1px solid #c8deeb;
     border-radius: 10px;
     min-width: 32px;
     min-height: 28px;
@@ -747,10 +679,10 @@ if (typeof jQuery !== 'undefined') {
 <!-- FORMULARIO DE PESQUISAS -->
 <div class="container-fluid internacao-list-page" id='main-container'>
 
-    <div class="internacao-list-hero">
-        <div class="internacao-list-hero__copy">
-            <div class="internacao-list-kicker">Internações</div>
-            <h1 class="internacao-list-title"><?= $onlySemSenha ? 'Internações com senha pendente' : 'Listagem de internações' ?></h1>
+    <div class="listagem-hero listagem-hero--cadastro internacao-list-hero">
+        <div class="listagem-hero__copy internacao-list-hero__copy">
+            <div class="listagem-kicker internacao-list-kicker">Internações</div>
+            <h1 class="listagem-title internacao-list-title"><?= $onlySemSenha ? 'Senha pendente' : 'Listagem de internações' ?></h1>
         </div>
 
         <?php
@@ -765,7 +697,7 @@ if (typeof jQuery !== 'undefined') {
         $pesquisa_seguradora = $pesquisa_seguradora ?? '';
         ?>
 
-        <div class="internacao-list-hero__actions">
+        <div class="listagem-hero__actions internacao-list-hero__actions">
             <!-- Botão de Exportar para Excel (abre modal) -->
             <a href="#" id="btn-exportar-excel" class="btn btn-success btn-list-top btn-export">
                 Exportar para Excel
@@ -893,7 +825,7 @@ if (typeof jQuery !== 'undefined') {
                     <div class="form-group col-sm-1 filter-inline-field filter-inline--icon" style="padding:2px;">
                         <div class="filter-inline-actions">
                             <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
-                                style="background-color:#5e2363;width:42px;height:32px;border-color:#5e2363;margin-top:0;">
+                                style="background-color:#2f6f9f;width:42px;height:32px;border-color:#2f6f9f;margin-top:0;">
                                 <i class="bi bi-search"></i>
                             </button>
                             <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/lista', ENT_QUOTES, 'UTF-8') ?>"
@@ -1310,7 +1242,7 @@ if (typeof jQuery !== 'undefined') {
                             <td class="fc-list-action">
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" id="acoesInternacaoDropdown<?= (int)$intern['id_internacao'] ?>"
-                                        role="button" data-bs-toggle="dropdown" style="color:#5e2363"
+                                        role="button" data-bs-toggle="dropdown" style="color:#2f6f9f"
                                         aria-expanded="false">
                                         <i class="bi bi-stack"></i>
                                     </button>
@@ -1912,7 +1844,7 @@ $(document).ready(function() {
     });
 
     // ==========================================
-    // 3) PILLS (chips lilás) <-> checkboxes
+    // 3) Pills de exportação <-> checkboxes
     // ==========================================
 
     // Deixa as pills com visual coerente com o estado dos checkboxes
