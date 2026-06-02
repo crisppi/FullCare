@@ -38,11 +38,16 @@
 }
 
 .listagem-title {
+    display: inline-flex;
+    align-items: center;
     margin: 0;
-    color: #2d203d;
+    color: #fff;
+    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+    border-radius: 18px;
+    padding: 8px 16px;
     font-size: 1.26rem;
     font-weight: 800;
-    letter-spacing: -.03em;
+    letter-spacing: 0;
 }
 
 .listagem-subtitle {
@@ -366,7 +371,7 @@
 .listagem-table-wrap thead th {
     padding-top: 10px;
     padding-bottom: 10px;
-    background: linear-gradient(90deg, #5e2363 0%, #69407f 100%);
+    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
     border-bottom: none;
     color: #fff;
     font-size: .66rem;

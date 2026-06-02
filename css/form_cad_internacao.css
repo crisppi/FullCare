@@ -798,11 +798,11 @@
         }
 
         .internacao-page__hero {
-            background: linear-gradient(135deg, #4f2469 0%, #6f45a2 55%, #8e68c2 100%);
+            background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
             color: #fff;
             border-radius: 24px;
             padding: 8px 14px;
-            box-shadow: 0 8px 16px rgba(37, 18, 54, 0.12);
+            box-shadow: 0 8px 16px rgba(35, 102, 147, 0.16);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -2323,8 +2323,8 @@
         }
 
         .entity-form .table-responsive thead th {
-            background: #f5effa;
-            color: #4a345f;
+            background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+            color: #fff;
             border-bottom-width: 1px;
             font-size: .68rem;
             text-transform: uppercase;

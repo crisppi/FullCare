@@ -4,6 +4,8 @@
     --select-arrow: var(--select-border);
     --app-zoom: 0.9;
     --header-offset: 112px;
+    --fullcare-blue-gradient: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+    --fullcare-blue-border: #2d6c9b;
 }
 
 * {
@@ -124,7 +126,12 @@ p {
 }
 
 .page-title {
-    color: #000;
+    display: inline-flex;
+    align-items: center;
+    color: #fff;
+    background: var(--fullcare-blue-gradient);
+    border-radius: 18px;
+    padding: 8px 16px;
     margin-top: 1.25rem;
     margin-bottom: 0.75rem;
 }
@@ -192,8 +199,8 @@ p {
 }
 
 .table thead {
-    background-color: #5e2363;
-    border-color: #5e2363;
+    background: var(--fullcare-blue-gradient);
+    border-color: var(--fullcare-blue-border);
     height: 37px;
     vertical-align: middle;
 }

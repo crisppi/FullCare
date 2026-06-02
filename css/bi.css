@@ -87,12 +87,17 @@ body.bi-theme,
 }
 
 .bi-title {
+  display: inline-flex;
+  align-items: center;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   font-size: clamp(0.98rem, 1.8vw, 1.34rem);
   margin: 0;
-  color: var(--bi-text);
+  color: #ffffff;
+  background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+  border-radius: 18px;
+  padding: 8px 16px;
 }
 
 .bi-theme .bi-wrapper > .bi-obitos-hero .bi-obitos-header,
@@ -1153,8 +1158,8 @@ table.bi-table::after,
   font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--bi-muted);
-  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
   border-bottom: 1px solid var(--bi-border);
   padding: 7px 9px;
   text-align: left;
@@ -1758,8 +1763,8 @@ table.bi-table::after,
 }
 
 .bi-theme .bi-table th {
-  color: #dceafa;
-  background: linear-gradient(180deg, rgba(22, 54, 85, 0.92), rgba(14, 40, 66, 0.88));
+  color: #ffffff;
+  background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
   border-bottom: 1px solid rgba(218, 239, 255, 0.22);
   padding: 9px 10px;
 }
