@@ -247,6 +247,9 @@ if (!empty($sessionIdUsuario)) {
     <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/css/theme.css" rel="stylesheet" media="all">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/style.css?v=<?= @filemtime(__DIR__ . '/../css/style.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/legendas.css?v=<?= @filemtime(__DIR__ . '/../css/legendas.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/styleMenu.css?v=<?= @filemtime(__DIR__ . '/../css/styleMenu.css') ?>" rel="stylesheet">
@@ -394,7 +397,7 @@ if (!empty($sessionIdUsuario)) {
         .navbar-nav.navbar-nav-scroll .nav-link {
             white-space: nowrap;
             padding: 0.36rem 0.34rem;
-            font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
+            font-family: "Inter", Arial, Helvetica, sans-serif !important;
             font-size: 0.82rem;
             font-weight: 400;
             line-height: 1.18;

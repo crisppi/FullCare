@@ -125,7 +125,7 @@ li {
 .navbar-light.nav_bar_custom .navbar-nav .nav-link:visited,
 .navbar-light.nav_bar_custom .navbar-nav .nav-link.show {
     color: #111827 !important;
-    font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
+    font-family: "Inter", Arial, Helvetica, sans-serif !important;
     font-weight: 400;
     letter-spacing: 0;
     text-rendering: auto;
@@ -179,7 +179,7 @@ li {
 
 .navbar .dropdown-menu .dropdown-item {
     color: #111827;
-    font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
+    font-family: "Inter", Arial, Helvetica, sans-serif !important;
     border-radius: 10px;
     margin: 1px 6px;
     padding: 7px 12px;
@@ -263,7 +263,7 @@ li {
 select,
 .form-select {
     color: #111827;
-    font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
+    font-family: "Inter", Arial, Helvetica, sans-serif !important;
     font-weight: 400;
     letter-spacing: 0;
     text-rendering: auto;
