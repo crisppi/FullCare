@@ -723,7 +723,7 @@ select.select-placeholder-empty option[value=""] {
     opacity: 1;
     font-size: .78rem !important;
     font-weight: 500 !important;
-    font-family: "Poppins", sans-serif !important;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
     font-style: normal !important;
     letter-spacing: 0 !important;
 }
@@ -732,7 +732,7 @@ select.select-placeholder-empty option {
     color: #333 !important;
     font-style: normal !important;
     font-weight: 400 !important;
-    font-family: "Poppins", sans-serif !important;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
 }
 
 select:invalid,

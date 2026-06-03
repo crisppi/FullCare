@@ -124,15 +124,20 @@ li {
 .navbar-light.nav_bar_custom .navbar-nav .nav-link,
 .navbar-light.nav_bar_custom .navbar-nav .nav-link:visited,
 .navbar-light.nav_bar_custom .navbar-nav .nav-link.show {
-    color: #000000 !important;
+    color: #111827 !important;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
     font-weight: 400;
-    text-rendering: optimizeLegibility;
+    letter-spacing: 0;
+    text-rendering: auto;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    font-synthesis-weight: none;
 }
 
 .navbar-light.nav_bar_custom .navbar-nav .nav-link:hover,
 .navbar-light.nav_bar_custom .navbar-nav .nav-link:focus,
 .navbar-light.nav_bar_custom .navbar-nav .nav-link.active {
-    color: #000000 !important;
+    color: #111827 !important;
 }
 
 .navbar.nav_bar_custom.fixed-top {
@@ -173,20 +178,25 @@ li {
 }
 
 .navbar .dropdown-menu .dropdown-item {
-    color: #000000;
+    color: #111827;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
     border-radius: 10px;
     margin: 1px 6px;
     padding: 7px 12px;
     font-weight: 400;
     font-size: 0.92rem;
     line-height: 1.28;
-    text-rendering: optimizeLegibility;
+    letter-spacing: 0;
+    text-rendering: auto;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    font-synthesis-weight: none;
 }
 
 .navbar .dropdown-menu .dropdown-item:hover,
 .navbar .dropdown-menu .dropdown-item:focus {
     background: linear-gradient(90deg, rgba(47, 111, 159, 0.10), rgba(94, 180, 216, 0.10));
-    color: #000000;
+    color: #111827;
 }
 
 .navbar .dropdown-menu .dropdown-divider {
@@ -252,9 +262,14 @@ li {
 .bootstrap-select .dropdown-menu .dropdown-item,
 select,
 .form-select {
-    color: #000000;
+    color: #111827;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
     font-weight: 400;
-    text-rendering: optimizeLegibility;
+    letter-spacing: 0;
+    text-rendering: auto;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    font-synthesis-weight: none;
 }
 
 .bootstrap-select .dropdown-menu {

@@ -394,10 +394,16 @@ if (!empty($sessionIdUsuario)) {
         .navbar-nav.navbar-nav-scroll .nav-link {
             white-space: nowrap;
             padding: 0.36rem 0.34rem;
-            font-size: 0.78rem;
+            font-family: "Segoe UI", Arial, Helvetica, sans-serif !important;
+            font-size: 0.82rem;
             font-weight: 400;
             line-height: 1.18;
-            text-rendering: optimizeLegibility;
+            color: #111827 !important;
+            letter-spacing: 0;
+            text-rendering: auto;
+            -webkit-font-smoothing: subpixel-antialiased;
+            -moz-osx-font-smoothing: auto;
+            font-synthesis-weight: none;
         }
 
         #navbarGestorListas {
