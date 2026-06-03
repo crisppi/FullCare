@@ -439,8 +439,12 @@ $urlBase = $self . '?' . $urlParams;
         .rota-paciente-table thead,
         .rota-paciente-table thead tr,
         .rota-paciente-table thead th {
-            background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%) !important;
+            background: #2f6f9f !important;
             color: #ffffff !important;
+        }
+
+        .rota-paciente-table thead th {
+            background: transparent !important;
         }
 
         .rota-paciente-table thead th {

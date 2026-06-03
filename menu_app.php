@@ -1303,6 +1303,8 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
 
     #dash-visitas-atraso .table thead th,
     #dash-longa-perm .table thead th {
+        background: #2f6f9f !important;
+        background-image: none !important;
         font-size: .52rem !important;
         font-weight: 500 !important;
         letter-spacing: .04em;
@@ -1516,7 +1518,7 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                     </div>
                 </div>
                 <table class="table table-sm table-striped table-hover table-condensed" style="margin-top:10px;">
-                    <thead style="background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%); color: #fff;">
+                    <thead style="background: #2f6f9f; background-image: none; color: #fff;">
                         <tr>
                             <th style="width:18%">Hospital</th>
                             <th style="width:22%">Paciente</th>
@@ -1963,7 +1965,8 @@ canvas {
     position: sticky;
     top: 0;
     z-index: 2;
-    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+    background: #2f6f9f !important;
+    background-image: none !important;
     color: #ffffff;
 }
 

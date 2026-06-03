@@ -207,7 +207,7 @@ body {
     font-size: .68rem;
     letter-spacing: .06em;
     color: #ffffff;
-    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+    background: #2f6f9f;
     font-weight: 800;
 }
 .forecast-table tbody tr:nth-child(even) {

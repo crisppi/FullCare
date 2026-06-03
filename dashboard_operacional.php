@@ -310,7 +310,7 @@ if (!is_array($prioridades)) {
     font-weight: 700;
     color: #ffffff;
     border-bottom: 1px solid rgba(47, 111, 159, .22);
-    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+    background: #2f6f9f;
 }
 .dash-table-card tr + tr td {
     border-top: 1px solid rgba(76, 142, 187, .10);

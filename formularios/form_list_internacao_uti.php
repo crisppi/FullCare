@@ -187,7 +187,7 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
     }
 
     #table-content thead th {
-        background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%) !important;
+        background: transparent !important;
         color: #ffffff !important;
         border-bottom: 1px solid rgba(47, 111, 159, .35) !important;
         padding: 7px 10px;
@@ -196,7 +196,7 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
     }
 
     #table-content thead {
-        background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%) !important;
+        background: #2f6f9f !important;
     }
 
     #table-content.listagem-table-wrap {

@@ -761,13 +761,23 @@ if (!empty($sessionIdUsuario)) {
             border-radius: 10px !important;
         }
 
+        .table thead,
+        .report-wrapper .table thead,
+        .insight-card .table thead,
+        .forecast-table thead,
+        .dash-table-card thead,
+        .perf-table thead {
+            background: #2f6f9f !important;
+        }
+
         .table thead th,
         .report-wrapper .table thead th,
         .insight-card .table thead th,
         .forecast-table th,
         .dash-table-card th,
         .perf-table th {
-            background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%) !important;
+            background: transparent !important;
+            background-image: none !important;
             color: #ffffff !important;
             border-bottom: 1px solid rgba(47, 111, 159, .35) !important;
             font-weight: 800 !important;

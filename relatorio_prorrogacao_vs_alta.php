@@ -170,7 +170,7 @@ $altasComPrazo = $altasDentro + $altasFora;
     color: #2f6f9f;
 }
 .table thead th {
-    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+    background: #2f6f9f;
     color: #fff;
     font-size: .7rem;
     padding-top: .65rem;

@@ -5,6 +5,7 @@
     --app-zoom: 0.9;
     --header-offset: 112px;
     --fullcare-blue-gradient: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+    --fullcare-table-head-bg: #2f6f9f;
     --fullcare-blue-border: #2d6c9b;
 }
 
@@ -199,7 +200,7 @@ p {
 }
 
 .table thead {
-    background: var(--fullcare-blue-gradient);
+    background: var(--fullcare-table-head-bg);
     border-color: var(--fullcare-blue-border);
     height: 37px;
     vertical-align: middle;

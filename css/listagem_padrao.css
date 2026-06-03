@@ -413,11 +413,15 @@
     margin-bottom: 0;
 }
 
+.listagem-table-wrap thead {
+    background: #2f6f9f;
+}
+
 .listagem-table-wrap thead th {
     padding-top: 10px;
     padding-bottom: 10px;
-    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
-    border-bottom: none;
+    background: transparent;
+    border-bottom: 1px solid #d9e8f1;
     color: #fff;
     font-size: .66rem;
     font-weight: 800;

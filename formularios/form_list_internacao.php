@@ -654,10 +654,14 @@ try {
     margin-bottom: 0;
 }
 
+#table-content thead {
+    background: #2f6f9f;
+}
+
 #table-content thead th {
     padding-top: 7px;
     padding-bottom: 7px;
-    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%) !important;
+    background: transparent !important;
     border-bottom: none;
     color: #fff;
     font-size: .54rem;

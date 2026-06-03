@@ -2322,8 +2322,12 @@
             overflow: hidden;
         }
 
+        .entity-form .table-responsive thead {
+            background: #2f6f9f;
+        }
+
         .entity-form .table-responsive thead th {
-            background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
+            background: transparent;
             color: #fff;
             border-bottom-width: 1px;
             font-size: .68rem;
