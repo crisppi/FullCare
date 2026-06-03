@@ -16,6 +16,8 @@ function fc_clinical_e($value): string
 $ctx = ajax_user_context($conn);
 $clinicalService = new AuditoriaClinicaAIService($conn, $BASE_URL);
 $hospitais = $clinicalService->listHospitals($ctx);
+$clinicalScopeMode = function_exists('ajax_scope_mode') ? ajax_scope_mode($ctx) : 'hospital';
+$clinicalHospitalScoped = ($clinicalScopeMode === 'hospital');
 ?>
 
 <style>
@@ -299,7 +301,7 @@ $hospitais = $clinicalService->listHospitals($ctx);
             <div class="clinical-ai-field">
                 <label for="clinicalHospital">Hospital</label>
                 <select id="clinicalHospital">
-                    <option value="">Todos os hospitais</option>
+                    <option value=""><?= $clinicalHospitalScoped ? 'Todos os meus hospitais' : 'Todos os hospitais' ?></option>
                     <?php foreach ($hospitais as $h): ?>
                         <option value="<?= (int)$h['id_hospital'] ?>"><?= fc_clinical_e($h['nome_hosp']) ?></option>
                     <?php endforeach; ?>
@@ -336,7 +338,12 @@ $hospitais = $clinicalService->listHospitals($ctx);
                 </select>
             </div>
 
-            <div class="clinical-ai-note">Esta IA nao consulta capeante, negociacao, faturamento, glosa, custo ou saving real. Quando falar em oportunidade, a leitura e qualitativa.</div>
+            <div class="clinical-ai-note">
+                Esta IA nao consulta capeante, negociacao, faturamento, glosa, custo ou saving real. Quando falar em oportunidade, a leitura e qualitativa.
+                <?php if ($clinicalHospitalScoped): ?>
+                    O recorte respeita somente os hospitais vinculados ao seu usuario.
+                <?php endif; ?>
+            </div>
 
             <div class="clinical-ai-suggestions">
                 <button type="button" class="clinical-ai-suggestion" data-question="Quais casos precisam de revisao clinica hoje e por que?">Casos para revisar hoje</button>

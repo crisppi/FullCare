@@ -625,7 +625,38 @@ class AuditoriaClinicaAIService
         if (function_exists('ajax_scope_clause_for_internacao')) {
             return ajax_scope_clause_for_internacao($ctx, $alias, $params, $prefix);
         }
-        return '';
+
+        $mode = $this->scopeMode($ctx);
+        if ($mode === 'full') {
+            return '';
+        }
+        if ($mode === 'seguradora') {
+            $segId = (int)($ctx['seguradora_id'] ?? 0);
+            if ($segId <= 0) {
+                return ' AND 1=0 ';
+            }
+            $key = ':' . $prefix . '_seg';
+            $params[$key] = $segId;
+            return " AND EXISTS (
+                SELECT 1
+                  FROM tb_paciente pa_scope
+                 WHERE pa_scope.id_paciente = {$alias}.fk_paciente_int
+                   AND pa_scope.fk_seguradora_pac = {$key}
+            ) ";
+        }
+
+        $uid = (int)($ctx['user_id'] ?? 0);
+        if ($uid <= 0) {
+            return ' AND 1=0 ';
+        }
+        $key = ':' . $prefix . '_uid';
+        $params[$key] = $uid;
+        return " AND EXISTS (
+            SELECT 1
+              FROM tb_hospitalUser hu_scope
+             WHERE hu_scope.fk_hospital_user = {$alias}.fk_hospital_int
+               AND hu_scope.fk_usuario_hosp = {$key}
+        ) ";
     }
 
     private function assertHospitalAccess(array $ctx, int $hospitalId): bool
@@ -633,7 +664,61 @@ class AuditoriaClinicaAIService
         if (function_exists('ajax_assert_hospital_access')) {
             return ajax_assert_hospital_access($this->conn, $ctx, $hospitalId);
         }
-        return true;
+
+        $mode = $this->scopeMode($ctx);
+        if ($mode === 'full') {
+            return true;
+        }
+        if ($mode === 'seguradora') {
+            $segId = (int)($ctx['seguradora_id'] ?? 0);
+            if ($segId <= 0) {
+                return false;
+            }
+            $stmt = $this->conn->prepare("
+                SELECT 1
+                  FROM tb_internacao i
+                  JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+                 WHERE i.fk_hospital_int = :hospital_id
+                   AND p.fk_seguradora_pac = :seguradora_id
+                 LIMIT 1
+            ");
+            $stmt->bindValue(':hospital_id', $hospitalId, PDO::PARAM_INT);
+            $stmt->bindValue(':seguradora_id', $segId, PDO::PARAM_INT);
+            $stmt->execute();
+            return (bool)$stmt->fetchColumn();
+        }
+
+        $uid = (int)($ctx['user_id'] ?? 0);
+        if ($uid <= 0) {
+            return false;
+        }
+        $stmt = $this->conn->prepare("
+            SELECT 1
+              FROM tb_hospitalUser
+             WHERE fk_usuario_hosp = :user_id
+               AND fk_hospital_user = :hospital_id
+             LIMIT 1
+        ");
+        $stmt->bindValue(':user_id', $uid, PDO::PARAM_INT);
+        $stmt->bindValue(':hospital_id', $hospitalId, PDO::PARAM_INT);
+        $stmt->execute();
+        return (bool)$stmt->fetchColumn();
+    }
+
+    private function scopeMode(array $ctx): string
+    {
+        if (function_exists('ajax_scope_mode')) {
+            return ajax_scope_mode($ctx);
+        }
+
+        if (!empty($ctx['is_diretoria']) || !empty($ctx['is_system_admin'])) {
+            return 'full';
+        }
+        if (!empty($ctx['is_seguradora'])) {
+            return 'seguradora';
+        }
+
+        return 'hospital';
     }
 
     private function bindParams(PDOStatement $stmt, array $params): void
