@@ -44,6 +44,8 @@ $isOperationalIntelligencePage =
         'risco_glosa.php',
         'clusterizacao_clinica.php',
         'text_automation.php',
+        'inteligenciainternacoes.php',
+        'inteligenciagraficos.php',
         'inteligencia_logs_usuario.php',
     ], true));
 
@@ -475,6 +477,38 @@ if (!empty($sessionIdUsuario)) {
 
         #search-results-dropdown .dropdown-item small {
             color: #5c5c5c;
+        }
+
+        .navbar .dropdown-menu .dropdown-item.inteligencia-chat-featured {
+            width: calc(100% - 16px);
+            margin: 4px 8px;
+            border: 1px solid rgba(94, 61, 184, 0.18);
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(94, 61, 184, 0.12), rgba(47, 111, 159, 0.12));
+            color: #25334a;
+            font-weight: 800;
+        }
+
+        .navbar .dropdown-menu .dropdown-item.inteligencia-chat-featured:hover,
+        .navbar .dropdown-menu .dropdown-item.inteligencia-chat-featured:focus {
+            background: linear-gradient(90deg, rgba(94, 61, 184, 0.18), rgba(47, 111, 159, 0.18));
+            color: #172133;
+        }
+
+        .navbar .dropdown-menu .dropdown-item.producao-ai-featured {
+            width: calc(100% - 16px);
+            margin: 4px 8px;
+            border: 1px solid rgba(32, 139, 122, 0.2);
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(32, 139, 122, 0.14), rgba(47, 111, 159, 0.12));
+            color: #24384f;
+            font-weight: 800;
+        }
+
+        .navbar .dropdown-menu .dropdown-item.producao-ai-featured:hover,
+        .navbar .dropdown-menu .dropdown-item.producao-ai-featured:focus {
+            background: linear-gradient(90deg, rgba(32, 139, 122, 0.2), rgba(47, 111, 159, 0.18));
+            color: #172133;
         }
 
         .account-user-trigger::after {
@@ -1075,6 +1109,9 @@ if (!empty($sessionIdUsuario)) {
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
                                                 Censo</a></li>
+                                        <li><a class="dropdown-item producao-ai-featured" href="<?= $BASE_URL ?>producao/ia-clinica"><i
+                                                    class="bi bi-clipboard2-pulse"
+                                                    style="font-size: 1rem;margin-right:5px; color: #208b7a;"></i> IA Cl&iacute;nica</a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
@@ -1361,6 +1398,17 @@ if (!empty($sessionIdUsuario)) {
                                         Inteligência Operacional
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarInteligenciaDropdown">
+                                        <li><a class="dropdown-item inteligencia-chat-featured" href="<?= $BASE_URL ?>inteligencia/assistente-internacoes"><i
+                                                    class="bi bi-chat-dots"
+                                                    style="font-size: 1rem;margin-right:5px; color:#5e3db8;"></i>
+                                                IA de Internações</a></li>
+                                        <li><a class="dropdown-item inteligencia-chat-featured" href="<?= $BASE_URL ?>inteligencia/ia-graficos"><i
+                                                    class="bi bi-bar-chart-line"
+                                                    style="font-size: 1rem;margin-right:5px; color:#20a37a;"></i>
+                                                IA Gráficos</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/dashboard-360"><i
                                                     class="bi bi-grid-3x3-gap"
                                                     style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
