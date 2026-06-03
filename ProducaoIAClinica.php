@@ -32,7 +32,7 @@ $clinicalHospitalScoped = ($clinicalScopeMode === 'hospital');
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr) 360px;
     gap: 12px;
-    align-items: stretch;
+    align-items: start;
 }
 .clinical-ai-panel {
     background: #fff;
@@ -124,10 +124,12 @@ $clinicalHospitalScoped = ($clinicalScopeMode === 'hospital');
 .clinical-ai-main {
     display: flex;
     flex-direction: column;
-    min-height: 640px;
+    height: clamp(430px, calc(100vh - 360px), 620px);
+    min-height: 0;
 }
 .clinical-ai-messages {
     flex: 1;
+    min-height: 0;
     padding: 16px;
     overflow-y: auto;
     background:
@@ -183,22 +185,23 @@ $clinicalHospitalScoped = ($clinicalScopeMode === 'hospital');
 .clinical-ai-composer {
     display: flex;
     gap: 10px;
-    padding: 12px;
+    flex: 0 0 auto;
+    padding: 8px 10px;
     border-top: 1px solid #dbe8f0;
     background: #fff;
     border-radius: 0 0 8px 8px;
 }
 .clinical-ai-composer textarea {
     flex: 1;
-    min-height: 48px;
-    max-height: 130px;
+    min-height: 38px;
+    max-height: 82px;
     border: 1px solid #cadde8;
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 8px 11px;
     resize: vertical;
 }
 .clinical-ai-send {
-    width: 48px;
+    width: 42px;
     border: 0;
     border-radius: 8px;
     background: linear-gradient(145deg, #1aa58d, #5e3db8);
@@ -207,7 +210,7 @@ $clinicalHospitalScoped = ($clinicalScopeMode === 'hospital');
     box-shadow: 0 8px 18px rgba(26, 165, 141, .22);
 }
 .clinical-ai-clear {
-    width: 44px;
+    width: 40px;
     border: 1px solid #d5e3ec;
     border-radius: 8px;
     background: #f7fbfd;
@@ -221,7 +224,7 @@ $clinicalHospitalScoped = ($clinicalScopeMode === 'hospital');
 .clinical-ai-results {
     padding: 14px;
     overflow-y: auto;
-    max-height: 720px;
+    max-height: clamp(430px, calc(100vh - 360px), 620px);
 }
 .clinical-ai-result {
     display: block;
@@ -276,7 +279,7 @@ $clinicalHospitalScoped = ($clinicalScopeMode === 'hospital');
         grid-template-columns: 1fr;
     }
     .clinical-ai-main {
-        min-height: 560px;
+        height: min(560px, calc(100vh - 300px));
     }
 }
 </style>
@@ -336,13 +339,6 @@ $clinicalHospitalScoped = ($clinicalScopeMode === 'hospital');
                     <option value="365">Ultimos 12 meses</option>
                     <option value="730">Ultimos 24 meses</option>
                 </select>
-            </div>
-
-            <div class="clinical-ai-note">
-                Esta IA nao consulta capeante, negociacao, faturamento, glosa, custo ou saving real. Quando falar em oportunidade, a leitura e qualitativa.
-                <?php if ($clinicalHospitalScoped): ?>
-                    O recorte respeita somente os hospitais vinculados ao seu usuario.
-                <?php endif; ?>
             </div>
 
             <div class="clinical-ai-suggestions">
