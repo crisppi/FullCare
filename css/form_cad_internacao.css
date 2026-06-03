@@ -800,7 +800,7 @@
         .internacao-page__hero {
             background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
             color: #fff;
-            border-radius: 24px;
+            border-radius: 12px;
             padding: 8px 14px;
             box-shadow: 0 8px 16px rgba(35, 102, 147, 0.16);
             display: flex;

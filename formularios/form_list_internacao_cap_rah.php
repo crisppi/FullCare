@@ -314,12 +314,14 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
     ?>
     <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
     <!-- FORMULARIO DE PESQUISAS -->
-    <div class="container-fluid form_container listagem-page" id='main-container' style="margin-top:-5px;">
+    <div class="container-fluid form_container listagem-page" id='main-container'>
 
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"
             integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
-        <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 10px;">
-            <h4 class="page-title" style="color: #3A3A3A; font-size:.96rem; margin-bottom:6px;">
+        <div class="listagem-hero listagem-hero--module">
+            <div class="listagem-hero__copy">
+                <div class="listagem-kicker">Capeantes</div>
+                <h1 class="listagem-title">
                 <?php
                 if ($rahListContext === 'senhas') {
                     echo 'Senhas Finalizadas';
@@ -329,7 +331,8 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                     echo 'Contas para Auditar';
                 }
                 ?>
-            </h4>
+                </h1>
+            </div>
         </div>
 
         <style>

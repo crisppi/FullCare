@@ -365,6 +365,12 @@ if (!empty($sessionIdUsuario)) {
         .navbar-nav.navbar-nav-scroll {
             flex-wrap: nowrap;
             gap: 0;
+            align-items: center;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+            border: 1px solid rgba(47, 111, 159, 0.12);
+            border-radius: 14px;
+            box-shadow: 0 8px 22px rgba(31, 76, 110, 0.10);
+            padding: 8px 10px;
             min-width: 0;
         }
 
@@ -386,9 +392,11 @@ if (!empty($sessionIdUsuario)) {
 
         .navbar-nav.navbar-nav-scroll .nav-link {
             white-space: nowrap;
-            padding: 0.24rem 0.3rem;
+            padding: 0.36rem 0.34rem;
             font-size: 0.78rem;
-            line-height: 1.1;
+            font-weight: 400;
+            line-height: 1.18;
+            text-rendering: optimizeLegibility;
         }
 
         #navbarGestorListas {
@@ -443,11 +451,16 @@ if (!empty($sessionIdUsuario)) {
             background: #f4faff;
         }
 
-        .navbar.nav_bar_custom .navbar-nav .nav-link > i,
-        .navbar.nav_bar_custom .navbar-nav .nav-link > .bi,
-        .navbar.nav_bar_custom .navbar-nav .nav-link > .material-icons {
-            color: #24384f !important;
-        }
+        #navbarMenuDropdown > i { color: #24384f !important; }
+        #navbarCadastrosDropdown > i { color: #2f6f9f !important; }
+        #navbarProducaoDropdown > i { color: #0d6efd !important; }
+        #dropdownContasRah > i { color: #7c3aed !important; }
+        #navbarListasDropdown > i { color: #64748b !important; }
+        #navbarGestaoDropdown > i { color: #198754 !important; }
+        #navbarCuidadoContinuado > i { color: #d63384 !important; }
+        #navbarBiDropdown > i { color: #2f6f9f !important; }
+        #navbarInteligenciaDropdown > i { color: #5e3db8 !important; }
+        #navbarGestorListas > i { color: #2f6f9f !important; }
 
         .header-chat-launcher {
             display: inline-flex;
@@ -486,7 +499,7 @@ if (!empty($sessionIdUsuario)) {
             border-radius: 10px;
             background: linear-gradient(90deg, rgba(94, 61, 184, 0.12), rgba(47, 111, 159, 0.12));
             color: #25334a;
-            font-weight: 800;
+            font-weight: 500;
         }
 
         .navbar .dropdown-menu .dropdown-item.inteligencia-chat-featured:hover,
@@ -502,7 +515,7 @@ if (!empty($sessionIdUsuario)) {
             border-radius: 10px;
             background: linear-gradient(90deg, rgba(32, 139, 122, 0.14), rgba(47, 111, 159, 0.12));
             color: #24384f;
-            font-weight: 800;
+            font-weight: 500;
         }
 
         .navbar .dropdown-menu .dropdown-item.producao-ai-featured:hover,
@@ -586,6 +599,8 @@ if (!empty($sessionIdUsuario)) {
                 overflow: visible !important;
                 width: 100%;
                 align-items: flex-start !important;
+                border-radius: 12px;
+                padding: 8px;
             }
 
             .header-actions {

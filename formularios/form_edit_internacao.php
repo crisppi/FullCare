@@ -2213,7 +2213,7 @@
         .internacao-page__hero {
             background: linear-gradient(135deg, #4f2469 0%, #6f45a2 55%, #8e68c2 100%);
             color: #fff;
-            border-radius: 24px;
+            border-radius: 12px;
             padding: 8px 14px;
             box-shadow: 0 8px 16px rgba(37, 18, 54, 0.12);
             display: flex;
