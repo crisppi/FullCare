@@ -3,6 +3,8 @@
     --select-focus: blue;
     --select-arrow: var(--select-border);
     --app-zoom: 0.9;
+    --app-font-family: "Inter", Arial, Helvetica, sans-serif;
+    --bs-font-sans-serif: var(--app-font-family);
     --header-offset: 112px;
     --fullcare-blue-gradient: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
     --fullcare-table-head-bg: #2f6f9f;
@@ -21,10 +23,23 @@
 /* Certifique-se de que o corpo da página tenha padding suficiente */
 
 body {
+    font-family: var(--app-font-family);
     padding-top: var(--header-offset);
     zoom: 90%;
 
     /* Ajuste este valor de acordo com a altura real do seu header */
+}
+
+button,
+input,
+select,
+textarea,
+.btn,
+.form-control,
+.form-select,
+.dropdown-menu,
+.table {
+    font-family: var(--app-font-family);
 }
 
 @supports (zoom: 1) {
@@ -434,7 +449,7 @@ p {
 
 .select2-container--default .select2-results__option {
     font-size: 0.7em !important;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--app-font-family);
     color: rgb(122, 121, 121);
 }
 

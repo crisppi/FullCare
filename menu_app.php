@@ -608,7 +608,6 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
     <title>Gráficos de Internações</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Fontfaces CSS-->
-    <link href="diversos/CoolAdmin-master/css/font-face.css" rel="stylesheet" media="all">
     <link href="diversos/CoolAdmin-master/vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet"
         media="all">
     <link href="diversos/CoolAdmin-master/vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet"
@@ -1631,7 +1630,7 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                 data: {
                     labels: ["2010", "2011", "2012", "2013", "2014", "2015", "2016"],
                     type: 'line',
-                    defaultFontFamily: 'Poppins',
+                    defaultFontFamily: 'Inter',
                     datasets: [{
                         label: "Foods",
                         data: [0, 30, 10, 120, 50, 63, 10],
@@ -1662,8 +1661,8 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                         titleFontColor: '#000',
                         bodyFontColor: '#000',
                         backgroundColor: '#fff',
-                        titleFontFamily: 'Poppins',
-                        bodyFontFamily: 'Poppins',
+                        titleFontFamily: 'Inter',
+                        bodyFontFamily: 'Inter',
                         cornerRadius: 3,
                         intersect: false
                     },
@@ -1671,7 +1670,7 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                         display: false,
                         labels: {
                             usePointStyle: true,
-                            fontFamily: 'Poppins'
+                            fontFamily: 'Inter'
                         }
                     },
                     scales: {
@@ -1686,7 +1685,7 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                                 labelString: 'Month'
                             },
                             ticks: {
-                                fontFamily: "Poppins"
+                                fontFamily: "Inter"
                             }
                         }],
                         yAxes: [{
@@ -1698,10 +1697,10 @@ $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) :
                             scaleLabel: {
                                 display: true,
                                 labelString: 'Value',
-                                fontFamily: "Poppins"
+                                fontFamily: "Inter"
                             },
                             ticks: {
-                                fontFamily: "Poppins"
+                                fontFamily: "Inter"
                             }
                         }]
                     },

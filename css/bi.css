@@ -21,7 +21,7 @@ body.bi-theme,
               radial-gradient(circle at 90% 10%, rgba(216, 153, 196, 0.14), transparent 40%),
               linear-gradient(120deg, var(--bi-bg), var(--bi-bg-2));
   color: var(--bi-text);
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--app-font-family, "Inter", Arial, Helvetica, sans-serif);
 }
 
 .bi-theme {

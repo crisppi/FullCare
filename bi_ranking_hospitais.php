@@ -290,7 +290,7 @@ const biBarValueLabelPlugin = {
                     return Number(v || 0).toLocaleString('pt-BR');
                 };
 
-                ctx.font = '600 12px Poppins, sans-serif';
+                ctx.font = '600 12px Inter, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.fillStyle = '#f5fbff';

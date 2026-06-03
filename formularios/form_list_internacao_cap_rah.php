@@ -337,11 +337,13 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
 
         <style>
         .listagem-page { padding: 2px 4px 14px; }
-        .complete-table { padding: 4px 8px 2px; border-radius:16px; border:1px solid #eee8f6; background:#fff; box-shadow:0 10px 28px -22px rgba(89,46,131,.28); }
-        .form-group.row { margin-top: 0 !important; margin-bottom: 4px !important; row-gap: 4px; }
-        .form-group.row > [class*="col-"], .form-group.row > .form-group { padding:2px !important; }
+        .listagem-hero--module { margin-bottom: 7px; }
+        .complete-table { padding: 2px 8px 2px; border-radius:16px; border:1px solid #eee8f6; background:#fff; box-shadow:0 10px 28px -22px rgba(89,46,131,.28); }
+        .table-filters { padding-top: 0; padding-bottom: 0; }
+        .form-group.row { margin-top: 0 !important; margin-bottom: 2px !important; row-gap: 2px; }
+        .form-group.row > [class*="col-"], .form-group.row > .form-group { padding:1px 2px !important; }
         .form-group.row > :first-child { padding-left:8px !important; }
-        .form-group.row .form-control, .form-group.row .btn { min-height:32px; height:32px; font-size:.72rem; line-height:1.2; border-radius:11px; margin-top:0 !important; }
+        .form-group.row .form-control, .form-group.row .btn { min-height:30px; height:30px; font-size:.72rem; line-height:1.2; border-radius:10px; margin-top:0 !important; margin-bottom:0 !important; padding-top:0; padding-bottom:0; }
         .form-group.row .form-control::placeholder { font-size:.72rem; color:#c4c4c4; }
         .form-group.row .material-icons { font-size:16px; line-height:1; margin:0; }
         #table-content thead th { padding:7px 10px; font-size:.54rem; letter-spacing:.08em; }

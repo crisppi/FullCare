@@ -854,18 +854,18 @@
         }
 
         .internacao-page__content {
-            margin-top: 12px;
+            margin-top: 6px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 7px;
         }
 
         .internacao-card {
             background: linear-gradient(180deg, #f8f7fc 0%, #f3f4f8 100%);
-            border-radius: 22px;
-            padding: 12px 14px 14px;
+            border-radius: 12px;
+            padding: 8px 10px 10px;
             border: 1px solid #e6e1ef;
-            box-shadow: 0 10px 26px rgba(37, 18, 54, .08);
+            box-shadow: 0 8px 18px rgba(37, 18, 54, .06);
             margin: 0;
             width: 100%;
         }
@@ -875,9 +875,9 @@
             align-items: flex-start;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 8px;
-            padding-bottom: 6px;
+            gap: 6px;
+            margin-bottom: 5px;
+            padding-bottom: 4px;
             border-bottom: 1px solid rgba(111, 69, 162, 0.10);
         }
 
@@ -907,8 +907,8 @@
         .internacao-card__tag {
             background: #f1ebfb;
             color: #5c3687;
-            padding: 4px 9px;
-            border-radius: 999px;
+            padding: 3px 8px;
+            border-radius: 8px;
             font-weight: 700;
             font-size: .56rem;
             border: 1px solid #e2d4f6;
@@ -1210,7 +1210,7 @@
         .internacao-card__body {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
             padding: 0;
         }
 
@@ -1239,7 +1239,7 @@
         .internacao-head-grid {
             display: grid !important;
             grid-template-columns: repeat(18, minmax(0, 1fr));
-            gap: 8px 8px !important;
+            gap: 5px 6px !important;
             align-items: start !important;
             margin-top: 0;
         }
@@ -1390,7 +1390,7 @@
         }
 
         .internacao-card--fields .internacao-card__body {
-            gap: 10px;
+            gap: 6px;
         }
 
         .internacao-card--fields .internacao-card__body .row,
@@ -1399,12 +1399,12 @@
         }
 
         .internacao-card--fields .form-group {
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .internacao-card--fields .form-group.row {
-            margin-top: 2px;
-            margin-bottom: 2px;
+            margin-top: 0;
+            margin-bottom: 0;
         }
 
         .internacao-card--fields .form-check {
@@ -1619,7 +1619,7 @@
         .internacao-card .bootstrap-select > .dropdown-toggle,
         .tabelas-adicionais-card .form-control,
         .detalhes-card .form-control {
-            border-radius: 12px !important;
+            border-radius: 8px !important;
             border-color: #d8dbe5 !important;
             box-shadow: none !important;
             background-color: #fff !important;
@@ -2056,7 +2056,7 @@
             opacity: 1;
             font-size: .78rem !important;
             font-weight: 500 !important;
-            font-family: "Poppins", sans-serif !important;
+            font-family: var(--app-font-family) !important;
             letter-spacing: 0 !important;
         }
 
@@ -2066,7 +2066,7 @@
             color: #c4c4c4 !important;
             font-size: .78rem !important;
             font-weight: 500 !important;
-            font-family: "Poppins", sans-serif !important;
+            font-family: var(--app-font-family) !important;
             letter-spacing: 0 !important;
         }
 
@@ -2085,7 +2085,7 @@
             color: #c4c4c4 !important;
             font-size: .78rem !important;
             font-weight: 500 !important;
-            font-family: "Poppins", sans-serif !important;
+            font-family: var(--app-font-family) !important;
             letter-spacing: 0 !important;
         }
 
@@ -2117,7 +2117,7 @@
             color: #c4c4c4 !important;
             font-weight: 500 !important;
             font-size: .78rem !important;
-            font-family: "Poppins", sans-serif !important;
+            font-family: var(--app-font-family) !important;
             letter-spacing: 0 !important;
         }
 
@@ -2401,10 +2401,10 @@
         }
 
         #main-container.internacao-page.cadastro-layout .internacao-page__hero {
-            min-height: 58px !important;
-            margin: 0 0 5px !important;
-            padding: 14px !important;
-            border-radius: 18px !important;
+            min-height: 50px !important;
+            margin: 0 0 3px !important;
+            padding: 9px 12px !important;
+            border-radius: 12px !important;
         }
 
         #main-container.internacao-page.cadastro-layout .internacao-page__hero h1 {
@@ -2435,25 +2435,30 @@
 
         #main-container.internacao-page.cadastro-layout .internacao-page__content {
             display: block !important;
+            margin-top: 4px !important;
         }
 
         #main-container.internacao-page.cadastro-layout .internacao-page__tag,
         #main-container.internacao-page.cadastro-layout .internacao-card__tag,
         #main-container.internacao-page.cadastro-layout .entity-step-badge {
-            padding: 4px 8px !important;
+            padding: 3px 8px !important;
+            border-radius: 8px !important;
             font-size: .6rem !important;
         }
 
         #main-container.internacao-page.cadastro-layout .internacao-card {
             border: 0 !important;
-            border-radius: 0 !important;
+            border-radius: 10px !important;
             background: transparent !important;
             box-shadow: none !important;
+            padding-top: 6px !important;
+            padding-bottom: 8px !important;
         }
 
         #main-container.internacao-page.cadastro-layout .internacao-card__header {
-            padding: 8px 8px 2px !important;
+            padding: 4px 8px 1px !important;
             border-bottom: 0 !important;
+            margin-bottom: 3px !important;
         }
 
         #main-container.internacao-page.cadastro-layout .internacao-card__title {
@@ -2462,8 +2467,8 @@
         }
 
         #main-container.internacao-page.cadastro-layout .internacao-card__body {
-            gap: 5px !important;
-            padding: 4px 8px 10px !important;
+            gap: 3px !important;
+            padding: 2px 8px 6px !important;
             background: transparent !important;
         }
 
@@ -2510,7 +2515,7 @@
         #main-container.internacao-page.cadastro-layout .entity-form .form-group,
         #main-container.internacao-page.cadastro-layout .entity-form [class*="col-md-"].form-group,
         #main-container.internacao-page.cadastro-layout .entity-form [class*="col-sm-"].form-group {
-            margin-bottom: 8px !important;
+            margin-bottom: 4px !important;
         }
 
         #main-container.internacao-page.cadastro-layout .entity-form .form-group label {
@@ -2525,11 +2530,11 @@
         #main-container.internacao-page.cadastro-layout #add-movie-form .form-control,
         #main-container.internacao-page.cadastro-layout #multi-step-form select.form-control,
         #main-container.internacao-page.cadastro-layout #add-movie-form select.form-control {
-            min-height: 40px !important;
-            height: 40px !important;
-            padding-top: 5px !important;
-            padding-bottom: 5px !important;
-            border-radius: 9px !important;
+            min-height: 36px !important;
+            height: 36px !important;
+            padding-top: 3px !important;
+            padding-bottom: 3px !important;
+            border-radius: 8px !important;
             font-size: .78rem !important;
         }
 
@@ -2570,4 +2575,72 @@
             font-weight: 800 !important;
             line-height: 1 !important;
             box-shadow: 0 8px 16px rgba(94, 35, 99, .14);
+        }
+
+        /* Compactacao visual do cadastro de internacao */
+        .internacao-page > .internacao-page__hero {
+            margin-bottom: 4px !important;
+            border-radius: 10px !important;
+            padding: 8px 12px !important;
+        }
+
+        .internacao-page > .internacao-page__content {
+            margin-top: 5px !important;
+            gap: 6px !important;
+        }
+
+        .internacao-page .internacao-card {
+            border-radius: 10px !important;
+            padding: 7px 9px 9px !important;
+            box-shadow: 0 7px 16px rgba(37, 18, 54, .055) !important;
+        }
+
+        .internacao-page .internacao-card__header {
+            margin-bottom: 4px !important;
+            padding-bottom: 3px !important;
+        }
+
+        .internacao-page .internacao-card__body {
+            gap: 5px !important;
+        }
+
+        .internacao-page .internacao-head-grid,
+        .internacao-page .assistenciais-row-full,
+        .internacao-page .form-group.row {
+            gap: 5px 6px !important;
+            row-gap: 4px !important;
+        }
+
+        .internacao-page .form-group,
+        .internacao-page .internacao-card--fields .form-group {
+            margin-bottom: 2px !important;
+        }
+
+        .internacao-page .internacao-card label,
+        .internacao-page .entity-form .form-group label {
+            margin-bottom: 2px !important;
+            line-height: 1.08 !important;
+        }
+
+        .internacao-page .internacao-card .form-control,
+        .internacao-page .entity-form .form-control,
+        .internacao-page .entity-form .form-control-sm,
+        .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle,
+        .internacao-page .entity-form .bootstrap-select > .dropdown-toggle {
+            min-height: 36px !important;
+            height: 36px !important;
+            border-radius: 8px !important;
+            padding-top: 3px !important;
+            padding-bottom: 3px !important;
+        }
+
+        .internacao-page textarea.form-control,
+        .internacao-page .entity-form textarea.form-control {
+            min-height: 58px !important;
+            height: auto !important;
+        }
+
+        .internacao-page .internacao-card__tag,
+        .internacao-page .internacao-page__tag {
+            border-radius: 8px !important;
         }

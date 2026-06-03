@@ -340,7 +340,7 @@ const doughnutValuePlugin = {
         const canvasId = (chart.canvas && chart.canvas.id) ? chart.canvas.id : '';
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = '600 11px Poppins, sans-serif';
+        ctx.font = '600 11px Inter, Arial, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 

@@ -432,7 +432,7 @@ const biValueLabelPlugin = {
                     ? formatMoneyCompact(rawValue)
                     : Number(rawValue).toLocaleString('pt-BR');
 
-                ctx.font = '600 12px Poppins, sans-serif';
+                ctx.font = '600 12px Inter, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 ctx.fillStyle = isMoney ? '#f4fbff' : '#f6e6ff';
