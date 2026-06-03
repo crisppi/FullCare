@@ -110,7 +110,7 @@ sort($tiposDisponiveis);
 </style>
 
 <div class="container-fluid form_container" id="main-container" style="margin-top:-20px;">
-    <div class="fc-module-header">
+    <div class="fc-module-header fc-module-header--gestao">
         <div class="fc-module-header__copy">
             <p class="fc-module-header__kicker">Gestão</p>
             <h1 class="fc-module-header__title">Negociações realizadas</h1>

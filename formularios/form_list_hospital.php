@@ -97,7 +97,7 @@
 
     <!--filtro evento-->
     <div class="container-fluid form_container listagem-page" style="margin-top:18px;">
-        <div class="listagem-hero listagem-hero--module">
+        <div class="listagem-hero listagem-hero--module listagem-hero--cadastros">
             <div class="listagem-hero__copy">
                 <div class="listagem-kicker">Cadastros</div>
                 <h1 class="listagem-title">Hospitais</h1>

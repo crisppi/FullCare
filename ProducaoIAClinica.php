@@ -280,7 +280,7 @@ $hospitais = $clinicalService->listHospitals($ctx);
 </style>
 
 <div class="clinical-ai-page">
-    <div class="fc-module-header">
+    <div class="fc-module-header fc-module-header--producao">
         <div class="fc-module-header__copy">
             <p class="fc-module-header__kicker">Producao</p>
             <h1 class="fc-module-header__title">IA Cl&iacute;nica</h1>

@@ -287,7 +287,7 @@ try {
                 font-size: .72rem;
             }
         </style>
-        <div class="fc-module-header">
+        <div class="fc-module-header fc-module-header--gestao">
             <div class="fc-module-header__copy">
                 <p class="fc-module-header__kicker">Gestão</p>
                 <h1 class="fc-module-header__title">Fila de Tarefas</h1>

@@ -735,7 +735,7 @@ if (typeof jQuery !== 'undefined') {
 <!-- FORMULARIO DE PESQUISAS -->
 <div class="container-fluid internacao-list-page" id='main-container'>
 
-    <div class="fc-module-header internacao-list-hero">
+    <div class="fc-module-header fc-module-header--internacoes internacao-list-hero">
         <div class="fc-module-header__copy internacao-list-hero__copy">
             <p class="fc-module-header__kicker">Internações</p>
             <h1 class="fc-module-header__title"><?= $onlySemSenha ? 'Senha pendente' : 'Listagem de internações' ?></h1>

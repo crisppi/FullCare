@@ -494,7 +494,7 @@ $urlBase = $self . '?' . $urlParams;
 <body>
 
     <div class="container-fluid" style="margin-top:8px;">
-        <div class="fc-module-header">
+        <div class="fc-module-header fc-module-header--internacoes">
             <div class="fc-module-header__copy">
                 <p class="fc-module-header__kicker">Internações</p>
                 <h1 class="fc-module-header__title">Rota do Paciente</h1>

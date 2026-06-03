@@ -600,7 +600,7 @@ if ($semAtualizacaoLabel !== '') {
 </style>
 
 <div class="lp-shell">
-    <div class="fc-module-header">
+    <div class="fc-module-header fc-module-header--cuidado">
         <div class="fc-module-header__copy">
             <p class="fc-module-header__kicker">Cuidado Continuado</p>
             <h1 class="fc-module-header__title">Gestão de Longa Permanência</h1>

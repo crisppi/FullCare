@@ -945,7 +945,7 @@ $brandSoftColor = $isFaturamentoView ? '#d6e4ff' : '#dfe6ff';
 </style>
 
 <div class="container-fluid visitas-page">
-    <div class="fc-module-header visitas-page-heading">
+    <div class="fc-module-header fc-module-header--gestao visitas-page-heading">
         <div class="fc-module-header__copy">
             <p class="fc-module-header__kicker">Gestão</p>
             <h1 class="fc-module-header__title"><?= h($pageTitle) ?></h1>

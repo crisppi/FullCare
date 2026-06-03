@@ -72,8 +72,8 @@
     padding: 8px 14px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.16);
-    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
-    box-shadow: 0 8px 16px rgba(35, 102, 147, 0.16);
+    background: linear-gradient(135deg, var(--module-start) 0%, var(--module-mid) 54%, var(--module-end) 100%);
+    box-shadow: 0 8px 16px var(--module-shadow);
     color: #fff;
 }
 

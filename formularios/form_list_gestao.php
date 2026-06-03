@@ -93,7 +93,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
 <!-- FORMULARIO DE PESQUISAS -->
 <div class="container-fluid form_container listagem-page" id='main-container' style="margin-top:4px;">
     <script src="./js/ajaxNav.js"></script>
-    <div class="fc-module-header">
+    <div class="fc-module-header fc-module-header--gestao">
         <div class="fc-module-header__copy">
             <p class="fc-module-header__kicker">Gestão</p>
             <h1 class="fc-module-header__title">Gestão Assistencial</h1>

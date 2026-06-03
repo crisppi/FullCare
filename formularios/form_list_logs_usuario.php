@@ -295,7 +295,7 @@ $acessosRows = array_slice($acessosRows, 0, 30);
 ?>
 
 <div class="container-fluid form_container" style="margin-top:15px;">
-    <div class="fc-module-header">
+    <div class="fc-module-header fc-module-header--gestao">
         <div class="fc-module-header__copy">
             <p class="fc-module-header__kicker">Gestão</p>
             <h1 class="fc-module-header__title">Logs por Usuário</h1>

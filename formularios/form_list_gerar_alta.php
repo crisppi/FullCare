@@ -51,7 +51,7 @@ sort($dadosAlta);
 <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
 
 <div class="container-fluid form_container listagem-page" id="main-container">
-    <div class="listagem-hero listagem-hero--module">
+    <div class="listagem-hero listagem-hero--module listagem-hero--internacoes">
         <div class="listagem-hero__copy">
             <div class="listagem-kicker">Internações abertas</div>
             <h1 class="listagem-title">Gerar altas</h1>

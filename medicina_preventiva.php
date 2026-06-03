@@ -169,7 +169,7 @@ function mp_action_label(string $action): string
 
 <div class="mp-shell">
     <div class="container-fluid">
-        <div class="fc-module-header mb-4">
+        <div class="fc-module-header fc-module-header--cuidado mb-4">
             <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
                 <div class="fc-module-header__copy">
                     <p class="fc-module-header__kicker">Cuidado Continuado</p>

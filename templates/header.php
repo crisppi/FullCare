@@ -250,6 +250,7 @@ if (!empty($sessionIdUsuario)) {
     <link href="<?= $BASE_URL ?>css/style.css?v=<?= @filemtime(__DIR__ . '/../css/style.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/legendas.css?v=<?= @filemtime(__DIR__ . '/../css/legendas.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/styleMenu.css?v=<?= @filemtime(__DIR__ . '/../css/styleMenu.css') ?>" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/module_headers.css?v=<?= @filemtime(__DIR__ . '/../css/module_headers.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/style_show_internacao.css?v=<?= @filemtime(__DIR__ . '/../css/style_show_internacao.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/table_style.css?v=<?= @filemtime(__DIR__ . '/../css/table_style.css') ?>" rel="stylesheet">
     <script defer src="<?= $BASE_URL ?>js/lista_header_sort.js"></script>
@@ -627,81 +628,6 @@ if (!empty($sessionIdUsuario)) {
             .header-actions #global-patient-search {
                 min-width: 0;
                 width: 100%;
-            }
-        }
-
-        .fc-module-header {
-            width: 100%;
-            margin: 0 0 10px;
-            padding: 7px 14px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 10px rgba(35, 102, 147, 0.10);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .fc-module-header__copy {
-            min-width: 0;
-        }
-
-        .fc-module-header__kicker {
-            margin: 0 0 1px;
-            color: rgba(255, 255, 255, .78) !important;
-            font-size: .5rem;
-            font-weight: 800;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-        }
-
-        .fc-module-header__title {
-            margin: 0;
-            color: #ffffff !important;
-            font-size: clamp(.92rem, 1.18vw, 1.08rem) !important;
-            font-weight: 800 !important;
-            line-height: 1.15 !important;
-            letter-spacing: 0;
-        }
-
-        .fc-module-header__subtitle {
-            margin: 2px 0 0;
-            max-width: 900px;
-            color: rgba(255, 255, 255, .9) !important;
-            font-size: .66rem;
-            line-height: 1.25;
-        }
-
-        .fc-module-header__actions {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .fc-module-header__actions .btn {
-            min-height: 28px;
-            border-radius: 9px;
-            font-size: .68rem;
-            font-weight: 700;
-            padding-top: 4px;
-            padding-bottom: 4px;
-        }
-
-        @media (max-width: 767.98px) {
-            .fc-module-header {
-                align-items: flex-start;
-                flex-direction: column;
-                border-radius: 12px;
-                padding: 8px 12px;
-            }
-
-            .fc-module-header__actions {
-                justify-content: flex-start;
             }
         }
 
