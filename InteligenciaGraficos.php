@@ -198,12 +198,34 @@ $hospitais = $chartService->listHospitals($ctx);
     margin-top: 12px;
     padding: 14px;
 }
+.ai-chart-insight-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 6px;
+    color: #637286;
+    font-size: .66rem;
+    font-weight: 700;
+}
+.ai-chart-insight-speaker {
+    color: #24384f;
+}
+.ai-chart-insight-time {
+    color: #7b8ca0;
+    font-weight: 600;
+}
 .ai-chart-insight-text {
     margin: 0;
+    padding: 12px 14px;
     white-space: pre-wrap;
     color: #2f3f55;
     line-height: 1.48;
     font-size: .9rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f2f8fc 100%);
+    border: 1px solid #c7deea;
+    border-left: 4px solid #5eb4d8;
+    border-radius: 8px;
+    box-shadow: 0 10px 24px rgba(31, 76, 110, .12);
 }
 .ai-chart-table {
     margin-top: 12px;
@@ -327,6 +349,10 @@ $hospitais = $chartService->listHospitals($ctx);
 
             <section class="ai-chart-panel ai-chart-insight">
                 <h2>Leitura da IA</h2>
+                <div class="ai-chart-insight-meta">
+                    <span class="ai-chart-insight-speaker">FullCare - IA</span>
+                    <span id="aiChartInsightTime" class="ai-chart-insight-time"><?= htmlspecialchars(date('d/m/Y H:i'), ENT_QUOTES, 'UTF-8') ?></span>
+                </div>
                 <p id="aiChartInsight" class="ai-chart-insight-text">A interpretação aparecerá após gerar o gráfico.</p>
             </section>
 
@@ -346,6 +372,7 @@ $hospitais = $chartService->listHospitals($ctx);
     const title = document.getElementById('aiChartTitle');
     const meta = document.getElementById('aiChartMeta');
     const insight = document.getElementById('aiChartInsight');
+    const insightTime = document.getElementById('aiChartInsightTime');
     const table = document.getElementById('aiChartTable');
     const empty = document.getElementById('aiChartEmpty');
     const wrap = document.getElementById('aiChartWrap');
@@ -415,6 +442,20 @@ $hospitais = $chartService->listHospitals($ctx);
         return isMoneyMetric(chart) ? formatMoneyBR(value) : formatNumberBR(value, Number(value) % 1 === 0 ? 0 : 2);
     }
 
+    function formatMessageDate(date) {
+        return date.toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function touchInsightTime() {
+        insightTime.textContent = formatMessageDate(new Date());
+    }
+
     function formatExtraValue(value) {
         const text = String(value || '');
         const match = text.match(/^R\$\s*(-?\d+(?:[.,]\d+)?)$/);
@@ -431,6 +472,7 @@ $hospitais = $chartService->listHospitals($ctx);
         title.textContent = payload.title || 'Gráfico';
         meta.textContent = (chart.metric || 'Indicador') + ' por ' + (chart.dimension || 'dimensão');
         insight.textContent = payload.insight || 'Sem leitura disponível.';
+        touchInsightTime();
         renderTable(payload.rows || [], chart);
 
         if (!labels.length) {
@@ -540,6 +582,7 @@ $hospitais = $chartService->listHospitals($ctx);
         title.textContent = 'Gráfico sob demanda';
         meta.textContent = 'Aguardando pedido';
         insight.textContent = 'A interpretação aparecerá após gerar o gráfico.';
+        touchInsightTime();
         table.textContent = 'Nenhum dado carregado ainda.';
         empty.style.display = 'flex';
         empty.textContent = 'Digite um pedido ou escolha um exemplo para gerar o gráfico.';
@@ -555,6 +598,7 @@ $hospitais = $chartService->listHospitals($ctx);
         title.textContent = 'Gerando gráfico...';
         meta.textContent = 'Consultando dados';
         insight.textContent = 'Analisando pedido e preparando visualização...';
+        touchInsightTime();
         table.textContent = 'Carregando dados...';
         empty.style.display = 'flex';
         empty.textContent = 'Gerando gráfico...';
@@ -576,6 +620,7 @@ $hospitais = $chartService->listHospitals($ctx);
             title.textContent = 'Não foi possível gerar';
             meta.textContent = 'Erro';
             insight.textContent = err && err.message ? err.message : 'Erro inesperado.';
+            touchInsightTime();
             table.textContent = 'Sem dados.';
             empty.style.display = 'flex';
             empty.textContent = 'Tente ajustar o pedido ou os filtros.';

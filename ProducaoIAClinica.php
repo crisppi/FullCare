@@ -132,9 +132,34 @@ $hospitais = $clinicalService->listHospitals($ctx);
         linear-gradient(180deg, rgba(247, 251, 253, .96), rgba(245, 248, 252, .96));
     border-radius: 8px 8px 0 0;
 }
-.clinical-ai-message {
+.clinical-ai-entry {
     width: min(86%, 780px);
     margin-bottom: 12px;
+}
+.clinical-ai-entry.user {
+    margin-left: auto;
+}
+.clinical-ai-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 5px;
+    color: #637286;
+    font-size: .66rem;
+    font-weight: 700;
+}
+.clinical-ai-entry.user .clinical-ai-meta {
+    justify-content: flex-end;
+}
+.clinical-ai-speaker {
+    color: #24384f;
+}
+.clinical-ai-time {
+    color: #7b8ca0;
+    font-weight: 600;
+}
+.clinical-ai-message {
+    width: 100%;
     padding: 12px 14px;
     border-radius: 8px;
     line-height: 1.45;
@@ -147,9 +172,11 @@ $hospitais = $clinicalService->listHospitals($ctx);
 }
 .clinical-ai-message.assistant {
     margin-right: auto;
-    background: #fff;
-    border: 1px solid #dbe8f0;
+    background: linear-gradient(180deg, #ffffff 0%, #f2f8fc 100%);
+    border: 1px solid #c7deea;
+    border-left: 4px solid #5eb4d8;
     color: #26384f;
+    box-shadow: 0 10px 24px rgba(31, 76, 110, .12);
 }
 .clinical-ai-composer {
     display: flex;
@@ -323,7 +350,13 @@ $hospitais = $clinicalService->listHospitals($ctx);
 
         <main class="clinical-ai-panel clinical-ai-main">
             <div id="clinicalMessages" class="clinical-ai-messages">
-                <div class="clinical-ai-message assistant">Ola. Posso pesquisar as internacoes filtradas com foco clinico para auditoria: patologia, permanencia, UTI, visitas, eventos adversos e oportunidades qualitativas de cuidado.</div>
+                <div class="clinical-ai-entry assistant">
+                    <div class="clinical-ai-meta">
+                        <span class="clinical-ai-speaker">FullCare - IA</span>
+                        <span class="clinical-ai-time"><?= fc_clinical_e(date('d/m/Y H:i')) ?></span>
+                    </div>
+                    <div class="clinical-ai-message assistant">Ola. Posso pesquisar as internacoes filtradas com foco clinico para auditoria: patologia, permanencia, UTI, visitas, eventos adversos e oportunidades qualitativas de cuidado.</div>
+                </div>
             </div>
             <form id="clinicalForm" class="clinical-ai-composer">
                 <textarea id="clinicalQuestion" placeholder="Pergunte sobre quadro clinico, patologia, UTI, eventos, visitas ou permanencia..." required></textarea>
@@ -349,6 +382,7 @@ $hospitais = $clinicalService->listHospitals($ctx);
     const clearBtn = document.getElementById('clinicalClear');
     const initialMessage = 'Ola. Posso pesquisar as internacoes filtradas com foco clinico para auditoria: patologia, permanencia, UTI, visitas, eventos adversos e oportunidades qualitativas de cuidado.';
     const initialResults = 'As internacoes relacionadas a resposta aparecerao aqui.';
+    const loggedUserName = <?= json_encode(trim((string)($_SESSION['usuario_user'] ?? $_SESSION['login_user'] ?? $_SESSION['email_user'] ?? 'Usuário')) ?: 'Usuário') ?>;
 
     function filters() {
         return {
@@ -360,12 +394,42 @@ $hospitais = $clinicalService->listHospitals($ctx);
     }
 
     function addMessage(type, text) {
+        const entry = document.createElement('div');
+        entry.className = 'clinical-ai-entry ' + type;
+
+        const meta = document.createElement('div');
+        meta.className = 'clinical-ai-meta';
+
+        const speaker = document.createElement('span');
+        speaker.className = 'clinical-ai-speaker';
+        speaker.textContent = type === 'user' ? loggedUserName : 'FullCare - IA';
+
+        const time = document.createElement('span');
+        time.className = 'clinical-ai-time';
+        time.textContent = formatMessageDate(new Date());
+
+        meta.appendChild(speaker);
+        meta.appendChild(time);
+
         const el = document.createElement('div');
         el.className = 'clinical-ai-message ' + type;
         el.textContent = text;
-        messages.appendChild(el);
+
+        entry.appendChild(meta);
+        entry.appendChild(el);
+        messages.appendChild(entry);
         messages.scrollTop = messages.scrollHeight;
         return el;
+    }
+
+    function formatMessageDate(date) {
+        return date.toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     }
 
     function renderResults(items) {

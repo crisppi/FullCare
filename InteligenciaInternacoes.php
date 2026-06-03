@@ -128,9 +128,34 @@ $hospitais = $chatService->listHospitals($ctx);
     background: #f7fbfd;
     border-radius: 8px 8px 0 0;
 }
-.intern-chat-message {
+.intern-chat-entry {
     width: min(86%, 780px);
     margin-bottom: 12px;
+}
+.intern-chat-entry.user {
+    margin-left: auto;
+}
+.intern-chat-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 5px;
+    color: #637286;
+    font-size: .66rem;
+    font-weight: 700;
+}
+.intern-chat-entry.user .intern-chat-meta {
+    justify-content: flex-end;
+}
+.intern-chat-speaker {
+    color: #24384f;
+}
+.intern-chat-time {
+    color: #7b8ca0;
+    font-weight: 600;
+}
+.intern-chat-message {
+    width: 100%;
     padding: 12px 14px;
     border-radius: 8px;
     line-height: 1.45;
@@ -143,9 +168,11 @@ $hospitais = $chatService->listHospitals($ctx);
 }
 .intern-chat-message.assistant {
     margin-right: auto;
-    background: #fff;
-    border: 1px solid #dbe8f0;
+    background: linear-gradient(180deg, #ffffff 0%, #f2f8fc 100%);
+    border: 1px solid #c7deea;
+    border-left: 4px solid #5eb4d8;
     color: #26384f;
+    box-shadow: 0 10px 24px rgba(31, 76, 110, .12);
 }
 .intern-chat-composer {
     display: flex;
@@ -306,7 +333,13 @@ $hospitais = $chatService->listHospitals($ctx);
 
         <main class="intern-chat-panel intern-chat-main">
             <div id="chatMessages" class="intern-chat-messages">
-                <div class="intern-chat-message assistant">Olá. Posso analisar as internações filtradas e destacar riscos, pendências, longa permanência, visitas atrasadas e próximos passos operacionais.</div>
+                <div class="intern-chat-entry assistant">
+                    <div class="intern-chat-meta">
+                        <span class="intern-chat-speaker">FullCare - IA</span>
+                        <span class="intern-chat-time"><?= htmlspecialchars(date('d/m/Y H:i'), ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <div class="intern-chat-message assistant">Olá. Posso analisar as internações filtradas e destacar riscos, pendências, longa permanência, visitas atrasadas e próximos passos operacionais.</div>
+                </div>
             </div>
             <form id="chatForm" class="intern-chat-composer">
                 <textarea id="chatQuestion" placeholder="Pergunte sobre internações, saving, faturamento, glosa, eventos, visitas ou UTI..." required></textarea>
@@ -332,6 +365,7 @@ $hospitais = $chatService->listHospitals($ctx);
     const clearBtn = document.getElementById('chatClear');
     const initialMessage = 'Olá. Posso analisar as internações filtradas e destacar riscos, pendências, longa permanência, visitas atrasadas e próximos passos operacionais.';
     const initialResults = 'Os casos relacionados à resposta aparecerão aqui.';
+    const loggedUserName = <?= json_encode(trim((string)($_SESSION['usuario_user'] ?? $_SESSION['login_user'] ?? $_SESSION['email_user'] ?? 'Usuário')) ?: 'Usuário') ?>;
 
     function filters() {
         return {
@@ -343,12 +377,42 @@ $hospitais = $chatService->listHospitals($ctx);
     }
 
     function addMessage(type, text) {
+        const entry = document.createElement('div');
+        entry.className = 'intern-chat-entry ' + type;
+
+        const meta = document.createElement('div');
+        meta.className = 'intern-chat-meta';
+
+        const speaker = document.createElement('span');
+        speaker.className = 'intern-chat-speaker';
+        speaker.textContent = type === 'user' ? loggedUserName : 'FullCare - IA';
+
+        const time = document.createElement('span');
+        time.className = 'intern-chat-time';
+        time.textContent = formatMessageDate(new Date());
+
+        meta.appendChild(speaker);
+        meta.appendChild(time);
+
         const el = document.createElement('div');
         el.className = 'intern-chat-message ' + type;
         el.textContent = text;
-        messages.appendChild(el);
+
+        entry.appendChild(meta);
+        entry.appendChild(el);
+        messages.appendChild(entry);
         messages.scrollTop = messages.scrollHeight;
         return el;
+    }
+
+    function formatMessageDate(date) {
+        return date.toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     }
 
     function renderResults(items) {
