@@ -8,6 +8,7 @@ require_once("dao/seguradoraDao.php");
 require_once("models/estipulante.php");
 require_once("dao/estipulanteDao.php");
 require_once("models/message.php");
+include_once("array_dados.php");
 
 $seguradoraDao = new seguradoraDAO($conn, $BASE_URL);
 $seguradoras = $seguradoraDao->findAll();

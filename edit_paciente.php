@@ -11,6 +11,7 @@ include_once("dao/estipulanteDao.php");
 
 include_once("models/paciente.php");
 include_once("dao/pacienteDao.php");
+include_once("array_dados.php");
 
 $seguradoraDao = new seguradoraDAO($conn, $BASE_URL);
 $seguradoras = $seguradoraDao->findAll();
