@@ -236,7 +236,7 @@ $adm_check_front   = strtolower((string)(strPOST('adm_check')   ?? '')) === 's' 
 
 $med_check   = $med_check_front   ?? $aud_med_capeante;
 $enfer_check = $enfer_check_front ?? $aud_enf_capeante;
-$adm_check = $adm_check_front ?? $aud_aud_capeante;
+$adm_check = $adm_check_front ?? $aud_adm_capeante;
 
 // *** ADM CHECK TAMBÉM SEMPRE 's' ***
 $adm_check   = 's';

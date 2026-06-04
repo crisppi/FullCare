@@ -27,6 +27,8 @@ include_once("array_dados.php");
 
 $internacaoDao = new internacaoDAO($conn, $BASE_URL);
 $tuss_list = new tussDAO($conn, $BASE_URL);
+$limite = isset($limite) ? (int)$limite : null;
+$inicio = isset($inicio) ? (int)$inicio : null;
 
 $hospital_geral = new hospitalDAO($conn, $BASE_URL);
 $hospitals = $hospital_geral->findGeral($limite, $inicio);
@@ -62,7 +64,7 @@ $int_tuss = $tuss_list->findByIdIntern($id_internacao);
 
     <!-- FORMULARIO INTERNACAO -->
     <?php
-    include_once('formularios/form_edit_internacao_TUSS2.php'); ?>
+    include_once('formularios/form_edit_internacao_tuss2.php'); ?>
 
 </div>
 </div>
