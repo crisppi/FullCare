@@ -1640,7 +1640,7 @@ function aumentarTextProgramacao() {
     background-size: 16px 16px !important;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111827'><path d='M7 10l5 5 5-5z'/></svg>") !important;
     border-radius: 14px !important;
-    font-weight: 800 !important;
+    font-weight: 400 !important;
     transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
     opacity: 1 !important;
     -webkit-appearance: none;
@@ -1813,6 +1813,7 @@ function aumentarTextProgramacao() {
     height: 42px;
     min-width: 42px;
     padding: 8px 12px;
+    font-weight: 400 !important;
 }
 
 .visita-card--tabelas .adicional-card .form-group[style*="margin-top:25px"],
@@ -1941,6 +1942,204 @@ function aumentarTextProgramacao() {
     min-height: 42px !important;
     height: 42px !important;
     min-width: 42px !important;
+}
+
+/* Alinha a tela de visita ao padrao compacto de internacao/cadastro. */
+.visita-page {
+    padding: 0 0 24px !important;
+}
+
+.visita-page__content {
+    margin-top: 5px !important;
+    gap: 6px !important;
+}
+
+.visita-hero {
+    background: linear-gradient(135deg, #2f6f9f 0%, #4b90bd 54%, #5eb4d8 100%) !important;
+    border-radius: 10px !important;
+    padding: 8px 12px !important;
+    box-shadow: 0 7px 16px rgba(37, 18, 54, .055) !important;
+    align-items: center !important;
+}
+
+.visita-hero h1 {
+    font-size: 1.22rem !important;
+    letter-spacing: 0 !important;
+    line-height: 1.15 !important;
+}
+
+.visita-hero__tag,
+.btn-visita-historico {
+    min-height: 26px !important;
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+    font-size: .72rem !important;
+    font-weight: 700 !important;
+}
+
+.visita-card {
+    border-radius: 10px !important;
+    padding: 7px 9px 9px !important;
+    box-shadow: 0 7px 16px rgba(37, 18, 54, .055) !important;
+}
+
+.visita-card__header {
+    margin-bottom: 4px !important;
+    padding-bottom: 3px !important;
+    align-items: center !important;
+}
+
+.visita-card__eyebrow {
+    font-size: .66rem !important;
+    letter-spacing: .14em !important;
+}
+
+.visita-card__title {
+    font-size: .95rem !important;
+    line-height: 1.15 !important;
+}
+
+.visita-card__tag {
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+    font-size: .7rem !important;
+}
+
+.visita-card__body {
+    gap: 5px !important;
+}
+
+.visita-dados-row,
+.visita-summary-grid,
+.visita-head-grid,
+.visita-card .form-group.row {
+    gap: 5px 6px !important;
+    row-gap: 4px !important;
+}
+
+.visita-summary-card,
+.visita-head-field {
+    border-radius: 8px !important;
+    padding: 6px 8px 7px !important;
+    background: rgba(255, 255, 255, .72) !important;
+    border-color: rgba(111, 69, 162, .10) !important;
+    box-shadow: none !important;
+}
+
+.visita-summary-card__label,
+.visita-head-field label {
+    min-height: 20px !important;
+    margin-bottom: 2px !important;
+    font-size: .78rem !important;
+    font-weight: 600 !important;
+    line-height: 1.08 !important;
+}
+
+.visita-summary-card__value {
+    font-size: .86rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0 !important;
+}
+
+.visita-summary-card__input,
+.visita-head-field .form-control,
+.visita-head-field .form-select,
+.visita-head-field select,
+.visita-card .form-control,
+.visita-card .bootstrap-select > .dropdown-toggle {
+    min-height: 36px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    font-size: .84rem !important;
+    font-weight: 500 !important;
+    line-height: 20px !important;
+    box-shadow: none !important;
+}
+
+.visita-summary-card__input {
+    font-weight: 600 !important;
+}
+
+.clinical-text-field,
+.ia-highlight-box {
+    border-radius: 10px !important;
+    padding: 8px 10px !important;
+    box-shadow: none !important;
+}
+
+.clinical-text-field__head label {
+    font-size: .84rem !important;
+    font-weight: 600 !important;
+}
+
+.ia-highlight-box__header {
+    margin-bottom: 6px !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+.ia-highlight-box__title-wrap {
+    gap: 8px !important;
+}
+
+.ia-highlight-box__eyebrow {
+    margin-bottom: 1px !important;
+    font-size: .66rem !important;
+    font-weight: 700 !important;
+    letter-spacing: .12em !important;
+}
+
+.ia-highlight-box__title {
+    font-size: .95rem !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+}
+
+.parecer-ia-powered {
+    min-height: 24px !important;
+    padding: 3px 9px !important;
+    border-radius: 8px !important;
+    font-size: .68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+}
+
+.parecer-ia-card {
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+.parecer-ia-card__header {
+    min-height: 36px !important;
+    padding: 5px 8px !important;
+}
+
+.parecer-ia-card__header h4 {
+    font-size: .84rem !important;
+    font-weight: 600 !important;
+}
+
+.parecer-ia-toggle {
+    width: 28px !important;
+    height: 28px !important;
+}
+
+.parecer-ia-status,
+.parecer-ia-badge,
+.parecer-ia-section,
+.parecer-ia-empty {
+    font-size: .82rem !important;
+}
+
+.clinical-text-field__actions .btn,
+.auditoria-action-btn {
+    min-height: 30px !important;
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+    font-size: .78rem !important;
 }
 
 @media (max-width: 991.98px) {

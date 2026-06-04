@@ -296,14 +296,14 @@
         #internado_int,
         #data_alta_alt,
         #tipo_alta_alt {
-            min-height: 42px !important;
-            height: 42px !important;
+            min-height: 36px !important;
+            height: 36px !important;
         }
 
         #data_alta_alt,
         #tipo_alta_alt {
-            padding-top: 8px;
-            padding-bottom: 8px;
+            padding-top: 3px;
+            padding-bottom: 3px;
             line-height: 24px;
         }
 
@@ -1321,10 +1321,10 @@
         .internacao-head-grid > .form-group > .form-control,
         .internacao-head-grid > .form-group > select.form-control,
         .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle {
-            min-height: 42px !important;
-            height: 42px !important;
-            padding-top: 8px !important;
-            padding-bottom: 8px !important;
+            min-height: 36px !important;
+            height: 36px !important;
+            padding-top: 3px !important;
+            padding-bottom: 3px !important;
             line-height: 1.25 !important;
         }
 
@@ -1792,7 +1792,7 @@
         .tabelas-selects > .tabelas-col .detail-select,
         .tabelas-selects > .tabelas-col .select-purple {
             border-radius: 14px !important;
-            font-weight: 800 !important;
+            font-weight: 400 !important;
             transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
         }
 
@@ -2103,6 +2103,7 @@
             min-height: 42px !important;
             height: 42px !important;
             min-width: 42px !important;
+            font-weight: 400 !important;
         }
 
         /* Placeholder unificado em campos do formulario */
@@ -2679,6 +2680,32 @@
             line-height: 1.08 !important;
         }
 
+        .internacao-page .internacao-head-grid > .form-group > label,
+        .internacao-page .internacao-head-grid > .hospital-col > .d-flex.mb-1,
+        .internacao-page .internacao-head-grid > .patient-col > .d-flex.mb-1 {
+            height: 24px !important;
+            min-height: 24px !important;
+            margin-bottom: 2px !important;
+            align-items: flex-end !important;
+        }
+
+        .internacao-page .internacao-head-grid > .patient-col > .d-flex.mb-1 {
+            justify-content: space-between !important;
+        }
+
+        .internacao-page .internacao-head-grid .patient-label-actions {
+            height: 24px !important;
+            margin-bottom: 0 !important;
+            align-items: center !important;
+        }
+
+        .internacao-page .internacao-head-grid .patient-inline-link {
+            min-height: 22px !important;
+            height: 22px !important;
+            padding-top: 2px !important;
+            padding-bottom: 2px !important;
+        }
+
         .internacao-page .internacao-card .form-control,
         .internacao-page .entity-form .form-control,
         .internacao-page .entity-form .form-control-sm,
@@ -2689,6 +2716,66 @@
             border-radius: 8px !important;
             padding-top: 3px !important;
             padding-bottom: 3px !important;
+        }
+
+        .internacao-page .internacao-head-grid > .form-group > .form-control,
+        .internacao-page .internacao-head-grid > .form-group > select.form-control,
+        .internacao-page .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle {
+            font-size: .84rem !important;
+            font-weight: 500 !important;
+            line-height: 20px !important;
+            vertical-align: middle !important;
+        }
+
+        .internacao-page .internacao-head-grid input[type="date"]::-webkit-datetime-edit,
+        .internacao-page .internacao-head-grid input[type="datetime-local"]::-webkit-datetime-edit,
+        .internacao-page .internacao-head-grid input[type="date"]::-webkit-datetime-edit-text,
+        .internacao-page .internacao-head-grid input[type="datetime-local"]::-webkit-datetime-edit-text,
+        .internacao-page .internacao-head-grid input[type="date"]::-webkit-datetime-edit-day-field,
+        .internacao-page .internacao-head-grid input[type="datetime-local"]::-webkit-datetime-edit-day-field,
+        .internacao-page .internacao-head-grid input[type="date"]::-webkit-datetime-edit-month-field,
+        .internacao-page .internacao-head-grid input[type="datetime-local"]::-webkit-datetime-edit-month-field,
+        .internacao-page .internacao-head-grid input[type="date"]::-webkit-datetime-edit-year-field,
+        .internacao-page .internacao-head-grid input[type="datetime-local"]::-webkit-datetime-edit-year-field,
+        .internacao-page .internacao-head-grid input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+        .internacao-page .internacao-head-grid input[type="datetime-local"]::-webkit-datetime-edit-minute-field {
+            font-family: var(--app-font-family) !important;
+            font-size: .84rem !important;
+            font-weight: 500 !important;
+            line-height: 20px !important;
+        }
+
+        .internacao-page .internacao-head-grid input[type="date"]::-webkit-calendar-picker-indicator,
+        .internacao-page .internacao-head-grid input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            width: 16px !important;
+            height: 16px !important;
+            margin: 0 !important;
+        }
+
+        .internacao-page .internacao-head-grid > .hospital-col .bootstrap-select > .dropdown-toggle,
+        .internacao-page .internacao-head-grid > .patient-col .bootstrap-select > .dropdown-toggle,
+        .internacao-page .internacao-head-grid > .hospital-col select,
+        .internacao-page .internacao-head-grid > .patient-col select {
+            min-height: 36px !important;
+            height: 36px !important;
+            padding-top: 3px !important;
+            padding-bottom: 3px !important;
+            line-height: 1.25 !important;
+            box-shadow: none !important;
+        }
+
+        .internacao-page .internacao-head-grid > .hospital-col .bootstrap-select > .dropdown-toggle .filter-option,
+        .internacao-page .internacao-head-grid > .patient-col .bootstrap-select > .dropdown-toggle .filter-option,
+        .internacao-page .internacao-head-grid > .hospital-col .bootstrap-select > .dropdown-toggle .filter-option-inner,
+        .internacao-page .internacao-head-grid > .patient-col .bootstrap-select > .dropdown-toggle .filter-option-inner {
+            min-height: 0 !important;
+            height: auto !important;
+            line-height: 20px !important;
+        }
+
+        .internacao-page .internacao-head-grid > .hospital-col .bootstrap-select > .dropdown-toggle .filter-option-inner-inner,
+        .internacao-page .internacao-head-grid > .patient-col .bootstrap-select > .dropdown-toggle .filter-option-inner-inner {
+            line-height: 20px !important;
         }
 
         .internacao-page textarea.form-control,
