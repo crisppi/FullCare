@@ -422,6 +422,46 @@
             grid-column: span 3;
         }
 
+        .edit-head-grid .edit-head-hospital,
+        .edit-head-grid .edit-head-patient {
+            padding: 12px 14px 14px;
+            border-color: rgba(70, 118, 166, .24);
+            background: linear-gradient(180deg, #f2f8ff 0%, #ffffff 100%);
+            box-shadow: 0 10px 24px rgba(70, 118, 166, .11), inset 0 1px 0 rgba(255,255,255,.9);
+        }
+
+        .edit-head-grid .edit-head-patient {
+            border-color: rgba(94, 35, 99, .22);
+            background: linear-gradient(180deg, #fbf7ff 0%, #ffffff 100%);
+            box-shadow: 0 10px 24px rgba(94, 35, 99, .10), inset 0 1px 0 rgba(255,255,255,.9);
+        }
+
+        .edit-head-grid .edit-head-hospital label,
+        .edit-head-grid .edit-head-patient label {
+            color: #2f4767;
+            font-size: .82rem;
+            font-weight: 800;
+        }
+
+        .edit-head-grid .edit-head-patient label {
+            color: #5e2363;
+        }
+
+        .edit-head-grid .edit-head-hospital input[readonly],
+        .edit-head-grid .edit-head-patient input[readonly] {
+            color: #1f2937;
+            font-size: .96rem;
+            font-weight: 700;
+            background: #fff !important;
+            border-color: rgba(70, 118, 166, .22);
+            box-shadow: 0 1px 0 rgba(255,255,255,.8), 0 0 0 3px rgba(70, 118, 166, .08);
+        }
+
+        .edit-head-grid .edit-head-patient input[readonly] {
+            border-color: rgba(94, 35, 99, .22);
+            box-shadow: 0 1px 0 rgba(255,255,255,.8), 0 0 0 3px rgba(94, 35, 99, .08);
+        }
+
         .edit-head-medium {
             grid-column: span 2;
         }
@@ -1575,8 +1615,8 @@
                         Atualizar
                     </button>
                     <div class="edit-draft-actions">
-                        <small id="clinical-autosave-status" class="text-muted">Rascunho automático: ativo</small>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-clinical-draft="fields">Limpar rascunho</button>
+                        <small id="clinical-autosave-status" class="text-muted">Alterações salvam somente ao clicar em Atualizar</small>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-clinical-draft>Limpar rascunho local</button>
                     </div>
                 </div>
 
@@ -1782,7 +1822,9 @@
             baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
             draftKey: <?= json_encode('fullcare:edit-internacao:' . (string)($intern['id_internacao'] ?? ($_GET['id_internacao'] ?? 'local')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
             fields: ['rel_int', 'acoes_int', 'programacao_int'],
-            autosaveStatusId: 'clinical-autosave-status'
+            autosaveStatusId: 'clinical-autosave-status',
+            autosave: false,
+            restoreDrafts: false
         };
     </script>
     <script src="<?= $BASE_URL ?>js/clinical_text_tools.js?v=<?= filemtime(__DIR__ . '/../js/clinical_text_tools.js') ?>"></script>
@@ -2267,5 +2309,6 @@
             background-color: #d7ebff !important;
             color: #111827 !important;
             border-color: #8fc7f5 !important;
+            font-weight: 400 !important;
         }
     </style>

@@ -1318,12 +1318,60 @@
             display: none;
         }
 
+        .internacao-head-grid > .form-group > .form-control,
+        .internacao-head-grid > .form-group > select.form-control,
+        .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle {
+            min-height: 42px !important;
+            height: 42px !important;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
+            line-height: 1.25 !important;
+        }
+
+        .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle .filter-option,
+        .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle .filter-option-inner {
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle .filter-option-inner-inner {
+            line-height: 24px !important;
+        }
+
+        .internacao-head-grid > .hospital-col .control-label,
+        .internacao-head-grid > .patient-col .control-label {
+            color: #2f4767;
+            font-size: .82rem;
+            font-weight: 800;
+        }
+
+        .internacao-head-grid > .patient-col .control-label {
+            color: #5e2363;
+        }
+
         .internacao-head-grid > .hospital-col .bootstrap-select > .dropdown-toggle,
         .internacao-head-grid > .patient-col .bootstrap-select > .dropdown-toggle,
         .internacao-head-grid > .hospital-col select,
         .internacao-head-grid > .patient-col select {
             font-size: .84rem !important;
             font-weight: 600 !important;
+            background: linear-gradient(180deg, #f2f8ff 0%, #ffffff 100%) !important;
+            border-color: rgba(70, 118, 166, .32) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85) !important;
+        }
+
+        .internacao-head-grid > .patient-col .bootstrap-select > .dropdown-toggle,
+        .internacao-head-grid > .patient-col select {
+            background: linear-gradient(180deg, #fbf7ff 0%, #ffffff 100%) !important;
+            border-color: rgba(94, 35, 99, .30) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85) !important;
+        }
+
+        .internacao-head-grid > .hospital-col .bootstrap-select > .dropdown-toggle .filter-option-inner-inner,
+        .internacao-head-grid > .patient-col .bootstrap-select > .dropdown-toggle .filter-option-inner-inner {
+            font-weight: 600 !important;
+            color: #1f2937 !important;
         }
 
         @media (max-width: 1399.98px) {
@@ -1705,6 +1753,7 @@
         .tabelas-selects .bootstrap-select > .dropdown-toggle .filter-option,
         .tabelas-selects .bootstrap-select > .dropdown-toggle .filter-option-inner-inner {
             font-size: .82rem !important;
+            font-weight: 400 !important;
         }
 
         .tabelas-selects .tabelas-col {

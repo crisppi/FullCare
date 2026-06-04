@@ -1795,6 +1795,18 @@ function aumentarTextProgramacao() {
     align-items: center;
 }
 
+.visita-card--tabelas .tabelas-selects .form-control,
+.visita-card--tabelas .tabelas-selects .detail-select,
+.visita-card--tabelas .tabelas-selects .select-purple,
+.visita-card--tabelas .tabelas-selects .bootstrap-select > .dropdown-toggle,
+.visita-card--tabelas .tabelas-selects .bootstrap-select > .dropdown-toggle .filter-option,
+.visita-card--tabelas .tabelas-selects .bootstrap-select > .dropdown-toggle .filter-option-inner-inner,
+.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle,
+.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle .filter-option,
+.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle .filter-option-inner-inner {
+    font-weight: 400 !important;
+}
+
 .visita-card--tabelas .adicional-card .btn-add,
 .visita-card--tabelas .adicional-card .btn-remove {
     min-height: 42px;

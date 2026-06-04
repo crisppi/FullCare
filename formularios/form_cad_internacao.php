@@ -289,6 +289,7 @@
             background-color: #d7ebff !important;
             color: #111827 !important;
             border-color: #8fc7f5 !important;
+            font-weight: 400 !important;
         }
     </style>
 

@@ -3,6 +3,8 @@
     const fields = Array.isArray(config.fields) ? config.fields : [];
     const draftKey = config.draftKey || '';
     const statusEl = config.autosaveStatusId ? document.getElementById(config.autosaveStatusId) : null;
+    const autosaveEnabled = config.autosave !== false;
+    const restoreDrafts = config.restoreDrafts !== false;
 
     function setStatus(text) {
         if (statusEl) statusEl.textContent = text;
@@ -27,6 +29,16 @@
         }
     }
 
+    function clearDraft() {
+        if (!draftKey || !window.localStorage) return;
+        try {
+            localStorage.removeItem(draftKey);
+            setStatus(autosaveEnabled ? 'Rascunho automatico: limpo' : 'Rascunho local limpo');
+        } catch (error) {
+            setStatus('Rascunho automatico: indisponivel');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         if (!fields.length) return;
 
@@ -35,8 +47,18 @@
             .map(function (id) { return document.getElementById(id); })
             .filter(Boolean);
 
+        document.querySelectorAll('[data-clear-clinical-draft]').forEach(function (button) {
+            button.addEventListener('click', clearDraft);
+        });
+
+        if (!autosaveEnabled) {
+            clearDraft();
+            setStatus('Alteracoes salvam somente ao clicar em Atualizar');
+            return;
+        }
+
         inputs.forEach(function (input) {
-            if (!input.value && drafts[input.id]) {
+            if (restoreDrafts && !input.value && drafts[input.id]) {
                 input.value = drafts[input.id];
             }
 
