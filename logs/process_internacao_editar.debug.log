@@ -1,3 +1,10 @@
 [2026-02-16 12:30:02] START id_int=642 type=edit_negociacao select_gestao=s evento_adverso_ges=s id_gestao=8
 [2026-02-16 12:30:03] GESTAO update ok id_int=642 id_gestao=8 evento=s
 [2026-02-16 12:30:03] COMMIT ok id_int=642
+[2026-06-04 21:09:03] START id_int=668 type=edit_negociacao select_gestao=n evento_adverso_ges=n id_gestao=
+[2026-06-04 21:09:03] GESTAO skip id_int=668 select_gestao=n evento=n
+[2026-06-04 21:09:03] NEGOC fallback post rows=1 id_int=668
+[2026-06-04 21:09:03] NEGOC skip id_int=668 id_neg=0 reasons=tipo_vazio,troca_de_vazia,troca_para_vazia,saving_invalido tipo= troca_de= troca_para= qtd=1 saving=0.00
+[2026-06-04 21:09:03] PRORROG input id_int=668 rows=1
+[2026-06-04 21:09:03] PRORROG skip invalid id_int=668 id_pror=0 reasons=acomodacao_vazia,data_final_invalida ini=2026-03-05 fim=
+[2026-06-04 21:09:03] COMMIT ok id_int=668

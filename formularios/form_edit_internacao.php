@@ -2210,38 +2210,7 @@
             font-size: .88rem;
         }
 
-        .internacao-page__hero {
-            background: linear-gradient(135deg, #4f2469 0%, #6f45a2 55%, #8e68c2 100%);
-            color: #fff;
-            border-radius: 12px;
-            padding: 8px 14px;
-            box-shadow: 0 8px 16px rgba(37, 18, 54, 0.12);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin: 0;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-        }
-
-        .internacao-page__hero h1 {
-            margin: 0;
-            font-size: 1.08rem;
-            letter-spacing: .02em;
-            color: #fff;
-            font-weight: 800;
-        }
-
-        .internacao-page__tag {
-            background: rgba(255, 255, 255, 0.14);
-            color: #f7efff;
-            padding: 3px 8px;
-            border-radius: 999px;
-            font-weight: 700;
-            font-size: .54rem;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            align-self: flex-start;
-        }
+        /* hero/tag/content herdados de form_cad_internacao.css */
 
         .internacao-page__content {
             margin-top: 12px;
@@ -2261,30 +2230,17 @@
             padding-bottom: 8px !important;
         }
 
-        .internacao-card {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.9));
-            border-radius: 28px;
-            padding: 18px 10px;
-            border: 1px solid #ece6f2;
-            box-shadow: 0 20px 50px rgba(94, 35, 99, 0.08);
-            margin: 0;
-            width: 100%;
-        }
-
-        .internacao-card__body {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .internacao-card--general {
-            border-color: #c7aedc;
-            background: #fff;
-        }
+        /* internacao-card herdado de form_cad_internacao.css */
 
         #accordionInternacao .accordion-item,
         #accordionInternacao .accordion-body {
             background: #f5f5f9;
             border-color: #ebe1f5;
+        }
+
+        /* Altura mínima dos inputs para igualar ao cad */
+        #main-container .form-control:not(textarea) {
+            min-height: 42px;
+            font-size: 0.9rem;
         }
     </style>
