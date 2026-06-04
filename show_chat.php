@@ -11,9 +11,6 @@ $para_usuario = isset($_GET['para_usuario']) ? (int) $_GET['para_usuario'] : nul
 $mensagemDao = new mensagemDAO($conn, $BASE_URL);
 $userDao = new UserDAO($conn, $BASE_URL);
 $users = $userDao->findAllMensagens($de_usuario);
-$users = array_values(array_filter($users, static function ($user) {
-    return !empty($user['data_mensagem']) || !empty($user['ultima_mensagem']);
-}));
 $resolveUserPhoto = static function ($foto) use ($BASE_URL): string {
     $defaultPhoto = 'uploads/usuarios/default-user.jpeg';
     $foto = trim((string) $foto);
@@ -88,7 +85,14 @@ include_once("templates/header.php");
     <div class="container-fluid chat-page">
         <div class="row d-flex align-items-stretch chat-row">
             <div class="col-3 sidebar">
+                <div class="chat-sidebar-title">
+                    <h2>Mensagens</h2>
+                    <p>Envie mensagens para outros usuários cadastrados.</p>
+                </div>
                 <ul class="user-list">
+                    <?php if (empty($users)): ?>
+                    <li class="chat-empty-users">Nenhum outro usuário ativo disponível.</li>
+                    <?php endif; ?>
                     <?php foreach ($users as $user): ?>
                     <li class="d-flex align-items-start w-100 py-2 border-bottom">
                         <a href="show_chat.php?para_usuario=<?= urlencode($user['id_usuario']) ?>"
@@ -104,10 +108,10 @@ include_once("templates/header.php");
                                         <?php endif; ?>
                                     </span>
                                     <small
-                                        class="text-muted"><?= $user['data_mensagem'] ? htmlspecialchars(date('d/m/Y H:i', strtotime($user['data_mensagem']))) : "Iniciar Conversa" ?></small>
+                                        class="text-muted"><?= $user['data_mensagem'] ? htmlspecialchars(date('d/m/Y H:i', strtotime($user['data_mensagem']))) : "Sem conversa" ?></small>
                                 </div>
                                 <p class="mb-0 text-truncate text-muted small">
-                                    <?= htmlspecialchars($user['ultima_mensagem']) ?>
+                                    <?= htmlspecialchars($user['ultima_mensagem'] ?: 'Clique para enviar a primeira mensagem') ?>
                                 </p>
                             </div>
                         </a>
@@ -121,11 +125,17 @@ include_once("templates/header.php");
                 <div class="chat-header d-flex align-items-center">
                     <img src="<?= htmlspecialchars($resolveUserPhoto($user_para->foto_usuario ?? '')) ?>"
                         alt="Foto de <?= htmlspecialchars($user_para->usuario_user) ?>" class="user-photo-chat">
-                    <h3 class="ms-3"><?= htmlspecialchars($user_para->usuario_user) ?></h3>
+                    <div class="ms-3">
+                        <h3><?= htmlspecialchars($user_para->usuario_user) ?></h3>
+                        <p class="chat-recipient-meta">Conversa direta com usuário cadastrado</p>
+                    </div>
                 </div>
                 <?php else: ?>
                 <div class="chat-header d-flex align-items-center">
-                    <h3 class="ms-3">Selecione um usuário para iniciar a conversa</h3>
+                    <div class="ms-3">
+                        <h3>Selecione um usuário cadastrado</h3>
+                        <p class="chat-recipient-meta">Escolha um nome na lista para enviar uma mensagem.</p>
+                    </div>
                 </div>
                 <?php endif; ?>
 
@@ -139,11 +149,12 @@ include_once("templates/header.php");
                     <form id="chat-form">
                         <div class="input-group">
                             <input type="hidden" id="chat-target" value="<?= (int) $para_usuario ?>">
-                            <input type="text" id="message" class="form-control" placeholder="Digite sua mensagem..."
-                                required autocomplete="off">
+                            <input type="text" id="message" class="form-control"
+                                placeholder="<?= $user_para ? 'Digite uma mensagem para ' . htmlspecialchars($user_para->usuario_user) : 'Selecione um usuário para enviar mensagem' ?>"
+                                required autocomplete="off" <?= $user_para ? '' : 'disabled' ?>>
                             <button type="button" class="btn btn-secondary" id="add-capeante-link"
-                                title="Adicionar referência de capeante">+</button>
-                            <button type="submit" class="btn btn-primary">Enviar</button>
+                                title="Adicionar referência de capeante" <?= $user_para ? '' : 'disabled' ?>>+</button>
+                            <button type="submit" class="btn btn-primary" <?= $user_para ? '' : 'disabled' ?>>Enviar mensagem</button>
                         </div>
                     </form>
                 </div>
@@ -217,8 +228,8 @@ include_once("templates/header.php");
     // Envio de mensagem via Ajax
     $('#chat-form').on('submit', function(e) {
         e.preventDefault();
-        var message = $('#message').val();
-        if (!chatTarget || message.trim() === '') return;
+        var message = $('#message').val().trim();
+        if (!chatTarget || message === '') return;
 
         $.ajax({
             url: 'cad_mensagem.php',

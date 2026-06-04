@@ -961,6 +961,7 @@ input:invalid {
     font-weight: 400;
     line-height: 1.28;
     text-rendering: optimizeLegibility;
+    text-transform: none !important;
 }
 
 .fc-list-action .dropdown-menu .btn-default:hover,

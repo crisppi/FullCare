@@ -1,165 +1,409 @@
 <?php
 include_once("check_logado.php");
-
 include_once("globals.php");
-
 include_once("models/hospital.php");
 include_once("dao/hospitalDao.php");
 include_once("templates/header.php");
 
-// Pegar o id do paceinte
-$id_hospital = filter_input(INPUT_GET, "id_hospital", FILTER_SANITIZE_NUMBER_INT);
-
-$hospital;
-
+$id_hospital = filter_input(INPUT_GET, "id_hospital", FILTER_VALIDATE_INT);
 $hospitalDao = new hospitalDAO($conn, $BASE_URL);
+$hospital = $id_hospital ? $hospitalDao->findById($id_hospital) : null;
 
-//Instanciar o metodo hospital   
-$hospital = $hospitalDao->findById($id_hospital);
-$telefone01_format = $telefone02_format = $cnpj_format = null;
-if (strlen($hospital->telefone01_hosp) > 0) {
+if (!$hospital) {
+    echo "<div class='container mt-4'><div class='alert alert-warning'>Hospital não encontrado.</div></div>";
+    include_once("templates/footer.php");
+    exit;
+}
 
-    if (strlen($hospital->telefone01_hosp) == 10) {
-        $telefone01_format = '(' .
-            substr($hospital->telefone01_hosp, 0, 2) . ') ' .
-            substr($hospital->telefone01_hosp, 2, 4) . '-' .
-            substr($hospital->telefone01_hosp, 6, 9);
-    } else {
-        $telefone01_format = '(' .
-            substr($hospital->telefone01_hosp, 0, 2) . ') ' .
-            substr($hospital->telefone01_hosp, 2, 5) . '-' .
-            substr($hospital->telefone01_hosp, 7, 9);
+function hospitalShowEsc($value): string
+{
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+}
+
+function hospitalShowValue($value): string
+{
+    $value = trim((string)$value);
+    return $value !== '' ? hospitalShowEsc($value) : '-';
+}
+
+function hospitalShowPhone($value): string
+{
+    $digits = preg_replace('/\D+/', '', (string)$value);
+    if ($digits === '') {
+        return '-';
     }
-} else {
-    $telefone01_format = null;
-};
-if (strlen($hospital->telefone02_hosp) > 0) {
-
-    if (strlen($hospital->telefone02_hosp) == 10) {
-        $telefone02_format = '(' .
-            substr($hospital->telefone02_hosp, 0, 2) . ') ' .
-            substr($hospital->telefone02_hosp, 2, 4) . '-' .
-            substr($hospital->telefone02_hosp, 6, 9);
-    } else {
-        $telefone02_format = '(' .
-            substr($hospital->telefone02_hosp, 0, 2) . ') ' .
-            substr($hospital->telefone02_hosp, 2, 5) . '-' .
-            substr($hospital->telefone02_hosp, 7, 9);
+    if (strlen($digits) === 10) {
+        return '(' . substr($digits, 0, 2) . ') ' . substr($digits, 2, 4) . '-' . substr($digits, 6);
     }
-} else {
-    $telefone02_format = null;
-};
+    if (strlen($digits) === 11) {
+        return '(' . substr($digits, 0, 2) . ') ' . substr($digits, 2, 5) . '-' . substr($digits, 7);
+    }
+    return hospitalShowEsc((string)$value);
+}
 
-if (strlen($hospital->cnpj_hosp) > 0) {
+function hospitalShowCnpj($value): string
+{
+    $digits = preg_replace('/\D+/', '', (string)$value);
+    if ($digits === '') {
+        return '-';
+    }
+    if (strlen($digits) === 14) {
+        return substr($digits, 0, 2) . '.' .
+            substr($digits, 2, 3) . '.' .
+            substr($digits, 5, 3) . '/' .
+            substr($digits, 8, 4) . '-' .
+            substr($digits, 12, 2);
+    }
+    return hospitalShowEsc((string)$value);
+}
 
-    $cnpj_format =
+function hospitalShowDate($value): string
+{
+    $value = trim((string)$value);
+    if ($value === '' || $value === '0000-00-00' || $value === '0000-00-00 00:00:00') {
+        return '-';
+    }
+    $timestamp = strtotime($value);
+    return $timestamp ? date('d/m/Y', $timestamp) : hospitalShowEsc($value);
+}
 
-        substr($hospital->cnpj_hosp, 0, 2) . '.' .
-        substr($hospital->cnpj_hosp, 2, 3) . '.' .
-        substr($hospital->cnpj_hosp, 5, 3) . '/' .
-        substr($hospital->cnpj_hosp, 8, 4) . '-' .
-        substr($hospital->cnpj_hosp, 12, 2);
-} else {
-    $telefone02_format = null;
-};
+function hospitalShowLogoUrl($logo, string $baseUrl): ?string
+{
+    $logo = trim((string)$logo);
+    if ($logo === '') {
+        return null;
+    }
+    if (preg_match('#^https?://#i', $logo)) {
+        return $logo;
+    }
 
-$hospital->cnpj_hosp = $cnpj_format;
-$hospital->telefone01_hosp = $telefone01_format;
-$hospital->telefone02_hosp = $telefone02_format;
+    $logoPath = ltrim($logo, '/');
+    $relativePath = stripos($logoPath, 'uploads/') === 0 ? $logoPath : 'uploads/' . $logoPath;
+    $localPath = __DIR__ . '/' . $relativePath;
+    return is_file($localPath) ? $baseUrl . $relativePath : null;
+}
+
+$statusAtivo = strtolower((string)($hospital->ativo_hosp ?? '')) === 's';
+$statusLabel = $statusAtivo ? 'Ativo' : 'Inativo';
+$statusClass = $statusAtivo ? 'is-active' : 'is-inactive';
+$logoUrl = hospitalShowLogoUrl($hospital->logo_hosp ?? '', $BASE_URL);
+$endereco = trim(implode(' ', array_filter([
+    trim((string)($hospital->endereco_hosp ?? '')),
+    trim((string)($hospital->numero_hosp ?? '')) !== '' ? ', ' . trim((string)$hospital->numero_hosp) : '',
+])));
 ?>
 <script src="js/timeout.js"></script>
+<link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/css/form_cad_internacao.css') ?>">
 
-<div style="margin:15px" id="main-container">
-    <h4>Dados do Hospital Registro no: <?= $hospital->id_hospital ?></h4>
-    <div class="card">
-        <div class="card-header container" id="view-contact-container">
-            <!-- <h6>Dados Hospital</h6> -->
+<style>
+.hospital-show-page {
+    padding: 0 16px 96px;
+}
 
-            <?php
-            // monta o caminho físico até o arquivo
-            $logoFile = __DIR__ . '/uploads/' . $hospital->logo_hosp;
+.hospital-show-page .internacao-page__hero {
+    margin-bottom: 14px;
+}
 
-            // só exibe se tiver nome e o arquivo existir
-            if (!empty($hospital->logo_hosp) && file_exists($logoFile)):
-            ?>
-            <img src="uploads/<?= htmlspecialchars($hospital->logo_hosp, ENT_QUOTES) ?>" height="80" width="80"
-                alt="Logo do Hospital">
-            <?php
-            endif;
-            ?>
+.hospital-profile-card {
+    display: grid;
+    grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: stretch;
+}
 
-            <span class="card-title bold">Hospital:</span>
-            <span class="card-title bold"><?= $hospital->nome_hosp ?></span>
-            <span style="margin:10px 0 10px 250px" class="card-title bold">CNPJ:</span>
-            <span class="card-title bold"><?= $cnpj_format ?></span>
+.hospital-profile-summary,
+.hospital-info-card {
+    background: #fff;
+    border: 1px solid rgba(47, 111, 159, 0.12);
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(47, 60, 85, 0.08);
+}
+
+.hospital-profile-summary {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 100%;
+}
+
+.hospital-logo {
+    width: 112px;
+    height: 112px;
+    border-radius: 28px;
+    display: grid;
+    place-items: center;
+    object-fit: contain;
+    background: #eef6fb;
+    border: 4px solid #eef6fb;
+    box-shadow: 0 10px 24px rgba(47, 111, 159, 0.16);
+}
+
+.hospital-logo-placeholder {
+    color: #2f6f9f;
+    font-size: 2.8rem;
+}
+
+.hospital-name {
+    margin: 14px 0 4px;
+    color: #1f2937;
+    font-size: 1.22rem;
+    font-weight: 800;
+}
+
+.hospital-location {
+    margin: 0;
+    color: #667085;
+    font-size: 0.92rem;
+}
+
+.hospital-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.hospital-status::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.hospital-status.is-active {
+    background: #eaf8f0;
+    color: #16834d;
+}
+
+.hospital-status.is-inactive {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.hospital-summary-meta {
+    width: 100%;
+    display: grid;
+    gap: 8px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #edf2f7;
+    text-align: left;
+}
+
+.hospital-summary-meta span {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: #667085;
+    font-size: 0.82rem;
+}
+
+.hospital-summary-meta strong {
+    color: #334155;
+    font-weight: 800;
+}
+
+.hospital-info-stack {
+    display: grid;
+    gap: 14px;
+}
+
+.hospital-info-card {
+    padding: 16px;
+}
+
+.hospital-info-card h3 {
+    margin: 0;
+    color: #24384f;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.hospital-card-subtitle {
+    margin: 3px 0 0;
+    color: #64748b;
+    font-size: 0.84rem;
+}
+
+.hospital-field-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.hospital-field {
+    min-height: 74px;
+    padding: 11px 12px;
+    border: 1px solid #e5edf4;
+    border-radius: 10px;
+    background: #f8fbfd;
+}
+
+.hospital-field label {
+    display: block;
+    margin: 0 0 5px;
+    padding: 0;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.hospital-field div {
+    color: #1f2937;
+    font-size: 0.94rem;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+@media (max-width: 980px) {
+    .hospital-profile-card,
+    .hospital-field-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<main id="main-container" class="internacao-page cadastro-layout hospital-show-page">
+    <div class="internacao-page__hero">
+        <div class="internacao-page__hero-main">
+            <h1>Dados do hospital</h1>
         </div>
-        <div class="card-body">
-            <h6>Dados Cadastrais</h6>
-            <span class="card-text bold">Endereço:</span>
-            <span class="card-text bold"><?= $hospital->endereco_hosp . "," ?></span>
-            <span class="card-text bold"><?= $hospital->numero_hosp ?></span>
-            <span style="margin:10px 0 10px 25%" class="card-text bold">Bairro:</span>
-            <span class="card-text bold"><?= $hospital->bairro_hosp ?></span>
-            <span style="margin:10px 0 10px 25%" class="card-text bold">Cidade:</span>
-            <span class="card-text bold"><?= $hospital->cidade_hosp ?></span>
-            <span style="margin:10px 0 10px 25%" class="card-text bold">Estado:</span>
-            <span class="card-text bold"><?= $hospital->estado_hosp ?></span>
-            <hr>
+        <div class="hero-actions">
+            <a href="<?= $BASE_URL ?>hospitais" class="hero-back-btn">Voltar para lista</a>
+            <a href="<?= $BASE_URL ?>hospitais/editar/<?= (int)$hospital->id_hospital ?>" class="hero-back-btn">Editar hospital</a>
+            <a href="<?= $BASE_URL ?>hospital_usuarios.php?id_hospital=<?= (int)$hospital->id_hospital ?>" class="hero-back-btn">Usuários</a>
+            <a href="<?= $BASE_URL ?>hospital_acomodacoes.php?id_hospital=<?= (int)$hospital->id_hospital ?>" class="hero-back-btn">Acomodações</a>
+            <span class="internacao-page__tag">Registro #<?= (int)$hospital->id_hospital ?></span>
         </div>
-        <div style="margin-top:-5px" class="card-body">
-            <h6>Dados Contato</h6>
-            <span class=" card-text bold">Email: </span>
-            <span class=" card-text bold"><?= $hospital->email01_hosp ?></span>
-            <span style="margin:10px 0 10px 25%" class=" card-text bold"> Email 02:</span>
-            <span class=" card-text bold"><?= $hospital->email02_hosp ?></span>
-            <br>
-            <span class=" card-text bold">Telefone:</span>
-            <span class=" card-text bold"><?= $hospital->telefone01_hosp ?></span>
-            <span style="margin:10px 0 10px 25%" class=" card-text bold">Telefone:</span>
-            <span class=" card-text bold"><?= $hospital->telefone02_hosp ?></span>
-            <hr>
-        </div>
-        <div class="card-body">
-            <div style="margin-left:20px" id="id-confirmacao" class="btn_acoes visible">
-                <div class="form-group row">
-                    <div class="form-group col-sm-2">
-                        <form display="in-line" id="form_delete"
-                            action="process_hospital.php?id_hospital=<?= $id_hospital ?>" method="POST">
-                            <input type="hidden" value="deletando">
-                            <!-- <input type="hidden" name="type" value="delete"> -->
-                            <input type="hidden" name="typeDel" value="delUpdate">
+    </div>
 
-                        </form>
+    <div class="hospital-profile-card">
+        <aside class="hospital-profile-summary">
+            <?php if ($logoUrl): ?>
+                <img src="<?= hospitalShowEsc($logoUrl) ?>" alt="Logo de <?= hospitalShowValue($hospital->nome_hosp ?? '') ?>" class="hospital-logo">
+            <?php else: ?>
+                <div class="hospital-logo hospital-logo-placeholder" aria-hidden="true">
+                    <i class="bi bi-hospital"></i>
+                </div>
+            <?php endif; ?>
+            <h2 class="hospital-name"><?= hospitalShowValue($hospital->nome_hosp ?? '') ?></h2>
+            <p class="hospital-location"><?= hospitalShowValue(trim((string)($hospital->cidade_hosp ?? '') . ' / ' . (string)($hospital->estado_hosp ?? ''), ' /')) ?></p>
+            <span class="hospital-status <?= $statusClass ?>"><?= $statusLabel ?></span>
+
+            <div class="hospital-summary-meta">
+                <span><strong>CNPJ</strong><?= hospitalShowCnpj($hospital->cnpj_hosp ?? '') ?></span>
+                <span><strong>CEP</strong><?= hospitalShowValue($hospital->cep_hosp ?? '') ?></span>
+                <span><strong>Cadastrado</strong><?= hospitalShowDate($hospital->data_create_hosp ?? '') ?></span>
+            </div>
+        </aside>
+
+        <section class="hospital-info-stack">
+            <div class="hospital-info-card">
+                <h3>Identificação</h3>
+                <p class="hospital-card-subtitle">Dados institucionais e responsáveis principais.</p>
+                <div class="hospital-field-grid">
+                    <div class="hospital-field">
+                        <label>Hospital</label>
+                        <div><?= hospitalShowValue($hospital->nome_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>CNPJ</label>
+                        <div><?= hospitalShowCnpj($hospital->cnpj_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Diretor</label>
+                        <div><?= hospitalShowValue($hospital->diretor_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Coordenação médica</label>
+                        <div><?= hospitalShowValue($hospital->coordenador_medico_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Coordenação faturamento</label>
+                        <div><?= hospitalShowValue($hospital->coordenador_fat_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Criado por</label>
+                        <div><?= hospitalShowValue($hospital->usuario_create_hosp ?? '') ?></div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="hospital-info-card">
+                <h3>Contato</h3>
+                <p class="hospital-card-subtitle">Canais administrativos do hospital.</p>
+                <div class="hospital-field-grid">
+                    <div class="hospital-field">
+                        <label>E-mail principal</label>
+                        <div><?= hospitalShowValue($hospital->email01_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>E-mail secundário</label>
+                        <div><?= hospitalShowValue($hospital->email02_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Telefone principal</label>
+                        <div><?= hospitalShowPhone($hospital->telefone01_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Telefone secundário</label>
+                        <div><?= hospitalShowPhone($hospital->telefone02_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>E-mail coord. médica</label>
+                        <div><?= hospitalShowValue($hospital->emailCoordMedico_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>E-mail coord. faturamento</label>
+                        <div><?= hospitalShowValue($hospital->email_coordFat_hosp ?? '') ?></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hospital-info-card">
+                <h3>Endereço</h3>
+                <p class="hospital-card-subtitle">Localização e referência cadastrada.</p>
+                <div class="hospital-field-grid">
+                    <div class="hospital-field">
+                        <label>Endereço</label>
+                        <div><?= hospitalShowValue($endereco) ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Bairro</label>
+                        <div><?= hospitalShowValue($hospital->bairro_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Cidade</label>
+                        <div><?= hospitalShowValue($hospital->cidade_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Estado</label>
+                        <div><?= hospitalShowValue($hospital->estado_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Latitude</label>
+                        <div><?= hospitalShowValue($hospital->latitude_hosp ?? '') ?></div>
+                    </div>
+                    <div class="hospital-field">
+                        <label>Longitude</label>
+                        <div><?= hospitalShowValue($hospital->longitude_hosp ?? '') ?></div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-</div>
-<script>
-function apareceOpcoes() {
-    $('#deletar-btn').val('nao');
-    let mudancaStatus = ($('#deletar-btn').val())
-    let idAcoes = (document.getElementById('id-confirmacao'));
-    idAcoes.style.display = 'block';
-}
+</main>
 
-function deletar() {
-    let idAcoes = (document.getElementById('id-confirmacao'));
-    idAcoes.style.display = 'none';
-    window.location = "<?= $BASE_URL ?>del_hospital.php?id_hospital=<?= $id_hospital ?>";
-
-};
-
-function cancelar() {
-    let idAcoes = (document.getElementById('id-confirmacao'));
-    idAcoes.style.display = 'none';
-    window.location = "<?= $BASE_URL ?>hospitais";
-};
-src = "https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js";
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+<?php include_once("templates/footer.php"); ?>

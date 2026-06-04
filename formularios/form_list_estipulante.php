@@ -203,10 +203,9 @@ if ($qtdIntItens > $limite) {
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                         <li>
-                                            <button class="dropdown-item" style="font-size: .9rem;"
-                                                onclick="openModal('<?= $BASE_URL ?>show_estipulante.php?id_estipulante=<?= $id_estipulante ?>')"
-                                                data-bs-toggle="modal" data-bs-target="#myModal"><i class="bi bi-eye"
-                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver</button>
+                                            <a class="dropdown-item" style="font-size: .9rem;"
+                                                href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/show_estipulante.php?id_estipulante=' . (int) $id_estipulante, ENT_QUOTES, 'UTF-8') ?>"><i class="bi bi-eye"
+                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver</a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" style="font-size: .9rem;"
@@ -240,25 +239,6 @@ if ($qtdIntItens > $limite) {
 
                 <!-- paginacao que aparece abaixo da tabela -->
                 <div style="display: flex;margin-top:20px">
-
-                    <!-- Modal para abrir tela de cadastro -->
-                    <div class="modal fade" id="myModal">
-                        <div class="modal-dialog  modal-lg modal-dialog-centered modal-xl">
-                            <div class="modal-content">
-                                <div style="padding-left:20px;padding-top:20px;">
-                                    <h4>Estipulante</h4>
-                                    <p class="page-description">Informações
-                                        sobre a Estipulante</p>
-                                </div>
-                                <div class="modal-body">
-                                    <div id="content-php"></div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Modal para abrir tela de cadastro -->
-
                     <div class="pagination" style="margin: 0 auto;">
                         <?php if ($total_pages ?? 1 > 1): ?>
                         <ul class="pagination">
@@ -396,19 +376,6 @@ $(document).ready(function() {
 });
 </script>
 
-<style>
-.modal-backdrop {
-    display: none;
-}
-
-.modal {
-    background: rgba(0, 0, 0, 0.5);
-}
-
-.modal-header {
-    background: #35bae1;
-}
-</style>
 <script src="./js/input-estilo.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>

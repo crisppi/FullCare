@@ -13,6 +13,15 @@
     text-transform: uppercase;
 }
 
+.table td .dropdown-menu .dropdown-item,
+.table td .dropdown-menu .btn-default,
+.table td .fc-list-action,
+.table td .fc-list-action *,
+.table td .action,
+.table td .action * {
+    text-transform: none !important;
+}
+
 .table thead th {
     text-align: center;
     height: 30px;

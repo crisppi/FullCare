@@ -234,6 +234,12 @@
 
                                             <li>
                                                 <a class="dropdown-item" style="font-size: .9rem;"
+                                                    href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/show_seguradora.php?id_seguradora=' . (int) $id_seguradora, ENT_QUOTES, 'UTF-8') ?>">
+                                                    <i class="bi bi-eye" style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" style="font-size: .9rem;"
                                                     href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/seguradoras/editar/' . (int) $id_seguradora, ENT_QUOTES, 'UTF-8') ?>">
                                                     <i class="bi bi-pencil-square" style="font-size:1rem;margin-right:8px;color:#3b82f6;"></i>Editar
                                                 </a>
@@ -263,25 +269,6 @@
 
                     <!-- paginacao que aparece abaixo da tabela -->
                     <div style="display: flex;margin-top:20px">
-
-                        <!-- Modal para abrir tela de cadastro -->
-                        <div class="modal fade" id="myModal">
-                            <div class="modal-dialog  modal-lg modal-dialog-centered modal-xl">
-                                <div class="modal-content">
-                                    <div style="padding-left:20px;padding-top:20px;">
-                                        <h4 class="page-title">Seguradora</h4>
-                                        <p class="page-description">Informações
-                                            sobre a Seguradora</p>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div id="content-php"></div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Modal para abrir tela de cadastro -->
-
                         <div class="pagination" style="margin: 0 auto;">
                             <?php if ($total_pages ?? 1 > 1): ?>
                             <ul class="pagination">
@@ -431,22 +418,6 @@ if (typeof window.paginateSeguradoras !== 'function') {
     };
 }
 </script>
-<style>
-.modal-backdrop {
-    display: none;
-
-}
-
-.modal {
-    background: rgba(0, 0, 0, 0.5);
-
-}
-
-.modal-header {
-    color: white;
-    background: #35bae1;
-}
-</style>
 <script src="./js/input-estilo.js"></script>
 
 <script src="./scripts/cadastro/general.js"></script>

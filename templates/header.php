@@ -90,6 +90,53 @@ $isDiretoria = in_array($normCargoAccess, ['diretoria', 'diretor', 'administrado
     || ($sessionNivel === -1);
 $canSeeInteligenciaMenu = $isDiretoria;
 $canSeeUsuariosCadastro = $isDiretoria && in_array($sessionNivel, [5, -1], true);
+$canSeeFullMenu = (($sessionNivel > 0) || $isDiretoria) && !$isBiHubOnly;
+$hasHeaderMenuAccess = ($sessionNivel > 0) || $isDiretoria;
+$cadastroScripts = [
+    'list_paciente.php',
+    'cad_paciente.php',
+    'edit_paciente.php',
+    'show_paciente.php',
+    'list_hospital.php',
+    'cad_hospital.php',
+    'edit_hospital.php',
+    'show_hospital.php',
+    'list_seguradora.php',
+    'cad_seguradora.php',
+    'edit_seguradora.php',
+    'show_seguradora.php',
+    'list_estipulante.php',
+    'cad_estipulante.php',
+    'edit_estipulante.php',
+    'show_estipulante.php',
+    'list_usuario.php',
+    'cad_usuario.php',
+    'edit_usuario.php',
+    'show_usuario.php',
+    'list_hospitaluser.php',
+    'cad_hospitaluser.php',
+    'edit_hospitaluser.php',
+    'list_acomodacao.php',
+    'cad_acomodacao.php',
+    'edit_acomodacao.php',
+    'show_acomodacao.php',
+    'list_patologia.php',
+    'cad_patologia.php',
+    'edit_patologia.php',
+    'show_patologia.php',
+    'list_antecedente.php',
+    'cad_antecedente.php',
+    'edit_antecedente.php',
+    'show_antecedente.php',
+];
+$isCadastroRequestPath = preg_match('#/(pacientes|hospitais|seguradoras|estipulantes|usuarios)(/|$)#i', $requestUriPath) === 1
+    || in_array($currentScriptName, $cadastroScripts, true)
+    || preg_match('/^(form_)?(list|cad|edit|show)_(paciente|hospital|hospitaluser|seguradora|estipulante|usuario|acomodacao|patologia|antecedente)\.php$/i', $currentScriptName) === 1;
+$canSeeCadastrosMenu = $canSeeFullMenu && (
+    $sessionNivel > 3
+    || $canSeeUsuariosCadastro
+    || $isCadastroRequestPath
+);
 $isPerfilMedicoMenu = $startsWithAnyAccess($normCargoAccess, ['medico', 'med']);
 $seguradoraHeaderLogoUrl = null;
 $seguradoraHeaderNome = null;
@@ -927,7 +974,7 @@ if (!empty($sessionIdUsuario)) {
                         style="--bs-scroll-height: 75vh;">
                         <!-- Ícone de mensagem -->
 
-                        <?php if ($sessionNivel > 0) { ?>
+                        <?php if ($hasHeaderMenuAccess) { ?>
 
                             <?php if ($canSeeFullMenu) { ?>
                                 <li class="nav-item dropdown">
@@ -988,7 +1035,7 @@ if (!empty($sessionIdUsuario)) {
                                 </li>
                             <?php } ?>
 
-                            <?php if ($canSeeFullMenu && ($sessionNivel > 3 || $canSeeUsuariosCadastro)) { ?>
+                            <?php if ($canSeeCadastrosMenu) { ?>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarCadastrosDropdown" role="button"
@@ -1516,9 +1563,9 @@ if (!empty($sessionIdUsuario)) {
             <div class="d-flex align-items-center gap-2 ms-auto header-actions pe-3">
                 <a href="<?= htmlspecialchars($chatAssistantLink) ?>"
                     class="btn btn-outline-secondary position-relative header-chat-launcher header-action-btn"
-                    title="Chat interno">
+                    title="Mensagens entre usuários">
                     <i class="bi bi-chat-dots"></i>
-                    <span class="d-none d-xl-inline ms-1">Chat</span>
+                    <span class="d-none d-xl-inline ms-1">Mensagens</span>
                     <?php if ($chatUnreadCount > 0): ?>
                         <span
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger chat-unread-badge">
