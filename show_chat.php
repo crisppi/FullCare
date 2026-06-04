@@ -4,50 +4,72 @@ include_once("globals.php");
 include_once("models/mensagem.php");
 require_once("dao/mensagemDao.php");
 require_once("dao/usuarioDao.php");
-require_once("app/services/AssistenteVirtualService.php");
 
 $de_usuario = $_SESSION['id_usuario'];
 $para_usuario = isset($_GET['para_usuario']) ? (int) $_GET['para_usuario'] : null;
 
-$assistantService = new AssistenteVirtualService($conn, $BASE_URL);
-$assistantId = $assistantService->getAssistantUserId();
-$assistantSummary = $assistantService->getAssistantSummary();
-
-if ($para_usuario === null) {
-    $para_usuario = $assistantId;
-}
-
 $mensagemDao = new mensagemDAO($conn, $BASE_URL);
 $userDao = new UserDAO($conn, $BASE_URL);
-$assistantUserProfile = $userDao->findById_user($assistantId);
 $users = $userDao->findAllMensagens($de_usuario);
+$users = array_values(array_filter($users, static function ($user) {
+    return !empty($user['data_mensagem']) || !empty($user['ultima_mensagem']);
+}));
+$resolveUserPhoto = static function ($foto) use ($BASE_URL): string {
+    $defaultPhoto = 'uploads/usuarios/default-user.jpeg';
+    $foto = trim((string) $foto);
 
-$assistantInList = false;
-foreach ($users as $user) {
-    if ((int) $user['id_usuario'] === $assistantId) {
-        $assistantInList = true;
-        break;
+    if ($foto === '') {
+        return $BASE_URL . $defaultPhoto;
     }
+
+    if (preg_match('#^https?://#i', $foto)) {
+        return $foto;
+    }
+
+    $fotoPath = ltrim($foto, '/');
+    $relativePath = stripos($fotoPath, 'uploads/') === 0 ? $fotoPath : 'uploads/usuarios/' . $fotoPath;
+    $localPath = __DIR__ . '/' . $relativePath;
+
+    if (!is_file($localPath)) {
+        return $BASE_URL . $defaultPhoto;
+    }
+
+    return $BASE_URL . $relativePath;
+};
+
+$assistantId = 0;
+try {
+    $stmtAssistant = $conn->prepare("SELECT id_usuario FROM tb_user WHERE login_user = :login LIMIT 1");
+    $stmtAssistant->bindValue(':login', 'assistente.virtual');
+    $stmtAssistant->execute();
+    $assistantId = (int) ($stmtAssistant->fetchColumn() ?: 0);
+} catch (Throwable $e) {
+    $assistantId = 0;
 }
 
-if (!$assistantInList) {
-    $users = array_merge([[
-        'id_usuario' => $assistantId,
-        'usuario_user' => $assistantUserProfile ? $assistantUserProfile->usuario_user : $assistantSummary['titulo'],
-        'foto_usuario' => $assistantUserProfile ? $assistantUserProfile->foto_usuario : 'default-user.jpeg',
-        'ultima_mensagem' => $assistantSummary['descricao'],
-        'data_mensagem' => null,
-        'vista' => 1,
-        'para_usuario' => $de_usuario
-    ]], $users);
+if ($assistantId > 0) {
+    $users = array_values(array_filter($users, static function ($user) use ($assistantId) {
+        return (int) ($user['id_usuario'] ?? 0) !== $assistantId;
+    }));
 }
 
-$user_para = $userDao->findById_user($para_usuario);
-if (!$user_para && $assistantService->isAssistantUser($para_usuario)) {
-    $user_para = $assistantUserProfile;
+$visibleUserIds = array_map(static function ($user) {
+    return (int) ($user['id_usuario'] ?? 0);
+}, $users);
+
+if (
+    $para_usuario === null
+    || ($assistantId > 0 && $para_usuario === $assistantId)
+    || ($para_usuario > 0 && !in_array($para_usuario, $visibleUserIds, true))
+) {
+    $para_usuario = !empty($users) ? (int) $users[0]['id_usuario'] : 0;
 }
 
-$mensagemDao->marcarMensagensComoLidas($de_usuario, $para_usuario);
+$user_para = $para_usuario > 0 ? $userDao->findById_user($para_usuario) : null;
+
+if ($para_usuario > 0) {
+    $mensagemDao->marcarMensagensComoLidas($de_usuario, $para_usuario);
+}
 
 include_once("templates/header.php");
 ?>
@@ -71,7 +93,7 @@ include_once("templates/header.php");
                     <li class="d-flex align-items-start w-100 py-2 border-bottom">
                         <a href="show_chat.php?para_usuario=<?= urlencode($user['id_usuario']) ?>"
                             class="d-flex align-items-start w-100 text-decoration-none">
-                            <img src="<?= 'uploads/usuarios/' . $user['foto_usuario'] ?>"
+                            <img src="<?= htmlspecialchars($resolveUserPhoto($user['foto_usuario'] ?? '')) ?>"
                                 alt="Foto de <?= htmlspecialchars($user['usuario_user']) ?>" class="user-photo">
                             <div class="d-flex flex-column w-100 ms-2">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -97,22 +119,13 @@ include_once("templates/header.php");
             <div class="col-9 chat-container">
                 <?php if ($user_para): ?>
                 <div class="chat-header d-flex align-items-center">
-                    <img src="<?= 'uploads/usuarios/' . $user_para->foto_usuario ?>"
+                    <img src="<?= htmlspecialchars($resolveUserPhoto($user_para->foto_usuario ?? '')) ?>"
                         alt="Foto de <?= htmlspecialchars($user_para->usuario_user) ?>" class="user-photo-chat">
                     <h3 class="ms-3"><?= htmlspecialchars($user_para->usuario_user) ?></h3>
                 </div>
                 <?php else: ?>
                 <div class="chat-header d-flex align-items-center">
                     <h3 class="ms-3">Selecione um usuário para iniciar a conversa</h3>
-                </div>
-                <?php endif; ?>
-
-                <?php if ($assistantService->isAssistantUser($para_usuario)): ?>
-                <div class="alert alert-info py-2">
-                    <strong><?= htmlspecialchars($assistantSummary['titulo']) ?>:</strong>
-                    <?= htmlspecialchars($assistantSummary['descricao']) ?>
-                    <br><small>As respostas são automáticas e precisam de revisão humana antes de seguir para o
-                        cliente.</small>
                 </div>
                 <?php endif; ?>
 
@@ -146,16 +159,17 @@ include_once("templates/header.php");
     <script>
     // Variável de controle para saber se é a primeira vez que o chat está sendo carregado
     var isFirstLoad = true;
-    var chatTarget = parseInt($('#chat-target').val(), 10) || <?= (int) $assistantId ?>;
+    var chatTarget = parseInt($('#chat-target').val(), 10) || 0;
 
     function loadMessages() {
+        if (!chatTarget) return;
+
         var ultimo_id = $('#message-box .message').last().data('id') || 0;
 
         $.ajax({
             url: 'load_messages.php',
             method: 'GET',
             data: {
-                de_usuario: <?= (int) $de_usuario ?>,
                 para_usuario: chatTarget,
                 ultima_msg: ultimo_id
             },
@@ -204,13 +218,12 @@ include_once("templates/header.php");
     $('#chat-form').on('submit', function(e) {
         e.preventDefault();
         var message = $('#message').val();
-        if (message.trim() === '') return;
+        if (!chatTarget || message.trim() === '') return;
 
         $.ajax({
             url: 'cad_mensagem.php',
             method: 'POST',
             data: {
-                de_usuario: <?= (int) $de_usuario ?>,
                 para_usuario: chatTarget,
                 mensagem: message
             },

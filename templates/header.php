@@ -198,13 +198,6 @@ if (!empty($sessionIdUsuario)) {
         $chatUnreadCount = 0;
     }
 
-    try {
-        require_once __DIR__ . '/../app/services/AssistenteVirtualService.php';
-        $headerAssistantService = new AssistenteVirtualService($conn, $BASE_URL);
-        $chatAssistantLink = $BASE_URL . 'show_chat.php?para_usuario=' . $headerAssistantService->getAssistantUserId();
-    } catch (Throwable $th) {
-        $chatAssistantLink = $BASE_URL . 'show_chat.php';
-    }
 }
 
 ?>
@@ -1523,7 +1516,7 @@ if (!empty($sessionIdUsuario)) {
             <div class="d-flex align-items-center gap-2 ms-auto header-actions pe-3">
                 <a href="<?= htmlspecialchars($chatAssistantLink) ?>"
                     class="btn btn-outline-secondary position-relative header-chat-launcher header-action-btn"
-                    title="Chat interno e Assistente Virtual">
+                    title="Chat interno">
                     <i class="bi bi-chat-dots"></i>
                     <span class="d-none d-xl-inline ms-1">Chat</span>
                     <?php if ($chatUnreadCount > 0): ?>
