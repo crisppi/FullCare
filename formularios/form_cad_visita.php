@@ -2880,7 +2880,7 @@ window.visitaAiConfig = Object.assign({}, window.visitaAiConfig || {}, {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="<?= $BASE_URL ?>js/uti_audit_ai_visita.js"></script>
+<script src="<?= $BASE_URL ?>js/uti_audit_ai_visita.js?v=<?= filemtime(__DIR__ . '/../js/uti_audit_ai_visita.js') ?>"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>

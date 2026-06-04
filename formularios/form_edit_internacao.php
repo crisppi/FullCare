@@ -1763,7 +1763,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <script src="<?= $BASE_URL ?>js/uti_audit_ai.js"></script>
+    <script src="<?= $BASE_URL ?>js/uti_audit_ai.js?v=<?= filemtime(__DIR__ . '/../js/uti_audit_ai.js') ?>"></script>
 
     <!-- <script src="js/scriptDataInt.js"></script> -->
     <script src="<?= $BASE_URL ?>js/text_cad_internacao.js"></script>
