@@ -1598,13 +1598,23 @@
     </div>
 
     <script>
-        // Função para aumentar o tamanho do campo de texto do relatório de auditoria
+        // Expande visualmente os textos clínicos mesmo quando o CSS do layout fixa min-height.
         function aumentarText(textareaId) {
-            document.getElementById(textareaId).rows = 20;
+            var textarea = document.getElementById(textareaId);
+            if (!textarea) return;
+            textarea.dataset.closedRows = textarea.dataset.closedRows || textarea.getAttribute('rows') || '2';
+            textarea.rows = 20;
+            textarea.style.setProperty('height', 'auto', 'important');
+            textarea.style.setProperty('min-height', '360px', 'important');
+            textarea.style.setProperty('height', Math.max(textarea.scrollHeight, 360) + 'px', 'important');
         }
 
         function reduzirText(textareaId, originalRows) {
-            document.getElementById(textareaId).rows = originalRows;
+            var textarea = document.getElementById(textareaId);
+            if (!textarea) return;
+            textarea.rows = originalRows || parseInt(textarea.dataset.closedRows || '2', 10);
+            textarea.style.removeProperty('height');
+            textarea.style.removeProperty('min-height');
         }
         document.addEventListener('DOMContentLoaded', function() {
             var additionalSections = [{

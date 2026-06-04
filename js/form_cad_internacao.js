@@ -286,12 +286,20 @@ if (config.prefillPacienteId) {
 
 function aumentarText(id) {
     const el = document.getElementById(id);
-    if (el) el.rows = 20;
+    if (!el) return;
+    el.dataset.closedRows = el.dataset.closedRows || el.getAttribute('rows') || '2';
+    el.rows = 20;
+    el.style.setProperty('height', 'auto', 'important');
+    el.style.setProperty('min-height', '360px', 'important');
+    el.style.setProperty('height', Math.max(el.scrollHeight, 360) + 'px', 'important');
 }
 
 function reduzirText(id, rows) {
     const el = document.getElementById(id);
-    if (el) el.rows = rows;
+    if (!el) return;
+    el.rows = rows || parseInt(el.dataset.closedRows || '2', 10);
+    el.style.removeProperty('height');
+    el.style.removeProperty('min-height');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
