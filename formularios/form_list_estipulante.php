@@ -204,11 +204,6 @@ if ($qtdIntItens > $limite) {
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                         <li>
                                             <a class="dropdown-item" style="font-size: .9rem;"
-                                                href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/show_estipulante.php?id_estipulante=' . (int) $id_estipulante, ENT_QUOTES, 'UTF-8') ?>"><i class="bi bi-eye"
-                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" style="font-size: .9rem;"
                                                 href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/estipulantes/editar/' . (int) $id_estipulante, ENT_QUOTES, 'UTF-8') ?>">
                                                 <i class="bi bi-pencil-square" style="font-size:1rem;margin-right:8px;color:#3b82f6;"></i>Editar
                                             </a>
