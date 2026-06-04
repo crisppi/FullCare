@@ -2243,4 +2243,19 @@
             min-height: 42px;
             font-size: 0.9rem;
         }
+
+        /* Selects azuis - Tabelas Adicionais (nativo) */
+        #main-container .tabelas-adicionais-card select.select-purple,
+        #main-container .tabelas-adicionais-card select.detail-select {
+            background-color: #d7ebff !important;
+            color: #111827 !important;
+            border-color: #8fc7f5 !important;
+        }
+        /* Selects azuis - bootstrap-select: alvo é o BOTÃO */
+        #main-container .tabelas-adicionais-card .tabelas-selects .bootstrap-select > button.dropdown-toggle,
+        #main-container .tabelas-adicionais-card .tabelas-selects .bootstrap-select > button.dropdown-toggle .filter-option-inner-inner {
+            background-color: #d7ebff !important;
+            color: #111827 !important;
+            border-color: #8fc7f5 !important;
+        }
     </style>

@@ -1139,18 +1139,18 @@ document.addEventListener('DOMContentLoaded', function() {
 $('#relatorio-detalhado').on('change', function() {
     const optionDetalhes = $(this).find(":selected").text();
     const baseCss = {
-        "color": "white",
+        "color": "#111827",
         "font-weight": "normal",
-        "border": "1px solid #5e2363",
-        "background-color": "#5e2363"
+        "border": "1px solid #8fc7f5",
+        "background-color": "#d7ebff"
     };
     $(this).css(baseCss);
     if (optionDetalhes === "Sim") {
         $(this).css({
-            "color": "black",
+            "color": "#111827",
             "font-weight": "bold",
-            "border": "2px solid green",
-            "background-color": "#d8b4fe"
+            "border": "2px solid #5aa8e8",
+            "background-color": "#c7e3ff"
         });
     } else {
         $(this).val("").css(baseCss);
@@ -1960,10 +1960,10 @@ $("#myForm").submit(function(event) {
                 });
                 // Especificamente resetar os selects roxos para o estilo padrão deles
                 $('.select-purple').css({
-                    "color": "white",
+                    "color": "#111827",
                     "font-weight": "normal",
-                    "border": "1px solid #5e2363",
-                    "background-color": "#5e2363"
+                    "border": "1px solid #8fc7f5",
+                    "background-color": "#d7ebff"
                 });
 
 

@@ -1638,7 +1638,7 @@ function aumentarTextProgramacao() {
     background-repeat: no-repeat !important;
     background-position: right 14px center !important;
     background-size: 16px 16px !important;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M7 10l5 5 5-5z'/></svg>") !important;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111827'><path d='M7 10l5 5 5-5z'/></svg>") !important;
     border-radius: 14px !important;
     font-weight: 800 !important;
     transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
@@ -1649,42 +1649,42 @@ function aumentarTextProgramacao() {
 
 .visita-card--tabelas .detail-select,
 .visita-card--tabelas .detail-select:focus {
-    background: linear-gradient(180deg, #ecfff1 0%, #dcfce7 100%) !important;
-    background-color: #dcfce7 !important;
-    border: 1px solid #7ccf95 !important;
-    color: #14532d !important;
-    box-shadow: 0 6px 14px rgba(34, 197, 94, 0.14) !important;
+    background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
+    background-color: #d7ebff !important;
+    border: 1px solid #8fc7f5 !important;
+    color: #111827 !important;
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.12) !important;
 }
 
 .visita-card--tabelas .detail-select option[value=""] {
-    color: #14532d !important;
+    color: #111827 !important;
 }
 
 .visita-card--tabelas .detail-select option {
-    background-color: #14532d !important;
-    color: #fff !important;
+    background-color: #f8fbff !important;
+    color: #111827 !important;
 }
 
 .visita-card--tabelas .select-purple,
 .visita-card--tabelas .select-purple:focus,
 .visita-card--tabelas select[id^="select_"],
 .visita-card--tabelas select[id^="select_"]:focus {
-    background: linear-gradient(180deg, #f4ecff 0%, #eadbff 100%) !important;
-    background-color: #eadbff !important;
-    border: 1px solid #b89ae7 !important;
-    color: #512b81 !important;
-    box-shadow: 0 8px 16px rgba(111, 69, 162, 0.14) !important;
+    background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
+    background-color: #d7ebff !important;
+    border: 1px solid #8fc7f5 !important;
+    color: #111827 !important;
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.12) !important;
 }
 
 .visita-card--tabelas .select-purple option[value=""],
 .visita-card--tabelas select[id^="select_"] option[value=""] {
-    color: #512b81 !important;
+    color: #111827 !important;
 }
 
 .visita-card--tabelas .select-purple option,
 .visita-card--tabelas select[id^="select_"] option {
-    background-color: #5e2363 !important;
-    color: #fff !important;
+    background-color: #f8fbff !important;
+    color: #111827 !important;
 }
 
 .visita-card--tabelas .tabelas-selects .form-control:hover,
@@ -1693,14 +1693,14 @@ function aumentarTextProgramacao() {
 }
 
 .visita-card--tabelas #relatorio-detalhado:focus {
-    border-color: #3ea76a !important;
-    box-shadow: 0 0 0 .18rem rgba(62, 167, 106, 0.18), 0 6px 14px rgba(34, 197, 94, 0.14) !important;
+    border-color: #5aa8e8 !important;
+    box-shadow: 0 0 0 .18rem rgba(90, 168, 232, 0.18), 0 6px 14px rgba(59, 130, 246, 0.12) !important;
 }
 
 .visita-card--tabelas .select-purple:focus,
 .visita-card--tabelas select[id^="select_"]:focus {
-    border-color: #8450bf !important;
-    box-shadow: 0 0 0 .18rem rgba(132, 80, 191, 0.18), 0 8px 16px rgba(111, 69, 162, 0.14) !important;
+    border-color: #5aa8e8 !important;
+    box-shadow: 0 0 0 .18rem rgba(90, 168, 232, 0.18), 0 8px 16px rgba(59, 130, 246, 0.12) !important;
 }
 
 .tabelas-detalhes-block {

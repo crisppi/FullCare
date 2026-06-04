@@ -8,12 +8,12 @@
             z-index: 1055;
         }
 
-        /* Selects roxos (tabelas adicionais) */
+        /* Selects azuis (tabelas adicionais) */
         .select-purple,
         .select-purple:focus {
-            background-color: #5e2363 !important;
-            color: #fff !important;
-            border: 1px solid #5e2363 !important;
+            background-color: #d7ebff !important;
+            color: #111827 !important;
+            border: 1px solid #8fc7f5 !important;
         }
 
         .select-purple,
@@ -34,7 +34,7 @@
         .detail-select:focus,
         #relatorio-detalhado,
         #relatorio-detalhado:focus {
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M7 10l5 5 5-5z'/></svg>") !important;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111827'><path d='M7 10l5 5 5-5z'/></svg>") !important;
         }
 
         .bootstrap-select .dropdown-toggle.select-purple,
@@ -42,25 +42,25 @@
         .bootstrap-select .dropdown-toggle.select-purple .filter-option-inner,
         .bootstrap-select .dropdown-toggle.select-purple .filter-option-inner-inner,
         .bootstrap-select .dropdown-toggle.select-purple.btn {
-            background-color: #5e2363 !important;
-            color: #fff !important;
-            border: 1px solid #5e2363 !important;
+            background-color: #d7ebff !important;
+            color: #111827 !important;
+            border: 1px solid #8fc7f5 !important;
             font-weight: 600 !important;
             box-shadow: none !important;
         }
 
         .detail-select,
         .detail-select:focus {
-            background-color: #5e2363 !important;
-            color: #fff !important;
-            border: 1px solid #5e2363 !important;
+            background-color: #d7ebff !important;
+            color: #111827 !important;
+            border: 1px solid #8fc7f5 !important;
             font-weight: 700;
             box-shadow: none !important;
         }
 
         .detail-select option {
-            background-color: #5e2363 !important;
-            color: #fff !important;
+            background-color: #f8fbff !important;
+            color: #111827 !important;
             font-weight: 700;
         }
 
@@ -1547,7 +1547,7 @@
             justify-content: space-between;
             margin-bottom: 8px;
             padding-bottom: 6px;
-            border-bottom: 1px solid rgba(111, 69, 162, .10);
+            border-bottom: 1px solid rgba(47, 111, 159, .15);
         }
 
         .tabelas-adicionais-card__eyebrow {
@@ -1557,14 +1557,14 @@
             font-size: .58rem;
             font-weight: 800;
             line-height: 1.1;
-            color: #6e4a96;
+            color: #2f6f9f;
         }
 
         .tabelas-adicionais-card__title {
             margin: 0;
             font-size: .82rem;
             font-weight: 800;
-            color: #2a1b43;
+            color: #0d3052;
         }
 
         .patient-inline-actions {
@@ -1623,6 +1623,14 @@
             border-color: #d8dbe5 !important;
             box-shadow: none !important;
             background-color: #fff !important;
+        }
+
+        /* select-purple dentro do card tabelas: azul, sobrepõe o #fff acima */
+        .tabelas-adicionais-card .form-control.select-purple,
+        .tabelas-adicionais-card .bootstrap-select > .dropdown-toggle.select-purple {
+            background-color: #d7ebff !important;
+            color: #111827 !important;
+            border-color: #8fc7f5 !important;
         }
 
         .internacao-card .form-control:focus,
@@ -1747,30 +1755,30 @@
 
         .tabelas-selects > .tabelas-col #relatorio-detalhado,
         .tabelas-selects > .tabelas-col .detail-select {
-            background: linear-gradient(180deg, #ecfff1 0%, #dcfce7 100%) !important;
-            border: 1px solid #7ccf95 !important;
-            color: #14532d !important;
-            box-shadow: 0 6px 14px rgba(34, 197, 94, 0.14) !important;
+            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
+            border: 1px solid #8fc7f5 !important;
+            color: #111827 !important;
+            box-shadow: 0 6px 14px rgba(59, 130, 246, 0.12) !important;
         }
 
         .tabelas-selects > .tabelas-col #relatorio-detalhado:focus,
         .tabelas-selects > .tabelas-col .detail-select:focus {
-            border-color: #3ea76a !important;
-            box-shadow: 0 0 0 .18rem rgba(62, 167, 106, 0.18), 0 6px 14px rgba(34, 197, 94, 0.14) !important;
+            border-color: #5aa8e8 !important;
+            box-shadow: 0 0 0 .18rem rgba(90, 168, 232, 0.18), 0 6px 14px rgba(59, 130, 246, 0.12) !important;
         }
 
         .tabelas-selects > .tabelas-col .select-purple,
         .tabelas-selects > .tabelas-col select[id^="select_"] {
-            background: linear-gradient(180deg, #f4ecff 0%, #eadbff 100%) !important;
-            border: 1px solid #b89ae7 !important;
-            color: #512b81 !important;
-            box-shadow: 0 8px 16px rgba(111, 69, 162, 0.14) !important;
+            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
+            border: 1px solid #8fc7f5 !important;
+            color: #111827 !important;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.12) !important;
         }
 
         .tabelas-selects > .tabelas-col .select-purple:focus,
         .tabelas-selects > .tabelas-col select[id^="select_"]:focus {
-            border-color: #8450bf !important;
-            box-shadow: 0 0 0 .18rem rgba(132, 80, 191, 0.18), 0 8px 16px rgba(111, 69, 162, 0.14) !important;
+            border-color: #5aa8e8 !important;
+            box-shadow: 0 0 0 .18rem rgba(90, 168, 232, 0.18), 0 8px 16px rgba(59, 130, 246, 0.12) !important;
         }
 
         /* Padronização completa das tabelas adicionais (Internação) */

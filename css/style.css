@@ -597,17 +597,17 @@ select {
 }
 
 
-/* Select fechado: fundo lilás */
+/* Select fechado: fundo azul */
 .select-purple,
 .select-purple:focus {
-    background-color: #5e2363 !important;
+    background-color: #2f6f9f !important;
     color: #fff !important;
-    border: 1px solid #5e2363 !important;
+    border: 1px solid #2f6f9f !important;
 }
 
-/* Dropdown das opções (funciona no Firefox e em navegadores compatíveis) */
+/* Dropdown das opções */
 .select-purple option {
-    background-color: #5e2363 !important;
+    background-color: #2f6f9f !important;
     color: #fff !important;
 }
 
