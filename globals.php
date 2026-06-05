@@ -287,6 +287,7 @@ if (!in_array($__scriptBase, $__schemaSkip, true)) {
     require_once __DIR__ . '/app/schemaEnsurer.php';
     ensure_visita_timer_column($conn);
     ensure_visita_faturamento_columns($conn);
+    ensure_capeante_core_columns($conn);
     ensure_internacao_timer_column($conn);
     ensure_internacao_core_columns($conn);
     ensure_internacao_forecast_columns($conn);
