@@ -2,7 +2,7 @@
 
 if (!defined("FLOW_LOGGER_AUTO_V1")) {
     define("FLOW_LOGGER_AUTO_V1", 1);
-    @require_once(__DIR__ . "/utils/flow_logger.php");
+    @require_once(__DIR__ . "/../../utils/flow_logger.php");
     if (function_exists("flowLogStart") && function_exists("flowLog")) {
         $__flowCtxAuto = flowLogStart(basename(__FILE__, ".php"), [
             "type" => $_POST["type"] ?? $_GET["type"] ?? null,
@@ -31,7 +31,7 @@ require_once("dao/internacaoDao.php");
 require_once('vendor/autoload.php');
 
 $signatureFont = 'times';
-$signatureFontPath = __DIR__ . '/fonts/Allura-Regular.ttf';
+$signatureFontPath = __DIR__ . '/../../fonts/Allura-Regular.ttf';
 if (file_exists($signatureFontPath)) {
     try {
         $loadedFont = \TCPDF_FONTS::addTTFfont($signatureFontPath, 'TrueTypeUnicode', '', 96);
@@ -260,7 +260,7 @@ $pdf->setPrintFooter(true); // rodapé automático
 
 $pdf->AddPage();
 
-$logoPath = __DIR__ . '/img/LogoFullCare.png';
+$logoPath = __DIR__ . '/../../img/LogoFullCare.png';
 renderHeader($pdf, $logoPath);
 
 // Cores (azul + cinza padrão)

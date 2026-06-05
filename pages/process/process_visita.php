@@ -3,7 +3,7 @@
 // process_visita.php  (refatorado, sem alterar métodos existentes)
 // ======================================================================
 
-require_once(__DIR__ . '/utils/audit_logger.php');
+require_once(__DIR__ . '/../../utils/audit_logger.php');
 
 // Debug local opcional (somente quando APP_DEBUG=1 no ambiente)
 $__DEBUG = in_array(strtolower((string)getenv('APP_DEBUG')), ['1', 'true', 'on', 'yes'], true);
@@ -269,9 +269,9 @@ require_once("dao/usuarioDao.php");
 
 require_once("models/message.php");
 require_once("utils/flow_logger.php");
-require_once(__DIR__ . "/app/cuidadoContinuado.php");
-require_once(__DIR__ . "/app/prorrog_alta_helper.php");
-require_once(__DIR__ . "/app/services/TextSecurityService.php");
+require_once(__DIR__ . "/../../app/cuidadoContinuado.php");
+require_once(__DIR__ . "/../../app/prorrog_alta_helper.php");
+require_once(__DIR__ . "/../../app/services/TextSecurityService.php");
 
 $message                = new Message($BASE_URL);
 $userDao                = new UserDAO($conn, $BASE_URL);

@@ -2,7 +2,7 @@
 
 if (!defined("FLOW_LOGGER_AUTO_V1")) {
     define("FLOW_LOGGER_AUTO_V1", 1);
-    @require_once(__DIR__ . "/utils/flow_logger.php");
+    @require_once(__DIR__ . "/../../utils/flow_logger.php");
     if (function_exists("flowLogStart") && function_exists("flowLog")) {
         $__flowCtxAuto = flowLogStart(basename(__FILE__, ".php"), [
             "type" => $_POST["type"] ?? $_GET["type"] ?? null,

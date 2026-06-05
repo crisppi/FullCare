@@ -43,9 +43,9 @@ require_once("models/alta.php");
 require_once("dao/altaDao.php");
 require_once("utils/flow_logger.php");
 require_once("utils/audit_logger.php");
-require_once(__DIR__ . "/app/cuidadoContinuado.php");
-require_once(__DIR__ . "/app/prorrog_alta_helper.php");
-require_once(__DIR__ . "/app/services/TextSecurityService.php");
+require_once(__DIR__ . "/../../app/cuidadoContinuado.php");
+require_once(__DIR__ . "/../../app/prorrog_alta_helper.php");
+require_once(__DIR__ . "/../../app/services/TextSecurityService.php");
 
 if (!function_exists('normalizeDateTimeInput')) {
 function normalizeDateTimeInput($value)
@@ -161,7 +161,7 @@ if (!function_exists('internacaoCreateDebugLog')) {
     function internacaoCreateDebugLog(string $message): void
     {
         $line = '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL;
-        @file_put_contents(__DIR__ . '/logs/process_internacao_create.debug.log', $line, FILE_APPEND);
+        @file_put_contents(__DIR__ . '/../../logs/process_internacao_create.debug.log', $line, FILE_APPEND);
     }
 }
 
