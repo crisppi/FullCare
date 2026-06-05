@@ -539,6 +539,35 @@ class PacienteChatService
         return trim((string)$text);
     }
 
+    private function cleanLabel($value): string
+    {
+        $text = trim((string)$value);
+        $text = preg_replace('/\s+/u', ' ', $text);
+        return trim((string)$text);
+    }
+
+    private function cleanClinicalLabel($value): string
+    {
+        $text = $this->cleanLabel($value);
+        if ($text === '') {
+            return '';
+        }
+
+        $text = trim((string)preg_replace('/\bSEM\s+INFORMA\S*/iu', '', $text));
+        $text = $this->cleanLabel($text);
+        $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+        $norm = strtoupper(trim($ascii !== false ? $ascii : $text));
+        if (in_array($norm, ['SEM INFORMACOES', 'SEM INFORMACAO', 'NAO INFORMADO', 'NAO INFORMADA'], true)) {
+            return '';
+        }
+        return $text;
+    }
+
+    private function formatCount(int $count, string $singular, string $plural): string
+    {
+        return $count . ' ' . ($count === 1 ? $singular : $plural);
+    }
+
     private function requestOpenAi(array $payload): string
     {
         $ch = curl_init($this->apiUrl);
@@ -622,7 +651,7 @@ class PacienteChatService
             if ($months > 0) {
                 return [
                     'anos' => 0,
-                    'descricao' => $months . ' mês' . ($months === 1 ? '' : 'es'),
+                    'descricao' => $months . ' ' . ($months === 1 ? 'mês' : 'meses'),
                 ];
             }
 
