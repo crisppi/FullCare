@@ -2,6 +2,7 @@
 
 include_once("globals.php");
 include_once("db.php");
+require_once(__DIR__ . "/../app/services/AuditorActionService.php");
 require_once(__DIR__ . "/../app/security/bi_access.php");
 require_once(__DIR__ . "/../app/security/inteligencia_access.php");
 date_default_timezone_set('America/Sao_Paulo');
@@ -138,6 +139,9 @@ $canSeeCadastrosMenu = $canSeeFullMenu && (
     || $isCadastroRequestPath
 );
 $isPerfilMedicoMenu = $startsWithAnyAccess($normCargoAccess, ['medico', 'med']);
+$isAuditorHeaderSearch = class_exists('AuditorActionService')
+    ? AuditorActionService::isAuditorProfile($_SESSION['cargo'] ?? '', $_SESSION['nivel'] ?? null)
+    : false;
 $seguradoraHeaderLogoUrl = null;
 $seguradoraHeaderNome = null;
 $resolveSeguradoraLogoUrl = static function (string $logoSeg, int $seguradoraId, string $seguradoraNome) use ($BASE_URL): ?string {
@@ -1577,8 +1581,8 @@ if (!empty($sessionIdUsuario)) {
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                         <input type="text" class="form-control" id="inp-search-paciente"
-                            placeholder="Pesquisar por senha, matrícula ou nome"
-                            aria-label="Buscar por senha, matrícula ou nome" />
+                            placeholder="<?= $isAuditorHeaderSearch ? 'Buscar paciente, internação, senha ou conta' : 'Pesquisar por senha, matrícula ou nome' ?>"
+                            aria-label="<?= $isAuditorHeaderSearch ? 'Buscar paciente, internação, senha ou conta' : 'Buscar por senha, matrícula ou nome' ?>" />
                     </div>
 
                     <div id="search-results-dropdown" class="dropdown-menu show"
@@ -1919,16 +1923,26 @@ if (!empty($sessionIdUsuario)) {
     const $input = $('#inp-search-paciente');
     const $menu = $('#search-results-dropdown');
 
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     // Renderiza itens no dropdown
     function renderResults(items) {
         if (!items || !items.length) {
             const termo = $input.val().trim();
+            const termoEsc = escapeHtml(termo);
             $menu.html(`
         <div class="dropdown-item text-muted">Nada encontrado. Tente outra senha, matrícula ou nome.</div>
         <a href="#" id="create-new-pac" class="dropdown-item d-flex justify-content-between align-items-center">
             <div>
                 <div><strong>Cadastrar novo paciente</strong></div>
-                ${termo ? `<small class="text-muted">Iniciar cadastro com: <em>${termo}</em></small>` : ''}
+                ${termo ? `<small class="text-muted">Iniciar cadastro com: <em>${termoEsc}</em></small>` : ''}
             </div>
             <i class="bi bi-plus-circle"></i>
         </a>
@@ -1937,22 +1951,35 @@ if (!empty($sessionIdUsuario)) {
         }
 
         const html = items.map((p, idx) => {
-            const metaParts = [];
-            if (p.senha) metaParts.push(`Senha: ${p.senha}`);
-            if (p.matricula) metaParts.push(`Matrícula: ${p.matricula}`);
-            if (p.nascimento_fmt) metaParts.push(`Nasc.: ${p.nascimento_fmt}`);
-            const meta = metaParts.length ? `<small class="text-muted">${metaParts.join(' • ')}</small>` : '';
-            const nome = p.nome || 'Paciente sem nome';
+            const isOperational = Boolean(p.type || p.title || p.url);
+            const href = isOperational && p.url
+                ? p.url
+                : `hub_paciente/paciente${encodeURIComponent(p.id_paciente)}`;
+            const icon = escapeHtml(p.icon || (p.type === 'internacao' ? 'bi-hospital' : (p.type === 'conta' ? 'bi-receipt' : 'bi-person-vcard')));
+            const typeLabel = p.type ? escapeHtml(String(p.type).charAt(0).toUpperCase() + String(p.type).slice(1)) : 'Paciente';
+            let title = p.title || p.nome || 'Paciente sem nome';
+            let subtitle = p.subtitle || '';
+            if (!subtitle) {
+                const metaParts = [];
+                if (p.senha) metaParts.push(`Senha: ${p.senha}`);
+                if (p.matricula) metaParts.push(`Matrícula: ${p.matricula}`);
+                if (p.nascimento_fmt) metaParts.push(`Nasc.: ${p.nascimento_fmt}`);
+                subtitle = metaParts.join(' • ');
+            }
+            const meta = subtitle ? `<small class="text-muted">${escapeHtml(subtitle)}</small>` : '';
 
             return `
-        <a href="hub_paciente/paciente${encodeURIComponent(p.id_paciente)}"
+        <a href="${escapeHtml(href)}"
             class="dropdown-item d-flex justify-content-between align-items-center ${idx === 0 ? 'active' : ''}"
-            data-id="${p.id_paciente}">
+            data-id="${escapeHtml(p.id_paciente || '')}">
             <div>
-                <div><strong>${nome}</strong></div>
+                <div><strong>${escapeHtml(title)}</strong></div>
                 ${meta}
             </div>
-            <i class="bi bi-arrow-return-right"></i>
+            <span class="d-inline-flex align-items-center gap-2">
+                <small class="text-muted">${typeLabel}</small>
+                <i class="bi ${icon}"></i>
+            </span>
         </a>
         `;
         }).join('');

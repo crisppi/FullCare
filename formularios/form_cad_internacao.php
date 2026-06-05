@@ -1284,8 +1284,12 @@
     </script>
     <script src="<?= $BASE_URL ?>js/form_cad_internacao.js?v=<?= filemtime(__DIR__ . '/../js/form_cad_internacao.js') ?>"></script>
     <script>
-    /* Abre o popup de perfil do hospital toda vez que myFunctionSelected reporta um hospital válido */
+    /* Abre o popup de perfil do hospital — somente para auditor médico ou enfermeiro */
     (function() {
+        var cargo = (window.formInternacaoConfig && window.formInternacaoConfig.cargoSessao) || '';
+        var isAuditor = /^(Med|Enf)/i.test(cargo);
+        if (!isAuditor) return;
+
         var _orig = window.myFunctionSelected;
         window.myFunctionSelected = function() {
             _orig && _orig.apply(this, arguments);

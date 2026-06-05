@@ -11,6 +11,7 @@ chdir($ROOT);
 require_once 'globals.php';
 require_once 'db.php';
 require_once 'ajax/_auth_scope.php';
+require_once 'app/services/AuditorActionService.php';
 require_once 'models/message.php';
 require_once 'models/paciente.php'; // opcional, mas não atrapalha (require_once)
 require_once 'dao/pacienteDao.php';
@@ -33,6 +34,12 @@ if (mb_strlen($q) < 2) {
 }
 
 try {
+    if (AuditorActionService::isAuditorProfile($_SESSION['cargo'] ?? '', $_SESSION['nivel'] ?? null)) {
+        $auditorSearch = new AuditorActionService($conn, $BASE_URL);
+        echo json_encode($auditorSearch->globalSearch($q, $_SESSION, 12));
+        exit;
+    }
+
     $scopeParams = [];
     $scopePacSql = ajax_scope_clause_for_paciente($ctx, 'pa', $scopeParams, 'psh');
     $scopeIntSql = ajax_scope_clause_for_internacao($ctx, 'i2', $scopeParams, 'psh2');
