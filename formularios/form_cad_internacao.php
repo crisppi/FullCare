@@ -1060,6 +1060,166 @@
         </form>
     </div>
     </div>
+    <!-- ══ Modal Perfil do Hospital ══════════════════════════════════════ -->
+    <div class="modal fade" id="modalHospitalPerfil" tabindex="-1" aria-hidden="true" data-bs-backdrop="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content hosp-modal">
+                <div class="hosp-modal__header">
+                    <div class="hosp-modal__title-wrap">
+                        <span class="hosp-modal__icon"><i class="bi bi-hospital"></i></span>
+                        <div>
+                            <p class="hosp-modal__eyebrow">Perfil do Hospital</p>
+                            <h5 class="hosp-modal__title" id="hospModalNome">—</h5>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body hosp-modal__body" id="hospModalBody">
+                    <div class="hosp-modal__loading" id="hospModalLoading">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <span>Carregando dados do hospital…</span>
+                    </div>
+                    <div id="hospModalContent" style="display:none;">
+                        <div class="hosp-kpi-grid">
+                            <div class="hosp-kpi hosp-kpi--green">
+                                <div class="hosp-kpi__icon"><i class="bi bi-cash-coin"></i></div>
+                                <small>Oportunidade de Negociação</small>
+                                <strong id="hkpi-saving">—</strong>
+                                <span class="hosp-kpi__sub" id="hkpi-neg-count">— negociações</span>
+                            </div>
+                            <div class="hosp-kpi hosp-kpi--red">
+                                <div class="hosp-kpi__icon"><i class="bi bi-x-circle"></i></div>
+                                <small>Glosas</small>
+                                <strong id="hkpi-glosa">—</strong>
+                                <span class="hosp-kpi__sub" id="hkpi-glosa-count">— contas com glosa</span>
+                            </div>
+                            <div class="hosp-kpi hosp-kpi--blue">
+                                <div class="hosp-kpi__icon"><i class="bi bi-calendar-week"></i></div>
+                                <small>Média de Permanência</small>
+                                <strong id="hkpi-mp">—</strong>
+                                <span class="hosp-kpi__sub" id="hkpi-mp-sub">— internações</span>
+                            </div>
+                            <div class="hosp-kpi hosp-kpi--orange">
+                                <div class="hosp-kpi__icon"><i class="bi bi-exclamation-triangle"></i></div>
+                                <small>Eventos Adversos</small>
+                                <strong id="hkpi-ea">—</strong>
+                                <span class="hosp-kpi__sub">registrados</span>
+                            </div>
+                            <div class="hosp-kpi hosp-kpi--purple">
+                                <div class="hosp-kpi__icon"><i class="bi bi-clock-history"></i></div>
+                                <small>Longa Permanência</small>
+                                <strong id="hkpi-lp">—</strong>
+                                <span class="hosp-kpi__sub" id="hkpi-lp-sub">MP: — dias</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="hospModalError" style="display:none;" class="alert alert-warning mb-0">
+                        Não foi possível carregar os dados do hospital.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+    .hosp-modal { border:0; border-radius:16px; overflow:hidden; }
+    .hosp-modal__header {
+        display:flex; align-items:center; justify-content:space-between;
+        padding:18px 24px;
+        background: linear-gradient(120deg, #1c4f80 0%, #2f6f9f 55%, #4a1d55 100%);
+        color:#fff;
+    }
+    .hosp-modal__title-wrap { display:flex; align-items:center; gap:14px; }
+    .hosp-modal__icon {
+        width:42px; height:42px; border-radius:10px;
+        background:rgba(255,255,255,.15);
+        display:flex; align-items:center; justify-content:center;
+        font-size:20px;
+    }
+    .hosp-modal__eyebrow { margin:0; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; opacity:.7; }
+    .hosp-modal__title   { margin:0; font-size:17px; font-weight:700; }
+    .hosp-modal__body    { padding:22px 24px; background:#f5f7fb; }
+    .hosp-modal__loading { display:flex; align-items:center; gap:12px; color:#6b7a8d; padding:12px 0; }
+    .hosp-kpi-grid {
+        display:grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap:12px;
+    }
+    @media(max-width:860px) { .hosp-kpi-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:540px) { .hosp-kpi-grid { grid-template-columns: repeat(2,1fr); } }
+    .hosp-kpi {
+        background:#fff;
+        border-radius:12px;
+        padding:16px 14px 14px;
+        display:flex; flex-direction:column; align-items:center; text-align:center;
+        border-top:3px solid transparent;
+        box-shadow:0 2px 10px rgba(31,42,63,.07);
+        gap:4px;
+    }
+    .hosp-kpi__icon { font-size:22px; margin-bottom:4px; }
+    .hosp-kpi small { font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#7a8ea8; line-height:1.2; }
+    .hosp-kpi strong { font-size:20px; font-weight:800; color:#1a2d3e; line-height:1.1; }
+    .hosp-kpi__sub { font-size:11px; color:#9baab8; }
+    .hosp-kpi--green  { border-color:#22c55e; } .hosp-kpi--green  .hosp-kpi__icon { color:#16a34a; }
+    .hosp-kpi--red    { border-color:#ef4444; } .hosp-kpi--red    .hosp-kpi__icon { color:#dc2626; }
+    .hosp-kpi--blue   { border-color:#2f6f9f; } .hosp-kpi--blue   .hosp-kpi__icon { color:#2f6f9f; }
+    .hosp-kpi--orange { border-color:#f97316; } .hosp-kpi--orange .hosp-kpi__icon { color:#ea6c10; }
+    .hosp-kpi--purple { border-color:#6b2b74; } .hosp-kpi--purple .hosp-kpi__icon { color:#6b2b74; }
+    </style>
+    <script>
+    (function() {
+        function fmtBRL(v) {
+            return 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
+        }
+        function set(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+
+        function openHospitalModal(hospitalId, hospitalName) {
+            var modal   = document.getElementById('modalHospitalPerfil');
+            var loading = document.getElementById('hospModalLoading');
+            var content = document.getElementById('hospModalContent');
+            var errBox  = document.getElementById('hospModalError');
+            if (!modal) return;
+
+            set('hospModalNome', hospitalName || '—');
+            loading.style.display = 'flex';
+            content.style.display = 'none';
+            errBox.style.display  = 'none';
+
+            try {
+                var bsModal = window.bootstrap && bootstrap.Modal
+                    ? (bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(modal))
+                    : null;
+                if (bsModal) bsModal.show();
+            } catch(e) {
+                if (window.jQuery) window.jQuery(modal).modal('show');
+            }
+
+            fetch('ajax/hospital_insights.php?id_hospital=' + encodeURIComponent(hospitalId), {credentials:'same-origin'})
+                .then(function(r) { return r.json(); })
+                .then(function(payload) {
+                    loading.style.display = 'none';
+                    if (!payload.success || !payload.data) { errBox.style.display = 'block'; return; }
+                    var d = payload.data;
+                    set('hkpi-saving',     fmtBRL(d.total_saving ?? 0));
+                    set('hkpi-neg-count',  (d.negociacoes ?? 0) + ' negociações');
+                    set('hkpi-glosa',      fmtBRL(d.total_glosa ?? 0));
+                    set('hkpi-glosa-count',(d.qtd_glosa ?? 0) + ' contas com glosa');
+                    set('hkpi-mp',         (d.mp_hospital ?? 0) + ' dias');
+                    set('hkpi-mp-sub',     (d.total_internacoes ?? 0) + ' internações');
+                    set('hkpi-ea',         d.eventos_adversos ?? 0);
+                    set('hkpi-lp',         (d.long_stay ?? 0) + ' casos');
+                    set('hkpi-lp-sub',     'MP: ' + (d.mp_long ?? 0) + ' dias');
+                    content.style.display = 'block';
+                })
+                .catch(function() {
+                    loading.style.display = 'none';
+                    errBox.style.display  = 'block';
+                });
+        }
+
+        window._openHospitalPerfilModal = openHospitalModal;
+    })();
+    </script>
+
     <!-- Modal retroativa -->
     <div class="modal fade" id="modalInternacaoAtiva" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -1123,6 +1283,23 @@
         });
     </script>
     <script src="<?= $BASE_URL ?>js/form_cad_internacao.js?v=<?= filemtime(__DIR__ . '/../js/form_cad_internacao.js') ?>"></script>
+    <script>
+    /* Abre o popup de perfil do hospital toda vez que myFunctionSelected reporta um hospital válido */
+    (function() {
+        var _orig = window.myFunctionSelected;
+        window.myFunctionSelected = function() {
+            _orig && _orig.apply(this, arguments);
+            setTimeout(function() {
+                var sel = document.getElementById('hospital_selected');
+                if (!sel || !sel.value) return;
+                var nome = (sel.options[sel.selectedIndex] || {}).text || '';
+                if (typeof window._openHospitalPerfilModal === 'function') {
+                    window._openHospitalPerfilModal(sel.value, nome);
+                }
+            }, 60);
+        };
+    })();
+    </script>
     <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>

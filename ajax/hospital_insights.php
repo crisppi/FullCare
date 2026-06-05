@@ -33,14 +33,41 @@ try {
     $threshold = 5;
 
     $stmtNeg = $conn->prepare("
-        SELECT COUNT(*) 
+        SELECT COUNT(*), COALESCE(SUM(ng.saving), 0) AS total_saving
           FROM tb_negociacao ng
           INNER JOIN tb_internacao ac ON ng.fk_id_int = ac.id_internacao
          WHERE ac.fk_hospital_int = :hospId
     ");
     $stmtNeg->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
     $stmtNeg->execute();
-    $totalNegociacoes = (int) $stmtNeg->fetchColumn();
+    $negRow           = $stmtNeg->fetch(PDO::FETCH_ASSOC) ?: [];
+    $totalNegociacoes = (int)   ($negRow['COUNT(*)']    ?? 0);
+    $totalSaving      = (float) ($negRow['total_saving'] ?? 0);
+
+    $stmtGlosa = $conn->prepare("
+        SELECT COALESCE(SUM(ca.valor_glosa_total), 0) AS total_glosa,
+               COUNT(ca.id_capeante)                  AS qtd_glosa
+          FROM tb_capeante ca
+          INNER JOIN tb_internacao ac ON ca.fk_int_capeante = ac.id_internacao
+         WHERE ac.fk_hospital_int = :hospId
+           AND ca.valor_glosa_total > 0
+    ");
+    $stmtGlosa->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
+    $stmtGlosa->execute();
+    $glosaRow   = $stmtGlosa->fetch(PDO::FETCH_ASSOC) ?: [];
+    $totalGlosa = (float) ($glosaRow['total_glosa'] ?? 0);
+    $qtdGlosa   = (int)   ($glosaRow['qtd_glosa']   ?? 0);
+
+    $stmtEA = $conn->prepare("
+        SELECT COUNT(*) AS qtd_ea
+          FROM tb_gestao g
+          INNER JOIN tb_internacao ac ON g.fk_internacao_ges = ac.id_internacao
+         WHERE ac.fk_hospital_int = :hospId
+           AND g.evento_adverso_ges = 's'
+    ");
+    $stmtEA->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
+    $stmtEA->execute();
+    $eventosAdversos = (int) ($stmtEA->fetchColumn() ?: 0);
 
     $stmtTotal = $conn->prepare("
         SELECT COUNT(*) 
@@ -119,6 +146,10 @@ try {
         'success' => true,
         'data' => [
             'negociacoes'       => $totalNegociacoes,
+            'total_saving'      => $totalSaving,
+            'total_glosa'       => $totalGlosa,
+            'qtd_glosa'         => $qtdGlosa,
+            'eventos_adversos'  => $eventosAdversos,
             'total_internacoes' => $totalInternacoes,
             'inter_uti'         => $pacientesUti,
             'percent_uti'       => $percentUti,
