@@ -345,6 +345,25 @@
     opacity: 1;
 }
 
+.fc-list-empty-feedback {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: -2px 10px 8px;
+    padding: 8px 10px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #f8fbff;
+    color: #1f5f8f;
+    font-size: .74rem;
+    font-weight: 800;
+}
+
+.fc-list-empty-feedback i {
+    font-size: .92rem;
+    line-height: 1;
+}
+
 .fc-status-badge {
     display: inline-flex;
     align-items: center;

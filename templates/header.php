@@ -300,8 +300,10 @@ if (!empty($sessionIdUsuario)) {
     <link href="<?= $BASE_URL ?>css/style_show_internacao.css?v=<?= @filemtime(__DIR__ . '/../css/style_show_internacao.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/table_style.css?v=<?= @filemtime(__DIR__ . '/../css/table_style.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/listagem_padrao.css?v=<?= @filemtime(__DIR__ . '/../css/listagem_padrao.css') ?>" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/feedback.css?v=<?= @filemtime(__DIR__ . '/../css/feedback.css') ?>" rel="stylesheet">
     <script defer src="<?= $BASE_URL ?>js/lista_header_sort.js"></script>
     <script defer src="<?= $BASE_URL ?>js/listagem_enhancer.js?v=<?= @filemtime(__DIR__ . '/../js/listagem_enhancer.js') ?: time() ?>"></script>
+    <script defer src="<?= $BASE_URL ?>js/feedback.js?v=<?= @filemtime(__DIR__ . '/../js/feedback.js') ?: time() ?>"></script>
 
     <!-- ======= APENAS DESIGN (logos alinhados e simétricos) ======= -->
     <style>
@@ -535,8 +537,40 @@ if (!empty($sessionIdUsuario)) {
             gap: 0.25rem;
         }
 
+        .header-chat-launcher.has-unread {
+            border-color: rgba(220, 38, 38, .35);
+            background: #fff7f7;
+            color: #7f1d1d;
+            box-shadow: 0 8px 18px rgba(220, 38, 38, .12);
+        }
+
+        .header-chat-launcher.has-unread:hover {
+            background: #fff1f1;
+            border-color: rgba(220, 38, 38, .48);
+            color: #7f1d1d;
+        }
+
         .header-chat-launcher .chat-unread-badge {
-            font-size: 0.58rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border: 2px solid #fff;
+            font-size: 0.66rem;
+            font-weight: 900;
+            box-shadow: 0 7px 16px rgba(220, 38, 38, .28);
+            animation: chatUnreadPulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes chatUnreadPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.08);
+            }
         }
 
         #search-results-dropdown {
@@ -1580,16 +1614,19 @@ if (!empty($sessionIdUsuario)) {
 
             <div class="d-flex align-items-center gap-2 ms-auto header-actions pe-3">
                 <a href="<?= htmlspecialchars($chatAssistantLink) ?>"
-                    class="btn btn-outline-secondary position-relative header-chat-launcher header-action-btn"
-                    title="Mensagens entre usuários">
+                    id="header-chat-launcher"
+                    class="btn btn-outline-secondary position-relative header-chat-launcher header-action-btn<?= $chatUnreadCount > 0 ? ' has-unread' : '' ?>"
+                    title="<?= $chatUnreadCount > 0 ? htmlspecialchars($chatUnreadCount . ' mensagem(ns) não lida(s)') : 'Mensagens entre usuários' ?>"
+                    aria-label="<?= $chatUnreadCount > 0 ? htmlspecialchars('Mensagens: ' . $chatUnreadCount . ' não lida(s)') : 'Mensagens entre usuários' ?>"
+                    data-unread-count="<?= (int)$chatUnreadCount ?>">
                     <i class="bi bi-chat-dots"></i>
                     <span class="d-none d-xl-inline ms-1">Mensagens</span>
-                    <?php if ($chatUnreadCount > 0): ?>
-                        <span
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger chat-unread-badge">
-                            <?= $chatUnreadCount > 99 ? '99+' : $chatUnreadCount ?>
-                        </span>
-                    <?php endif; ?>
+                    <span
+                        id="header-chat-unread-badge"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger chat-unread-badge"
+                        <?= $chatUnreadCount > 0 ? '' : 'hidden' ?>>
+                        <?= $chatUnreadCount > 99 ? '99+' : (int)$chatUnreadCount ?>
+                    </span>
                 </a>
                 <form class="d-flex position-relative" id="global-patient-search" autocomplete="off">
                     <div class="input-group">
@@ -1679,46 +1716,48 @@ if (!empty($sessionIdUsuario)) {
             </script>
         <?php endif; ?>
 
-        <!-- notification message -->
+        <!-- feedback visual global -->
         <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start(); ?>
         <?php
-        $flashMsg  = $_SESSION['mensagem']      ?? '';
-        $flashType = $_SESSION['mensagem_tipo'] ?? 'danger';
-        unset($_SESSION['mensagem'], $_SESSION['mensagem_tipo']);
+        $feedbackItems = [];
+        if (!empty($_SESSION['fullcare_feedback']) && is_array($_SESSION['fullcare_feedback'])) {
+            foreach ($_SESSION['fullcare_feedback'] as $item) {
+                if (!is_array($item) || empty($item['message'])) continue;
+                $feedbackItems[] = [
+                    'type' => function_exists('fullcare_feedback_type') ? fullcare_feedback_type($item['type'] ?? 'info') : ($item['type'] ?? 'info'),
+                    'title' => $item['title'] ?? null,
+                    'message' => (string)$item['message'],
+                ];
+            }
+        }
+        if (!empty($_SESSION['mensagem'])) {
+            $feedbackItems[] = [
+                'type' => function_exists('fullcare_feedback_type') ? fullcare_feedback_type($_SESSION['mensagem_tipo'] ?? 'danger') : ($_SESSION['mensagem_tipo'] ?? 'danger'),
+                'title' => null,
+                'message' => (string)$_SESSION['mensagem'],
+            ];
+        }
+        if (!empty($_SESSION['msg'])) {
+            $feedbackItems[] = [
+                'type' => function_exists('fullcare_feedback_type') ? fullcare_feedback_type($_SESSION['type'] ?? 'info') : ($_SESSION['type'] ?? 'info'),
+                'title' => null,
+                'message' => trim(strip_tags((string)$_SESSION['msg'])),
+            ];
+        }
+        $feedbackSeen = [];
+        $feedbackItems = array_values(array_filter($feedbackItems, static function ($item) use (&$feedbackSeen) {
+            $message = trim((string)($item['message'] ?? ''));
+            if ($message === '') return false;
+            $key = (string)($item['type'] ?? 'info') . '|' . mb_strtolower($message, 'UTF-8');
+            if (isset($feedbackSeen[$key])) return false;
+            $feedbackSeen[$key] = true;
+            return true;
+        }));
+        unset($_SESSION['fullcare_feedback'], $_SESSION['mensagem'], $_SESSION['mensagem_tipo'], $_SESSION['msg'], $_SESSION['type']);
         ?>
-        <?php if ($flashMsg): ?>
-            <div class="container mt-3">
-                <div id="app-flash"
-                    class="alert alert-<?= htmlspecialchars($flashType) ?> text-center alert-dismissible fade show"
-                    role="alert">
-                    <?= htmlspecialchars($flashMsg) ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-                </div>
-            </div>
-
-            <script>
-                (function() {
-                    var el = document.getElementById('app-flash');
-                    if (!el) return;
-
-                    // fecha visualmente ~9.8s (para dar tempo da transição)
-                    setTimeout(function() {
-                        try {
-                            if (window.bootstrap && bootstrap.Alert) {
-                                bootstrap.Alert.getOrCreateInstance(el).close();
-                            } else {
-                                el.classList.remove('show'); // some a classe de exibição
-                            }
-                        } catch (e) {}
-                    }, 9800);
-
-                    // remove do DOM em 10s (garantia)
-                    setTimeout(function() {
-                        if (el && el.parentNode) el.parentNode.removeChild(el);
-                    }, 5000);
-                })();
-            </script>
-        <?php endif; ?>
+        <script>
+            window.FullCareInitialFeedback = <?= json_encode($feedbackItems, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        </script>
 
         <div class="modal fade" id="globalModal">
             <div class="modal-dialog  modal-lg modal-dialog-centered modal-xl">
@@ -1739,11 +1778,47 @@ if (!empty($sessionIdUsuario)) {
 <script src="js/fix-header.js"></script>
 <script>
     window.FullCareListUserId = <?= json_encode((string)($sessionIdUsuario ?? 'anon')) ?>;
+    window.FullCareChatUnreadUrl = <?= json_encode($BASE_URL . 'ajax/chat_unread_count.php') ?>;
+
+    function updateHeaderChatBadge(count) {
+        const btn = document.getElementById('header-chat-launcher');
+        const badge = document.getElementById('header-chat-unread-badge');
+        if (!btn || !badge) return;
+
+        const unread = Math.max(0, Number(count || 0));
+        btn.dataset.unreadCount = String(unread);
+        btn.classList.toggle('has-unread', unread > 0);
+        btn.title = unread > 0 ? `${unread} mensagem(ns) não lida(s)` : 'Mensagens entre usuários';
+        btn.setAttribute('aria-label', unread > 0 ? `Mensagens: ${unread} não lida(s)` : 'Mensagens entre usuários');
+        badge.textContent = unread > 99 ? '99+' : String(unread);
+        badge.hidden = unread <= 0;
+    }
+
+    function refreshHeaderChatBadge() {
+        if (!window.FullCareChatUnreadUrl || typeof fetch !== 'function') return;
+        fetch(window.FullCareChatUnreadUrl, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+            .then((response) => response.ok ? response.json() : null)
+            .then((payload) => {
+                if (!payload || payload.success === false) return;
+                updateHeaderChatBadge(payload.count || 0);
+            })
+            .catch(() => {});
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         try {
             localStorage.removeItem('fcx_zoom');
         } catch (e) {}
         document.documentElement.style.zoom = '';
+        updateHeaderChatBadge(document.getElementById('header-chat-launcher')?.dataset.unreadCount || 0);
+        refreshHeaderChatBadge();
+        window.setInterval(refreshHeaderChatBadge, 30000);
     });
 </script>
 
@@ -1829,6 +1904,9 @@ if (!empty($sessionIdUsuario)) {
                                     detail: payload.paciente
                                 }));
                             }
+                            if (window.FullCareFeedback && typeof window.FullCareFeedback.success === 'function') {
+                                window.FullCareFeedback.success(payload.message || 'As informações foram salvas com sucesso.', 'Cadastro atualizado');
+                            }
                             return;
                         }
                         if (payload && payload.success === false) {
@@ -1846,7 +1924,10 @@ if (!empty($sessionIdUsuario)) {
                     })
                     .catch((err) => {
                         const msg = (err && err.message) ? err.message : 'Erro ao processar o formulário.';
-                        container.innerHTML = '<div class="p-4 text-danger">' + msg + '</div>';
+                        if (window.FullCareFeedback && typeof window.FullCareFeedback.error === 'function') {
+                            window.FullCareFeedback.error(msg, 'Não foi possível salvar');
+                        }
+                        container.innerHTML = '<div class="p-4 text-danger">' + escapeHtml(msg) + '</div>';
                     })
                     .finally(() => {
                         if (submitBtn) submitBtn.disabled = false;
@@ -1928,7 +2009,11 @@ if (!empty($sessionIdUsuario)) {
                 })
                 .catch(err => {
                     console.error(err);
-                    body.innerHTML = '<div class="p-4 text-danger">Falha ao carregar conteúdo do modal.</div>';
+                    const msg = 'Falha ao carregar conteúdo do modal.';
+                    if (window.FullCareFeedback && typeof window.FullCareFeedback.error === 'function') {
+                        window.FullCareFeedback.error(msg, 'Conteúdo indisponível');
+                    }
+                    body.innerHTML = '<div class="p-4 text-danger">' + msg + '</div>';
                 });
         };
     }
@@ -2065,6 +2150,9 @@ if (!empty($sessionIdUsuario)) {
                     errorThrown,
                     responseText: jqXHR.responseText
                 });
+                if (window.FullCareFeedback && typeof window.FullCareFeedback.error === 'function') {
+                    window.FullCareFeedback.error('Não foi possível concluir a busca. Tente novamente.', 'Busca indisponível');
+                }
                 $menu
                     .html(
                         `<div class="dropdown-item text-danger">

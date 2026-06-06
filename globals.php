@@ -339,6 +339,34 @@ if (!function_exists('flash')) {
     }
 }
 
+if (!function_exists('fullcare_feedback_type')) {
+    function fullcare_feedback_type(?string $type): string
+    {
+        $type = strtolower(trim((string)$type));
+        if (in_array($type, ['success', 'sucesso', 'ok'], true)) return 'success';
+        if (in_array($type, ['warning', 'warn', 'aviso', 'alert'], true)) return 'warning';
+        if (in_array($type, ['danger', 'error', 'erro'], true)) return 'error';
+        return 'info';
+    }
+}
+
+if (!function_exists('fullcare_flash')) {
+    function fullcare_flash(string $message, string $type = 'info', ?string $title = null): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            @session_start();
+        }
+        if (!isset($_SESSION['fullcare_feedback']) || !is_array($_SESSION['fullcare_feedback'])) {
+            $_SESSION['fullcare_feedback'] = [];
+        }
+        $_SESSION['fullcare_feedback'][] = [
+            'type' => fullcare_feedback_type($type),
+            'title' => $title,
+            'message' => $message,
+        ];
+    }
+}
+
 if (!function_exists('csrf_token')) {
     function csrf_token(): string
     {

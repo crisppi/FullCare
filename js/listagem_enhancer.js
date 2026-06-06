@@ -96,24 +96,26 @@
 
         toolbar.append(saveBtn, restoreBtn, columnsBtn, priorityBtn, exportBtn, columnsMenu);
         filters.parentElement.insertBefore(toolbar, filters.nextSibling);
+        installEmptyResultHint(form, table, toolbar);
 
         saveBtn.addEventListener('click', () => {
             localStorage.setItem(storageKey('filters'), JSON.stringify(serializeForm(form)));
             restoreBtn.classList.add('is-ready');
-            showToast(toolbar, 'Filtros salvos');
+            showToast(toolbar, 'Filtros salvos', 'success');
         });
 
         restoreBtn.addEventListener('click', () => {
             const raw = localStorage.getItem(storageKey('filters'));
             if (!raw) {
-                showToast(toolbar, 'Nenhum filtro salvo');
+                showToast(toolbar, 'Nenhum filtro salvo', 'warning');
                 return;
             }
             try {
                 applyFormValues(form, JSON.parse(raw));
+                showToast(toolbar, 'Filtros restaurados', 'info');
                 submitForm(form);
             } catch (_) {
-                showToast(toolbar, 'Filtro salvo inválido');
+                showToast(toolbar, 'Filtro salvo inválido', 'error');
             }
         });
 
@@ -124,9 +126,9 @@
         exportBtn.addEventListener('click', () => exportVisibleTable(table));
         priorityBtn.addEventListener('click', () => {
             if (sortVisibleRowsByPriority(table)) {
-                showToast(toolbar, 'Ordenado por prioridade');
+                showToast(toolbar, 'Ordenado por prioridade', 'success');
             } else {
-                showToast(toolbar, 'Sem sinal de prioridade');
+                showToast(toolbar, 'Sem sinal de prioridade', 'warning');
             }
         });
 
@@ -144,7 +146,7 @@
         }
     }
 
-    function showToast(toolbar, message) {
+    function showToast(toolbar, message, type) {
         let toast = qs('.fc-list-toast', toolbar);
         if (!toast) {
             toast = document.createElement('span');
@@ -155,6 +157,14 @@
         toast.classList.add('is-visible');
         window.clearTimeout(toast._timer);
         toast._timer = window.setTimeout(() => toast.classList.remove('is-visible'), 1800);
+        if (window.FullCareFeedback && typeof window.FullCareFeedback.show === 'function') {
+            window.FullCareFeedback.show({
+                type: type || 'info',
+                title: type === 'success' ? 'Tudo certo' : undefined,
+                message,
+                duration: 2600,
+            });
+        }
     }
 
     function installColumnControls(table, menu) {
@@ -318,7 +328,12 @@
                 .map((cell) => `"${(cell.textContent || '').replace(/\s+/g, ' ').trim().replace(/"/g, '""')}"`)
                 .join(',');
         }).filter(Boolean);
-        if (!rows.length) return;
+        if (!rows.length) {
+            if (window.FullCareFeedback && typeof window.FullCareFeedback.warning === 'function') {
+                window.FullCareFeedback.warning('Não há dados visíveis para exportar.', 'Exportação não realizada');
+            }
+            return;
+        }
 
         const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -329,6 +344,47 @@
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
+        if (window.FullCareFeedback && typeof window.FullCareFeedback.success === 'function') {
+            window.FullCareFeedback.success('CSV gerado com as colunas visíveis.', 'Exportação concluída');
+        }
+    }
+
+    function installEmptyResultHint(form, table, toolbar) {
+        if (!isFilteredView(form) || !isTableEmpty(table)) return;
+
+        const hint = document.createElement('div');
+        hint.className = 'fc-list-empty-feedback';
+        hint.innerHTML = '<i class="bi bi-search" aria-hidden="true"></i><span>Nenhum resultado encontrado com os filtros atuais.</span>';
+        toolbar.parentElement.insertBefore(hint, toolbar.nextSibling);
+
+        if (window.FullCareFeedback && typeof window.FullCareFeedback.info === 'function') {
+            window.FullCareFeedback.info('Nenhum resultado encontrado com os filtros atuais.', 'Busca sem resultado');
+        }
+    }
+
+    function isFilteredView(form) {
+        const params = new URLSearchParams(window.location.search);
+        if (Array.from(params.keys()).some((key) => !['pag', 'page', 'pagina'].includes(String(key).toLowerCase()))) {
+            return true;
+        }
+        return qsa('input, select, textarea', form).some((el) => {
+            if (!el.name || el.disabled) return false;
+            const type = (el.type || '').toLowerCase();
+            if (['submit', 'button', 'reset', 'file', 'hidden'].includes(type)) return false;
+            if (type === 'checkbox' || type === 'radio') return el.checked;
+            return String(el.value || '').trim() !== '';
+        });
+    }
+
+    function isTableEmpty(table) {
+        const bodyRows = qsa('tbody tr', table);
+        const dataRows = bodyRows.filter((tr) => qsa('td', tr).length > 0);
+        if (!dataRows.length) return true;
+        if (dataRows.length === 1) {
+            const text = (dataRows[0].textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            return /nenhum|nada encontrado|sem registro|não encontrado|nao encontrado/.test(text);
+        }
+        return false;
     }
 
     function applyStatusBadges(table) {
