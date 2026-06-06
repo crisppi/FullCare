@@ -656,7 +656,7 @@ $complexInfo = $complexMap[$effectiveLevel];
             <input id="buscaInternacoes" type="text" class="form-control" placeholder="Filtrar...">
           </div>
           <?php if (!$isGestorSeguradora) { ?>
-            <a class="btn btn-sm btn-primary hub-new-int-btn" href="<?= $BASE_URL ?>cad_internacao.php?id_paciente=<?= (int)$p['id_paciente'] ?>">
+            <a class="btn btn-sm btn-primary hub-new-int-btn" href="<?= $BASE_URL ?>internacoes/nova/paciente/<?= (int)$p['id_paciente'] ?>">
               <i class="bi bi-plus me-1"></i> Nova Internação
             </a>
           <?php } ?>

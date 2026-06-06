@@ -304,6 +304,7 @@ if (!empty($sessionIdUsuario)) {
     <script defer src="<?= $BASE_URL ?>js/lista_header_sort.js"></script>
     <script defer src="<?= $BASE_URL ?>js/listagem_enhancer.js?v=<?= @filemtime(__DIR__ . '/../js/listagem_enhancer.js') ?: time() ?>"></script>
     <script defer src="<?= $BASE_URL ?>js/feedback.js?v=<?= @filemtime(__DIR__ . '/../js/feedback.js') ?: time() ?>"></script>
+    <script defer src="<?= $BASE_URL ?>js/friendly_urls.js?v=<?= @filemtime(__DIR__ . '/../js/friendly_urls.js') ?: time() ?>"></script>
 
     <!-- ======= APENAS DESIGN (logos alinhados e simétricos) ======= -->
     <style>
@@ -1838,7 +1839,6 @@ if (!empty($sessionIdUsuario)) {
 <script src="<?= $BASE_URL ?>js/stepper.js?v=<?= rawurlencode(defined('APP_VERSION') ? APP_VERSION : '1') ?>"></script>
 <script src="js/show_internacao_visitas.js"></script>
 <script src="<?= $BASE_URL ?>js/contextual-assistant.js"></script>
-</script>
 <script>
     // Base para links absolutos
     const BASE_URL = '<?= $BASE_URL ?>';
@@ -2084,7 +2084,7 @@ if (!empty($sessionIdUsuario)) {
             const isOperational = Boolean(p.type || p.title || p.url);
             const href = isOperational && p.url
                 ? p.url
-                : `hub_paciente/paciente${encodeURIComponent(p.id_paciente)}`;
+                : `pacientes/hub/${encodeURIComponent(p.id_paciente)}`;
             const icon = escapeHtml(p.icon || (p.type === 'internacao' ? 'bi-hospital' : (p.type === 'conta' ? 'bi-receipt' : 'bi-person-vcard')));
             const typeLabel = p.type ? escapeHtml(String(p.type).charAt(0).toUpperCase() + String(p.type).slice(1)) : 'Paciente';
             let title = p.title || p.nome || 'Paciente sem nome';
@@ -2378,7 +2378,7 @@ if (!empty($sessionIdUsuario)) {
             navigateWithReturn(BASE_URL + 'pacientes/novo');
         } else if (key === 'V') {
             handled = true;
-            navigateWithReturn(BASE_URL + 'cad_visita.php');
+            navigateWithReturn(BASE_URL + 'visitas/nova');
         } else if (key === 'S') {
             handled = true;
             if (typeof triggerInternacaoAutoSave === 'function') {

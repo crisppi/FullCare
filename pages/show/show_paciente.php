@@ -726,7 +726,7 @@ $enderecoPaciente = trim(implode(' ', array_filter([
             <a href="<?= $BASE_URL ?>pacientes" class="hero-back-btn">Voltar para lista</a>
             <a href="<?= $BASE_URL ?>pacientes/editar/<?= (int)$id_paciente ?>" class="hero-back-btn">Editar paciente</a>
             <a href="<?= $BASE_URL ?>pacientes/historico/<?= (int)$id_paciente ?>" class="hero-back-btn">Histórico</a>
-            <a href="<?= $BASE_URL ?>hub_paciente/paciente<?= (int)$id_paciente ?>" class="hero-back-btn">Hub Paciente</a>
+            <a href="<?= $BASE_URL ?>pacientes/hub/<?= (int)$id_paciente ?>" class="hero-back-btn">Hub Paciente</a>
             <a href="<?= $BASE_URL ?>internacoes/nova?id_paciente=<?= (int)$id_paciente ?>" class="hero-back-btn">Nova internação</a>
             <span class="internacao-page__tag">Registro #<?= (int)$id_paciente ?></span>
         </div>

@@ -145,7 +145,7 @@ $cards = [
         'value' => $contasAuditoria,
         'icon'  => 'bi-journal-text',
         'variant' => 'kpi-card-v2-2',
-        'link'  => 'list_internacao_cap_rah.php',
+        'link'  => 'contas/auditar',
         'desc'  => 'Capeantes ainda sem encerramento.'
     ],
     [
@@ -153,7 +153,7 @@ $cards = [
         'value' => $visitasAtrasadas,
         'icon'  => 'bi-calendar-x',
         'variant' => 'kpi-card-v2-3',
-        'link'  => 'lista_visitas.php?sort_field=data_visita&sort_dir=asc',
+        'link'  => 'visitas/lista?sort_field=data_visita&sort_dir=asc',
         'desc'  => 'Visitas sem lançamento atualizado.'
     ],
     [

@@ -280,11 +280,11 @@ class AuditorActionService
                 if (($row['tipo'] ?? '') === 'Internação') {
                     $row['url'] = $this->baseUrl . 'internacoes/visualizar/' . $refId;
                 } elseif (($row['tipo'] ?? '') === 'Visita') {
-                    $row['url'] = $this->baseUrl . 'show_visita.php?id_visita=' . $refId;
+                    $row['url'] = $this->baseUrl . 'visitas/ver/' . $refId;
                 } elseif (($row['tipo'] ?? '') === 'Evento') {
                     $row['url'] = $this->baseUrl . 'show_gestao.php?id_gestao=' . $refId;
                 } else {
-                    $row['url'] = $this->baseUrl . 'cad_capeante_rah.php?id_capeante=' . $refId;
+                    $row['url'] = $this->baseUrl . 'contas/auditar/' . $refId;
                 }
             }
             unset($row);
@@ -337,7 +337,7 @@ class AuditorActionService
                 'nome' => (string)$row['nome_pac'],
                 'title' => (string)$row['nome_pac'],
                 'subtitle' => implode(' · ', $meta),
-                'url' => $this->baseUrl . 'hub_paciente/paciente' . (int)$row['id_paciente'],
+                'url' => $this->baseUrl . 'pacientes/hub/' . (int)$row['id_paciente'],
                 'matricula' => (string)($row['matricula_pac'] ?? ''),
                 'nascimento_fmt' => $nasc,
                 'senha' => (string)($row['ultima_senha'] ?? ''),
@@ -422,7 +422,7 @@ class AuditorActionService
                 'nome' => (string)$row['nome_pac'],
                 'title' => 'Capeante #' . (int)$row['id_capeante'] . ' · ' . (string)$row['nome_pac'],
                 'subtitle' => $status . ' · internação #' . (int)$row['id_internacao'] . ' · senha ' . (($row['senha_int'] ?? '') ?: '—'),
-                'url' => $this->baseUrl . 'cad_capeante_rah.php?id_capeante=' . (int)$row['id_capeante'],
+                'url' => $this->baseUrl . 'contas/auditar/' . (int)$row['id_capeante'],
                 'senha' => (string)($row['senha_int'] ?? ''),
                 'icon' => 'bi-receipt',
             ];
@@ -456,7 +456,7 @@ class AuditorActionService
             'hospital' => (string)($row['nome_hosp'] ?? 'Hospital não informado'),
             'senha' => (string)($row['senha_int'] ?? ''),
             'dias' => (int)($row['dias'] ?? 0),
-            'paciente_url' => $this->baseUrl . 'hub_paciente/paciente' . $idPaciente,
+            'paciente_url' => $this->baseUrl . 'pacientes/hub/' . $idPaciente,
             'internacao_url' => $this->baseUrl . 'internacoes/visualizar/' . $idInternacao,
         ];
 
@@ -465,7 +465,7 @@ class AuditorActionService
                 'label' => 'Visita atrasada',
                 'detail' => 'Registrar ou revisar visita vencida',
                 'action_label' => 'Lançar visita',
-                'action_url' => $this->baseUrl . 'cad_visita.php?id_internacao=' . $idInternacao,
+                'action_url' => $this->baseUrl . 'visitas/nova/internacao/' . $idInternacao,
                 'severity' => 'warning',
                 'icon' => 'bi-calendar-x',
                 'priority_score' => 90 + (int)($row['dias'] ?? 0),
@@ -488,7 +488,7 @@ class AuditorActionService
                 'label' => 'Conta pendente',
                 'detail' => 'Capeante #' . $idCapeante . ' em auditoria',
                 'action_label' => 'Auditar conta',
-                'action_url' => $this->baseUrl . 'cad_capeante_rah.php?id_capeante=' . $idCapeante,
+                'action_url' => $this->baseUrl . 'contas/auditar/' . $idCapeante,
                 'severity' => 'primary',
                 'icon' => 'bi-receipt-cutoff',
                 'priority_score' => 70 + (int)($row['dias'] ?? 0),
@@ -510,7 +510,7 @@ class AuditorActionService
             'label' => 'Longa permanência',
             'detail' => 'Paciente internado há ' . (int)($row['dias'] ?? 0) . ' dia(s)',
             'action_label' => 'Abrir hub',
-            'action_url' => $this->baseUrl . 'hub_paciente/paciente' . $idPaciente,
+            'action_url' => $this->baseUrl . 'pacientes/hub/' . $idPaciente,
             'severity' => 'secondary',
             'icon' => 'bi-hourglass-split',
             'priority_score' => 55 + (int)($row['dias'] ?? 0),

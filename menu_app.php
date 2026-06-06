@@ -634,14 +634,14 @@ $menuQuickActions = [
         'label' => 'Contas',
         'desc' => 'Contas para auditar',
         'icon' => 'bi-receipt',
-        'url' => $BASE_URL . 'list_internacao_cap_rah.php',
+        'url' => $BASE_URL . 'contas/auditar',
         'tone' => 'warning',
     ],
     [
         'label' => 'Pendências',
         'desc' => 'Pendências operacionais',
         'icon' => 'bi-exclamation-diamond',
-        'url' => $BASE_URL . 'list_pendencias_operacionais.php',
+        'url' => $BASE_URL . 'gestao/pendencias-operacionais',
         'tone' => 'danger',
     ],
 ];
@@ -2015,7 +2015,7 @@ try {
                     <div class="menu-panel">
                         <div class="menu-panel-head">
                             <strong>Fila do auditor</strong>
-                            <a href="<?= htmlspecialchars($BASE_URL . 'dashboard_operacional.php', ENT_QUOTES, 'UTF-8') ?>">Ver painel</a>
+                            <a href="<?= htmlspecialchars($BASE_URL . 'dashboard-operacional', ENT_QUOTES, 'UTF-8') ?>">Ver painel</a>
                         </div>
                         <div class="menu-auditor-list">
                             <?php if (empty($audQueueMenu)): ?>
@@ -2080,7 +2080,7 @@ try {
                                 </a>
                             <?php endforeach; ?>
                             <?php foreach (array_slice($recentPatients, 0, max(0, 5 - min(3, count($recentAdmissions)))) as $recent): ?>
-                                <a class="menu-recent-item" href="<?= htmlspecialchars($BASE_URL . 'hub_paciente/paciente' . (int)$recent['id_paciente'], ENT_QUOTES, 'UTF-8') ?>">
+                                <a class="menu-recent-item" href="<?= htmlspecialchars($BASE_URL . 'pacientes/hub/' . (int)$recent['id_paciente'], ENT_QUOTES, 'UTF-8') ?>">
                                     <span class="menu-recent-icon"><i class="bi bi-person-vcard"></i></span>
                                     <span>
                                         <strong><?= htmlspecialchars((string)($recent['nome_pac'] ?? 'Paciente'), ENT_QUOTES, 'UTF-8') ?></strong>
