@@ -25,6 +25,7 @@ include_once("dao/hospitalDao.php");
 
 include_once("dao/indicadoresDao.php");
 require_once __DIR__ . '/app/services/PermanenciaForecastService.php';
+require_once __DIR__ . '/app/services/HospitalOpportunityService.php';
 
 // -----------------------------
 // ENTRADAS E SESSÃO
@@ -133,6 +134,7 @@ $userHospitalResumo = [
     'com_internados' => 0,
     'sem_internados' => 0,
 ];
+$hospitalOpportunityRows = [];
 
 // -----------------------------
 // CONDIÇÕES / WHEREs
@@ -362,6 +364,44 @@ if ($hospital_selecionado > 0) {
 $hospital_name = (!empty($filtered_hospital) && !empty($filtered_hospital[0]['nome_hosp']))
     ? ucwords(strtolower($filtered_hospital[0]['nome_hosp']))
     : 'Todos Hospitais';
+
+$hospitalOpportunityRows = dashCacheGet($cacheBase . '_hospital_opportunities_v2', 90);
+if (!is_array($hospitalOpportunityRows)) {
+    $hospitalOpportunityRows = [];
+    try {
+        $hospitalOpportunityIds = array_map(static function ($h) {
+            return (int)($h['id_hospital'] ?? 0);
+        }, $dados_hospital_select);
+        $hospitalOpportunityRows = (new HospitalOpportunityService($conn))->hospitalRows($hospitalOpportunityIds, 8);
+        dashCacheSet($cacheBase . '_hospital_opportunities_v2', $hospitalOpportunityRows);
+    } catch (Throwable $e) {
+        error_log('[MENU_APP][HOSPITAL_OPPORTUNITIES] ' . $e->getMessage());
+        $hospitalOpportunityRows = [];
+    }
+}
+
+if (!function_exists('menuFmtMoney')) {
+    function menuFmtMoney($value): string
+    {
+        return 'R$ ' . number_format((float)$value, 2, ',', '.');
+    }
+}
+
+if (!function_exists('menuFmtMonthly')) {
+    function menuFmtMonthly($value): string
+    {
+        $value = (float)$value;
+        $decimals = abs($value - round($value)) < 0.05 ? 0 : 1;
+        return number_format($value, $decimals, ',', '.');
+    }
+}
+
+if (!function_exists('menuFmtPercent')) {
+    function menuFmtPercent($value): string
+    {
+        return number_format((float)$value, 1, ',', '.') . '%';
+    }
+}
 
 // -----------------------------
 // BUSCAS
@@ -1706,6 +1746,205 @@ try {
     background: linear-gradient(145deg, #fff1f6, #ffdfe8);
 }
 
+.hospital-opportunity-panel {
+    margin: 10px 0 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(76, 111, 151, 0.26);
+    background:
+        linear-gradient(145deg, #e7eef5 0%, #f1f5f8 45%, #e3edf3 100%);
+    box-shadow: 0 12px 24px rgba(35, 102, 147, 0.12);
+    overflow: hidden;
+}
+
+.hospital-opportunity-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px 8px;
+    background: rgba(255, 255, 255, 0.36);
+    border-bottom: 1px solid rgba(76, 111, 151, 0.12);
+}
+
+.hospital-opportunity-head strong {
+    display: block;
+    color: #24384f;
+    font-size: .76rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.hospital-opportunity-head small {
+    display: block;
+    margin-top: 2px;
+    color: #64748b;
+    font-size: .64rem;
+    font-weight: 700;
+}
+
+.hospital-opportunity-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 10px;
+    padding: 12px;
+}
+
+.hospital-opportunity-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 210px;
+    padding: 12px 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(74, 112, 151, 0.30);
+    background:
+        linear-gradient(145deg, #eef5fa 0%, #f7fbfd 54%, #e5eff6 100%);
+    color: #24384f;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .78),
+        0 8px 18px rgba(35, 102, 147, 0.12);
+}
+
+.hospital-opportunity-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(83, 109, 151, 0.13);
+}
+
+.hospital-opportunity-name {
+    min-width: 0;
+}
+
+.hospital-opportunity-name strong {
+    display: block;
+    color: #24384f;
+    font-size: .78rem;
+    font-weight: 900;
+    line-height: 1.15;
+}
+
+.hospital-opportunity-name small {
+    display: block;
+    margin-top: 3px;
+    color: #64748b;
+    font-size: .62rem;
+    font-weight: 700;
+}
+
+.hospital-opportunity-level {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.hospital-opportunity-level.alto {
+    background: #fde7ec;
+    color: #a11f3a;
+    border: 1px solid rgba(161, 31, 58, .18);
+}
+
+.hospital-opportunity-level.medio {
+    background: #fff2c7;
+    color: #8b5a00;
+    border: 1px solid rgba(139, 90, 0, .18);
+}
+
+.hospital-opportunity-level.baixo {
+    background: #dcf8e8;
+    color: #166534;
+    border: 1px solid rgba(22, 101, 52, .16);
+}
+
+.hospital-opportunity-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+}
+
+.hospital-opportunity-metric {
+    min-height: 54px;
+    padding: 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(83, 109, 151, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .86);
+}
+
+.hospital-opportunity-metric small {
+    display: block;
+    color: #64748b;
+    font-size: .58rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.hospital-opportunity-metric strong {
+    display: block;
+    margin-top: 4px;
+    color: #24384f;
+    font-size: .78rem;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.hospital-opportunity-detail {
+    display: grid;
+    gap: 7px;
+}
+
+.hospital-opportunity-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    color: #334155;
+    font-size: .68rem;
+    font-weight: 750;
+    line-height: 1.25;
+}
+
+.hospital-opportunity-line i {
+    margin-top: 1px;
+    color: #2f6f9f;
+}
+
+.hospital-glosa-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hospital-glosa-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 24px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #f8edf2;
+    color: #7c2440;
+    border: 1px solid rgba(124, 36, 64, 0.12);
+    font-size: .62rem;
+    font-weight: 850;
+}
+
+.hospital-opportunity-empty {
+    padding: 18px 12px;
+    color: #64748b;
+    font-size: .76rem;
+    font-weight: 700;
+    text-align: center;
+}
+
 @media (max-width: 1100px) {
     .menu-workspace-head {
         flex-direction: column;
@@ -1727,6 +1966,10 @@ try {
 
     .user-patient-grid {
         grid-template-columns: repeat(2, minmax(130px, 1fr));
+    }
+
+    .hospital-opportunity-grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
     }
 }
 
@@ -1770,6 +2013,19 @@ try {
     }
 
     .user-hospital-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .hospital-opportunity-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .hospital-opportunity-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hospital-opportunity-metrics {
         grid-template-columns: 1fr;
     }
 }
@@ -2097,6 +2353,90 @@ try {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="hospital-opportunity-panel">
+                <div class="hospital-opportunity-head">
+                    <div>
+                        <strong><i class="bi bi-hospital me-1"></i> Meus hospitais</strong>
+                        <small>Médias mensais de negociação/saving e percentual de glosa por hospital do seu escopo.</small>
+                    </div>
+                    <span class="menu-workspace-pill">
+                        <i class="bi bi-diagram-3"></i>
+                        <?= number_format(count($hospitalOpportunityRows), 0, ',', '.') ?> em destaque
+                    </span>
+                </div>
+                <?php if (empty($hospitalOpportunityRows)): ?>
+                    <div class="hospital-opportunity-empty">Nenhum hospital com dados para exibir no momento.</div>
+                <?php else: ?>
+                    <div class="hospital-opportunity-grid">
+                        <?php foreach ($hospitalOpportunityRows as $hospitalOpp): ?>
+                            <?php
+                            $oppNivel = (string)($hospitalOpp['nivel'] ?? 'baixo');
+                            $oppIcon = preg_match('/^[a-z0-9-]+$/i', (string)($hospitalOpp['nivel_icon'] ?? ''))
+                                ? (string)$hospitalOpp['nivel_icon']
+                                : 'bi-check-circle-fill';
+                            $glosaTipos = (array)($hospitalOpp['glosa_tipos'] ?? []);
+                            ?>
+                            <article class="hospital-opportunity-card">
+                                <div class="hospital-opportunity-top">
+                                    <div class="hospital-opportunity-name">
+                                        <strong><?= htmlspecialchars((string)($hospitalOpp['nome_hosp'] ?? 'Hospital'), ENT_QUOTES, 'UTF-8') ?></strong>
+                                        <small><?= (int)($hospitalOpp['internados'] ?? 0) ?> internado(s) ativos</small>
+                                    </div>
+                                    <span class="hospital-opportunity-level <?= htmlspecialchars($oppNivel, ENT_QUOTES, 'UTF-8') ?>">
+                                        <i class="bi <?= htmlspecialchars($oppIcon, ENT_QUOTES, 'UTF-8') ?>"></i>
+                                        <?= htmlspecialchars((string)($hospitalOpp['nivel_label'] ?? 'Baixo'), ENT_QUOTES, 'UTF-8') ?>
+                                    </span>
+                                </div>
+
+                                <div class="hospital-opportunity-metrics">
+                                    <div class="hospital-opportunity-metric">
+                                        <small>Neg./mês</small>
+                                        <strong><?= htmlspecialchars(menuFmtMonthly($hospitalOpp['negociacoes_media_mensal'] ?? 0), ENT_QUOTES, 'UTF-8') ?></strong>
+                                    </div>
+                                    <div class="hospital-opportunity-metric">
+                                        <small>Saving/mês</small>
+                                        <strong><?= htmlspecialchars(menuFmtMoney($hospitalOpp['saving_media_mensal'] ?? 0), ENT_QUOTES, 'UTF-8') ?></strong>
+                                    </div>
+                                    <div class="hospital-opportunity-metric">
+                                        <small>Glosa %</small>
+                                        <strong><?= htmlspecialchars(menuFmtPercent($hospitalOpp['glosa_percentual'] ?? 0), ENT_QUOTES, 'UTF-8') ?></strong>
+                                    </div>
+                                </div>
+
+                                <div class="hospital-opportunity-detail">
+                                    <div class="hospital-opportunity-line">
+                                        <i class="bi bi-arrow-left-right"></i>
+                                        <span>
+                                            <strong>Troca:</strong>
+                                            <?= htmlspecialchars((string)($hospitalOpp['troca_principal'] ?? 'Sem troca registrada'), ENT_QUOTES, 'UTF-8') ?>
+                                        </span>
+                                    </div>
+                                    <div class="hospital-opportunity-line">
+                                        <i class="bi bi-tag"></i>
+                                        <span>
+                                            <strong>Tipo:</strong>
+                                            <?= htmlspecialchars((string)($hospitalOpp['tipo_negociacao'] ?? 'Sem negociação registrada'), ENT_QUOTES, 'UTF-8') ?>
+                                        </span>
+                                    </div>
+                                    <div class="hospital-glosa-tags">
+                                        <?php if (empty($glosaTipos)): ?>
+                                            <span class="hospital-glosa-tag">Sem glosa categorizada</span>
+                                        <?php else: ?>
+                                            <?php foreach ($glosaTipos as $glosaTipo): ?>
+                                                <span class="hospital-glosa-tag">
+                                                    <?= htmlspecialchars((string)($glosaTipo['tipo'] ?? 'Glosa'), ENT_QUOTES, 'UTF-8') ?>
+                                                    <?= htmlspecialchars(menuFmtPercent($glosaTipo['percentual'] ?? 0), ENT_QUOTES, 'UTF-8') ?>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </section>
 
