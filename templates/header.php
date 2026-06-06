@@ -299,7 +299,9 @@ if (!empty($sessionIdUsuario)) {
     <link href="<?= $BASE_URL ?>css/module_headers.css?v=<?= @filemtime(__DIR__ . '/../css/module_headers.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/style_show_internacao.css?v=<?= @filemtime(__DIR__ . '/../css/style_show_internacao.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/table_style.css?v=<?= @filemtime(__DIR__ . '/../css/table_style.css') ?>" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/listagem_padrao.css?v=<?= @filemtime(__DIR__ . '/../css/listagem_padrao.css') ?>" rel="stylesheet">
     <script defer src="<?= $BASE_URL ?>js/lista_header_sort.js"></script>
+    <script defer src="<?= $BASE_URL ?>js/listagem_enhancer.js?v=<?= @filemtime(__DIR__ . '/../js/listagem_enhancer.js') ?: time() ?>"></script>
 
     <!-- ======= APENAS DESIGN (logos alinhados e simétricos) ======= -->
     <style>
@@ -1736,6 +1738,7 @@ if (!empty($sessionIdUsuario)) {
 </body>
 <script src="js/fix-header.js"></script>
 <script>
+    window.FullCareListUserId = <?= json_encode((string)($sessionIdUsuario ?? 'anon')) ?>;
     document.addEventListener('DOMContentLoaded', function() {
         try {
             localStorage.removeItem('fcx_zoom');
