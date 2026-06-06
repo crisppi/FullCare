@@ -1037,12 +1037,12 @@ if (!empty($sessionIdUsuario)) {
                                         Menu
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarMenuDropdown">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>menu_app.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>central-trabalho"><i
                                                     class="bi bi-speedometer2"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
-                                                Dashboard</a></li>
+                                                Central de trabalho</a></li>
                                         <?php if ($isDiretoria) { ?>
-                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard_operacional.php"><i
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard-operacional"><i
                                                         class="bi bi-activity"
                                                         style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i>
                                                     Dashboard operacional</a></li>
@@ -1050,13 +1050,13 @@ if (!empty($sessionIdUsuario)) {
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
                                                 Manual</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>SolicitacaoCustomizacao.php">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacoes/customizacao">
                                                 <i class="bi bi-file-earmark-text"
                                                     style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
                                                 Solicitação de Customização
                                             </a></li>
                                         <?php if ($isDiretoria) { ?>
-                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>SolicitacaoCustomizacaoList.php">
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacoes/customizacao/lista">
                                                     <i class="bi bi-clipboard-check"
                                                         style="font-size: 1rem;margin-right:5px; color: #0d6efd;"></i>
                                                     Solicitações (Lista)
@@ -1068,15 +1068,9 @@ if (!empty($sessionIdUsuario)) {
                                                         style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
                                                     Performance equipes</a></li>
                                         <?php } ?>
-                                        <?php if (in_array((int)($_SESSION['nivel'] ?? 0), [4, 5], true) || mb_strtolower(trim((string)($_SESSION['email_user'] ?? '')), 'UTF-8') === 'crisppi@fullcare.com.br') { ?>
-                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_audit_log.php">
-                                                    <i class="bi bi-journal-text"
-                                                        style="font-size: 1rem;margin-right:5px; color:#7c5023;"></i>
-                                                    Auditoria</a></li>
-                                        <?php } ?>
                                         <?php if ($sessionNivel > 3) { ?>
                                             <li class="nav-item">
-                                                <a class="dropdown-item" href="<?= $BASE_URL ?>admin_permissao.php">
+                                                <a class="dropdown-item" href="<?= $BASE_URL ?>administracao/permissoes">
                                                     <i class="bi bi-shield-lock"
                                                         style="font-size: 1rem;margin-right:5px; color: rgb(21, 56, 210);"></i>
                                                     Permissões
@@ -1116,7 +1110,7 @@ if (!empty($sessionIdUsuario)) {
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_usuario.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>usuarios"><i
                                                     class="bi bi-people-fill"
                                                     style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
                                                 Usuários</a></li>
@@ -1181,19 +1175,19 @@ if (!empty($sessionIdUsuario)) {
                                         <i class="bi bi-journal-richtext me-1" style="color:#4b7fa5;"></i>Contas
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownContasRah">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_rah.php">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/auditar">
                                                 <i class="bi bi-currency-dollar text-success me-2"></i>Contas para Auditar
                                             </a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_fin.php">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/finalizadas">
                                                 <i class="bi bi-shield-check text-primary me-2"></i>Contas Finalizadas
                                             </a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_senha_fin.php">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/senhas-finalizadas">
                                                 <i class="bi bi-bookmark-check text-danger me-2"></i>Senhas Finalizadas
                                             </a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_par.php">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/paradas">
                                                 <i class="bi bi-pause-circle text-warning me-2"></i>Contas Paradas
                                             </a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_internacao_cap_jornada.php">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/jornada">
                                                 <i class="bi bi-diagram-3 text-info me-2"></i>Jornada da Conta
                                             </a></li>
                                     </ul>
@@ -1258,7 +1252,7 @@ if (!empty($sessionIdUsuario)) {
                                                     style="font-size:  1rem;margin-right:5px; color:#d63384;"></i>
                                                 Internações sem senha</a></li>
                                         <?php if (!$isPerfilMedicoMenu) { ?>
-                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_pendencias_operacionais.php"><i
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/pendencias-operacionais"><i
                                                         class="bi bi-exclamation-diamond"
                                                         style="font-size:  1rem;margin-right:5px; color:#fd7e14;"></i>
                                                     Pendências operacionais</a></li>
@@ -1274,11 +1268,11 @@ if (!empty($sessionIdUsuario)) {
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_fila_tarefas.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/fila-tarefas"><i
                                                     class="bi bi-list-check"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(20, 120, 90);"></i>
                                                 Fila de Tarefas</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_prorrogacao_pendente.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/prorrogacoes-pendentes"><i
                                                     class="bi bi-hourglass-split"
                                                     style="font-size: 1rem;margin-right:5px; color: rgb(180, 120, 20);"></i>
                                                 Prorrogação Pendente</a></li>
@@ -1290,7 +1284,7 @@ if (!empty($sessionIdUsuario)) {
                                                         class="bi bi-list-check"
                                                         style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
                                                     Lista Visitas</a></li>
-                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>faturamento_visitas.php"><i
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/faturamento"><i
                                                         class="bi bi-clipboard-check"
                                                         style="font-size: 1rem;margin-right:5px; color:#0a4fa3;"></i>
                                                     Faturamento Mensal</a></li>
@@ -1322,11 +1316,11 @@ if (!empty($sessionIdUsuario)) {
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>longa_permanencia_gestao.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/longa-permanencia"><i
                                                     class="bi bi-hourglass-split"
                                                     style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
                                                 Longa Permanência</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>home_care_gestao.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/home-care"><i
                                                     class="bi bi-house-heart"
                                                     style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
                                                 Home Care</a></li>
@@ -1372,7 +1366,7 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-speedometer2"
                                                     style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
                                                 Resumo</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>IndicadoresEssenciaisHubBI.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/indicadores-essenciais"><i
                                                     class="bi bi-bar-chart-steps"
                                                     style="font-size: 1rem;margin-right:5px; color:#7ee3c8;"></i>
                                                 Indicadores Essenciais</a></li>
@@ -1419,11 +1413,11 @@ if (!empty($sessionIdUsuario)) {
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>longa_permanencia_gestao.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/longa-permanencia"><i
                                                     class="bi bi-hourglass-split"
                                                     style="font-size: 1rem;margin-right:5px; color:#c084fc;"></i>
                                                 Gestão Longa Permanência</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>home_care_gestao.php"><i
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/home-care"><i
                                                     class="bi bi-house-heart"
                                                     style="font-size: 1rem;margin-right:5px; color:#7dd3fc;"></i>
                                                 Gestão Home Care</a></li>
@@ -1533,10 +1527,10 @@ if (!empty($sessionIdUsuario)) {
                                         Lista
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarGestorListas">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>menu_app.php">
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>central-trabalho">
                                                 <i class="bi bi-grid-1x2-fill"
                                                     style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
-                                                Dashboard Operacional</a></li>
+                                                Central de trabalho</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista">
                                                 <i class="bi bi-clipboard-data"
                                                     style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
@@ -1549,12 +1543,6 @@ if (!empty($sessionIdUsuario)) {
                                                 <i class="bi bi-clipboard-check"
                                                     style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
                                                 Altas</a></li>
-                                        <?php if (in_array((int)($_SESSION['nivel'] ?? 0), [4, 5], true) || mb_strtolower(trim((string)($_SESSION['email_user'] ?? '')), 'UTF-8') === 'crisppi@fullcare.com.br') { ?>
-                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>list_audit_log.php">
-                                                    <i class="bi bi-journal-text"
-                                                        style="font-size: 1rem;margin-right:5px; color:#7c5023;"></i>
-                                                    Auditoria</a></li>
-                                        <?php } ?>
                                     </ul>
                                 </li>
                             <?php } ?>
