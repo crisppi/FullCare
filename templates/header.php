@@ -140,7 +140,7 @@ $canSeeCadastrosMenu = $canSeeFullMenu && (
 );
 $isPerfilMedicoMenu = $startsWithAnyAccess($normCargoAccess, ['medico', 'med']);
 $isAuditorHeaderSearch = class_exists('AuditorActionService')
-    ? AuditorActionService::isAuditorProfile($_SESSION['cargo'] ?? '', $_SESSION['nivel'] ?? null)
+    ? AuditorActionService::canUseOperationalSearch($_SESSION)
     : false;
 $seguradoraHeaderLogoUrl = null;
 $seguradoraHeaderNome = null;
@@ -474,11 +474,23 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .header-actions #global-patient-search .form-control,
+        .header-actions #global-patient-search .form-select,
         .header-actions #global-patient-search input,
         .header-actions #global-patient-search .btn {
             min-height: 34px !important;
             height: 34px !important;
             font-size: 0.78rem !important;
+        }
+
+        .header-actions #global-patient-search .global-search-type {
+            width: 118px;
+            max-width: 118px;
+            border-left: 0;
+            border-right: 0;
+            padding: 0 1.75rem 0 0.55rem !important;
+            color: #24384f;
+            font-weight: 700;
+            background-color: #f8fbff;
         }
 
         .header-actions #global-patient-search .input-group-text {
@@ -1580,9 +1592,16 @@ if (!empty($sessionIdUsuario)) {
                 <form class="d-flex position-relative" id="global-patient-search" autocomplete="off">
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <?php if ($isAuditorHeaderSearch): ?>
+                            <select class="form-select global-search-type" id="global-search-type" aria-label="Tipo de pesquisa">
+                                <option value="paciente" selected>Paciente</option>
+                                <option value="internacao">Internação</option>
+                                <option value="conta">Conta</option>
+                            </select>
+                        <?php endif; ?>
                         <input type="text" class="form-control" id="inp-search-paciente"
-                            placeholder="<?= $isAuditorHeaderSearch ? 'Buscar paciente, internação, senha ou conta' : 'Pesquisar por senha, matrícula ou nome' ?>"
-                            aria-label="<?= $isAuditorHeaderSearch ? 'Buscar paciente, internação, senha ou conta' : 'Buscar por senha, matrícula ou nome' ?>" />
+                            placeholder="<?= $isAuditorHeaderSearch ? 'Nome ou matrícula' : 'Pesquisar por senha, matrícula ou nome' ?>"
+                            aria-label="<?= $isAuditorHeaderSearch ? 'Buscar pelo tipo selecionado' : 'Buscar por senha, matrícula ou nome' ?>" />
                     </div>
 
                     <div id="search-results-dropdown" class="dropdown-menu show"
@@ -1922,6 +1941,37 @@ if (!empty($sessionIdUsuario)) {
 
     const $input = $('#inp-search-paciente');
     const $menu = $('#search-results-dropdown');
+    const $searchType = $('#global-search-type');
+
+    const searchTypeConfig = {
+        paciente: {
+            placeholder: 'Nome ou matrícula',
+            empty: 'Nenhum paciente encontrado por nome ou matrícula.',
+            create: true,
+        },
+        internacao: {
+            placeholder: 'Nome do paciente ou ID da internação',
+            empty: 'Nenhuma internação encontrada por nome ou ID.',
+            create: false,
+        },
+        conta: {
+            placeholder: 'Nome do paciente ou ID da conta',
+            empty: 'Nenhuma conta encontrada por nome ou ID.',
+            create: false,
+        },
+    };
+
+    function currentSearchType() {
+        return ($searchType.length ? String($searchType.val() || 'paciente') : 'paciente');
+    }
+
+    function applySearchTypeUi() {
+        const cfg = searchTypeConfig[currentSearchType()] || searchTypeConfig.paciente;
+        if ($searchType.length) {
+            $input.attr('placeholder', cfg.placeholder);
+        }
+        $menu.hide();
+    }
 
     function escapeHtml(value) {
         return String(value ?? '')
@@ -1937,15 +1987,19 @@ if (!empty($sessionIdUsuario)) {
         if (!items || !items.length) {
             const termo = $input.val().trim();
             const termoEsc = escapeHtml(termo);
+            const cfg = searchTypeConfig[currentSearchType()] || searchTypeConfig.paciente;
+            const createLink = cfg.create ? `
+                <a href="#" id="create-new-pac" class="dropdown-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <div><strong>Cadastrar novo paciente</strong></div>
+                        ${termo ? `<small class="text-muted">Iniciar cadastro com: <em>${termoEsc}</em></small>` : ''}
+                    </div>
+                    <i class="bi bi-plus-circle"></i>
+                </a>
+            ` : '';
             $menu.html(`
-        <div class="dropdown-item text-muted">Nada encontrado. Tente outra senha, matrícula ou nome.</div>
-        <a href="#" id="create-new-pac" class="dropdown-item d-flex justify-content-between align-items-center">
-            <div>
-                <div><strong>Cadastrar novo paciente</strong></div>
-                ${termo ? `<small class="text-muted">Iniciar cadastro com: <em>${termoEsc}</em></small>` : ''}
-            </div>
-            <i class="bi bi-plus-circle"></i>
-        </a>
+        <div class="dropdown-item text-muted">${escapeHtml(cfg.empty)}</div>
+        ${createLink}
         `).show();
             return;
         }
@@ -1995,7 +2049,8 @@ if (!empty($sessionIdUsuario)) {
             return;
         }
         $.getJSON('ajax/pacientes_search.php', {
-                q
+                q,
+                type: currentSearchType()
             })
             .done(res => {
                 renderResults(res);
@@ -2020,6 +2075,14 @@ if (!empty($sessionIdUsuario)) {
     }, 250);
 
     $input.on('input', doSearch);
+    $searchType.on('change', function() {
+        applySearchTypeUi();
+        if ($input.val().trim().length >= 2) {
+            doSearch();
+        }
+        $input.trigger('focus');
+    });
+    applySearchTypeUi();
 
     // Fecha dropdown ao clicar fora
     $(document).on('click', function(e) {

@@ -49,7 +49,7 @@ if ($isGestorSeguradora && $seguradoraUserId <= 0) {
 $seguradoraFiltroPac = $isGestorSeguradora
     ? ($seguradoraUserId > 0 ? ' AND p.fk_seguradora_pac = ' . $seguradoraUserId : ' AND 1=0')
     : '';
-$isAuditorOperacional = AuditorActionService::isAuditorProfile($_SESSION['cargo'] ?? '', $_SESSION['nivel'] ?? null);
+$isAuditorOperacional = AuditorActionService::canUseOperationalSearch($_SESSION);
 $auditorDashboard = ['counts' => [], 'queue' => [], 'alerts' => []];
 if ($isAuditorOperacional) {
     $auditorActionService = new AuditorActionService($conn, $BASE_URL);

@@ -28,7 +28,7 @@ $normCargoAccess = function ($txt) {
   return preg_replace('/[^a-z]/', '', $txt);
 };
 $isGestorSeguradora = (strpos($normCargoAccess($_SESSION['cargo'] ?? ''), 'seguradora') !== false);
-$isAuditorPacienteHub = AuditorActionService::isAuditorProfile($_SESSION['cargo'] ?? '', $_SESSION['nivel'] ?? null);
+$isAuditorPacienteHub = AuditorActionService::canUseOperationalSearch($_SESSION);
 if ($isGestorSeguradora && empty($_SESSION['fk_seguradora_user'])) {
   try {
     $uid = (int)($_SESSION['id_usuario'] ?? 0);
@@ -828,12 +828,45 @@ $complexInfo = $complexMap[$effectiveLevel];
 
   .auditor-hub-card {
     border-radius: 16px;
-    border: 1px solid rgba(76, 142, 187, .16);
-    background: #fff;
+    border: 1px solid rgba(47, 111, 159, .26);
+    background: linear-gradient(180deg, #ffffff 0%, #f4faff 100%);
+    box-shadow: 0 10px 24px rgba(35, 102, 147, .12) !important;
+    overflow: hidden;
   }
 
   .auditor-hub-card .card-body {
     padding: 12px;
+  }
+
+  .auditor-hub-card .card-body > .d-flex:first-child {
+    margin: -12px -12px 10px;
+    padding: 10px 12px;
+    background: linear-gradient(90deg, rgba(47, 111, 159, .18), rgba(94, 35, 99, .10));
+    color: #24384f;
+    border-bottom: 1px solid rgba(47, 111, 159, .20);
+    position: relative;
+  }
+
+  .auditor-hub-card .card-body > .d-flex:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    bottom: 9px;
+    width: 4px;
+    border-radius: 0 999px 999px 0;
+    background: linear-gradient(180deg, #2f6f9f, #5e2363);
+  }
+
+  .auditor-hub-card .card-body > .d-flex:first-child small,
+  .auditor-hub-card .card-body > .d-flex:first-child h6 {
+    color: #24384f !important;
+  }
+
+  .auditor-hub-card .card-body > .d-flex:first-child .badge {
+    background: rgba(255,255,255,.82) !important;
+    border-color: rgba(47, 111, 159, .28) !important;
+    color: #24384f !important;
   }
 
   .auditor-hub-kpis {
@@ -845,10 +878,11 @@ $complexInfo = $complexMap[$effectiveLevel];
 
   .auditor-hub-kpis > div {
     min-height: 54px;
-    border: 1px solid #d7e8f3;
-    background: #f8fcff;
+    border: 1px solid rgba(47, 111, 159, .22);
+    background: #ffffff;
     border-radius: 11px;
     padding: 7px 8px;
+    box-shadow: 0 5px 12px rgba(35, 102, 147, .065);
   }
 
   .auditor-hub-kpis small {
@@ -863,7 +897,7 @@ $complexInfo = $complexMap[$effectiveLevel];
 
   .auditor-hub-kpis strong {
     display: block;
-    color: #24384f;
+    color: #16324f;
     font-size: 1rem;
     line-height: 1.15;
   }
@@ -876,17 +910,19 @@ $complexInfo = $complexMap[$effectiveLevel];
 
   .auditor-hub-task,
   .auditor-hub-event {
-    color: #24384f;
+    color: #1d2940;
     text-decoration: none;
-    border: 1px solid rgba(76, 142, 187, .12);
+    border: 1px solid rgba(47, 111, 159, .18);
     border-radius: 11px;
-    background: #fff;
+    background: #ffffff;
+    box-shadow: 0 5px 12px rgba(35, 102, 147, .06);
   }
 
   .auditor-hub-task:hover,
   .auditor-hub-event:hover {
-    color: #24384f;
-    background: #f7fbff;
+    color: #16324f;
+    background: #edf7ff;
+    border-color: rgba(47, 111, 159, .32);
   }
 
   .auditor-hub-task {
@@ -937,7 +973,7 @@ $complexInfo = $complexMap[$effectiveLevel];
   }
 
   .auditor-hub-event__date {
-    color: #2f6f9f;
+    color: #1f5f8f;
     font-size: .68rem;
     font-weight: 800;
   }

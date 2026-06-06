@@ -36,6 +36,44 @@ class AuditorActionService
             || strpos($role, 'enfaudit') !== false;
     }
 
+    public static function isAuditorOrDirectorProfile(?string $cargo, $nivel = null): bool
+    {
+        $role = self::normalizeRole($cargo);
+        if (strpos($role, 'seguradora') !== false) {
+            return false;
+        }
+
+        $isDirector = in_array($role, ['diretoria', 'diretor', 'board'], true)
+            || strpos($role, 'diretor') !== false
+            || strpos($role, 'diretoria') !== false
+            || (int)$nivel === -1;
+
+        return $isDirector || self::isAuditorProfile($cargo, $nivel);
+    }
+
+    public static function canUseOperationalSearch(array $session): bool
+    {
+        $cargo = self::normalizeRole($session['cargo'] ?? '');
+        $usuario = self::normalizeRole($session['usuario_user'] ?? '');
+        $nivel = (int)($session['nivel'] ?? 0);
+
+        if (strpos($cargo, 'seguradora') !== false || strpos($usuario, 'seguradora') !== false) {
+            return false;
+        }
+
+        $isDirector = in_array($cargo, ['diretoria', 'diretor', 'board'], true)
+            || in_array($usuario, ['diretoria', 'diretor', 'board'], true)
+            || strpos($cargo, 'diretor') !== false
+            || strpos($cargo, 'diretoria') !== false
+            || strpos($usuario, 'diretor') !== false
+            || strpos($usuario, 'diretoria') !== false
+            || $nivel === -1;
+
+        return $isDirector
+            || $nivel >= 4
+            || self::isAuditorProfile((string)($session['cargo'] ?? ''), $nivel);
+    }
+
     public function dashboardSummary(array $session, int $limit = 10): array
     {
         $counts = [
@@ -95,17 +133,26 @@ class AuditorActionService
         ];
     }
 
-    public function globalSearch(string $query, array $session, int $limit = 10): array
+    public function globalSearch(string $query, array $session, int $limit = 10, ?string $type = null): array
     {
         $q = trim($query);
         if (mb_strlen($q) < 2) {
             return [];
         }
 
+        $type = strtolower(trim((string)($type ?? 'paciente')));
+        if (!in_array($type, ['paciente', 'internacao', 'conta'], true)) {
+            $type = 'paciente';
+        }
+
         $items = [];
-        $items = array_merge($items, $this->searchPatients($q, $session, 6));
-        $items = array_merge($items, $this->searchAdmissions($q, $session, 6));
-        $items = array_merge($items, $this->searchCapeantes($q, $session, 4));
+        if ($type === 'paciente') {
+            $items = $this->searchPatients($q, $session, $limit);
+        } elseif ($type === 'internacao') {
+            $items = $this->searchAdmissions($q, $session, $limit);
+        } else {
+            $items = $this->searchCapeantes($q, $session, $limit);
+        }
 
         usort($items, static function (array $a, array $b): int {
             return ($b['rank'] ?? 0) <=> ($a['rank'] ?? 0);
@@ -264,18 +311,17 @@ class AuditorActionService
              WHERE IFNULL(p.deletado_pac, 'n') <> 's'
                {$scope['sql']}
                AND (
-                    p.nome_pac LIKE :q
-                    OR p.matricula_pac LIKE :q
-                    OR EXISTS (
-                        SELECT 1 FROM tb_internacao i
-                         WHERE i.fk_paciente_int = p.id_paciente
-                           AND i.senha_int LIKE :q
-                    )
+                    p.nome_pac LIKE :q_nome
+                    OR p.matricula_pac LIKE :q_matricula
                )
              ORDER BY p.nome_pac ASC
              LIMIT {$limit}
         ";
-        $params = array_merge([':q' => '%' . $q . '%'], $scope['params']);
+        $like = '%' . $q . '%';
+        $params = array_merge([
+            ':q_nome' => $like,
+            ':q_matricula' => $like,
+        ], $scope['params']);
         $rows = $this->fetchRows($sql, $params);
         return array_map(function (array $row): array {
             $nasc = $this->formatDate((string)($row['data_nasc_pac'] ?? ''));
@@ -286,7 +332,7 @@ class AuditorActionService
             ]);
             return [
                 'type' => 'paciente',
-                'rank' => 80,
+                'rank' => 100,
                 'id_paciente' => (int)$row['id_paciente'],
                 'nome' => (string)$row['nome_pac'],
                 'title' => (string)$row['nome_pac'],
@@ -312,21 +358,23 @@ class AuditorActionService
              WHERE IFNULL(p.deletado_pac, 'n') <> 's'
                {$scope['sql']}
                AND (
-                    i.senha_int LIKE :q
-                    OR i.id_internacao = :idq
-                    OR p.nome_pac LIKE :q
-                    OR p.matricula_pac LIKE :q
+                    i.id_internacao = :idq
+                    OR p.nome_pac LIKE :q_nome
                )
              ORDER BY i.data_intern_int DESC, i.id_internacao DESC
              LIMIT {$limit}
         ";
-        $params = array_merge([':q' => '%' . $q . '%', ':idq' => ctype_digit($q) ? (int)$q : 0], $scope['params']);
+        $like = '%' . $q . '%';
+        $params = array_merge([
+            ':q_nome' => $like,
+            ':idq' => ctype_digit($q) ? (int)$q : 0,
+        ], $scope['params']);
         $rows = $this->fetchRows($sql, $params);
         return array_map(function (array $row): array {
             $status = strtolower((string)($row['internado_int'] ?? '')) === 's' ? 'Internado' : 'Encerrado';
             return [
                 'type' => 'internacao',
-                'rank' => 95,
+                'rank' => 90,
                 'id_paciente' => (int)$row['id_paciente'],
                 'id_internacao' => (int)$row['id_internacao'],
                 'nome' => (string)$row['nome_pac'],
@@ -352,19 +400,22 @@ class AuditorActionService
                {$scope['sql']}
                AND (
                     c.id_capeante = :idq
-                    OR i.senha_int LIKE :q
-                    OR p.nome_pac LIKE :q
+                    OR p.nome_pac LIKE :q_nome
                )
              ORDER BY c.id_capeante DESC
              LIMIT {$limit}
         ";
-        $params = array_merge([':q' => '%' . $q . '%', ':idq' => ctype_digit($q) ? (int)$q : 0], $scope['params']);
+        $like = '%' . $q . '%';
+        $params = array_merge([
+            ':q_nome' => $like,
+            ':idq' => ctype_digit($q) ? (int)$q : 0,
+        ], $scope['params']);
         $rows = $this->fetchRows($sql, $params);
         return array_map(function (array $row): array {
             $status = strtolower((string)($row['encerrado_cap'] ?? 'n')) === 's' ? 'Encerrado' : 'Pendente';
             return [
                 'type' => 'conta',
-                'rank' => 88,
+                'rank' => 80,
                 'id_paciente' => (int)$row['id_paciente'],
                 'id_internacao' => (int)$row['id_internacao'],
                 'id_capeante' => (int)$row['id_capeante'],
@@ -728,6 +779,17 @@ class AuditorActionService
             return ['sql' => ' AND 1=0 ', 'params' => []];
         }
 
+        $usuario = self::normalizeRole($session['usuario_user'] ?? '');
+        if (in_array($role, ['diretoria', 'diretor', 'board'], true)
+            || in_array($usuario, ['diretoria', 'diretor', 'board'], true)
+            || strpos($role, 'diretor') !== false
+            || strpos($role, 'diretoria') !== false
+            || strpos($usuario, 'diretor') !== false
+            || strpos($usuario, 'diretoria') !== false
+            || (int)($session['nivel'] ?? 0) === -1) {
+            return ['sql' => '', 'params' => []];
+        }
+
         $param = ':' . $prefix . '_uid';
         return [
             'sql' => " AND EXISTS (
@@ -750,6 +812,17 @@ class AuditorActionService
         $role = self::normalizeRole($session['cargo'] ?? '');
         if (strpos($role, 'seguradora') !== false) {
             return ['sql' => ' AND 1=0 ', 'params' => []];
+        }
+
+        $usuario = self::normalizeRole($session['usuario_user'] ?? '');
+        if (in_array($role, ['diretoria', 'diretor', 'board'], true)
+            || in_array($usuario, ['diretoria', 'diretor', 'board'], true)
+            || strpos($role, 'diretor') !== false
+            || strpos($role, 'diretoria') !== false
+            || strpos($usuario, 'diretor') !== false
+            || strpos($usuario, 'diretoria') !== false
+            || (int)($session['nivel'] ?? 0) === -1) {
+            return ['sql' => '', 'params' => []];
         }
 
         $param = ':' . $prefix . '_uid';
