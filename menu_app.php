@@ -403,6 +403,20 @@ if (!function_exists('menuFmtPercent')) {
     }
 }
 
+if (!function_exists('menuFmtDateBr')) {
+    function menuFmtDateBr($value): string
+    {
+        if (empty($value) || $value === '0000-00-00') {
+            return '—';
+        }
+        try {
+            return (new DateTime((string)$value))->format('d/m/Y');
+        } catch (Throwable $e) {
+            return '—';
+        }
+    }
+}
+
 // -----------------------------
 // BUSCAS
 // -----------------------------
@@ -635,6 +649,11 @@ if (!is_array($reinternacao_30)) {
     dashCacheSet($cacheBase . '_reinternacao_30', $reinternacao_30);
 }
 $total_reinternacoes_30 = is_array($reinternacao_30) ? count($reinternacao_30) : 0;
+if (is_array($reinternacao_30)) {
+    usort($reinternacao_30, static function ($a, $b) {
+        return (int)($b['dias_reinternacao'] ?? 0) <=> (int)($a['dias_reinternacao'] ?? 0);
+    });
+}
 
 $canUseAuditorActions = class_exists('AuditorActionService')
     ? AuditorActionService::canUseOperationalSearch($_SESSION)
@@ -692,7 +711,7 @@ $menuWorkCards = [
         'value' => count($dados_visitas_atraso),
         'hint' => 'Revisar visitas vencidas',
         'icon' => 'bi-calendar-x',
-        'url' => '#dash-visitas-atraso',
+        'url' => '#dash-visitas-atraso-section',
         'tone' => 'warning',
     ],
     [
@@ -716,7 +735,7 @@ $menuWorkCards = [
         'value' => (int)$longa_perm_30,
         'hint' => 'Pacientes acima de 30 dias',
         'icon' => 'bi-hourglass-split',
-        'url' => '#dash-longa-perm',
+        'url' => '#dash-longa-perm-section',
         'tone' => 'info',
     ],
     [
@@ -724,7 +743,7 @@ $menuWorkCards = [
         'value' => (int)$total_reinternacoes_30,
         'hint' => 'Até 30 dias da alta',
         'icon' => 'bi-arrow-repeat',
-        'url' => $BASE_URL . 'internacoes/lista',
+        'url' => '#dash-reinternacoes-section',
         'tone' => 'warning',
     ],
 ];
@@ -1877,6 +1896,7 @@ try {
     background: rgba(255, 255, 255, 0.82);
     border: 1px solid rgba(83, 109, 151, 0.18);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .86);
+    text-align: center;
 }
 
 .hospital-opportunity-metric small {
@@ -1918,23 +1938,39 @@ try {
 }
 
 .hospital-glosa-tags {
-    display: flex;
+    display: inline-flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 6px 12px;
+    margin-left: 2px;
+    vertical-align: baseline;
 }
 
 .hospital-glosa-tag {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    min-height: 24px;
-    padding: 0 7px;
-    border-radius: 999px;
-    background: #f8edf2;
-    color: #7c2440;
-    border: 1px solid rgba(124, 36, 64, 0.12);
-    font-size: .62rem;
-    font-weight: 850;
+    min-height: auto;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    border: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    text-transform: uppercase;
+}
+
+.hospital-glosa-tag + .hospital-glosa-tag {
+    position: relative;
+}
+
+.hospital-glosa-tag + .hospital-glosa-tag::before {
+    content: "";
+    width: 3px;
+    height: 3px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: rgba(51, 65, 85, 0.38);
 }
 
 .hospital-opportunity-empty {
@@ -2160,12 +2196,14 @@ try {
     }
 
     #dash-visitas-atraso .table,
-    #dash-longa-perm .table {
+    #dash-longa-perm .table,
+    #dash-reinternacoes .table {
         font-size: .68rem !important;
     }
 
     #dash-visitas-atraso .table thead th,
-    #dash-longa-perm .table thead th {
+    #dash-longa-perm .table thead th,
+    #dash-reinternacoes .table thead th {
         background: #2f6f9f !important;
         background-image: none !important;
         font-size: .52rem !important;
@@ -2175,14 +2213,17 @@ try {
 
     #dash-visitas-atraso .table tbody td,
     #dash-longa-perm .table tbody td,
+    #dash-reinternacoes .table tbody td,
     #dash-visitas-atraso .table tbody td *,
-    #dash-longa-perm .table tbody td * {
+    #dash-longa-perm .table tbody td *,
+    #dash-reinternacoes .table tbody td * {
         font-size: .68rem !important;
         font-weight: 400 !important;
     }
 
     #dash-visitas-atraso .table tbody td:nth-child(4),
-    #dash-longa-perm .table tbody td:nth-child(4) {
+    #dash-longa-perm .table tbody td:nth-child(4),
+    #dash-reinternacoes .table tbody td:nth-child(4) {
         white-space: nowrap;
     }
 </style>
@@ -2420,17 +2461,23 @@ try {
                                             <?= htmlspecialchars((string)($hospitalOpp['tipo_negociacao'] ?? 'Sem negociação registrada'), ENT_QUOTES, 'UTF-8') ?>
                                         </span>
                                     </div>
-                                    <div class="hospital-glosa-tags">
-                                        <?php if (empty($glosaTipos)): ?>
-                                            <span class="hospital-glosa-tag">Sem glosa categorizada</span>
-                                        <?php else: ?>
-                                            <?php foreach ($glosaTipos as $glosaTipo): ?>
-                                                <span class="hospital-glosa-tag">
-                                                    <?= htmlspecialchars((string)($glosaTipo['tipo'] ?? 'Glosa'), ENT_QUOTES, 'UTF-8') ?>
-                                                    <?= htmlspecialchars(menuFmtPercent($glosaTipo['percentual'] ?? 0), ENT_QUOTES, 'UTF-8') ?>
-                                                </span>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
+                                    <div class="hospital-opportunity-line">
+                                        <i class="bi bi-percent"></i>
+                                        <span>
+                                            <strong>Glosas:</strong>
+                                            <span class="hospital-glosa-tags">
+                                                <?php if (empty($glosaTipos)): ?>
+                                                    <span class="hospital-glosa-tag">Sem glosa categorizada</span>
+                                                <?php else: ?>
+                                                    <?php foreach ($glosaTipos as $glosaTipo): ?>
+                                                        <span class="hospital-glosa-tag">
+                                                            <?= htmlspecialchars((string)($glosaTipo['tipo'] ?? 'Glosa'), ENT_QUOTES, 'UTF-8') ?>
+                                                            <?= htmlspecialchars(menuFmtPercent($glosaTipo['percentual'] ?? 0), ENT_QUOTES, 'UTF-8') ?>
+                                                        </span>
+                                                    <?php endforeach; ?>
+                                                <?php endif; ?>
+                                            </span>
+                                        </span>
                                     </div>
                                 </div>
                             </article>
@@ -2595,7 +2642,7 @@ try {
 
     <div class=" container-fluid">
         <div class="row m-t-25">
-            <div class="col-12">
+            <div id="dash-visitas-atraso-section" class="col-12">
                 <div class="header_div">
                     <span>Visitas em atraso</span>
                 </div>
@@ -2604,12 +2651,96 @@ try {
                 </div>
             </div>
 
-            <div class="col-12" style="margin-top:20px;">
+            <div id="dash-longa-perm-section" class="col-12" style="margin-top:20px;">
                 <div class="header_div">
                     <span>Pacientes de longa permanência</span>
                 </div>
                 <div id="dash-longa-perm" class="dash-table-loading">
                     Carregando...
+                </div>
+            </div>
+
+            <div id="dash-reinternacoes-section" class="col-12" style="margin-top:20px;">
+                <div class="header_div">
+                    <span>Reinternações até 30 dias</span>
+                </div>
+                <div id="dash-reinternacoes" class="dash-table-scroll">
+                    <table class="table table-sm table-striped table-hover table-condensed dash-sortable" style="margin-top:10px;">
+                        <thead style="background: #2f6f9f; background-image: none; color: #fff;">
+                            <tr>
+                                <th scope="col" class="th-sortable" data-sort-type="number">Id Int
+                                    <span class="sort-icons">
+                                        <a href="#" data-dir="asc">▲</a>
+                                        <a href="#" data-dir="desc">▼</a>
+                                    </span>
+                                </th>
+                                <th scope="col" class="th-sortable" data-sort-type="text">Hospital
+                                    <span class="sort-icons">
+                                        <a href="#" data-dir="asc">▲</a>
+                                        <a href="#" data-dir="desc">▼</a>
+                                    </span>
+                                </th>
+                                <th scope="col" class="th-sortable" data-sort-type="text">Paciente
+                                    <span class="sort-icons">
+                                        <a href="#" data-dir="asc">▲</a>
+                                        <a href="#" data-dir="desc">▼</a>
+                                    </span>
+                                </th>
+                                <th scope="col" class="th-sortable" data-sort-type="date">Internação anterior
+                                    <span class="sort-icons">
+                                        <a href="#" data-dir="asc">▲</a>
+                                        <a href="#" data-dir="desc">▼</a>
+                                    </span>
+                                </th>
+                                <th scope="col" class="th-sortable" data-sort-type="date">Alta anterior
+                                    <span class="sort-icons">
+                                        <a href="#" data-dir="asc">▲</a>
+                                        <a href="#" data-dir="desc">▼</a>
+                                    </span>
+                                </th>
+                                <th scope="col" class="th-sortable" data-sort-type="date">Nova internação
+                                    <span class="sort-icons">
+                                        <a href="#" data-dir="asc">▲</a>
+                                        <a href="#" data-dir="desc">▼</a>
+                                    </span>
+                                </th>
+                                <th scope="col" class="th-sortable" data-sort-type="number">Intervalo
+                                    <span class="sort-icons">
+                                        <a href="#" data-dir="asc">▲</a>
+                                        <a href="#" data-dir="desc" class="active">▼</a>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach (array_slice((array)$reinternacao_30, 0, 50) as $reint): ?>
+                                <tr>
+                                    <td scope="row"><?= (int)($reint['id_internacao_atual'] ?? 0) ?></td>
+                                    <td scope="row"><?= htmlspecialchars((string)($reint['nome_hosp'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td scope="row">
+                                        <a href="<?= htmlspecialchars($BASE_URL . 'internacoes/visualizar/' . (int)($reint['id_internacao_atual'] ?? 0), ENT_QUOTES, 'UTF-8') ?>">
+                                            <i class="bi bi-box-arrow-right" style="color:green; margin-right:6px; font-size:1em;"></i>
+                                        </a>
+                                        <?= htmlspecialchars((string)($reint['nome_pac'] ?? '—'), ENT_QUOTES, 'UTF-8') ?>
+                                    </td>
+                                    <td scope="row"><?= htmlspecialchars(menuFmtDateBr($reint['data_internacao_anterior'] ?? null), ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td scope="row"><?= htmlspecialchars(menuFmtDateBr($reint['data_alta_anterior'] ?? null), ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td scope="row"><?= htmlspecialchars(menuFmtDateBr($reint['data_internacao_atual'] ?? null), ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td scope="row" class="text-danger">
+                                        <?= isset($reint['dias_reinternacao']) ? (int)$reint['dias_reinternacao'] . ' dias' : '—' ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+
+                            <?php if (count((array)$reinternacao_30) === 0): ?>
+                                <tr>
+                                    <td colspan="7" scope="row" class="col-id" style="font-size:.8rem">
+                                        Não foram encontrados registros
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -2892,8 +3023,15 @@ try {
             body: formData.toString()
         })
         .then(function(res) {
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            return res.text();
+            return res.text().then(function(text) {
+                if (!res.ok) {
+                    const err = new Error('HTTP ' + res.status);
+                    err.responseText = text;
+                    err.status = res.status;
+                    throw err;
+                }
+                return text;
+            });
         })
         .then(function(html) {
             const temp = document.createElement('div');
@@ -2903,10 +3041,23 @@ try {
             visitasEl.innerHTML = visitasContent ? visitasContent.innerHTML : '<div style="padding:10px">Não foi possível carregar.</div>';
             longaEl.innerHTML = longaContent ? longaContent.innerHTML : '<div style="padding:10px">Não foi possível carregar.</div>';
         })
-        .catch(function() {
-            visitasEl.innerHTML = '<div style="padding:10px">Erro ao carregar.</div>';
-            longaEl.innerHTML = '<div style="padding:10px">Erro ao carregar.</div>';
+        .catch(function(error) {
+            const msg = error && error.status === 401
+                ? 'Sessão expirada. Recarregue a página e faça login novamente.'
+                : 'Erro ao carregar. Tente recarregar a página.';
+            visitasEl.innerHTML = '<div style="padding:10px">' + msg + '</div>';
+            longaEl.innerHTML = '<div style="padding:10px">' + msg + '</div>';
         });
+    }
+
+    function scrollToDashTarget(hash) {
+        if (!hash || hash.charAt(0) !== '#') return false;
+        const target = document.querySelector(hash);
+        if (!target) return false;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - 72;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        history.replaceState(null, '', hash);
+        return true;
     }
 
     function submitDashboardFilter(formData) {
@@ -2993,6 +3144,17 @@ try {
             sortDashTable(table, colIndex, dir, type);
         });
         window.__dashSortBound = true;
+    }
+
+    if (!window.__dashAnchorBound) {
+        document.addEventListener('click', function(event) {
+            const link = event.target.closest('a[href^="#dash-"]');
+            if (!link) return;
+            if (scrollToDashTarget(link.getAttribute('href'))) {
+                event.preventDefault();
+            }
+        });
+        window.__dashAnchorBound = true;
     }
 
     document.addEventListener('DOMContentLoaded', initDashboardMenuPage);

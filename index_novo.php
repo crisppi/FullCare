@@ -36,9 +36,10 @@
         padding: 44px 56px 36px;
         overflow: hidden;
         background:
-            radial-gradient(ellipse at 10% 0%,   rgba(79, 155, 210, .22) 0%, transparent 46%),
-            radial-gradient(ellipse at 90% 100%,  rgba(90, 35,  99, .28) 0%, transparent 52%),
-            linear-gradient(160deg, #081e36 0%, #0d2d4a 45%, #0a1f36 100%);
+            radial-gradient(ellipse at 12% 0%,   rgba(92, 150, 205, .16) 0%, transparent 46%),
+            radial-gradient(ellipse at 88% 100%,  rgba(132, 75, 154, .36) 0%, transparent 54%),
+            radial-gradient(ellipse at 20% 78%, rgba(118, 78, 166, .18) 0%, transparent 46%),
+            linear-gradient(160deg, #0b1f34 0%, #183250 48%, #1b2541 100%);
     }
 
     /* noise overlay */
@@ -60,7 +61,7 @@
     }
 
     .lp-logo img {
-        height: 36px;
+        height: 46px;
         width: auto;
         filter: brightness(0) invert(1);
     }
