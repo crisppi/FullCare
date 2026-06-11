@@ -475,7 +475,7 @@ if (!empty($sessionIdUsuario)) {
         .header-actions {
             margin-left: auto !important;
             margin-right: 0 !important;
-            gap: 0.7rem !important;
+            gap: 0.35rem !important;
             flex: 0 0 auto;
             align-items: center;
         }
