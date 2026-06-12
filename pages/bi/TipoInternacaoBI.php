@@ -1,7 +1,7 @@
 <?php
 include_once("check_logado.php");
 require_once("templates/header.php");
-require_once __DIR__ . "/app/bi_cid_options.php";
+require_once __DIR__ . "/../../app/bi_cid_options.php";
 
 if (!isset($conn) || !($conn instanceof PDO)) {
     die("Conexao invalida.");
