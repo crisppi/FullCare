@@ -212,7 +212,7 @@ body.bi-theme,
   padding: 5px 8px;
   min-height: 30px;
   line-height: 1.2;
-  font-size: 0.68rem;
+  font-size: 11px;
 }
 
 .bi-filter.is-selected select,
@@ -1761,12 +1761,14 @@ table.bi-table::after,
   background: rgba(16, 61, 92, 0.42);
   border-color: rgba(231, 244, 252, 0.62);
   color: #f4fbff;
+  font-size: 11px !important;
   -webkit-text-fill-color: #f4fbff;
 }
 
 .bi-theme .bi-filter select option {
   background: #f4f8fb;
   color: #1f2d3a;
+  font-size: 11px;
   -webkit-text-fill-color: #1f2d3a;
 }
 
@@ -1918,9 +1920,13 @@ table.bi-table::after,
   height: 28px;
   padding: 4px 8px;
   border-radius: 7px;
-  font-size: 0.64rem;
+  font-size: 11px;
   line-height: 1.2;
   box-shadow: none;
+}
+
+.bi-consolidado-filters .bi-filter select option {
+  font-size: 11px;
 }
 
 .bi-consolidado-filters .bi-filter label {
@@ -2127,6 +2133,202 @@ table.bi-table::after,
 
   .bi-consolidado-filters .bi-actions .bi-btn {
     flex: 1 1 auto;
+  }
+}
+
+.bi-consolidado-cards-page .bi-header {
+  margin-bottom: 6px;
+}
+
+.bi-consolidado-cards-page .bi-title {
+  font-size: clamp(0.9rem, 1.25vw, 1.08rem);
+  padding: 5px 11px;
+  border-radius: 8px;
+  line-height: 1.05;
+}
+
+.bi-consolidado-cards-page .bi-consolidado-cards-layout {
+  display: block;
+  align-items: initial;
+  gap: 8px;
+  margin-top: 7px;
+}
+
+.bi-consolidado-cards-page .bi-grid.fixed-3.bi-grid-kpi {
+  gap: 8px;
+}
+
+.bi-consolidado-cards-page .bi-grid-kpi > .bi-panel {
+  padding: 0 0 7px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(35, 91, 132, 0.54), rgba(20, 70, 110, 0.38));
+  border-color: rgba(225, 242, 255, 0.30);
+}
+
+.bi-consolidado-cards-page .bi-grid-kpi > .bi-panel > h3 {
+  min-height: 25px;
+  margin: 0 0 6px;
+  padding: 4px 9px;
+  justify-content: flex-start;
+  border-radius: 8px 8px 0 0;
+  font-size: 0.68rem;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-align: left !important;
+  background: linear-gradient(90deg, rgba(22, 69, 106, 0.74), rgba(42, 103, 145, 0.42));
+}
+
+.bi-consolidado-cards-page .bi-grid-kpi .bi-stack {
+  gap: 5px;
+  padding: 0 7px;
+}
+
+.bi-consolidado-cards-page .bi-kpi {
+  min-height: 34px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  box-shadow: none;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.bi-consolidado-cards-page .bi-kpi small {
+  min-width: 0;
+  color: rgba(238, 247, 255, 0.70);
+  font-size: 0.48rem;
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bi-consolidado-cards-page .bi-kpi strong {
+  margin-top: 0;
+  justify-self: end;
+  font-size: 0.74rem;
+  line-height: 1.08;
+  white-space: nowrap;
+}
+
+.bi-consolidado-cards-page .bi-sidebar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 8px;
+  padding: 7px;
+  border: 1px solid rgba(225, 242, 255, 0.26);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(24, 73, 109, 0.34), rgba(18, 58, 92, 0.20));
+}
+
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi {
+  min-height: 44px;
+  grid-template-columns: 1fr;
+  row-gap: 1px;
+  padding: 6px 7px;
+  border-radius: 6px;
+  border-color: rgba(255, 255, 255, 0.10);
+  background: rgba(20, 63, 96, 0.58);
+  justify-items: center;
+  text-align: center;
+}
+
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi small {
+  font-size: 0.42rem;
+  text-align: center;
+  letter-spacing: 0.07em;
+}
+
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi strong {
+  justify-self: center;
+  font-size: 0.66rem;
+  text-align: right;
+}
+
+.bi-consolidado-cards-page .bi-kpi.with-badge {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+  padding-right: 7px;
+  row-gap: 2px;
+}
+
+.bi-consolidado-cards-page .bi-kpi.with-badge .bi-kpi-badge {
+  position: static;
+  transform: none;
+  padding: 2px 5px;
+  font-size: 0.44rem;
+  background: rgba(239, 247, 255, 0.88);
+  color: #293a4c;
+  box-shadow: none;
+  justify-self: center;
+  margin-top: 0;
+}
+
+.bi-consolidado-cards-page .kpi-indigo {
+  background: linear-gradient(135deg, rgba(65, 82, 196, 0.82), rgba(48, 61, 156, 0.72));
+}
+
+.bi-consolidado-cards-page .kpi-rose {
+  background: linear-gradient(135deg, rgba(162, 82, 112, 0.80), rgba(125, 47, 77, 0.72));
+}
+
+.bi-consolidado-cards-page .kpi-steel {
+  background: linear-gradient(135deg, rgba(63, 78, 96, 0.82), rgba(43, 57, 75, 0.72));
+}
+
+.bi-consolidado-cards-page .bi-sidebar .kpi-berry {
+  background: rgba(91, 41, 86, 0.62);
+}
+
+.bi-consolidado-cards-page .bi-sidebar .kpi-teal {
+  background: rgba(26, 100, 100, 0.62);
+}
+
+.bi-consolidado-cards-page .bi-sidebar .kpi-indigo {
+  background: rgba(61, 73, 168, 0.62);
+}
+
+.bi-consolidado-cards-page .bi-sidebar .kpi-amber {
+  background: rgba(137, 87, 32, 0.62);
+}
+
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(1),
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(5),
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(8),
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(9) {
+  min-height: 42px;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+}
+
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(1) small,
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(5) small,
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(8) small,
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(9) small {
+  text-align: center;
+}
+
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(1) strong,
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(5) strong,
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(8) strong,
+.bi-consolidado-cards-page .bi-sidebar .bi-kpi:nth-child(9) strong {
+  justify-self: center;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 1200px) {
+  .bi-consolidado-cards-page .bi-sidebar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

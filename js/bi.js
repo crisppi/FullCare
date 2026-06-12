@@ -459,6 +459,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const setupFilterStates = (root) => {
+    if (root.classList && root.classList.contains('bi-consolidado-filters')) {
+      return;
+    }
     const updateFilterState = (filter) => {
       const control = filter.querySelector('select, input');
       if (!control) {

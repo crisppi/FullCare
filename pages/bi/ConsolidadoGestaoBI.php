@@ -50,6 +50,46 @@ function table_exists(PDO $conn, string $table): bool
     return $cache[$table];
 }
 
+function consolidado_fallback_options(PDO $conn, string $field): array
+{
+    $queries = [
+        'hospital' => "
+            SELECT id_hospital AS value, nome_hosp AS label
+            FROM tb_hospital
+            WHERE id_hospital IS NOT NULL AND nome_hosp IS NOT NULL AND nome_hosp <> ''
+            ORDER BY nome_hosp
+        ",
+        'tipo_internacao' => "
+            SELECT DISTINCT tipo_admissao_int AS value, tipo_admissao_int AS label
+            FROM tb_internacao
+            WHERE tipo_admissao_int IS NOT NULL AND tipo_admissao_int <> ''
+            ORDER BY tipo_admissao_int
+        ",
+        'modo_internacao' => "
+            SELECT DISTINCT modo_internacao_int AS value, modo_internacao_int AS label
+            FROM tb_internacao
+            WHERE modo_internacao_int IS NOT NULL AND modo_internacao_int <> ''
+            ORDER BY modo_internacao_int
+        ",
+        'grupo_patologia' => "
+            SELECT DISTINCT grupo_patologia_int AS value, grupo_patologia_int AS label
+            FROM tb_internacao
+            WHERE grupo_patologia_int IS NOT NULL AND grupo_patologia_int <> ''
+            ORDER BY grupo_patologia_int
+        ",
+        'antecedente' => "
+            SELECT ant.id_antecedente AS value, ant.antecedente_ant AS label
+            FROM tb_antecedente ant
+            WHERE ant.id_antecedente IS NOT NULL AND ant.antecedente_ant IS NOT NULL AND ant.antecedente_ant <> ''
+            ORDER BY ant.antecedente_ant
+        ",
+    ];
+    if (empty($queries[$field])) {
+        return [];
+    }
+    return $conn->query($queries[$field])->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
 $anoInput = filter_input(INPUT_GET, 'ano', FILTER_VALIDATE_INT);
 $mesInput = filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT);
 $ano = ($anoInput !== null && $anoInput !== false) ? (int)$anoInput : null;
@@ -83,12 +123,18 @@ $filterScope = [
     'faixa_etaria' => $faixaEtaria,
 ];
 
-$hospitais = array_map(fn($r) => ['id_hospital' => $r['value'], 'nome_hosp' => $r['label']], bi_fetch_filter_options($conn, 'hospital', $filterScope));
-$tiposInt = array_column(bi_fetch_filter_options($conn, 'tipo_internacao', $filterScope), 'label');
-$modos = array_column(bi_fetch_filter_options($conn, 'modo_internacao', $filterScope), 'label');
+$hospitalOptions = bi_fetch_filter_options($conn, 'hospital', $filterScope) ?: consolidado_fallback_options($conn, 'hospital');
+$tipoOptions = bi_fetch_filter_options($conn, 'tipo_internacao', $filterScope) ?: consolidado_fallback_options($conn, 'tipo_internacao');
+$modoOptions = bi_fetch_filter_options($conn, 'modo_internacao', $filterScope) ?: consolidado_fallback_options($conn, 'modo_internacao');
+$grupoOptions = bi_fetch_filter_options($conn, 'grupo_patologia', $filterScope) ?: consolidado_fallback_options($conn, 'grupo_patologia');
+$antecedenteOptions = bi_fetch_filter_options($conn, 'antecedente', $filterScope) ?: consolidado_fallback_options($conn, 'antecedente');
+
+$hospitais = array_map(fn($r) => ['id_hospital' => $r['value'], 'nome_hosp' => $r['label']], $hospitalOptions);
+$tiposInt = array_column($tipoOptions, 'label');
+$modos = array_column($modoOptions, 'label');
 $patologias = bi_fetch_cid_options($conn, $filterScope);
-$grupos = array_column(bi_fetch_filter_options($conn, 'grupo_patologia', $filterScope), 'label');
-$antecedentes = array_map(fn($r) => ['id_antecedente' => $r['value'], 'antecedente_ant' => $r['label']], bi_fetch_filter_options($conn, 'antecedente', $filterScope));
+$grupos = array_column($grupoOptions, 'label');
+$antecedentes = array_map(fn($r) => ['id_antecedente' => $r['value'], 'antecedente_ant' => $r['label']], $antecedenteOptions);
 $anos = $conn->query("SELECT DISTINCT YEAR(data_intern_int) AS ano FROM tb_internacao WHERE data_intern_int IS NOT NULL AND data_intern_int <> '0000-00-00' ORDER BY ano DESC")
     ->fetchAll(PDO::FETCH_COLUMN);
 if (!filter_has_var(INPUT_GET, 'ano') && $anos) {
@@ -676,29 +722,17 @@ body .bi-consolidado-page .bi-consolidado-filters .bi-filter select:focus-visibl
 body .bi-consolidado-page .bi-consolidado-filters .bi-filter input:focus-visible {
   background: rgba(16, 61, 92, 0.42) !important;
   border-color: rgba(231, 244, 252, 0.62) !important;
+  font-size: 11px !important;
   outline: none !important;
   box-shadow: none !important;
 }
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter select option {
+  font-size: 11px !important;
+}
 </style>
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260516-rounded-bars"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.body.classList.add('bi-theme');
-  const form = document.querySelector('.bi-consolidado-filters');
-  if (!form) return;
-  const clearSelectedState = () => {
-    form.querySelectorAll('.bi-filter').forEach((filter) => {
-      filter.classList.remove('is-selected');
-      const control = filter.querySelector('select, input');
-      if (control) control.removeAttribute('data-selected');
-    });
-  };
-  clearSelectedState();
-  form.addEventListener('change', () => setTimeout(clearSelectedState, 0), true);
-  form.addEventListener('input', () => setTimeout(clearSelectedState, 0), true);
-});
-</script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=<?= @filemtime(__DIR__ . '/../../js/bi.js') ?: time() ?>"></script>
+<script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme bi-consolidado-page">
     <div class="bi-header">
