@@ -823,6 +823,7 @@ try {
     <link href="diversos/CoolAdmin-master/vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
     <!-- Main CSS-->
     <link href="diversos/CoolAdmin-master/css/theme.css" rel="stylesheet" media="all">
+    <link href="css/menu_app.css?v=<?= @filemtime(__DIR__ . '/css/menu_app.css') ?>" rel="stylesheet">
 </head>
 
 <style>
@@ -2077,12 +2078,6 @@ try {
 </style>
 
 <style>
-    .header_div {
-        border-radius: 22px;
-        padding: 12px 18px;
-        margin: 4px 0 2px;
-        font-size: .88rem;
-    }
 
     .scope-badge {
         margin-bottom: 8px;
