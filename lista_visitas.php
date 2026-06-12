@@ -888,6 +888,98 @@ $brandSoftColor = $isFaturamentoView ? '#d6e4ff' : '#dfe6ff';
     .visitas-list-card .listagem-total p {
         margin: 0;
     }
+
+    .visitas-page--faturamento .visitas-hero {
+        min-height: 46px;
+        margin-bottom: 7px;
+        padding: 6px 12px;
+    }
+
+    .visitas-page--faturamento .visitas-toolbar {
+        padding: 8px !important;
+    }
+
+    .visitas-page--faturamento .visitas-toolbar-head {
+        margin-bottom: .42rem;
+    }
+
+    .visitas-page--faturamento .field-selector {
+        grid-template-columns: repeat(9, minmax(0, 1fr));
+        gap: .32rem;
+        padding: .45rem;
+        margin-bottom: .55rem;
+    }
+
+    .visitas-page--faturamento .field-option {
+        min-height: 24px;
+        padding: .24rem .42rem;
+    }
+
+    .visitas-page--faturamento .field-option-text {
+        font-size: .6rem;
+    }
+
+    .visitas-page--faturamento .field-option i {
+        font-size: .68rem;
+    }
+
+    .visitas-page--faturamento .field-option .form-check-input {
+        width: .74rem;
+        height: .74rem;
+    }
+
+    .visitas-page--faturamento .filters-inline {
+        row-gap: 6px;
+    }
+
+    #faturamentoActionBox {
+        border: 1px solid #e6edf5 !important;
+        border-radius: 9px;
+        box-shadow: 0 2px 9px rgba(34, 45, 60, .12) !important;
+        padding: 8px 10px !important;
+        margin-bottom: 10px !important;
+    }
+
+    #faturamentoActionBox .faturamento-actions {
+        gap: 8px !important;
+    }
+
+    #faturamentoActionBox h6 {
+        margin-bottom: 1px !important;
+        font-size: .58rem !important;
+        letter-spacing: .08em;
+    }
+
+    #faturamentoActionBox .fw-semibold.fs-5 {
+        font-size: .82rem !important;
+        line-height: 1.1;
+    }
+
+    #faturamentoActionBox .form-check-label {
+        font-size: .68rem;
+        font-weight: 700;
+    }
+
+    #faturamentoActionBox .form-check-input {
+        width: 28px;
+        height: 15px;
+        margin-top: 0;
+    }
+
+    #btnFaturarVisitas {
+        min-height: 30px;
+        padding: 0 10px;
+        border-radius: 7px;
+        font-size: .72rem;
+        font-weight: 800;
+    }
+
+    #badgeSelVisitas {
+        min-width: 22px;
+        padding: 2px 6px;
+        font-size: .66rem;
+    }
+
     .th-sortable {
         display: flex;
         align-items: center;
@@ -941,6 +1033,13 @@ $brandSoftColor = $isFaturamentoView ? '#d6e4ff' : '#dfe6ff';
         .field-selector {
             grid-template-columns: repeat(9, minmax(0, 1fr));
         }
+
+        .visitas-page--faturamento .filters-inline {
+            display: grid;
+            grid-template-columns: minmax(150px, 1.25fr) minmax(150px, 1.25fr) minmax(170px, 1fr) minmax(170px, 1fr) minmax(220px, .9fr) minmax(210px, .85fr) minmax(260px, 1fr);
+            align-items: end;
+            gap: 8px;
+        }
     }
 
     @media (max-width: 767.98px) {
@@ -967,7 +1066,7 @@ $brandSoftColor = $isFaturamentoView ? '#d6e4ff' : '#dfe6ff';
     }
 </style>
 
-<div class="container-fluid form_container listagem-page visitas-page">
+<div class="container-fluid form_container listagem-page visitas-page<?= $isFaturamentoView ? ' visitas-page--faturamento' : '' ?>">
     <div class="listagem-hero listagem-hero--module listagem-hero--gestao visitas-hero">
         <div class="listagem-hero__copy">
             <p class="listagem-kicker">Gestão</p>
