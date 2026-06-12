@@ -22,6 +22,26 @@
     text-transform: none !important;
 }
 
+.table td .dropdown-menu {
+    min-width: 132px;
+    padding: 6px 0;
+    border-radius: 8px;
+    font-size: .68rem;
+}
+
+.table td .dropdown-menu .dropdown-item {
+    min-height: 28px;
+    padding: 6px 10px !important;
+    font-size: .68rem !important;
+    line-height: 1.1;
+}
+
+.table td .dropdown-menu .dropdown-item i {
+    margin-right: 6px !important;
+    font-size: .78rem !important;
+    line-height: 1 !important;
+}
+
 .table thead th {
     text-align: center;
     height: 24px;
@@ -39,6 +59,58 @@
     font-weight: 600;
     letter-spacing: 0.025em;
     transform: translateZ(0);
+}
+
+.complete-table .table,
+.complete-table .table-sm {
+    font-size: 10px !important;
+}
+
+.complete-table .table thead {
+    height: 24px !important;
+}
+
+.complete-table .table thead th,
+.complete-table .table-sm > :not(caption) > * > th {
+    height: 24px !important;
+    min-height: 24px !important;
+    padding: 2px 6px !important;
+    font-size: .66rem !important;
+    line-height: 1.02 !important;
+    vertical-align: middle !important;
+}
+
+.complete-table .table tbody tr {
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+.complete-table .table tbody td,
+.complete-table .table tbody th,
+.complete-table .table-sm > :not(caption) > * > td {
+    height: 26px !important;
+    min-height: 26px !important;
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+    line-height: 1.05 !important;
+    vertical-align: middle !important;
+}
+
+.complete-table .table a,
+.complete-table .table button {
+    font-size: inherit;
+}
+
+.complete-table .form-check {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+}
+
+.complete-table .form-check-input[type=checkbox] {
+    width: 13px !important;
+    height: 13px !important;
+    margin: 0 !important;
 }
 
 .table thead th span {

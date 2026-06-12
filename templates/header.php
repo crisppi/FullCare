@@ -425,7 +425,7 @@ if (!empty($sessionIdUsuario)) {
             border: 1px solid rgba(47, 111, 159, 0.12);
             border-radius: 14px;
             box-shadow: 0 8px 22px rgba(31, 76, 110, 0.10);
-            padding: 5px 8px;
+            padding: 8px 8px;
             min-width: 0;
         }
 
@@ -452,7 +452,7 @@ if (!empty($sessionIdUsuario)) {
 
         .navbar-nav.navbar-nav-scroll .nav-link {
             white-space: nowrap;
-            padding: 0.24rem 0.20rem !important;
+            padding: 0.34rem 0.22rem !important;
             font-family: "Inter", Arial, Helvetica, sans-serif !important;
             font-size: 0.70rem !important;
             font-weight: 400;

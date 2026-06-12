@@ -668,12 +668,14 @@
 }
 
 .listagem-table-wrap thead th {
-    padding-top: 4px;
-    padding-bottom: 4px;
+    height: 24px;
+    min-height: 24px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     background: transparent;
     border-bottom: 1px solid #d9e8f1;
     color: #fff;
-    font-size: .62rem;
+    font-size: .66rem;
     font-weight: 800;
     letter-spacing: .025em;
     text-transform: uppercase;
@@ -682,12 +684,32 @@
 
 .listagem-table-wrap tbody td,
 .listagem-table-wrap tbody th {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    font-size: .68rem;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 10px;
     line-height: 1.05;
     vertical-align: middle;
     border-top: 1px solid #f1ebf7;
+}
+
+#table-content .censo-list-table thead th,
+#table-content .tabela-altas thead th {
+    height: 24px !important;
+    min-height: 24px !important;
+    padding: 2px 6px !important;
+    font-size: .66rem !important;
+    line-height: 1.02 !important;
+    letter-spacing: .025em !important;
+}
+
+#table-content .censo-list-table tbody td,
+#table-content .censo-list-table tbody th,
+#table-content .tabela-altas tbody td,
+#table-content .tabela-altas tbody th {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+    line-height: 1.05 !important;
+    vertical-align: middle !important;
 }
 
 .listagem-table-wrap tbody tr:nth-child(even) {
