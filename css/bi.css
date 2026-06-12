@@ -1884,20 +1884,25 @@ table.bi-table::after,
 }
 
 .bi-consolidado-page .bi-header {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .bi-consolidado-page .bi-title {
-  font-size: clamp(1.08rem, 1.9vw, 1.42rem);
+  font-size: clamp(0.96rem, 1.35vw, 1.16rem);
+  padding: 5px 11px;
+  border-radius: 8px;
+  letter-spacing: 0.03em;
+  line-height: 1.05;
 }
 
 .bi-consolidado-filters.bi-panel {
-  padding: 14px 16px;
-  gap: 10px;
+  padding: 8px 10px;
+  gap: 6px;
+  border-radius: 8px;
 }
 
 .bi-consolidado-filters.bi-panel.bi-filters-wrap {
-  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  grid-template-columns: repeat(7, minmax(112px, 1fr));
 }
 
 .bi-consolidado-filters.bi-panel.bi-filters-wrap .bi-actions {
@@ -1909,24 +1914,56 @@ table.bi-table::after,
 
 .bi-consolidado-filters .bi-filter select,
 .bi-consolidado-filters .bi-filter input {
-  min-height: 38px;
+  min-height: 28px;
+  height: 28px;
+  padding: 4px 8px;
+  border-radius: 7px;
+  font-size: 0.64rem;
+  line-height: 1.2;
+  box-shadow: none;
+}
+
+.bi-consolidado-filters .bi-filter label {
+  margin-bottom: 2px;
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+}
+
+.bi-consolidado-filters .bi-filter.is-selected label {
+  color: rgba(226, 238, 249, 0.84) !important;
+}
+
+.bi-consolidado-filters .bi-filter.is-selected select,
+.bi-consolidado-filters .bi-filter.is-selected input,
+.bi-consolidado-filters .bi-filter select[data-selected="1"],
+.bi-consolidado-filters .bi-filter input[data-selected="1"],
+.bi-consolidado-filters .bi-filter select:focus,
+.bi-consolidado-filters .bi-filter input:focus,
+.bi-consolidado-filters .bi-filter select:focus-visible,
+.bi-consolidado-filters .bi-filter input:focus-visible {
+  min-height: 28px;
+  height: 28px;
+  background: rgba(16, 61, 92, 0.42) !important;
+  border-color: rgba(231, 244, 252, 0.62) !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .bi-consolidado-layout {
   align-items: stretch;
-  gap: 14px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .bi-consolidado-main {
-  gap: 14px;
+  gap: 8px;
 }
 
 .bi-consolidado-chart-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: minmax(382px, auto);
-  gap: 14px;
+  grid-auto-rows: minmax(218px, auto);
+  gap: 8px;
   align-items: stretch;
 }
 
@@ -1936,42 +1973,42 @@ table.bi-table::after,
 }
 
 .bi-consolidado-page .bi-chart-panel {
-  min-height: 382px;
+  min-height: 218px;
   display: flex;
   flex-direction: column;
-  padding: 14px 16px 16px;
+  padding: 8px 10px 10px;
   background: var(--cg-panel-bg);
   border-color: var(--cg-panel-border);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .bi-consolidado-page .bi-chart-panel h3 {
   min-height: 0;
-  margin: 0 0 10px;
+  margin: 0 0 5px;
   padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: #f7fbff;
-  font-size: 0.92rem;
+  font-size: 0.68rem;
   letter-spacing: 0;
   text-shadow: none;
 }
 
 .bi-consolidado-page .bi-chart {
-  height: 324px;
-  min-height: 324px;
+  height: 178px;
+  min-height: 178px;
   flex: 1 1 auto;
   overflow: visible;
 }
 
 .bi-consolidado-page .bi-chart-donut {
-  height: 324px;
-  min-height: 324px;
+  height: 178px;
+  min-height: 178px;
 }
 
 .bi-consolidado-page .bi-empty-state {
-  min-height: 324px;
+  min-height: 178px;
   flex: 1 1 auto;
   color: rgba(234, 246, 255, 0.64);
   border: 1px dashed rgba(225, 242, 255, 0.22);
@@ -1980,20 +2017,20 @@ table.bi-table::after,
 }
 
 .bi-consolidado-sidebar {
-  flex: 0 0 188px;
-  max-width: 188px;
-  gap: 7px;
+  flex: 0 0 150px;
+  max-width: 150px;
+  gap: 5px;
 }
 
 .bi-kpi.kpi-finance {
-  min-height: 58px;
+  min-height: 42px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   text-align: left;
-  padding: 8px 10px;
-  border-radius: 8px;
+  padding: 6px 7px;
+  border-radius: 7px;
   background: linear-gradient(135deg, rgba(25, 96, 139, 0.7), rgba(33, 123, 156, 0.46));
   border-color: rgba(226, 243, 255, 0.34);
   box-shadow: 0 5px 12px rgba(6, 27, 48, 0.16);
@@ -2001,31 +2038,33 @@ table.bi-table::after,
 }
 
 .bi-kpi.kpi-finance.kpi-finance-primary {
-  min-height: 64px;
+  min-height: 46px;
 }
 
 .bi-kpi.kpi-finance small {
   color: rgba(232, 244, 255, 0.74);
-  font-size: 0.52rem;
+  font-size: 0.42rem;
 }
 
 .bi-kpi.kpi-finance strong {
-  margin-top: 3px;
-  font-size: 0.86rem;
+  margin-top: 2px;
+  font-size: 0.7rem;
   line-height: 1.12;
 }
 
 .bi-kpi.kpi-finance .bi-kpi-big {
-  font-size: 1rem;
+  font-size: 0.78rem;
 }
 
 .bi-kpi.kpi-finance.with-badge {
-  padding-right: 54px;
+  padding-right: 43px;
 }
 
 .bi-kpi.kpi-finance.with-badge .bi-kpi-badge {
-  top: 14px;
-  right: 14px;
+  top: 10px;
+  right: 7px;
+  font-size: 0.48rem;
+  padding: 2px 5px;
   background: rgba(238, 247, 255, 0.94);
   color: #26384a;
   box-shadow: 0 4px 12px rgba(7, 27, 45, 0.16);

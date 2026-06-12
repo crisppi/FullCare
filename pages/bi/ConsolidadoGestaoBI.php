@@ -37,6 +37,19 @@ function table_columns(PDO $conn, string $table): array
     return $cache[$table];
 }
 
+function table_exists(PDO $conn, string $table): bool
+{
+    static $cache = [];
+    if (array_key_exists($table, $cache)) {
+        return $cache[$table];
+    }
+    $stmt = $conn->prepare("SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :t LIMIT 1");
+    $stmt->bindValue(':t', $table);
+    $stmt->execute();
+    $cache[$table] = (bool)$stmt->fetchColumn();
+    return $cache[$table];
+}
+
 $anoInput = filter_input(INPUT_GET, 'ano', FILTER_VALIDATE_INT);
 $mesInput = filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT);
 $ano = ($anoInput !== null && $anoInput !== false) ? (int)$anoInput : null;
@@ -329,10 +342,10 @@ function custos_breakdown(PDO $conn, array $filters): array
     $params = [];
     $where = build_where_financeiro($filters, $params, true);
 
-    $diarCols = table_columns($conn, 'tb_cap_valores_diar');
-    $apCols = table_columns($conn, 'tb_cap_valores_ap');
-    $utiCols = table_columns($conn, 'tb_cap_valores_uti');
-    $ccCols = table_columns($conn, 'tb_cap_valores_cc');
+    $diarCols = table_exists($conn, 'tb_cap_valores_diar') ? table_columns($conn, 'tb_cap_valores_diar') : [];
+    $apCols = table_exists($conn, 'tb_cap_valores_ap') ? table_columns($conn, 'tb_cap_valores_ap') : [];
+    $utiCols = table_exists($conn, 'tb_cap_valores_uti') ? table_columns($conn, 'tb_cap_valores_uti') : [];
+    $ccCols = table_exists($conn, 'tb_cap_valores_cc') ? table_columns($conn, 'tb_cap_valores_cc') : [];
 
     $sumCols = function (array $cols, array $candidates): string {
         $parts = [];
@@ -453,6 +466,82 @@ function custos_breakdown(PDO $conn, array $filters): array
     $sumTaxasCobradoCc = $sumCols($ccCols, ['cc_taxas_cobrado', 'cc_taxas_cob']);
     $sumTaxasGlosaCc = $sumCols($ccCols, ['cc_taxas_glosado', 'cc_taxas_glo']);
 
+    $emptyCostJoin = static function (string $alias, array $fields): string {
+        $selects = ["NULL AS fk_capeante"];
+        foreach ($fields as $field) {
+            $selects[] = "0 AS {$field}";
+        }
+        return "LEFT JOIN (SELECT " . implode(', ', $selects) . ") {$alias} ON 1=0";
+    };
+
+    $diarJoin = $diarCols
+        ? "
+        LEFT JOIN (
+            SELECT fk_capeante,
+                SUM({$sumDiariasCobrado}) AS diarias_cobrado,
+                SUM({$sumDiariasGlosa}) AS diarias_glosado
+            FROM tb_cap_valores_diar
+            GROUP BY fk_capeante
+        ) d ON d.fk_capeante = t.id_capeante"
+        : $emptyCostJoin('d', ['diarias_cobrado', 'diarias_glosado']);
+
+    $apJoin = $apCols
+        ? "
+        LEFT JOIN (
+            SELECT fk_capeante,
+                SUM({$sumHonorCobradoAp}) AS honorarios_cobrado,
+                SUM({$sumHonorGlosaAp}) AS honorarios_glosado,
+                SUM({$sumMatCobradoAp}) AS matmed_cobrado,
+                SUM({$sumMatGlosaAp}) AS matmed_glosado,
+                SUM({$sumSadtCobradoAp}) AS sadt_cobrado,
+                SUM({$sumSadtGlosaAp}) AS sadt_glosado,
+                SUM({$sumOxigCobradoAp}) AS oxig_cobrado,
+                SUM({$sumOxigGlosaAp}) AS oxig_glosado,
+                SUM({$sumTaxasCobradoAp}) AS taxas_cobrado,
+                SUM({$sumTaxasGlosaAp}) AS taxas_glosado
+            FROM tb_cap_valores_ap
+            GROUP BY fk_capeante
+        ) a ON a.fk_capeante = t.id_capeante"
+        : $emptyCostJoin('a', ['honorarios_cobrado', 'honorarios_glosado', 'matmed_cobrado', 'matmed_glosado', 'sadt_cobrado', 'sadt_glosado', 'oxig_cobrado', 'oxig_glosado', 'taxas_cobrado', 'taxas_glosado']);
+
+    $utiJoinValores = $utiCols
+        ? "
+        LEFT JOIN (
+            SELECT fk_capeante,
+                SUM({$sumHonorCobradoUti}) AS honorarios_cobrado,
+                SUM({$sumHonorGlosaUti}) AS honorarios_glosado,
+                SUM({$sumMatCobradoUti}) AS matmed_cobrado,
+                SUM({$sumMatGlosaUti}) AS matmed_glosado,
+                SUM({$sumSadtCobradoUti}) AS sadt_cobrado,
+                SUM({$sumSadtGlosaUti}) AS sadt_glosado,
+                SUM({$sumOxigCobradoUti}) AS oxig_cobrado,
+                SUM({$sumOxigGlosaUti}) AS oxig_glosado,
+                SUM({$sumTaxasCobradoUti}) AS taxas_cobrado,
+                SUM({$sumTaxasGlosaUti}) AS taxas_glosado
+            FROM tb_cap_valores_uti
+            GROUP BY fk_capeante
+        ) u ON u.fk_capeante = t.id_capeante"
+        : $emptyCostJoin('u', ['honorarios_cobrado', 'honorarios_glosado', 'matmed_cobrado', 'matmed_glosado', 'sadt_cobrado', 'sadt_glosado', 'oxig_cobrado', 'oxig_glosado', 'taxas_cobrado', 'taxas_glosado']);
+
+    $ccJoin = $ccCols
+        ? "
+        LEFT JOIN (
+            SELECT fk_capeante,
+                SUM({$sumHonorCobradoCc}) AS honorarios_cobrado,
+                SUM({$sumHonorGlosaCc}) AS honorarios_glosado,
+                SUM({$sumMatCobradoCc}) AS matmed_cobrado,
+                SUM({$sumMatGlosaCc}) AS matmed_glosado,
+                SUM({$sumSadtCobradoCc}) AS sadt_cobrado,
+                SUM({$sumSadtGlosaCc}) AS sadt_glosado,
+                SUM({$sumOxigCobradoCc}) AS oxig_cobrado,
+                SUM({$sumOxigGlosaCc}) AS oxig_glosado,
+                SUM({$sumTaxasCobradoCc}) AS taxas_cobrado,
+                SUM({$sumTaxasGlosaCc}) AS taxas_glosado
+            FROM tb_cap_valores_cc
+            GROUP BY fk_capeante
+        ) c ON c.fk_capeante = t.id_capeante"
+        : $emptyCostJoin('c', ['honorarios_cobrado', 'honorarios_glosado', 'matmed_cobrado', 'matmed_glosado', 'sadt_cobrado', 'sadt_glosado', 'oxig_cobrado', 'oxig_glosado', 'taxas_cobrado', 'taxas_glosado']);
+
     $sql = "
         SELECT
             SUM(COALESCE(d.diarias_cobrado,0)) AS valor_diarias,
@@ -486,58 +575,10 @@ function custos_breakdown(PDO $conn, array $filters): array
             INNER JOIN tb_internacao ac ON ac.id_internacao = ca.fk_int_capeante
             LEFT JOIN tb_paciente pa ON pa.id_paciente = ac.fk_paciente_int
         ) t
-        LEFT JOIN (
-            SELECT fk_capeante,
-                SUM({$sumDiariasCobrado}) AS diarias_cobrado,
-                SUM({$sumDiariasGlosa}) AS diarias_glosado
-            FROM tb_cap_valores_diar
-            GROUP BY fk_capeante
-        ) d ON d.fk_capeante = t.id_capeante
-        LEFT JOIN (
-            SELECT fk_capeante,
-                SUM({$sumHonorCobradoAp}) AS honorarios_cobrado,
-                SUM({$sumHonorGlosaAp}) AS honorarios_glosado,
-                SUM({$sumMatCobradoAp}) AS matmed_cobrado,
-                SUM({$sumMatGlosaAp}) AS matmed_glosado,
-                SUM({$sumSadtCobradoAp}) AS sadt_cobrado,
-                SUM({$sumSadtGlosaAp}) AS sadt_glosado,
-                SUM({$sumOxigCobradoAp}) AS oxig_cobrado,
-                SUM({$sumOxigGlosaAp}) AS oxig_glosado,
-                SUM({$sumTaxasCobradoAp}) AS taxas_cobrado,
-                SUM({$sumTaxasGlosaAp}) AS taxas_glosado
-            FROM tb_cap_valores_ap
-            GROUP BY fk_capeante
-        ) a ON a.fk_capeante = t.id_capeante
-        LEFT JOIN (
-            SELECT fk_capeante,
-                SUM({$sumHonorCobradoUti}) AS honorarios_cobrado,
-                SUM({$sumHonorGlosaUti}) AS honorarios_glosado,
-                SUM({$sumMatCobradoUti}) AS matmed_cobrado,
-                SUM({$sumMatGlosaUti}) AS matmed_glosado,
-                SUM({$sumSadtCobradoUti}) AS sadt_cobrado,
-                SUM({$sumSadtGlosaUti}) AS sadt_glosado,
-                SUM({$sumOxigCobradoUti}) AS oxig_cobrado,
-                SUM({$sumOxigGlosaUti}) AS oxig_glosado,
-                SUM({$sumTaxasCobradoUti}) AS taxas_cobrado,
-                SUM({$sumTaxasGlosaUti}) AS taxas_glosado
-            FROM tb_cap_valores_uti
-            GROUP BY fk_capeante
-        ) u ON u.fk_capeante = t.id_capeante
-        LEFT JOIN (
-            SELECT fk_capeante,
-                SUM({$sumHonorCobradoCc}) AS honorarios_cobrado,
-                SUM({$sumHonorGlosaCc}) AS honorarios_glosado,
-                SUM({$sumMatCobradoCc}) AS matmed_cobrado,
-                SUM({$sumMatGlosaCc}) AS matmed_glosado,
-                SUM({$sumSadtCobradoCc}) AS sadt_cobrado,
-                SUM({$sumSadtGlosaCc}) AS sadt_glosado,
-                SUM({$sumOxigCobradoCc}) AS oxig_cobrado,
-                SUM({$sumOxigGlosaCc}) AS oxig_glosado,
-                SUM({$sumTaxasCobradoCc}) AS taxas_cobrado,
-                SUM({$sumTaxasGlosaCc}) AS taxas_glosado
-            FROM tb_cap_valores_cc
-            GROUP BY fk_capeante
-        ) c ON c.fk_capeante = t.id_capeante
+        {$diarJoin}
+        {$apJoin}
+        {$utiJoinValores}
+        {$ccJoin}
         LEFT JOIN (SELECT DISTINCT fk_internacao_uti FROM tb_uti) ut ON ut.fk_internacao_uti = t.fk_int_capeante
         WHERE {$where}
     ";
@@ -617,10 +658,47 @@ $glosaSeries = [
 ];
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-filter-icons">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=<?= @filemtime(__DIR__ . '/../../css/bi.css') ?: time() ?>">
+<style>
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter.is-selected label,
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter label {
+  color: rgba(226, 238, 249, 0.84) !important;
+}
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter select,
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter input,
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter.is-selected select,
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter.is-selected input,
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter select[data-selected="1"],
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter input[data-selected="1"],
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter select:focus,
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter input:focus,
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter select:focus-visible,
+body .bi-consolidado-page .bi-consolidado-filters .bi-filter input:focus-visible {
+  background: rgba(16, 61, 92, 0.42) !important;
+  border-color: rgba(231, 244, 252, 0.62) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+</style>
 <script src="diversos/chartjs/Chart.min.js"></script>
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260516-rounded-bars"></script>
-<script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('bi-theme');
+  const form = document.querySelector('.bi-consolidado-filters');
+  if (!form) return;
+  const clearSelectedState = () => {
+    form.querySelectorAll('.bi-filter').forEach((filter) => {
+      filter.classList.remove('is-selected');
+      const control = filter.querySelector('select, input');
+      if (control) control.removeAttribute('data-selected');
+    });
+  };
+  clearSelectedState();
+  form.addEventListener('change', () => setTimeout(clearSelectedState, 0), true);
+  form.addEventListener('input', () => setTimeout(clearSelectedState, 0), true);
+});
+</script>
 
 <div class="bi-wrapper bi-theme bi-consolidado-page">
     <div class="bi-header">
