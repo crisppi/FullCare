@@ -416,27 +416,93 @@ class HomeHubPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          const Card(
+          Card(
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
                   _AuditOverviewRow(
                     icon: Icons.assignment_outlined,
                     title: 'Auditoria operacional',
                     subtitle: 'Controle de atividades e responsáveis',
+                    onTap:
+                        () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (_) => AdmissionsHomePage(
+                                  api: api,
+                                  title: 'Auditoria operacional',
+                                ),
+                          ),
+                        ),
                   ),
-                  Divider(height: 22),
+                  const Divider(height: 22),
                   _AuditOverviewRow(
                     icon: Icons.fact_check_outlined,
                     title: 'Conformidade',
                     subtitle: 'Organização de registros e evidências',
+                    onTap:
+                        () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (_) => ModuleOverviewPage(
+                                  api: api,
+                                  title: 'Conformidade',
+                                  description:
+                                      'Acompanhe pendências, evidências e controles internos vinculados às auditorias.',
+                                  icon: Icons.fact_check_outlined,
+                                  accentColor: const Color(0xFF2D63A6),
+                                  entries: const [
+                                    ModuleOverviewEntry(
+                                      icon: Icons.rule_folder_outlined,
+                                      title: 'Pendências e evidências',
+                                      subtitle:
+                                          'Consulte registros operacionais que precisam de acompanhamento.',
+                                    ),
+                                    ModuleOverviewEntry(
+                                      icon: Icons.verified_user_outlined,
+                                      title: 'Rastreabilidade',
+                                      subtitle:
+                                          'Apoio à revisão de permissões, histórico e documentos internos.',
+                                    ),
+                                  ],
+                                ),
+                          ),
+                        ),
                   ),
-                  Divider(height: 22),
+                  const Divider(height: 22),
                   _AuditOverviewRow(
                     icon: Icons.query_stats_outlined,
                     title: 'Indicadores gerenciais',
                     subtitle: 'Acompanhamento administrativo restrito',
+                    onTap:
+                        () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (_) => ModuleOverviewPage(
+                                  api: api,
+                                  title: 'Indicadores gerenciais',
+                                  description:
+                                      'Visualize atalhos de acompanhamento para priorização administrativa.',
+                                  icon: Icons.query_stats_outlined,
+                                  accentColor: const Color(0xFF1A7F64),
+                                  entries: const [
+                                    ModuleOverviewEntry(
+                                      icon: Icons.query_stats_outlined,
+                                      title: 'Visão operacional',
+                                      subtitle:
+                                          'Resumo para análise de volume e priorização de registros.',
+                                    ),
+                                    ModuleOverviewEntry(
+                                      icon: Icons.pending_actions_outlined,
+                                      title: 'Acompanhamentos',
+                                      subtitle:
+                                          'Controle administrativo de atividades em andamento.',
+                                    ),
+                                  ],
+                                ),
+                          ),
+                        ),
                   ),
                 ],
               ),
@@ -769,7 +835,7 @@ class _HomeCareCasesPageState extends State<HomeCareCasesPage> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<String>(
-                          value:
+                          initialValue:
                               statusController.text.trim().isEmpty
                                   ? null
                                   : statusController.text.trim(),
@@ -793,7 +859,7 @@ class _HomeCareCasesPageState extends State<HomeCareCasesPage> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          value:
+                          initialValue:
                               modeController.text.trim().isEmpty
                                   ? null
                                   : modeController.text.trim(),
@@ -847,7 +913,7 @@ class _HomeCareCasesPageState extends State<HomeCareCasesPage> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          value:
+                          initialValue:
                               barrierController.text.trim().isEmpty
                                   ? null
                                   : barrierController.text.trim(),
@@ -1316,7 +1382,7 @@ class _LongStayCasesPageState extends State<LongStayCasesPage> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<String>(
-                          value: selectedStatus.isEmpty ? null : selectedStatus,
+                          initialValue: selectedStatus.isEmpty ? null : selectedStatus,
                           items:
                               _statusOptions
                                   .map(
@@ -1337,7 +1403,7 @@ class _LongStayCasesPageState extends State<LongStayCasesPage> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          value: selectedReason.isEmpty ? null : selectedReason,
+                          initialValue: selectedReason.isEmpty ? null : selectedReason,
                           items:
                               _reasonOptions
                                   .map(
@@ -1358,7 +1424,7 @@ class _LongStayCasesPageState extends State<LongStayCasesPage> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          value: selectedRisk.isEmpty ? null : selectedRisk,
+                          initialValue: selectedRisk.isEmpty ? null : selectedRisk,
                           items:
                               _riskOptions
                                   .map(
@@ -1845,7 +1911,7 @@ class _AdverseEventCasesPageState extends State<AdverseEventCasesPage> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<String>(
-                          value: selectedType.isEmpty ? null : selectedType,
+                          initialValue: selectedType.isEmpty ? null : selectedType,
                           items:
                               _eventTypes
                                   .map(
@@ -2168,74 +2234,110 @@ class _AdverseEventCasesPageState extends State<AdverseEventCasesPage> {
   }
 }
 
-class ModulePlaceholderPage extends StatelessWidget {
-  const ModulePlaceholderPage({
+class ModuleOverviewEntry {
+  const ModuleOverviewEntry({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+}
+
+class ModuleOverviewPage extends StatelessWidget {
+  const ModuleOverviewPage({
     super.key,
+    required this.api,
     required this.title,
     required this.description,
     required this.icon,
     required this.accentColor,
+    required this.entries,
   });
 
+  final MobileApi api;
   final String title;
   final String description;
   final IconData icon;
   final Color accentColor;
+  final List<ModuleOverviewEntry> entries;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 460),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: accentColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Icon(icon, color: accentColor, size: 32),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 54,
+                    height: 54,
+                    decoration: BoxDecoration(
+                      color: accentColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(18),
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    child: Icon(icon, color: accentColor, size: 30),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1D2940),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      description,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF5B6577),
-                        height: 1.4,
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF5B6577),
+                      height: 1.45,
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'A navegação já está preparada no app. Se você quiser, o próximo passo é conectar esse módulo ao backend mobile.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed:
+                          () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => AdmissionsHomePage(
+                                    api: api,
+                                    title: 'Registros operacionais',
+                                  ),
+                            ),
+                          ),
+                      icon: const Icon(Icons.list_alt_outlined),
+                      label: const Text('Abrir registros operacionais'),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
+          const SizedBox(height: 12),
+          ...entries.map(
+            (entry) => Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                leading: Icon(entry.icon, color: accentColor),
+                title: Text(entry.title),
+                subtitle: Text(entry.subtitle),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2764,7 +2866,7 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<String>(
-                          value: selectedType.isNotEmpty ? selectedType : null,
+                          initialValue: selectedType.isNotEmpty ? selectedType : null,
                           items:
                               dischargeTypes
                                   .map(
@@ -3087,50 +3189,61 @@ class _AuditOverviewRow extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: const Color(0xFFEEF4FB),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Icon(icon, color: const Color(0xFF2D63A6), size: 23),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1D2940),
-                ),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEEF4FB),
+                borderRadius: BorderRadius.circular(14),
               ),
-              const SizedBox(height: 3),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF5B6577),
-                ),
+              child: Icon(icon, color: const Color(0xFF2D63A6), size: 23),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1D2940),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF5B6577),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            if (onTap != null)
+              const Icon(Icons.chevron_right, color: Color(0xFF8B97A8)),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

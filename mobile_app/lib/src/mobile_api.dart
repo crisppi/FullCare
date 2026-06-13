@@ -9,7 +9,7 @@ class MobileApi {
 
   static const String _baseUrl = String.fromEnvironment(
     'FULLCARE_API_BASE_URL',
-    defaultValue: 'http://10.0.2.2/FullCare/api/mobile/index.php',
+    defaultValue: 'https://sistema.fullcareaudit.com.br/api/mobile/index.php',
   );
   static const String _tokenKey = 'fullcare_mobile_token';
 
