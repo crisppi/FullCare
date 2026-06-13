@@ -260,6 +260,7 @@ $__guardSkip = [
     'logout.php',        // logout
     'index.php',         // tela de login
     'index_novo.php',    // sua tela de login nova
+    'process_mfa_verify.php', // segunda etapa do login, ainda sem sessão completa
     'nova_senha.php',    // troca de senha inicial
     'process_recuperar_senha.php',
     'process_redefinir_senha.php',

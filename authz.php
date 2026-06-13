@@ -100,6 +100,9 @@ final class Gate
         if (($scriptBase === 'process_usuario.php' && strtolower($_POST['type'] ?? '') === 'update-senha')
             || $scriptBase === 'process_recuperar_senha.php'
             || $scriptBase === 'process_redefinir_senha.php'
+            || $scriptBase === 'process_mfa_verify.php'
+            || $scriptBase === 'process_mfa_configuracao.php'
+            || $scriptBase === 'process_usuario_mfa_reset.php'
             || $scriptBase === 'nova_senha.php') {
             return;
         }

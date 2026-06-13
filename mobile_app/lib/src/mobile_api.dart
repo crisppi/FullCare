@@ -4,6 +4,16 @@ import 'package:http/http.dart' as http;
 import 'package:mobile_app/src/models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class MfaRequiredException implements Exception {
+  const MfaRequiredException(this.challengeToken, this.message);
+
+  final String challengeToken;
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 class MobileApi {
   MobileApi();
 
@@ -39,6 +49,35 @@ class MobileApi {
     );
 
     final data = payload['data'] as Map<String, dynamic>;
+    if (data['mfa_required'] == true) {
+      final challengeToken = data['challenge_token'] as String? ?? '';
+      if (challengeToken.isEmpty) {
+        throw Exception('Não foi possível iniciar a verificação MFA.');
+      }
+      throw MfaRequiredException(
+        challengeToken,
+        data['message'] as String? ?? 'Informe o código do autenticador.',
+      );
+    }
+
+    return _saveSessionFromData(data);
+  }
+
+  Future<SessionUser> verifyMfa({
+    required String challengeToken,
+    required String code,
+  }) async {
+    final payload = await _request(
+      method: 'POST',
+      action: 'mfa-verify',
+      body: {'challenge_token': challengeToken, 'code': code},
+    );
+
+    final data = payload['data'] as Map<String, dynamic>;
+    return _saveSessionFromData(data);
+  }
+
+  Future<SessionUser> _saveSessionFromData(Map<String, dynamic> data) async {
     final user = data['user'] as Map<String, dynamic>;
     final token = data['token'] as String;
     _token = token;
