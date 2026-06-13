@@ -246,6 +246,8 @@ RewriteRule ^solicitacoes/customizacao/editar/([0-9]+)/?$ SolicitacaoCustomizaca
 RewriteRule ^internacoes/nova/?$ cad_internacao.php [L,QSA]
 RewriteRule ^internacoes/nova/paciente/([0-9]+)/?$ cad_internacao.php?id_paciente=$1 [L,QSA]
 RewriteRule ^censo/lista/?$ list_censo.php [L,QSA]
+RewriteRule ^censo/importar-ia/?$ censo_importar_ia.php [L,QSA]
+RewriteRule ^censo/leitura-ia/?$ censo_importar_ia.php [L,QSA]
 RewriteRule ^censo/novo/?$ cad_censo.php [L,QSA]
 RewriteRule ^gestao/?$ list_gestao.php [L,QSA]
 RewriteRule ^gestao/pendencias-operacionais/?$ list_pendencias_operacionais.php [L,QSA]

@@ -96,6 +96,7 @@ $censoDao = new censoDAO($conn, $BASE_URL);
 $censo = new censoDAO($conn, $BASE_URL);
 $where = $order = $obLimite = null;
 $user = $_SESSION['id_usuario'];
+$censoIaUrl = rtrim($BASE_URL, '/') . '/censo/importar-ia';
 
 ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css?v=' . @filemtime(__DIR__ . '/../css/listagem_padrao.css'), ENT_QUOTES, 'UTF-8') ?>">
@@ -125,10 +126,16 @@ $user = $_SESSION['id_usuario'];
             <h1 class="listagem-title">Listagem de censo</h1>
         </div>
         <div class="listagem-hero__actions">
+            <a class="btn listagem-btn-top listagem-btn-top--green" href="<?= htmlspecialchars($censoIaUrl, ENT_QUOTES, 'UTF-8') ?>"><i class="bi bi-file-earmark-arrow-up"></i>Importar IA</a>
             <a class="btn listagem-btn-top listagem-btn-top--blue" href="censo/novo"><i class="bi bi-plus-lg"></i>Novo lançamento</a>
             <a onclick="sendIdListToPHP()" id="submitInter" class="btn listagem-btn-top listagem-btn-top--purple"><i class="bi bi-door-open"></i>Internar selecionados</a>
         </div>
     </div>
+    <?php if (isset($_GET['importados_ia']) && (int)$_GET['importados_ia'] > 0) { ?>
+        <div class="alert alert-success mt-3" role="alert">
+            <?= (int)$_GET['importados_ia'] ?> censo(s) importado(s) com IA e lançado(s) na lista.
+        </div>
+    <?php } ?>
     <div class="complete-table">
         <div id="navbarToggleExternalContent" class="table-filters">
             <div class="row">

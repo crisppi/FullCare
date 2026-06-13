@@ -88,7 +88,7 @@
         const restoreBtn = buildButton('bi-arrow-counterclockwise', 'Meus filtros', 'Voltar para meus filtros salvos');
         const columnsBtn = buildButton('bi-layout-three-columns', 'Colunas', 'Configurar colunas visíveis');
         const priorityBtn = buildButton('bi-sort-down', 'Prioridade', 'Ordenar a página visível por prioridade');
-        const exportBtn = buildButton('bi-file-earmark-spreadsheet', 'Exportar CSV', 'Exportar tabela visível');
+        const exportBtn = buildButton('bi-file-earmark-spreadsheet', 'Exportar Excel', 'Exportar tabela visível para Excel');
 
         const columnsMenu = document.createElement('div');
         columnsMenu.className = 'fc-list-columns-menu';
@@ -324,9 +324,13 @@
 
     function exportVisibleTable(table) {
         const rows = qsa('tr', table).map((tr) => {
-            return qsa('th:not(.fc-list-col-hidden), td:not(.fc-list-col-hidden)', tr)
-                .map((cell) => `"${(cell.textContent || '').replace(/\s+/g, ' ').trim().replace(/"/g, '""')}"`)
-                .join(',');
+            const cells = qsa('th:not(.fc-list-col-hidden), td:not(.fc-list-col-hidden)', tr);
+            if (!cells.length) return '';
+            return `<tr>${cells.map((cell) => {
+                const tag = cell.tagName.toLowerCase() === 'th' ? 'th' : 'td';
+                const value = (cell.textContent || '').replace(/\s+/g, ' ').trim();
+                return `<${tag}>${escapeHtml(value)}</${tag}>`;
+            }).join('')}</tr>`;
         }).filter(Boolean);
         if (!rows.length) {
             if (window.FullCareFeedback && typeof window.FullCareFeedback.warning === 'function') {
@@ -335,17 +339,31 @@
             return;
         }
 
-        const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const html = `<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+table { border-collapse: collapse; }
+th, td { border: 1px solid #d9e2ec; padding: 6px 8px; mso-number-format: "\\@"; }
+th { background: #eef3f8; font-weight: 700; }
+</style>
+</head>
+<body>
+<table>${rows.join('')}</table>
+</body>
+</html>`;
+        const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `fullcare-listagem-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.download = `fullcare-listagem-${new Date().toISOString().slice(0, 10)}.xls`;
         document.body.appendChild(a);
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
         if (window.FullCareFeedback && typeof window.FullCareFeedback.success === 'function') {
-            window.FullCareFeedback.success('CSV gerado com as colunas visíveis.', 'Exportação concluída');
+            window.FullCareFeedback.success('Excel gerado com as colunas visíveis.', 'Exportação concluída');
         }
     }
 
