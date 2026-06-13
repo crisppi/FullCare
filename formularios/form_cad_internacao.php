@@ -255,6 +255,83 @@
             color: #4b1850;
         }
 
+        .internacao-page select.selectpicker.bs-select-hidden,
+        .internacao-page select.selectpicker[data-fcx-picker-locked="1"] {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 1px !important;
+            min-width: 1px !important;
+            max-width: 1px !important;
+            height: 1px !important;
+            min-height: 1px !important;
+            max-height: 1px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            clip-path: inset(50%) !important;
+        }
+
+        .internacao-page .hospital-select-wrapper,
+        .internacao-page .assist-select-clear,
+        .internacao-page .hospital-select-wrapper .bootstrap-select,
+        .internacao-page .patient-col .bootstrap-select,
+        .internacao-page .assist-select-clear .bootstrap-select {
+            min-height: 30px !important;
+            height: 30px !important;
+        }
+
+        .internacao-page .bootstrap-select > button.dropdown-toggle.input-lg-fullcare[data-id="hospital_selected"],
+        .internacao-page .bootstrap-select > button.dropdown-toggle.input-lg-fullcare[data-id="fk_paciente_int"],
+        .internacao-page .bootstrap-select > button.dropdown-toggle.input-lg-fullcare[data-id="fk_cid_int"],
+        .internacao-page .bootstrap-select > button.dropdown-toggle.input-lg-fullcare[data-id="fk_patologia2"],
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="hospital_selected"],
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_paciente_int"],
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_cid_int"],
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_patologia2"] {
+            display: flex !important;
+            align-items: center !important;
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 0 28px 0 8px !important;
+            border-radius: 7px !important;
+            border-width: 1px !important;
+            box-shadow: none !important;
+            font-size: .68rem !important;
+            line-height: 1 !important;
+        }
+
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="hospital_selected"] .filter-option,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_paciente_int"] .filter-option,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_cid_int"] .filter-option,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_patologia2"] .filter-option,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="hospital_selected"] .filter-option-inner,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_paciente_int"] .filter-option-inner,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_cid_int"] .filter-option-inner,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_patologia2"] .filter-option-inner,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="hospital_selected"] .filter-option-inner-inner,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_paciente_int"] .filter-option-inner-inner,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_cid_int"] .filter-option-inner-inner,
+        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_patologia2"] .filter-option-inner-inner {
+            height: 22px !important;
+            min-height: 0 !important;
+            line-height: 22px !important;
+            font-size: .68rem !important;
+            font-weight: 500 !important;
+        }
+
+        .internacao-page .internacao-head-grid > .form-group > .form-control,
+        .internacao-page .internacao-head-grid > .form-group > select.form-control,
+        .internacao-page .internacao-head-grid > .form-group .bootstrap-select,
+        .internacao-page .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle {
+            min-height: 30px !important;
+            height: 30px !important;
+        }
+
         .assistenciais-row-full {
             display: grid;
             grid-template-columns: 3fr 3fr 2fr 1fr 1fr 2fr;

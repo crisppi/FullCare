@@ -2169,6 +2169,264 @@ function aumentarTextProgramacao() {
         flex-basis: 160px !important;
     }
 }
+
+/* Ajuste final de escala da tela de cadastro de visita */
+.visita-page {
+    padding-bottom: 14px !important;
+}
+
+.visita-page__content,
+#add-visita-form {
+    gap: 4px !important;
+}
+
+.visita-hero {
+    min-height: 44px !important;
+    padding: 7px 10px !important;
+    border-radius: 8px !important;
+}
+
+.visita-hero h1 {
+    font-size: 1.04rem !important;
+    line-height: 1.08 !important;
+}
+
+.visita-hero__actions {
+    gap: 6px !important;
+}
+
+.visita-hero__tag,
+.btn-visita-historico {
+    min-height: 22px !important;
+    padding: 3px 8px !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+}
+
+.visita-card {
+    padding: 5px 8px 7px !important;
+    border-radius: 8px !important;
+}
+
+.visita-card__header {
+    min-height: 0 !important;
+    margin-bottom: 3px !important;
+    padding-bottom: 2px !important;
+}
+
+.visita-card__eyebrow,
+.tabelas-adicionais-card__eyebrow {
+    font-size: .56rem !important;
+    line-height: 1 !important;
+    letter-spacing: .12em !important;
+}
+
+.visita-card__title,
+.tabelas-adicionais-card__title {
+    margin-top: 1px !important;
+    font-size: .78rem !important;
+    line-height: 1.08 !important;
+}
+
+.visita-card__tag {
+    padding: 3px 8px !important;
+    border-radius: 8px !important;
+    font-size: .58rem !important;
+    line-height: 1.05 !important;
+}
+
+.visita-card__body {
+    gap: 4px !important;
+}
+
+.visita-dados-row,
+.visita-summary-grid,
+.visita-head-grid,
+.visita-card .form-group.row {
+    gap: 4px 5px !important;
+}
+
+.visita-summary-card,
+.visita-head-field {
+    min-height: 52px !important;
+    padding: 5px 7px 6px !important;
+    border-radius: 7px !important;
+}
+
+.visita-summary-card__label,
+.visita-head-field label,
+.visita-card .form-label,
+.visita-card label {
+    min-height: 0 !important;
+    margin-bottom: 2px !important;
+    font-size: .62rem !important;
+    line-height: 1.05 !important;
+    font-weight: 600 !important;
+}
+
+.visita-summary-card__value {
+    font-size: .72rem !important;
+    line-height: 1.12 !important;
+    font-weight: 600 !important;
+}
+
+.visita-summary-card__input,
+.visita-head-field .form-control,
+.visita-head-field .form-select,
+.visita-head-field select,
+.visita-card .form-control,
+.visita-card .form-select,
+.visita-card .bootstrap-select > .dropdown-toggle {
+    min-height: 28px !important;
+    height: 28px !important;
+    border-radius: 7px !important;
+    padding: 2px 7px !important;
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+    font-weight: 500 !important;
+}
+
+.visita-inline-clear select {
+    padding-right: 30px !important;
+}
+
+.visita-inline-clear__btn {
+    width: 16px !important;
+    height: 16px !important;
+    right: 8px !important;
+    font-size: 10px !important;
+    line-height: 16px !important;
+}
+
+.clinical-text-field,
+.ia-highlight-box {
+    gap: 4px !important;
+    padding: 6px 8px !important;
+    border-radius: 8px !important;
+}
+
+.clinical-text-field__head {
+    gap: 6px !important;
+    align-items: center !important;
+}
+
+.clinical-text-field__head label {
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+}
+
+.clinical-text-field__actions {
+    gap: 5px !important;
+}
+
+.clinical-text-field__actions .btn,
+.auditoria-action-btn {
+    min-height: 22px !important;
+    padding: 2px 7px !important;
+    border-radius: 7px !important;
+    font-size: .58rem !important;
+    line-height: 1 !important;
+}
+
+.clinical-text-field textarea.form-control {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 4px 7px !important;
+    font-size: .66rem !important;
+    line-height: 1.15 !important;
+}
+
+.clinical-text-field small,
+.visita-card small,
+[data-counter-for] {
+    font-size: .58rem !important;
+    line-height: 1 !important;
+}
+
+.ia-highlight-box__header {
+    margin-bottom: 4px !important;
+    gap: 6px !important;
+}
+
+.ia-highlight-box__eyebrow {
+    font-size: .54rem !important;
+    letter-spacing: .1em !important;
+}
+
+.ia-highlight-box__title {
+    font-size: .78rem !important;
+    line-height: 1.08 !important;
+}
+
+.parecer-ia-powered {
+    min-height: 20px !important;
+    padding: 2px 7px !important;
+    font-size: .55rem !important;
+}
+
+.parecer-ia-card__header {
+    min-height: 28px !important;
+    padding: 4px 7px !important;
+}
+
+.parecer-ia-card__header h4 {
+    font-size: .68rem !important;
+}
+
+.parecer-ia-toggle {
+    width: 22px !important;
+    height: 22px !important;
+}
+
+.visita-card--tabelas {
+    margin-top: -6px !important;
+}
+
+.tabelas-adicionais-card__header {
+    margin-bottom: 5px !important;
+    padding-bottom: 4px !important;
+}
+
+.visita-card--tabelas .tabelas-selects .form-control,
+.visita-card--tabelas .tabelas-selects .select-purple,
+.visita-card--tabelas .detail-select,
+.visita-card--tabelas .adicional-card .form-control,
+.visita-card--tabelas .adicional-card .form-control-sm.form-control,
+.visita-card--tabelas .tabelas-detalhes-block .form-control,
+.visita-card--tabelas .tabelas-detalhes-block .form-control-sm.form-control,
+#container-tuss .form-control,
+#container-tuss .form-control-sm.form-control,
+#container-prorrog .form-control,
+#container-prorrog .form-control-sm.form-control,
+#container-gestao .form-control,
+#container-gestao .form-control-sm.form-control,
+#container-uti .form-control,
+#container-uti .form-control-sm.form-control,
+#container-negoc .form-control,
+#container-negoc .form-control-sm.form-control,
+#detalhes-card-wrapper .form-control,
+#detalhes-card-wrapper .form-control-sm.form-control {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 2px 7px !important;
+    border-radius: 7px !important;
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+}
+
+#container-tuss textarea.form-control,
+#container-prorrog textarea.form-control,
+#container-gestao textarea.form-control,
+#container-uti textarea.form-control,
+#container-negoc textarea.form-control,
+#detalhes-card-wrapper textarea.form-control,
+.visita-card--tabelas .adicional-card textarea.form-control,
+.visita-card--tabelas .tabelas-detalhes-block textarea.form-control {
+    min-height: 54px !important;
+    height: auto !important;
+    padding: 5px 7px !important;
+    font-size: .68rem !important;
+}
 </style>
 <script>
 const dataVisitaInput = document.getElementById('data_visita_vis');
