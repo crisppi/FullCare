@@ -546,7 +546,8 @@
     font-weight: 600;
 }
 
-.pagination .page-link .fa-solid::before {
+.pagination .page-link .fa-solid::before,
+.pagination .page-link .fas::before {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -557,24 +558,37 @@
 }
 
 .pagination .page-link i,
-.pagination .page-link .fa-solid {
+.pagination .page-link .fa-solid,
+.pagination .page-link .fas {
     font-weight: 400 !important;
 }
 
-.pagination .page-link .fa-solid.fa-angles-left::before {
-    content: "<<";
+.pagination .page-link .fa-solid.fa-angles-left::before,
+.pagination .page-link .fa-solid.fa-angle-double-left::before,
+.pagination .page-link .fas.fa-angles-left::before,
+.pagination .page-link .fas.fa-angle-double-left::before {
+    content: "«";
 }
 
-.pagination .page-link .fa-solid.fa-angle-left::before {
-    content: "<";
+.pagination .page-link .fa-solid.fa-angle-left::before,
+.pagination .page-link .fa-solid.fa-chevron-left::before,
+.pagination .page-link .fas.fa-angle-left::before,
+.pagination .page-link .fas.fa-chevron-left::before {
+    content: "‹";
 }
 
-.pagination .page-link .fa-solid.fa-angle-right::before {
-    content: ">";
+.pagination .page-link .fa-solid.fa-angle-right::before,
+.pagination .page-link .fa-solid.fa-chevron-right::before,
+.pagination .page-link .fas.fa-angle-right::before,
+.pagination .page-link .fas.fa-chevron-right::before {
+    content: "›";
 }
 
-.pagination .page-link .fa-solid.fa-angles-right::before {
-    content: ">>";
+.pagination .page-link .fa-solid.fa-angles-right::before,
+.pagination .page-link .fa-solid.fa-angle-double-right::before,
+.pagination .page-link .fas.fa-angles-right::before,
+.pagination .page-link .fas.fa-angle-double-right::before {
+    content: "»";
 }
 
 

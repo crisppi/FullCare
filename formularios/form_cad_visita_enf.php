@@ -544,8 +544,7 @@
 <hr>
 <?php if ($contarVis > 0) { ?>
 <div style="margin:0 0px 20px 30px" class="form-group col-sm-3">
-    <label id="textVisita" style="font-weight:800" for="exibirVisita"><i style="color:green; font-weight:800"
-            class="fas fa-eye check-icon"></i> Visualizar visitas anteriores</label>
+    <label id="textVisita" style="font-weight:800" for="exibirVisita"><i class="bi bi-eye text-success"></i> Visualizar visitas anteriores</label>
     <input style="margin-left:20px" type="checkbox" id="exibirVisita" name="exibirVisita" value="exibirVisita">
     <br>
 </div>
@@ -591,7 +590,7 @@
                 </td>
                 <td scope="row"><?= $intern["rel_visita_vis"] ?></td>
                 <td><a href="<?= $BASE_URL ?>show_visita.php?id_visita=<?= $intern["id_visita"] ?>"><i
-                            style="color:green; margin-right:10px" class="aparecer-acoes fas fa-eye check-icon"></i></a>
+                            class="aparecer-acoes bi bi-eye text-success"></i></a>
                 </td>
 
             </tr>

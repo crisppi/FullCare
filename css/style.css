@@ -987,7 +987,8 @@ input:invalid {
 .action .dropdown-menu .dropdown-item i {
     margin: 0;
     min-width: 18px;
-    font-weight: 700;
+    font-size: .92rem;
+    font-weight: 400;
     display: inline-flex;
     align-items: center;
     justify-content: center;

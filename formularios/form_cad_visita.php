@@ -127,7 +127,7 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
             <span class="visita-hero__tag">Campos obrigatórios em destaque</span>
             <?php if ($contarVis > 0): ?>
             <button type="button" class="btn btn-sm btn-visita-historico" data-bs-toggle="modal" data-bs-target="#myModal1">
-                <i class="fas fa-eye me-2"></i>
+                <i class="bi bi-eye me-2"></i>
                 Visitas Anteriores
             </button>
             <?php endif; ?>
@@ -611,8 +611,7 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
                             <td scope="row"><?= $intern['rel_visita_vis'] = !empty($intern['rel_visita_vis']) ? $intern['rel_visita_vis'] : $intern['rel_int'];
                                                     ?></td>
                             <td><a href="<?= $BASE_URL ?>show_visita.php?id_visita=<?= $intern["id_visita"] ?>"><i
-                                        style="color:green; margin-right:10px"
-                                        class="aparecer-acoes fas fa-eye check-icon"></i></a>
+                                        class="aparecer-acoes bi bi-eye text-success"></i></a>
                             </td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-link p-0 text-primary"

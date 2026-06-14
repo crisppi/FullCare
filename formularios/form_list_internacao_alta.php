@@ -511,7 +511,7 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                                     <a class="btn btn-sm btn-outline-primary"
                                        href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/visualizar/' . (int)$intern["fk_id_int_alt"], ENT_QUOTES, 'UTF-8') ?>"
                                        title="Visualizar internação">
-                                        <i class="fa-solid fa-eye me-1"></i> Ver
+                                        <i class="bi bi-eye me-1"></i> Ver
                                     </a>
                                 </td>
                                 <?php if (!$somenteListaAltas): ?>

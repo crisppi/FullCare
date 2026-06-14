@@ -352,7 +352,7 @@ if ($qtdIntItens > $limite) {
                                 <li>
                                     <button class="dropdown-item"
                                         onclick="edit('<?= $BASE_URL ?>contas/ver/<?= $intern['id_capeante'] ?>')">
-                                        <i style="color:green; margin-right:10px" class="fas fa-eye check-icon"></i> Ver
+                                        <i class="bi bi-eye text-success"></i> Ver
                                         Detalhes
                                     </button>
                                 </li>

@@ -375,17 +375,14 @@ $censoIaUrl = rtrim($BASE_URL, '/') . '/censo/importar-ia';
                                         <li>
                                             <button class="btn btn-default"
                                                 onclick="openModal('<?= $BASE_URL ?>show_censo_adm.php?id_censo=<?= $intern['id_censo'] ?>')"
-                                                data-bs-toggle="modal" data-bs-target="#myModal"><i class="fas fa-eye"
-                                                    style="color: rgb(27,156, 55);"></i>Ver</button>
+                                                data-bs-toggle="modal" data-bs-target="#myModal"><i class="bi bi-eye text-success"></i>Ver</button>
                                         </li>
                                         <li>
                                             <form class="d-inline-block delete-form" action="process_censo_int.php"
                                                 method="get">
                                                 <input type="hidden" name="type" value="create">
                                                 <input type="hidden" name="id_censo" value="<?= $intern["id_censo"] ?>">
-                                                <button class="btn btn-default"><i
-                                                        style="color: rgb(67, 125, 525);"
-                                                        class="bi bi-door-open"></i>Internar</button>
+                                                <button class="btn btn-default"><i class="bi bi-hospital text-primary"></i>Internar</button>
                                             </form>
                                         </li>
                                         <li>
@@ -394,9 +391,7 @@ $censoIaUrl = rtrim($BASE_URL, '/') . '/censo/importar-ia';
                                                 <input type="hidden" name="type" value="delete">
                                                 <input type="hidden" name="id_censo" value="<?= $intern["id_censo"] ?>">
                                                 <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
-                                                <button class="btn btn-default"><i
-                                                        style="color: red;"
-                                                        class="bi bi-x-circle-fill"></i>Deletar</button>
+                                                <button class="btn btn-default"><i class="bi bi-trash3 text-danger"></i>Deletar</button>
                                             </form>
                                         </li>
                                     </ul>

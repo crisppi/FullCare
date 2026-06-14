@@ -545,7 +545,7 @@ if (isset($dados_alta) && is_array($dados_alta)) {
             <?php if (!empty($prorrogIntern) && count($prorrogIntern) > 0): ?>
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalProrrog"
                 id="openmodal">
-                <i class="fas fa-eye"></i> Prorrogações Anteriores
+                <i class="bi bi-eye"></i> Prorrogações Anteriores
             </button>
             <?php endif; ?>
         </div>

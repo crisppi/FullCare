@@ -112,7 +112,7 @@
             <?php if (!empty($tussIntern) && count($tussIntern) > 0): ?>
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTUSS"
                 id="openmodal">
-                <i class="fas fa-eye"></i> TUSS Liberados
+                <i class="bi bi-eye"></i> TUSS Liberados
             </button>
             <?php endif; ?>
         </div>
@@ -223,8 +223,7 @@
                             <td><?= $qtdSolicitado ?></td>
                             <td><?= $qtdLiberado ?></td>
                             <td><?= $dataTuss ?></td>
-                            <td><a href="<?= $linkVisualizar ?>"><i style="color:green;margin-right:10px"
-                                        class="fas fa-eye check-icon"></i></a></td>
+                            <td><a href="<?= $linkVisualizar ?>"><i class="bi bi-eye text-success"></i></a></td>
                         </tr>
                         <?php } ?>
                     </tbody>

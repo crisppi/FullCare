@@ -229,8 +229,7 @@ $uti = new utiDAO($conn, $BASE_URL);
                             <td class="action">
                                 <a
                                     href="<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern["id_internacao"] ?>"><i
-                                        style="color:green; margin-right:10px"
-                                        class="aparecer-acoes fas fa-eye check-icon"></i></a>
+                                        class="aparecer-acoes bi bi-eye text-success"></i></a>
 
                                 <form class="d-inline-block delete-form" action="edit_alta_uti.php" method="get">
                                     <input type="hidden" name="type" value="update">

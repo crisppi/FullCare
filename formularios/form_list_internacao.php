@@ -1303,8 +1303,7 @@ if (typeof jQuery !== 'undefined') {
                                             <button class="btn btn-default"
                                                 onclick="edit('<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern['id_internacao'] ?>')"
                                                 style="font-size: 1rem;">
-                                                <i class="fas fa-eye"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
+                                                <i class="bi bi-eye text-success"></i>
                                                 Visualização
                                             </button>
                                         </li>

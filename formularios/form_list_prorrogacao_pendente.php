@@ -459,8 +459,7 @@ $baseParams = [
                                         <button class="btn btn-default"
                                             onclick="window.location.href='<?= e(rtrim($BASE_URL, '/')) ?>/internacoes/visualizar/<?= (int)$row['id_internacao'] ?>'"
                                             style="font-size: .9rem;">
-                                            <i class="fas fa-eye"
-                                                style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
+                                            <i class="bi bi-eye text-success"></i>
                                             Visualização
                                         </button>
                                     </li>
