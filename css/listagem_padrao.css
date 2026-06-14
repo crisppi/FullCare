@@ -341,18 +341,41 @@
     display: none !important;
 }
 
-.fc-list-toast {
-    position: absolute;
-    left: 10px;
-    color: #1f5f8f;
-    font-size: .66rem;
-    font-weight: 800;
+.fc-list-global-toast {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 9999;
+    max-width: min(360px, calc(100vw - 36px));
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #1f5f8f;
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 500;
+    line-height: 1.25;
+    box-shadow: 0 12px 28px rgba(21, 63, 96, .22);
     opacity: 0;
-    transition: opacity .18s ease;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
 }
 
-.fc-list-toast.is-visible {
+.fc-list-global-toast.is-visible {
     opacity: 1;
+    transform: translateY(0);
+}
+
+.fc-list-global-toast[data-type="warning"] {
+    background: #8a6d1f;
+}
+
+.fc-list-global-toast[data-type="error"] {
+    background: #9a2734;
+}
+
+.fc-list-global-toast[data-type="success"] {
+    background: #2f7d58;
 }
 
 .fc-list-empty-feedback {

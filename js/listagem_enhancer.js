@@ -87,14 +87,13 @@
         const saveBtn = buildButton('bi-bookmark-check', 'Salvar filtros', 'Salvar filtros atuais');
         const restoreBtn = buildButton('bi-arrow-counterclockwise', 'Meus filtros', 'Voltar para meus filtros salvos');
         const columnsBtn = buildButton('bi-layout-three-columns', 'Colunas', 'Configurar colunas visíveis');
-        const priorityBtn = buildButton('bi-sort-down', 'Prioridade', 'Ordenar a página visível por prioridade');
         const exportBtn = buildButton('bi-file-earmark-spreadsheet', 'Exportar Excel', 'Exportar tabela visível para Excel');
 
         const columnsMenu = document.createElement('div');
         columnsMenu.className = 'fc-list-columns-menu';
         columnsMenu.hidden = true;
 
-        toolbar.append(saveBtn, restoreBtn, columnsBtn, priorityBtn, exportBtn, columnsMenu);
+        toolbar.append(saveBtn, restoreBtn, columnsBtn, exportBtn, columnsMenu);
         filters.parentElement.insertBefore(toolbar, filters.nextSibling);
         installEmptyResultHint(form, table, toolbar);
 
@@ -124,13 +123,6 @@
         });
 
         exportBtn.addEventListener('click', () => exportVisibleTable(table));
-        priorityBtn.addEventListener('click', () => {
-            if (sortVisibleRowsByPriority(table)) {
-                showToast(toolbar, 'Ordenado por prioridade', 'success');
-            } else {
-                showToast(toolbar, 'Sem sinal de prioridade', 'warning');
-            }
-        });
 
         form.addEventListener('submit', () => {
             sessionStorage.setItem(storageKey('last_filters'), JSON.stringify(serializeForm(form)));
@@ -141,30 +133,36 @@
         }
 
         installColumnControls(table, columnsMenu);
-        if (!new URLSearchParams(window.location.search).has('ordenar')) {
-            sortVisibleRowsByPriority(table);
-        }
     }
 
     function showToast(toolbar, message, type) {
-        let toast = qs('.fc-list-toast', toolbar);
-        if (!toast) {
-            toast = document.createElement('span');
-            toast.className = 'fc-list-toast';
-            toolbar.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.classList.add('is-visible');
-        window.clearTimeout(toast._timer);
-        toast._timer = window.setTimeout(() => toast.classList.remove('is-visible'), 1800);
         if (window.FullCareFeedback && typeof window.FullCareFeedback.show === 'function') {
+            const titles = {
+                success: 'Tudo certo',
+                warning: 'Atenção',
+                error: 'Erro',
+                info: 'Informação',
+            };
             window.FullCareFeedback.show({
                 type: type || 'info',
-                title: type === 'success' ? 'Tudo certo' : undefined,
+                title: titles[type || 'info'] || 'Informação',
                 message,
                 duration: 2600,
             });
+            return;
         }
+
+        let toast = qs('.fc-list-global-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'fc-list-global-toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.dataset.type = type || 'info';
+        toast.classList.add('is-visible');
+        window.clearTimeout(toast._timer);
+        toast._timer = window.setTimeout(() => toast.classList.remove('is-visible'), 2600);
     }
 
     function installColumnControls(table, menu) {
@@ -497,42 +495,6 @@ th { background: #eef3f8; font-weight: 700; }
             if (!badgeMap[key]) return;
             td.innerHTML = `<span class="fc-status-badge fc-status-badge--${badgeMap[key]}">${escapeHtml(text)}</span>`;
         });
-    }
-
-    function rowPriorityScore(tr) {
-        const text = (tr.textContent || '').toLowerCase();
-        let score = 0;
-        if (/cr[ií]tic|evento|adverso/.test(text)) score += 100;
-        if (/atrasad|vencid/.test(text)) score += 90;
-        if (/pendente|abert[oa]|em auditoria|parad[ao]/.test(text)) score += 70;
-        if (/internad[oa]|ativ[oa]/.test(text)) score += 35;
-        if (/encerrad[oa]|finalizad[oa]|inativ[oa]/.test(text)) score -= 20;
-
-        const daysMatch = text.match(/(\d+)\s*dia/);
-        if (daysMatch) score += Math.min(60, Number(daysMatch[1] || 0));
-
-        if (qs('.fc-status-badge--danger', tr)) score += 90;
-        if (qs('.fc-status-badge--warning', tr)) score += 60;
-        if (qs('.fc-status-badge--success', tr)) score += 20;
-
-        return score;
-    }
-
-    function sortVisibleRowsByPriority(table) {
-        const tbody = qs('tbody', table);
-        if (!tbody) return false;
-        const rows = qsa('tr', tbody).filter((tr) => qsa('td', tr).length > 1);
-        if (rows.length < 2) return false;
-
-        const scored = rows.map((tr, index) => ({ tr, index, score: rowPriorityScore(tr) }));
-        if (!scored.some((item) => item.score > 0)) return false;
-
-        scored.sort((a, b) => {
-            if (b.score !== a.score) return b.score - a.score;
-            return a.index - b.index;
-        });
-        scored.forEach((item) => tbody.appendChild(item.tr));
-        return true;
     }
 
     function readJson(key, fallback) {

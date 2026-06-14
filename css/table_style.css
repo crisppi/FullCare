@@ -538,8 +538,12 @@
     align-items: center;
     justify-content: center;
     font-size: .72rem;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1;
+}
+
+.pagination .page-item.active .page-link {
+    font-weight: 600;
 }
 
 .pagination .page-link .fa-solid::before {
@@ -547,9 +551,14 @@
     align-items: center;
     justify-content: center;
     font-family: var(--app-font-family, "Inter", Arial, Helvetica, sans-serif) !important;
-    font-weight: 700;
+    font-weight: 400;
     font-size: .76rem;
     line-height: 1;
+}
+
+.pagination .page-link i,
+.pagination .page-link .fa-solid {
+    font-weight: 400 !important;
 }
 
 .pagination .page-link .fa-solid.fa-angles-left::before {
