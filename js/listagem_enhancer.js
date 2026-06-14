@@ -405,6 +405,71 @@ th { background: #eef3f8; font-weight: 700; }
         return false;
     }
 
+    function normalizeHeaderText(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[↕↑↓]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toLowerCase();
+    }
+
+    function formatPersonName(value) {
+        const original = String(value || '').replace(/\s+/g, ' ').trim();
+        if (!original || /^[-—]+$/.test(original)) return original;
+
+        const particles = new Set(['da', 'das', 'de', 'do', 'dos', 'e']);
+        return original
+            .toLocaleLowerCase('pt-BR')
+            .split(' ')
+            .map((part, index) => {
+                if (!part) return part;
+                if (index > 0 && particles.has(part)) return part;
+
+                return part.replace(/(^|[-'’])(\p{L})/gu, (match, prefix, letter) => {
+                    return prefix + letter.toLocaleUpperCase('pt-BR');
+                });
+            })
+            .join(' ');
+    }
+
+    function normalizePatientNamesInTable(table) {
+        const headers = qsa('thead th', table);
+        if (!headers.length) return;
+
+        const patientColumns = headers
+            .map((th, index) => ({ index, text: normalizeHeaderText(th.textContent) }))
+            .filter((item) => item.text === 'paciente' || item.text.includes('paciente'))
+            .map((item) => item.index);
+
+        if (!patientColumns.length) return;
+
+        qsa('tbody tr', table).forEach((tr) => {
+            const cells = qsa('td', tr);
+            patientColumns.forEach((index) => {
+                const cell = cells[index];
+                if (!cell || cell.dataset.fcPatientNameNormalized === '1') return;
+
+                cell.classList.add('fc-patient-name');
+                cell.style.textTransform = 'none';
+
+                const rawText = (cell.textContent || '').trim();
+                if (!rawText || /nenhum|nao encontrado|não encontrado|sem registro/i.test(rawText)) return;
+
+                const formatted = formatPersonName(rawText);
+                if (formatted && formatted !== rawText) {
+                    cell.textContent = formatted;
+                }
+                cell.dataset.fcPatientNameNormalized = '1';
+            });
+        });
+    }
+
+    function normalizeAllPatientNames(root = document) {
+        qsa('table', root).forEach(normalizePatientNamesInTable);
+    }
+
     function applyStatusBadges(table) {
         const badgeMap = {
             ativo: 'success',
@@ -491,9 +556,11 @@ th { background: #eef3f8; font-weight: 700; }
     function init() {
         const form = getMainForm();
         const table = getMainTable();
+        normalizeAllPatientNames();
         if (!form || !table) return;
 
         installToolbar(form, table);
+        normalizePatientNamesInTable(table);
         applyStatusBadges(table);
     }
 
@@ -502,4 +569,18 @@ th { background: #eef3f8; font-weight: 700; }
     } else {
         init();
     }
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (!(node instanceof Element)) return;
+                if (node.matches && node.matches('table')) {
+                    normalizePatientNamesInTable(node);
+                    return;
+                }
+                normalizeAllPatientNames(node);
+            });
+        });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
 })();

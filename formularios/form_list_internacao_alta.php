@@ -474,15 +474,15 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                 <table class="table table-sm table-striped table-hover table-condensed tabela-altas">
                     <thead>
                         <tr>
-                            <th scope="col" width="3%">Id-Int</th>
-                            <th scope="col" width="3%">UTI</th>
-                            <th scope="col" width="14%">Hospital</th>
-                            <th scope="col" width="14%">Paciente</th>
-                            <th scope="col" width="7%">Tipo Alta</th>
-                            <th scope="col" width="8%">Data Alta</th>
-                            <th scope="col" width="6%">Ações</th>
+                            <th scope="col" class="th-w-3">Id-Int</th>
+                            <th scope="col" class="th-w-3">UTI</th>
+                            <th scope="col" class="th-w-14">Hospital</th>
+                            <th scope="col" class="th-w-14">Paciente</th>
+                            <th scope="col" class="th-w-7">Tipo Alta</th>
+                            <th scope="col" class="th-w-8">Data Alta</th>
+                            <th scope="col" class="th-w-6">Ações</th>
                             <?php if (!$somenteListaAltas): ?>
-                            <th scope="col" width="4%">Remover</th>
+                            <th scope="col" class="th-w-4">Remover</th>
                             <?php endif; ?>
                         </tr>
                     </thead>

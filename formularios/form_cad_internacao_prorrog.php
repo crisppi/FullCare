@@ -716,11 +716,11 @@ if (isset($dados_alta) && is_array($dados_alta)) {
                 <table class="table table-sm table-striped table-hover table-condensed">
                     <thead>
                         <tr>
-                            <th scope="col" style="width:5%">Id</th>
-                            <th scope="col" style="width:10%">Acomodação</th>
-                            <th scope="col" style="width:15%">Início</th>
-                            <th scope="col" style="width:15%">Fim</th>
-                            <th scope="col" style="width:15%">Diárias</th>
+                            <th scope="col" class="th-w-5">Id</th>
+                            <th scope="col" class="th-w-10">Acomodação</th>
+                            <th scope="col" class="th-w-15">Início</th>
+                            <th scope="col" class="th-w-15">Fim</th>
+                            <th scope="col" class="th-w-15">Diárias</th>
                         </tr>
                     </thead>
                     <tbody>

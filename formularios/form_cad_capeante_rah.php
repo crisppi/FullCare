@@ -1370,7 +1370,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                         </div>
                         <div class="table-responsive mt-4">
                             <table class="table table-striped align-middle" id="prevParcialTabela">
-                                <thead class="table-light text-dark fw-semibold" style="background:#dfe9ff;color:#1f2a44;">
+                                <thead class="table-light text-dark fw-semibold capeante-rah-preview-head">
                                     <tr>
                                         <th>Parcial</th>
                                         <th>Período</th>

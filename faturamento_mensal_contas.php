@@ -534,7 +534,7 @@ $fieldIcons = [
             <table class="table table-striped align-middle" id="tabelaContas">
                 <thead>
                     <tr>
-                        <th class="text-center" style="width:70px"><i class="bi bi-check2-square"></i></th>
+                        <th class="text-center th-px-70"><i class="bi bi-check2-square"></i></th>
                         <?php foreach ($visibleFields as $k): ?>
                             <th class="col-<?= h($k) ?>"><?= h($fieldsMap[$k]['label']) ?></th>
                         <?php endforeach; ?>

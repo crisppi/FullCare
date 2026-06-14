@@ -186,11 +186,6 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
         padding: 4px 10px;
         font-size: .68rem;
     }
-    #table-content thead th {
-        padding: 7px 10px;
-        font-size: .54rem;
-        letter-spacing: .08em;
-    }
     #table-content tbody td,
     #table-content tbody th {
         padding: 6px 10px;

@@ -334,7 +334,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                                 <th>Endereço</th>
                                 <th>Cidade/UF</th>
                                 <th>Principal</th>
-                                <th style="width: 90px;">Ação</th>
+                                <th class="th-px-90">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="enderecosTableBody">
@@ -429,7 +429,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                                 <th>Ramal</th>
                                 <th>Contato</th>
                                 <th>Principal</th>
-                                <th style="width: 90px;">Ação</th>
+                                <th class="th-px-90">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="telefonesTableBody">
@@ -485,7 +485,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                                 <th>Email</th>
                                 <th>Telefone</th>
                                 <th>Principal</th>
-                                <th style="width: 90px;">Ação</th>
+                                <th class="th-px-90">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="contatosTableBody">
@@ -576,7 +576,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                                 <th>Acomodação</th>
                                 <th>Valor diária</th>
                                 <th>Data contrato</th>
-                                <th style="width: 80px;">Ação</th>
+                                <th class="th-px-80">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="acomodacoesTableBody">

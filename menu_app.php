@@ -1342,19 +1342,20 @@ try {
     min-height: 58px;
     padding: 8px 10px;
     border-radius: 14px;
-    background: rgba(255, 255, 255, .17);
-    border: 1px solid rgba(255, 255, 255, .22);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
+    background: rgba(30, 82, 126, .34);
+    border: 1px solid rgba(255, 255, 255, .58);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .38), 0 8px 18px rgba(20, 63, 99, .16);
 }
 
 .menu-workspace-summary-item small {
     display: block;
-    color: rgba(255,255,255,.78);
+    color: #fff;
     font-size: .62rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: .04em;
     line-height: 1.1;
+    text-shadow: 0 1px 2px rgba(24, 61, 92, .28);
 }
 
 .menu-workspace-summary-item strong {
@@ -1364,6 +1365,7 @@ try {
     font-size: 1.15rem;
     font-weight: 900;
     line-height: 1;
+    text-shadow: 0 1px 2px rgba(24, 61, 92, .28);
 }
 
 .menu-workspace-pill {
@@ -2686,7 +2688,7 @@ try {
                 </div>
                 <div id="dash-reinternacoes" class="dash-table-scroll">
                     <table class="table table-sm table-striped table-hover table-condensed dash-sortable" style="margin-top:10px;">
-                        <thead style="background: #2f6f9f; background-image: none; color: #fff;">
+                        <thead>
                             <tr>
                                 <th scope="col" class="th-sortable" data-sort-type="number">Id Int
                                     <span class="sort-icons">
@@ -2774,15 +2776,15 @@ try {
                     <i class="bi bi-robot" style="color:white; margin-left:10px;"></i>
                 </div>
                 <table id="forecast-ia-table" class="table table-sm table-striped table-hover table-condensed" style="margin-top:10px;">
-                    <thead style="background: #2f6f9f; background-image: none; color: #fff;">
+                    <thead>
                         <tr>
-                            <th style="width:18%">Hospital</th>
-                            <th style="width:22%">Paciente</th>
-                            <th style="width:12%">Dias atuais</th>
-                            <th style="width:14%">Previsto (dias)</th>
-                            <th style="width:14%">Alta estimada</th>
-                            <th style="width:12%">Intervalo</th>
-                            <th style="width:8%">Conf.</th>
+                            <th class="th-w-18">Hospital</th>
+                            <th class="th-w-22">Paciente</th>
+                            <th class="th-w-12">Dias atuais</th>
+                            <th class="th-w-14">Previsto (dias)</th>
+                            <th class="th-w-14">Alta estimada</th>
+                            <th class="th-w-12">Intervalo</th>
+                            <th class="th-w-8">Conf.</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3258,29 +3260,37 @@ canvas {
 }
 
 .th-sortable {
-    white-space: nowrap;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    width: 100%;
+    white-space: nowrap !important;
 }
 
 .th-sortable .sort-icons {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    margin-left: 6px;
-    vertical-align: middle;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 1px !important;
+    margin-left: 2px !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
 }
 
 .th-sortable .sort-icons a {
-    text-decoration: none;
-    font-size: 0.75rem;
-    color: #ffffff;
-    margin-left: 2px;
-    opacity: 0.7;
+    text-decoration: none !important;
+    font-size: .58rem !important;
+    color: rgba(255, 255, 255, .82) !important;
+    margin-left: 0 !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
 }
 
 .th-sortable .sort-icons a.active {
     color: #ffd966;
     opacity: 1;
-    font-weight: bold;
+    font-weight: 600;
 }
 </style>
 

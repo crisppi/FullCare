@@ -196,12 +196,12 @@
                 <table class="table table-sm table-striped table-hover table-condensed">
                     <thead>
                         <tr>
-                            <th scope="col" style="width:15%">TUSS Solicitado</th>
-                            <th scope="col" style="width:15%">TUSS Liberado?</th>
-                            <th scope="col" style="width:15%">Quantidade Solicitada</th>
-                            <th scope="col" style="width:10%">Quantidade Liberada</th>
-                            <th scope="col" style="width:10%">Data TUSS</th>
-                            <th scope="col" style="width:5%">Visualizar</th>
+                            <th scope="col" class="th-w-15">TUSS Solicitado</th>
+                            <th scope="col" class="th-w-15">TUSS Liberado?</th>
+                            <th scope="col" class="th-w-15">Quantidade Solicitada</th>
+                            <th scope="col" class="th-w-10">Quantidade Liberada</th>
+                            <th scope="col" class="th-w-10">Data TUSS</th>
+                            <th scope="col" class="th-w-5">Visualizar</th>
                         </tr>
                     </thead>
                     <tbody>

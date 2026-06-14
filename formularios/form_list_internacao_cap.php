@@ -317,7 +317,7 @@ if ($havePages) {
     $current_block = reset($block_pages)["bloco"] ?? 1;
 }
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css', ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css?v=' . @filemtime(__DIR__ . '/../css/listagem_padrao.css'), ENT_QUOTES, 'UTF-8') ?>">
 <!-- FORMULARIO DE PESQUISAS -->
 <div class="container-fluid form_container listagem-page" id='main-container'>
 
@@ -452,25 +452,25 @@ if ($havePages) {
 
         <div>
             <div id="table-content" class="listagem-table-wrap" style="margin-top:10px">
-                <table class="table table-sm table-striped  table-hover table-condensed">
+                <table class="table table-sm table-striped table-hover table-condensed">
                     <thead>
                         <tr>
-                            <th scope="col" style="width:4%">Reg Int</th>
-                            <th scope="col" style="width:5%">Conta No.</th>
-                            <th scope="col" style="width:12%">Hospital</th>
-                            <th scope="col" style="width:16%">Paciente</th>
-                            <th scope="col" style="width:10%">Senha</th>
-                            <th scope="col" style="width:8%">Data internação</th>
-                            <th scope="col" style="width:4%;">Med</th>
-                            <th scope="col" style="width:4%;">Enf</th>
-                            <th scope="col" style="width:4%;">Adm</th>
-                            <th scope="col" style="width:4%;">Parcial</th>
-                            <th scope="col" style="width:3%;">Final</th>
-                            <th scope="col" style="width:3%;">EA</th>
-                            <th scope="col" style="width:3%;">Aberto</th>
-                            <th scope="col" style="width:6%;">Cap Encer</th>
-                            <th scope="col" style="width:6%;">Em Audit</th>
-                            <th scope="col" style="width:13%">Ações</th>
+                            <th scope="col" class="th-w-4">Reg Int</th>
+                            <th scope="col" class="th-w-5">Conta No.</th>
+                            <th scope="col" class="th-w-12">Hospital</th>
+                            <th scope="col" class="th-w-16">Paciente</th>
+                            <th scope="col" class="th-w-10">Senha</th>
+                            <th scope="col" class="th-w-8">Data internação</th>
+                            <th scope="col" class="th-w-4">Med</th>
+                            <th scope="col" class="th-w-4">Enf</th>
+                            <th scope="col" class="th-w-4">Adm</th>
+                            <th scope="col" class="th-w-4">Parcial</th>
+                            <th scope="col" class="th-w-3">Final</th>
+                            <th scope="col" class="th-w-3">EA</th>
+                            <th scope="col" class="th-w-3">Aberto</th>
+                            <th scope="col" class="th-w-6">Cap Encer</th>
+                            <th scope="col" class="th-w-6">Em Audit</th>
+                            <th scope="col" class="th-w-13">Ações</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -419,16 +419,16 @@ $baseParams = [
             <table class="table table-sm table-striped table-hover table-condensed">
                 <thead>
                     <tr>
-                        <th scope="col" style="min-width: 60px;">Id-Int</th>
-                        <th scope="col" style="min-width: 150px;">Hospital</th>
-                        <th scope="col" style="min-width: 150px;">Paciente</th>
-                        <th scope="col" style="min-width: 150px;">Seguradora</th>
-                        <th scope="col" style="min-width: 100px;">Data Int</th>
-                        <th scope="col" style="min-width: 80px;">Senha</th>
-                        <th scope="col" style="min-width: 80px;">Dias Int</th>
-                        <th scope="col" style="min-width: 90px;">Últ Visita</th>
-                        <th scope="col" style="min-width: 240px;">Períodos em aberto para prorrogar</th>
-                        <th scope="col" style="min-width: 80px;">Ações</th>
+                        <th scope="col" class="th-min-60">Id-Int</th>
+                        <th scope="col" class="th-min-150">Hospital</th>
+                        <th scope="col" class="th-min-150">Paciente</th>
+                        <th scope="col" class="th-min-150">Seguradora</th>
+                        <th scope="col" class="th-min-100">Data Int</th>
+                        <th scope="col" class="th-min-80">Senha</th>
+                        <th scope="col" class="th-min-80">Dias Int</th>
+                        <th scope="col" class="th-min-90">Últ Visita</th>
+                        <th scope="col" class="th-min-240">Períodos em aberto para prorrogar</th>
+                        <th scope="col" class="th-min-80">Ações</th>
                     </tr>
                 </thead>
                 <tbody>

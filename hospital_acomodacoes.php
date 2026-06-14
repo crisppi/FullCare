@@ -151,7 +151,7 @@ function h($value)
                                 <th>Acomodação</th>
                                 <th>Valor Diária</th>
                                 <th>Data Contrato</th>
-                                <th style="width: 180px;">Ações</th>
+                                <th class="th-px-180">Ações</th>
                             </tr>
                         </thead>
                         <tbody>

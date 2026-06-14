@@ -148,7 +148,7 @@ function h($value)
                                 <th>E-mail</th>
                                 <th>Cargo</th>
                                 <th>Nível</th>
-                                <th style="width: 120px;">Ações</th>
+                                <th class="th-px-120">Ações</th>
                             </tr>
                         </thead>
                         <tbody>

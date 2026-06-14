@@ -410,7 +410,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                                 <th>Endereço</th>
                                 <th>Cidade/UF</th>
                                 <th>Principal</th>
-                                <th style="width: 90px;">Ação</th>
+                                <th class="th-px-90">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="enderecosTableBody">
@@ -532,7 +532,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                                 <th>Ramal</th>
                                 <th>Contato</th>
                                 <th>Principal</th>
-                                <th style="width: 90px;">Ação</th>
+                                <th class="th-px-90">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="telefonesTableBody">
@@ -618,7 +618,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                                 <th>Email</th>
                                 <th>Telefone</th>
                                 <th>Principal</th>
-                                <th style="width: 90px;">Ação</th>
+                                <th class="th-px-90">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="contatosTableBody">
@@ -752,7 +752,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                                 <th>Acomodação</th>
                                 <th>Valor diária</th>
                                 <th>Data contrato</th>
-                                <th style="width: 140px;">Ação</th>
+                                <th class="th-px-140">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="acomodacoesTableBodyEdit">

@@ -190,7 +190,7 @@ foreach ($rows as $row) {
                     <tr>
                         <th>Internação</th>
                         <th>Paciente</th>
-                        <th style="min-width: 220px;">Hospital</th>
+                        <th class="th-min-220">Hospital</th>
                         <th>Dias Internação</th>
                         <th>Dias Esperado</th>
                         <th>Ultima Visita</th>

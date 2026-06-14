@@ -576,14 +576,14 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
                 <table class="table table-sm table-striped  table-hover table-condensed">
                     <thead>
                         <tr>
-                            <th scope="col" style="width:2%">Visita</th>
-                            <th scope="col" style="width:2%">Data visita</th>
-                            <th scope="col" style="width:2%">Med</th>
-                            <th scope="col" style="width:2%">Enf</th>
-                            <th scope="col" style="width:15%">Relatório</th>
-                            <th scope="col" style="width:2%">Visualizar</th>
-                            <th scope="col" style="width:2%">Editar</th>
-                            <th scope="col" style="width:2%">Remover</th>
+                            <th scope="col" class="th-w-2">Visita</th>
+                            <th scope="col" class="th-w-2">Data visita</th>
+                            <th scope="col" class="th-w-2">Med</th>
+                            <th scope="col" class="th-w-2">Enf</th>
+                            <th scope="col" class="th-w-15">Relatório</th>
+                            <th scope="col" class="th-w-2">Visualizar</th>
+                            <th scope="col" class="th-w-2">Editar</th>
+                            <th scope="col" class="th-w-2">Remover</th>
                         </tr>
                     </thead>
                     <tbody>
