@@ -1,6 +1,7 @@
     <?php
     require_once("templates/header.php");
     require_once("models/message.php");
+    require_once __DIR__ . "/../app/text_formatters.php";
 
     include_once("models/internacao.php");
     include_once("dao/internacaoDao.php");
@@ -672,7 +673,8 @@
                                                 };
                                                 sort($dados_alta, SORT_ASC);
                                                 foreach ($dados_alta as $alta): ?>
-                                                    <option value="<?= htmlspecialchars($alta); ?>"><?= htmlspecialchars($alta); ?></option>
+                                                    <?php $altaFormatada = fc_sentence_case($alta); ?>
+                                                    <option value="<?= htmlspecialchars($altaFormatada); ?>"><?= htmlspecialchars($altaFormatada); ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>

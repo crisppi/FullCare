@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../app/text_formatters.php";
 
 if (!defined("FLOW_LOGGER_AUTO_V1")) {
     define("FLOW_LOGGER_AUTO_V1", 1);
@@ -70,7 +71,7 @@ $internado_int = "n";
 $internado_alt = "n";
 $data_alta_alt = filter_input(INPUT_POST, "data_alta_alt");
 $hora_alta_alt = filter_input(INPUT_POST, "hora_alta_alt");
-$tipo_alta_alt = filter_input(INPUT_POST, "tipo_alta_alt");
+$tipo_alta_alt = fc_sentence_case(filter_input(INPUT_POST, "tipo_alta_alt"));
 $data_create_alt = filter_input(INPUT_POST, "data_create_alt") ?: date('Y-m-d');
 $usuario_alt = filter_input(INPUT_POST, "usuario_alt") ?: ($_SESSION['email_user'] ?? 'sistema');
 $fk_usuario_alt = filter_input(INPUT_POST, "fk_usuario_alt", FILTER_VALIDATE_INT);

@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 
 require_once("globals.php");
 require_once("db.php");
+require_once __DIR__ . "/../../app/text_formatters.php";
 
 require_once("models/internacao.php");
 require_once("dao/internacaoDao.php");
@@ -663,7 +664,7 @@ if ($type === "create") {
         $data_alta_alt = date('Y-m-d');
         $hora_alta_alt = date('H:i:s');
     }
-    $tipo_alta_alt = filter_input(INPUT_POST, "tipo_alta_alt") ?: "Alta médica";
+    $tipo_alta_alt = fc_sentence_case(filter_input(INPUT_POST, "tipo_alta_alt") ?: "Alta médica");
     $data_create_alt = date('Y-m-d');
     $usuario_alt = filter_input(INPUT_POST, "usuario_create_int") ?: ($_SESSION['email_user'] ?? 'sistema');
     $fk_usuario_alt = $fk_usuario_int ?: ((int)($_SESSION['id_usuario'] ?? 0) ?: null);

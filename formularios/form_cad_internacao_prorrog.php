@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../app/text_formatters.php";
 $prorrogDefaultAcomod = '';
 $prorrogDefaultIni = '';
 $prorrogFkInternacaoValue = (int)($id_internacao ?? 0);
@@ -644,7 +645,8 @@ if (isset($dados_alta) && is_array($dados_alta)) {
                     <select class="form-control-sm form-control" id="prorrog_tipo_alta_alt" name="prorrog_tipo_alta_alt">
                         <option value="">Selecione o motivo da alta</option>
                         <?php foreach ($dadosAltaProrrog as $altaMotivo): ?>
-                            <option value="<?= htmlspecialchars((string)$altaMotivo, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$altaMotivo, ENT_QUOTES, 'UTF-8') ?></option>
+                            <?php $altaMotivoFormatado = fc_sentence_case($altaMotivo); ?>
+                            <option value="<?= htmlspecialchars($altaMotivoFormatado, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($altaMotivoFormatado, ENT_QUOTES, 'UTF-8') ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

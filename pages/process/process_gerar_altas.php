@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../app/text_formatters.php";
 
 if (!defined("FLOW_LOGGER_AUTO_V1")) {
     define("FLOW_LOGGER_AUTO_V1", 1);
@@ -109,7 +110,7 @@ foreach ($selecionadas as $rawId) {
 
     $alta = new alta();
     $alta->fk_id_int_alt = $idInternacao;
-    $alta->tipo_alta_alt = $motivoAlta;
+    $alta->tipo_alta_alt = fc_sentence_case($motivoAlta);
     $alta->data_alta_alt = $dataAlta;
     $alta->hora_alta_alt = $horaAlta !== "" ? $horaAlta : null;
     $alta->internado_alt = "n";

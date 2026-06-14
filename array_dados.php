@@ -126,15 +126,15 @@ $dados_tipo_evento = [
 ];
 
 $dados_alta = [
-    "Alta Curado",
-    "Alta Melhorado",
+    "Alta curado",
+    "Alta melhorado",
     "Alta por evasão",
     "Residência",
     "Transferido",
     "Óbito",
     "A pedido",
-    "Home-Care",
-    "Alta Administrativa"
+    "Home-care",
+    "Alta administrativa"
 ];
 
 $cargo_user = ["Administrativo", "Analista", "Diretoria", "Enf_Auditor", "Gerência", "Hospital", "Med_auditor", "Secretária", "Gestor Seguradora"];

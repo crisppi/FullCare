@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../app/text_formatters.php";
 /*------------------------------------------------------------
  *  BLOCO — PRORROGAÇÕES DINÂMICAS (completo)
  *-----------------------------------------------------------
@@ -496,8 +497,9 @@ $prorrogAltaAtiva = $prorrogAltaDataValue !== '' || !empty($altaAtual['tipo_alta
                     <select class="form-control form-control-sm" id="prorrog_tipo_alta_alt" name="prorrog_tipo_alta_alt">
                         <option value="">Selecione o motivo da alta</option>
                         <?php foreach ($dadosAltaProrrog as $altaMotivo): ?>
-                            <option value="<?= htmlspecialchars((string)$altaMotivo, ENT_QUOTES, 'UTF-8') ?>" <?= (($altaAtual['tipo_alta_alt'] ?? '') === $altaMotivo) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars((string)$altaMotivo, ENT_QUOTES, 'UTF-8') ?>
+                            <?php $altaMotivoFormatado = fc_sentence_case($altaMotivo); ?>
+                            <option value="<?= htmlspecialchars($altaMotivoFormatado, ENT_QUOTES, 'UTF-8') ?>" <?= (fc_sentence_case($altaAtual['tipo_alta_alt'] ?? '') === $altaMotivoFormatado) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($altaMotivoFormatado, ENT_QUOTES, 'UTF-8') ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

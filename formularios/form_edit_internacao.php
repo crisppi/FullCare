@@ -5,6 +5,7 @@
     include_once("check_logado.php");
 
     require_once("templates/header.php");
+    require_once __DIR__ . "/../app/text_formatters.php";
 
     include_once("models/internacao.php");
     include_once("dao/internacaoDao.php");
@@ -995,8 +996,9 @@
                             $dados_alta = is_array($dados_alta ?? null) ? $dados_alta : [];
                             sort($dados_alta, SORT_ASC);
                             foreach ($dados_alta as $alta): ?>
-                                <option value="<?= htmlspecialchars($alta); ?>" <?= ($altaAtual['tipo_alta_alt'] ?? '') === $alta ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($alta); ?>
+                                <?php $altaFormatada = fc_sentence_case($alta); ?>
+                                <option value="<?= htmlspecialchars($altaFormatada); ?>" <?= fc_sentence_case($altaAtual['tipo_alta_alt'] ?? '') === $altaFormatada ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($altaFormatada); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

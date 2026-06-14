@@ -549,7 +549,7 @@ final class Seeder
 
             $this->insertDynamic('tb_alta', [
                 'fk_id_int_alt' => $idInt,
-                'tipo_alta_alt' => 'ALTA MÉDICA',
+                'tipo_alta_alt' => 'Alta médica',
                 'internado_alt' => 'n',
                 'usuario_alt' => 'seed_script',
                 'data_create_alt' => $this->now,
@@ -893,4 +893,3 @@ try {
     fwrite(STDERR, "Erro na carga: " . $e->getMessage() . "\n");
     exit(1);
 }
-
