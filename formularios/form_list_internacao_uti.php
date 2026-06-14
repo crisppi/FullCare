@@ -453,7 +453,7 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                             <td scope="row" class="nome-coluna-table">
                                 <?= $intern["internado_int"] == "s" ? "Sim" : "Não" ?>
                             </td>
-                            <td class="action">
+                            <td class="fc-list-action">
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown"
                                         role="button" data-bs-toggle="dropdown" style="color:#2f6f9f"

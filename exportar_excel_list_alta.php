@@ -6,6 +6,7 @@ require_once("db.php");
 
 require_once("models/alta.php");
 require_once("dao/altaDao.php");
+require_once __DIR__ . "/app/text_formatters.php";
 require_once("vendor/autoload.php");
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -244,7 +245,7 @@ foreach ($registros as $alta) {
                 break;
 
             case 'tipo_alta':
-                $value = $alta['tipo_alta_alt'] ?? '';
+                $value = fc_sentence_case($alta['tipo_alta_alt'] ?? '');
                 $sheet->setCellValue($colLetter . $row, $value);
                 break;
 

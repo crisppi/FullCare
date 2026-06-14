@@ -19,8 +19,15 @@
     text-transform: none !important;
 }
 
+.table td.fc-sentence-case,
+.table td.fc-sentence-case * {
+    text-transform: none !important;
+}
+
 .table td .dropdown-menu .dropdown-item,
 .table td .dropdown-menu .btn-default,
+.table td.fc-list-action,
+.table td.fc-list-action *,
 .table td .fc-list-action,
 .table td .fc-list-action *,
 .table td .action,
@@ -714,9 +721,8 @@
     min-height: 0;
 }
 
-.table tbody td.action .btn,
-.table tbody td .action .btn,
-.table tbody td .fc-list-action {
+.table tbody td.action > .dropdown > .dropdown-toggle,
+.table tbody td .action > .dropdown > .dropdown-toggle {
     min-width: 26px !important;
     width: 26px !important;
     min-height: 24px !important;
@@ -728,9 +734,8 @@
     line-height: 1 !important;
 }
 
-.table tbody td.action .btn i,
-.table tbody td .action .btn i,
-.table tbody td .fc-list-action i {
+.table tbody td.action > .dropdown > .dropdown-toggle i,
+.table tbody td .action > .dropdown > .dropdown-toggle i {
     font-size: .9rem !important;
     line-height: 1 !important;
 }

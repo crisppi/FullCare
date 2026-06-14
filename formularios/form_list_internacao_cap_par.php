@@ -342,7 +342,7 @@ if ($qtdIntItens > $limite) {
                     <td scope="row">
                         <?= $intern["parada_motivo_cap"] ?>
                     </td>
-                    <td class="action">
+                    <td class="fc-list-action">
                         <div class="dropdown">
                             <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown" role="button"
                                 data-bs-toggle="dropdown" style="color:#5e2363" aria-expanded="false">

@@ -330,7 +330,7 @@ if ($qtdIntItens > $limite) {
                             title="Conta com evento adverso"></span>
                         <?php } ?>
                     </td>
-                    <td class="action">
+                    <td class="fc-list-action">
                         <div class="dropdown">
                             <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown" role="button"
                                 data-bs-toggle="dropdown" style="color:#5e2363" aria-expanded="false">

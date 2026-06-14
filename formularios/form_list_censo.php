@@ -364,7 +364,7 @@ $censoIaUrl = rtrim($BASE_URL, '/') . '/censo/importar-ia';
                             <td scope="row">
                                 <?= $intern["senha_censo"] ?>
                             </td>
-                            <td class="action">
+                            <td class="fc-list-action">
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown"
                                         role="button" data-bs-toggle="dropdown" style="color:#5e2363"

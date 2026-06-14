@@ -334,7 +334,7 @@ if ($qtdIntItens > $limite) {
                             style="font-size: 1.1rem; font-weight:800; color: rgb(255, 25, 55);"></span>
                         <?php }; ?>
                     </td>
-                    <td class="action">
+                    <td class="fc-list-action">
                         <div class="dropdown">
                             <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown" role="button"
                                 data-bs-toggle="dropdown" style="color:#5e2363" aria-expanded="false">
