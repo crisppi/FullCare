@@ -209,10 +209,11 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
 
 <!-- FORMULARIO DE PESQUISAS -->
 <div class="container-fluid form_container listagem-page" id='main-container'>
-    <div class="listagem-hero">
-        <div class="listagem-hero__copy">
-            <div class="listagem-kicker">UTI</div>
-            <h1 class="listagem-title">Internações em UTI</h1>
+    <div class="fc-module-header fc-module-header--internacoes uti-list-header">
+        <div class="fc-module-header__copy">
+            <p class="fc-module-header__kicker">UTI</p>
+            <h1 class="fc-module-header__title">Internações em UTI</h1>
+            <p class="fc-module-header__subtitle">Acompanhe pacientes com passagem ou permanência em UTI, status de internação e datas principais.</p>
         </div>
     </div>
     <div class="complete-table listagem-panel">

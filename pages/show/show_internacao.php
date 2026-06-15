@@ -731,7 +731,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                 </div>
 
                 <div class="ux-actions-sticky mb-3">
-                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <div class="internacao-action-row d-flex flex-wrap gap-2 align-items-center">
                         <?php if (!$isGestorSeguradora): ?>
                             <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white shadow-sm"
                                 style="background-color:#5e2363;border-color:#5e2363;">
@@ -2616,6 +2616,128 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
     .visita-actions-head {
         text-align: center;
+    }
+
+    /* Ajuste de leitura e alinhamento da tela de visualizacao */
+    .internacao-show-page {
+        font-size: 0.88rem;
+    }
+
+    .internacao-show-page .header-card h4 {
+        font-size: 1.02rem !important;
+        line-height: 1.18 !important;
+    }
+
+    .internacao-show-page .header-card .small,
+    .internacao-show-page .header-card .text-secondary {
+        font-size: .76rem !important;
+        line-height: 1.25 !important;
+    }
+
+    .internacao-show-page .ux-chip-label {
+        font-size: .66rem !important;
+    }
+
+    .internacao-show-page .ux-chip-value {
+        font-size: .82rem !important;
+    }
+
+    .internacao-show-page .ux-chip-sub {
+        font-size: .72rem !important;
+    }
+
+    #main-container.internacao-show-page #internTabs button.nav-link {
+        min-height: 30px !important;
+        padding: .38rem .64rem !important;
+        font-size: .78rem !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    #main-container.internacao-show-page .internacao-action-row .btn {
+        min-height: 28px !important;
+        padding: .28rem .58rem !important;
+        font-size: .72rem !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: .32rem;
+        text-align: center;
+    }
+
+    #main-container.internacao-show-page .internacao-action-row .btn i {
+        margin-right: 0 !important;
+        line-height: 1;
+    }
+
+    #main-container.internacao-show-page #resumo .row {
+        --bs-gutter-x: .35rem !important;
+        --bs-gutter-y: .16rem !important;
+    }
+
+    #main-container.internacao-show-page #resumo .row.mt-1 {
+        margin-top: .12rem !important;
+    }
+
+    #main-container.internacao-show-page #resumo > .row + .row {
+        margin-top: .12rem !important;
+    }
+
+    #main-container.internacao-show-page #resumo .row.mt-1 > [class*="col-"] {
+        margin-top: 0 !important;
+    }
+
+    #main-container.internacao-show-page #internTabsContent,
+    #main-container.internacao-show-page #resumo .ov-card {
+        margin-bottom: 0 !important;
+    }
+
+    #main-container.internacao-show-page .internacao-main-card > .card-body {
+        padding-bottom: .45rem !important;
+    }
+
+    #main-container.internacao-show-page .internacao-main-card > .card-body > .d-flex.mb-3:first-child {
+        margin-bottom: .55rem !important;
+    }
+
+    .internacao-show-page .ov-card .card-body,
+    #main-container .ov-card .card-body,
+    #main-container .tab-pane .ov-card .card-body {
+        padding: .76rem .9rem !important;
+    }
+
+    .internacao-show-page .ov-card .ov-head,
+    #main-container .tab-pane .ov-head {
+        margin-bottom: .38rem !important;
+    }
+
+    .internacao-show-page .ov-title,
+    #main-container .ov-title,
+    #main-container .tab-pane h6 {
+        font-size: .9rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .internacao-show-page .details-dl {
+        grid-template-columns: 125px 1fr;
+        row-gap: 7px;
+    }
+
+    .internacao-show-page .details-dl dt,
+    .internacao-show-page .details-dl dd,
+    #main-container .details-dl dt,
+    #main-container .details-dl dd {
+        font-size: .8rem !important;
+        line-height: 1.22 !important;
+    }
+
+    .internacao-show-page .v2-relatorio,
+    #main-container .tab-pane .v2-relatorio {
+        font-size: .82rem !important;
+        line-height: 1.36 !important;
     }
 </style>
 

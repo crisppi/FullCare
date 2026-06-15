@@ -324,6 +324,7 @@ include_once("templates/header.php");
             color: #2f6f9f;
         }
     </style>
+    <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 </head>
 <body>
     <div class="report-wrapper">

@@ -1,0 +1,232 @@
+.report-wrapper,
+.forecast-wrapper,
+.monthly-dashboard {
+    --op-blue: #2f6f9f;
+    --op-blue-soft: #eef8fd;
+    --op-ink: #24384f;
+    --op-muted: #667085;
+    --op-border: rgba(76, 142, 187, .18);
+    width: 100%;
+    max-width: none;
+    color: var(--op-ink);
+}
+
+.report-wrapper {
+    margin: 6px 0 28px !important;
+    padding: 0 24px !important;
+}
+
+.report-header,
+.forecast-hero,
+.monthly-dashboard .monthly-header {
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    margin-bottom: 12px !important;
+    box-shadow: none !important;
+}
+
+.report-header h1,
+.forecast-hero h1,
+.monthly-dashboard .monthly-header h4 {
+    margin: 0 0 3px !important;
+    font-size: 1rem !important;
+    line-height: 1.18 !important;
+    font-weight: 800 !important;
+    color: var(--op-ink) !important;
+}
+
+.report-header .text-muted,
+.forecast-hero p,
+.monthly-dashboard .monthly-header .text-muted {
+    font-size: .72rem !important;
+    line-height: 1.25 !important;
+    color: var(--op-muted) !important;
+}
+
+.report-card {
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 10px !important;
+    box-shadow: none !important;
+}
+
+.report-card h5,
+.report-card h6 {
+    margin-bottom: .45rem !important;
+    font-size: .86rem !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+    color: #2d3440 !important;
+}
+
+.report-wrapper .row.g-3,
+.monthly-dashboard .row.g-3 {
+    --bs-gutter-x: .7rem !important;
+    --bs-gutter-y: .48rem !important;
+}
+
+.report-wrapper .form-label,
+.monthly-dashboard label,
+.forecast-wrapper label {
+    margin-bottom: .25rem !important;
+    font-size: .7rem !important;
+    line-height: 1.1 !important;
+    font-weight: 800 !important;
+    color: #3f6f99 !important;
+}
+
+.report-wrapper .form-control,
+.report-wrapper .form-select,
+.monthly-dashboard .form-select,
+.forecast-wrapper .form-control,
+.forecast-wrapper .form-select {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: .22rem .5rem !important;
+    border-radius: 6px !important;
+    font-size: .72rem !important;
+    line-height: 1.1 !important;
+}
+
+.report-wrapper .btn,
+.forecast-wrapper .btn,
+.monthly-dashboard .btn {
+    min-height: 30px !important;
+    padding: .28rem .64rem !important;
+    border-radius: 6px !important;
+    font-size: .72rem !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.report-wrapper .table,
+.forecast-table {
+    margin-bottom: 0 !important;
+    font-size: .72rem !important;
+}
+
+.report-wrapper .table thead th,
+.forecast-table th {
+    background: var(--op-blue) !important;
+    color: #fff !important;
+    padding: 8px 10px !important;
+    font-size: .66rem !important;
+    line-height: 1.05 !important;
+    letter-spacing: .03em !important;
+    text-transform: uppercase !important;
+    vertical-align: middle !important;
+}
+
+.report-wrapper .table tbody td,
+.forecast-table td {
+    padding: 7px 10px !important;
+    font-size: .72rem !important;
+    line-height: 1.18 !important;
+    vertical-align: middle !important;
+}
+
+.report-wrapper .table-responsive,
+.forecast-table-wrap {
+    border-radius: 10px !important;
+}
+
+.report-wrapper .text-muted,
+.report-wrapper small,
+.forecast-wrapper small,
+.monthly-dashboard .text-muted,
+.monthly-dashboard .small {
+    font-size: .7rem !important;
+    line-height: 1.25 !important;
+}
+
+.status-pill,
+.badge-pill {
+    min-height: 20px !important;
+    padding: 2px 8px !important;
+    font-size: .64rem !important;
+    line-height: 1 !important;
+}
+
+.forecast-wrapper {
+    min-height: auto !important;
+    margin: 8px 0 30px !important;
+    padding: 0 24px !important;
+}
+
+.cards-grid {
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+}
+
+.forecast-card,
+.dashboard-card {
+    border-radius: 10px !important;
+    box-shadow: none !important;
+}
+
+.forecast-card {
+    padding: 12px 14px 11px !important;
+}
+
+.forecast-card h3,
+.monthly-dashboard .text-uppercase {
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+    letter-spacing: .04em !important;
+}
+
+.forecast-card strong,
+.monthly-dashboard .dashboard-card h3 {
+    font-size: 1.08rem !important;
+    line-height: 1.12 !important;
+}
+
+.forecast-table-wrap {
+    margin-top: 4px !important;
+    box-shadow: none !important;
+}
+
+.forecast-table {
+    min-width: 900px !important;
+}
+
+.monthly-dashboard {
+    min-height: auto !important;
+    padding-top: 10px !important;
+    padding-bottom: 24px !important;
+}
+
+.monthly-dashboard .dashboard-card.kpi-card {
+    min-height: 74px !important;
+}
+
+.monthly-dashboard .dashboard-card.p-3 {
+    padding: .65rem !important;
+}
+
+.monthly-dashboard .dashboard-card .card-header {
+    padding: 8px 10px !important;
+    font-size: .76rem !important;
+    line-height: 1.15 !important;
+}
+
+.monthly-dashboard .chart-container {
+    height: 280px !important;
+    min-height: 280px !important;
+    padding: 10px 12px 8px !important;
+}
+
+.monthly-dashboard .chart-container canvas {
+    height: 100% !important;
+}
+
+@media (max-width: 768px) {
+    .report-wrapper,
+    .forecast-wrapper,
+    .monthly-dashboard {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+}

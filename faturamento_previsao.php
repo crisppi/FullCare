@@ -252,6 +252,7 @@ body {
     }
 }
 </style>
+<link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 
 <div class="forecast-wrapper">
     <div class="forecast-hero">
