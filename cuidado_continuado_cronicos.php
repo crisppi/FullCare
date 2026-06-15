@@ -90,9 +90,9 @@ function cc_action_label(string $action): string
 <script src="js/timeout.js"></script>
 <style>
     .cc-module-shell {
-        padding: 18px 12px 20px;
+        padding: 10px 12px 16px;
         background: #f6f8fc;
-        min-height: 100vh;
+        min-height: auto;
     }
     .cc-module-hero {
         background: linear-gradient(135deg, #6b2230, #b6475f 60%, #f2b8c6);
@@ -119,9 +119,9 @@ function cc_action_label(string $action): string
         line-height: 1.4;
     }
     .cc-module-hero .btn {
-        min-height: 32px;
-        padding: 6px 12px;
-        font-size: .72rem;
+        min-height: 28px;
+        padding: 4px 10px;
+        font-size: .68rem;
     }
     .cc-quick-form textarea {
         min-height: 42px;
@@ -131,17 +131,66 @@ function cc_action_label(string $action): string
         color: #6b7280;
     }
     .cc-module-shell .card {
-        border-radius: 16px;
+        border-radius: 12px;
     }
     .cc-module-shell .card-body {
-        padding: 14px;
+        padding: 10px 12px;
+    }
+    .cc-module-shell .card.shadow-sm {
+        box-shadow: 0 5px 14px rgba(36, 50, 74, 0.06) !important;
+    }
+    .cc-module-shell .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .cc-module-shell .fc-module-header {
+        margin-bottom: .75rem !important;
+        padding: 8px 12px !important;
+        border-radius: 12px !important;
+    }
+    .cc-module-shell .fc-module-header__title {
+        font-size: .98rem !important;
+    }
+    .cc-module-shell .fc-module-header__subtitle {
+        max-width: 820px;
+        font-size: .68rem !important;
+        line-height: 1.25 !important;
+    }
+    .cc-module-shell .fc-module-header__actions .btn {
+        min-height: 28px;
+        padding: 4px 10px;
+        font-size: .68rem;
+        line-height: 1.15;
+    }
+    .cc-module-shell .row.g-3 {
+        --bs-gutter-x: .65rem;
+        --bs-gutter-y: .65rem;
+    }
+    .cc-module-shell .row.g-2 {
+        --bs-gutter-x: .45rem;
+        --bs-gutter-y: .45rem;
+    }
+    .cc-module-shell .mb-4 {
+        margin-bottom: .75rem !important;
+    }
+    .cc-module-shell .mb-3 {
+        margin-bottom: .55rem !important;
+    }
+    .cc-module-shell .mb-2 {
+        margin-bottom: .4rem !important;
+    }
+    .cc-module-shell h2,
+    .cc-module-shell .h5 {
+        font-size: .82rem !important;
+        line-height: 1.2 !important;
     }
     .cc-module-shell .text-muted.small,
     .cc-module-shell .small {
         font-size: .68rem !important;
     }
     .cc-module-shell .fs-3 {
-        font-size: 1.35rem !important;
+        font-size: 1.08rem !important;
+        line-height: 1 !important;
     }
     .cc-module-shell .form-label {
         font-size: .68rem;
@@ -150,8 +199,8 @@ function cc_action_label(string $action): string
     .cc-module-shell .form-control,
     .cc-module-shell .form-select,
     .cc-module-shell .btn {
-        min-height: 32px;
-        height: 32px;
+        min-height: 30px;
+        height: 30px;
         font-size: .72rem;
         line-height: 1.2;
     }
@@ -160,9 +209,9 @@ function cc_action_label(string $action): string
         color: #c4c4c4;
     }
     .cc-module-shell .btn.btn-sm {
-        min-height: 30px;
+        min-height: 26px;
         font-size: .68rem;
-        padding: 5px 10px;
+        padding: 3px 8px;
     }
     .cc-module-shell .table thead th {
         font-size: .56rem;
@@ -174,6 +223,11 @@ function cc_action_label(string $action): string
         font-size: .72rem;
         padding: 6px 8px;
         vertical-align: middle;
+    }
+    .cc-module-shell .alert {
+        padding: .55rem .7rem;
+        font-size: .72rem;
+        line-height: 1.25;
     }
 </style>
 

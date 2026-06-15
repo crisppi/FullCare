@@ -470,8 +470,9 @@ $acessosRows = array_slice($acessosRows, 0, 30);
         }
     }
 </style>
+<link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/../css/operational_reports.css') ?>" rel="stylesheet">
 
-<div class="container-fluid form_container" style="margin-top:15px;">
+<div class="container-fluid form_container operational-report-page logs-report-page" style="margin-top:15px;">
     <div class="fc-module-header fc-module-header--gestao">
         <div class="fc-module-header__copy">
             <p class="fc-module-header__kicker">Gestão</p>

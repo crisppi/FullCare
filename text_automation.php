@@ -298,8 +298,9 @@ include_once("templates/header.php");
         }
     }
     </style>
+    <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 
-<main class="container-fluid mt-5 pt-4">
+<main class="container-fluid mt-5 pt-4 operational-report-page">
         <div class="automation-title-card">
             <div class="automation-title-row">
                 <h1>Auditoria Médica Inteligente</h1>

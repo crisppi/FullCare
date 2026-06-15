@@ -46,9 +46,9 @@ function cc_fmt_datetime_dash(?string $value): string
 <script src="js/timeout.js"></script>
 <style>
     .cc-shell {
-        padding: 18px 12px 20px;
+        padding: 10px 12px 16px;
         background: linear-gradient(180deg, #f5f8ff 0%, #ffffff 180px);
-        min-height: 100vh;
+        min-height: auto;
     }
     .cc-hero {
         background: linear-gradient(135deg, #0f3d63, #1d6a96 58%, #71c2cb);
@@ -76,17 +76,17 @@ function cc_fmt_datetime_dash(?string $value): string
         line-height: 1.4;
     }
     .cc-hero .btn {
-        min-height: 32px;
-        padding: 6px 12px;
-        font-size: .72rem;
+        min-height: 28px;
+        padding: 4px 10px;
+        font-size: .68rem;
     }
     .cc-link-card {
         display: block;
         text-decoration: none;
         color: inherit;
         background: #fff;
-        border-radius: 16px;
-        padding: 14px;
+        border-radius: 12px;
+        padding: 12px 14px;
         height: 100%;
         box-shadow: 0 10px 26px rgba(36, 50, 74, 0.08);
         border: 1px solid rgba(15, 61, 99, 0.08);
@@ -96,16 +96,17 @@ function cc_fmt_datetime_dash(?string $value): string
         transform: translateY(-1px);
     }
     .cc-shell .card {
-        border-radius: 16px;
+        border-radius: 12px;
     }
     .cc-shell .card-body {
-        padding: 14px;
+        padding: 10px 12px;
     }
     .cc-shell .h4,
     .cc-shell .h5,
     .cc-shell h2,
     .cc-shell h3 {
-        font-size: .9rem !important;
+        font-size: .82rem !important;
+        line-height: 1.2 !important;
     }
     .cc-shell .text-muted.small,
     .cc-shell .small {
@@ -113,7 +114,7 @@ function cc_fmt_datetime_dash(?string $value): string
     }
     .cc-shell .fs-5,
     .cc-kpi-value {
-        font-size: 1.4rem !important;
+        font-size: 1.08rem !important;
     }
     .cc-kpi-badge {
         font-size: .64rem;
@@ -123,9 +124,9 @@ function cc_fmt_datetime_dash(?string $value): string
         font-size: .66rem !important;
     }
     .cc-shell .btn.btn-sm {
-        min-height: 30px;
+        min-height: 26px;
         font-size: .68rem;
-        padding: 5px 10px;
+        padding: 3px 8px;
     }
     .cc-shell .table thead th {
         font-size: .56rem;
@@ -142,6 +143,69 @@ function cc_fmt_datetime_dash(?string $value): string
         font-size: .72rem;
         padding-top: .45rem;
         padding-bottom: .45rem;
+    }
+    .cc-shell .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .cc-shell .fc-module-header {
+        margin-bottom: .75rem !important;
+        padding: 8px 12px !important;
+        border-radius: 12px !important;
+    }
+    .cc-shell .fc-module-header__title {
+        font-size: .98rem !important;
+    }
+    .cc-shell .fc-module-header__subtitle {
+        max-width: 760px;
+        font-size: .68rem !important;
+        line-height: 1.25 !important;
+    }
+    .cc-shell .row.g-3 {
+        --bs-gutter-x: .65rem;
+        --bs-gutter-y: .65rem;
+    }
+    .cc-shell .row.g-4 {
+        --bs-gutter-x: .8rem;
+        --bs-gutter-y: .8rem;
+    }
+    .cc-shell .mb-4 {
+        margin-bottom: .75rem !important;
+    }
+    .cc-shell .mt-1 {
+        margin-top: .35rem !important;
+    }
+    .cc-shell .mt-2 {
+        margin-top: .35rem !important;
+    }
+    .cc-shell .mb-3 {
+        margin-bottom: .55rem !important;
+    }
+    .cc-shell .card.shadow-sm {
+        box-shadow: 0 5px 14px rgba(36, 50, 74, 0.06) !important;
+    }
+    .cc-shell .card.h-100 {
+        min-height: 0;
+    }
+    .cc-shell .cc-kpi-badge {
+        font-size: .6rem !important;
+        padding: .2rem .48rem !important;
+    }
+    .cc-shell .cc-kpi-subtitle,
+    .cc-shell p.text-muted {
+        font-size: .66rem !important;
+        line-height: 1.24 !important;
+    }
+    .cc-shell .cc-link-card > .d-flex i {
+        font-size: 1.35rem !important;
+    }
+    .cc-shell .cc-link-card .row {
+        --bs-gutter-y: .25rem;
+    }
+    .cc-shell .alert {
+        padding: .55rem .7rem;
+        font-size: .72rem;
+        line-height: 1.25;
     }
 </style>
 

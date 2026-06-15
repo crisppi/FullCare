@@ -6,6 +6,20 @@ require_once("app/services/OperationalIntelligenceService.php");
 $service = new OperationalIntelligenceService($conn);
 $drivers = $service->explainabilityDrivers();
 
+function insight_factor_label(string $factor): string
+{
+    $factor = trim($factor);
+    if ($factor === '') {
+        return '-';
+    }
+
+    if (function_exists('mb_strtolower') && function_exists('mb_convert_case')) {
+        return mb_convert_case(mb_strtolower($factor, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+    }
+
+    return ucfirst(strtolower($factor));
+}
+
 include_once("templates/header.php");
 ?>
 <!DOCTYPE html>
@@ -44,15 +58,60 @@ include_once("templates/header.php");
         .alert {
             margin-bottom: 0;
         }
-        .factor-chip {
+        .insight-table-wrap {
+            overflow-x: visible;
+        }
+        .insight-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        .insight-table th,
+        .insight-table td {
+            white-space: normal !important;
+        }
+        .insight-table .patient-col { width: 25%; }
+        .insight-table .hospital-col { width: 18%; }
+        .insight-table .operator-col { width: 10%; }
+        .insight-table .days-col { width: 8%; }
+        .insight-table .status-col { width: 10%; }
+        .insight-table .factors-col { width: 29%; }
+        .patient-name {
+            color: #3e4653;
+            font-weight: 500;
+        }
+        .days-value {
+            color: #3e4653;
+            font-weight: 500;
+        }
+        .insight-status {
             display: inline-flex;
             align-items: center;
-            background: #eef7fc;
-            color: #24384f;
-            font-size: 0.76rem;
+            min-height: 18px;
             border-radius: 999px;
-            padding: 0.18rem 0.62rem;
-            margin: 0.15rem;
+            padding: 2px 7px;
+            font-size: .58rem;
+            line-height: 1;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .factor-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 6px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .factor-list li {
+            color: #536171;
+            font-size: .66rem;
+            line-height: 1.18;
+            font-weight: 400;
+        }
+        .factor-list li + li::before {
+            content: "·";
+            margin-right: 6px;
+            color: #9aa7b6;
         }
         .insight-card .table tbody tr:nth-child(odd),
         .insight-card .table tbody tr:nth-child(odd) > * {
@@ -73,9 +132,10 @@ include_once("templates/header.php");
             --bs-table-accent-bg: #e8f4fb !important;
         }
     </style>
+    <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 </head>
 <body>
-    <div class="container-fluid" style="margin-top:24px; padding:0 0 16px;">
+    <div class="container-fluid operational-report-page" style="margin-top:24px; padding:0 0 16px;">
         <div class="row mb-2">
             <div class="col-12">
                 <h2 class="mb-0 fw-semibold" style="color:#2f6f9f;">Insights explicáveis</h2>
@@ -93,8 +153,16 @@ include_once("templates/header.php");
 
         <div class="insight-card">
             <?php if (!empty($drivers['available'])): ?>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <div class="table-responsive insight-table-wrap">
+                <table class="table table-hover align-middle insight-table">
+                    <colgroup>
+                        <col class="patient-col">
+                        <col class="hospital-col">
+                        <col class="operator-col">
+                        <col class="days-col">
+                        <col class="status-col">
+                        <col class="factors-col">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>Paciente</th>
@@ -109,18 +177,18 @@ include_once("templates/header.php");
                         <?php foreach ($drivers['entries'] as $entry): ?>
                         <tr>
                             <td>
-                                <div class="fw-semibold"><?= htmlspecialchars($entry['nome_pac'] ?? 'Paciente') ?></div>
+                                <div class="patient-name"><?= htmlspecialchars($entry['nome_pac'] ?? 'Paciente') ?></div>
                                 <small class="text-muted">Int. #<?= (int)$entry['id_internacao'] ?> · <?= date('d/m/Y', strtotime($entry['data_intern_int'])) ?></small>
                             </td>
                             <td><?= htmlspecialchars($entry['nome_hosp'] ?? '-') ?></td>
                             <td><?= htmlspecialchars($entry['seguradora_seg'] ?? '-') ?></td>
-                            <td class="text-center fw-semibold"><?= (int)$entry['dias_atual'] ?>d</td>
+                            <td class="text-center days-value"><?= (int)$entry['dias_atual'] ?>d</td>
                             <td class="text-center">
                                 <?php
                                 $statusClass = [
-                                    'atrasado' => 'badge bg-danger',
-                                    'atencao'  => 'badge bg-warning text-dark',
-                                    'no_prazo' => 'badge bg-success'
+                                    'atrasado' => 'insight-status bg-danger text-white',
+                                    'atencao'  => 'insight-status bg-warning text-dark',
+                                    'no_prazo' => 'insight-status bg-success text-white'
                                 ];
                                 $label = [
                                     'atrasado' => 'Acima do previsto',
@@ -133,10 +201,12 @@ include_once("templates/header.php");
                                     <?= $label[$state] ?? 'Monitorar' ?>
                                 </span>
                             </td>
-                            <td>
+                            <td class="factors-cell">
+                                <ul class="factor-list">
                                 <?php foreach (($entry['factors'] ?? []) as $factor): ?>
-                                <span class="factor-chip"><?= htmlspecialchars($factor) ?></span>
+                                    <li><?= htmlspecialchars(insight_factor_label((string)$factor)) ?></li>
                                 <?php endforeach; ?>
+                                </ul>
                             </td>
                         </tr>
                         <?php endforeach; ?>

@@ -44,9 +44,10 @@ include_once("templates/header.php");
             margin-bottom: 0;
         }
     </style>
+    <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 </head>
 <body>
-    <div class="container-fluid" style="margin-top:24px; padding:0 0 16px;">
+    <div class="container-fluid operational-report-page" style="margin-top:24px; padding:0 0 16px;">
         <div class="row mb-2">
             <div class="col-12">
                 <h2 class="mb-0 fw-semibold" style="color:#2f6f9f;">Previsão de permanência e alertas</h2>

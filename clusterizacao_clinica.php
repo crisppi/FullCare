@@ -57,9 +57,10 @@ include_once("templates/header.php");
         .cluster-risco {background:#e0f2fe;color:#075985;}
         .cluster-padrao {background:#e2e8f0;color:#1f2937;}
     </style>
+    <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 </head>
 <body>
-    <div class="container-fluid" style="margin-top:24px; padding:0 0 16px;">
+    <div class="container-fluid operational-report-page" style="margin-top:24px; padding:0 0 16px;">
         <div class="row mb-2">
             <div class="col-12">
                 <h2 class="mb-0 fw-semibold" style="color:#2f6f9f;">Clusterização clínica</h2>

@@ -150,10 +150,11 @@ include_once("templates/header.php");
         font-weight: 600;
     }
     </style>
+    <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 </head>
 
 <body>
-    <div class="container-fluid mt-5 pt-4">
+    <div class="container-fluid mt-5 pt-4 operational-report-page">
         <div class="row mb-4">
             <div class="col-12">
                 <div class="alert alert-info">
