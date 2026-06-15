@@ -97,11 +97,11 @@ $stmt->execute();
 $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-date-selects">
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-date-selects"></script>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-select-neutral"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
-<div class="bi-wrapper bi-theme">
+<div class="bi-wrapper bi-theme bi-visita-inicial-page">
     <div class="bi-header">
         <div>
             <h1 class="bi-title">Visita Inicial</h1>

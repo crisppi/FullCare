@@ -118,7 +118,11 @@ $rowsJust = distQuery($conn, "COALESCE(NULLIF(u.just_uti,''), 'Sem informações
 $rowsUti = distQuery($conn, "CASE WHEN u.internado_uti = 's' THEN 'Sim' WHEN u.internado_uti = 'n' THEN 'Não' ELSE 'Sem informações' END", $sqlBase, $params, 6);
 $rowsDva = distQuery($conn, "CASE WHEN u.dva_uti = 's' THEN 'Sim' WHEN u.dva_uti = 'n' THEN 'Não' ELSE 'Sem informações' END", $sqlBase, $params, 6);
 $rowsSaps = distQuery($conn, "COALESCE(NULLIF(u.saps_uti,''), 'Sem informações')", $sqlBase, $params, 10);
-$rowsSexo = distQuery($conn, "COALESCE(NULLIF(pa.sexo_pac,''), 'Sem informações')", $sqlBase, $params, 6);
+$rowsSexo = distQuery($conn, "CASE
+        WHEN LOWER(TRIM(COALESCE(pa.sexo_pac, ''))) IN ('f', 'fem', 'feminino') THEN 'Fem'
+        WHEN LOWER(TRIM(COALESCE(pa.sexo_pac, ''))) IN ('m', 'masc', 'masculino') THEN 'Masc'
+        ELSE 'Sem informações'
+    END", $sqlBase, $params, 6);
 $rowsIdade = distQuery($conn, "CASE
         WHEN pa.idade_pac IS NULL THEN 'Sem informações'
         WHEN pa.idade_pac < 20 THEN '0-19'
@@ -163,10 +167,52 @@ function labelsAndValues(array $rows): array
 [$labelsIdade, $valuesIdade] = labelsAndValues($rowsIdade);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-date-selects">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-date-selects"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-select-neutral"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
+<style>
+    .bi-uti-balanced-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .bi-uti-balanced-grid .bi-panel {
+        min-width: 0;
+        margin-top: 0;
+        overflow: hidden;
+    }
+
+    .bi-uti-balanced-grid .bi-chart {
+        height: var(--bi-chart-height);
+        min-height: var(--bi-chart-height);
+    }
+
+    .bi-uti-balanced-grid .bi-kpi-panel {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .bi-uti-balanced-grid .bi-kpi-panel .bi-kpis {
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: start;
+    }
+
+    @media (max-width: 1180px) {
+        .bi-uti-balanced-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 720px) {
+        .bi-uti-balanced-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
 <div class="bi-wrapper bi-theme">
     <div class="bi-header">
@@ -241,7 +287,7 @@ function labelsAndValues(array $rows): array
         </div>
     </form>
 
-    <div class="bi-row" style="margin-top:16px;">
+    <div class="bi-uti-balanced-grid">
         <div class="bi-panel">
             <h3>Score</h3>
             <div class="bi-chart"><canvas id="chartScore"></canvas></div>
@@ -256,7 +302,7 @@ function labelsAndValues(array $rows): array
         </div>
     </div>
 
-    <div class="bi-row" style="margin-top:16px;">
+    <div class="bi-uti-balanced-grid">
         <div class="bi-panel">
             <h3>UTI Selecionado</h3>
             <div class="bi-chart"><canvas id="chartUti"></canvas></div>
@@ -273,14 +319,11 @@ function labelsAndValues(array $rows): array
             <h3>Sexo</h3>
             <div class="bi-chart"><canvas id="chartSexo"></canvas></div>
         </div>
-    </div>
-
-    <div class="bi-row" style="margin-top:16px;">
         <div class="bi-panel">
             <h3>Idade</h3>
             <div class="bi-chart"><canvas id="chartIdade"></canvas></div>
         </div>
-        <div class="bi-panel">
+        <div class="bi-panel bi-kpi-panel">
             <div class="bi-kpis">
                 <div class="bi-kpi">
                     <small>Internações</small>
@@ -337,11 +380,14 @@ function barChart(ctx, labels, data, color) {
 function pieChart(ctx, labels, data) {
     return new Chart(ctx, {
         type: 'pie',
-        data: { labels, datasets: [{ data, backgroundColor: ['#7db8ff','#c17ac3','#4fc1b5','#f2b96b','#8b9fff','#6ac9ff'] }] },
+        data: { labels, datasets: [{ data, backgroundColor: ['#86b6f0','#b77db7','#67b8ae','#d6a65d','#8f99d7','#6faecc'] }] },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            legend: window.biLegendWhite || {}
+            biPieSeparator: true,
+            biPieShadow: true,
+            legend: window.biLegendWhite || {},
+            layout: { padding: { left: 6, right: 6, top: 4, bottom: 2 } }
         }
     });
 }

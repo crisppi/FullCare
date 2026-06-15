@@ -91,8 +91,8 @@ $shareTop = $totalFinal > 0 ? round(($topFinal / $totalFinal) * 100, 1) : 0;
 $topList = array_slice($rows, 0, 15);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-date-selects">
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-date-selects"></script>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-select-neutral"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));
 </script>

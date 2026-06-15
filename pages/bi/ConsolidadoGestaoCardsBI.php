@@ -416,7 +416,7 @@ $custoMedioDiariaUti = $selUti['total_diarias'] > 0 ? ($selFinanceiroUti['valor_
 $custoMedioConta = $selFinanceiro['total_contas'] > 0 ? ($selFinanceiro['valor_apresentado'] / $selFinanceiro['total_contas']) : 0.0;
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=<?= @filemtime(__DIR__ . '/../../css/bi.css') ?: time() ?>">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
 <script src="<?= $BASE_URL ?>js/bi.js?v=<?= @filemtime(__DIR__ . '/../../js/bi.js') ?: time() ?>"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 

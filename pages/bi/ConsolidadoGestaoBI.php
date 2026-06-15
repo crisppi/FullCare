@@ -704,7 +704,7 @@ $glosaSeries = [
 ];
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=<?= @filemtime(__DIR__ . '/../../css/bi.css') ?: time() ?>">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
 <style>
 body .bi-consolidado-page .bi-consolidado-filters .bi-filter.is-selected label,
 body .bi-consolidado-page .bi-consolidado-filters .bi-filter label {

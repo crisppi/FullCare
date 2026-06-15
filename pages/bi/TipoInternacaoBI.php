@@ -93,9 +93,9 @@ $mp = $internacoes > 0 ? $diarias / $internacoes : 0;
 [$labelsTipoCusto, $valuesTipoCusto] = labelsValues($rowsTipoCusto);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-date-selects">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-date-selects"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-select-neutral"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 
 <div class="bi-wrapper bi-theme">
