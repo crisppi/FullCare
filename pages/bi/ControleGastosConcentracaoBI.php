@@ -85,9 +85,9 @@ $labels = array_map(fn($r) => $r['hospital'], $topRows);
 $values = array_map(fn($r) => round((float)($r['share'] ?? 0), 2), $topRows);
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260509-filter-icons">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-date-selects">
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="<?= $BASE_URL ?>js/bi.js?v=20260516-rounded-bars"></script>
+<script src="<?= $BASE_URL ?>js/bi.js?v=20260614-date-selects"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));
 </script>

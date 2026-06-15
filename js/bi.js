@@ -451,9 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const applyDateStyles = (root) => {
     root.querySelectorAll('input[type="date"]').forEach((input) => {
-      input.style.setProperty('background-color', 'var(--bi-panel-strong)', 'important');
+      input.style.setProperty('background-color', 'rgba(16, 61, 92, 0.42)', 'important');
       input.style.setProperty('color', '#eaf6ff', 'important');
-      input.style.setProperty('border-color', 'rgba(255,255,255,0.35)', 'important');
+      input.style.setProperty('border-color', 'rgba(231, 244, 252, 0.62)', 'important');
+      input.style.setProperty('box-shadow', 'none', 'important');
       input.style.setProperty('-webkit-text-fill-color', '#eaf6ff', 'important');
     });
   };
@@ -467,9 +468,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!control) {
         return;
       }
+      const isDateInput = control.matches('input[type="date"]');
       const label = filter.querySelector('label');
       const value = (control.value || '').trim();
-      const isSelected = value !== '';
+      const isSelected = !isDateInput && value !== '';
       filter.classList.toggle('is-selected', isSelected);
       if (isSelected) {
         control.setAttribute('data-selected', '1');
@@ -484,6 +486,11 @@ document.addEventListener('DOMContentLoaded', () => {
         control.style.removeProperty('border-color');
         control.style.removeProperty('background-color');
         control.style.removeProperty('box-shadow');
+        if (isDateInput) {
+          control.style.setProperty('border-color', 'rgba(231, 244, 252, 0.62)', 'important');
+          control.style.setProperty('background-color', 'rgba(16, 61, 92, 0.42)', 'important');
+          control.style.setProperty('box-shadow', 'none', 'important');
+        }
         if (label) {
           label.style.removeProperty('color');
         }

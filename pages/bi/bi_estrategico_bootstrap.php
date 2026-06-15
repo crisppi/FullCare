@@ -112,7 +112,7 @@ if (!function_exists('bi_render_page_start')) {
         <link rel="stylesheet" href="<?= $baseUrl ?>css/bi.css?v=<?= $biCssVersion ?>">
         <link rel="stylesheet" href="<?= $baseUrl ?>css/bi-estrategico.css?v=<?= $biStrategicCssVersion ?>">
         <script src="diversos/chartjs/Chart.min.js"></script>
-        <script src="<?= $baseUrl ?>js/bi.js?v=20260516-rounded-bars"></script>
+        <script src="<?= $baseUrl ?>js/bi.js?v=20260614-date-selects"></script>
         <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
         <div class="bi-wrapper bi-theme bi-strategic-page">
             <div class="bi-header">

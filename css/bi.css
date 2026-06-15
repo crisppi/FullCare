@@ -224,14 +224,27 @@ body.bi-theme,
 
 .bi-theme input[type="date"],
 .bi-panel.bi-filters input[type="date"] {
-  background-color: var(--bi-panel-strong) !important;
+  background-color: rgba(16, 61, 92, 0.42) !important;
   color: var(--bi-text) !important;
   color-scheme: dark;
   -webkit-appearance: none;
   appearance: none;
-  border-color: var(--bi-border) !important;
+  border-color: rgba(231, 244, 252, 0.62) !important;
   box-shadow: none !important;
   -webkit-text-fill-color: var(--bi-text);
+}
+
+.bi-filter.is-selected input[type="date"],
+.bi-filter input[type="date"][data-selected="1"],
+.bi-panel.bi-filters input[type="date"]:focus,
+.bi-panel.bi-filters input[type="date"]:focus-visible {
+  background-color: rgba(16, 61, 92, 0.42) !important;
+  border-color: rgba(231, 244, 252, 0.62) !important;
+  box-shadow: none !important;
+}
+
+.bi-filter:has(input[type="date"]).is-selected label {
+  color: var(--bi-muted) !important;
 }
 
 .bi-theme input[type="date"]::-webkit-datetime-edit,
