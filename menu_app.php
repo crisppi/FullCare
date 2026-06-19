@@ -3268,6 +3268,12 @@ canvas {
     white-space: nowrap !important;
 }
 
+#dash-visitas-atraso .table thead th.th-sortable,
+#dash-longa-perm .table thead th.th-sortable,
+#dash-reinternacoes .table thead th.th-sortable {
+    display: table-cell !important;
+}
+
 .th-sortable .sort-icons {
     display: inline-flex !important;
     align-items: center !important;
