@@ -559,7 +559,7 @@ class _HomeHubPageState extends State<HomeHubPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 12,
+                      vertical: 10,
                     ),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
@@ -572,21 +572,13 @@ class _HomeHubPageState extends State<HomeHubPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'FULLCARE AUDIT',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.1,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
                         Text(
                           'Olá, ${widget.user.name}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: 13,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -613,51 +605,11 @@ class _HomeHubPageState extends State<HomeHubPage> {
                   ),
                   _FullCareMenuRow(
                     icon: Icons.edit_note_outlined,
-                    title: 'Auditoria e evolução',
+                    title: 'Auditoria e visita',
                     subtitle: 'Visitas, TUSS, prorrogações e alta hospitalar',
                     iconBackgroundColor: const Color(0xFFF2EAF7),
                     accentColor: const Color(0xFF5E2363),
-                    onTap: () => _openAdmissions('Auditoria e evolução'),
-                  ),
-                  _FullCareMenuRow(
-                    icon: Icons.home_work_outlined,
-                    title: 'Desospitalização / Home Care',
-                    subtitle: 'Elegibilidade, barreiras e plano de transição',
-                    iconBackgroundColor: const Color(0xFFE6F7F3),
-                    accentColor: const Color(0xFF0F766E),
-                    onTap:
-                        () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => HomeCareCasesPage(api: widget.api),
-                          ),
-                        ),
-                  ),
-                  _FullCareMenuRow(
-                    icon: Icons.pending_actions_outlined,
-                    title: 'Longa permanência',
-                    subtitle: 'Risco, responsável, próxima revisão e plano',
-                    iconBackgroundColor: const Color(0xFFFFF4DF),
-                    accentColor: const Color(0xFF9A650D),
-                    onTap:
-                        () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => LongStayCasesPage(api: widget.api),
-                          ),
-                        ),
-                  ),
-                  _FullCareMenuRow(
-                    icon: Icons.health_and_safety_outlined,
-                    title: 'Eventos adversos',
-                    subtitle: 'Sinalização, investigação e encerramento',
-                    iconBackgroundColor: const Color(0xFFFFE8E5),
-                    accentColor: const Color(0xFFC2410C),
-                    onTap:
-                        () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder:
-                                (_) => AdverseEventCasesPage(api: widget.api),
-                          ),
-                        ),
+                    onTap: () => _openAdmissions('Auditoria e visita'),
                   ),
                   const SizedBox(height: 20),
                   const Text(
@@ -2998,376 +2950,6 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
     }
   }
 
-  Future<void> _addLongStayUpdate() async {
-    final detail = _detail;
-    final patientName = detail?.admission.patientName ?? 'Paciente';
-    List<LongStayCase> cases = const [];
-    List<String> statusOptions = const [];
-    List<String> reasonOptions = const [];
-    List<String> riskOptions = const [];
-
-    try {
-      final results = await Future.wait([
-        widget.api.listLongStayCases(patientName),
-        widget.api.listLongStayStatuses(),
-        widget.api.listLongStayReasons(),
-        widget.api.listLongStayRisks(),
-      ]);
-      cases = results[0] as List<LongStayCase>;
-      statusOptions = results[1] as List<String>;
-      reasonOptions = results[2] as List<String>;
-      riskOptions = results[3] as List<String>;
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString().replaceFirst('Exception: ', '')),
-        ),
-      );
-      return;
-    }
-
-    LongStayCase? currentCase;
-    for (final item in cases) {
-      if (item.admissionId == widget.admissionId) {
-        currentCase = item;
-        break;
-      }
-    }
-
-    final ownerController = TextEditingController(
-      text: currentCase?.owner ?? '',
-    );
-    final clinicalBarrierController = TextEditingController(
-      text: currentCase?.clinicalBarrier ?? '',
-    );
-    final administrativeBarrierController = TextEditingController(
-      text: currentCase?.administrativeBarrier ?? '',
-    );
-    final actionPlanController = TextEditingController(
-      text: currentCase?.actionPlan ?? '',
-    );
-    final notesController = TextEditingController(
-      text: currentCase?.notes ?? '',
-    );
-    final deadlineController = TextEditingController();
-    final nextReviewController = TextEditingController(
-      text:
-          currentCase == null || currentCase.nextReviewDate.isEmpty
-              ? ''
-              : _formatDate(currentCase.nextReviewDate),
-    );
-    final expectedDischargeController = TextEditingController(
-      text:
-          currentCase == null || currentCase.expectedDischargeDate.isEmpty
-              ? ''
-              : _formatDate(currentCase.expectedDischargeDate),
-    );
-    String selectedStatus = currentCase?.status.trim() ?? '';
-    String selectedReason = currentCase?.mainReason.trim() ?? '';
-    String selectedRisk = currentCase?.riskLevel.trim() ?? '';
-    bool escalated = currentCase?.escalatedFlag.trim().toLowerCase() == 's';
-    bool dehospitalization =
-        currentCase?.dehospitalizationFlag.trim().toLowerCase() == 's';
-    bool saved = false;
-
-    if (!mounted) return;
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      showDragHandle: true,
-      backgroundColor: const Color(0xFFF2F6FC),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder:
-          (context) => StatefulBuilder(
-            builder:
-                (context, setModalState) => Padding(
-                  padding: EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    top: 4,
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    patientName,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFF1D2940),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  const Text(
-                                    'Atualização de longa permanência',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF5B6577),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              icon: const Icon(Icons.close),
-                              tooltip: 'Fechar',
-                              visualDensity: VisualDensity.compact,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          width: double.infinity,
-                          height: 1,
-                          color: const Color(0xFFD8E3F0),
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          initialValue:
-                              selectedStatus.isEmpty ? null : selectedStatus,
-                          items:
-                              statusOptions
-                                  .map(
-                                    (item) => DropdownMenuItem<String>(
-                                      value: item,
-                                      child: Text(_labelize(item)),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged: (value) {
-                            setModalState(() {
-                              selectedStatus = value ?? '';
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Status atual',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          initialValue:
-                              selectedReason.isEmpty ? null : selectedReason,
-                          items:
-                              reasonOptions
-                                  .map(
-                                    (item) => DropdownMenuItem<String>(
-                                      value: item,
-                                      child: Text(_labelize(item)),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged: (value) {
-                            setModalState(() {
-                              selectedReason = value ?? '';
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Motivo principal',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          initialValue:
-                              selectedRisk.isEmpty ? null : selectedRisk,
-                          items:
-                              riskOptions
-                                  .map(
-                                    (item) => DropdownMenuItem<String>(
-                                      value: item,
-                                      child: Text(_labelize(item)),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged: (value) {
-                            setModalState(() {
-                              selectedRisk = value ?? '';
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Risco sinistro',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: ownerController,
-                          decoration: const InputDecoration(
-                            labelText: 'Responsável',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: nextReviewController,
-                          readOnly: true,
-                          onTap: () => _pickDate(context, nextReviewController),
-                          decoration: const InputDecoration(
-                            labelText: 'Próxima revisão',
-                            suffixIcon: Icon(Icons.calendar_today),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: expectedDischargeController,
-                          readOnly: true,
-                          onTap:
-                              () => _pickDate(
-                                context,
-                                expectedDischargeController,
-                              ),
-                          decoration: const InputDecoration(
-                            labelText: 'Previsão de alta',
-                            suffixIcon: Icon(Icons.calendar_today),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: deadlineController,
-                          readOnly: true,
-                          onTap: () => _pickDate(context, deadlineController),
-                          decoration: const InputDecoration(
-                            labelText: 'Prazo da ação',
-                            suffixIcon: Icon(Icons.calendar_today),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        SwitchListTile(
-                          value: escalated,
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text('Necessita escalonamento'),
-                          onChanged: (value) {
-                            setModalState(() {
-                              escalated = value;
-                            });
-                          },
-                        ),
-                        SwitchListTile(
-                          value: dehospitalization,
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text('Potencial de desospitalização'),
-                          onChanged: (value) {
-                            setModalState(() {
-                              dehospitalization = value;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: clinicalBarrierController,
-                          minLines: 2,
-                          maxLines: 4,
-                          decoration: const InputDecoration(
-                            labelText: 'Barreira clínica',
-                            alignLabelWithHint: true,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: administrativeBarrierController,
-                          minLines: 2,
-                          maxLines: 4,
-                          decoration: const InputDecoration(
-                            labelText: 'Barreira administrativa',
-                            alignLabelWithHint: true,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: actionPlanController,
-                          minLines: 2,
-                          maxLines: 4,
-                          decoration: const InputDecoration(
-                            labelText: 'Plano de ação',
-                            alignLabelWithHint: true,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: notesController,
-                          minLines: 2,
-                          maxLines: 4,
-                          decoration: const InputDecoration(
-                            labelText: 'Observações',
-                            alignLabelWithHint: true,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        FilledButton(
-                          onPressed: () async {
-                            await widget.api.saveLongStayUpdate(
-                              admissionId: widget.admissionId,
-                              status: selectedStatus,
-                              mainReason: selectedReason,
-                              clinicalBarrier:
-                                  clinicalBarrierController.text.trim(),
-                              administrativeBarrier:
-                                  administrativeBarrierController.text.trim(),
-                              actionPlan: actionPlanController.text.trim(),
-                              owner: ownerController.text.trim(),
-                              deadlineDate: _toApiDate(
-                                deadlineController.text.trim(),
-                              ),
-                              expectedDischargeDate: _toApiDate(
-                                expectedDischargeController.text.trim(),
-                              ),
-                              nextReviewDate: _toApiDate(
-                                nextReviewController.text.trim(),
-                              ),
-                              dehospitalizationFlag:
-                                  dehospitalization ? 's' : 'n',
-                              escalatedFlag: escalated ? 's' : 'n',
-                              riskLevel: selectedRisk,
-                              notes: notesController.text.trim(),
-                            );
-                            saved = true;
-                            if (!context.mounted) return;
-                            Navigator.of(context).pop();
-                          },
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size.fromHeight(48),
-                            backgroundColor: const Color(0xFF5E2363),
-                          ),
-                          child: const Text('Salvar longa permanência'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-          ),
-    );
-
-    ownerController.dispose();
-    clinicalBarrierController.dispose();
-    administrativeBarrierController.dispose();
-    actionPlanController.dispose();
-    notesController.dispose();
-    deadlineController.dispose();
-    nextReviewController.dispose();
-    expectedDischargeController.dispose();
-
-    await _load();
-    if (saved && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Longa permanência salva com sucesso.')),
-      );
-    }
-  }
-
   Future<void> _addTuss() async {
     final codeController = TextEditingController();
     final requestedController = TextEditingController(text: '1');
@@ -3916,7 +3498,7 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      'Evolução do paciente',
+                      'Visita do paciente',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -3950,14 +3532,6 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                           backgroundColor: const Color(0xFFECFDF5),
                           accentColor: const Color(0xFF0F766E),
                           onTap: _addHomeCareUpdate,
-                        ),
-                        _ActionTile(
-                          label: 'Longa permanência',
-                          subtitle: 'Atualizar',
-                          icon: Icons.schedule_outlined,
-                          backgroundColor: const Color(0xFFF6F0FB),
-                          accentColor: const Color(0xFF5E2363),
-                          onTap: _addLongStayUpdate,
                         ),
                         _ActionTile(
                           label: 'Prorrogação',
@@ -4372,7 +3946,7 @@ class _PrimaryEvolutionCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Evolução',
+                      'Visita',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
@@ -4633,7 +4207,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
     if (report.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Informe a evolução.')));
+      ).showSnackBar(const SnackBar(content: Text('Informe a visita.')));
       return;
     }
 
@@ -4652,7 +4226,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
         _therapeuticPlanController.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Evolução salva com sucesso.')),
+        const SnackBar(content: Text('Visita salva com sucesso.')),
       );
       await _load();
     } catch (error) {
@@ -4672,7 +4246,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Evoluções')),
+      appBar: AppBar(title: const Text('Visitas')),
       body: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
@@ -4694,7 +4268,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
                     ),
                     const SizedBox(height: 6),
                     const Text(
-                      'Evolução clínica e programação terapêutica',
+                      'Visita clínica e programação terapêutica',
                       style: TextStyle(
                         color: Color(0xFF5B6577),
                         fontWeight: FontWeight.w600,
@@ -4716,7 +4290,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
                         Icon(Icons.edit_note, color: Color(0xFF8B5E1A)),
                         SizedBox(width: 8),
                         Text(
-                          'Nova evolução',
+                          'Nova visita',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
@@ -4735,7 +4309,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
                       minLines: 5,
                       maxLength: 5000,
                       decoration: InputDecoration(
-                        labelText: 'Evolução / Relatório',
+                        labelText: 'Visita / Relatório',
                         alignLabelWithHint: true,
                         suffixIcon: IconButton(
                           onPressed: () => _focusForDictation(_reportFocusNode),
@@ -4785,9 +4359,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
                                   ),
                                 )
                                 : const Icon(Icons.save_outlined),
-                        label: Text(
-                          _saving ? 'Salvando...' : 'Salvar evolução',
-                        ),
+                        label: Text(_saving ? 'Salvando...' : 'Salvar visita'),
                       ),
                     ),
                   ],
@@ -4799,7 +4371,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
               children: [
                 const Expanded(
                   child: Text(
-                    'Evoluções anteriores',
+                    'Visitas anteriores',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
@@ -4826,7 +4398,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
               const Card(
                 child: Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text('Nenhuma evolução registrada.'),
+                  child: Text('Nenhuma visita registrada.'),
                 ),
               )
             else
