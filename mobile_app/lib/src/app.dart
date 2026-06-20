@@ -88,13 +88,22 @@ class _FullCareMobileAppState extends State<FullCareMobileApp> {
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.white,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 12,
+          ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(color: Color(0xFFD8E3F0)),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(color: Color(0xFFD8E3F0)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF2D63A6), width: 1.4),
           ),
         ),
       ),
@@ -163,9 +172,9 @@ class _LoginPageState extends State<LoginPage> {
         _mfaChallengeToken = error.challengeToken;
         _mfaCodeController.clear();
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message)));
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -210,11 +219,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final privacyTextStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
       color: const Color(0xFF425466),
-      height: 1.35,
+      height: 1.2,
     );
 
     return Scaffold(
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF2D63A6), Color(0xFF92BEE2), Color(0xFF5E2363)],
@@ -223,186 +234,226 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Card(
-                  elevation: 0,
-                  color: Colors.white.withValues(alpha: 0.95),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
+          child: LayoutBuilder(
+            builder:
+                (context, constraints) => SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Image.asset(
-                            'assets/branding/fullcare_footer_logo.png',
-                            width: 104,
-                            height: 104,
-                            fit: BoxFit.contain,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight:
+                          constraints.maxHeight > 32
+                              ? constraints.maxHeight - 32
+                              : 0,
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 420),
+                        child: Card(
+                          elevation: 0,
+                          color: Colors.white.withValues(alpha: 0.95),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
                           ),
-                        ),
-                        const SizedBox(height: 18),
-                        Text(
-                          'FullCare Audit',
-                          style: Theme.of(context).textTheme.headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Acesso seguro para gestao de auditoria e controles operacionais.',
-                        ),
-                        const SizedBox(height: 20),
-                        if (_mfaChallengeToken.isEmpty) ...[
-                          TextField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            autofillHints: const [AutofillHints.email],
-                            textInputAction: TextInputAction.next,
-                            decoration: const InputDecoration(
-                              labelText: 'E-mail',
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            autofillHints: const [AutofillHints.password],
-                            textInputAction: TextInputAction.done,
-                            onSubmitted: (_) => _submitting ? null : _submit(),
-                            decoration: const InputDecoration(
-                              labelText: 'Senha',
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF5F8FC),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: const Color(0xFFD8E3F0),
-                              ),
-                            ),
-                            padding: const EdgeInsets.all(12),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: Checkbox(
-                                        value: _acceptedPrivacy,
-                                        onChanged:
-                                            (value) => setState(
-                                              () =>
-                                                  _acceptedPrivacy =
-                                                      value ?? false,
-                                            ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        'Declaro estar ciente da Politica de Privacidade e autorizo o uso dos meus dados para acesso e operacao segura do sistema.',
-                                        style: privacyTextStyle,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: TextButton(
-                                    onPressed:
-                                        () => _showPrivacyPolicy(context),
-                                    child: const Text(
-                                      'Ver Politica de Privacidade',
-                                    ),
+                                Center(
+                                  child: Image.asset(
+                                    'assets/branding/fullcare_footer_logo.png',
+                                    width: 76,
+                                    height: 76,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'FullCare Audit',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall
+                                      ?.copyWith(fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Acesso seguro para gestao de auditoria e controles operacionais.',
+                                ),
+                                const SizedBox(height: 16),
+                                if (_mfaChallengeToken.isEmpty) ...[
+                                  TextField(
+                                    controller: _emailController,
+                                    keyboardType: TextInputType.emailAddress,
+                                    autofillHints: const [AutofillHints.email],
+                                    textInputAction: TextInputAction.next,
+                                    decoration: const InputDecoration(
+                                      labelText: 'E-mail',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                    controller: _passwordController,
+                                    obscureText: true,
+                                    autofillHints: const [
+                                      AutofillHints.password,
+                                    ],
+                                    textInputAction: TextInputAction.done,
+                                    onSubmitted:
+                                        (_) => _submitting ? null : _submit(),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Senha',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF5F8FC),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: const Color(0xFFD8E3F0),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      12,
+                                      10,
+                                      12,
+                                      8,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: Checkbox(
+                                                value: _acceptedPrivacy,
+                                                onChanged:
+                                                    (value) => setState(
+                                                      () =>
+                                                          _acceptedPrivacy =
+                                                              value ?? false,
+                                                    ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                'Li e aceito a Politica de Privacidade.',
+                                                style: privacyTextStyle,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: TextButton(
+                                            onPressed:
+                                                () =>
+                                                    _showPrivacyPolicy(context),
+                                            style: TextButton.styleFrom(
+                                              minimumSize: const Size(0, 32),
+                                              padding: const EdgeInsets.only(
+                                                left: 34,
+                                                right: 8,
+                                              ),
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
+                                            child: const Text(
+                                              'Ver Politica de Privacidade',
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: const Color(0xFF5E2363),
+                                      minimumSize: const Size.fromHeight(52),
+                                    ),
+                                    onPressed: _submitting ? null : _submit,
+                                    child:
+                                        _submitting
+                                            ? const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                            : const Text('Entrar'),
+                                  ),
+                                ] else ...[
+                                  const Text(
+                                    'Digite o código de 6 dígitos do seu aplicativo autenticador.',
+                                  ),
+                                  const SizedBox(height: 14),
+                                  TextField(
+                                    controller: _mfaCodeController,
+                                    keyboardType: TextInputType.number,
+                                    autofillHints: const [
+                                      AutofillHints.oneTimeCode,
+                                    ],
+                                    textInputAction: TextInputAction.done,
+                                    onSubmitted:
+                                        (_) =>
+                                            _submitting ? null : _submitMfa(),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Código do autenticador',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: const Color(0xFF5E2363),
+                                      minimumSize: const Size.fromHeight(52),
+                                    ),
+                                    onPressed: _submitting ? null : _submitMfa,
+                                    child:
+                                        _submitting
+                                            ? const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                            : const Text('Verificar'),
+                                  ),
+                                  TextButton(
+                                    onPressed:
+                                        _submitting
+                                            ? null
+                                            : () => setState(() {
+                                              _mfaChallengeToken = '';
+                                              _mfaCodeController.clear();
+                                              _passwordController.clear();
+                                            }),
+                                    child: const Text('Voltar ao login'),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
-                          const SizedBox(height: 18),
-                          FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF5E2363),
-                              minimumSize: const Size.fromHeight(52),
-                            ),
-                            onPressed: _submitting ? null : _submit,
-                            child:
-                                _submitting
-                                    ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                    : const Text('Entrar'),
-                          ),
-                        ] else ...[
-                          const Text(
-                            'Digite o código de 6 dígitos do seu aplicativo autenticador.',
-                          ),
-                          const SizedBox(height: 14),
-                          TextField(
-                            controller: _mfaCodeController,
-                            keyboardType: TextInputType.number,
-                            autofillHints: const [AutofillHints.oneTimeCode],
-                            textInputAction: TextInputAction.done,
-                            onSubmitted:
-                                (_) => _submitting ? null : _submitMfa(),
-                            decoration: const InputDecoration(
-                              labelText: 'Código do autenticador',
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF5E2363),
-                              minimumSize: const Size.fromHeight(52),
-                            ),
-                            onPressed: _submitting ? null : _submitMfa,
-                            child:
-                                _submitting
-                                    ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                    : const Text('Verificar'),
-                          ),
-                          TextButton(
-                            onPressed:
-                                _submitting
-                                    ? null
-                                    : () => setState(() {
-                                      _mfaChallengeToken = '';
-                                      _mfaCodeController.clear();
-                                      _passwordController.clear();
-                                    }),
-                            child: const Text('Voltar ao login'),
-                          ),
-                        ],
-                      ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
           ),
         ),
       ),
@@ -443,7 +494,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class HomeHubPage extends StatelessWidget {
+class HomeHubPage extends StatefulWidget {
   const HomeHubPage({
     super.key,
     required this.api,
@@ -456,176 +507,182 @@ class HomeHubPage extends StatelessWidget {
   final Future<void> Function() onLogout;
 
   @override
+  State<HomeHubPage> createState() => _HomeHubPageState();
+}
+
+class _HomeHubPageState extends State<HomeHubPage> {
+  void _openAdmissions(String title) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => AdmissionsHomePage(api: widget.api, title: title),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF2F6FC),
       appBar: AppBar(
-        title: const Text('FullCare Audit'),
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/branding/fullcare_footer_logo.png',
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 10),
+            const Text('FullCare'),
+          ],
+        ),
         actions: [
           IconButton(
             onPressed: () async {
-              await onLogout();
+              await widget.onLogout();
             },
             icon: const Icon(Icons.logout),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2D63A6), Color(0xFF4D8CC6)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Central operacional',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: .8,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Olá, ${user.name}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 21,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '${user.email} • ${user.roleName}',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Gestão de auditoria',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1D2940),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+            sliver: SliverFillRemaining(
+              hasScrollBody: false,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _AuditOverviewRow(
-                    icon: Icons.assignment_outlined,
-                    title: 'Auditoria operacional',
-                    subtitle: 'Controle de atividades e responsáveis',
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF2D63A6), Color(0xFF4D8CC6)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'FULLCARE AUDIT',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Olá, ${widget.user.name}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Rotinas FullCare',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1D2940),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _FullCareMenuRow(
+                    icon: Icons.menu_book_outlined,
+                    title: 'Censo de internações',
+                    subtitle: 'Lista de pacientes internados e prestadores',
+                    iconBackgroundColor: const Color(0xFFE8F1FB),
+                    accentColor: const Color(0xFF2D63A6),
+                    onTap: () => _openAdmissions('Censo de internações'),
+                  ),
+                  _FullCareMenuRow(
+                    icon: Icons.edit_note_outlined,
+                    title: 'Auditoria e evolução',
+                    subtitle: 'Visitas, TUSS, prorrogações e alta hospitalar',
+                    iconBackgroundColor: const Color(0xFFF2EAF7),
+                    accentColor: const Color(0xFF5E2363),
+                    onTap: () => _openAdmissions('Auditoria e evolução'),
+                  ),
+                  _FullCareMenuRow(
+                    icon: Icons.home_work_outlined,
+                    title: 'Desospitalização / Home Care',
+                    subtitle: 'Elegibilidade, barreiras e plano de transição',
+                    iconBackgroundColor: const Color(0xFFE6F7F3),
+                    accentColor: const Color(0xFF0F766E),
                     onTap:
                         () => Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder:
-                                (_) => AdmissionsHomePage(
-                                  api: api,
-                                  title: 'Auditoria operacional',
-                                ),
+                            builder: (_) => HomeCareCasesPage(api: widget.api),
                           ),
                         ),
                   ),
-                  const Divider(height: 22),
-                  _AuditOverviewRow(
-                    icon: Icons.fact_check_outlined,
-                    title: 'Conformidade',
-                    subtitle: 'Organização de registros e evidências',
+                  _FullCareMenuRow(
+                    icon: Icons.pending_actions_outlined,
+                    title: 'Longa permanência',
+                    subtitle: 'Risco, responsável, próxima revisão e plano',
+                    iconBackgroundColor: const Color(0xFFFFF4DF),
+                    accentColor: const Color(0xFF9A650D),
                     onTap:
                         () => Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder:
-                                (_) => ModuleOverviewPage(
-                                  api: api,
-                                  title: 'Conformidade',
-                                  description:
-                                      'Acompanhe pendências, evidências e controles internos vinculados às auditorias.',
-                                  icon: Icons.fact_check_outlined,
-                                  accentColor: const Color(0xFF2D63A6),
-                                  entries: const [
-                                    ModuleOverviewEntry(
-                                      icon: Icons.rule_folder_outlined,
-                                      title: 'Pendências e evidências',
-                                      subtitle:
-                                          'Consulte registros operacionais que precisam de acompanhamento.',
-                                    ),
-                                    ModuleOverviewEntry(
-                                      icon: Icons.verified_user_outlined,
-                                      title: 'Rastreabilidade',
-                                      subtitle:
-                                          'Apoio à revisão de permissões, histórico e documentos internos.',
-                                    ),
-                                  ],
-                                ),
+                            builder: (_) => LongStayCasesPage(api: widget.api),
                           ),
                         ),
                   ),
-                  const Divider(height: 22),
-                  _AuditOverviewRow(
-                    icon: Icons.query_stats_outlined,
-                    title: 'Indicadores gerenciais',
-                    subtitle: 'Acompanhamento administrativo restrito',
+                  _FullCareMenuRow(
+                    icon: Icons.health_and_safety_outlined,
+                    title: 'Eventos adversos',
+                    subtitle: 'Sinalização, investigação e encerramento',
+                    iconBackgroundColor: const Color(0xFFFFE8E5),
+                    accentColor: const Color(0xFFC2410C),
                     onTap:
                         () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder:
-                                (_) => ModuleOverviewPage(
-                                  api: api,
-                                  title: 'Indicadores gerenciais',
-                                  description:
-                                      'Visualize atalhos de acompanhamento para priorização administrativa.',
-                                  icon: Icons.query_stats_outlined,
-                                  accentColor: const Color(0xFF1A7F64),
-                                  entries: const [
-                                    ModuleOverviewEntry(
-                                      icon: Icons.query_stats_outlined,
-                                      title: 'Visão operacional',
-                                      subtitle:
-                                          'Resumo para análise de volume e priorização de registros.',
-                                    ),
-                                    ModuleOverviewEntry(
-                                      icon: Icons.pending_actions_outlined,
-                                      title: 'Acompanhamentos',
-                                      subtitle:
-                                          'Controle administrativo de atividades em andamento.',
-                                    ),
-                                  ],
-                                ),
+                                (_) => AdverseEventCasesPage(api: widget.api),
                           ),
                         ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'App',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF5B6577),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF0F8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFD8E3F0)),
+                    ),
+                    child: _SecondaryMenuRow(
+                      icon: Icons.privacy_tip_outlined,
+                      title: 'Política de Privacidade',
+                      onTap: () => _showAboutAndPrivacy(context),
+                    ),
                   ),
                 ],
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            child: ListTile(
-              dense: true,
-              leading: const Icon(
-                Icons.privacy_tip_outlined,
-                color: Color(0xFF2D63A6),
-              ),
-              title: const Text('Sobre e privacidade'),
-              subtitle: const Text('Politica de Privacidade'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showAboutAndPrivacy(context),
             ),
           ),
         ],
@@ -735,23 +792,15 @@ class _AdmissionsPageState extends State<AdmissionsPage> {
             textInputAction: TextInputAction.search,
             onSubmitted: _load,
             decoration: InputDecoration(
-              labelText: 'Pesquisar por beneficiário ou prestador',
+              hintText: 'Buscar beneficiário ou prestador',
+              prefixIcon: const Icon(Icons.search, size: 20),
               suffixIcon: IconButton(
                 onPressed: () => _load(_searchController.text.trim()),
-                icon: const Icon(Icons.search),
+                icon: const Icon(Icons.arrow_forward, size: 20),
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Total de internados: ${_items.length}',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF2D63A6),
-            ),
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           if (_loading)
             const Center(
               child: Padding(
@@ -762,13 +811,9 @@ class _AdmissionsPageState extends State<AdmissionsPage> {
           else
             ..._items.map(
               (item) => Card(
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  title: Text(item.patientName),
-                  subtitle: Text(
-                    'Prestador: ${item.hospitalName.isEmpty ? "-" : item.hospitalName}\nConvênio: ${item.insuranceName.isEmpty ? "-" : item.insuranceName}\nCID: ${item.cidCode.isEmpty ? "-" : item.cidCode}\nSenha: ${item.authorizationCode.isEmpty ? "-" : item.authorizationCode}',
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
+                margin: const EdgeInsets.only(bottom: 8),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
                   onTap: () async {
                     await Navigator.of(context).push(
                       MaterialPageRoute(
@@ -781,6 +826,72 @@ class _AdmissionsPageState extends State<AdmissionsPage> {
                     );
                     _load(_searchController.text.trim());
                   },
+                  child: IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 5,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF2D63A6),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.patientName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF1D2940),
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                _CompactInfoLine(
+                                  icon: Icons.local_hospital_outlined,
+                                  text:
+                                      item.hospitalName.isEmpty
+                                          ? 'Prestador não informado'
+                                          : item.hospitalName,
+                                ),
+                                const SizedBox(height: 3),
+                                _CompactInfoLine(
+                                  icon: Icons.health_and_safety_outlined,
+                                  text:
+                                      item.insuranceName.isEmpty
+                                          ? 'Convênio não informado'
+                                          : item.insuranceName,
+                                ),
+                                if (item.cidCode.trim().isNotEmpty) ...[
+                                  const SizedBox(height: 3),
+                                  _CompactInfoLine(
+                                    icon: Icons.badge_outlined,
+                                    text: 'CID ${item.cidCode}',
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(right: 8),
+                          child: Icon(
+                            Icons.chevron_right,
+                            color: Color(0xFF2D63A6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -875,12 +986,19 @@ class _HomeCareCasesPageState extends State<HomeCareCasesPage> {
     return '${parts[2]}/${parts[1]}/${parts[0]}';
   }
 
+  bool _isHomeCareCase(HomeCareCase item) {
+    return item.updateId > 0 ||
+        item.flaggedHomeCare.trim().toLowerCase() == 's' ||
+        item.status.trim().isNotEmpty ||
+        item.neadEligible.trim().toLowerCase() == 's';
+  }
+
   Future<void> _load([String query = '']) async {
     setState(() => _loading = true);
     try {
       final items = await widget.api.listHomeCareCases(query);
       if (!mounted) return;
-      setState(() => _items = items);
+      setState(() => _items = items.where(_isHomeCareCase).toList());
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1143,7 +1261,7 @@ class _HomeCareCasesPageState extends State<HomeCareCasesPage> {
               children: [
                 Expanded(
                   child: _InfoMetricCard(
-                    label: 'Casos',
+                    label: 'Casos HC',
                     value: '${_items.length}',
                     accentColor: const Color(0xFF0F766E),
                   ),
@@ -1488,7 +1606,8 @@ class _LongStayCasesPageState extends State<LongStayCasesPage> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<String>(
-                          initialValue: selectedStatus.isEmpty ? null : selectedStatus,
+                          initialValue:
+                              selectedStatus.isEmpty ? null : selectedStatus,
                           items:
                               _statusOptions
                                   .map(
@@ -1509,7 +1628,8 @@ class _LongStayCasesPageState extends State<LongStayCasesPage> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          initialValue: selectedReason.isEmpty ? null : selectedReason,
+                          initialValue:
+                              selectedReason.isEmpty ? null : selectedReason,
                           items:
                               _reasonOptions
                                   .map(
@@ -1530,7 +1650,8 @@ class _LongStayCasesPageState extends State<LongStayCasesPage> {
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
-                          initialValue: selectedRisk.isEmpty ? null : selectedRisk,
+                          initialValue:
+                              selectedRisk.isEmpty ? null : selectedRisk,
                           items:
                               _riskOptions
                                   .map(
@@ -1945,6 +2066,14 @@ class _AdverseEventCasesPageState extends State<AdverseEventCasesPage> {
     return '${parts[2]}/${parts[1]}/${parts[0]}';
   }
 
+  bool _hasAdverseEvent(AdverseEventCase item) {
+    return item.updateId > 0 ||
+        item.signaledFlag.trim().toLowerCase() == 's' ||
+        item.eventType.trim().isNotEmpty ||
+        item.eventDate.trim().isNotEmpty ||
+        item.report.trim().isNotEmpty;
+  }
+
   Future<void> _load([String query = '']) async {
     setState(() => _loading = true);
     try {
@@ -2017,7 +2146,8 @@ class _AdverseEventCasesPageState extends State<AdverseEventCasesPage> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<String>(
-                          initialValue: selectedType.isEmpty ? null : selectedType,
+                          initialValue:
+                              selectedType.isEmpty ? null : selectedType,
                           items:
                               _eventTypes
                                   .map(
@@ -2147,8 +2277,11 @@ class _AdverseEventCasesPageState extends State<AdverseEventCasesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final withEvent = _items.where((item) => item.updateId > 0);
-    final concluded = _items.where(
+    final eventItems = _items.where(_hasAdverseEvent).toList();
+    final open = eventItems.where(
+      (item) => item.closeFlag.trim().toLowerCase() != 's',
+    );
+    final concluded = eventItems.where(
       (item) => item.concludedFlag.trim().toLowerCase() == 's',
     );
 
@@ -2177,16 +2310,16 @@ class _AdverseEventCasesPageState extends State<AdverseEventCasesPage> {
               children: [
                 Expanded(
                   child: _InfoMetricCard(
-                    label: 'Casos',
-                    value: '${_items.length}',
+                    label: 'Eventos',
+                    value: '${eventItems.length}',
                     accentColor: const Color(0xFF8B5E1A),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _InfoMetricCard(
-                    label: 'Com evento',
-                    value: '${withEvent.length}',
+                    label: 'Em aberto',
+                    value: '${open.length}',
                     accentColor: const Color(0xFFC2410C),
                   ),
                 ),
@@ -2215,8 +2348,15 @@ class _AdverseEventCasesPageState extends State<AdverseEventCasesPage> {
                   child: Text('Nenhum caso encontrado para evento adverso.'),
                 ),
               )
+            else if (eventItems.isEmpty)
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text('Nenhum evento adverso registrado.'),
+                ),
+              )
             else
-              ..._items.map(
+              ...eventItems.map(
                 (item) => Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -2464,8 +2604,52 @@ class AdmissionDetailPage extends StatefulWidget {
 }
 
 class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
+  static const List<String> _homeCareStatusOptions = [
+    'em_avaliacao',
+    'elegivel',
+    'implantacao',
+    'aguardando_familia',
+    'aguardando_hospital',
+    'aguardando_operadora',
+    'implantado',
+    'negado',
+    'descontinuado',
+  ];
+
+  static const List<String> _homeCareModeOptions = [
+    'procedimento_pontual',
+    'atendimento_multiprofissional',
+    'internacao_domiciliar_6h',
+    'internacao_domiciliar_12h',
+    'internacao_domiciliar_24h',
+  ];
+
+  static const List<String> _homeCareBarrierOptions = [
+    'familia',
+    'ambiente',
+    'fornecedor',
+    'hospital',
+    'operadora',
+    'equipamentos',
+    'clinica',
+    'outros',
+  ];
+
   AdmissionDetail? _detail;
   bool _loading = true;
+
+  String _labelize(String value) {
+    if (value.trim().isEmpty) return '-';
+    if (value == 'hospital') return 'Prestador';
+    return value
+        .split('_')
+        .map((part) {
+          if (part == 'hospital') return 'Prestador';
+          if (part.isEmpty) return part;
+          return '${part[0].toUpperCase()}${part.substring(1)}';
+        })
+        .join(' ');
+  }
 
   String _formatDate(String value) {
     final raw = value.trim();
@@ -2575,6 +2759,612 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
       if (mounted) {
         setState(() => _loading = false);
       }
+    }
+  }
+
+  Future<void> _addHomeCareUpdate() async {
+    final detail = _detail;
+    final patientName = detail?.admission.patientName ?? 'Paciente';
+    final statusController = TextEditingController();
+    final supplierController = TextEditingController();
+    final modeController = TextEditingController();
+    final expectedDateController = TextEditingController();
+    final barrierController = TextEditingController();
+    final transitionController = TextEditingController();
+    final notesController = TextEditingController();
+    bool saved = false;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      backgroundColor: const Color(0xFFF2F6FC),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder:
+          (context) => StatefulBuilder(
+            builder:
+                (context, setModalState) => Padding(
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 4,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    patientName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF1D2940),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  const Text(
+                                    'Atualização de Home Care',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF5B6577),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              icon: const Icon(Icons.close),
+                              tooltip: 'Fechar',
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          width: double.infinity,
+                          height: 1,
+                          color: const Color(0xFFD8E3F0),
+                        ),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<String>(
+                          initialValue:
+                              statusController.text.trim().isEmpty
+                                  ? null
+                                  : statusController.text.trim(),
+                          items:
+                              _homeCareStatusOptions
+                                  .map(
+                                    (item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(_labelize(item)),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (value) {
+                            setModalState(() {
+                              statusController.text = value ?? '';
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Status',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          initialValue:
+                              modeController.text.trim().isEmpty
+                                  ? null
+                                  : modeController.text.trim(),
+                          items:
+                              _homeCareModeOptions
+                                  .map(
+                                    (item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(_labelize(item)),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (value) {
+                            setModalState(() {
+                              modeController.text = value ?? '';
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Modalidade aprovada',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: supplierController,
+                          decoration: const InputDecoration(
+                            labelText: 'Fornecedor',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: expectedDateController,
+                          readOnly: true,
+                          onTap:
+                              () => _pickDate(context, expectedDateController),
+                          decoration: const InputDecoration(
+                            labelText: 'Previsão de implantação',
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          initialValue:
+                              barrierController.text.trim().isEmpty
+                                  ? null
+                                  : barrierController.text.trim(),
+                          items:
+                              _homeCareBarrierOptions
+                                  .map(
+                                    (item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(_labelize(item)),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (value) {
+                            setModalState(() {
+                              barrierController.text = value ?? '';
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Barreira principal',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: transitionController,
+                          minLines: 2,
+                          maxLines: 4,
+                          decoration: const InputDecoration(
+                            labelText: 'Plano de transição',
+                            alignLabelWithHint: true,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: notesController,
+                          minLines: 2,
+                          maxLines: 4,
+                          decoration: const InputDecoration(
+                            labelText: 'Observações',
+                            alignLabelWithHint: true,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: () async {
+                            await widget.api.saveHomeCareUpdate(
+                              admissionId: widget.admissionId,
+                              status: statusController.text.trim(),
+                              supplier: supplierController.text.trim(),
+                              approvedMode: modeController.text.trim(),
+                              expectedDate: _toApiDate(
+                                expectedDateController.text.trim(),
+                              ),
+                              mainBarrier: barrierController.text.trim(),
+                              transitionPlan: transitionController.text.trim(),
+                              notes: notesController.text.trim(),
+                            );
+                            saved = true;
+                            if (!context.mounted) return;
+                            Navigator.of(context).pop();
+                          },
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size.fromHeight(48),
+                            backgroundColor: const Color(0xFF0F766E),
+                          ),
+                          child: const Text('Salvar Home Care'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+          ),
+    );
+
+    statusController.dispose();
+    supplierController.dispose();
+    modeController.dispose();
+    expectedDateController.dispose();
+    barrierController.dispose();
+    transitionController.dispose();
+    notesController.dispose();
+
+    await _load();
+    if (saved && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Home Care salvo com sucesso.')),
+      );
+    }
+  }
+
+  Future<void> _addLongStayUpdate() async {
+    final detail = _detail;
+    final patientName = detail?.admission.patientName ?? 'Paciente';
+    List<LongStayCase> cases = const [];
+    List<String> statusOptions = const [];
+    List<String> reasonOptions = const [];
+    List<String> riskOptions = const [];
+
+    try {
+      final results = await Future.wait([
+        widget.api.listLongStayCases(patientName),
+        widget.api.listLongStayStatuses(),
+        widget.api.listLongStayReasons(),
+        widget.api.listLongStayRisks(),
+      ]);
+      cases = results[0] as List<LongStayCase>;
+      statusOptions = results[1] as List<String>;
+      reasonOptions = results[2] as List<String>;
+      riskOptions = results[3] as List<String>;
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString().replaceFirst('Exception: ', '')),
+        ),
+      );
+      return;
+    }
+
+    LongStayCase? currentCase;
+    for (final item in cases) {
+      if (item.admissionId == widget.admissionId) {
+        currentCase = item;
+        break;
+      }
+    }
+
+    final ownerController = TextEditingController(
+      text: currentCase?.owner ?? '',
+    );
+    final clinicalBarrierController = TextEditingController(
+      text: currentCase?.clinicalBarrier ?? '',
+    );
+    final administrativeBarrierController = TextEditingController(
+      text: currentCase?.administrativeBarrier ?? '',
+    );
+    final actionPlanController = TextEditingController(
+      text: currentCase?.actionPlan ?? '',
+    );
+    final notesController = TextEditingController(
+      text: currentCase?.notes ?? '',
+    );
+    final deadlineController = TextEditingController();
+    final nextReviewController = TextEditingController(
+      text:
+          currentCase == null || currentCase.nextReviewDate.isEmpty
+              ? ''
+              : _formatDate(currentCase.nextReviewDate),
+    );
+    final expectedDischargeController = TextEditingController(
+      text:
+          currentCase == null || currentCase.expectedDischargeDate.isEmpty
+              ? ''
+              : _formatDate(currentCase.expectedDischargeDate),
+    );
+    String selectedStatus = currentCase?.status.trim() ?? '';
+    String selectedReason = currentCase?.mainReason.trim() ?? '';
+    String selectedRisk = currentCase?.riskLevel.trim() ?? '';
+    bool escalated = currentCase?.escalatedFlag.trim().toLowerCase() == 's';
+    bool dehospitalization =
+        currentCase?.dehospitalizationFlag.trim().toLowerCase() == 's';
+    bool saved = false;
+
+    if (!mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      backgroundColor: const Color(0xFFF2F6FC),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder:
+          (context) => StatefulBuilder(
+            builder:
+                (context, setModalState) => Padding(
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 4,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    patientName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF1D2940),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  const Text(
+                                    'Atualização de longa permanência',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF5B6577),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              icon: const Icon(Icons.close),
+                              tooltip: 'Fechar',
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          width: double.infinity,
+                          height: 1,
+                          color: const Color(0xFFD8E3F0),
+                        ),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<String>(
+                          initialValue:
+                              selectedStatus.isEmpty ? null : selectedStatus,
+                          items:
+                              statusOptions
+                                  .map(
+                                    (item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(_labelize(item)),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (value) {
+                            setModalState(() {
+                              selectedStatus = value ?? '';
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Status atual',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          initialValue:
+                              selectedReason.isEmpty ? null : selectedReason,
+                          items:
+                              reasonOptions
+                                  .map(
+                                    (item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(_labelize(item)),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (value) {
+                            setModalState(() {
+                              selectedReason = value ?? '';
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Motivo principal',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          initialValue:
+                              selectedRisk.isEmpty ? null : selectedRisk,
+                          items:
+                              riskOptions
+                                  .map(
+                                    (item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(_labelize(item)),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged: (value) {
+                            setModalState(() {
+                              selectedRisk = value ?? '';
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Risco sinistro',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: ownerController,
+                          decoration: const InputDecoration(
+                            labelText: 'Responsável',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: nextReviewController,
+                          readOnly: true,
+                          onTap: () => _pickDate(context, nextReviewController),
+                          decoration: const InputDecoration(
+                            labelText: 'Próxima revisão',
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: expectedDischargeController,
+                          readOnly: true,
+                          onTap:
+                              () => _pickDate(
+                                context,
+                                expectedDischargeController,
+                              ),
+                          decoration: const InputDecoration(
+                            labelText: 'Previsão de alta',
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: deadlineController,
+                          readOnly: true,
+                          onTap: () => _pickDate(context, deadlineController),
+                          decoration: const InputDecoration(
+                            labelText: 'Prazo da ação',
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SwitchListTile(
+                          value: escalated,
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text('Necessita escalonamento'),
+                          onChanged: (value) {
+                            setModalState(() {
+                              escalated = value;
+                            });
+                          },
+                        ),
+                        SwitchListTile(
+                          value: dehospitalization,
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text('Potencial de desospitalização'),
+                          onChanged: (value) {
+                            setModalState(() {
+                              dehospitalization = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: clinicalBarrierController,
+                          minLines: 2,
+                          maxLines: 4,
+                          decoration: const InputDecoration(
+                            labelText: 'Barreira clínica',
+                            alignLabelWithHint: true,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: administrativeBarrierController,
+                          minLines: 2,
+                          maxLines: 4,
+                          decoration: const InputDecoration(
+                            labelText: 'Barreira administrativa',
+                            alignLabelWithHint: true,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: actionPlanController,
+                          minLines: 2,
+                          maxLines: 4,
+                          decoration: const InputDecoration(
+                            labelText: 'Plano de ação',
+                            alignLabelWithHint: true,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: notesController,
+                          minLines: 2,
+                          maxLines: 4,
+                          decoration: const InputDecoration(
+                            labelText: 'Observações',
+                            alignLabelWithHint: true,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: () async {
+                            await widget.api.saveLongStayUpdate(
+                              admissionId: widget.admissionId,
+                              status: selectedStatus,
+                              mainReason: selectedReason,
+                              clinicalBarrier:
+                                  clinicalBarrierController.text.trim(),
+                              administrativeBarrier:
+                                  administrativeBarrierController.text.trim(),
+                              actionPlan: actionPlanController.text.trim(),
+                              owner: ownerController.text.trim(),
+                              deadlineDate: _toApiDate(
+                                deadlineController.text.trim(),
+                              ),
+                              expectedDischargeDate: _toApiDate(
+                                expectedDischargeController.text.trim(),
+                              ),
+                              nextReviewDate: _toApiDate(
+                                nextReviewController.text.trim(),
+                              ),
+                              dehospitalizationFlag:
+                                  dehospitalization ? 's' : 'n',
+                              escalatedFlag: escalated ? 's' : 'n',
+                              riskLevel: selectedRisk,
+                              notes: notesController.text.trim(),
+                            );
+                            saved = true;
+                            if (!context.mounted) return;
+                            Navigator.of(context).pop();
+                          },
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size.fromHeight(48),
+                            backgroundColor: const Color(0xFF5E2363),
+                          ),
+                          child: const Text('Salvar longa permanência'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+          ),
+    );
+
+    ownerController.dispose();
+    clinicalBarrierController.dispose();
+    administrativeBarrierController.dispose();
+    actionPlanController.dispose();
+    notesController.dispose();
+    deadlineController.dispose();
+    nextReviewController.dispose();
+    expectedDischargeController.dispose();
+
+    await _load();
+    if (saved && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Longa permanência salva com sucesso.')),
+      );
     }
   }
 
@@ -2689,6 +3479,7 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                           border: Border.all(color: const Color(0xFFD8E3F0)),
                         ),
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
@@ -2972,7 +3763,8 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<String>(
-                          initialValue: selectedType.isNotEmpty ? selectedType : null,
+                          initialValue:
+                              selectedType.isNotEmpty ? selectedType : null,
                           items:
                               dischargeTypes
                                   .map(
@@ -3073,41 +3865,58 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                   children: [
                     Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              detail.admission.patientName,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text('Prestador: ${detail.admission.hospitalName}'),
-                            Text('Convênio: ${detail.admission.insuranceName}'),
-                            Text('CID: ${detail.admission.cidCode}'),
-                            Text(
-                              'Senha: ${detail.admission.authorizationCode}',
-                            ),
-                            Text(
-                              'Data: ${detail.admission.admissionDate.isEmpty ? "-" : _formatDate(detail.admission.admissionDate)}',
-                            ),
-                            Text(
-                              'Alta: ${detail.admission.dischargeDate.isEmpty ? "Sem alta" : _formatDate(detail.admission.dischargeDate)}',
-                            ),
-                            if (detail.admission.dischargeType.isNotEmpty)
+                        padding: const EdgeInsets.all(12),
+                        child: DefaultTextStyle(
+                          style: const TextStyle(
+                            color: Color(0xFF2B2F38),
+                            fontSize: 13.5,
+                            height: 1.25,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                'Tipo alta: ${detail.admission.dischargeType}',
+                                detail.admission.patientName,
+                                style: const TextStyle(
+                                  color: Color(0xFF1D232D),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
-                          ],
+                              const SizedBox(height: 6),
+                              if (detail.admission.hospitalName.isNotEmpty)
+                                Text(
+                                  'Prestador: ${detail.admission.hospitalName}',
+                                ),
+                              if (detail.admission.insuranceName.isNotEmpty)
+                                Text(
+                                  'Convênio: ${detail.admission.insuranceName}',
+                                ),
+                              if (detail.admission.cidCode.isNotEmpty)
+                                Text('CID: ${detail.admission.cidCode}'),
+                              if (detail.admission.authorizationCode.isNotEmpty)
+                                Text(
+                                  'Senha: ${detail.admission.authorizationCode}',
+                                ),
+                              Text(
+                                'Data: ${detail.admission.admissionDate.isEmpty ? "-" : _formatDate(detail.admission.admissionDate)}',
+                              ),
+                              if (detail.admission.dischargeDate.isNotEmpty)
+                                Text(
+                                  'Alta: ${_formatDate(detail.admission.dischargeDate)}',
+                                ),
+                              if (detail.admission.dischargeType.isNotEmpty)
+                                Text(
+                                  'Tipo alta: ${detail.admission.dischargeType}',
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      'Ações da internação',
+                      'Evolução do paciente',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -3115,51 +3924,40 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
+                    _PrimaryEvolutionCard(onTap: _addEvolution),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Subitens da internação',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF5B6577),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 1.45,
+                      mainAxisSpacing: 9,
+                      crossAxisSpacing: 9,
+                      childAspectRatio: 2.45,
                       children: [
                         _ActionTile(
                           label: 'Home Care',
-                          subtitle: 'Abrir módulo',
+                          subtitle: 'Atualizar',
                           icon: Icons.home_work_outlined,
                           backgroundColor: const Color(0xFFECFDF5),
                           accentColor: const Color(0xFF0F766E),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (_) => HomeCareCasesPage(
-                                      api: widget.api,
-                                      initialQuery:
-                                          detail.admission.patientName,
-                                    ),
-                              ),
-                            );
-                          },
+                          onTap: _addHomeCareUpdate,
                         ),
                         _ActionTile(
                           label: 'Longa permanência',
-                          subtitle: 'Abrir módulo',
+                          subtitle: 'Atualizar',
                           icon: Icons.schedule_outlined,
                           backgroundColor: const Color(0xFFF6F0FB),
                           accentColor: const Color(0xFF5E2363),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (_) => LongStayCasesPage(
-                                      api: widget.api,
-                                      initialQuery:
-                                          detail.admission.patientName,
-                                    ),
-                              ),
-                            );
-                          },
+                          onTap: _addLongStayUpdate,
                         ),
                         _ActionTile(
                           label: 'Prorrogação',
@@ -3176,14 +3974,6 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                           backgroundColor: const Color(0xFFEEF4FB),
                           accentColor: const Color(0xFF2D63A6),
                           onTap: _addTuss,
-                        ),
-                        _ActionTile(
-                          label: 'Evolução',
-                          subtitle: 'Ver histórico',
-                          icon: Icons.edit_note,
-                          backgroundColor: const Color(0xFFFFF8EC),
-                          accentColor: const Color(0xFF8B5E1A),
-                          onTap: _addEvolution,
                         ),
                         _ActionTile(
                           label: 'Alta',
@@ -3254,6 +4044,8 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                               .map(
                                 (item) => ListTile(
                                   dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: EdgeInsets.zero,
                                   title: Text(
                                     '${item.code} • ${item.description}',
                                   ),
@@ -3275,6 +4067,8 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                               .map(
                                 (item) => ListTile(
                                   dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  contentPadding: EdgeInsets.zero,
                                   title: Text(_extensionPeriodText(item)),
                                   subtitle: Text(
                                     'Diárias: ${item.days} • Acomodação: ${item.accommodation.isEmpty ? "-" : item.accommodation}',
@@ -3290,66 +4084,176 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
   }
 }
 
-class _AuditOverviewRow extends StatelessWidget {
-  const _AuditOverviewRow({
+class _FullCareMenuRow extends StatelessWidget {
+  const _FullCareMenuRow({
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.iconBackgroundColor = const Color(0xFFE8F1FB),
+    this.accentColor = const Color(0xFF2D63A6),
     this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final Color iconBackgroundColor;
+  final Color accentColor;
   final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 3,
+      shadowColor: accentColor.withValues(alpha: 0.22),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              Container(
+                width: 5,
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 88),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(13, 0, 0, 0),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: iconBackgroundColor,
+                            borderRadius: BorderRadius.circular(13),
+                          ),
+                          child: Icon(icon, color: accentColor, size: 25),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1D2940),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                height: 1.25,
+                                color: Color(0xFF5B6577),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (onTap != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 10, left: 8),
+                  child: Icon(
+                    Icons.chevron_right,
+                    color: accentColor.withValues(alpha: 0.75),
+                    size: 28,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SecondaryMenuRow extends StatelessWidget {
+  const _SecondaryMenuRow({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         child: Row(
           children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEEF4FB),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, color: const Color(0xFF2D63A6), size: 23),
-            ),
-            const SizedBox(width: 12),
+            Icon(icon, size: 18, color: const Color(0xFF5B6577)),
+            const SizedBox(width: 10),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1D2940),
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF5B6577),
-                    ),
-                  ),
-                ],
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF445166),
+                ),
               ),
             ),
-            if (onTap != null)
-              const Icon(Icons.chevron_right, color: Color(0xFF8B97A8)),
+            const Icon(Icons.chevron_right, size: 18, color: Color(0xFF8B97A8)),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _CompactInfoLine extends StatelessWidget {
+  const _CompactInfoLine({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: const Color(0xFF5E2363)),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF445166),
+              height: 1.15,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -3431,6 +4335,70 @@ class _CaseBadge extends StatelessWidget {
   }
 }
 
+class _PrimaryEvolutionCard extends StatelessWidget {
+  const _PrimaryEvolutionCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFFFFF8EC),
+      elevation: 2.5,
+      shadowColor: const Color(0xFF8B5E1A).withValues(alpha: 0.18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF8B5E1A).withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.edit_note,
+                  color: Color(0xFF8B5E1A),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Evolução',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF8B5E1A),
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Registrar, ditar e consultar histórico',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12, color: Color(0xFF5B6577)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, color: Color(0xFF8B5E1A)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ActionTile extends StatelessWidget {
   const _ActionTile({
     required this.label,
@@ -3452,45 +4420,53 @@ class _ActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: backgroundColor,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 10),
+          child: Row(
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   color: accentColor.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(11),
                 ),
-                child: Icon(icon, color: accentColor),
+                child: Icon(icon, color: accentColor, size: 20),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: accentColor,
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: accentColor,
+                        height: 1.1,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF5B6577),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        height: 1.1,
+                        color: Color(0xFF5B6577),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -3515,7 +4491,7 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -3524,29 +4500,32 @@ class _SectionCard extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 CircleAvatar(
-                  radius: 12,
+                  radius: 10,
                   backgroundColor: const Color(0xFFEEF4FB),
                   child: Text(
                     '$count',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: Color(0xFF2D63A6),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             if (children.isEmpty)
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('Nenhum registro encontrado.'),
+                padding: EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  'Nenhum registro encontrado.',
+                  style: TextStyle(fontSize: 13, color: Color(0xFF5B6577)),
+                ),
               )
             else
               ...children,
@@ -3575,8 +4554,13 @@ class AdmissionEvolutionsPage extends StatefulWidget {
 }
 
 class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
+  final _reportController = TextEditingController();
+  final _therapeuticPlanController = TextEditingController();
+  final _reportFocusNode = FocusNode();
+  final _therapeuticPlanFocusNode = FocusNode();
   List<EvolutionItem> _items = const [];
   bool _loading = true;
+  bool _saving = false;
 
   String _formatDateTime(String value) {
     final raw = value.trim();
@@ -3609,6 +4593,15 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _reportController.dispose();
+    _therapeuticPlanController.dispose();
+    _reportFocusNode.dispose();
+    _therapeuticPlanFocusNode.dispose();
+    super.dispose();
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
@@ -3629,86 +4622,50 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
     }
   }
 
-  Future<void> _createEvolution() async {
-    final reportController = TextEditingController();
-    bool saved = false;
+  void _focusForDictation(FocusNode focusNode) {
+    FocusScope.of(context).requestFocus(focusNode);
+  }
 
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder:
-          (context) => Padding(
-            padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 16,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Nova evolução',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: reportController,
-                    maxLines: 8,
-                    minLines: 6,
-                    maxLength: 5000,
-                    decoration: const InputDecoration(
-                      labelText: 'Evolução / Relatório',
-                      alignLabelWithHint: true,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: () async {
-                      final report = reportController.text.trim();
-                      if (report.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Informe a evolução.')),
-                        );
-                        return;
-                      }
+  Future<void> _saveEvolution() async {
+    final report = _reportController.text.trim();
+    final therapeuticPlan = _therapeuticPlanController.text.trim();
 
-                      final item = await widget.api.saveEvolution(
-                        admissionId: widget.admissionId,
-                        report: report,
-                      );
+    if (report.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Informe a evolução.')));
+      return;
+    }
 
-                      if (mounted) {
-                        setState(() {
-                          _items = [
-                            item,
-                            ..._items.where(
-                              (existing) => existing.id != item.id,
-                            ),
-                          ];
-                        });
-                      }
+    setState(() => _saving = true);
+    try {
+      final item = await widget.api.saveEvolution(
+        admissionId: widget.admissionId,
+        report: report,
+        therapeuticPlan: therapeuticPlan,
+      );
 
-                      saved = true;
-                      if (!context.mounted) return;
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Salvar evolução'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-    );
-
-    await Future<void>.delayed(const Duration(milliseconds: 300));
-    await _load();
-    if (saved && mounted) {
+      if (!mounted) return;
+      setState(() {
+        _items = [item, ..._items.where((existing) => existing.id != item.id)];
+        _reportController.clear();
+        _therapeuticPlanController.clear();
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Evolução salva com sucesso.')),
       );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString().replaceFirst('Exception: ', '')),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _saving = false);
+      }
     }
   }
 
@@ -3716,20 +4673,15 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Evoluções')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _createEvolution,
-        backgroundColor: const Color(0xFF8B5E1A),
-        icon: const Icon(Icons.edit_note),
-        label: const Text('Nova evolução'),
-      ),
       body: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             Card(
+              color: const Color(0xFFFFF8EC),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -3741,11 +4693,11 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      'Histórico de evoluções',
+                    const Text(
+                      'Evolução clínica e programação terapêutica',
                       style: TextStyle(
-                        color: Colors.blueGrey.shade700,
-                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF5B6577),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -3753,6 +4705,116 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
               ),
             ),
             const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.edit_note, color: Color(0xFF8B5E1A)),
+                        SizedBox(width: 8),
+                        Text(
+                          'Nova evolução',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF1D2940),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _reportController,
+                      focusNode: _reportFocusNode,
+                      keyboardType: TextInputType.multiline,
+                      textCapitalization: TextCapitalization.sentences,
+                      maxLines: 7,
+                      minLines: 5,
+                      maxLength: 5000,
+                      decoration: InputDecoration(
+                        labelText: 'Evolução / Relatório',
+                        alignLabelWithHint: true,
+                        suffixIcon: IconButton(
+                          onPressed: () => _focusForDictation(_reportFocusNode),
+                          icon: const Icon(Icons.mic_none),
+                          tooltip: 'Ditar',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: _therapeuticPlanController,
+                      focusNode: _therapeuticPlanFocusNode,
+                      keyboardType: TextInputType.multiline,
+                      textCapitalization: TextCapitalization.sentences,
+                      maxLines: 5,
+                      minLines: 3,
+                      maxLength: 3000,
+                      decoration: InputDecoration(
+                        labelText: 'Programação terapêutica',
+                        alignLabelWithHint: true,
+                        suffixIcon: IconButton(
+                          onPressed:
+                              () =>
+                                  _focusForDictation(_therapeuticPlanFocusNode),
+                          icon: const Icon(Icons.mic_none),
+                          tooltip: 'Ditar',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: _saving ? null : _saveEvolution,
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                          backgroundColor: const Color(0xFF8B5E1A),
+                        ),
+                        icon:
+                            _saving
+                                ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : const Icon(Icons.save_outlined),
+                        label: Text(
+                          _saving ? 'Salvando...' : 'Salvar evolução',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Evoluções anteriores',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1D2940),
+                    ),
+                  ),
+                ),
+                _CaseBadge(
+                  label: '${_items.length}',
+                  backgroundColor: const Color(0xFFEEF4FB),
+                  textColor: const Color(0xFF2D63A6),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
             if (_loading)
               const Center(
                 child: Padding(
@@ -3770,9 +4832,8 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
             else
               ..._items.map(
                 (item) => Card(
-                  color: const Color(0xFFFFF8EC),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -3804,12 +4865,24 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
                         Text(
                           item.report.trim().isEmpty ? '-' : item.report.trim(),
                         ),
+                        if (item.therapeuticPlan.trim().isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Programação terapêutica',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF8B5E1A),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(item.therapeuticPlan.trim()),
+                        ],
                       ],
                     ),
                   ),
                 ),
               ),
-            const SizedBox(height: 88),
+            const SizedBox(height: 24),
           ],
         ),
       ),

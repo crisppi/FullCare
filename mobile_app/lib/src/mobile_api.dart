@@ -427,11 +427,16 @@ class MobileApi {
   Future<EvolutionItem> saveEvolution({
     required int admissionId,
     required String report,
+    required String therapeuticPlan,
   }) async {
     final payload = await _request(
       method: 'POST',
       action: 'admission-evolution',
-      body: {'admission_id': admissionId, 'report': report},
+      body: {
+        'admission_id': admissionId,
+        'report': report,
+        'therapeutic_plan': therapeuticPlan,
+      },
     );
 
     final data = payload['data'] as Map<String, dynamic>;

@@ -166,6 +166,7 @@ class EvolutionItem {
   const EvolutionItem({
     required this.id,
     required this.report,
+    required this.therapeuticPlan,
     required this.visitedAt,
     required this.createdBy,
     required this.visitNumber,
@@ -175,6 +176,7 @@ class EvolutionItem {
     return EvolutionItem(
       id: _asInt(json['id']),
       report: json['report'] as String? ?? '',
+      therapeuticPlan: json['therapeutic_plan'] as String? ?? '',
       visitedAt: _cleanDate(json['visited_at']),
       createdBy: json['created_by'] as String? ?? '',
       visitNumber: _asInt(json['visit_number']),
@@ -183,6 +185,7 @@ class EvolutionItem {
 
   final int id;
   final String report;
+  final String therapeuticPlan;
   final String visitedAt;
   final String createdBy;
   final int visitNumber;
