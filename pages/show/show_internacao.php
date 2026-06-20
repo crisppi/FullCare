@@ -2428,18 +2428,28 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .btn-visitas-row .btn {
-        min-width: 170px;
-        height: 44px;
+        min-width: 112px;
+        height: 30px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 0.35rem 0.8rem;
+        padding: 0.22rem 0.65rem;
         white-space: nowrap;
+        font-size: .72rem;
+        line-height: 1;
     }
 
     .btn-visitas-row .btn span {
         line-height: 1.1;
+    }
+
+    #btn-visitas-range-pdf {
+        min-width: 128px;
+    }
+
+    #btn-visitas-range-info {
+        display: none !important;
     }
 
     .btn-visitas-row .btn.btn-danger {
@@ -2644,6 +2654,34 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
     .internacao-show-page .ux-chip-sub {
         font-size: .72rem !important;
+    }
+
+    .internacao-show-page .ux-summary-strip {
+        align-items: center !important;
+    }
+
+    .internacao-show-page .ux-summary-chip {
+        min-height: 34px !important;
+        padding: 0 10px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+    }
+
+    .internacao-show-page .ux-chip-label,
+    .internacao-show-page .ux-chip-value,
+    .internacao-show-page .ux-chip-sub {
+        display: inline-flex !important;
+        align-items: center !important;
+        line-height: 1 !important;
+        margin: 0 !important;
+    }
+
+    .internacao-show-page .ux-priority-chip .ux-chip-value {
+        align-items: center !important;
     }
 
     #main-container.internacao-show-page #internTabs button.nav-link {

@@ -866,6 +866,7 @@ function mobileCreateAdmissionEvolution(PDO $conn, array $authUser, array $input
     $admissionId = (int)($input['admission_id'] ?? 0);
     $report = trim((string)($input['report'] ?? ''));
     $therapeuticPlan = trim((string)($input['therapeutic_plan'] ?? ''));
+    $visitedAt = (new DateTimeImmutable('now', new DateTimeZone('America/Sao_Paulo')))->format('Y-m-d H:i:s');
 
     mobileValidateClinicalTextSecurity([
         'rel_int' => $report,
@@ -926,8 +927,8 @@ function mobileCreateAdmissionEvolution(PDO $conn, array $authUser, array $input
             'n',
             :visit_number,
             :user_id,
-            NOW(),
-            NOW(),
+            :visited_at,
+            :launched_at,
             'n',
             'Sem exames relevantes no período',
             '',
@@ -942,6 +943,8 @@ function mobileCreateAdmissionEvolution(PDO $conn, array $authUser, array $input
     $insertStmt->bindValue(':created_by', (string)($authUser['name'] ?? 'Mobile'), PDO::PARAM_STR);
     $insertStmt->bindValue(':visit_number', $nextVisitNumber, PDO::PARAM_INT);
     $insertStmt->bindValue(':user_id', (int)$authUser['id'], PDO::PARAM_INT);
+    $insertStmt->bindValue(':visited_at', $visitedAt, PDO::PARAM_STR);
+    $insertStmt->bindValue(':launched_at', $visitedAt, PDO::PARAM_STR);
     $insertStmt->execute();
 
     $id = (int)$conn->lastInsertId();
