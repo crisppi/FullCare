@@ -478,35 +478,7 @@ $hospitais = $chartService->listHospitals($ctx);
 
     <div class="ai-chart-shell">
         <aside class="ai-chart-panel ai-chart-sidebar">
-            <h2>Filtros</h2>
-            <div class="ai-chart-field">
-                <label for="chartHospital">Hospital</label>
-                <select id="chartHospital">
-                    <option value="">Todos os hospitais</option>
-                    <?php foreach ($hospitais as $h): ?>
-                        <option value="<?= (int)$h['id_hospital'] ?>"><?= htmlspecialchars((string)$h['nome_hosp'], ENT_QUOTES, 'UTF-8') ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="ai-chart-field">
-                <label for="chartStatus">Status</label>
-                <select id="chartStatus">
-                    <option value="internados">Internados</option>
-                    <option value="todos">Todos</option>
-                    <option value="alta">Com alta</option>
-                </select>
-            </div>
-            <div class="ai-chart-field">
-                <label for="chartDays">Período</label>
-                <select id="chartDays">
-                    <option value="30">Últimos 30 dias</option>
-                    <option value="90">Últimos 90 dias</option>
-                    <option value="180" selected>Últimos 180 dias</option>
-                    <option value="365">Últimos 12 meses</option>
-                    <option value="730">Últimos 24 meses</option>
-                </select>
-            </div>
-
+            <h2>Exemplos</h2>
             <div class="ai-chart-suggestions">
                 <button type="button" class="ai-chart-suggestion" data-question="Crie um gráfico de saving por hospital">Saving por hospital</button>
                 <button type="button" class="ai-chart-suggestion" data-question="Mostre saving por auditor">Saving por auditor</button>
@@ -578,40 +550,10 @@ $hospitais = $chartService->listHospitals($ctx);
 
     function filters() {
         return {
-            hospital_id: document.getElementById('chartHospital').value,
-            status: document.getElementById('chartStatus').value,
-            days: document.getElementById('chartDays').value
+            hospital_id: '',
+            status: 'todos',
+            days: 180
         };
-    }
-
-    function syncPeriodFromQuestion(question) {
-        const daysSelect = document.getElementById('chartDays');
-        const normalized = String(question || '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase();
-        const monthMatch = normalized.match(/(?:ultim[oa]s?|nos|em|de)?\s*(\d{1,2})\s*(mes|meses)\b/);
-        if (monthMatch) {
-            const days = Math.max(7, Math.min(730, parseInt(monthMatch[1], 10) * 30));
-            const closest = Array.from(daysSelect.options).reduce(function(best, option) {
-                const value = parseInt(option.value, 10);
-                return Math.abs(value - days) < Math.abs(parseInt(best.value, 10) - days) ? option : best;
-            }, daysSelect.options[0]);
-            if (closest) {
-                daysSelect.value = closest.value;
-            }
-            return;
-        }
-        const dayMatch = normalized.match(/(?:ultim[oa]s?|nos|em|de)?\s*(\d{1,3})\s*(dia|dias)\b/);
-        if (dayMatch) {
-            const days = Math.max(7, Math.min(730, parseInt(dayMatch[1], 10)));
-            const exact = Array.from(daysSelect.options).find(function(option) {
-                return parseInt(option.value, 10) === days;
-            });
-            if (exact) {
-                daysSelect.value = exact.value;
-            }
-        }
     }
 
     function palette(count) {
@@ -858,7 +800,6 @@ $hospitais = $chartService->listHospitals($ctx);
     }
 
     async function generate(question) {
-        syncPeriodFromQuestion(question);
         title.textContent = 'Gerando gráfico...';
         meta.textContent = 'Consultando dados';
         insight.textContent = 'Analisando pedido e preparando visualização...';
