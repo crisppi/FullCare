@@ -45,13 +45,18 @@ class InternacaoChartService
         }
 
         $filters = $this->normalizeFilters($filters, $ctx);
+        $filters = $this->applyQuestionFilterOverrides($question, $filters);
         $templates = $this->templates();
-        $spec = $this->chooseLocalSpec($question, $templates);
+        $spec = null;
         $source = 'local';
 
         try {
             $aiSpec = $this->requestChartSpec($question, $filters, $templates);
-            if (isset($templates[$aiSpec['template_key'] ?? ''])) {
+            $action = (string)($aiSpec['action'] ?? 'chart');
+            if (in_array($action, ['help', 'clarify'], true)) {
+                return $this->buildAssistantResponse($action, (string)($aiSpec['message'] ?? ''), $filters, 'openai');
+            }
+            if ($action === 'chart' && isset($templates[$aiSpec['template_key'] ?? ''])) {
                 $spec = $templates[$aiSpec['template_key']];
                 if (!empty($aiSpec['chart_type']) && in_array($aiSpec['chart_type'], ['bar', 'line', 'doughnut'], true)) {
                     $spec['chart_type'] = $aiSpec['chart_type'];
@@ -60,6 +65,13 @@ class InternacaoChartService
             }
         } catch (Throwable $e) {
             $source = 'local';
+        }
+
+        if ($spec === null) {
+            if ($this->isMetaQuestion($question)) {
+                return $this->buildAssistantResponse('help', '', $filters, 'local');
+            }
+            $spec = $this->chooseLocalSpec($question, $templates);
         }
 
         $rows = $this->fetchRows($spec['key'], $filters, $ctx);
@@ -106,6 +118,57 @@ class InternacaoChartService
             'status' => $status,
             'days' => $days,
         ];
+    }
+
+    private function buildAssistantResponse(string $mode, string $message, array $filters, string $source): array
+    {
+        $examples = [
+            'MP mensal nos últimos 3 meses',
+            'Saving por hospital nos últimos 180 dias',
+            'Glosa mensal no último ano',
+            'Contas abertas por hospital',
+            'Eventos adversos por tipo',
+            'Visitas em atraso por hospital',
+        ];
+
+        if (trim($message) === '') {
+            $message = $mode === 'clarify'
+                ? 'Preciso de um indicador ou agrupamento para montar o gráfico. Exemplo: "MP mensal nos últimos 3 meses" ou "saving por hospital".'
+                : "Você pode pedir gráficos com indicador, agrupamento e período. Exemplos:\n- " . implode("\n- ", $examples);
+        }
+
+        return [
+            'mode' => $mode,
+            'title' => $mode === 'clarify' ? 'Preciso de mais detalhe' : 'O que você pode perguntar',
+            'chart' => [
+                'type' => 'bar',
+                'labels' => [],
+                'dataset_label' => 'Exemplos',
+                'values' => [],
+                'dimension' => 'Pergunta',
+                'metric' => 'Resposta',
+            ],
+            'rows' => array_map(static fn(string $example): array => [
+                'label' => $example,
+                'value' => 0,
+                'extra' => 'Exemplo de pergunta',
+            ], $examples),
+            'examples' => $examples,
+            'insight' => $message,
+            'summary' => [
+                'template_key' => null,
+                'metric' => null,
+                'dimension' => null,
+                'source' => $source,
+                'filters' => $filters,
+            ],
+        ];
+    }
+
+    private function isMetaQuestion(string $question): bool
+    {
+        $q = $this->normalizeText($question);
+        return (bool)preg_match('/^(o\s+q|oq|o\s+que|que|quais|como).*(posso|da\s+para|consigo|pode).*(fazer|perguntar|pedir|gerar|usar|aqui)|^(ajuda|help|exemplos|opcoes|opcoes\s+de\s+graficos)$/', $q);
     }
 
     private function templates(): array
@@ -158,6 +221,12 @@ class InternacaoChartService
                 'dimension' => 'Hospital',
                 'metric' => 'Dias médios',
                 'chart_type' => 'bar',
+            ],
+            'media_permanencia_mensal' => [
+                'title' => 'Evolução mensal da média de permanência',
+                'dimension' => 'Mês',
+                'metric' => 'Dias médios',
+                'chart_type' => 'line',
             ],
             'status_internacao' => [
                 'title' => 'Status das internações',
@@ -302,6 +371,12 @@ class InternacaoChartService
     private function chooseLocalSpec(string $question, array $templates): array
     {
         $q = $this->normalizeText($question);
+        if ($this->isAverageStayQuestion($q)) {
+            if ($this->isMonthlyTrendQuestion($q)) {
+                return $templates['media_permanencia_mensal'];
+            }
+            return $templates['media_permanencia_por_hospital'];
+        }
         if (preg_match('/saving|savings|economia|negoci|desconto/', $q)) {
             if (preg_match('/auditor|usuario|responsavel/', $q)) {
                 return $templates['saving_por_auditor'];
@@ -393,6 +468,38 @@ class InternacaoChartService
             return $templates['grupo_patologia'];
         }
         return $templates['internacoes_por_hospital'];
+    }
+
+    private function applyQuestionFilterOverrides(string $question, array $filters): array
+    {
+        $q = $this->normalizeText($question);
+
+        if (preg_match('/(?:ultim[oa]s?|nos|em|de)?\s*(\d{1,2})\s*(mes|meses)\b/', $q, $m)) {
+            $months = max(1, min(24, (int)$m[1]));
+            $filters['days'] = max(7, min(730, $months * 30));
+            return $filters;
+        }
+
+        if (preg_match('/(?:ultim[oa]s?|nos|em|de)?\s*(\d{1,3})\s*(dia|dias)\b/', $q, $m)) {
+            $filters['days'] = max(7, min(730, (int)$m[1]));
+            return $filters;
+        }
+
+        if (preg_match('/ultimo\s+ano|ultimos\s+12\s+meses|12\s+meses/', $q)) {
+            $filters['days'] = 365;
+        }
+
+        return $filters;
+    }
+
+    private function isAverageStayQuestion(string $normalizedQuestion): bool
+    {
+        return (bool)preg_match('/\bmp\b|media\s+perman|media\s+de\s+perman|permanencia\s+media|tempo\s+medio\s+(?:de\s+)?(?:internacao|permanencia)|dias\s+medio|dias\s+medios/', $normalizedQuestion);
+    }
+
+    private function isMonthlyTrendQuestion(string $normalizedQuestion): bool
+    {
+        return (bool)preg_match('/mensal|evolucao|tendencia|linha|por\s+mes|mes\s+a\s+mes/', $normalizedQuestion);
     }
 
     private function fetchRows(string $templateKey, array $filters, array $ctx): array
@@ -584,6 +691,16 @@ class InternacaoChartService
                     'GROUP BY h.id_hospital, h.nome_hosp',
                     'ORDER BY value DESC, label ASC',
                     'LIMIT 12',
+                    $internacaoFrom,
+                ];
+            case 'media_permanencia_mensal':
+                return [
+                    "DATE_FORMAT(i.data_intern_int, '%Y-%m') AS label, AVG(GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1)) AS value, CONCAT(COUNT(DISTINCT i.id_internacao), ' internações') AS extra",
+                    $altaJoin,
+                    '',
+                    'GROUP BY label',
+                    'ORDER BY label ASC',
+                    'LIMIT 24',
                     $internacaoFrom,
                 ];
             case 'status_internacao':
@@ -862,6 +979,7 @@ class InternacaoChartService
     {
         $monthlyTemplates = [
             'internacoes_por_mes',
+            'media_permanencia_mensal',
             'saving_mensal',
             'faturamento_apresentado_mensal',
             'faturamento_final_mensal',
@@ -931,19 +1049,19 @@ class InternacaoChartService
                     'role' => 'system',
                     'content' => [[
                         'type' => 'input_text',
-                        'text' => 'Você escolhe gráficos seguros para um sistema hospitalar. Responda apenas JSON válido. Não crie SQL. Use somente template_key da lista.',
+                        'text' => "Você interpreta pedidos para a tela IA Gráficos do sistema hospitalar FullCare. Responda apenas JSON válido. Não crie SQL. Use somente template_key da lista quando action=chart.\n\nActions permitidas:\n- chart: quando o usuário pediu um gráfico/indicador.\n- help: quando o usuário perguntou o que pode fazer, o que pode perguntar, pediu exemplos, ajuda ou capacidades da tela.\n- clarify: quando o usuário quer gráfico, mas faltou indicador essencial.\n\nGlossário obrigatório:\n- MP, media permanencia, média permanência, permanência média = média de permanência hospitalar.\n- mensal, por mês, mês a mês, evolução mensal = dimensão Mês.\n- últimos X meses/dias define somente período do filtro; não significa dimensão mensal se o usuário não pedir mensal/evolução/por mês.\n- saving = economia em negociações.\n- glosa/faturamento/contas pertencem ao fluxo financeiro.\n\nSe action=chart, escolha o template que melhor representa a intenção completa do usuário, combinando indicador e dimensão. Se action=help ou clarify, devolva message curta em português-BR.",
                     ]],
                 ],
                 [
                     'role' => 'user',
                     'content' => [[
                         'type' => 'input_text',
-                        'text' => "Pedido: {$question}\nFiltros: " . json_encode($filters, JSON_UNESCAPED_UNICODE) . "\nTemplates permitidos: " . json_encode($available, JSON_UNESCAPED_UNICODE) . "\nRetorne JSON no formato {\"template_key\":\"...\",\"chart_type\":\"bar|line|doughnut\"}.",
+                        'text' => "Pedido: {$question}\nFiltros: " . json_encode($filters, JSON_UNESCAPED_UNICODE) . "\nTemplates permitidos: " . json_encode($available, JSON_UNESCAPED_UNICODE) . "\nRetorne JSON em um destes formatos:\n{\"action\":\"chart\",\"template_key\":\"...\",\"chart_type\":\"bar|line|doughnut\"}\n{\"action\":\"help\",\"message\":\"...\"}\n{\"action\":\"clarify\",\"message\":\"...\"}",
                     ]],
                 ],
             ],
             'temperature' => 0.05,
-            'max_output_tokens' => 160,
+            'max_output_tokens' => 260,
         ];
 
         $raw = $this->requestOpenAi($payload);
