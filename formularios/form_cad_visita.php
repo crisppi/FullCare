@@ -1,5 +1,28 @@
 <?php
 
+$BASE_URL = isset($BASE_URL) ? (string)$BASE_URL : '';
+$dbConn = $GLOBALS['conn'] ?? null;
+$ultimaVis = $ultimaVis ?? [];
+$internacaoList = $internacaoList ?? [];
+$visitasAntigas = $visitasAntigas ?? [];
+$editVisitaIdParam = $editVisitaIdParam ?? null;
+$editVisitaIdReal = $editVisitaIdReal ?? 0;
+$editAdditionalSelects = $editAdditionalSelects ?? [];
+$tussPorVisita = $tussPorVisita ?? [];
+$tussPorInternacao = $tussPorInternacao ?? [];
+$negPorVisita = $negPorVisita ?? [];
+$negPorInternacao = $negPorInternacao ?? [];
+$gestaoPorVisita = $gestaoPorVisita ?? [];
+$gestaoPorInternacao = $gestaoPorInternacao ?? [];
+$utiPorVisita = $utiPorVisita ?? [];
+$utiPorInternacao = $utiPorInternacao ?? [];
+$prorrogPorVisita = $prorrogPorVisita ?? [];
+$prorrogPorInternacao = $prorrogPorInternacao ?? [];
+$prorrogEditRows = $prorrogEditRows ?? [];
+$visitaInterMap = $visitaInterMap ?? [];
+$jsonAcomodacoes = $jsonAcomodacoes ?? '[]';
+$id_internacao = $id_internacao ?? '';
+
 function fmtYmd(?string $s): ?string
 {
     return !empty($s) ? date('Y-m-d', strtotime($s)) : null;
@@ -14,7 +37,7 @@ $cargoSessao = $_SESSION['cargo'] ?? ($_SESSION['cargo_user'] ?? '');
 $emailSessao = mb_strtolower(trim((string)($_SESSION['email_user'] ?? '')), 'UTF-8');
 
 include_once("dao/usuarioDao.php");
-$usuarioDao = new UserDAO($conn, $BASE_URL);
+$usuarioDao = new UserDAO($dbConn, $BASE_URL);
 
 $normCargoSessao = mb_strtolower(str_replace([' ', '-'], '_', (string)$cargoSessao), 'UTF-8');
 $isCrisppiSessao = $emailSessao === 'crisppi@fullcare.com.br';
@@ -87,15 +110,15 @@ $intervaloUltimaVisDias = $visAnt ? $visAnt->diff($atual)->days : 0;
 $diasInternDias         = $dataIntern ? $dataIntern->diff($atual)->days : 0;
 
 
-$visitasDAO = new visitaDAO($conn, $BASE_URL);
-$internacaoDAO = new internacaoDAO($conn, $BASE_URL);
-$query2DAO = new visitaDAO($conn, $BASE_URL);
+$visitasDAO = new visitaDAO($dbConn, $BASE_URL);
+$internacaoDAO = new internacaoDAO($dbConn, $BASE_URL);
+$query2DAO = new visitaDAO($dbConn, $BASE_URL);
 $id_internacao = filter_input(INPUT_GET, "id_internacao", FILTER_SANITIZE_NUMBER_INT);
 $visitas = $visitasDAO->joinVisitaInternacao($id_internacao);
 
 $visitaMax = $internacaoDAO->selectInternVisLast(); // pegar o Id max da visita
 
-$cargo = $_SESSION['cargo'];
+$cargo = $_SESSION['cargo'] ?? '';
 if (($cargo == "Med_auditor") || ($cargo == "Enf_Auditor")) {
     $cargo;
 } else {
@@ -111,19 +134,24 @@ $condicoesvisita = array_filter($condicoesvisita);
 $wherevisita = implode(' AND ', $condicoesvisita);
 $wherevisitaParams = strlen($id_internacao) ? [':id_internacao' => (int)$id_internacao] : [];
 
-$ultimoReg = $visitaMax['0']['id_visita'];
+$ultimoReg = (int)($visitaMax[0]['id_visita'] ?? 0);
 
 $contarVis = 0; //contar numero de visitas por internacao 
 $queryVis = $internacaoDAO->selectAllInternacaoCountVis($wherevisita, null, null, $wherevisitaParams);
-$contarVis = $queryVis[0]['numero_de_id_visita'];
+$contarVis = (int)($queryVis[0]['numero_de_id_visita'] ?? 0);
+
+$internacoesContexto = array_values((array)$internacaoList);
+$internacaoAtual = is_array($internacoesContexto[0] ?? null) ? $internacoesContexto[0] : [];
+$internacaoId = $internacaoAtual['id_internacao'] ?? '';
+$internacaoHospital = $internacaoAtual['nome_hosp'] ?? '';
+$internacaoPaciente = $internacaoAtual['nome_pac'] ?? '';
+$internacaoDataRaw = $internacaoAtual['data_intern_int'] ?? '';
+$internacaoDataBR = $internacaoDataRaw ? date('d/m/Y', strtotime((string)$internacaoDataRaw)) : '';
+$internacaoHospitalId = $internacaoAtual['id_hospital'] ?? '';
+$internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
 ?>
 
-<style>
-    .visita-page {
-        visibility: hidden;
-    }
-</style>
-<div class="visita-page">
+<div class="visita-page" style="visibility:hidden;">
     <div class="visita-hero">
         <div>
             <h1 id="visita-page-title">Cadastrar visita</h1>
@@ -157,19 +185,19 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
             <div class="visita-summary-grid">
                 <div class="visita-summary-card visita-summary-card--small">
                     <span class="visita-summary-card__label">Reg Int</span>
-                    <strong class="visita-summary-card__value"><?= $internacaoList['0']['id_internacao'] ?></strong>
+                    <strong class="visita-summary-card__value"><?= htmlspecialchars((string)$internacaoId, ENT_QUOTES, 'UTF-8') ?></strong>
                 </div>
                 <div class="visita-summary-card visita-summary-card--wide">
                     <span class="visita-summary-card__label">Hospital</span>
-                    <strong class="visita-summary-card__value"><?= $internacaoList['0']['nome_hosp'] ?></strong>
+                    <strong class="visita-summary-card__value"><?= htmlspecialchars((string)$internacaoHospital, ENT_QUOTES, 'UTF-8') ?></strong>
                 </div>
                 <div class="visita-summary-card visita-summary-card--wide">
                     <span class="visita-summary-card__label">Paciente</span>
-                    <strong class="visita-summary-card__value"><?= $internacaoList['0']['nome_pac'] ?></strong>
+                    <strong class="visita-summary-card__value"><?= htmlspecialchars((string)$internacaoPaciente, ENT_QUOTES, 'UTF-8') ?></strong>
                 </div>
                 <div class="visita-summary-card visita-summary-card--medium">
                     <span class="visita-summary-card__label">Data internação</span>
-                    <strong class="visita-summary-card__value"><?= date("d/m/Y", strtotime($internacaoList['0']['data_intern_int'])); ?></strong>
+                    <strong class="visita-summary-card__value"><?= htmlspecialchars((string)$internacaoDataBR, ENT_QUOTES, 'UTF-8') ?></strong>
                 </div>
                 <div class="visita-summary-card visita-summary-card--small">
                     <span class="visita-summary-card__label">Visita No.</span>
@@ -242,18 +270,18 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
                 value="<?= $defaultAuditorEnf ?>">
             <input type="hidden" class="form-control" value="<?= $id_internacao ?>" id="fk_internacao_vis"
                 name="fk_internacao_vis" placeholder="">
-            <input type="hidden" id="id_hospital" name="id_hospital" value="<?= $internacaoList['0']['id_hospital'] ?>">
+            <input type="hidden" id="id_hospital" name="id_hospital" value="<?= htmlspecialchars((string)$internacaoHospitalId, ENT_QUOTES, 'UTF-8') ?>">
 
             <input type="hidden" class="form-control" id="fk_int_visita" name="fk_int_visita"
                 value="<?= $ultimoReg + 1 ?>">
 
             <input type="hidden" class="form-control" id="fk_paciente_int" name="fk_paciente_int"
-                value="<?= $internacaoList['0']['fk_paciente_int'] ?>">
+                value="<?= htmlspecialchars((string)$internacaoPacienteId, ENT_QUOTES, 'UTF-8') ?>">
 
             <input type="hidden" class="form-control" id="data_internacao" name="data_internacao"
-                value="<?= date("d/m/Y", strtotime($internacaoList['0']['data_intern_int'])); ?>">
+                value="<?= htmlspecialchars((string)$internacaoDataBR, ENT_QUOTES, 'UTF-8') ?>">
             <input type="hidden" class="form-control" id="data_intern_int" name="data_intern_int"
-                value="<?= date("d/m/Y", strtotime($internacaoList['0']['data_intern_int'])); ?>">
+                value="<?= htmlspecialchars((string)$internacaoDataBR, ENT_QUOTES, 'UTF-8') ?>">
         </div>
             </div>
         </div>
@@ -664,12 +692,24 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
         </div>
     </div>
 </div>
+<textarea id="visita-client-config-json" hidden><?= htmlspecialchars(json_encode([
+    'baseUrl' => (string) $BASE_URL,
+    'draftKey' => 'fullcare:visita:' . (string)($id_internacao ?? ($_GET['id_internacao'] ?? 'local')),
+    'sessionId' => (string) $idSessao,
+    'isMedSessao' => (bool) $isMedSessao,
+    'isEnfSessao' => (bool) $isEnfSessao,
+    'listaInternacoesUrl' => rtrim($BASE_URL, '/') . '/internacoes/lista',
+    'csrf' => csrf_token(),
+    'acomodacoes' => json_decode($jsonAcomodacoes ?? '[]', true) ?: [],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), ENT_NOQUOTES, 'UTF-8') ?></textarea>
 <script src="<?= $BASE_URL ?>js/select_visita.js?v=<?= filemtime(__DIR__ . '/../js/select_visita.js') ?>"></script>
 <script src="js/text_cad_visita.js"></script>
 <script>
+const __VISITA_CLIENT_CONFIG_NODE = document.getElementById('visita-client-config-json');
+const __VISITA_CLIENT_CONFIG = JSON.parse(__VISITA_CLIENT_CONFIG_NODE ? __VISITA_CLIENT_CONFIG_NODE.value : '{}');
 window.clinicalTextToolsConfig = {
-    baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
-    draftKey: <?= json_encode('fullcare:visita:' . (string)($id_internacao ?? ($_GET['id_internacao'] ?? 'local')), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+    baseUrl: __VISITA_CLIENT_CONFIG.baseUrl || '',
+    draftKey: __VISITA_CLIENT_CONFIG.draftKey || 'fullcare:visita:local',
     fields: ['rel_visita_vis', 'acoes_int_vis', 'programacao_enf'],
     autosaveStatusId: 'clinical-autosave-status'
 };
@@ -690,9 +730,9 @@ window.clinicalTextToolsConfig = {
     const auditorMed = document.getElementById('visita_auditor_prof_med');
     const auditorEnf = document.getElementById('visita_auditor_prof_enf');
 
-    const sessionId = "<?= $idSessao ?>";
-    const isMedSessao = <?= $isMedSessao ? 'true' : 'false' ?>;
-    const isEnfSessao = <?= $isEnfSessao ? 'true' : 'false' ?>;
+    const sessionId = __VISITA_CLIENT_CONFIG.sessionId || '';
+    const isMedSessao = !!__VISITA_CLIENT_CONFIG.isMedSessao;
+    const isEnfSessao = !!__VISITA_CLIENT_CONFIG.isEnfSessao;
 
     function applySelection(userId, tipo) {
         const effectiveTipo = tipo || (isMedSessao ? 'med' : (isEnfSessao ? 'enf' : ''));
@@ -798,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (btnEncerrar) {
         btnEncerrar.addEventListener('click', function() {
-            window.location.href = '<?= rtrim($BASE_URL, '/') ?>/internacoes/lista';
+            window.location.href = __VISITA_CLIENT_CONFIG.listaInternacoesUrl || 'list_internacao.php';
         }, { once: true });
     }
 
@@ -842,7 +882,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('id_visita', currentId);
         formData.append('redirect', window.location.href);
         formData.append('ajax', '1');
-        formData.append('csrf', '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>');
+        formData.append('csrf', __VISITA_CLIENT_CONFIG.csrf || '');
 
         fetch('process_visita.php', {
             method: 'POST',
@@ -903,7 +943,7 @@ function populateSelects(acomodacoes) {
     $('input[name="saving_show"]').val('').css('color', '');
 }
 
-const acomodacoes = <?php echo $jsonAcomodacoes; ?>;
+const acomodacoes = __VISITA_CLIENT_CONFIG.acomodacoes || [];
 
 populateSelects(acomodacoes)
 </script>
@@ -986,7 +1026,7 @@ function aumentarTextProgramacao() {
 </script>
 <style>
 .visita-page {
-    visibility: visible;
+    visibility: visible !important;
 }
 
 .form-select-placeholder,
@@ -3128,11 +3168,30 @@ function aumentarTextProgramacao() {
     }
 }
 </style>
+<textarea id="visita-bootstrap-json" hidden><?= htmlspecialchars(json_encode([
+    'dataInternacaoVis' => !empty($ultimaVis['data_intern_int']) ? date('Y-m-d', strtotime($ultimaVis['data_intern_int'])) : '',
+    'tussPorVisita' => $tussPorVisita,
+    'tussPorInternacao' => $tussPorInternacao,
+    'negPorVisita' => $negPorVisita,
+    'negPorInternacao' => $negPorInternacao,
+    'gestaoPorVisita' => $gestaoPorVisita,
+    'gestaoPorInternacao' => $gestaoPorInternacao,
+    'utiPorVisita' => $utiPorVisita,
+    'utiPorInternacao' => $utiPorInternacao,
+    'prorrogPorVisita' => $prorrogPorVisita,
+    'prorrogPorInternacao' => $prorrogPorInternacao,
+    'editVisitaIdReal' => (int)($editVisitaIdReal ?? 0),
+    'prorrogEditRows' => $prorrogEditRows ?? [],
+    'editAdditionalSelects' => $editAdditionalSelects ?? [],
+    'visitaInterMap' => $visitaInterMap,
+    'visitasAntigas' => $visitasAntigas ?? [],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), ENT_NOQUOTES, 'UTF-8') ?></textarea>
 <script>
+const __VISITA_BOOTSTRAP_NODE = document.getElementById('visita-bootstrap-json');
+const __VISITA_BOOTSTRAP = JSON.parse(__VISITA_BOOTSTRAP_NODE ? __VISITA_BOOTSTRAP_NODE.value : '{}');
 const dataVisitaInput = document.getElementById('data_visita_vis');
 const dataVisitaError = document.getElementById('data-visita-error');
-const dataInternacaoVis = new Date(
-    '<?= date('Y-m-d', strtotime($ultimaVis['data_intern_int'])); ?>'); // Data da internação
+const dataInternacaoVis = new Date(__VISITA_BOOTSTRAP.dataInternacaoVis || ''); // Data da internação
 const hoje = new Date(); // Data atual
 
 dataVisitaInput.addEventListener('change', () => {
@@ -3155,20 +3214,20 @@ dataVisitaInput.addEventListener('click', () => {
 var currentEditVisitaId = null;
 var isHydratingAdditionalSection = false;
 
-window.VISITA_TUSS_DATA = <?= json_encode($tussPorVisita, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_TUSS_FALLBACK = <?= json_encode($tussPorInternacao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_NEG_DATA = <?= json_encode($negPorVisita, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_NEG_FALLBACK = <?= json_encode($negPorInternacao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_GESTAO_DATA = <?= json_encode($gestaoPorVisita, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_GESTAO_FALLBACK = <?= json_encode($gestaoPorInternacao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_UTI_DATA = <?= json_encode($utiPorVisita, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_UTI_FALLBACK = <?= json_encode($utiPorInternacao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_PRORR_DATA = <?= json_encode($prorrogPorVisita, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_PRORR_FALLBACK = <?= json_encode($prorrogPorInternacao, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_EDIT_ID_REAL = <?= json_encode((int)($editVisitaIdReal ?? 0), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_PRORR_EDIT_ROWS = <?= json_encode($prorrogEditRows ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_EDIT_ADDITIONAL_SELECTS = <?= json_encode($editAdditionalSelects ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-window.VISITA_INTER_MAP = <?= json_encode($visitaInterMap, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+window.VISITA_TUSS_DATA = __VISITA_BOOTSTRAP.tussPorVisita || {};
+window.VISITA_TUSS_FALLBACK = __VISITA_BOOTSTRAP.tussPorInternacao || {};
+window.VISITA_NEG_DATA = __VISITA_BOOTSTRAP.negPorVisita || {};
+window.VISITA_NEG_FALLBACK = __VISITA_BOOTSTRAP.negPorInternacao || {};
+window.VISITA_GESTAO_DATA = __VISITA_BOOTSTRAP.gestaoPorVisita || {};
+window.VISITA_GESTAO_FALLBACK = __VISITA_BOOTSTRAP.gestaoPorInternacao || {};
+window.VISITA_UTI_DATA = __VISITA_BOOTSTRAP.utiPorVisita || {};
+window.VISITA_UTI_FALLBACK = __VISITA_BOOTSTRAP.utiPorInternacao || {};
+window.VISITA_PRORR_DATA = __VISITA_BOOTSTRAP.prorrogPorVisita || {};
+window.VISITA_PRORR_FALLBACK = __VISITA_BOOTSTRAP.prorrogPorInternacao || {};
+window.VISITA_EDIT_ID_REAL = __VISITA_BOOTSTRAP.editVisitaIdReal || 0;
+window.VISITA_PRORR_EDIT_ROWS = __VISITA_BOOTSTRAP.prorrogEditRows || [];
+window.VISITA_EDIT_ADDITIONAL_SELECTS = __VISITA_BOOTSTRAP.editAdditionalSelects || {};
+window.VISITA_INTER_MAP = __VISITA_BOOTSTRAP.visitaInterMap || {};
 </script>
 <script>
 const __VISITA_INTER_MAP = window.VISITA_INTER_MAP || {};
@@ -3224,7 +3283,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 (function() {
-    const visitasOriginais = <?= json_encode($visitasAntigas ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+    const visitasOriginais = __VISITA_BOOTSTRAP.visitasAntigas || [];
     const visitaMap = {};
     const visitaMapById = {};
     (visitasOriginais || []).forEach((row) => {
@@ -4050,7 +4109,7 @@ window.setTimeout(signalEditAdditionalSelectsFromServer, 0);
 <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
 <script>
 window.visitaAiConfig = Object.assign({}, window.visitaAiConfig || {}, {
-    baseUrl: <?= json_encode((string) $BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
+    baseUrl: __VISITA_CLIENT_CONFIG.baseUrl || ''
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
