@@ -130,6 +130,19 @@ try {
            OR LOWER(TRIM(email02_user)) = :email2_identifier
            OR LOWER(TRIM(login_user)) = :login_identifier
            OR LOWER(TRIM(usuario_user)) = :user_identifier
+        ORDER BY
+            CASE
+                WHEN :original_identifier = 'diretor@fullcare.com.br'
+                 AND (
+                        nivel_user = 5
+                     OR nivel_user = -1
+                     OR LOWER(TRIM(cargo_user)) LIKE '%diretor%'
+                     OR LOWER(TRIM(cargo_user)) LIKE '%diretoria%'
+                 )
+                THEN 0
+                ELSE 1
+            END,
+            id_usuario ASC
         LIMIT 1
     ");
     $user = null;
@@ -138,6 +151,7 @@ try {
         $stmt->bindValue(':email2_identifier', $loginLookupIdentifier, PDO::PARAM_STR);
         $stmt->bindValue(':login_identifier', $loginLookupIdentifier, PDO::PARAM_STR);
         $stmt->bindValue(':user_identifier', $loginLookupIdentifier, PDO::PARAM_STR);
+        $stmt->bindValue(':original_identifier', $loginIdentifier, PDO::PARAM_STR);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
 

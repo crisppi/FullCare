@@ -50,6 +50,12 @@ if (!function_exists('fullcare_mfa_config_url')) {
 if (!function_exists('fullcare_require_mfa_setup')) {
     function fullcare_require_mfa_setup(PDO $conn): void
     {
+        $requireMfaSetup = getenv('FULLCARE_REQUIRE_MFA_SETUP');
+        $requireMfaSetup = $requireMfaSetup === false ? '' : strtolower(trim((string)$requireMfaSetup));
+        if (!in_array($requireMfaSetup, ['1', 'true', 'on', 'yes', 's', 'sim'], true)) {
+            return;
+        }
+
         $scriptBase = strtolower(basename((string)($_SERVER['SCRIPT_NAME'] ?? '')));
         $allowed = [
             'mfa_configuracao.php',
