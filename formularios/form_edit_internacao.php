@@ -710,6 +710,36 @@
             height: auto !important;
         }
 
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control),
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #1f2937 !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .95),
+                0 1px 2px rgba(15, 23, 42, .10) !important;
+        }
+
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):hover,
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:hover {
+            border-color: #94a3b8 !important;
+        }
+
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):focus,
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select.show > .dropdown-toggle,
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:focus {
+            border-color: #3b82f6 !important;
+            box-shadow:
+                0 0 0 .14rem rgba(59, 130, 246, .16),
+                0 1px 2px rgba(15, 23, 42, .10) !important;
+            outline: none !important;
+        }
+
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, textarea.form-control)::placeholder {
+            color: #8b95a5 !important;
+            opacity: 1 !important;
+        }
+
         #tabelas-adicionais-paineis-edit #container-gestao [id^="div_rel_"],
         #tabelas-adicionais-paineis-edit #container-gestao #div_evento,
         #tabelas-adicionais-paineis-edit #container-uti .form-group.col-sm-12 {
@@ -1663,7 +1693,7 @@
                     selectId: 'relatorio-detalhado',
                     containerId: 'detalhes-card-wrapper',
                     bodyId: 'div-detalhado',
-                    display: 'flex'
+                    display: 'block'
                 },
                 {
                     selectId: 'select_tuss',
@@ -2296,6 +2326,36 @@
         #main-container .form-control:not(textarea) {
             min-height: 42px;
             font-size: 0.9rem;
+        }
+
+        #main-container .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control),
+        #main-container .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #1f2937 !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .95),
+                0 1px 2px rgba(15, 23, 42, .10) !important;
+        }
+
+        #main-container .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):hover,
+        #main-container .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle:hover {
+            border-color: #94a3b8 !important;
+        }
+
+        #main-container .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):focus,
+        #main-container .internacao-page .internacao-card .bootstrap-select.show > .dropdown-toggle,
+        #main-container .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle:focus {
+            border-color: #3b82f6 !important;
+            box-shadow:
+                0 0 0 .14rem rgba(59, 130, 246, .16),
+                0 1px 2px rgba(15, 23, 42, .10) !important;
+            outline: none !important;
+        }
+
+        #main-container .internacao-page .internacao-card :is(input.form-control, textarea.form-control)::placeholder {
+            color: #8b95a5 !important;
+            opacity: 1 !important;
         }
 
         /* Selects azuis - Tabelas Adicionais (nativo) */

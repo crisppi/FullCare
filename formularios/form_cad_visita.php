@@ -512,7 +512,7 @@ $contarVis = $queryVis[0]['numero_de_id_visita'];
                 if (!select || !wrapper || !detalhes) return;
                 var show = select.value === 's';
                 wrapper.style.display = show ? 'block' : 'none';
-                detalhes.style.display = show ? 'grid' : 'none';
+                detalhes.style.display = show ? 'block' : 'none';
             }
 
             document.addEventListener('DOMContentLoaded', function() {
@@ -2568,6 +2568,36 @@ function aumentarTextProgramacao() {
     line-height: 1.25 !important;
 }
 
+#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control),
+#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1f2937 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .95),
+        0 1px 2px rgba(15, 23, 42, .10) !important;
+}
+
+#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):hover,
+#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:hover {
+    border-color: #94a3b8 !important;
+}
+
+#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):focus,
+#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select.show > .dropdown-toggle,
+#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:focus {
+    border-color: #3b82f6 !important;
+    box-shadow:
+        0 0 0 .14rem rgba(59, 130, 246, .16),
+        0 1px 2px rgba(15, 23, 42, .10) !important;
+    outline: none !important;
+}
+
+#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, textarea.form-control)::placeholder {
+    color: #8b95a5 !important;
+    opacity: 1 !important;
+}
+
 #main-container .visita-page #detalhes-card-wrapper .d-flex.flex-wrap.align-items-center {
     display: flex !important;
     align-items: center !important;
@@ -2598,16 +2628,17 @@ function aumentarTextProgramacao() {
 }
 
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado {
-    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-    gap: 7px 10px !important;
-    align-items: end !important;
     margin: 0 !important;
     padding: 0 !important;
 }
 
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .row,
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .form-group.row {
-    display: contents !important;
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 5px 10px !important;
+    align-items: start !important;
+    margin: 0 0 5px !important;
 }
 
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado > input[type="hidden"] {
@@ -2629,31 +2660,34 @@ function aumentarTextProgramacao() {
     grid-column: span 2 !important;
 }
 
+#main-container .visita-page #detalhes-card-wrapper #div-detalhado .col-sm-1 {
+    grid-column: span 1 !important;
+}
+
+#main-container .visita-page #detalhes-card-wrapper #div-detalhado .col-sm-2 {
+    grid-column: span 2 !important;
+}
+
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
     grid-column: span 3 !important;
-    order: 80 !important;
-}
-
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .form-group:has(#liminar_det),
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .form-group:has(#paliativos_det),
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .form-group:has(#parto_det),
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .form-group:has(#braden_det) {
-    order: 70 !important;
 }
 
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado label {
     min-height: 0 !important;
-    margin: 0 0 2px !important;
+    margin: 0 0 1px !important;
+    display: block !important;
     font-size: .6rem !important;
-    line-height: 1.05 !important;
+    line-height: 1 !important;
     font-weight: 650 !important;
     color: #646b78 !important;
+    white-space: normal !important;
+    overflow: visible !important;
 }
 
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado :is(.form-control, .form-control-sm.form-control) {
-    min-height: 28px !important;
-    height: 28px !important;
+    min-height: 26px !important;
+    height: 26px !important;
     padding: 2px 24px 2px 7px !important;
     border-radius: 7px !important;
     font-size: .66rem !important;
@@ -2676,7 +2710,8 @@ function aumentarTextProgramacao() {
 }
 
 @media (max-width: 1199.98px) {
-    #main-container .visita-page #detalhes-card-wrapper #div-detalhado {
+    #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .row,
+    #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .form-group.row {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
 

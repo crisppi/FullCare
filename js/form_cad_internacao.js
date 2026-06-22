@@ -2186,7 +2186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const body = section.bodyId ? document.getElementById(section.bodyId) : null;
         const hidden = section.hiddenId ? document.getElementById(section.hiddenId) : null;
         if (container) container.style.display = show ? 'block' : 'none';
-        if (body) body.style.display = show ? 'grid' : 'none';
+        if (body) body.style.display = show ? (section.display || 'block') : 'none';
         if (hidden) hidden.value = show ? 's' : 'n';
     }
 
