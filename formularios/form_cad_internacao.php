@@ -1422,16 +1422,17 @@
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado {
-            grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-            gap: 7px 10px !important;
-            align-items: end !important;
             margin: 0 !important;
             padding: 0 !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado > .form-group.row,
         .internacao-page #detalhes-card-wrapper #div-detalhado > .row {
-            display: contents !important;
+            display: grid !important;
+            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+            gap: 5px 10px !important;
+            align-items: start !important;
+            margin: 0 0 5px !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado > input[type="hidden"] {
@@ -1453,31 +1454,34 @@
             grid-column: span 2 !important;
         }
 
+        .internacao-page #detalhes-card-wrapper #div-detalhado .col-sm-1 {
+            grid-column: span 1 !important;
+        }
+
+        .internacao-page #detalhes-card-wrapper #div-detalhado .col-sm-2 {
+            grid-column: span 2 !important;
+        }
+
         .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
         .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
             grid-column: span 3 !important;
-            order: 80 !important;
-        }
-
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#liminar_det),
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#paliativos_det),
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#parto_det),
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#braden_det) {
-            order: 70 !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado label {
             min-height: 0 !important;
-            margin: 0 0 2px !important;
+            margin: 0 0 1px !important;
+            display: block !important;
             font-size: .6rem !important;
-            line-height: 1.05 !important;
+            line-height: 1 !important;
             font-weight: 650 !important;
             color: #646b78 !important;
+            white-space: normal !important;
+            overflow: visible !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado :is(.form-control, .form-control-sm.form-control) {
-            min-height: 28px !important;
-            height: 28px !important;
+            min-height: 26px !important;
+            height: 26px !important;
             padding: 2px 24px 2px 7px !important;
             border-radius: 7px !important;
             font-size: .66rem !important;

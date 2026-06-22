@@ -56,14 +56,14 @@
  // aparecer campos relatorio detalhado
  $(document).ready(function() {
     if (document.querySelector("#relatorio-detalhado").value === 's') {
-        $('#div-detalhado').css('display', 'grid');
+        $('#div-detalhado').css('display', 'block');
         $('#text-detalhado').hide();
     }else{
         $('#div-detalhado').hide();
     }
      $('#relatorio-detalhado').change(function() {
          if ($(this).val() === 's') {
-             $('#div-detalhado').css('display', 'grid');
+             $('#div-detalhado').css('display', 'block');
              $('#text-detalhado').hide();
              $("#select_detalhes").val("s");
 

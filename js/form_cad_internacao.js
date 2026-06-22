@@ -2138,7 +2138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function aplicar() {
         if (selectDet.value === 's') {
             if (wrapperDet) wrapperDet.style.display = 'block';
-            divDet.style.display = 'grid';
+            divDet.style.display = 'block';
             if (hiddenDet) hiddenDet.value = 's';
         } else {
             divDet.style.display = 'none';
