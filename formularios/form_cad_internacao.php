@@ -212,6 +212,10 @@
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
     <style>
+        .internacao-page {
+            visibility: hidden;
+        }
+
         .assist-select-clear {
             position: relative;
         }
@@ -1705,6 +1709,8 @@
         </div>
     </div>
     <style>
+    .internacao-page { visibility: visible; }
+
     .hosp-modal { border:0; border-radius:16px; overflow:hidden; }
     .hosp-modal__header {
         display:flex; align-items:center; justify-content:space-between;

@@ -118,6 +118,11 @@ $queryVis = $internacaoDAO->selectAllInternacaoCountVis($wherevisita, null, null
 $contarVis = $queryVis[0]['numero_de_id_visita'];
 ?>
 
+<style>
+    .visita-page {
+        visibility: hidden;
+    }
+</style>
 <div class="visita-page">
     <div class="visita-hero">
         <div>
@@ -980,6 +985,10 @@ function aumentarTextProgramacao() {
 }
 </script>
 <style>
+.visita-page {
+    visibility: visible;
+}
+
 .form-select-placeholder,
 #add-visita-form select.select-placeholder {
     color: #c4c4c4 !important;
@@ -3070,6 +3079,42 @@ function aumentarTextProgramacao() {
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_negoc"] .filter-option-inner-inner {
     color: #1f4d85 !important;
     font-weight: 750 !important;
+}
+
+#add-visita-form .visita-summary-card__input,
+#add-visita-form .visita-head-field :is(input.form-control, select.form-control, textarea.form-control, .form-select),
+#add-visita-form .visita-card:not(.visita-card--tabelas) :is(input.form-control, select.form-control, textarea.form-control, .form-select),
+#add-visita-form .clinical-text-field textarea.form-control,
+#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control),
+#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle {
+    background-color: #ffffff !important;
+    border: 1px solid #b8c4d6 !important;
+    color: #1f2937 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
+}
+
+#add-visita-form .visita-head-field :is(input.form-control, select.form-control, textarea.form-control, .form-select):hover,
+#add-visita-form .visita-card:not(.visita-card--tabelas) :is(input.form-control, select.form-control, textarea.form-control, .form-select):hover,
+#add-visita-form .clinical-text-field textarea.form-control:hover,
+#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):hover,
+#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:hover {
+    border-color: #8796aa !important;
+}
+
+#add-visita-form .visita-head-field :is(input.form-control, select.form-control, textarea.form-control, .form-select):focus,
+#add-visita-form .visita-card:not(.visita-card--tabelas) :is(input.form-control, select.form-control, textarea.form-control, .form-select):focus,
+#add-visita-form .clinical-text-field textarea.form-control:focus,
+#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):focus,
+#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select.show > .dropdown-toggle,
+#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16), 0 1px 3px rgba(15, 23, 42, .16) !important;
+    outline: none !important;
+}
+
+#add-visita-form :is(input.form-control, textarea.form-control)::placeholder {
+    color: #8b95a5 !important;
+    opacity: 1 !important;
 }
 
 @media (max-width: 1199.98px) {

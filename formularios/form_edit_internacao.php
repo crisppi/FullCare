@@ -391,6 +391,10 @@
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
     <style>
+        .internacao-page {
+            visibility: hidden;
+        }
+
         .edit-head-grid {
             display: grid;
             grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -2265,6 +2269,10 @@
     </script>
 
     <style>
+        .internacao-page {
+            visibility: visible;
+        }
+
         /* coloca no seu <head> ou no final do CSS carregado */
         .accordion .accordion-button {
             background-color: #5e2363;
