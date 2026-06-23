@@ -117,8 +117,6 @@ $showGestaoContainer = isset($activeEditSection) && $activeEditSection === 'gest
                 onblur="this.rows=2"><?= htmlspecialchars((string)($int_gestao->rel_desospitalizacao_ges ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
         </div>
     </div>
-    <hr>
-
     <!-- ========== EVENTO ADVERSO ==================================== -->
     <div class="form-group row">
         <div class="form-group col-sm-2">
@@ -189,7 +187,6 @@ $showGestaoContainer = isset($activeEditSection) && $activeEditSection === 'gest
             </div>
         </div>
     </div>
-    <hr>
 </div> <!-- /container-gestao -->
 
 <!-- --------------------- JS: mostrar/ocultar ------------------------ -->

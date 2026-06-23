@@ -7,6 +7,9 @@
     require_once("templates/header.php");
     require_once __DIR__ . "/../app/text_formatters.php";
 
+    /** @var PDO $conn */
+    /** @var string $BASE_URL */
+
     include_once("models/internacao.php");
     include_once("dao/internacaoDao.php");
 
@@ -56,6 +59,9 @@
     $cid = new cidDAO($conn, $BASE_URL);
     $cids = $cid->findAll();
     $internacaoDao = new internacaoDAO($conn, $BASE_URL);
+    $id_internacao = filter_input(INPUT_GET, 'id_internacao', FILTER_VALIDATE_INT) ?: 1;
+    $internRows = $internacaoDao->findByIdArray($id_internacao);
+    $intern = $internRows[0] ?? ['id_internacao' => $id_internacao];
 
     $hospital_geral = new hospitalDAO($conn, $BASE_URL);
 
@@ -204,9 +210,6 @@
 
     $tuss_int = new tussDAO($conn, $BASE_URL);
 
-    $id_internacao = filter_input(INPUT_GET, 'id_internacao') ? filter_input(INPUT_GET, 'id_internacao') : 1;
-
-    $intern = $internacaoDao->findByIdArray($id_internacao)[0];
     $altaAtual = [
         'data_alta_alt' => '',
         'tipo_alta_alt' => ''
@@ -261,7 +264,7 @@
         $acomodacoesNegoc = $acomodacaoDaoEdit->findGeralByHospital((int)($intern['fk_hospital_int'] ?? 0));
     }
     $tussInt = $tuss_int->findByIdIntern($intern['id_internacao'] ?? 0);
-    $int_gestao = $gestao->findByIdInt($intern['id_internacao']);
+    $int_gestao = $gestaoDao->findByIdInt($intern['id_internacao']);
 
     $tussGeral = $tuss->findAll();
 
@@ -1254,15 +1257,15 @@
                         </div>
                         <div class="tabelas-selects d-flex flex-wrap justify-content-between align-items-end">
                             <div class="form-group tabelas-col<?= savedFieldClass($hasDetalhesReg) ?>">
-                                <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório detalhado<?= savedIndicator($hasDetalhesReg, 'Relatório detalhado', $detalhesSavedCount, 'registro', 'registros') ?></label>
-                                <select class="input-lg-fullcare form-control select-purple<?= savedFieldClass($hasDetalhesReg) ?>" id="relatorio-detalhado" name="relatorio-detalhado">
+                                <label class="control-label" for="select_relatorio_detalhado">Relatório detalhado<?= savedIndicator($hasDetalhesReg, 'Relatório detalhado', $detalhesSavedCount, 'registro', 'registros') ?></label>
+                                <select class="input-lg-fullcare form-control select-purple<?= savedFieldClass($hasDetalhesReg) ?>" id="select_relatorio_detalhado" name="relatorio-detalhado">
                                     <option value="">Selecione</option>
                                     <option value="s">Sim</option>
                                     <option value="n" selected>Não</option>
                                 </select>
                             </div>
                             <div class="form-group tabelas-col<?= savedFieldClass($hasTussReg) ?>">
-                                <label class="control-label" style="font-weight: bold;" for="select_tuss">Tuss<?= savedIndicator($hasTussReg, 'Tuss', $tussSavedCount) ?></label>
+                                <label class="control-label" for="select_tuss">Tuss<?= savedIndicator($hasTussReg, 'Tuss', $tussSavedCount) ?></label>
                                 <select class="input-lg-fullcare form-control select-purple<?= savedFieldClass($hasTussReg) ?>" id="select_tuss" name="select_tuss">
                                     <option value="">Selecione</option>
                                     <option value="s">Sim</option>
@@ -1270,7 +1273,7 @@
                                 </select>
                             </div>
                             <div class="form-group tabelas-col<?= savedFieldClass($hasProrrogReg) ?>">
-                                <label class="control-label" style="font-weight: bold;" for="select_prorrog">Prorrogação<?= savedIndicator($hasProrrogReg, 'Prorrogação', $prorrogSavedCount) ?></label>
+                                <label class="control-label" for="select_prorrog">Prorrogação<?= savedIndicator($hasProrrogReg, 'Prorrogação', $prorrogSavedCount) ?></label>
                                 <select class="input-lg-fullcare form-control select-purple<?= savedFieldClass($hasProrrogReg) ?>" id="select_prorrog" name="select_prorrog">
                                     <option value="">Selecione</option>
                                     <option value="s" <?= $forceProrrogSection ? 'selected' : '' ?>>Sim</option>
@@ -1278,7 +1281,7 @@
                                 </select>
                             </div>
                             <div class="form-group tabelas-col<?= savedFieldClass($hasGestaoReg) ?>">
-                                <label class="control-label" style="font-weight: bold;" for="select_gestao">Gestão Assistencial<?= savedIndicator($hasGestaoReg, 'Gestão Assistencial', $gestaoSavedCount, 'registro', 'registros', $gestaoFilledCount > 0 ? $gestaoFilledCount . ' campo(s) preenchido(s).' : null) ?></label>
+                                <label class="control-label" for="select_gestao">Gestão Assistencial<?= savedIndicator($hasGestaoReg, 'Gestão Assistencial', $gestaoSavedCount, 'registro', 'registros', $gestaoFilledCount > 0 ? $gestaoFilledCount . ' campo(s) preenchido(s).' : null) ?></label>
                                 <select class="input-lg-fullcare form-control select-purple<?= savedFieldClass($hasGestaoReg) ?>" id="select_gestao" name="select_gestao">
                                     <option value="">Selecione</option>
                                     <option value="s" <?= $forceGestaoSection ? 'selected' : '' ?>>Sim</option>
@@ -1286,7 +1289,7 @@
                                 </select>
                             </div>
                             <div class="form-group tabelas-col<?= savedFieldClass($hasUtiReg) ?>">
-                                <label class="control-label" style="font-weight: bold;" for="select_uti">UTI<?= savedIndicator($hasUtiReg, 'UTI', $utiSavedCount) ?></label>
+                                <label class="control-label" for="select_uti">UTI<?= savedIndicator($hasUtiReg, 'UTI', $utiSavedCount) ?></label>
                                 <select class="input-lg-fullcare form-control select-purple<?= savedFieldClass($hasUtiReg) ?>" id="select_uti" name="select_uti">
                                     <option value="">Selecione</option>
                                     <option value="s">Sim</option>
@@ -1294,7 +1297,7 @@
                                 </select>
                             </div>
                             <div class="form-group tabelas-col<?= savedFieldClass($hasNegocReg) ?>">
-                                <label class="control-label" style="font-weight: bold;" for="select_negoc">Negociações<?= savedIndicator($hasNegocReg, 'Negociações', $negocSavedCount, 'negociação', 'negociações') ?></label>
+                                <label class="control-label" for="select_negoc">Negociações<?= savedIndicator($hasNegocReg, 'Negociações', $negocSavedCount, 'negociação', 'negociações') ?></label>
                                 <select class="input-lg-fullcare form-control select-purple<?= savedFieldClass($hasNegocReg) ?>" id="select_negoc" name="select_negoc">
                                     <option value="">Selecione</option>
                                     <option value="s" <?= $forceNegocSection ? 'selected' : '' ?>>Sim</option>
@@ -1457,7 +1460,7 @@
                     </div>
 
 
-                    <div class="form-group row">
+                    <div class="form-group row detalhes-grid-row">
                         <?php
                         $dados = $detalhesDaInt[0] ?? [];
 
@@ -1564,14 +1567,14 @@
                         $oportunidades = htmlspecialchars($detalhesDaInt[0]['oportunidades_det'] ?? '');
                         ?>
 
-                        <div>
+                        <div class="form-group col-sm-12 detalhes-full-textarea">
                             <label for="exames_det">Exames relevantes</label>
                             <textarea type="textarea" style="resize:none" maxlength="5000" rows="3"
                                 onclick="aumentarText('exames_det')" onblur="reduzirText('exames_det', 3)"
                                 class="form-control" id="exames_det" name="exames_det"><?= $exames ?></textarea>
                         </div>
 
-                        <div>
+                        <div class="form-group col-sm-12 detalhes-full-textarea">
                             <label for="oportunidades_det">Oportunidades</label>
                             <textarea type="textarea" style="resize:none" maxlength="5000" rows="2"
                                 onclick="aumentarText('oportunidades_det')" onblur="reduzirText('oportunidades_det', 3)"
@@ -1685,7 +1688,7 @@
         }
         document.addEventListener('DOMContentLoaded', function() {
             var additionalSections = [{
-                    selectId: 'relatorio-detalhado',
+                    selectId: 'select_relatorio_detalhado',
                     containerId: 'detalhes-card-wrapper',
                     bodyId: 'div-detalhado',
                     display: 'block'
@@ -2665,10 +2668,12 @@
         }
 
         #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .form-group,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .tabelas-col {
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .tabelas-col,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .tabelas-col:first-child {
             min-width: 0 !important;
             width: auto !important;
             max-width: none !important;
+            flex-basis: auto !important;
             flex: none !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -2685,11 +2690,7 @@
             line-height: 1.05 !important;
         }
 
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects .form-control,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects .detail-select,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects .select-purple,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects select[id^="select_"],
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #relatorio-detalhado,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado,
         #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_tuss,
         #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_prorrog,
         #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_gestao,
@@ -2700,27 +2701,53 @@
             padding: 0 26px 0 7px !important;
             border-radius: 7px !important;
             border: 1px solid #8fc7f5 !important;
+            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
             background-color: #d7ebff !important;
-            background-image: none !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.62), 0 1px 2px rgba(15,23,42,.06) !important;
+            background-image: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
             color: #17446f !important;
+            font-family: var(--app-font-family, "Inter", Arial, Helvetica, sans-serif) !important;
             font-size: .72rem !important;
             font-weight: 600 !important;
             line-height: 1 !important;
+            text-align: left !important;
             transform: none !important;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.12) !important;
+            outline: none !important;
         }
 
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #relatorio-detalhado {
-            min-height: 30px !important;
-            height: 30px !important;
-            padding: 0 26px 0 7px !important;
-            border-radius: 7px !important;
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_tuss:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_prorrog:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_gestao:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_uti:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_negoc:focus {
+            border: 1px solid #8fc7f5 !important;
+            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
             background-color: #d7ebff !important;
-            color: #17446f !important;
-            border-color: #8fc7f5 !important;
-            font-size: .72rem !important;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.12) !important;
+            outline: none !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado option {
+            font-weight: 800 !important;
+            -webkit-text-stroke: .16px currentColor;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects label[for="select_relatorio_detalhado"],
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects label[for="select_tuss"],
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects label[for="select_prorrog"],
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects label[for="select_gestao"],
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects label[for="select_uti"],
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects label[for="select_negoc"],
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado option,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_tuss option,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_prorrog option,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_gestao option,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_uti option,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_negoc option {
+            font-family: var(--app-font-family, "Inter", Arial, Helvetica, sans-serif) !important;
             font-weight: 600 !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.62), 0 1px 2px rgba(15,23,42,.06) !important;
         }
 
         #main-container .internacao-page .tabelas-adicionais-card .saved-indicator {
@@ -2823,6 +2850,10 @@
         }
 
         #tabelas-adicionais-paineis-edit #container-gestao > input[type="hidden"] {
+            display: none !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao > hr {
             display: none !important;
         }
 
@@ -2979,6 +3010,55 @@
             border-radius: 999px !important;
             font-size: .72rem !important;
             font-weight: 600 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {
+            flex: 0 0 100% !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-bottom: 8px !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+            display: grid !important;
+            grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .form-group {
+            width: auto !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: none !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .detalhes-full-textarea {
+            grid-column: 1 / -1 !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: none !important;
+            min-width: 0 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea textarea.form-control {
+            min-height: 58px !important;
+            height: 58px !important;
+            padding: 8px 10px !important;
+            resize: none !important;
+            overflow-y: auto !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea textarea.form-control:focus {
+            min-height: 92px !important;
+            height: 92px !important;
         }
 
         @media (max-width: 1199.98px) {
