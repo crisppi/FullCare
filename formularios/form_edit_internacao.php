@@ -58,13 +58,11 @@
     $internacaoDao = new internacaoDAO($conn, $BASE_URL);
 
     $hospital_geral = new hospitalDAO($conn, $BASE_URL);
-    $hospitals = $hospital_geral->findGeral($limite, $inicio);
 
     $hospitalList = new hospitalUserDAO($conn, $BASE_URL);
     $hospitalUser = new hospitalUserDAO($conn, $BASE_URL);
 
     $pacienteDao = new pacienteDAO($conn, $BASE_URL);
-    $pacientes = $pacienteDao->findGeral($limite, $inicio);
 
     $patologiaDao = new patologiaDAO($conn, $BASE_URL);
     $patologias = $patologiaDao->findGeral();
@@ -251,6 +249,13 @@
     $int_detalhes = $detalhesDao->findById($intern['id_internacao']);
     $ctl_detalhes = $detalhesDao->findById($intern['id_internacao']);
     $int_hospital = $hospital_geral->findById($intern['fk_hospital_int']);
+    $editHospitalNome = is_object($int_hospital)
+        ? (string)($int_hospital->nome_hosp ?? '')
+        : (string)($intern['nome_hosp'] ?? '');
+    $editPacienteRow = is_array($int_paciente) && isset($int_paciente[0]) && is_array($int_paciente[0])
+        ? $int_paciente[0]
+        : (is_array($int_paciente) ? $int_paciente : []);
+    $editPacienteNome = (string)($editPacienteRow['nome_pac'] ?? $intern['nome_pac'] ?? '');
     if (!isset($acomodacoesNegoc) || !is_array($acomodacoesNegoc) || !$acomodacoesNegoc) {
         $acomodacaoDaoEdit = new acomodacaoDAO($conn, $BASE_URL);
         $acomodacoesNegoc = $acomodacaoDaoEdit->findGeralByHospital((int)($intern['fk_hospital_int'] ?? 0));
@@ -846,28 +851,14 @@
                     <!-- Hospital (Somente leitura) -->
                     <div class="form-group edit-head-hospital">
                         <label class="control-label">Hospital</label>
-                        <input type="text" class="form-control form-control-sm" readonly value="<?php
-                                                                                                foreach ($hospitals as $hospital) {
-                                                                                                    if ($hospital['id_hospital'] == $intern['fk_hospital_int']) {
-                                                                                                        echo $hospital['nome_hosp'];
-                                                                                                        break;
-                                                                                                    }
-                                                                                                }
-                                                                                                ?>">
+                        <input type="text" class="form-control form-control-sm" readonly value="<?= htmlspecialchars($editHospitalNome, ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="fk_hospital_int" value="<?= $intern['fk_hospital_int'] ?>">
                     </div>
 
                     <!-- Paciente (Somente leitura) -->
                     <div class="form-group edit-head-patient">
                         <label class="control-label">Paciente</label>
-                        <input type="text" class="form-control form-control-sm" readonly value="<?php
-                                                                                                foreach ($pacientes as $paciente) {
-                                                                                                    if ($paciente['id_paciente'] == $intern['fk_paciente_int']) {
-                                                                                                        echo $paciente['nome_pac'];
-                                                                                                        break;
-                                                                                                    }
-                                                                                                }
-                                                                                                ?>">
+                        <input type="text" class="form-control form-control-sm" readonly value="<?= htmlspecialchars($editPacienteNome, ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="fk_paciente_int" value="<?= $intern['fk_paciente_int'] ?>">
                     </div>
 
@@ -1264,7 +1255,7 @@
                         <div class="tabelas-selects d-flex flex-wrap justify-content-between align-items-end">
                             <div class="form-group tabelas-col<?= savedFieldClass($hasDetalhesReg) ?>">
                                 <label class="control-label" style="font-weight: bold;" for="relatorio-detalhado">Relatório detalhado<?= savedIndicator($hasDetalhesReg, 'Relatório detalhado', $detalhesSavedCount, 'registro', 'registros') ?></label>
-                                <select class="input-lg-fullcare form-control detail-select<?= savedFieldClass($hasDetalhesReg) ?>" id="relatorio-detalhado" name="relatorio-detalhado">
+                                <select class="input-lg-fullcare form-control select-purple<?= savedFieldClass($hasDetalhesReg) ?>" id="relatorio-detalhado" name="relatorio-detalhado">
                                     <option value="">Selecione</option>
                                     <option value="s">Sim</option>
                                     <option value="n" selected>Não</option>
@@ -2380,5 +2371,645 @@
             color: #111827 !important;
             border-color: #8fc7f5 !important;
             font-weight: 400 !important;
+        }
+
+        /* Overrides finais da edicao: mantem Tabelas Adicionais compactas e no padrao atual */
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects {
+            display: grid !important;
+            grid-template-columns: repeat(6, minmax(150px, 1fr)) !important;
+            gap: 8px 10px !important;
+            align-items: end !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-col {
+            width: auto !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-col label.control-label {
+            min-height: 18px !important;
+            margin: 0 0 3px !important;
+            color: #5f6673 !important;
+            font-size: .76rem !important;
+            font-weight: 800 !important;
+            line-height: 1.15 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.form-control,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.detail-select,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.select-purple,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.has-saved-record {
+            height: 36px !important;
+            min-height: 36px !important;
+            padding: 6px 10px !important;
+            border: 1px solid #8fc7f5 !important;
+            border-radius: 8px !important;
+            background-color: #d7ebff !important;
+            color: #17446f !important;
+            font-size: .86rem !important;
+            font-weight: 800 !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.70), 0 1px 2px rgba(15,23,42,.08) !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator {
+            margin-left: 5px !important;
+            padding: 2px 6px !important;
+            font-size: .62rem !important;
+            line-height: 1 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator__icon {
+            width: 13px !important;
+            height: 13px !important;
+            font-size: .58rem !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-tuss,
+        #tabelas-adicionais-paineis-edit #container-prorrog,
+        #tabelas-adicionais-paineis-edit #container-uti,
+        #tabelas-adicionais-paineis-edit #container-gestao,
+        #tabelas-adicionais-paineis-edit #container-negoc {
+            margin: 8px 0 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-tuss h5,
+        #tabelas-adicionais-paineis-edit #container-prorrog h4 {
+            margin: 0 0 8px !important;
+            color: #243142 !important;
+            font-size: .98rem !important;
+            font-weight: 800 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field,
+        #tabelas-adicionais-paineis-edit .pror-row {
+            padding: 10px !important;
+            margin-bottom: 8px !important;
+            border: 1px solid #d9e2ef !important;
+            border-radius: 8px !important;
+            background: #f8fafc !important;
+            box-shadow: 0 1px 2px rgba(15,23,42,.06) !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field label,
+        #tabelas-adicionais-paineis-edit .pror-row label,
+        #tabelas-adicionais-paineis-edit #container-uti label {
+            min-height: 16px !important;
+            margin: 0 0 3px !important;
+            color: #5f6673 !important;
+            font-size: .74rem !important;
+            font-weight: 800 !important;
+            line-height: 1.15 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .form-control,
+        #tabelas-adicionais-paineis-edit .pror-row .form-control,
+        #tabelas-adicionais-paineis-edit #container-uti .form-control {
+            height: 34px !important;
+            min-height: 34px !important;
+            padding: 5px 9px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 8px !important;
+            background: #fff !important;
+            color: #1f2937 !important;
+            font-size: .82rem !important;
+            font-weight: 600 !important;
+            line-height: 1.25 !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 1px 2px rgba(15,23,42,.07) !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field textarea.form-control,
+        #tabelas-adicionais-paineis-edit .pror-row textarea.form-control,
+        #tabelas-adicionais-paineis-edit #container-uti textarea.form-control {
+            height: auto !important;
+            min-height: 70px !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .form-inline {
+            display: grid !important;
+            grid-template-columns: minmax(300px, 1fr) 130px 74px 74px 68px 76px !important;
+            gap: 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .pror-row .form-grid {
+            display: grid !important;
+            grid-template-columns: minmax(160px, 1fr) 126px 126px 76px 96px 76px !important;
+            gap: 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .form-group,
+        #tabelas-adicionais-paineis-edit .pror-row .form-group,
+        #tabelas-adicionais-paineis-edit #container-uti .form-group {
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .w-btns > div,
+        #tabelas-adicionais-paineis-edit .pror-row .w-btns .btn-group {
+            display: flex !important;
+            gap: 6px !important;
+            height: 34px !important;
+            align-items: center !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .btn,
+        #tabelas-adicionais-paineis-edit .pror-row .btn {
+            width: 34px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            height: 34px !important;
+            min-height: 34px !important;
+            padding: 0 !important;
+            border-radius: 7px !important;
+            font-size: .9rem !important;
+            font-weight: 900 !important;
+            line-height: 1 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+        #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
+            display: grid !important;
+            grid-template-columns: repeat(5, minmax(140px, 1fr)) !important;
+            gap: 8px 10px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-uti .form-group.col-sm-12 {
+            grid-column: 1 / -1 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-uti a {
+            font-size: .76rem !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-pendente-badge {
+            position: static !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            width: auto !important;
+            max-width: 100% !important;
+            margin: 0 0 0 auto !important;
+            padding: 3px 9px !important;
+            border-color: #fca5a5 !important;
+            border-radius: 999px !important;
+            background: #fff7f7 !important;
+            color: #b42346 !important;
+            font-size: .72rem !important;
+            font-weight: 800 !important;
+            line-height: 1.15 !important;
+            white-space: normal !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-head {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            min-height: 0 !important;
+            margin-bottom: 8px !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta {
+            margin-top: 10px !important;
+            padding: 10px !important;
+            border-radius: 8px !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__title {
+            font-size: .88rem !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__hint {
+            font-size: .74rem !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__toggle .btn {
+            width: auto !important;
+            min-width: 58px !important;
+            max-width: none !important;
+            height: 30px !important;
+            min-height: 30px !important;
+            padding: 4px 10px !important;
+            border-radius: 999px !important;
+            font-size: .78rem !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .pror-row .pror-row-error {
+            margin-top: 6px !important;
+            padding: 5px 8px !important;
+            border-radius: 6px !important;
+            font-size: .74rem !important;
+            line-height: 1.2 !important;
+        }
+
+        @media (max-width: 1199.98px) {
+            #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects {
+                grid-template-columns: repeat(3, minmax(150px, 1fr)) !important;
+            }
+
+            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
+            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
+            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
+                grid-template-columns: repeat(3, minmax(140px, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects,
+            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
+            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
+            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* Padrao final compacto: igual ao restante das telas atuais */
+        #main-container .internacao-page .tabelas-adicionais-card {
+            margin-top: 8px !important;
+            padding: 8px 10px !important;
+            border-radius: 8px !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card__header {
+            margin-bottom: 5px !important;
+            padding-bottom: 4px !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card__title {
+            font-size: .82rem !important;
+            line-height: 1.05 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects {
+            display: grid !important;
+            grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+            justify-content: initial !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .form-group,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .tabelas-col {
+            min-width: 0 !important;
+            width: auto !important;
+            max-width: none !important;
+            flex: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card label,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .tabelas-col > label.control-label,
+        #tabelas-adicionais-paineis-edit label {
+            min-height: 0 !important;
+            margin: 0 0 2px !important;
+            color: #5f6673 !important;
+            font-size: .62rem !important;
+            font-weight: 600 !important;
+            line-height: 1.05 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects .form-control,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects .detail-select,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects .select-purple,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects select[id^="select_"],
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #relatorio-detalhado,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_tuss,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_prorrog,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_gestao,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_uti,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_negoc {
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 0 26px 0 7px !important;
+            border-radius: 7px !important;
+            border: 1px solid #8fc7f5 !important;
+            background-color: #d7ebff !important;
+            background-image: none !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.62), 0 1px 2px rgba(15,23,42,.06) !important;
+            color: #17446f !important;
+            font-size: .72rem !important;
+            font-weight: 600 !important;
+            line-height: 1 !important;
+            transform: none !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #relatorio-detalhado {
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 0 26px 0 7px !important;
+            border-radius: 7px !important;
+            background-color: #d7ebff !important;
+            color: #17446f !important;
+            border-color: #8fc7f5 !important;
+            font-size: .72rem !important;
+            font-weight: 600 !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.62), 0 1px 2px rgba(15,23,42,.06) !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator {
+            margin-left: 4px !important;
+            padding: 2px 6px !important;
+            font-size: .58rem !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator__icon {
+            width: 12px !important;
+            height: 12px !important;
+            font-size: .54rem !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field,
+        #tabelas-adicionais-paineis-edit .pror-row,
+        #tabelas-adicionais-paineis-edit .negoc-row {
+            padding: 8px !important;
+            margin-bottom: 8px !important;
+            border: 1px solid #d9dce4 !important;
+            border-radius: 8px !important;
+            background: #f7f8fb !important;
+            box-shadow: none !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-tuss h5,
+        #tabelas-adicionais-paineis-edit #container-prorrog h4 {
+            margin: 0 0 7px !important;
+            color: #232b36 !important;
+            font-size: .9rem !important;
+            font-weight: 700 !important;
+            line-height: 1.15 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .form-control,
+        #tabelas-adicionais-paineis-edit .pror-row .form-control,
+        #tabelas-adicionais-paineis-edit #container-uti .form-control,
+        #tabelas-adicionais-paineis-edit #container-negoc .form-control,
+        #tabelas-adicionais-paineis-edit .negoc-row .form-control {
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 0 8px !important;
+            border: 1px solid #dfe4ec !important;
+            border-radius: 7px !important;
+            background-color: #fff !important;
+            background-image: none !important;
+            box-shadow: 0 1px 2px rgba(15,23,42,.06) !important;
+            color: #2f3742 !important;
+            font-size: .74rem !important;
+            font-weight: 400 !important;
+            line-height: 1 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field textarea.form-control,
+        #tabelas-adicionais-paineis-edit .pror-row textarea.form-control,
+        #tabelas-adicionais-paineis-edit #container-uti textarea.form-control,
+        #tabelas-adicionais-paineis-edit #container-negoc textarea.form-control,
+        #tabelas-adicionais-paineis-edit .negoc-row textarea.form-control {
+            height: auto !important;
+            min-height: 70px !important;
+            padding: 8px 10px !important;
+            line-height: 1.25 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .form-inline {
+            display: grid !important;
+            grid-template-columns: minmax(300px, 1fr) 122px 68px 68px 62px 72px !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .pror-row .form-grid {
+            display: grid !important;
+            grid-template-columns: minmax(160px, 1fr) 118px 118px 68px 88px 72px !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+        #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
+            display: grid !important;
+            grid-template-columns: repeat(5, minmax(120px, 1fr)) !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao[style*="block"] {
+            display: grid !important;
+            grid-template-columns: repeat(5, minmax(120px, 1fr)) !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin: 8px 0 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao > input[type="hidden"] {
+            display: none !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao > .form-group.row {
+            display: contents !important;
+            margin: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao > .form-group.row > .form-group,
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento > .form-group,
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento > .form-group.row > .form-group {
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: none !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao .form-control {
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 0 8px !important;
+            border: 1px solid #dfe4ec !important;
+            border-radius: 7px !important;
+            background-color: #fff !important;
+            box-shadow: 0 1px 2px rgba(15,23,42,.06) !important;
+            color: #2f3742 !important;
+            font-size: .74rem !important;
+            font-weight: 400 !important;
+            line-height: 1 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao textarea.form-control {
+            height: auto !important;
+            min-height: 70px !important;
+            padding: 8px 10px !important;
+            line-height: 1.25 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao [id^="div_rel_"],
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento {
+            grid-column: 1 / -1 !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao [id^="div_rel_"][style*="none"],
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="none"] {
+            display: none !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="block"] {
+            display: grid !important;
+            grid-template-columns: repeat(5, minmax(120px, 1fr)) !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento > .form-group.row {
+            display: contents !important;
+            margin: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-gestao #rel_evento_adverso_ges,
+        #tabelas-adicionais-paineis-edit #container-gestao #div_evento > .form-group:has(#rel_evento_adverso_ges) {
+            grid-column: 1 / -1 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit #container-negoc .negoc-row,
+        #tabelas-adicionais-paineis-edit .negoc-row,
+        #tabelas-adicionais-paineis-edit .negociation-field-container,
+        #tabelas-adicionais-paineis-edit .negotiation-field-container {
+            display: grid !important;
+            grid-template-columns: minmax(180px, 1fr) 118px 118px minmax(120px, 1fr) minmax(120px, 1fr) 66px 96px 72px !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin-bottom: 8px !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .form-group,
+        #tabelas-adicionais-paineis-edit .pror-row .form-group,
+        #tabelas-adicionais-paineis-edit #container-uti .form-group,
+        #tabelas-adicionais-paineis-edit #container-negoc .form-group,
+        #tabelas-adicionais-paineis-edit .negoc-row > .form-group[class*="col-"] {
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: none !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .w-btns > div,
+        #tabelas-adicionais-paineis-edit .pror-row .w-btns .btn-group,
+        #tabelas-adicionais-paineis-edit .negoc-row__actions {
+            display: flex !important;
+            gap: 5px !important;
+            height: 30px !important;
+            align-items: center !important;
+            margin: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .tuss-field .btn,
+        #tabelas-adicionais-paineis-edit .pror-row .btn,
+        #tabelas-adicionais-paineis-edit #container-negoc .btn,
+        #tabelas-adicionais-paineis-edit .negoc-row .btn {
+            width: 30px !important;
+            min-width: 30px !important;
+            max-width: 30px !important;
+            height: 30px !important;
+            min-height: 30px !important;
+            padding: 0 !important;
+            border-radius: 7px !important;
+            font-size: .8rem !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-pendente-badge {
+            padding: 3px 8px !important;
+            font-size: .68rem !important;
+            font-weight: 700 !important;
+            line-height: 1.1 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta {
+            margin-top: 8px !important;
+            padding: 8px 10px !important;
+            border-radius: 8px !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__title {
+            font-size: .82rem !important;
+            font-weight: 700 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__hint {
+            font-size: .7rem !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__toggle .btn {
+            width: auto !important;
+            min-width: 54px !important;
+            max-width: none !important;
+            height: 28px !important;
+            min-height: 28px !important;
+            padding: 3px 10px !important;
+            border-radius: 999px !important;
+            font-size: .72rem !important;
+            font-weight: 600 !important;
+        }
+
+        @media (max-width: 1199.98px) {
+            #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects,
+            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
+            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
+            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-negoc .negoc-row,
+            #tabelas-adicionais-paineis-edit .negoc-row,
+            #tabelas-adicionais-paineis-edit .negociation-field-container,
+            #tabelas-adicionais-paineis-edit .negotiation-field-container {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects,
+            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
+            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
+            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-negoc .negoc-row,
+            #tabelas-adicionais-paineis-edit .negoc-row,
+            #tabelas-adicionais-paineis-edit .negociation-field-container,
+            #tabelas-adicionais-paineis-edit .negotiation-field-container {
+                grid-template-columns: 1fr !important;
+            }
         }
     </style>

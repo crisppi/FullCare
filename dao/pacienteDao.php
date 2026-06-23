@@ -52,10 +52,10 @@ class PacienteDAO implements PacienteDAOInterface
         $paciente->deletado_pac = $data["deletado_pac"];
         $paciente->num_atendimento_pac = $data["num_atendimento_pac"];
 
-        $paciente->recem_nascido_pac = $data["recem_nascido_pac"];
-        $paciente->mae_titular_pac = $data["mae_titular_pac"];
-        $paciente->matricula_titular_pac = $data["matricula_titular_pac"];
-        $paciente->numero_rn_pac = $data["numero_rn_pac"];
+        $paciente->recem_nascido_pac = $data["recem_nascido_pac"] ?? "";
+        $paciente->mae_titular_pac = $data["mae_titular_pac"] ?? "";
+        $paciente->matricula_titular_pac = $data["matricula_titular_pac"] ?? "";
+        $paciente->numero_rn_pac = $data["numero_rn_pac"] ?? "";
 
         return $paciente;
     }
@@ -157,41 +157,11 @@ class PacienteDAO implements PacienteDAOInterface
     {
         $paciente = [];
         $stmt = $this->conn->prepare("SELECT
-        pa.nome_pac,
-        pa.nome_social_pac,
-        pa.endereco_pac,
-        pa.bairro_pac,
-        pa.numero_pac,
-        pa.cidade_pac,
-        pa.estado_pac,
-        pa.data_nasc_pac,
-        pa.ativo_pac,
-        pa.deletado_pac,
-        pa.telefone01_pac,
-        pa.telefone02_pac,
-        pa.email01_pac,
-        pa.email02_pac,
-        pa.cpf_pac,
-        pa.complemento_pac,
-        pa.data_create_pac,
-        pa.mae_pac,
-        pa.fk_estipulante_pac,
-        pa.cep_pac,
-        pa.sexo_pac,
-        pa.matricula_pac,
-        pa.obs_pac,
-        pa.id_paciente,
+        pa.*,
         es.id_estipulante,
         es.nome_est,
         se.id_seguradora,
-        se.seguradora_seg,
-        pa.fk_estipulante_pac,
-        pa.fk_seguradora_pac,
-        pa.num_atendimento_pac,
-        pa.recem_nascido_pac,
-        pa.mae_titular_pac,
-        pa.matricula_titular_pac,
-        pa.numero_rn_pac
+        se.seguradora_seg
 
         FROM tb_paciente as pa
 
@@ -201,7 +171,7 @@ class PacienteDAO implements PacienteDAOInterface
         LEFT JOIN tb_estipulante as es On
         es.id_estipulante = pa.fk_estipulante_pac
 
-         WHERE id_paciente = :id_paciente");
+         WHERE pa.id_paciente = :id_paciente");
 
         $stmt->bindParam(":id_paciente", $id_paciente);
         $stmt->execute();
