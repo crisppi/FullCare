@@ -138,108 +138,127 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
     .alta-page {
         width: 100%;
         margin: 0;
-        padding: 0 0 40px;
+        padding: 8px 12px 28px;
     }
 
     .alta-hero {
         background: linear-gradient(135deg, #1f5d99, #58a9ff);
         color: #fff;
-        border-radius: 28px;
-        padding: 20px 24px;
-        box-shadow: 0 20px 40px rgba(24, 0, 30, 0.25);
+        border-radius: 12px;
+        padding: 9px 14px;
+        box-shadow: 0 8px 16px rgba(35, 102, 147, 0.14);
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        margin: 15px;
+        gap: 12px;
+        margin: 0 0 10px;
     }
 
     .alta-hero h1 {
         margin: 0;
-        font-size: 1.4rem;
+        font-size: .96rem;
         letter-spacing: .02em;
         color: #fff;
+        font-weight: 800;
     }
 
     .alta-hero__tag {
         background: rgba(255, 255, 255, 0.2);
-        padding: 6px 14px;
+        padding: 4px 10px;
         border-radius: 999px;
         font-weight: 600;
-        font-size: .78rem;
+        font-size: .68rem;
+        white-space: nowrap;
     }
 
     .alta-page__content {
-        margin: 16px 15px 0;
+        margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 8px;
     }
 
     .alta-card {
-        background: #f5f5f9;
-        border: 1px solid #ebe1f5;
-        border-radius: 18px;
-        box-shadow: 0 12px 24px rgba(45, 18, 70, .08);
-        padding: 18px 18px 22px;
+        background: #f8f9fc;
+        border: 1px solid #e5eaf3;
+        border-radius: 10px;
+        box-shadow: 0 5px 12px rgba(45, 18, 70, .045);
+        padding: 10px 12px 12px;
     }
 
     .alta-card__header {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 14px;
+        gap: 10px;
+        margin-bottom: 8px;
     }
 
     .alta-card__eyebrow {
         text-transform: uppercase;
-        letter-spacing: .3em;
-        font-size: .62rem;
+        letter-spacing: .18em;
+        font-size: .56rem;
         margin: 0;
         color: #5e2363;
+        font-weight: 800;
     }
 
     .alta-card__title {
         margin: 2px 0 0;
-        font-size: 1.2rem;
+        font-size: .78rem;
         color: #2e114c;
-        font-weight: 600;
+        font-weight: 750;
+        line-height: 1.1;
     }
 
     .alta-card__tag {
         background: #f8eefc;
         color: #5e2363;
-        padding: 4px 12px;
+        padding: 3px 9px;
         border-radius: 999px;
         font-weight: 600;
-        font-size: .75rem;
+        font-size: .65rem;
+        white-space: nowrap;
     }
 
     .alta-card .form-control,
     .alta-card select.form-control {
-        min-height: 42px !important;
-        height: 42px !important;
-        padding: 8px 12px;
-        font-size: .9rem;
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 3px 8px;
+        font-size: .68rem;
         border-radius: 6px;
-        line-height: 24px;
+        line-height: 1.2;
+        border: 1px solid #cbd5e1;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .10);
+    }
+
+    .alta-card label.control-label {
+        margin-bottom: 2px;
+        font-size: .62rem;
+        line-height: 1.1;
+        color: #5f6673;
+        font-weight: 700;
+    }
+
+    .alta-card .form-group {
+        margin-bottom: 4px;
     }
 
     .alta-card input[type="date"].form-control,
     .alta-card input[type="time"].form-control,
     .alta-card select.form-control {
-        padding-top: 8px;
-        padding-bottom: 8px;
+        padding-top: 4px;
+        padding-bottom: 4px;
     }
     .alta-open-badge {
         background: #ffe3e3;
         color: #8a1c1c;
         border: 1px solid #dc3545;
         border-radius: 999px;
-        padding: 4px 12px;
+        padding: 3px 10px;
         font-weight: 600;
-        font-size: .75rem;
+        font-size: .68rem;
         text-decoration: none;
         white-space: nowrap;
         display: inline-flex;
@@ -287,17 +306,17 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
     .alta-actions {
         display: flex;
         align-items: center;
-        gap: 16px;
-        padding: 4px 6px 0;
+        gap: 10px;
+        padding: 2px 8px 0;
     }
 
     .alta-actions #cadastrar_alta {
-        min-width: 180px;
-        min-height: 56px;
-        padding: 12px 22px;
-        font-size: 1.08rem;
+        min-width: 92px;
+        min-height: 30px;
+        padding: 5px 12px;
+        font-size: .72rem;
         font-weight: 700;
-        border-radius: 12px;
+        border-radius: 8px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -308,6 +327,22 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
     }
 
     @media (max-width: 576px) {
+        .alta-page {
+            padding: 6px 8px 24px;
+        }
+
+        .alta-hero,
+        .alta-card__header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .alta-hero__tag,
+        .alta-card__tag,
+        .alta-open-badge {
+            white-space: normal;
+        }
+
         .alta-actions #cadastrar_alta {
             width: 100%;
             min-width: 0;
@@ -497,29 +532,31 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
 <?php if (!empty($pr_pendente_label)): ?>
 <script>
-    const altaForm = document.getElementById('add-movie-form');
-    let altaConfirmOpen = false;
+    window.fullcareAltaForm = document.getElementById('add-movie-form');
+    window.fullcareAltaConfirmOpen = false;
+
     function openAltaConfirm() {
-        const dlg = document.getElementById('altaConfirmDialog');
+        var dlg = document.getElementById('altaConfirmDialog');
         if (dlg) {
             dlg.style.display = 'flex';
-            altaConfirmOpen = true;
+            window.fullcareAltaConfirmOpen = true;
         }
     }
     function closeAltaConfirm() {
-        const dlg = document.getElementById('altaConfirmDialog');
+        var dlg = document.getElementById('altaConfirmDialog');
         if (dlg) {
             dlg.style.display = 'none';
-            altaConfirmOpen = false;
+            window.fullcareAltaConfirmOpen = false;
         }
     }
     function confirmAlta() {
         closeAltaConfirm();
-        if (altaForm) altaForm.submit();
+        if (window.fullcareAltaForm) window.fullcareAltaForm.submit();
     }
-    if (altaForm) {
-        altaForm.addEventListener('submit', function(e) {
-            if (altaConfirmOpen) return;
+    if (window.fullcareAltaForm && window.fullcareAltaForm.dataset.altaConfirmBound !== '1') {
+        window.fullcareAltaForm.dataset.altaConfirmBound = '1';
+        window.fullcareAltaForm.addEventListener('submit', function(e) {
+            if (window.fullcareAltaConfirmOpen) return;
             e.preventDefault();
             openAltaConfirm();
         });

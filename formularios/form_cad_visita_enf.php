@@ -602,7 +602,7 @@
     <hr>
 </div>
 
-<script src="js/text_cad_visita.js"></script>
+<script src="<?= $BASE_URL ?>js/text_cad_visita.js?v=<?= filemtime(__DIR__ . '/../js/text_cad_visita.js') ?>"></script>
 <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
 <script>
 window.clinicalTextToolsConfig = {

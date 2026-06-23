@@ -703,7 +703,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
     'acomodacoes' => json_decode($jsonAcomodacoes ?? '[]', true) ?: [],
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), ENT_NOQUOTES, 'UTF-8') ?></textarea>
 <script src="<?= $BASE_URL ?>js/select_visita.js?v=<?= filemtime(__DIR__ . '/../js/select_visita.js') ?>"></script>
-<script src="js/text_cad_visita.js"></script>
+<script src="<?= $BASE_URL ?>js/text_cad_visita.js?v=<?= filemtime(__DIR__ . '/../js/text_cad_visita.js') ?>"></script>
 <script>
 const __VISITA_CLIENT_CONFIG_NODE = document.getElementById('visita-client-config-json');
 const __VISITA_CLIENT_CONFIG = JSON.parse(__VISITA_CLIENT_CONFIG_NODE ? __VISITA_CLIENT_CONFIG_NODE.value : '{}');

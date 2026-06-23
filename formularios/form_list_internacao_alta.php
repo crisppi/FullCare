@@ -364,14 +364,88 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
         text-decoration: none;
     }
 
+    .alta-list-page {
+        padding-top: 8px;
+    }
+
+    .alta-list-page .alta-list-header {
+        --module-start: #326a86;
+        --module-mid: #43889d;
+        --module-end: #5aa8b8;
+        --module-shadow: rgba(50, 106, 134, 0.16);
+    }
+
+    .alta-list-page .complete-table.listagem-panel {
+        border-radius: 12px;
+        border: 1px solid rgba(76, 142, 187, 0.16);
+        background: linear-gradient(180deg, rgba(255, 255, 255, .98) 0%, rgba(244, 250, 255, .96) 100%);
+        box-shadow: 0 10px 22px rgba(35, 102, 147, .07);
+        padding: 8px;
+    }
+
+    .alta-list-page .table-filters {
+        padding: 6px 6px 8px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, .72);
+        border: 1px solid rgba(203, 213, 225, .7);
+        margin-bottom: 8px;
+    }
+
+    .alta-list-page .alta-filter-row :is(input.form-control, select.form-control) {
+        height: 32px;
+        min-height: 32px;
+        border-radius: 8px;
+        border: 1px solid #b8c4d6;
+        color: #1f2937;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .10);
+        font-size: .72rem;
+        font-weight: 600;
+    }
+
+    .alta-list-page .alta-filter-actions .btn {
+        height: 32px;
+        min-height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .alta-list-page .tabela-altas {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+    }
+
+    .alta-list-page .tabela-altas thead th {
+        background: linear-gradient(180deg, #eef7fb 0%, #e3f0f6 100%) !important;
+        color: #24445b !important;
+        border-bottom: 1px solid #c9dce8 !important;
+    }
+
+    .alta-list-page .tabela-altas tbody tr:hover {
+        background: #f0f8fb !important;
+    }
+
+    .alta-list-page .fc-list-action .dropdown-toggle {
+        height: 28px;
+        min-width: 32px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .10);
+    }
+
 </style>
 
-<div class="container-fluid form_container listagem-page" id="main-container">
+<div class="container-fluid form_container listagem-page alta-list-page" id="main-container">
 
-    <div class="listagem-hero listagem-hero--module listagem-hero--cadastros alta-list-header">
+    <div class="listagem-hero listagem-hero--module listagem-hero--gestao alta-list-header">
         <div class="listagem-hero__copy">
-            <div class="listagem-kicker">Altas</div>
+            <div class="listagem-kicker">Gestão</div>
             <h1 class="listagem-title">Alta hospitalar</h1>
+            <p class="listagem-subtitle">Consulta, filtros, exportação e reversão de altas registradas</p>
         </div>
 
         <div class="listagem-hero__actions">
@@ -381,7 +455,7 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
         </div>
     </div>
 
-    <div class="complete-table">
+    <div class="complete-table listagem-panel">
         <?php if ($isSeguradoraRole): ?>
             <div class="scope-badge">
                 Escopo: Seguradora <?= htmlspecialchars($seguradoraUserNome !== '' ? $seguradoraUserNome : ('#' . $seguradoraUserId), ENT_QUOTES, 'UTF-8') ?>
@@ -758,8 +832,8 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 
 <script>
-    const SOMENTE_LISTA_ALTAS = <?= $somenteListaAltas ? 'true' : 'false' ?>;
     (function($) {
+        var SOMENTE_LISTA_ALTAS = <?= $somenteListaAltas ? 'true' : 'false' ?>;
         var altaAliasLongToShort = {
             pesquisa_nome: 'hosp',
             pesquisa_pac: 'pac',
@@ -815,6 +889,9 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
             if (!tableContent) {
                 return false;
             }
+            Array.from(tableContent.querySelectorAll('script')).forEach(function(script) {
+                script.parentNode.removeChild(script);
+            });
             $('#table-content').html(tableContent.innerHTML);
             return true;
         }
@@ -942,7 +1019,7 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                 loadAltaList(href, null);
             });
 
-        let idsSelecionados = [];
+        var idsSelecionados = [];
 
         $(document)
             .off('click.alta', '.js-reverter-alta')
@@ -992,10 +1069,10 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                         ids: idsSelecionados
                     },
                     success: function(resp) {
-                        const j = (typeof resp === 'string') ? JSON.parse(resp) : resp;
+                        var j = (typeof resp === 'string') ? JSON.parse(resp) : resp;
                         if (j && j.ok) {
-                            const modalEl = document.getElementById('modalReverterAlta');
-                            const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                            var modalEl = document.getElementById('modalReverterAlta');
+                            var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
                             modal.hide();
                             location.reload();
                         } else {

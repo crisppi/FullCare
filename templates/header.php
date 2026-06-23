@@ -1860,7 +1860,7 @@ if (!empty($sessionIdUsuario)) {
 <script src="<?= $BASE_URL ?>js/contextual-assistant.js"></script>
 <script>
     // Base para links absolutos
-    const BASE_URL = '<?= $BASE_URL ?>';
+    window.BASE_URL = '<?= $BASE_URL ?>';
 
     function setupModalForms(container, modalEl) {
         if (!container || !modalEl) return;
@@ -2034,11 +2034,21 @@ if (!empty($sessionIdUsuario)) {
         }
     }
 
-    const $input = $('#inp-search-paciente');
-    const $menu = $('#search-results-dropdown');
-    const $searchType = $('#global-search-type');
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
 
-    const searchTypeConfig = {
+    (function initFullCareHeaderSearch() {
+    var $input = $('#inp-search-paciente');
+    var $menu = $('#search-results-dropdown');
+    var $searchType = $('#global-search-type');
+
+    var searchTypeConfig = {
         paciente: {
             placeholder: 'Nome ou matrícula',
             empty: 'Nenhum paciente encontrado por nome ou matrícula.',
@@ -2061,29 +2071,20 @@ if (!empty($sessionIdUsuario)) {
     }
 
     function applySearchTypeUi() {
-        const cfg = searchTypeConfig[currentSearchType()] || searchTypeConfig.paciente;
+        var cfg = searchTypeConfig[currentSearchType()] || searchTypeConfig.paciente;
         if ($searchType.length) {
             $input.attr('placeholder', cfg.placeholder);
         }
         $menu.hide();
     }
 
-    function escapeHtml(value) {
-        return String(value ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
     // Renderiza itens no dropdown
     function renderResults(items) {
         if (!items || !items.length) {
-            const termo = $input.val().trim();
-            const termoEsc = escapeHtml(termo);
-            const cfg = searchTypeConfig[currentSearchType()] || searchTypeConfig.paciente;
-            const createLink = cfg.create ? `
+            var termo = $input.val().trim();
+            var termoEsc = escapeHtml(termo);
+            var cfg = searchTypeConfig[currentSearchType()] || searchTypeConfig.paciente;
+            var createLink = cfg.create ? `
                 <a href="#" id="create-new-pac" class="dropdown-item d-flex justify-content-between align-items-center">
                     <div>
                         <div><strong>Cadastrar novo paciente</strong></div>
@@ -2099,23 +2100,23 @@ if (!empty($sessionIdUsuario)) {
             return;
         }
 
-        const html = items.map((p, idx) => {
-            const isOperational = Boolean(p.type || p.title || p.url);
-            const href = isOperational && p.url
+        var html = items.map((p, idx) => {
+            var isOperational = Boolean(p.type || p.title || p.url);
+            var href = isOperational && p.url
                 ? p.url
                 : `pacientes/hub/${encodeURIComponent(p.id_paciente)}`;
-            const icon = escapeHtml(p.icon || (p.type === 'internacao' ? 'bi-hospital' : (p.type === 'conta' ? 'bi-receipt' : 'bi-person-vcard')));
-            const typeLabel = p.type ? escapeHtml(String(p.type).charAt(0).toUpperCase() + String(p.type).slice(1)) : 'Paciente';
-            let title = p.title || p.nome || 'Paciente sem nome';
-            let subtitle = p.subtitle || '';
+            var icon = escapeHtml(p.icon || (p.type === 'internacao' ? 'bi-hospital' : (p.type === 'conta' ? 'bi-receipt' : 'bi-person-vcard')));
+            var typeLabel = p.type ? escapeHtml(String(p.type).charAt(0).toUpperCase() + String(p.type).slice(1)) : 'Paciente';
+            var title = p.title || p.nome || 'Paciente sem nome';
+            var subtitle = p.subtitle || '';
             if (!subtitle) {
-                const metaParts = [];
+                var metaParts = [];
                 if (p.senha) metaParts.push(`Senha: ${p.senha}`);
                 if (p.matricula) metaParts.push(`Matrícula: ${p.matricula}`);
                 if (p.nascimento_fmt) metaParts.push(`Nasc.: ${p.nascimento_fmt}`);
                 subtitle = metaParts.join(' • ');
             }
-            const meta = subtitle ? `<small class="text-muted">${escapeHtml(subtitle)}</small>` : '';
+            var meta = subtitle ? `<small class="text-muted">${escapeHtml(subtitle)}</small>` : '';
 
             return `
         <a href="${escapeHtml(href)}"
@@ -2137,8 +2138,8 @@ if (!empty($sessionIdUsuario)) {
 
 
     // Faz a busca
-    const doSearch = debounce(function() {
-        const q = $input.val().trim();
+    var doSearch = debounce(function() {
+        var q = $input.val().trim();
         if (q.length < 2) {
             $menu.hide();
             return;
@@ -2172,8 +2173,8 @@ if (!empty($sessionIdUsuario)) {
 
     }, 250);
 
-    $input.on('input', doSearch);
-    $searchType.on('change', function() {
+    $input.off('input.fullcareHeaderSearch').on('input.fullcareHeaderSearch', doSearch);
+    $searchType.off('change.fullcareHeaderSearch').on('change.fullcareHeaderSearch', function() {
         applySearchTypeUi();
         if ($input.val().trim().length >= 2) {
             doSearch();
@@ -2183,19 +2184,19 @@ if (!empty($sessionIdUsuario)) {
     applySearchTypeUi();
 
     // Fecha dropdown ao clicar fora
-    $(document).on('click', function(e) {
+    $(document).off('click.fullcareHeaderSearch').on('click.fullcareHeaderSearch', function(e) {
         if (!$(e.target).closest('#global-patient-search').length) {
             $menu.hide();
         }
     });
 
     // Teclas: ↑ ↓ Enter Esc
-    $input.on('keydown', function(e) {
-        const $items = $menu.find('.dropdown-item');
+    $input.off('keydown.fullcareHeaderSearch').on('keydown.fullcareHeaderSearch', function(e) {
+        var $items = $menu.find('.dropdown-item');
         if (!$items.length || $menu.is(':hidden')) return;
 
-        let $current = $items.filter('.active');
-        let idx = $items.index($current);
+        var $current = $items.filter('.active');
+        var idx = $items.index($current);
 
         if (e.key === 'ArrowDown') {
             e.preventDefault();
@@ -2213,7 +2214,7 @@ if (!empty($sessionIdUsuario)) {
             });
         } else if (e.key === 'Enter') {
             e.preventDefault();
-            const href = ($current.length ? $current : $items.eq(0)).attr('href');
+            var href = ($current.length ? $current : $items.eq(0)).attr('href');
             if (href) window.location.href = href;
         } else if (e.key === 'Escape') {
             $menu.hide();
@@ -2221,18 +2222,19 @@ if (!empty($sessionIdUsuario)) {
     });
 
     // Clique em item
-    $menu.on('click', '.dropdown-item', function(e) {
+    $menu.off('click.fullcareHeaderSearchItem', '.dropdown-item').on('click.fullcareHeaderSearchItem', '.dropdown-item', function(e) {
         // deixa o link funcionar (navegar)
     });
-    $menu.on('click', '#create-new-pac', function(e) {
+    $menu.off('click.fullcareHeaderSearchCreate', '#create-new-pac').on('click.fullcareHeaderSearchCreate', '#create-new-pac', function(e) {
         e.preventDefault();
-        const termo = $input.val().trim();
+        var termo = $input.val().trim();
         // Se quiser pré-preencher:
         // const url = BASE_URL + 'cad_paciente.php' + (termo ? ('?nome_pac=' + encodeURIComponent(termo)) : '');
-        const url = BASE_URL + 'pacientes/novo';
+        var url = window.BASE_URL + 'pacientes/novo';
         navigateWithReturn(url);
         $menu.hide();
     });
+    })();
 
     function escapeAttrValue(val) {
         return String(val)
@@ -2391,13 +2393,13 @@ if (!empty($sessionIdUsuario)) {
 
         if (key === 'I') {
             handled = true;
-            navigateWithReturn(BASE_URL + 'internacoes/nova');
+            navigateWithReturn(window.BASE_URL + 'internacoes/nova');
         } else if (key === 'P') {
             handled = true;
-            navigateWithReturn(BASE_URL + 'pacientes/novo');
+            navigateWithReturn(window.BASE_URL + 'pacientes/novo');
         } else if (key === 'V') {
             handled = true;
-            navigateWithReturn(BASE_URL + 'visitas/nova');
+            navigateWithReturn(window.BASE_URL + 'visitas/nova');
         } else if (key === 'S') {
             handled = true;
             if (typeof triggerInternacaoAutoSave === 'function') {
@@ -2408,13 +2410,13 @@ if (!empty($sessionIdUsuario)) {
             }
         } else if (key === 'L') {
             handled = true;
-            navigateWithReturn(BASE_URL + 'internacoes/lista');
+            navigateWithReturn(window.BASE_URL + 'internacoes/lista');
         } else if (key === 'C') {
             handled = true;
-            navigateWithReturn(BASE_URL + 'internacoes/rah');
+            navigateWithReturn(window.BASE_URL + 'internacoes/rah');
         } else if (key === 'A') {
             handled = true;
-            navigateWithReturn(BASE_URL + 'listas/altas');
+            navigateWithReturn(window.BASE_URL + 'listas/altas');
         }
 
         if (handled) {
