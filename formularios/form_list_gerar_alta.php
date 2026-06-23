@@ -387,6 +387,15 @@ sort($dadosAlta);
             font-weight: 400;
         }
 
+        .gerar-alta-card input[type="date"].form-control,
+        .gerar-alta-card input[type="datetime-local"].form-control,
+        .gerar-alta-card input[type="time"].form-control {
+            font-size: .78rem !important;
+            font-weight: 400 !important;
+            line-height: 1.1 !important;
+            color: #1f2937 !important;
+        }
+
         .gerar-alta-card .shadow-field:focus-within {
             border-color: #3b82f6;
             box-shadow:
@@ -399,9 +408,27 @@ sort($dadosAlta);
             --bs-gutter-y: .3rem;
         }
         .gerar-alta-card .shadow-field.bg-light {
-            display: block;
-            height: auto;
-            min-height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 30px;
+            min-height: 30px;
+            padding: .24rem .5rem;
+            border-color: #fecaca;
+            background: #fff7f7;
+        }
+        .gerar-alta-card .shadow-field.bg-light span,
+        .gerar-alta-card .shadow-field.bg-light small {
+            display: inline;
+            margin: 0;
+            font-size: .72rem;
+            line-height: 1;
+        }
+        .gerar-alta-card .shadow-field.bg-light span {
+            font-weight: 700 !important;
+        }
+        .gerar-alta-card .shadow-field.bg-light small {
+            color: #7b7280 !important;
         }
         .gerar-alta-card .gerar-alta-check-field {
             justify-content: center;
@@ -417,6 +444,13 @@ sort($dadosAlta);
             margin: .38rem 0;
             opacity: .12;
             border-color: #7b2dbf;
+        }
+        .gerar-alta-total {
+            display: inline-flex;
+            justify-content: flex-end;
+            font-size: .68rem;
+            font-weight: 600;
+            line-height: 1;
         }
         @media (max-width: 991px) {
             .gerar-alta-filter-grid {
@@ -513,7 +547,7 @@ sort($dadosAlta);
                             <small class="text-muted">Informe a data da alta da UTI antes de gerar.</small>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="tag mb-1">Data alta UTI</div>
                         <div class="shadow-field">
                             <input type="date" class="form-control form-control-sm border-0 bg-transparent p-0"
@@ -556,8 +590,8 @@ sort($dadosAlta);
 
     </form>
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4">
-        <span class="text-muted small">Total encontrado: <?= $qtdItens ?></span>
+    <div class="d-flex flex-column flex-md-row justify-content-end align-items-center gap-3 mt-2">
+        <span class="text-muted gerar-alta-total">Total encontrado: <?= $qtdItens ?></span>
         <?php if ($totalPages > 1): ?>
         <nav aria-label="Paginação">
             <ul class="pagination justify-content-center mb-0">
