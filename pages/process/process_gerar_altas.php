@@ -83,12 +83,19 @@ foreach ($selecionadas as $rawId) {
     }
 
     $prefix = "alta_{$idInternacao}_";
+    $dataHoraAlta = trim((string) ($_POST[$prefix . "data_hora"] ?? ""));
     $dataAlta = trim((string) ($_POST[$prefix . "data"] ?? ""));
     $horaAlta = trim((string) ($_POST[$prefix . "hora"] ?? ""));
     $motivoAlta = trim((string) ($_POST[$prefix . "motivo"] ?? ""));
 
+    if ($dataHoraAlta !== "") {
+        $dataHoraAlta = str_replace('T', ' ', $dataHoraAlta);
+        $dataAlta = substr($dataHoraAlta, 0, 10);
+        $horaAlta = trim(substr($dataHoraAlta, 11, 5));
+    }
+
     if ($dataAlta === "" || $motivoAlta === "") {
-        $erros[] = "ID {$idInternacao}: informe data e motivo da alta.";
+        $erros[] = "ID {$idInternacao}: informe data/hora e motivo da alta.";
         continue;
     }
 

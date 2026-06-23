@@ -639,11 +639,15 @@
         }
 
         .edit-form-actions .btn-submit-standard {
-            min-width: 150px;
-            min-height: 46px;
-            padding: 9px 18px;
-            font-size: .96rem;
-            border-radius: 10px;
+            min-width: 118px;
+            min-height: 34px;
+            padding: 6px 14px;
+            font-size: .82rem;
+            border-radius: 8px;
+        }
+
+        .edit-form-actions .btn-submit-standard .edit-icon {
+            font-size: .78rem !important;
         }
 
         .edit-draft-actions {
@@ -3010,6 +3014,45 @@
             border-radius: 999px !important;
             font-size: .72rem !important;
             font-weight: 600 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__grid {
+            display: grid !important;
+            grid-template-columns: 180px minmax(240px, 360px) !important;
+            gap: 6px 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__grid .form-group {
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__grid label {
+            min-height: 0 !important;
+            margin: 0 0 3px !important;
+            color: #626b78 !important;
+            font-size: .68rem !important;
+            font-weight: 700 !important;
+            line-height: 1.05 !important;
+        }
+
+        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__grid .form-control {
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 0 8px !important;
+            border: 1px solid #dfe4ec !important;
+            border-radius: 7px !important;
+            background-color: #fff !important;
+            box-shadow: 0 1px 2px rgba(15,23,42,.06) !important;
+            color: #2f3742 !important;
+            font-size: .74rem !important;
+            font-weight: 400 !important;
+            line-height: 1 !important;
         }
 
         #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {

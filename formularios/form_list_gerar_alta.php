@@ -280,35 +280,41 @@ sort($dadosAlta);
         }
         .gerar-alta-card {
             position: relative;
-            border-radius: 16px;
-            padding: .85rem 1rem 1rem 1.35rem;
-            margin-bottom: .75rem;
-            background: #fff;
-            border: 1px solid #efe7f6;
-            box-shadow: 0 12px 35px -22px rgba(97, 35, 133, 0.6);
+            border-radius: 8px;
+            padding: .42rem .62rem .5rem .9rem;
+            margin-bottom: .56rem;
+            background: linear-gradient(180deg, #ffffff 0%, #fbf8ff 100%);
+            border: 1px solid #dbc7ec;
+            box-shadow:
+                0 10px 22px -17px rgba(94, 35, 99, .5),
+                0 2px 0 rgba(94, 35, 99, .06);
+        }
+        .gerar-alta-card + .gerar-alta-card {
+            margin-top: .56rem;
         }
         .gerar-alta-card::before {
             content: "";
             position: absolute;
-            left: 0.55rem;
-            top: .8rem;
-            bottom: .8rem;
+            left: .48rem;
+            top: .42rem;
+            bottom: .42rem;
             width: 4px;
             border-radius: 10px;
-            background: linear-gradient(180deg, #7b2dbf, #c35c91);
+            background: linear-gradient(180deg, #6d28a8 0%, #c35c91 100%);
+            box-shadow: 0 0 0 3px rgba(123, 45, 191, .08);
         }
         .gerar-alta-meta-grid {
             display: grid;
             grid-template-columns: minmax(210px, 1.45fr) minmax(210px, 1.45fr) minmax(140px, .75fr) minmax(95px, .5fr);
-            gap: 8px;
+            gap: 5px;
         }
         .gerar-alta-meta-card {
             min-width: 0;
-            min-height: 58px;
-            padding: .45rem .62rem;
+            min-height: 40px;
+            padding: .26rem .42rem;
             border: 1px solid #dfcdea;
             border-left: 3px solid #7b5a9a;
-            border-radius: 10px;
+            border-radius: 8px;
             background: linear-gradient(180deg, #fff 0%, #f8f2fd 100%);
             box-shadow: 0 8px 16px rgba(94, 35, 99, .06), inset 0 1px 0 rgba(255,255,255,.9);
         }
@@ -320,30 +326,30 @@ sort($dadosAlta);
             white-space: nowrap;
         }
         .gerar-alta-meta-card strong {
-            margin-top: 3px;
+            margin-top: 1px;
             color: #2c2742;
-            font-size: .78rem;
+            font-size: .68rem;
             font-weight: 700;
         }
         .gerar-alta-meta-card small {
             margin-top: 0;
-            min-height: 1em;
+            min-height: .9em;
             color: #8b8ca5;
-            font-size: .62rem;
+            font-size: .54rem;
         }
         .gerar-alta-meta-label {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             color: #5e2363;
-            font-size: .55rem;
+            font-size: .51rem;
             font-weight: 800;
             letter-spacing: .08em;
             line-height: 1;
             text-transform: uppercase;
         }
         .gerar-alta-meta-label i {
-            font-size: .68rem;
+            font-size: .6rem;
             letter-spacing: 0;
         }
         .gerar-alta-meta-card-id {
@@ -353,43 +359,62 @@ sort($dadosAlta);
             justify-content: center;
         }
         .gerar-alta-card .tag {
-            font-size: 0.62rem;
+            font-size: .52rem;
             letter-spacing: .08em;
             text-transform: uppercase;
             color: #8b8ca5;
         }
         .gerar-alta-card .shadow-field {
-            background: #f9fafc;
-            border-radius: 12px;
-            padding: .5rem .75rem;
-            border: 1px solid #eef0f4;
-            min-height: 50px;
-            height: 50px;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: .24rem .48rem;
+            border: 1px solid #cbd5e1;
+            min-height: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             width: 100%;
+            box-shadow:
+                0 1px 2px rgba(15, 23, 42, .10),
+                inset 0 1px 0 rgba(255, 255, 255, .95);
         }
         .gerar-alta-card .shadow-field .form-control,
         .gerar-alta-card .shadow-field .form-select {
             width: 100%;
+            font-size: .78rem;
+            line-height: 1.1;
+            color: #1f2937;
+            font-weight: 400;
+        }
+
+        .gerar-alta-card .shadow-field:focus-within {
+            border-color: #3b82f6;
+            box-shadow:
+                0 0 0 .14rem rgba(59, 130, 246, .16),
+                0 1px 2px rgba(15, 23, 42, .10);
+        }
+
+        .gerar-alta-card .row.g-3 {
+            --bs-gutter-x: .5rem;
+            --bs-gutter-y: .3rem;
         }
         .gerar-alta-card .shadow-field.bg-light {
             display: block;
             height: auto;
-            min-height: 58px;
+            min-height: 40px;
         }
         .gerar-alta-card .gerar-alta-check-field {
             justify-content: center;
             cursor: pointer;
         }
         .gerar-alta-card .gerar-alta-check-field .form-check-input {
-            width: 1.05rem;
-            height: 1.05rem;
+            width: .9rem;
+            height: .9rem;
             margin: 0;
             cursor: pointer;
         }
         .gerar-alta-card hr {
-            margin: .8rem 0;
+            margin: .38rem 0;
             opacity: .12;
             border-color: #7b2dbf;
         }
@@ -471,12 +496,10 @@ sort($dadosAlta);
                     <div class="gerar-alta-meta-card">
                         <span class="gerar-alta-meta-label"><i class="bi bi-calendar2-plus" aria-hidden="true"></i>Internação</span>
                         <strong><?= $dataInternacaoFormatada ?></strong>
-                        <small>Data de entrada</small>
                     </div>
                     <div class="gerar-alta-meta-card gerar-alta-meta-card-id">
                         <span class="gerar-alta-meta-label"><i class="bi bi-hash" aria-hidden="true"></i>ID</span>
                         <strong><?= $idIntern ?></strong>
-                        <small>Internação</small>
                     </div>
                 </div>
 
@@ -499,17 +522,10 @@ sort($dadosAlta);
                     </div>
                     <?php endif; ?>
                     <div class="col-md-4">
-                        <div class="tag mb-1">Data da alta</div>
+                        <div class="tag mb-1">Data/Hora da alta</div>
                         <div class="shadow-field">
-                            <input type="date" class="form-control form-control-sm border-0 bg-transparent p-0"
-                                name="<?= $fieldPrefix ?>_data">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="tag mb-1">Hora da alta</div>
-                        <div class="shadow-field">
-                            <input type="time" class="form-control form-control-sm border-0 bg-transparent p-0"
-                                name="<?= $fieldPrefix ?>_hora">
+                            <input type="datetime-local" class="form-control form-control-sm border-0 bg-transparent p-0"
+                                name="<?= $fieldPrefix ?>_data_hora" step="60">
                         </div>
                     </div>
                     <div class="col-md-4">
