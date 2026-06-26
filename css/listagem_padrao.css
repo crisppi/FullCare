@@ -116,10 +116,39 @@
 }
 
 .listagem-hero--module .listagem-btn-top {
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: #fff !important;
-    box-shadow: none;
+    background: linear-gradient(180deg, #ffffff 0%, #f6fbff 100%) !important;
+    border: 1px solid rgba(207, 224, 238, .98) !important;
+    color: #2b3d52 !important;
+    box-shadow: 0 8px 18px rgba(21, 69, 105, .22), inset 0 1px 0 rgba(255, 255, 255, .95) !important;
+}
+
+.listagem-hero--module .listagem-btn-top--purple {
+    background: linear-gradient(180deg, #ffffff 0%, #f7effb 100%) !important;
+    border-color: #d9c3f4 !important;
+    color: #5e2363 !important;
+}
+
+.listagem-hero--module .listagem-btn-top--blue {
+    background: linear-gradient(180deg, #ffffff 0%, #edf8ff 100%) !important;
+    border-color: #b9d8ea !important;
+    color: #236693 !important;
+    text-shadow: none !important;
+}
+
+.listagem-hero--module .listagem-btn-top--green {
+    background: linear-gradient(180deg, #ffffff 0%, #effaf3 100%) !important;
+    border-color: #bfe2cb !important;
+    color: #287047 !important;
+}
+
+.listagem-hero--module .listagem-btn-top:hover,
+.listagem-hero--module .listagem-btn-top:focus {
+    background: #ffffff !important;
+    border-color: rgba(255, 255, 255, .96) !important;
+    color: #1f2937 !important;
+    box-shadow: 0 10px 22px rgba(21, 69, 105, .30), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+    outline: none !important;
+    transform: translateY(-1px);
 }
 
 .listagem-hero--cadastro {
@@ -182,6 +211,7 @@
     text-align: center;
     white-space: nowrap;
     box-shadow: 0 8px 16px rgba(21, 69, 105, 0.18);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
 }
 
 .listagem-btn-top__icon {
@@ -211,6 +241,28 @@
     border-color: rgba(255, 255, 255, .52);
     color: #fff !important;
     box-shadow: 0 9px 18px rgba(21, 69, 105, 0.24);
+    outline: none !important;
+    transform: translateY(-1px);
+}
+
+.listagem-btn-top--purple:hover,
+.listagem-btn-top--purple:focus {
+    background: linear-gradient(135deg, #542058 0%, #6e4689 100%);
+    border-color: rgba(255, 255, 255, .52);
+    color: #fff !important;
+    box-shadow: 0 9px 18px rgba(94, 35, 99, .24);
+    outline: none !important;
+    transform: translateY(-1px);
+}
+
+.listagem-btn-top--green:hover,
+.listagem-btn-top--green:focus {
+    background: linear-gradient(135deg, #347c4f 0%, #4c9b67 100%);
+    border-color: rgba(255, 255, 255, .52);
+    color: #fff !important;
+    box-shadow: 0 9px 18px rgba(40, 112, 71, .24);
+    outline: none !important;
+    transform: translateY(-1px);
 }
 
 .listagem-panel {

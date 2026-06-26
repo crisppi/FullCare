@@ -61,7 +61,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
 <!-- Ícones via pacote local Font Awesome Free -->
 <link rel="stylesheet" href="diversos/CoolAdmin-master/vendor/font-awesome-5/css/fontawesome-all.min.css">
 <link rel="stylesheet" href="css/style.css?v=<?= @filemtime(__DIR__ . '/css/style.css') ?>">
-<link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/css/form_cad_internacao.css') ?>">
+<link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/../../css/form_cad_internacao.css') ?>">
 <style>
     #main-container.internacao-page {
         margin: 2px 0 0 !important;
@@ -373,11 +373,24 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         height: 28px !important;
         padding: 2px 7px !important;
         border-radius: 7px !important;
-        border: 1px solid #d6d4df !important;
+        border: 1px solid #b8c4d6 !important;
+        background-color: #ffffff !important;
         font-size: .68rem !important;
         line-height: 1.1 !important;
         font-weight: 500 !important;
-        box-shadow: none !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form .form-control:hover,
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form select.form-control:hover {
+        border-color: #8796aa !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form .form-control:focus,
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form select.form-control:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16), 0 1px 3px rgba(15, 23, 42, .16) !important;
+        outline: none !important;
     }
 
     #main-container.internacao-page.cadastro-paciente-page #multi-step-form textarea.form-control {
@@ -385,6 +398,9 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         height: auto !important;
         padding: 5px 7px !important;
         line-height: 1.22 !important;
+        border-color: #b8c4d6 !important;
+        background-color: #ffffff !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
     }
 
     #main-container.internacao-page.cadastro-paciente-page #multi-step-form input[type="date"]::-webkit-datetime-edit,

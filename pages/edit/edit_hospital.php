@@ -150,7 +150,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
 ?>
 <script src="css/ocultar.css"></script>
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/css/form_cad_internacao.css') ?>">
+<link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/../../css/form_cad_internacao.css') ?>">
 <style>
     #main-container.internacao-page {
         margin: 2px 0 0 !important;
@@ -252,6 +252,132 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
         border-radius: 14px;
         padding: 14px;
     }
+
+    #main-container.compact-edit-layout .hospital-grid-row {
+        display: grid !important;
+        column-gap: 10px !important;
+        row-gap: 4px !important;
+        align-items: flex-end !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row > [class*="col-"] {
+        display: block !important;
+        width: auto !important;
+        max-width: none !important;
+        flex: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-bottom: 1px !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row .form-control,
+    #main-container.compact-edit-layout .hospital-grid-row select.form-control {
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 2px 7px !important;
+        border-radius: 7px !important;
+        border: 1px solid #b8c4d6 !important;
+        background-color: #ffffff !important;
+        font-size: .68rem !important;
+        line-height: 1.1 !important;
+        font-weight: 500 !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row .form-control:hover,
+    #main-container.compact-edit-layout .hospital-grid-row select.form-control:hover {
+        border-color: #8796aa !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row .form-control:focus,
+    #main-container.compact-edit-layout .hospital-grid-row select.form-control:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16), 0 1px 3px rgba(15, 23, 42, .16) !important;
+        outline: none !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row label {
+        min-height: 0 !important;
+        margin-bottom: 2px !important;
+        font-size: .62rem !important;
+        line-height: 1.05 !important;
+        font-weight: 600 !important;
+        color: #3b2b4b !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row .inline-add-btn {
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        height: 28px !important;
+        min-height: 28px !important;
+        padding: 0 !important;
+        border-radius: 7px !important;
+        align-self: end !important;
+        justify-self: end !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--identificacao {
+        grid-template-columns: minmax(170px, 1fr) minmax(0, 2.5fr) !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--endereco-main {
+        grid-template-columns: minmax(150px, 1fr) minmax(0, 4.2fr) !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--endereco-secondary {
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(120px, .9fr) minmax(120px, .9fr) !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--endereco-inline-main {
+        grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(0, 2.5fr) minmax(74px, .55fr) minmax(120px, 1fr) 30px !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--endereco-inline-secondary {
+        grid-template-columns: minmax(0, 1.35fr) minmax(110px, .8fr) minmax(0, 2fr) minmax(120px, .9fr) !important;
+        margin-top: 4px !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--contato-base,
+    #main-container.compact-edit-layout .hospital-grid-row--telefone-base,
+    #main-container.compact-edit-layout .hospital-grid-row--dados-top {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--telefone-inline {
+        grid-template-columns: minmax(120px, 1fr) minmax(150px, 1.3fr) minmax(95px, .75fr) minmax(0, 1.5fr) minmax(120px, .9fr) 30px !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--contato-inline {
+        grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(0, 1.35fr) minmax(140px, 1fr) minmax(120px, .85fr) 30px !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--ativo {
+        grid-template-columns: minmax(150px, 1fr) !important;
+        max-width: 520px;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--dados-bottom {
+        grid-template-columns: minmax(0, 1.6fr) minmax(120px, .8fr) minmax(120px, .8fr) !important;
+    }
+
+    #main-container.compact-edit-layout .hospital-grid-row--acomodacao-inline {
+        grid-template-columns: minmax(0, 1.7fr) minmax(150px, 1.2fr) minmax(150px, 1fr) 30px !important;
+    }
+
+    @media (max-width: 991.98px) {
+        #main-container.compact-edit-layout .hospital-grid-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        #main-container.compact-edit-layout .hospital-grid-row {
+            grid-template-columns: 1fr !important;
+        }
+    }
 </style>
 
 <div class="internacao-page cadastro-layout compact-edit-layout" id="main-container">
@@ -289,7 +415,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
                 <span class="entity-step-badge">Dados base</span>
             </div>
-            <div class="row">
+            <div class="row hospital-grid-row hospital-grid-row--identificacao">
                 <div class="form-group col-md-6 mb-3">
                     <label for="cnpj_hosp">CNPJ</label>
                     <input type="text" oninput="mascara(this, 'cnpj')" value="<?= $cnpj_formatado ?>"
@@ -315,7 +441,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
                 <span class="entity-step-toggle">Abrir</span>
             </div>
-            <div class="row">
+            <div class="row hospital-grid-row hospital-grid-row--endereco-main">
                 <div class="form-group col-md-4 mb-3">
                     <label for="cep_hosp">CEP</label>
                     <input type="text" value="<?= $cep_formatado ?>" onkeyup="consultarCEP(this, 'hosp')"
@@ -328,7 +454,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row hospital-grid-row hospital-grid-row--endereco-secondary">
                 <div class="form-group col-md-6 mb-3">
                     <label for="bairro_hosp">Bairro</label>
                     <input readonly type="text" class="form-control" id="bairro_hosp"
@@ -339,9 +465,6 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                     <input readonly type="text" class="form-control" value="<?= $hospital->cidade_hosp ?>"
                         id="cidade_hosp" name="cidade_hosp">
                 </div>
-            </div>
-
-            <div class="row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="estado_hosp">Estado</label>
                     <input readonly class="form-control" id="estado_hosp" name="estado_hosp">
@@ -355,7 +478,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
 
             <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
             <div class="inline-manager-card mb-3">
-                <div class="row">
+                <div class="row hospital-grid-row hospital-grid-row--endereco-inline-main">
                     <div class="form-group col-md-2 mb-2">
                         <label for="end_tipo_inline">Tipo</label>
                         <input type="text" class="form-control" id="end_tipo_inline" placeholder="Filial / Cobrança">
@@ -380,7 +503,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                         <button type="button" id="btnAddEnderecoInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar endereço">+</button>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row hospital-grid-row hospital-grid-row--endereco-inline-secondary">
                     <div class="form-group col-md-3 mb-2">
                         <label for="end_cidade_inline">Cidade</label>
                         <input type="text" class="form-control" id="end_cidade_inline" placeholder="Cidade">
@@ -466,7 +589,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
                 <span class="entity-step-toggle">Abrir</span>
             </div>
-            <div class="row">
+            <div class="row hospital-grid-row hospital-grid-row--contato-base">
                 <div class="form-group col-md-6 mb-3">
                     <label for="email01_hosp">Email Principal</label>
                     <input type="email" class="form-control" value="<?= $hospital->email01_hosp ?>" id="email01_hosp"
@@ -479,7 +602,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row hospital-grid-row hospital-grid-row--telefone-base">
                 <div class="form-group col-md-6 mb-3">
                     <label for="telefone01_hosp">Telefone Principal</label>
                     <input type="text" onkeydown="mascaraTelefone(event)" maxlength="11" class="form-control"
@@ -494,7 +617,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
 
             <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
             <div class="inline-manager-card mb-3">
-                <div class="row">
+                <div class="row hospital-grid-row hospital-grid-row--telefone-inline">
                     <div class="form-group col-md-2 mb-2">
                         <label for="tel_tipo_inline">Tipo</label>
                         <input type="text" class="form-control" id="tel_tipo_inline" placeholder="Plantão / Financeiro">
@@ -576,7 +699,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
 
             <p class="internacao-card__eyebrow mb-3">Contatos do hospital</p>
             <div class="inline-manager-card mb-3">
-                <div class="row">
+                <div class="row hospital-grid-row hospital-grid-row--contato-inline">
                     <div class="form-group col-md-2 mb-2">
                         <label for="cont_nome_inline">Nome</label>
                         <input type="text" class="form-control" id="cont_nome_inline" placeholder="Nome do contato">
@@ -662,7 +785,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 <div id="contatosHiddenContainer"></div>
             </div>
 
-            <div class="row">
+            <div class="row hospital-grid-row hospital-grid-row--ativo">
                 <div class="form-group col-md-6 mb-3">
                     <label for="ativo_hosp">Ativo</label>
                     <select class="form-control" name="ativo_hosp">
@@ -684,7 +807,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
                 <span class="entity-step-toggle">Abrir</span>
             </div>
-            <div class="row">
+            <div class="row hospital-grid-row hospital-grid-row--dados-top">
                 <div class="form-group col-md-6 mb-3">
                     <label for="coordenador_medico_hosp">Coordenador Médico</label>
                     <input type="text" class="form-control" value="<?= $hospital->coordenador_medico_hosp ?>"
@@ -697,7 +820,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row hospital-grid-row hospital-grid-row--dados-bottom">
                 <div class="form-group col-md-6 mb-3">
                     <label for="coordenador_fat_hosp">Coordenador de Faturamento</label>
                     <input type="text" class="form-control" value="<?= $hospital->coordenador_fat_hosp ?>"
@@ -708,9 +831,6 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                     <input type="text" class="form-control" id="latitude_hosp" name="latitude_hosp"
                         placeholder="<?= $hospital->latitude_hosp ?>" value="<?= $hospital->latitude_hosp ?>">
                 </div>
-            </div>
-
-            <div class="row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="longitude_hosp">Longitude</label>
                     <input type="text" class="form-control" id="longitude_hosp" name="longitude_hosp"
@@ -720,7 +840,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
 
             <p class="internacao-card__eyebrow mb-3">Acomodações do hospital</p>
             <div id="acomodacao-inline-card" class="mb-3">
-                <div class="row">
+                <div class="row hospital-grid-row hospital-grid-row--acomodacao-inline">
                     <div class="form-group col-md-4 mb-2">
                         <label for="acomodacao_nome_inline">Acomodação</label>
                         <select class="form-control" id="acomodacao_nome_inline">
@@ -787,7 +907,6 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
             </div>
 
             <div class="entity-actions-bar">
-                <div class="entity-actions-copy">Revise acomodações e contatos antes de salvar. A ação de exclusão continua disponível na tela.</div>
                 <div class="d-flex align-items-center gap-2 flex-wrap" style="margin: 0">
                 <button type="submit" class="btn btn-success">
                     <i class="fas fa-check"></i> Atualizar

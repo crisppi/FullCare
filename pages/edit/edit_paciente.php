@@ -136,7 +136,7 @@ if (empty($telefonesPaciente)) {
 <link rel="stylesheet" href="diversos/CoolAdmin-master/vendor/font-awesome-5/css/fontawesome-all.min.css">
 <script src="css/ocultar.css"></script>
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/css/form_cad_internacao.css') ?>">
+<link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/../../css/form_cad_internacao.css') ?>">
 <style>
     #main-container.internacao-page {
         margin: 2px 0 0 !important;
@@ -318,11 +318,24 @@ if (empty($telefonesPaciente)) {
         height: 28px !important;
         padding: 2px 7px !important;
         border-radius: 7px !important;
-        border: 1px solid #d6d4df !important;
+        border: 1px solid #b8c4d6 !important;
+        background-color: #ffffff !important;
         font-size: .68rem !important;
         line-height: 1.1 !important;
         font-weight: 500 !important;
-        box-shadow: none !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .form-control:hover,
+    #main-container.compact-edit-layout #step-2 select.form-control:hover {
+        border-color: #8796aa !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .form-control:focus,
+    #main-container.compact-edit-layout #step-2 select.form-control:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16), 0 1px 3px rgba(15, 23, 42, .16) !important;
+        outline: none !important;
     }
 
     #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row {
@@ -434,11 +447,24 @@ if (empty($telefonesPaciente)) {
         height: 28px !important;
         padding: 2px 7px !important;
         border-radius: 7px !important;
-        border: 1px solid #d6d4df !important;
+        border: 1px solid #b8c4d6 !important;
+        background-color: #ffffff !important;
         font-size: .68rem !important;
         line-height: 1.1 !important;
         font-weight: 500 !important;
-        box-shadow: none !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .form-control:hover,
+    #main-container.compact-edit-layout #step-3 select.form-control:hover {
+        border-color: #8796aa !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .form-control:focus,
+    #main-container.compact-edit-layout #step-3 select.form-control:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16), 0 1px 3px rgba(15, 23, 42, .16) !important;
+        outline: none !important;
     }
 
     #main-container.compact-edit-layout #step-3 .paciente-contato-row .inline-add-btn {
