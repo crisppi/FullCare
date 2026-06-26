@@ -8,6 +8,63 @@ if (!function_exists('fullcare_mfa_env_value')) {
     }
 }
 
+if (!function_exists('fullcare_mfa_is_local_request')) {
+    function fullcare_mfa_is_local_request(): bool
+    {
+        $hosts = [
+            strtolower((string)($_SERVER['HTTP_HOST'] ?? '')),
+            strtolower((string)($_SERVER['SERVER_NAME'] ?? '')),
+        ];
+        $remoteAddr = strtolower((string)($_SERVER['REMOTE_ADDR'] ?? ''));
+
+        foreach ($hosts as $host) {
+            $host = preg_replace('/:\d+$/', '', trim($host));
+            if (in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+                return true;
+            }
+        }
+
+        return in_array($remoteAddr, ['127.0.0.1', '::1'], true);
+    }
+}
+
+if (!function_exists('fullcare_mfa_local_bypass_allowed')) {
+    function fullcare_mfa_local_bypass_allowed(?array $user = null, string $loginIdentifier = ''): bool
+    {
+        if (!fullcare_mfa_is_local_request()) {
+            return false;
+        }
+
+        $allowedEmail = 'diretor@fullcare.com.br';
+        $candidates = [
+            $loginIdentifier,
+            $_SESSION['email_user'] ?? '',
+            $_SESSION['login_user'] ?? '',
+        ];
+
+        if (is_array($user)) {
+            $candidates[] = $user['email_user'] ?? '';
+            $candidates[] = $user['email02_user'] ?? '';
+            $candidates[] = $user['login_user'] ?? '';
+            $candidates[] = $user['usuario_user'] ?? '';
+
+            $sessionBypassUserId = (int)($_SESSION['mfa_local_bypass_user_id'] ?? 0);
+            $userId = (int)($user['id_usuario'] ?? 0);
+            if ($sessionBypassUserId > 0 && $sessionBypassUserId === $userId) {
+                $candidates[] = $_SESSION['mfa_local_bypass_email'] ?? '';
+            }
+        }
+
+        foreach ($candidates as $candidate) {
+            if (strtolower(trim((string)$candidate)) === $allowedEmail) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 if (!function_exists('fullcare_mfa_master_key')) {
     function fullcare_mfa_master_key(): string
     {

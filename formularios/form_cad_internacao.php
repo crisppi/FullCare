@@ -212,6 +212,10 @@
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
     <style>
+        .internacao-page {
+            visibility: hidden;
+        }
+
         .assist-select-clear {
             position: relative;
         }
@@ -331,6 +335,43 @@
         .internacao-page .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle {
             min-height: 30px !important;
             height: 30px !important;
+        }
+
+        .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control),
+        .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #1f2937 !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .95),
+                0 1px 2px rgba(15, 23, 42, .10) !important;
+        }
+
+        .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):hover,
+        .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle:hover {
+            border-color: #94a3b8 !important;
+        }
+
+        .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):focus,
+        .internacao-page .internacao-card .bootstrap-select.show > .dropdown-toggle,
+        .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle:focus {
+            border-color: #3b82f6 !important;
+            box-shadow:
+                0 0 0 .14rem rgba(59, 130, 246, .16),
+                0 1px 2px rgba(15, 23, 42, .10) !important;
+            outline: none !important;
+        }
+
+        .internacao-page .internacao-card :is(input.form-control, textarea.form-control)::placeholder {
+            color: #8b95a5 !important;
+            opacity: 1 !important;
+        }
+
+        .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):disabled,
+        .internacao-page .internacao-card :is(input.form-control, textarea.form-control)[readonly] {
+            background-color: #f8fafc !important;
+            border-color: #d4dce8 !important;
+            color: #6b7280 !important;
         }
 
         .assistenciais-row-full {
@@ -1228,6 +1269,36 @@
             line-height: 1 !important;
         }
 
+        .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control),
+        .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #1f2937 !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .95),
+                0 1px 2px rgba(15, 23, 42, .10) !important;
+        }
+
+        .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):hover,
+        .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:hover {
+            border-color: #94a3b8 !important;
+        }
+
+        .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):focus,
+        .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select.show > .dropdown-toggle,
+        .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:focus {
+            border-color: #3b82f6 !important;
+            box-shadow:
+                0 0 0 .14rem rgba(59, 130, 246, .16),
+                0 1px 2px rgba(15, 23, 42, .10) !important;
+            outline: none !important;
+        }
+
+        .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, textarea.form-control)::placeholder {
+            color: #8b95a5 !important;
+            opacity: 1 !important;
+        }
+
         .internacao-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) textarea.form-control,
         .internacao-page #container-prorrog #prorrog-ia-contexto {
             min-height: 58px !important;
@@ -1422,16 +1493,17 @@
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado {
-            grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-            gap: 7px 10px !important;
-            align-items: end !important;
             margin: 0 !important;
             padding: 0 !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado > .form-group.row,
         .internacao-page #detalhes-card-wrapper #div-detalhado > .row {
-            display: contents !important;
+            display: grid !important;
+            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+            gap: 5px 10px !important;
+            align-items: start !important;
+            margin: 0 0 5px !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado > input[type="hidden"] {
@@ -1453,31 +1525,34 @@
             grid-column: span 2 !important;
         }
 
+        .internacao-page #detalhes-card-wrapper #div-detalhado .col-sm-1 {
+            grid-column: span 1 !important;
+        }
+
+        .internacao-page #detalhes-card-wrapper #div-detalhado .col-sm-2 {
+            grid-column: span 2 !important;
+        }
+
         .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
         .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
             grid-column: span 3 !important;
-            order: 80 !important;
-        }
-
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#liminar_det),
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#paliativos_det),
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#parto_det),
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#braden_det) {
-            order: 70 !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado label {
             min-height: 0 !important;
-            margin: 0 0 2px !important;
+            margin: 0 0 1px !important;
+            display: block !important;
             font-size: .6rem !important;
-            line-height: 1.05 !important;
+            line-height: 1 !important;
             font-weight: 650 !important;
             color: #646b78 !important;
+            white-space: normal !important;
+            overflow: visible !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado :is(.form-control, .form-control-sm.form-control) {
-            min-height: 28px !important;
-            height: 28px !important;
+            min-height: 26px !important;
+            height: 26px !important;
             padding: 2px 24px 2px 7px !important;
             border-radius: 7px !important;
             font-size: .66rem !important;
@@ -1634,6 +1709,8 @@
         </div>
     </div>
     <style>
+    .internacao-page { visibility: visible; }
+
     .hosp-modal { border:0; border-radius:16px; overflow:hidden; }
     .hosp-modal__header {
         display:flex; align-items:center; justify-content:space-between;

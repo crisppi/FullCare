@@ -40,6 +40,8 @@ if (!function_exists('fullcare_login_session_start')) {
             $_SESSION['mfa_pending_attempts'],
             $_SESSION['mfa_pending_email'],
             $_SESSION['mfa_pending_token'],
+            $_SESSION['mfa_local_bypass_email'],
+            $_SESSION['mfa_local_bypass_user_id'],
             $_SESSION['login_error'],
             $_SESSION['login_attempts_notice']
         );
@@ -60,7 +62,9 @@ if (!function_exists('fullcare_login_session_clear')) {
             $_SESSION['ativo'],
             $_SESSION['nivel'],
             $_SESSION['cargo'],
-            $_SESSION['fk_seguradora_user']
+            $_SESSION['fk_seguradora_user'],
+            $_SESSION['mfa_local_bypass_email'],
+            $_SESSION['mfa_local_bypass_user_id']
         );
     }
 }

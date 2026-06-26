@@ -1469,4 +1469,4 @@ window.prorrogAiConfig = Object.assign({}, window.prorrogAiConfig || {}, {
     baseUrl: <?= json_encode((string)$BASE_URL, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
 });
 </script>
-<script src="<?= $BASE_URL ?>js/prorrogacao_ai.js"></script>
+<script src="<?= $BASE_URL ?>js/prorrogacao_ai.js?v=<?= filemtime(__DIR__ . '/../js/prorrogacao_ai.js') ?>"></script>

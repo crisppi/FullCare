@@ -272,7 +272,7 @@ if (empty($telefonesPaciente)) {
     }
 </style>
 
-<div class="internacao-page cadastro-layout" id="main-container">
+<div class="internacao-page cadastro-layout compact-edit-layout" id="main-container">
     <div class="internacao-page__hero">
         <div><h1>Editar paciente</h1></div>
         <div class="hero-actions">
@@ -307,22 +307,20 @@ if (empty($telefonesPaciente)) {
                 </div>
                 <span class="entity-step-badge">Dados essenciais</span>
             </div>
-            <div class="row">
-                <div class="form-group col-md-4 mb-3">
+            <div class="row paciente-identificacao-row">
+                <div class="form-group col-md-2 mb-3">
                     <label for="cpf_pac">CPF</label>
                     <input class="form-control" type="text" oninput="mascara(this, 'cpf')" value="<?= $cpf_pac ?>"
                         id="cpf_pac" name="cpf_pac" placeholder="000.000.000-00">
                     <div class="invalid-feedback">Por favor, insira um CPF válido.</div>
                 </div>
-                <div class="form-group col-md-8 mb-3">
+                <div class="form-group col-md-6 mb-3">
                     <label for="nome_pac">Nome</label>
                     <input type="text" class="form-control" id="nome_pac" name="nome_pac"
                         value="<?= $paciente['0']['nome_pac'] ?>">
                     <div class="invalid-feedback">Por favor, insira o nome.</div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-4 mb-3">
+                <div class="form-group col-md-2 mb-3">
                     <label for="recem_nascido_pac">Recém-nascido?</label>
                     <select class="form-control" id="recem_nascido_pac" name="recem_nascido_pac"
                         onchange="handleRecemNascidoChange()">
@@ -333,6 +331,14 @@ if (empty($telefonesPaciente)) {
                         </option>
                     </select>
                 </div>
+                <div class="form-group col-md-2 mb-3">
+                    <label for="data_nasc_pac">Nascimento</label>
+                    <input type="date" class="form-control" id="data_nasc_pac" name="data_nasc_pac"
+                        value="<?= $paciente['0']['data_nasc_pac'] ?>">
+                    <div class="invalid-feedback">Por favor, insira a data de nascimento.</div>
+                </div>
+            </div>
+            <div class="row">
 
 
                 <?php
@@ -375,14 +381,8 @@ if (empty($telefonesPaciente)) {
                 </div>
 
             </div>
-            <div class="row">
-                <div class="form-group col-md-4 mb-3">
-                    <label for="data_nasc_pac">Nascimento</label>
-                    <input type="date" class="form-control" id="data_nasc_pac" name="data_nasc_pac"
-                        value="<?= $paciente['0']['data_nasc_pac'] ?>">
-                    <div class="invalid-feedback">Por favor, insira a data de nascimento.</div>
-                </div>
-                <div class="form-group col-md-4 mb-2">
+            <div class="row paciente-identificacao-row paciente-identificacao-row--secondary">
+                <div class="form-group col-md-3 mb-2">
                     <label for="matricula_pac">Matrícula</label>
                     <input type="text" class="form-control" id="matricula_pac" name="matricula_pac"
                         onkeyup="validarMatriculaExistente()" value="<?= $paciente['0']['matricula_pac'] ?>">
@@ -393,7 +393,7 @@ if (empty($telefonesPaciente)) {
                         Matrícula já cadastrada.
                     </div>
                 </div>
-                <div class="form-group col-md-4 mb-2">
+                <div class="form-group col-md-3 mb-2">
                     <label for="sexo_pac">Sexo</label>
                     <select class="form-control" name="sexo_pac" id="sexo_pac" required>
                         <option value="" disabled <?= empty($paciente['0']['sexo_pac']) ? 'selected' : '' ?>>Selecione...
@@ -414,13 +414,7 @@ if (empty($telefonesPaciente)) {
                     <input type="text" class="form-control" id="nome_social_pac" name="nome_social_pac"
                         value="<?= $paciente['0']['nome_social_pac'] ?>">
                 </div> -->
-
-            </div>
-
-
-
-            <div class="row">
-                <div class="form-group col-md-6 mb-3">
+                <div class="form-group col-md-3 mb-3">
                     <label for="fk_seguradora_pac">Seguradora</label>
                     <select class="form-control" id="fk_seguradora_pac" name="fk_seguradora_pac">
                         <option value="<?= $paciente['0']['fk_seguradora_pac'] ?>" selected>
@@ -433,7 +427,7 @@ if (empty($telefonesPaciente)) {
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group col-md-6 mb-3">
+                <div class="form-group col-md-3 mb-3">
                     <label for="fk_seguradora_pac">Estipulante</label>
                     <select class="form-control" id="fk_estipulante_pac" name="fk_estipulante_pac">
                         <option value="<?= $paciente['0']['fk_estipulante_pac'] ?>" selected>
@@ -467,7 +461,7 @@ if (empty($telefonesPaciente)) {
                 <span class="entity-step-toggle">Abrir</span>
             </div>
             <div class="entity-step-panel" id="step-2-panel" hidden>
-            <div class="row">
+            <div class="row paciente-endereco-row paciente-endereco-row--main">
                 <div class="form-group col-md-3 mb-3">
                     <label for="cep_pac">CEP</label>
                     <input type="text" oninput="mascara(this, 'cep')" onkeyup="consultarCEP(this, 'pac')"
@@ -482,7 +476,7 @@ if (empty($telefonesPaciente)) {
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row paciente-endereco-row paciente-endereco-row--secondary">
                 <div class="form-group col-md-6 mb-3">
                     <label for="bairro_pac">Bairro</label>
                     <input readonly type="text" class="form-control" value="<?= $paciente['0']['bairro_pac'] ?>"
@@ -493,9 +487,6 @@ if (empty($telefonesPaciente)) {
                     <input readonly type="text" class="form-control" id="cidade_pac"
                         value="<?= $paciente['0']['cidade_pac'] ?>" name="cidade_pac">
                 </div>
-            </div>
-
-            <div class="row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="estado_pac">Estado</label>
                     <select readonly class="form-control" id="estado_pac" name="estado_pac">
@@ -513,7 +504,7 @@ if (empty($telefonesPaciente)) {
                 </div>
             </div>
 
-            <div class="form-group mb-3">
+            <div class="form-group mb-3 paciente-endereco-complemento">
                 <label for="complemento_pac">Complemento</label>
                 <input type="text" class="form-control" id="complemento_pac" name="complemento_pac"
                     value="<?= $paciente['0']['complemento_pac'] ?>">
@@ -526,7 +517,7 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-5 mb-2"><label for="end_logradouro_inline">Endereço</label><input type="text" class="form-control" id="end_logradouro_inline"></div>
                     <div class="form-group col-md-1 mb-2"><label for="end_numero_inline">Nº</label><input type="text" class="form-control" id="end_numero_inline"></div>
                     <div class="form-group col-md-1 mb-2"><label for="end_principal_inline">Principal</label><select class="form-control" id="end_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
-                    <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddEnderecoInline" class="btn btn-primary w-100">+</button></div>
+                    <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddEnderecoInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar endereço">+</button></div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-3 mb-2"><label for="end_bairro_inline">Bairro</label><input type="text" class="form-control" id="end_bairro_inline"></div>
@@ -576,7 +567,7 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-3 mb-2"><label for="email_tipo_inline">Tipo</label><input type="text" class="form-control" id="email_tipo_inline"></div>
                     <div class="form-group col-md-6 mb-2"><label for="email_email_inline">Email</label><input type="email" class="form-control" id="email_email_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="email_principal_inline">Principal</label><select class="form-control" id="email_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
-                    <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddEmailInline" class="btn btn-primary w-100">+</button></div>
+                    <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddEmailInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar email">+</button></div>
                 </div>
                 <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Email</th><th>P</th><th>Ação</th></tr></thead><tbody id="emailsTableBody"><tr id="emailsTableEmpty" style="display: <?= empty($emailsPaciente) ? '' : 'none' ?>;"><td colspan="4" class="text-muted text-center">Nenhum email adicional.</td></tr>
                     <?php foreach ($emailsPaciente as $emailItem): ?>
@@ -610,7 +601,7 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-2 mb-2"><label for="tel_ramal_inline">Ramal</label><input type="text" class="form-control" id="tel_ramal_inline"></div>
                     <div class="form-group col-md-3 mb-2"><label for="tel_contato_inline">Contato</label><input type="text" class="form-control" id="tel_contato_inline"></div>
                     <div class="form-group col-md-1 mb-2"><label for="tel_principal_inline">Principal</label><select class="form-control" id="tel_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
-                    <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddTelefoneInline" class="btn btn-primary w-100">+</button></div>
+                    <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddTelefoneInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar telefone">+</button></div>
                 </div>
                 <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Número</th><th>Ramal</th><th>Contato</th><th>P</th><th>Ação</th></tr></thead><tbody id="telefonesTableBody"><tr id="telefonesTableEmpty" style="display: <?= empty($telefonesPaciente) ? '' : 'none' ?>;"><td colspan="6" class="text-muted text-center">Nenhum telefone adicional.</td></tr>
                     <?php foreach ($telefonesPaciente as $tel): ?>
@@ -629,7 +620,7 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-2 mb-2"><label for="cont_telefone_inline">Telefone</label><input type="text" class="form-control" id="cont_telefone_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="cont_observacao_inline">Observação</label><input type="text" class="form-control" id="cont_observacao_inline"></div>
                     <div class="form-group col-md-1 mb-2"><label for="cont_principal_inline">Principal</label><select class="form-control" id="cont_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
-                    <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddContatoInline" class="btn btn-primary w-100">+</button></div>
+                    <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddContatoInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar contato">+</button></div>
                 </div>
                 <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Nome</th><th>Parentesco</th><th>Email</th><th>Telefone</th><th>P</th><th>Ação</th></tr></thead><tbody id="contatosTableBody"><tr id="contatosTableEmpty" style="display: <?= empty($contatosPaciente) ? '' : 'none' ?>;"><td colspan="6" class="text-muted text-center">Nenhum contato adicional.</td></tr>
                     <?php foreach ($contatosPaciente as $ct): ?>
@@ -642,7 +633,6 @@ if (empty($telefonesPaciente)) {
             </div>
 
             <div class="entity-actions-bar">
-                <div class="entity-actions-copy">Confirme os dados antes de atualizar. A exclusão continua disponível nesta mesma etapa.</div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button type="submit" class="btn btn-success">
                     <i class="fas fa-check"></i> Atualizar
@@ -764,6 +754,14 @@ if (empty($telefonesPaciente)) {
             });
 
             setExpanded(false);
+        });
+
+        document.querySelectorAll('#multi-step-form button[type="submit"]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.entity-step-card--collapsible.is-collapsed .entity-step-header').forEach(function(header) {
+                    header.click();
+                });
+            });
         });
     });
 

@@ -83,34 +83,70 @@ function mp_action_label(string $action): string
 <script src="js/timeout.js"></script>
 <style>
     .mp-shell {
-        padding: 12px 12px 18px;
-        background: #f7faf5;
+        padding: 12px 14px 18px;
+        background: #f6f7fb;
         min-height: 100vh;
     }
     .mp-shell .fc-module-header {
-        margin-bottom: 6px !important;
+        margin-bottom: 8px !important;
+        padding: 10px 12px !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(47, 111, 159, .16) !important;
+        background: linear-gradient(135deg, #2f6f9f 0%, #4daed2 100%) !important;
+        box-shadow: 0 10px 24px -20px rgba(47, 111, 159, .55) !important;
     }
     .mp-shell .mb-4 {
-        margin-bottom: 7px !important;
+        margin-bottom: 8px !important;
     }
     .mp-shell .mb-3 {
-        margin-bottom: 5px !important;
+        margin-bottom: 6px !important;
     }
     .mp-shell .row.g-3 {
         --bs-gutter-x: 10px;
-        --bs-gutter-y: 7px;
+        --bs-gutter-y: 4px;
         margin-top: 0 !important;
-        margin-bottom: 7px !important;
+        margin-bottom: 4px !important;
+    }
+    .mp-shell .mp-summary-row {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    .mp-shell .mp-summary-row + .card {
+        margin-top: 0 !important;
+    }
+    .mp-shell .mp-filter-card {
+        margin-top: 0 !important;
+        margin-bottom: 8px !important;
+        transform: none;
+    }
+    .mp-top-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+    .mp-summary-row {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px !important;
+        width: 100%;
+    }
+    .mp-summary-row > .mp-summary-col {
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
     .mp-shell .row.g-2 {
         --bs-gutter-x: 6px;
         --bs-gutter-y: 6px;
     }
     .mp-hero {
-        background: linear-gradient(135deg, #1b6a43, #3ba56b 58%, #c9e7b5);
+        background: linear-gradient(135deg, #2f6f9f 0%, #4daed2 100%);
         color: #fff;
-        border-radius: 18px;
-        padding: 14px 16px;
+        border-radius: 8px;
+        padding: 10px 12px;
     }
     .mp-hero h1,
     .mp-hero h2,
@@ -140,7 +176,9 @@ function mp_action_label(string $action): string
         color: #6b7280;
     }
     .mp-shell .card {
-        border-radius: 10px;
+        border: 1px solid #e1e7ef !important;
+        border-radius: 8px;
+        box-shadow: 0 8px 20px -18px rgba(15, 23, 42, .35) !important;
     }
     .mp-shell .card-body {
         padding: 8px 10px;
@@ -157,20 +195,39 @@ function mp_action_label(string $action): string
         line-height: 1.1;
     }
     .mp-shell .row.g-3 > [class*="col-"] .card-body {
-        min-height: 54px;
+        min-height: 34px;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
+    .mp-shell .mp-summary-row .card-body {
+        min-height: 32px !important;
+        padding: 4px 8px !important;
+    }
+    .mp-shell .mp-summary-row .fs-3 {
+        font-size: .98rem !important;
+        line-height: 1 !important;
+    }
     .mp-shell .fc-module-header__title {
-        font-size: 1.02rem !important;
+        font-size: .98rem !important;
         line-height: 1.12;
         margin-bottom: 2px;
+    }
+    .mp-shell .fc-module-header__kicker {
+        font-size: .58rem !important;
+        letter-spacing: .12em !important;
+        margin-bottom: 2px !important;
     }
     .mp-shell .fc-module-header__subtitle {
         font-size: .68rem !important;
         line-height: 1.25;
         margin-bottom: 0;
+    }
+    .mp-shell .fc-module-header__actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        justify-content: flex-end;
     }
     .mp-shell .form-label {
         font-size: .68rem;
@@ -184,6 +241,20 @@ function mp_action_label(string $action): string
         font-size: .72rem;
         line-height: 1.2;
     }
+    .mp-shell .form-control,
+    .mp-shell .form-select {
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 7px !important;
+        background-color: #fff !important;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .08) !important;
+        color: #1f2937 !important;
+        font-weight: 400 !important;
+    }
+    .mp-shell .form-control:focus,
+    .mp-shell .form-select:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16), 0 1px 2px rgba(15, 23, 42, .08) !important;
+    }
     .mp-shell .form-control::placeholder {
         font-size: .72rem;
         color: #c4c4c4;
@@ -192,6 +263,15 @@ function mp_action_label(string $action): string
         min-height: 30px;
         font-size: .68rem;
         padding: 5px 10px;
+    }
+    .mp-shell .btn-success {
+        border-color: #2f6f9f !important;
+        background: #2f6f9f !important;
+        color: #fff !important;
+    }
+    .mp-shell .btn-success:hover {
+        border-color: #255b85 !important;
+        background: #255b85 !important;
     }
     .mp-shell .table thead th {
         font-size: .56rem;
@@ -203,6 +283,18 @@ function mp_action_label(string $action): string
         font-size: .72rem;
         padding: 6px 8px;
         vertical-align: middle;
+    }
+    .mp-shell h2.h5 {
+        color: #241437;
+        font-size: .9rem;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+    .mp-shell .alert {
+        padding: .55rem .7rem;
+        border-radius: 8px;
+        font-size: .72rem;
+        line-height: 1.25;
     }
 </style>
 
@@ -228,24 +320,26 @@ function mp_action_label(string $action): string
             <div class="alert alert-<?= htmlspecialchars($feedbackType) ?>"><?= htmlspecialchars($feedback) ?></div>
         <?php endif; ?>
 
-        <div class="row g-3 mb-4">
-            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Em monitoramento</div><div class="fs-3 fw-bold"><?= (int)$summary['ativos'] ?></div></div></div></div>
-            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Elegíveis para admissão</div><div class="fs-3 fw-bold text-primary"><?= (int)$summary['elegiveis'] ?></div></div></div></div>
-            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Pendentes de contato</div><div class="fs-3 fw-bold text-warning"><?= (int)$summary['pendentes'] ?></div></div></div></div>
-            <div class="col-12 col-md-6 col-xl-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Alto risco</div><div class="fs-3 fw-bold text-danger"><?= (int)$summary['alto_risco'] ?></div></div></div></div>
-        </div>
+        <div class="mp-top-stack">
+            <div class="mp-summary-row">
+                <div class="mp-summary-col"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Em monitoramento</div><div class="fs-3 fw-bold"><?= (int)$summary['ativos'] ?></div></div></div></div>
+                <div class="mp-summary-col"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Elegíveis para admissão</div><div class="fs-3 fw-bold text-primary"><?= (int)$summary['elegiveis'] ?></div></div></div></div>
+                <div class="mp-summary-col"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Pendentes de contato</div><div class="fs-3 fw-bold text-warning"><?= (int)$summary['pendentes'] ?></div></div></div></div>
+                <div class="mp-summary-col"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Alto risco</div><div class="fs-3 fw-bold text-danger"><?= (int)$summary['alto_risco'] ?></div></div></div></div>
+            </div>
 
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <form class="row g-3 align-items-end" method="get">
-                    <div class="col-12 col-lg-10">
-                        <label class="form-label">Pesquisar paciente, matrícula ou foco do monitoramento</label>
-                        <input type="text" name="q" class="form-control" value="<?= htmlspecialchars($search) ?>" placeholder="Ex.: João, diabetes, matrícula">
-                    </div>
-                    <div class="col-12 col-lg-2 d-grid">
-                        <button type="submit" class="btn btn-success">Filtrar</button>
-                    </div>
-                </form>
+            <div class="card border-0 shadow-sm mp-filter-card">
+                <div class="card-body">
+                    <form class="row g-3 align-items-end" method="get">
+                        <div class="col-12 col-lg-10">
+                            <label class="form-label">Pesquisar paciente, matrícula ou foco do monitoramento</label>
+                            <input type="text" name="q" class="form-control" value="<?= htmlspecialchars($search) ?>" placeholder="Ex.: João, diabetes, matrícula">
+                        </div>
+                        <div class="col-12 col-lg-2 d-grid">
+                            <button type="submit" class="btn btn-success">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 

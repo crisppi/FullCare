@@ -54,13 +54,11 @@ include_once("dao/antecedenteDao.php");
 $internacaoDao = new internacaoDAO($conn, $BASE_URL);
 
 $hospital_geral = new hospitalDAO($conn, $BASE_URL);
-$hospitals = $hospital_geral->findGeral($limite, $inicio);
 
 $hospitalList = new hospitalUserDAO($conn, $BASE_URL);
 $hospitalUser = new hospitalUserDAO($conn, $BASE_URL);
 
 $pacienteDao = new pacienteDAO($conn, $BASE_URL);
-$pacientes = $pacienteDao->findGeral($limite, $inicio);
 
 $patologiaDao = new patologiaDAO($conn, $BASE_URL);
 $patologias = $patologiaDao->findGeral();

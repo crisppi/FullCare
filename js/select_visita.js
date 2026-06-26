@@ -41,7 +41,7 @@ function bindAdditionalTables() {
         const container = document.getElementById(section.containerId);
         const body = section.bodyId ? document.getElementById(section.bodyId) : null;
         if (container) container.style.display = show ? 'block' : 'none';
-        if (body) body.style.display = show ? 'grid' : 'none';
+        if (body) body.style.display = show ? (section.display || 'block') : 'none';
     }
 
     function showOnly(activeSelectId) {

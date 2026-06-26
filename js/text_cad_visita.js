@@ -1,58 +1,37 @@
- // mudar linhas do relatorio 
- var text_audit = document.querySelector("#rel_visita_vis");
+function toggleTextareaRows(id) {
+    var field = document.getElementById(id);
+    if (!field) return;
+    var expanded = field.dataset.expanded === '1';
+    field.dataset.expanded = expanded ? '0' : '1';
+    field.rows = expanded ? 2 : 30;
+    field.style.setProperty('height', expanded ? '30px' : '420px', 'important');
+    field.style.setProperty('min-height', expanded ? '30px' : '420px', 'important');
+    field.style.setProperty('overflow-y', expanded ? 'hidden' : 'auto', 'important');
+}
 
- function aumentarTextAudit() {
-     if (text_audit.rows == "2") {
-         text_audit.rows = "30"
-     } else {
-         text_audit.rows = "2"
-     }
- }
+function aumentarTextAudit() {
+    toggleTextareaRows('rel_visita_vis');
+}
 
- // mudar linhas da acoes 
- var text_acoes = document.querySelector("#acoes_int_vis");
+function aumentarTextAcoes() {
+    toggleTextareaRows('acoes_int_vis');
+}
 
- function aumentarTextAcoes() {
-     if (text_acoes.rows == "2") {
-         text_acoes.rows = "30"
-     } else {
-         text_acoes.rows = "2"
-     }
- }
+function aumentarTextExamesEnf() {
+    toggleTextareaRows('exames_enf');
+}
 
+function aumentarTextProgEnf() {
+    toggleTextareaRows('programacao_enf');
+}
 
- // mudar linhas dos exames enf 
- var text_exames_enf = document.querySelector("#exames_enf");
+function aumentarTextProgVis() {
+    toggleTextareaRows('programacao_enf');
+}
 
- function aumentarTextExamesEnf() {
-     if (text_exames_enf.rows == "2") {
-         text_exames_enf.rows = "30"
-     } else {
-         text_exames_enf.rows = "2"
-     }
- }
-
- // mudar linhas dos programacao_enf enf 
- var programacao_enf = document.querySelector("#programacao_enf");
-
- function aumentarTextProgEnf() {
-     if (programacao_enf.rows == "2") {
-         programacao_enf.rows = "30"
-     } else {
-         programacao_enf.rows = "2"
-     }
- }
-
- // mudar linhas dos exames enf 
- var oportunidades_enf = document.querySelector("#oportunidades_enf");
-
- function aumentarTextOportEnf() {
-     if (oportunidades_enf.rows == "2") {
-         oportunidades_enf.rows = "30"
-     } else {
-         oportunidades_enf.rows = "2"
-     }
- }
+function aumentarTextOportEnf() {
+    toggleTextareaRows('oportunidades_enf');
+}
  $(document).ready(function() {
      // Adicione um ouvinte de mudança ao checkbox button
      $('#exibirVisita').change(function() {
@@ -81,7 +60,7 @@
          if (!select || !wrapper || !detalhes) return;
          var show = select.value === 's';
          wrapper.style.display = show ? 'block' : 'none';
-         detalhes.style.display = show ? 'grid' : 'none';
+         detalhes.style.display = show ? 'block' : 'none';
      }
 
      if (window.jQuery) {
@@ -89,7 +68,7 @@
              function toggleDetalhes() {
                  if ($('#relatorio-detalhado').val() === 's') {
                      $('#detalhes-card-wrapper').show();
-                     $('#div-detalhado').css('display', 'grid');
+                     $('#div-detalhado').css('display', 'block');
                  } else {
                      $('#div-detalhado').hide();
                      $('#detalhes-card-wrapper').hide();

@@ -485,14 +485,14 @@ $prorrogAltaAtiva = $prorrogAltaDataValue !== '' || !empty($altaAtual['tipo_alta
             </div>
         </div>
         <div class="prorrog-inline-alta__fields<?= $prorrogAltaAtiva ? ' is-visible' : '' ?>" id="prorrog-inline-alta-fields">
-            <div class="row g-2">
-                <div class="form-group col-sm-3">
+            <div class="prorrog-inline-alta__grid">
+                <div class="form-group">
                     <label class="control-label" for="prorrog_data_alta_alt">Data/Hora Alta</label>
                     <input type="datetime-local" class="form-control form-control-sm" id="prorrog_data_alta_alt"
                         name="prorrog_data_alta_alt" step="60"
                         value="<?= htmlspecialchars($prorrogAltaDataValue, ENT_QUOTES, 'UTF-8') ?>">
                 </div>
-                <div class="form-group col-sm-4">
+                <div class="form-group">
                     <label class="control-label" for="prorrog_tipo_alta_alt">Motivo Alta</label>
                     <select class="form-control form-control-sm" id="prorrog_tipo_alta_alt" name="prorrog_tipo_alta_alt">
                         <option value="">Selecione o motivo da alta</option>

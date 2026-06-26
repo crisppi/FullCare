@@ -49,6 +49,15 @@ function runEmbeddedScripts(element) {
     }, Promise.resolve());
 }
 
+function htmlWithoutScripts(element) {
+    if (!element) return '';
+    var clone = element.cloneNode(true);
+    Array.from(clone.querySelectorAll('script')).forEach(function (script) {
+        script.parentNode.removeChild(script);
+    });
+    return clone.innerHTML;
+}
+
 function edit(url) {
     if (typeof url === 'string' && /capeante_rah\.php/.test(url)) {
         window.location.href = url;
@@ -66,9 +75,9 @@ function edit(url) {
             var target = innerMain || tempElement;
 
             if (innerMain) {
-                $('#main-container').html(innerMain.innerHTML);
+                $('#main-container').html(htmlWithoutScripts(innerMain));
             } else {
-                $('#main-container').html(response);
+                $('#main-container').html(htmlWithoutScripts(tempElement));
             }
 
             runEmbeddedScripts(target).then(function () {
@@ -100,9 +109,9 @@ function loadContent(url) {
             var target = tableContent || tempElement;
 
             if (tableContent) {
-                $('#table-content').html(tableContent.innerHTML);
+                $('#table-content').html(htmlWithoutScripts(tableContent));
             } else {
-                $('#table-content').html(data);
+                $('#table-content').html(htmlWithoutScripts(tempElement));
             }
 
             runEmbeddedScripts(target).then(function () {

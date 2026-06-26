@@ -178,8 +178,232 @@ if (empty($id_estipulante)) {
         border-radius: 10px;
         padding: 9px;
     }
+
+    #main-container.internacao-page.cadastro-estipulante-page .internacao-card {
+        padding: 5px 8px 7px !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        border: 1px solid rgba(94, 35, 99, .08) !important;
+        box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .internacao-card__header {
+        min-height: 0 !important;
+        margin-bottom: 3px !important;
+        padding: 4px 8px 2px !important;
+        align-items: center !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .internacao-card__body {
+        gap: 4px !important;
+        padding: 2px 8px 6px !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-card {
+        padding: 7px 8px 8px 12px !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(94, 35, 99, .10) !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, .98) 0%, rgba(248, 244, 253, .94) 100%) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, .9),
+            0 5px 12px rgba(37, 18, 54, .045) !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-card::before {
+        display: block !important;
+        width: 3px !important;
+        border-radius: 8px 0 0 8px !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-card + .entity-step-card {
+        margin-top: 5px !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-header {
+        align-items: center !important;
+        margin-bottom: 6px !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-card--collapsible .entity-step-header {
+        cursor: pointer;
+        border-radius: 8px;
+        padding: 4px 6px;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-card--collapsible .entity-step-header:hover {
+        background: rgba(94, 35, 99, .06);
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-kicker {
+        display: none !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-title {
+        font-size: .92rem !important;
+        line-height: 1.1 !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-toggle {
+        border: 1px solid rgba(94, 35, 99, .22);
+        background: #fff;
+        color: #5e2363;
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: .62rem;
+        font-weight: 700;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-toggle::after {
+        content: "\f078";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        font-size: .58rem;
+        transition: transform .15s ease;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-card--collapsible:not(.is-collapsed) .entity-step-toggle::after {
+        transform: rotate(180deg);
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-step-panel {
+        padding-top: 4px;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-form .row {
+        column-gap: 0 !important;
+        row-gap: 4px !important;
+        margin-left: -5px !important;
+        margin-right: -5px !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-form .row > [class*="col-"] {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-form .form-group,
+    #main-container.internacao-page.cadastro-estipulante-page .entity-form [class*="col-md-"].form-group {
+        margin-bottom: 1px !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-form .form-group label {
+        min-height: 0 !important;
+        margin-bottom: 2px !important;
+        font-size: .62rem !important;
+        line-height: 1.05 !important;
+        font-weight: 600 !important;
+        color: #3b2b4b !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page #multi-step-form .form-control,
+    #main-container.internacao-page.cadastro-estipulante-page #multi-step-form select.form-control {
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 2px 7px !important;
+        border-radius: 7px !important;
+        border: 1px solid #d6d4df !important;
+        font-size: .68rem !important;
+        line-height: 1.1 !important;
+        font-weight: 500 !important;
+        box-shadow: none !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .inline-manager-card {
+        padding: 9px !important;
+        border-radius: 10px !important;
+        background: #f7f5fb !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85) !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .table-responsive table {
+        margin-bottom: 0 !important;
+        border-radius: 0 !important;
+        overflow: hidden;
+        font-size: 10px !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .table-responsive thead {
+        height: 24px !important;
+        background: #2f6f9f !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .table-responsive thead th {
+        height: 24px !important;
+        min-height: 24px !important;
+        padding: 2px 6px !important;
+        background: transparent !important;
+        border-bottom: 1px solid #d9e8f1 !important;
+        color: #fff !important;
+        font-family: var(--app-font-family, "Inter", Arial, Helvetica, sans-serif) !important;
+        font-size: .66rem !important;
+        font-weight: 600 !important;
+        line-height: 1.02 !important;
+        letter-spacing: .025em !important;
+        text-align: center !important;
+        text-transform: uppercase !important;
+        vertical-align: middle !important;
+        border-radius: 0 !important;
+        white-space: nowrap;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .table-responsive tbody td {
+        height: 26px !important;
+        min-height: 26px !important;
+        padding: 2px 6px !important;
+        border-top: 1px solid #f1ebf7 !important;
+        vertical-align: middle !important;
+        font-size: 10px !important;
+        line-height: 1.05 !important;
+        color: #56616f !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .table-responsive tbody td.text-muted {
+        color: #8b95a5 !important;
+        text-transform: uppercase;
+        letter-spacing: .02em;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .inline-add-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        height: 28px !important;
+        min-height: 28px !important;
+        padding: 0 !important;
+        border-radius: 7px !important;
+        font-size: .82rem !important;
+        font-weight: 800 !important;
+        line-height: 1 !important;
+        box-shadow: 0 5px 12px rgba(21, 69, 105, .18) !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-actions-bar {
+        margin-top: 5px !important;
+        padding: 7px 8px !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(94, 35, 99, .08) !important;
+        background: #ffffff !important;
+        box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .entity-actions-bar .btn {
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 2px 12px !important;
+        border-radius: 7px !important;
+        font-size: .68rem !important;
+        line-height: 1 !important;
+    }
 </style>
-<div class="internacao-page cadastro-layout" id="main-container">
+<div class="internacao-page cadastro-layout cadastro-estipulante-page" id="main-container">
     <div class="internacao-page__hero">
         <div>
             <h1>Cadastrar estipulante</h1>
@@ -211,7 +435,6 @@ if (empty($id_estipulante)) {
         <div id="step-1" class="step entity-step-card">
             <div class="entity-step-header">
                 <div class="entity-step-copy">
-                    <div class="entity-step-kicker">Passo 1</div>
                     <h3 class="entity-step-title">Identificação do estipulante</h3>
                 </div>
                 <span class="entity-step-badge">Dados base</span>
@@ -232,14 +455,14 @@ if (empty($id_estipulante)) {
         </div>
 
         <!-- Step 2: Endereço -->
-        <div id="step-2" class="step entity-step-card">
-            <div class="entity-step-header">
+        <div id="step-2" class="step entity-step-card entity-step-card--collapsible is-collapsed">
+            <div class="entity-step-header" role="button" tabindex="0" aria-expanded="false" aria-controls="step-2-panel">
                 <div class="entity-step-copy">
-                    <div class="entity-step-kicker">Passo 2</div>
                     <h3 class="entity-step-title">Endereço</h3>
                 </div>
-                <span class="entity-step-badge">Localização</span>
+                <span class="entity-step-toggle">Abrir</span>
             </div>
+            <div class="entity-step-panel" id="step-2-panel" hidden>
             <div class="row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="cep_est">CEP</label>
@@ -295,17 +518,18 @@ if (empty($id_estipulante)) {
                 <div id="enderecosHiddenContainer"></div>
             </div>
             <hr>
+            </div>
         </div>
 
         <!-- Step 3: Contato e Finalização -->
-        <div id="step-3" class="step entity-step-card">
-            <div class="entity-step-header">
+        <div id="step-3" class="step entity-step-card entity-step-card--collapsible is-collapsed">
+            <div class="entity-step-header" role="button" tabindex="0" aria-expanded="false" aria-controls="step-3-panel">
                 <div class="entity-step-copy">
-                    <div class="entity-step-kicker">Passo 3</div>
                     <h3 class="entity-step-title">Contato e anexos</h3>
                 </div>
-                <span class="entity-step-badge">Fechamento</span>
+                <span class="entity-step-toggle">Abrir</span>
             </div>
+            <div class="entity-step-panel" id="step-3-panel" hidden>
             <div class="row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="email01_est">Email Principal</label>
@@ -379,6 +603,7 @@ if (empty($id_estipulante)) {
                     <div class="notif-input oculto" id="notifImagem">Tamanho do arquivo inválido!</div>
                 </div>
             </div>
+            </div>
             <div class="entity-actions-bar">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-check"></i> Cadastrar
@@ -393,6 +618,36 @@ if (empty($id_estipulante)) {
 
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.entity-step-card--collapsible').forEach(function(card) {
+            var header = card.querySelector('.entity-step-header');
+            var panelId = header ? header.getAttribute('aria-controls') : '';
+            var panel = panelId ? document.getElementById(panelId) : null;
+            var toggle = card.querySelector('.entity-step-toggle');
+            if (!header || !panel) return;
+
+            function setExpanded(expanded) {
+                card.classList.toggle('is-collapsed', !expanded);
+                panel.hidden = !expanded;
+                header.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                if (toggle) toggle.textContent = expanded ? 'Recolher' : 'Abrir';
+            }
+
+            header.addEventListener('click', function() {
+                setExpanded(panel.hidden);
+            });
+
+            header.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    setExpanded(panel.hidden);
+                }
+            });
+
+            setExpanded(false);
+        });
+    });
+
     function mascara(i) {
 
         var v = i.value;
