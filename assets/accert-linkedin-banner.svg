@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2256" height="382" viewBox="0 0 2256 382">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbfdfb"/>
+      <stop offset="0.62" stop-color="#eef6ee"/>
+      <stop offset="1" stop-color="#dfeedd"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#008c48"/>
+      <stop offset="1" stop-color="#a9cf2f"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="2256" height="382" rx="0" fill="url(#bg)"/>
+
+  <g opacity="0.08" stroke="#0b7f46" stroke-width="2">
+    <path d="M1120 55h610M1120 109h760M1120 163h660"/>
+    <path d="M1285 255h640M1285 309h720"/>
+  </g>
+  <g opacity="0.055" fill="none" stroke="#0b7f46" stroke-width="4">
+    <path d="M1908 -68c-112 130-116 300-10 450"/>
+    <path d="M2036 -36c-82 108-88 244-10 370"/>
+  </g>
+
+  <path d="M0 0h2256v18H0z" fill="url(#green)"/>
+  <path d="M0 340h2256v28H0z" fill="#087b45" opacity="0.055"/>
+  <path d="M0 364h2256v18H0z" fill="#202a2a" opacity="0.055"/>
+
+  <g font-family="Helvetica Neue, Arial, sans-serif">
+    <text x="560" y="128" font-size="68" font-weight="800" fill="#172521">Gestão de Sinistralidade em Saúde</text>
+    <text x="562" y="202" font-size="40" font-weight="800" fill="#087b45">Auditoria Médica | BI | IA | Controle Assistencial</text>
+    <text x="562" y="272" font-size="31" font-weight="600" fill="#394944">Inteligência clínica e dados para reduzir desperdícios, prever custos e apoiar decisões em saúde.</text>
+  </g>
+</svg>
