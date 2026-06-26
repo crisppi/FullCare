@@ -82,6 +82,9 @@ if (!function_exists('fullcare_require_mfa_setup')) {
 
         ensure_user_mfa_schema($conn);
         $user = fullcare_mfa_fetch_user($conn, $userId);
+        if (function_exists('fullcare_mfa_local_bypass_allowed') && fullcare_mfa_local_bypass_allowed($user)) {
+            return;
+        }
         if (is_array($user) && fullcare_mfa_user_enabled($user)) {
             return;
         }

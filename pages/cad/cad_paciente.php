@@ -275,9 +275,160 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
     #main-container.internacao-page .entity-step-panel {
         padding-top: 4px;
     }
+
+    #main-container.internacao-page.cadastro-paciente-page .internacao-card {
+        padding: 5px 8px 7px !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        border: 1px solid rgba(94, 35, 99, .08) !important;
+        box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .internacao-card__header {
+        min-height: 0 !important;
+        margin-bottom: 3px !important;
+        padding: 4px 8px 2px !important;
+        align-items: center !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .internacao-card__body {
+        gap: 4px !important;
+        padding: 2px 8px 6px !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-step-card {
+        padding: 7px 8px 8px 12px !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(94, 35, 99, .10) !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, .98) 0%, rgba(248, 244, 253, .94) 100%) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, .9),
+            0 5px 12px rgba(37, 18, 54, .045) !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-step-card::before {
+        display: block !important;
+        width: 3px !important;
+        border-radius: 8px 0 0 8px !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-step-card + .entity-step-card {
+        margin-top: 5px !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-step-kicker {
+        display: none !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-step-header {
+        align-items: center !important;
+        margin-bottom: 6px !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-form .row {
+        column-gap: 0 !important;
+        row-gap: 4px !important;
+        margin-left: -5px !important;
+        margin-right: -5px !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-form .row > [class*="col-"] {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page #step-1 > .paciente-identificacao-row {
+        flex-wrap: nowrap !important;
+        align-items: flex-end !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page #step-1 > .paciente-identificacao-row--secondary {
+        margin-top: 4px !important;
+    }
+
+    @media (max-width: 991.98px) {
+        #main-container.internacao-page.cadastro-paciente-page #step-1 > .paciente-identificacao-row {
+            flex-wrap: wrap !important;
+        }
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-form .form-group,
+    #main-container.internacao-page.cadastro-paciente-page .entity-form [class*="col-md-"].form-group,
+    #main-container.internacao-page.cadastro-paciente-page .entity-form [class*="col-sm-"].form-group {
+        margin-bottom: 1px !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-form .form-group label {
+        min-height: 0 !important;
+        margin-bottom: 2px !important;
+        font-size: .62rem !important;
+        line-height: 1.05 !important;
+        font-weight: 600 !important;
+        color: #3b2b4b !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form .form-control,
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form select.form-control {
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 2px 7px !important;
+        border-radius: 7px !important;
+        border: 1px solid #d6d4df !important;
+        font-size: .68rem !important;
+        line-height: 1.1 !important;
+        font-weight: 500 !important;
+        box-shadow: none !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form textarea.form-control {
+        min-height: 58px !important;
+        height: auto !important;
+        padding: 5px 7px !important;
+        line-height: 1.22 !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form input[type="date"]::-webkit-datetime-edit,
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form input[type="date"]::-webkit-datetime-edit-text,
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form input[type="date"]::-webkit-datetime-edit-day-field,
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form input[type="date"]::-webkit-datetime-edit-month-field,
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form input[type="date"]::-webkit-datetime-edit-year-field {
+        font-size: .68rem !important;
+        line-height: 18px !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page #multi-step-form input[type="date"]::-webkit-calendar-picker-indicator {
+        width: 13px !important;
+        height: 13px !important;
+        margin: 0 !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .inline-manager-card {
+        padding: 9px !important;
+        border-radius: 10px !important;
+        background: #f7f5fb !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85) !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-actions-bar {
+        margin-top: 5px !important;
+        padding: 7px 8px !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(94, 35, 99, .08) !important;
+        background: #ffffff !important;
+        box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
+    }
+
+    #main-container.internacao-page.cadastro-paciente-page .entity-actions-bar .btn {
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 2px 12px !important;
+        border-radius: 7px !important;
+        font-size: .68rem !important;
+        line-height: 1 !important;
+    }
 </style>
 
-<div class="internacao-page cadastro-layout" id="main-container">
+<div class="internacao-page cadastro-layout cadastro-paciente-page" id="main-container">
     <div class="internacao-page__hero">
         <div>
             <h1>Cadastrar paciente</h1>
@@ -313,13 +464,12 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         <div id="step-1" class="step entity-step-card">
             <div class="entity-step-header">
                 <div class="entity-step-copy">
-                    <div class="entity-step-kicker">Passo 1</div>
                     <h3 class="entity-step-title">Identificação</h3>
                     <p class="entity-step-desc">Preencha os dados principais do beneficiário antes de seguir para endereço e contato.</p>
                 </div>
                 <span class="entity-step-badge">Dados essenciais</span>
             </div>
-            <div class="row">
+            <div class="row paciente-identificacao-row">
                 <div class="form-group col-md-2 mb-3">
                     <label for="cpf_pac">CPF</label>
                     <input class="form-control" type="text" oninput="mascara(this, 'cpf')" id="cpf_pac" name="cpf_pac"
@@ -388,7 +538,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     <input type="text" class="form-control" id="matricula_titular_pac" name="matricula_titular_pac">
                 </div>
             </div>
-            <div class="row">
+            <div class="row paciente-identificacao-row paciente-identificacao-row--secondary">
                 <div class="form-group col-md-3 mb-2">
                     <label for="matricula_pac">Matrícula</label>
                     <input type="text" class="form-control" onkeyup="validarMatriculaExistente()" id="matricula_pac"
@@ -438,7 +588,6 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         <div id="step-2" class="step entity-step-card entity-step-card--collapsible is-collapsed">
             <div class="entity-step-header" role="button" tabindex="0" aria-expanded="false" aria-controls="step-2-panel">
                 <div class="entity-step-copy">
-                    <div class="entity-step-kicker">Passo 2</div>
                     <h3 class="entity-step-title">Endereço</h3>
                     <p class="entity-step-desc">Use o CEP para completar os campos automaticamente e ajuste apenas o que for necessário.</p>
                 </div>
@@ -521,7 +670,6 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         <div id="step-3" class="step entity-step-card entity-step-card--collapsible is-collapsed">
             <div class="entity-step-header" role="button" tabindex="0" aria-expanded="false" aria-controls="step-3-panel">
                 <div class="entity-step-copy">
-                    <div class="entity-step-kicker">Passo 3</div>
                     <h3 class="entity-step-title">Contato e observações</h3>
                     <p class="entity-step-desc">Finalize com os canais de contato e registre qualquer contexto importante para o time assistencial.</p>
                 </div>

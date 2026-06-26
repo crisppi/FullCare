@@ -285,7 +285,9 @@ if ($hasLoginSecurityColumns && ((int)($user['login_fail_count'] ?? 0) > 0 || !e
 
 session_regenerate_id(true);
 
-if (fullcare_mfa_user_enabled($user)) {
+$allowLocalMfaBypass = fullcare_mfa_local_bypass_allowed($user, $loginIdentifier);
+
+if (fullcare_mfa_user_enabled($user) && !$allowLocalMfaBypass) {
     $_SESSION['mfa_pending_user_id'] = (int)($user['id_usuario'] ?? 0);
     $_SESSION['mfa_pending_issued_at'] = time();
     $_SESSION['mfa_pending_attempts'] = 0;
@@ -299,6 +301,10 @@ if (fullcare_mfa_user_enabled($user)) {
 }
 
 fullcare_login_session_start($user);
+if ($allowLocalMfaBypass) {
+    $_SESSION['mfa_local_bypass_email'] = 'diretor@fullcare.com.br';
+    $_SESSION['mfa_local_bypass_user_id'] = (int)($user['id_usuario'] ?? 0);
+}
 
 if (function_exists('flowLogStart') && function_exists('flowLog')) {
     $loginCtx = flowLogStart('auth_login', [
