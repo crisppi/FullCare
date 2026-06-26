@@ -291,7 +291,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
 </style>
 
 <!-- Formulário de Edição -->
-<div id="main-container" class="internacao-page cadastro-layout">
+<div id="main-container" class="internacao-page cadastro-layout compact-edit-layout">
     <div class="internacao-page__hero">
         <div><h1>Editar estipulante</h1></div>
         <div class="hero-actions">
@@ -342,14 +342,14 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
         </div>
 
         <!-- Step 2: Endereço -->
-        <div id="step-2" class="step entity-step-card">
-            <div class="entity-step-header">
+        <div id="step-2" class="step entity-step-card entity-step-card--collapsible is-collapsed">
+            <div class="entity-step-header" role="button" tabindex="0" aria-expanded="false">
                 <div class="entity-step-copy">
                     <div class="entity-step-kicker">Passo 2</div>
                     <h3 class="entity-step-title">Endereço</h3>
                     <p class="entity-step-desc">Revise o endereço principal e os complementares no mesmo padrão visual das demais entidades.</p>
                 </div>
-                <span class="entity-step-badge">Localização</span>
+                <span class="entity-step-toggle">Abrir</span>
             </div>
             <div class="row">
                 <div class="form-group col-md-6 mb-3">
@@ -415,14 +415,14 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
         </div>
 
         <!-- Step 3: Contato e Finalização -->
-        <div id="step-3" class="step entity-step-card">
-            <div class="entity-step-header">
+        <div id="step-3" class="step entity-step-card entity-step-card--collapsible is-collapsed">
+            <div class="entity-step-header" role="button" tabindex="0" aria-expanded="false">
                 <div class="entity-step-copy">
                     <div class="entity-step-kicker">Passo 3</div>
                     <h3 class="entity-step-title">Contato e anexos</h3>
                     <p class="entity-step-desc">Consolide os contatos, responsáveis e arquivos antes de concluir a atualização.</p>
                 </div>
-                <span class="entity-step-badge">Fechamento</span>
+                <span class="entity-step-toggle">Abrir</span>
             </div>
             <div class="row">
                 <div class="form-group col-md-6 mb-3">
@@ -602,6 +602,51 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#main-container.compact-edit-layout .entity-step-card--collapsible').forEach(function(card) {
+        var header = card.querySelector('.entity-step-header');
+        var toggle = card.querySelector('.entity-step-toggle');
+        if (!header) return;
+
+        function contentNodes() {
+            return Array.prototype.filter.call(card.children, function(child) {
+                return !child.classList.contains('entity-step-header') &&
+                    !child.classList.contains('entity-actions-bar') &&
+                    !child.classList.contains('confirm-delete-modal') &&
+                    child.tagName !== 'SCRIPT';
+            });
+        }
+
+        function setExpanded(expanded) {
+            card.classList.toggle('is-collapsed', !expanded);
+            header.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            contentNodes().forEach(function(child) {
+                child.hidden = !expanded;
+            });
+            if (toggle) toggle.textContent = expanded ? 'Recolher' : 'Abrir';
+        }
+
+        header.addEventListener('click', function() {
+            setExpanded(card.classList.contains('is-collapsed'));
+        });
+        header.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setExpanded(card.classList.contains('is-collapsed'));
+            }
+        });
+        setExpanded(!card.classList.contains('is-collapsed'));
+    });
+
+    document.querySelectorAll('#multi-step-form button[type="submit"]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('#main-container.compact-edit-layout .entity-step-card--collapsible.is-collapsed .entity-step-header').forEach(function(header) {
+                header.click();
+            });
+        });
+    });
+});
+
 function mascara(i, t) {
     var v = i.value;
     if (isNaN(v[v.length - 1])) {
