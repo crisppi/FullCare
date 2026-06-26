@@ -182,7 +182,6 @@ $isDiretoria = in_array($norm($_SESSION['cargo'] ?? ''), ['diretoria', 'diretor'
             <?php if ($isDiretoria) { ?>
                 <a class="hero-back-btn" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/SolicitacaoCustomizacaoList.php', ENT_QUOTES, 'UTF-8') ?>">Ver listagem</a>
             <?php } ?>
-            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
         </div>
     </div>
     <div class="internacao-page__content">

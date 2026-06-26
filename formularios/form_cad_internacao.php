@@ -419,7 +419,6 @@
                 <p class="internacao-page__eyebrow">Fluxo assistencial</p>
                 <h1>Cadastrar internação</h1>
             </div>
-            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
         </div>
         <div class="internacao-page__content">
             <form class="visible" action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/process_internacao.php', ENT_QUOTES, 'UTF-8') ?>" id="myForm" method="POST"

@@ -308,7 +308,6 @@ $id_seguradora = filter_input(INPUT_GET, "id_seguradora");
                 href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/seguradoras', ENT_QUOTES, 'UTF-8') ?>">
                 Voltar para lista
             </a>
-            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
         </div>
     </div>
     <div class="internacao-page__content">

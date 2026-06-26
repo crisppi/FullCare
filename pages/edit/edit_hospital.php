@@ -261,7 +261,6 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
         </div>
         <div class="hero-actions">
             <a class="hero-back-btn" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais', ENT_QUOTES, 'UTF-8') ?>">Voltar para lista</a>
-            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
         </div>
     </div>
     <div class="internacao-page__content">

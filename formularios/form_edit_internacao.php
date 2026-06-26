@@ -831,7 +831,6 @@
                 <p class="internacao-page__eyebrow">Fluxo assistencial</p>
                 <h1>Editar internação</h1>
             </div>
-            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
         </div>
         <div class="internacao-page__content">
             <div class="internacao-card internacao-card--general">

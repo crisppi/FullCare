@@ -157,7 +157,6 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
             <h1 id="visita-page-title">Cadastrar visita</h1>
         </div>
         <div class="visita-hero__actions">
-            <span class="visita-hero__tag">Campos obrigatórios em destaque</span>
             <?php if ($contarVis > 0): ?>
             <button type="button" class="btn btn-sm btn-visita-historico" data-bs-toggle="modal" data-bs-target="#myModal1">
                 <i class="bi bi-eye me-2"></i>

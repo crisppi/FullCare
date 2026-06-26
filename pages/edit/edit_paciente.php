@@ -270,6 +270,200 @@ if (empty($telefonesPaciente)) {
     #main-container.internacao-page .entity-step-panel {
         padding-top: 4px;
     }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-row {
+        display: grid !important;
+        column-gap: 10px !important;
+        row-gap: 4px !important;
+        align-items: flex-end !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-row > [class*="col-"] {
+        display: block !important;
+        width: auto !important;
+        max-width: none !important;
+        flex: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-bottom: 1px !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-row--main {
+        grid-template-columns: minmax(140px, 1fr) minmax(0, 4.2fr) !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-row--secondary {
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(120px, .9fr) minmax(120px, .9fr) !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-complemento {
+        margin-top: 4px !important;
+        margin-bottom: 1px !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .form-group label {
+        min-height: 0 !important;
+        margin-bottom: 2px !important;
+        font-size: .62rem !important;
+        line-height: 1.05 !important;
+        font-weight: 600 !important;
+        color: #3b2b4b !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .form-control,
+    #main-container.compact-edit-layout #step-2 select.form-control {
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 2px 7px !important;
+        border-radius: 7px !important;
+        border: 1px solid #d6d4df !important;
+        font-size: .68rem !important;
+        line-height: 1.1 !important;
+        font-weight: 500 !important;
+        box-shadow: none !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row {
+        display: grid !important;
+        column-gap: 10px !important;
+        row-gap: 4px !important;
+        align-items: flex-end !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row > [class*="col-"] {
+        display: block !important;
+        width: auto !important;
+        max-width: none !important;
+        flex: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-bottom: 1px !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row--main {
+        grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(0, 2.6fr) minmax(74px, .55fr) minmax(120px, .9fr) 30px !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row--secondary {
+        grid-template-columns: minmax(0, 1.35fr) minmax(0, 1.35fr) minmax(110px, .9fr) minmax(0, 1.8fr) !important;
+        margin-top: 4px !important;
+    }
+
+    #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row .inline-add-btn {
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        height: 28px !important;
+        min-height: 28px !important;
+        padding: 0 !important;
+        border-radius: 7px !important;
+        align-self: end !important;
+        justify-self: end !important;
+    }
+
+    @media (max-width: 991.98px) {
+        #main-container.compact-edit-layout #step-2 .paciente-endereco-row--main,
+        #main-container.compact-edit-layout #step-2 .paciente-endereco-row--secondary,
+        #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row--main,
+        #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row--secondary {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        #main-container.compact-edit-layout #step-2 .paciente-endereco-row--main,
+        #main-container.compact-edit-layout #step-2 .paciente-endereco-row--secondary,
+        #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row--main,
+        #main-container.compact-edit-layout #step-2 .paciente-endereco-inline-row--secondary {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+    #main-container.compact-edit-layout #step-3 .paciente-contato-row {
+        display: grid !important;
+        column-gap: 10px !important;
+        row-gap: 4px !important;
+        align-items: flex-end !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .paciente-contato-row > [class*="col-"] {
+        display: block !important;
+        width: auto !important;
+        max-width: none !important;
+        flex: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-bottom: 1px !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .paciente-contato-row--emails-base,
+    #main-container.compact-edit-layout #step-3 .paciente-contato-row--telefones-base {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .paciente-contato-row--email-inline {
+        grid-template-columns: minmax(140px, 1.2fr) minmax(0, 3fr) minmax(130px, .9fr) 30px !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .paciente-contato-row--telefone-inline {
+        grid-template-columns: minmax(120px, 1fr) minmax(150px, 1.3fr) minmax(95px, .75fr) minmax(0, 1.5fr) minmax(120px, .9fr) 30px !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .paciente-contato-row--contato-inline {
+        grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(0, 1.25fr) minmax(130px, 1fr) minmax(0, 1.1fr) minmax(120px, .85fr) 30px !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .form-group label {
+        min-height: 0 !important;
+        margin-bottom: 2px !important;
+        font-size: .62rem !important;
+        line-height: 1.05 !important;
+        font-weight: 600 !important;
+        color: #3b2b4b !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .form-control,
+    #main-container.compact-edit-layout #step-3 select.form-control {
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 2px 7px !important;
+        border-radius: 7px !important;
+        border: 1px solid #d6d4df !important;
+        font-size: .68rem !important;
+        line-height: 1.1 !important;
+        font-weight: 500 !important;
+        box-shadow: none !important;
+    }
+
+    #main-container.compact-edit-layout #step-3 .paciente-contato-row .inline-add-btn {
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        height: 28px !important;
+        min-height: 28px !important;
+        padding: 0 !important;
+        border-radius: 7px !important;
+        align-self: end !important;
+        justify-self: end !important;
+    }
+
+    @media (max-width: 991.98px) {
+        #main-container.compact-edit-layout #step-3 .paciente-contato-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        #main-container.compact-edit-layout #step-3 .paciente-contato-row {
+            grid-template-columns: 1fr !important;
+        }
+    }
 </style>
 
 <div class="internacao-page cadastro-layout compact-edit-layout" id="main-container">
@@ -277,7 +471,6 @@ if (empty($telefonesPaciente)) {
         <div><h1>Editar paciente</h1></div>
         <div class="hero-actions">
             <a class="hero-back-btn" href="<?= htmlspecialchars($BASE_URL . 'pacientes', ENT_QUOTES, 'UTF-8') ?>">Voltar para lista</a>
-            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
         </div>
     </div>
     <div class="internacao-page__content">
@@ -511,7 +704,7 @@ if (empty($telefonesPaciente)) {
             </div>
             <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
             <div class="inline-manager-card mb-3">
-                <div class="row">
+                <div class="row paciente-endereco-inline-row paciente-endereco-inline-row--main">
                     <div class="form-group col-md-2 mb-2"><label for="end_tipo_inline">Tipo</label><input type="text" class="form-control" id="end_tipo_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="end_cep_inline">CEP</label><input type="text" class="form-control" id="end_cep_inline"></div>
                     <div class="form-group col-md-5 mb-2"><label for="end_logradouro_inline">Endereço</label><input type="text" class="form-control" id="end_logradouro_inline"></div>
@@ -519,7 +712,7 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-1 mb-2"><label for="end_principal_inline">Principal</label><select class="form-control" id="end_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
                     <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddEnderecoInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar endereço">+</button></div>
                 </div>
-                <div class="row">
+                <div class="row paciente-endereco-inline-row paciente-endereco-inline-row--secondary">
                     <div class="form-group col-md-3 mb-2"><label for="end_bairro_inline">Bairro</label><input type="text" class="form-control" id="end_bairro_inline"></div>
                     <div class="form-group col-md-3 mb-2"><label for="end_cidade_inline">Cidade</label><input type="text" class="form-control" id="end_cidade_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="end_estado_inline">UF</label><input type="text" class="form-control" id="end_estado_inline"></div>
@@ -548,7 +741,7 @@ if (empty($telefonesPaciente)) {
                 <span class="entity-step-toggle">Abrir</span>
             </div>
             <div class="entity-step-panel" id="step-3-panel" hidden>
-            <div class="row">
+            <div class="row paciente-contato-row paciente-contato-row--emails-base">
                 <div class="form-group col-md-6 mb-3">
                     <label for="email01_pac">Email Principal</label>
                     <input type="email" class="form-control" id="email01_pac" name="email01_pac"
@@ -563,7 +756,7 @@ if (empty($telefonesPaciente)) {
             </div>
             <p class="internacao-card__eyebrow mb-3">Emails adicionais</p>
             <div class="inline-manager-card mb-3">
-                <div class="row">
+                <div class="row paciente-contato-row paciente-contato-row--email-inline">
                     <div class="form-group col-md-3 mb-2"><label for="email_tipo_inline">Tipo</label><input type="text" class="form-control" id="email_tipo_inline"></div>
                     <div class="form-group col-md-6 mb-2"><label for="email_email_inline">Email</label><input type="email" class="form-control" id="email_email_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="email_principal_inline">Principal</label><select class="form-control" id="email_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
@@ -578,7 +771,7 @@ if (empty($telefonesPaciente)) {
                 <div id="emailsHiddenContainer"></div>
             </div>
 
-            <div class="row">
+            <div class="row paciente-contato-row paciente-contato-row--telefones-base">
                 <div class="form-group col-md-6 mb-3">
                     <label for="telefone01_pac">Telefone</label>
                     <input type="text" onkeydown="return mascaraTelefone(event)" class="form-control"
@@ -595,7 +788,7 @@ if (empty($telefonesPaciente)) {
             </div>
             <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
             <div class="inline-manager-card mb-3">
-                <div class="row">
+                <div class="row paciente-contato-row paciente-contato-row--telefone-inline">
                     <div class="form-group col-md-2 mb-2"><label for="tel_tipo_inline">Tipo</label><input type="text" class="form-control" id="tel_tipo_inline"></div>
                     <div class="form-group col-md-3 mb-2"><label for="tel_numero_inline">Telefone</label><input type="text" class="form-control" id="tel_numero_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="tel_ramal_inline">Ramal</label><input type="text" class="form-control" id="tel_ramal_inline"></div>
@@ -613,7 +806,7 @@ if (empty($telefonesPaciente)) {
             </div>
             <p class="internacao-card__eyebrow mb-3">Contatos adicionais</p>
             <div class="inline-manager-card mb-3">
-                <div class="row">
+                <div class="row paciente-contato-row paciente-contato-row--contato-inline">
                     <div class="form-group col-md-2 mb-2"><label for="cont_nome_inline">Nome</label><input type="text" class="form-control" id="cont_nome_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="cont_parentesco_inline">Parentesco</label><input type="text" class="form-control" id="cont_parentesco_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="cont_email_inline">Email</label><input type="email" class="form-control" id="cont_email_inline"></div>

@@ -356,7 +356,6 @@ if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
         <div>
             <h1>Alta Hospitalar</h1>
         </div>
-        <span class="alta-hero__tag">Campos obrigatórios em destaque</span>
     </div>
 
     <div class="alta-page__content">

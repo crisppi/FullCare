@@ -412,7 +412,6 @@ if (empty($id_estipulante)) {
             <a class="hero-back-btn" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/estipulantes', ENT_QUOTES, 'UTF-8') ?>">
                 Voltar para lista
             </a>
-            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
         </div>
     </div>
     <div class="internacao-page__content">

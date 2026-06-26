@@ -40,7 +40,6 @@ if (empty($id_usuario)) {
         </div>
         <div class="hero-actions">
             <a href="<?= $BASE_URL ?>list_usuario.php" class="hero-back-btn">Voltar para lista</a>
-            <span class="internacao-page__tag">Campos obrigatórios em destaque</span>
         </div>
     </div>
     <div class="internacao-page__content">
