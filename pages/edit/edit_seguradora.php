@@ -280,7 +280,6 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                         <h3 class="entity-step-title">Identificação da seguradora</h3>
                         <p class="entity-step-desc">Ajuste os dados de referência da operadora antes de revisar endereço, contatos e parâmetros.</p>
                     </div>
-                    <span class="entity-step-badge">Dados base</span>
                 </div>
                 <div class="row seguradora-identificacao-row">
                     <div class="form-group col-md-6">
@@ -517,6 +516,7 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                     </div>
                     <?php endif; ?>
                 </div>
+            </div>
                 <div class="entity-actions-bar">
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                     <button type="submit" class="btn btn-success">
@@ -527,7 +527,6 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                     </button>
                     </div>
                 </div>
-            </div>
             <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="display:none;">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">

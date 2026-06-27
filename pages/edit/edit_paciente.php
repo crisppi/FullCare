@@ -530,7 +530,6 @@ if (empty($telefonesPaciente)) {
                     <h3 class="entity-step-title">Identificação</h3>
                     <p class="entity-step-desc">Atualize os dados principais do paciente, incluindo vínculo com seguradora e estipulante.</p>
                 </div>
-                <span class="entity-step-badge">Dados essenciais</span>
             </div>
             <div class="row paciente-identificacao-row">
                 <div class="form-group col-md-2 mb-3">
@@ -870,6 +869,7 @@ if (empty($telefonesPaciente)) {
                 <div id="contatosHiddenContainer"></div>
             </div>
             </div>
+        </div>
 
             <div class="entity-actions-bar">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -881,7 +881,6 @@ if (empty($telefonesPaciente)) {
                 </button>
                 </div>
             </div>
-        </div>
 
         <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="display:none;">
             <div class="modal-dialog modal-dialog-centered">

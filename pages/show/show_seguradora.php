@@ -266,6 +266,113 @@ $endereco = trim(implode(' ', array_filter([
     word-break: break-word;
 }
 
+.seguradora-show-page {
+    padding: 0 4px 48px;
+}
+
+.seguradora-show-page .internacao-page__hero {
+    margin-bottom: 6px !important;
+}
+
+.seguradora-profile-card {
+    grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+}
+
+.seguradora-profile-summary,
+.seguradora-info-card {
+    border-radius: 8px;
+    box-shadow: 0 5px 12px rgba(47, 60, 85, 0.045);
+}
+
+.seguradora-profile-summary {
+    padding: 10px;
+    min-height: 0;
+}
+
+.seguradora-logo {
+    width: 74px;
+    height: 74px;
+    border-radius: 16px;
+    border-width: 2px;
+    box-shadow: 0 5px 12px rgba(47, 111, 159, 0.10);
+}
+
+.seguradora-logo-placeholder {
+    font-size: 1.9rem;
+}
+
+.seguradora-name {
+    margin: 8px 0 2px;
+    font-size: .96rem;
+}
+
+.seguradora-location {
+    font-size: .74rem;
+}
+
+.seguradora-status {
+    margin-top: 8px;
+    padding: 4px 8px;
+    font-size: .68rem;
+}
+
+.seguradora-summary-meta {
+    gap: 5px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.seguradora-summary-meta span {
+    gap: 8px;
+    font-size: .72rem;
+}
+
+.seguradora-info-stack {
+    gap: 8px;
+}
+
+.seguradora-info-card {
+    padding: 10px 12px;
+}
+
+.seguradora-info-card h3 {
+    font-size: .86rem;
+}
+
+.seguradora-card-subtitle {
+    font-size: .74rem;
+}
+
+.seguradora-field-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.seguradora-field {
+    min-height: 48px;
+    padding: 7px 8px;
+    border-radius: 8px;
+}
+
+.seguradora-field label {
+    margin-bottom: 3px;
+    font-size: .6rem;
+    letter-spacing: .025em;
+}
+
+.seguradora-field div {
+    font-size: .8rem;
+}
+
+@media (max-width: 1200px) {
+    .seguradora-field-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 980px) {
     .seguradora-profile-card,
     .seguradora-field-grid {

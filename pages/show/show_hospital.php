@@ -265,6 +265,113 @@ $endereco = trim(implode(' ', array_filter([
     word-break: break-word;
 }
 
+.hospital-show-page {
+    padding: 0 4px 48px;
+}
+
+.hospital-show-page .internacao-page__hero {
+    margin-bottom: 6px !important;
+}
+
+.hospital-profile-card {
+    grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+}
+
+.hospital-profile-summary,
+.hospital-info-card {
+    border-radius: 8px;
+    box-shadow: 0 5px 12px rgba(47, 60, 85, 0.045);
+}
+
+.hospital-profile-summary {
+    padding: 10px;
+    min-height: 0;
+}
+
+.hospital-logo {
+    width: 74px;
+    height: 74px;
+    border-radius: 16px;
+    border-width: 2px;
+    box-shadow: 0 5px 12px rgba(47, 111, 159, 0.10);
+}
+
+.hospital-logo-placeholder {
+    font-size: 1.9rem;
+}
+
+.hospital-name {
+    margin: 8px 0 2px;
+    font-size: .96rem;
+}
+
+.hospital-location {
+    font-size: .74rem;
+}
+
+.hospital-status {
+    margin-top: 8px;
+    padding: 4px 8px;
+    font-size: .68rem;
+}
+
+.hospital-summary-meta {
+    gap: 5px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.hospital-summary-meta span {
+    gap: 8px;
+    font-size: .72rem;
+}
+
+.hospital-info-stack {
+    gap: 8px;
+}
+
+.hospital-info-card {
+    padding: 10px 12px;
+}
+
+.hospital-info-card h3 {
+    font-size: .86rem;
+}
+
+.hospital-card-subtitle {
+    font-size: .74rem;
+}
+
+.hospital-field-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.hospital-field {
+    min-height: 48px;
+    padding: 7px 8px;
+    border-radius: 8px;
+}
+
+.hospital-field label {
+    margin-bottom: 3px;
+    font-size: .6rem;
+    letter-spacing: .025em;
+}
+
+.hospital-field div {
+    font-size: .8rem;
+}
+
+@media (max-width: 1200px) {
+    .hospital-field-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 980px) {
     .hospital-profile-card,
     .hospital-field-grid {

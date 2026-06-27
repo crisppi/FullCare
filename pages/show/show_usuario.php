@@ -285,6 +285,126 @@ $endereco = trim(implode(' ', array_filter([
         flex-direction: column;
     }
 }
+
+.usuario-show-page {
+    padding: 0 4px 48px;
+}
+
+.usuario-show-page .internacao-page__hero {
+    margin-bottom: 6px !important;
+}
+
+.usuario-profile-card {
+    grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+}
+
+.usuario-profile-summary,
+.usuario-info-card,
+.usuario-danger-card {
+    border-radius: 8px;
+    box-shadow: 0 5px 12px rgba(47, 60, 85, 0.045);
+}
+
+.usuario-profile-summary {
+    padding: 10px;
+    min-height: 0;
+}
+
+.usuario-avatar {
+    width: 74px;
+    height: 74px;
+    border-radius: 16px;
+    border-width: 2px;
+    box-shadow: 0 5px 12px rgba(47, 111, 159, 0.10);
+}
+
+.usuario-name {
+    margin: 8px 0 2px;
+    font-size: .96rem;
+}
+
+.usuario-role {
+    font-size: .74rem;
+}
+
+.usuario-status {
+    margin-top: 8px;
+    padding: 4px 8px;
+    font-size: .68rem;
+}
+
+.usuario-summary-meta {
+    gap: 5px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.usuario-summary-meta span {
+    gap: 8px;
+    font-size: .72rem;
+}
+
+.usuario-info-stack {
+    gap: 8px;
+}
+
+.usuario-info-card,
+.usuario-danger-card {
+    padding: 10px 12px;
+}
+
+.usuario-info-card h3,
+.usuario-danger-card h3 {
+    font-size: .86rem;
+}
+
+.usuario-card-subtitle,
+.usuario-danger-card p {
+    font-size: .74rem;
+}
+
+.usuario-field-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.usuario-field {
+    min-height: 48px;
+    padding: 7px 8px;
+    border-radius: 8px;
+}
+
+.usuario-field label {
+    margin-bottom: 3px;
+    font-size: .6rem;
+    letter-spacing: .025em;
+}
+
+.usuario-field div {
+    font-size: .8rem;
+}
+
+.usuario-actions .btn {
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: .76rem;
+}
+
+@media (max-width: 1200px) {
+    .usuario-field-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 980px) {
+    .usuario-profile-card,
+    .usuario-field-grid {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 
 <main id="main-container" class="internacao-page cadastro-layout usuario-show-page">

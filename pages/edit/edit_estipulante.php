@@ -153,13 +153,50 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
         margin-bottom: 6px !important;
     }
 
+    #main-container.estipulante-edit-layout [hidden] {
+        display: none !important;
+    }
+
+    #main-container.estipulante-edit-layout .entity-form .row:not([hidden]) {
+        display: grid !important;
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        gap: 4px 10px !important;
+        align-items: flex-end !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #main-container.estipulante-edit-layout .entity-form .row > [class*="col-"] {
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        flex: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #main-container.estipulante-edit-layout .entity-form .row > .col-md-1 { grid-column: span 1 !important; }
+    #main-container.estipulante-edit-layout .entity-form .row > .col-md-2 { grid-column: span 2 !important; }
+    #main-container.estipulante-edit-layout .entity-form .row > .col-md-3 { grid-column: span 3 !important; }
+    #main-container.estipulante-edit-layout .entity-form .row > .col-md-4 { grid-column: span 4 !important; }
+    #main-container.estipulante-edit-layout .entity-form .row > .col-md-6 { grid-column: span 6 !important; }
+
+    @media (max-width: 575.98px) {
+        #main-container.estipulante-edit-layout .entity-form .row > .col-md-1,
+        #main-container.estipulante-edit-layout .entity-form .row > .col-md-2,
+        #main-container.estipulante-edit-layout .entity-form .row > .col-md-3,
+        #main-container.estipulante-edit-layout .entity-form .row > .col-md-4,
+        #main-container.estipulante-edit-layout .entity-form .row > .col-md-6 {
+            grid-column: span 6 !important;
+        }
+    }
+
     #main-container.internacao-page .internacao-page__content {
         display: block !important;
     }
 
     #main-container.internacao-page .internacao-page__tag,
-    #main-container.internacao-page .internacao-card__tag,
-    #main-container.internacao-page .entity-step-badge {
+    #main-container.internacao-page .internacao-card__tag {
         padding: 4px 8px !important;
         font-size: .6rem !important;
     }
@@ -296,7 +333,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
 </style>
 
 <!-- Formulário de Edição -->
-<div id="main-container" class="internacao-page cadastro-layout compact-edit-layout">
+<div id="main-container" class="internacao-page cadastro-layout compact-edit-layout estipulante-edit-layout">
     <div class="internacao-page__hero">
         <div><h1>Editar estipulante</h1></div>
         <div class="hero-actions">
@@ -326,7 +363,6 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                     <h3 class="entity-step-title">Identificação do estipulante</h3>
                     <p class="entity-step-desc">Atualize os dados principais do estipulante mantendo a leitura consistente com o cadastro novo.</p>
                 </div>
-                <span class="entity-step-badge">Dados base</span>
             </div>
             <div class="row">
                 <div class="form-group col-md-6 mb-3">
@@ -510,8 +546,8 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                     <div class="notif-input oculto" id="notifImagem">Tamanho do arquivo inválido!</div>
                 </div>
             </div>
+        </div>
             <div class="entity-actions-bar">
-                <div class="entity-actions-copy">Revise a rede de contatos antes de salvar. A exclusão permanece disponível nesta etapa final.</div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button type="submit" class="btn btn-success">
                     <i class="fas fa-check"></i> Atualizar
@@ -521,7 +557,6 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                 </button>
                 </div>
             </div>
-        </div>
         <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="display:none;">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">

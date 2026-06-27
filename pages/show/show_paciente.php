@@ -715,6 +715,170 @@ $enderecoPaciente = trim(implode(' ', array_filter([
         grid-template-columns: 1fr;
     }
 }
+
+.paciente-show-page {
+    padding: 0 4px 48px;
+}
+
+.paciente-show-page .internacao-page__hero {
+    margin-bottom: 6px !important;
+}
+
+.paciente-profile-card {
+    grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+}
+
+.paciente-profile-summary,
+.paciente-info-card,
+.paciente-ai-card,
+.paciente-risk-card,
+.paciente-danger-card {
+    border-radius: 8px;
+    box-shadow: 0 5px 12px rgba(47, 60, 85, 0.045);
+}
+
+.paciente-profile-summary {
+    padding: 10px;
+    min-height: 0;
+}
+
+.paciente-avatar {
+    width: 74px;
+    height: 74px;
+    border-radius: 16px;
+    border-width: 2px;
+    font-size: 2rem;
+    box-shadow: 0 5px 12px rgba(47, 111, 159, 0.10);
+}
+
+.paciente-name {
+    margin: 8px 0 2px;
+    font-size: .96rem;
+}
+
+.paciente-meta-line {
+    font-size: .74rem;
+}
+
+.paciente-status {
+    margin-top: 8px;
+    padding: 4px 8px;
+    font-size: .68rem;
+}
+
+.paciente-summary-meta {
+    gap: 5px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.paciente-summary-meta span {
+    gap: 8px;
+    font-size: .72rem;
+}
+
+.paciente-info-stack,
+.paciente-ai-card {
+    gap: 8px;
+}
+
+.paciente-info-card,
+.paciente-ai-card,
+.paciente-risk-card,
+.paciente-danger-card {
+    padding: 10px 12px;
+}
+
+.paciente-info-card h3,
+.paciente-ai-card h3,
+.paciente-risk-card h3,
+.paciente-danger-card h3 {
+    font-size: .86rem;
+}
+
+.paciente-card-subtitle,
+.paciente-danger-card p {
+    font-size: .74rem;
+}
+
+.paciente-field-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.paciente-field {
+    min-height: 48px;
+    padding: 7px 8px;
+    border-radius: 8px;
+}
+
+.paciente-field label {
+    margin-bottom: 3px;
+    font-size: .6rem;
+    letter-spacing: .025em;
+}
+
+.paciente-field div {
+    font-size: .8rem;
+}
+
+.paciente-risk-score {
+    font-size: 1.55rem;
+}
+
+.paciente-risk-pill,
+.paciente-risk-meta,
+.paciente-risk-card ul,
+.paciente-ai-suggestion,
+.paciente-ai-message,
+.paciente-ai-form textarea {
+    font-size: .76rem;
+}
+
+.paciente-ai-messages {
+    min-height: 150px;
+    max-height: 300px;
+    gap: 7px;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.paciente-ai-message {
+    padding: 8px 9px;
+    border-radius: 8px;
+}
+
+.paciente-ai-badge,
+.paciente-ai-suggestion {
+    padding: 5px 8px;
+}
+
+.paciente-ai-form textarea,
+.paciente-ai-form button {
+    min-height: 40px;
+}
+
+.paciente-actions .btn {
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: .76rem;
+}
+
+@media (max-width: 1200px) {
+    .paciente-field-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 980px) {
+    .paciente-profile-card,
+    .paciente-field-grid {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 
 <main id="main-container" class="internacao-page cadastro-layout paciente-show-page">

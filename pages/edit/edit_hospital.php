@@ -383,6 +383,10 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
             grid-template-columns: 1fr !important;
         }
     }
+
+    #main-container.compact-edit-layout [hidden] {
+        display: none !important;
+    }
 </style>
 
 <div class="internacao-page cadastro-layout compact-edit-layout" id="main-container">
@@ -400,7 +404,6 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
         <div class="internacao-card internacao-card--general">
             <div class="internacao-card__header">
                 <div>
-                    <p class="internacao-card__eyebrow">Etapa 1</p>
                     <h2 class="internacao-card__title">Dados do hospital</h2>
                 </div>
             </div>
@@ -417,7 +420,6 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                     <h3 class="entity-step-title">Identificação do hospital</h3>
                     <p class="entity-step-desc">Ajuste nome e CNPJ sem perder o padrão visual adotado no cadastro.</p>
                 </div>
-                <span class="entity-step-badge">Dados base</span>
             </div>
             <div class="row hospital-grid-row hospital-grid-row--identificacao">
                 <div class="form-group col-md-6 mb-3">
@@ -909,6 +911,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 <div id="acomodacoesHiddenContainerEdit"></div>
                 <div id="acomodacoesDeleteContainerEdit"></div>
             </div>
+        </div>
 
             <div class="entity-actions-bar">
                 <div class="d-flex align-items-center gap-2 flex-wrap" style="margin: 0">
@@ -920,7 +923,6 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </button>
                 </div>
             </div>
-        </div>
         <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="display:none;">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
