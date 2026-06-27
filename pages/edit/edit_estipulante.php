@@ -148,6 +148,11 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
         font-weight: 700 !important;
     }
 
+    #main-container.compact-edit-layout .estipulante-inline-section-title {
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
+    }
+
     #main-container.internacao-page .internacao-page__content {
         display: block !important;
     }
@@ -305,7 +310,6 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
         <div class="internacao-card internacao-card--general">
             <div class="internacao-card__header">
                 <div>
-                    <p class="internacao-card__eyebrow">Etapa 1</p>
                     <h2 class="internacao-card__title">Dados do estipulante</h2>
                 </div>
                 <span class="internacao-card__tag internacao-card__tag--critical">Edição comercial</span>
@@ -386,7 +390,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                         value="<?= $estipulante->numero_est ?>" placeholder="Número">
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
+            <p class="internacao-card__eyebrow estipulante-inline-section-title">Endereços adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="end_tipo_inline">Tipo</label><input type="text" class="form-control" id="end_tipo_inline"></div>
@@ -449,7 +453,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                         placeholder="(00) 00000-0000">
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
+            <p class="internacao-card__eyebrow estipulante-inline-section-title">Telefones adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="tel_tipo_inline">Tipo</label><input type="text" class="form-control" id="tel_tipo_inline"></div>
@@ -480,7 +484,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                         value="<?= $estipulante->nome_responsavel_est ?>" placeholder="Nome do responsável">
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Contatos adicionais</p>
+            <p class="internacao-card__eyebrow estipulante-inline-section-title">Contatos adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="cont_nome_inline">Nome</label><input type="text" class="form-control" id="cont_nome_inline"></div>

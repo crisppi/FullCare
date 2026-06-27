@@ -96,7 +96,9 @@ if ($qtdIntItens > $limite) {
 };
 ?>
 
-<div class="container-fluid form_container" style="margin-top:12px;">
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css?v=' . @filemtime(__DIR__ . '/../css/listagem_padrao.css'), ENT_QUOTES, 'UTF-8') ?>">
+
+<div class="container-fluid form_container listagem-page hospital-user-list-page" style="margin-top:18px;">
     <?php if ($debug): ?>
         <div class="alert alert-warning" style="font-size:0.9rem;">
             <strong>DEBUG list_hospitalUser</strong><br>
@@ -109,40 +111,42 @@ if ($qtdIntItens > $limite) {
         </div>
     <?php endif; ?>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <div class="d-flex justify-content-between align-items-center">
-        <h4 style="margin-top:8px;margin-bottom:8px" class="page-title">Distribuição de usuários por Hospital</h4>
-        <div>
-            <a href="exportar_excel_list_hosp_user.php" class="btn btn-success"
-                style="border-radius:10px; margin-right: 10px;">Exportar para
-                Excel</a>
+    <div class="listagem-hero listagem-hero--module listagem-hero--cadastros">
+        <div class="listagem-hero__copy">
+            <div class="listagem-kicker">Cadastros</div>
+            <h1 class="listagem-title">Usuários por hospital</h1>
+        </div>
+        <div class="listagem-hero__actions">
+            <a href="exportar_excel_list_hosp_user.php" class="btn listagem-btn-top listagem-btn-top--green">
+                <i class="bi bi-file-earmark-excel listagem-btn-top__icon" aria-hidden="true"></i>
+                <span>Exportar Excel</span>
+            </a>
 
             <button onclick="openModal('cad_hospitalUser.php')" data-bs-toggle="modal" data-bs-target="#myModal"
-                class="btn btn-success"
-                style="border-radius:10px;background-color: #35bae1;font-family:var(--bs-font-sans-serif);box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);border:none">
-                <i class="fa-solid fa-plus" style='font-size: 1rem;margin-right:5px;'></i>Novo Hospital/Usuário
+                class="btn listagem-btn-top listagem-btn-top--blue">
+                <i class="bi bi-plus-circle listagem-btn-top__icon" aria-hidden="true"></i>
+                <span>Novo vínculo</span>
             </button>
         </div>
     </div>
-    <hr style="margin-top: 5px; margin-bottom: 10px;">
-    <div class="complete-table">
+    <div class="complete-table listagem-panel">
         <div id="navbarToggleExternalContent" class="table-filters">
             <form id="form_pesquisa" method="GET">
-                <div class="row">
+                <div class="filter-inline-row hospital-user-filter-row">
 
-                    <div class="col-sm-3" style="padding:2px !important;padding-left:16px !important;">
-                        <input class="form-control form-control-sm" style="margin-top:7px;" type="text"
+                    <div class="filter-inline-field hospital-user-filter--hospital">
+                        <input class="form-control form-control-sm" type="text"
                             name="pesquisa_nome" placeholder="Selecione o Hospital (nome ou CNPJ)"
                             value="<?= $busca ?>">
                         <?php isset($_get['pesquisa_nome']) ? $_get['pesquisa_nome'] : ""; ?>
                     </div>
-                    <div class="col-sm-3" style="padding:2px !important">
-                        <input class="form-control form-control-sm" style="margin-top:7px;" type="text"
+                    <div class="filter-inline-field hospital-user-filter--user">
+                        <input class="form-control form-control-sm" type="text"
                             name="pesquisa_user" placeholder="Selecione o Usuário (nome ou email)"
                             value="<?= $busca_user ?>">
                     </div>
-                    <div class="col-sm-1" style="padding:2px !important">
-                        <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="limite"
-                            name="limite">
+                    <div class="filter-inline-field hospital-user-filter--limit">
+                        <select class="form-control form-control-sm" id="limite" name="limite">
                             <option value="">Reg por página</option>
                             <option value="5" <?= $limite == '5' ? 'selected' : null ?>>Reg por pág = 5
                             </option>
@@ -154,9 +158,8 @@ if ($qtdIntItens > $limite) {
                             </option>
                         </select>
                     </div>
-                    <div class="col-sm-2" style="padding:2px !important">
-                        <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="ordenar"
-                            name="ordenar">
+                    <div class="filter-inline-field hospital-user-filter--sort">
+                        <select class="form-control form-control-sm" id="ordenar" name="ordenar">
                             <option value="">Classificar por</option>
                             <option value="usuario_user" <?= $ordenar == 'usuario_user' ? 'selected' : null ?>>Usuário
                             </option>
@@ -164,10 +167,9 @@ if ($qtdIntItens > $limite) {
                             </option>
                         </select>
                     </div>
-                    <div class="col-sm-1" style="padding:2px !important" style="margin:0px 0px 20px 0px">
-                        <button type="submit" class="btn btn-primary"
-                            style="background-color:#5e2363;width:42px;height:32px;margin-top:7px;border-color:#5e2363"><span
-                                class="material-icons" style="margin-left:-3px;margin-top:-2px;">
+                    <div class="filter-inline-field hospital-user-filter--action">
+                        <button type="submit" class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon"
+                            style="background-color:#5e2363;border-color:#5e2363"><span class="material-icons">
                                 search
                             </span></button>
                     </div>
@@ -217,27 +219,24 @@ if ($qtdIntItens > $limite) {
                                         </div>
 
                                         <div class="hospital-user-card__actions fc-list-action">
-                                            <a href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/usuarios/editar/' . (int) $fk_usuario_hosp, ENT_QUOTES, 'UTF-8') ?>"
-                                                class="btn btn-sm btn-outline-secondary"
-                                                title="Editar usuário"
-                                                style="border-radius:8px; margin-right:8px;">
-                                                <i class="bi bi-person-gear"></i>
-                                            </a>
                                             <div class="dropdown">
-                                                <button class="btn btn-default dropdown-toggle" id="navbarScrollingDropdown"
-                                                    role="button" data-bs-toggle="dropdown" style="color:#5e2363"
+                                                <button class="btn btn-default dropdown-toggle" id="acoesHospitalUserDropdown<?= (int)$id_hospitalUser ?>"
+                                                    role="button" data-bs-toggle="dropdown" style="color:#2f6f9f"
                                                     aria-expanded="false">
                                                     <i class="bi bi-stack"></i>
                                                 </button>
-                                                <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-
+                                                <ul class="dropdown-menu" aria-labelledby="acoesHospitalUserDropdown<?= (int)$id_hospitalUser ?>">
+                                                    <li>
+                                                        <button class="btn btn-default"
+                                                            onclick="window.location.href='<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/usuarios/editar/' . (int) $fk_usuario_hosp, ENT_QUOTES, 'UTF-8') ?>'">
+                                                            <i class="bi bi-person-gear" style="color:#2f6f9f"></i>Editar usuário
+                                                        </button>
+                                                    </li>
                                                     <li>
                                                         <button data-bs-toggle="modal" data-bs-target="#myModal"
                                                             class="btn btn-default"
-                                                            onclick="openModal('<?= $BASE_URL ?>edit_hospitalUser.php?id_hospitalUser=<?= $id_hospitalUser ?>')"><i
-                                                                style="font-size: 1rem;margin-right:5px;color:blue" name="type"
-                                                                value="edite"
-                                                                class="aparecer-acoes far fa-edit edit-icon"></i>Editar</button>
+                                                            onclick="openModal('<?= $BASE_URL ?>edit_hospitalUser.php?id_hospitalUser=<?= $id_hospitalUser ?>')">
+                                                            <i class="bi bi-pencil-square" style="color:#2f7d58"></i>Editar vínculo</button>
                                                     </li>
                                                     <li>
                                                         <form class="d-inline-block delete-form" action="del_hosp_user.php"
@@ -395,45 +394,88 @@ $(document).ready(function() {
 
 </script>
 <style>
+.hospital-user-list-page {
+    padding-inline: 4px;
+}
+
+.hospital-user-list-page .listagem-hero--module {
+    margin-bottom: 10px;
+}
+
+.hospital-user-list-page .listagem-panel,
+.hospital-user-list-page .complete-table,
+.hospital-user-list-page #table-content {
+    overflow: visible !important;
+}
+
+.hospital-user-filter-row {
+    margin-bottom: 8px;
+}
+
+.hospital-user-filter-row .filter-inline-field {
+    min-width: 0;
+}
+
+.hospital-user-filter--hospital,
+.hospital-user-filter--user {
+    flex: 1 1 260px;
+}
+
+.hospital-user-filter--limit {
+    flex: 0 0 150px;
+}
+
+.hospital-user-filter--sort {
+    flex: 0 0 230px;
+}
+
+.hospital-user-filter--action {
+    flex: 0 0 36px;
+}
+
 .hospital-user-groups {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 12px;
 }
 
 .hospital-user-group {
-    border: 1px solid rgba(94, 35, 99, 0.12);
-    border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 243, 251, 0.98));
-    box-shadow: 0 12px 25px -18px rgba(94, 35, 99, 0.35);
-    overflow: hidden;
+    border: 1px solid rgba(94, 35, 99, 0.16);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 7px 16px rgba(37, 18, 54, .065);
+    overflow: visible;
+}
+
+.hospital-user-group + .hospital-user-group {
+    margin-top: 2px;
 }
 
 .hospital-user-group__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    padding: 10px 18px 9px;
-    background: #e8d8ef;
-    color: #4f2d5a;
-    border-bottom: 1px solid rgba(94, 35, 99, 0.14);
-    border-left: 5px solid #7b4d8a;
+    gap: 10px;
+    padding: 8px 12px 8px 14px;
+    background: linear-gradient(180deg, #f3edf8 0%, #ebe2f2 100%);
+    color: #3b2941;
+    border-bottom: 1px solid rgba(94, 35, 99, 0.16);
+    border-left: 4px solid #7b4d8a;
 }
 
 .hospital-user-group__title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    text-transform: none;
-    line-height: 1.35;
+    font-size: .76rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1.2;
 }
 
 .hospital-user-group__meta {
-    font-size: 0.8rem;
-    opacity: 0.9;
-    font-weight: 400;
-    color: #7a6a86;
+    margin-top: 2px;
+    color: #8a7f93;
+    font-size: .64rem;
+    font-weight: 700;
+    line-height: 1.15;
 }
 
 .hospital-user-group__rows {
@@ -442,79 +484,152 @@ $(document).ready(function() {
 }
 
 .hospital-user-card {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(260px, 1.5fr) minmax(250px, 1.2fr) auto;
-    gap: 14px;
+    grid-template-columns: minmax(240px, 1.35fr) minmax(360px, 1.1fr) auto;
+    gap: 10px;
     align-items: center;
-    padding: 14px 18px;
-    border-top: 1px solid rgba(94, 35, 99, 0.08);
+    min-height: 44px;
+    padding: 8px 12px;
+    border-top: 1px solid rgba(94, 35, 99, 0.07);
+}
+
+.hospital-user-card:first-child {
+    border-top: 0;
 }
 
 .hospital-user-card:nth-child(odd) {
-    background: rgba(255, 255, 255, 0.85);
+    background: #fff;
 }
 
 .hospital-user-card:nth-child(even) {
-    background: rgba(239, 232, 244, 0.7);
+    background: #fbf9fd;
 }
 
 .hospital-user-card__name {
-    font-size: 0.98rem;
-    font-weight: 700;
     color: #2b2230;
+    font-size: .78rem;
+    font-weight: 800;
+    line-height: 1.15;
 }
 
 .hospital-user-card__email {
     margin-top: 2px;
-    font-size: 0.9rem;
-    color: #64556f;
+    color: #6f6478;
+    font-size: .70rem;
+    font-weight: 500;
+    line-height: 1.15;
     word-break: break-word;
 }
 
 .hospital-user-card__chips {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(132px, 148px));
-    gap: 8px;
-    justify-content: start;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 6px;
 }
 
 .hospital-user-chip {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    min-height: 38px;
-    padding: 5px 10px;
+    min-width: 92px;
+    min-height: 24px;
+    padding: 3px 9px;
     border-radius: 999px;
-    background: rgba(94, 35, 99, 0.08);
-    color: #5e2363;
-    font-size: 0.84rem;
-    font-weight: 700;
     border: 1px solid rgba(94, 35, 99, 0.12);
+    background: #f4eef7;
+    color: #5e2363;
+    font-size: .66rem;
+    font-weight: 800;
+    line-height: 1;
     text-align: center;
 }
 
 .hospital-user-card__actions {
+    position: relative;
+    z-index: 5;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+}
+
+.hospital-user-list-page .hospital-user-card__actions .dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 32px;
+    min-height: 28px;
+    padding: 0 8px !important;
+    border: 1px solid #c8deeb;
+    border-radius: 10px !important;
+    background: #fff;
+    color: #2f6f9f !important;
+    font-size: .68rem;
+    line-height: 1;
+}
+
+.hospital-user-list-page .hospital-user-card__actions .dropdown-toggle i {
+    margin: 0;
+    font-size: .9rem;
+    line-height: 1;
+}
+
+.hospital-user-list-page .hospital-user-card__actions .dropdown-toggle::after {
+    margin-left: 2px;
+    font-size: .62rem;
+    color: #2f6f9f;
+}
+
+.hospital-user-list-page .hospital-user-card__actions .dropdown-menu {
+    z-index: 3060;
+    min-width: 170px;
+    max-width: 190px;
+    padding: 5px 0;
+    border-radius: 10px;
+}
+
+.hospital-user-list-page .hospital-user-card__actions .dropdown-menu .btn-default,
+.hospital-user-list-page .hospital-user-card__actions .dropdown-menu .dropdown-item {
+    min-height: 28px !important;
+    padding: 5px 10px !important;
+    margin: 1px 5px !important;
+    gap: 8px !important;
+    font-size: .72rem !important;
+    line-height: 1.1 !important;
+    font-weight: 500 !important;
+}
+
+.hospital-user-list-page .hospital-user-card__actions .dropdown-menu .btn-default i,
+.hospital-user-list-page .hospital-user-card__actions .dropdown-menu .dropdown-item i {
+    min-width: 16px !important;
+    margin-right: 0 !important;
+    font-size: .86rem !important;
+    line-height: 1 !important;
 }
 
 .hospital-user-empty {
-    padding: 20px;
+    padding: 14px;
     text-align: center;
-    border: 1px dashed rgba(94, 35, 99, 0.2);
-    border-radius: 16px;
+    border: 1px dashed rgba(94, 35, 99, 0.18);
+    border-radius: 8px;
     color: #6f617a;
-    background: rgba(255, 255, 255, 0.85);
+    background: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.hospital-user-list-page .table-counter p {
+    margin-bottom: 10px !important;
+    color: #3b2941;
+    font-size: .72rem !important;
 }
 
 @media (max-width: 991.98px) {
     .hospital-user-card {
         grid-template-columns: 1fr;
-    }
-
-    .hospital-user-card__chips {
-        grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+        align-items: flex-start;
     }
 
     .hospital-user-card__actions {

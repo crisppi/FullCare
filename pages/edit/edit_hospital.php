@@ -340,6 +340,11 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
         margin-top: 4px !important;
     }
 
+    #main-container.compact-edit-layout .hospital-inline-section-title {
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
+    }
+
     #main-container.compact-edit-layout .hospital-grid-row--contato-base,
     #main-container.compact-edit-layout .hospital-grid-row--telefone-base,
     #main-container.compact-edit-layout .hospital-grid-row--dados-top {
@@ -476,7 +481,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
+            <p class="internacao-card__eyebrow hospital-inline-section-title">Endereços adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row hospital-grid-row hospital-grid-row--endereco-inline-main">
                     <div class="form-group col-md-2 mb-2">
@@ -615,7 +620,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
+            <p class="internacao-card__eyebrow hospital-inline-section-title">Telefones adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row hospital-grid-row hospital-grid-row--telefone-inline">
                     <div class="form-group col-md-2 mb-2">
@@ -697,7 +702,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 <div id="telefonesHiddenContainer"></div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Contatos do hospital</p>
+            <p class="internacao-card__eyebrow hospital-inline-section-title">Contatos do hospital</p>
             <div class="inline-manager-card mb-3">
                 <div class="row hospital-grid-row hospital-grid-row--contato-inline">
                     <div class="form-group col-md-2 mb-2">
@@ -838,7 +843,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Acomodações do hospital</p>
+            <p class="internacao-card__eyebrow hospital-inline-section-title">Acomodações do hospital</p>
             <div id="acomodacao-inline-card" class="mb-3">
                 <div class="row hospital-grid-row hospital-grid-row--acomodacao-inline">
                     <div class="form-group col-md-4 mb-2">

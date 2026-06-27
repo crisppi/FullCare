@@ -124,6 +124,7 @@ try {
         $loginIdentifier,
         $loginAliases[$loginIdentifier] ?? null,
     ])));
+    $preferDiretoriaForLogin = $loginIdentifier === 'diretor@fullcare.com.br' ? 1 : 0;
 
     $stmt = $conn->prepare($userSelect . "
         WHERE LOWER(TRIM(email_user)) = :email_identifier
@@ -132,7 +133,7 @@ try {
            OR LOWER(TRIM(usuario_user)) = :user_identifier
         ORDER BY
             CASE
-                WHEN :original_identifier = 'diretor@fullcare.com.br'
+                WHEN :prefer_diretoria = 1
                  AND (
                         nivel_user = 5
                      OR nivel_user = -1
@@ -151,7 +152,7 @@ try {
         $stmt->bindValue(':email2_identifier', $loginLookupIdentifier, PDO::PARAM_STR);
         $stmt->bindValue(':login_identifier', $loginLookupIdentifier, PDO::PARAM_STR);
         $stmt->bindValue(':user_identifier', $loginLookupIdentifier, PDO::PARAM_STR);
-        $stmt->bindValue(':original_identifier', $loginIdentifier, PDO::PARAM_STR);
+        $stmt->bindValue(':prefer_diretoria', $preferDiretoriaForLogin, PDO::PARAM_INT);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
 

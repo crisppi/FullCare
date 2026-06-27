@@ -253,19 +253,27 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
     }
 
     #main-container.internacao-page.cadastro-hospital-page .entity-step-toggle::after {
-        content: "\f078";
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        font-size: .58rem;
+        content: "";
+        width: .42rem;
+        height: .42rem;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        flex: 0 0 auto;
+        transform: rotate(45deg);
         transition: transform .15s ease;
     }
 
     #main-container.internacao-page.cadastro-hospital-page .entity-step-card--collapsible:not(.is-collapsed) .entity-step-toggle::after {
-        transform: rotate(180deg);
+        transform: rotate(225deg);
     }
 
     #main-container.internacao-page.cadastro-hospital-page .entity-step-panel {
         padding-top: 4px;
+    }
+
+    #main-container.internacao-page.cadastro-hospital-page .hospital-inline-section-title {
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
     }
 
     #main-container.internacao-page.cadastro-hospital-page .entity-form .row {
@@ -455,7 +463,6 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
             <div class="internacao-card internacao-card--general">
                 <div class="internacao-card__header">
                     <div>
-                        <p class="internacao-card__eyebrow">Etapa 1</p>
                         <h2 class="internacao-card__title">Dados do hospital</h2>
                     </div>
                     <span class="internacao-card__tag internacao-card__tag--critical">Cadastro institucional</span>
@@ -538,7 +545,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 </div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
+            <p class="internacao-card__eyebrow hospital-inline-section-title">Endereços adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2">
@@ -651,7 +658,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 </div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
+            <p class="internacao-card__eyebrow hospital-inline-section-title">Telefones adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2">
@@ -703,7 +710,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 <div id="telefonesHiddenContainer"></div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Contatos do hospital</p>
+            <p class="internacao-card__eyebrow hospital-inline-section-title">Contatos do hospital</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2">
@@ -802,7 +809,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 </div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Acomodações do hospital</p>
+            <p class="internacao-card__eyebrow hospital-inline-section-title">Acomodações do hospital</p>
             <div id="acomodacao-inline-card" class="mb-3">
                 <div class="row">
                     <div class="form-group col-md-4 mb-2">

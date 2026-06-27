@@ -445,9 +445,18 @@ if (!empty($sessionIdUsuario)) {
             border-color: transparent !important;
         }
 
-        .navbar-nav.navbar-nav-scroll .nav-link i {
-            font-size: 0.75rem !important;
-            margin-right: 3px !important;
+        .navbar-nav.navbar-nav-scroll .nav-link > i,
+        .navbar-nav.navbar-nav-scroll .nav-link > span.bi {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            min-width: 1rem;
+            height: 1rem;
+            font-size: 0.82rem !important;
+            line-height: 1 !important;
+            margin-right: 4px !important;
+            vertical-align: middle;
         }
 
         .navbar-nav.navbar-nav-scroll .nav-link {

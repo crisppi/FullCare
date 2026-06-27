@@ -257,15 +257,18 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
     }
 
     #main-container.internacao-page .entity-step-toggle::after {
-        content: "\f078";
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        font-size: .58rem;
+        content: "";
+        width: .42rem;
+        height: .42rem;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        flex: 0 0 auto;
+        transform: rotate(45deg);
         transition: transform .15s ease;
     }
 
     #main-container.internacao-page .entity-step-card--collapsible:not(.is-collapsed) .entity-step-toggle::after {
-        transform: rotate(180deg);
+        transform: rotate(225deg);
     }
 
     #main-container.internacao-page .entity-step-card--collapsible.is-collapsed {
@@ -274,6 +277,11 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
 
     #main-container.internacao-page .entity-step-panel {
         padding-top: 4px;
+    }
+
+    #main-container.internacao-page .paciente-inline-section-title {
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
     }
 
     #main-container.internacao-page.cadastro-paciente-page .internacao-card {
@@ -464,7 +472,6 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
             <div class="internacao-card internacao-card--general">
                 <div class="internacao-card__header">
                     <div>
-                        <p class="internacao-card__eyebrow">Etapa 1</p>
                         <h2 class="internacao-card__title">Dados do paciente</h2>
                     </div>
                     <span class="internacao-card__tag internacao-card__tag--critical">Cadastro base</span>
@@ -590,7 +597,14 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     <select class="form-control" id="fk_estipulante_pac" name="fk_estipulante_pac">
                         <option value="1" <?= $estipulanteDefaultId === 1 ? 'selected' : '' ?>>Selecione</option>
                         <?php foreach ($estipulantesSelect as $estipulante): ?>
-                        <option value="<?= $estipulante["id_estipulante"] ?>" <?= ((int)$estipulante["id_estipulante"] === $estipulanteDefaultId) ? 'selected' : '' ?>><?= $estipulante['nome_est'] ?>
+                        <?php
+                        $nomeEstipulanteOption = (string)($estipulante['nome_est'] ?? '');
+                        $nomeEstipulanteNorm = mb_strtolower(trim($nomeEstipulanteOption), 'UTF-8');
+                        $nomeEstipulanteDisplay = in_array($nomeEstipulanteNorm, ['sem informações', 'sem informacoes'], true)
+                            ? 'Sem informações'
+                            : $nomeEstipulanteOption;
+                        ?>
+                        <option value="<?= $estipulante["id_estipulante"] ?>" <?= ((int)$estipulante["id_estipulante"] === $estipulanteDefaultId) ? 'selected' : '' ?>><?= htmlspecialchars($nomeEstipulanteDisplay, ENT_QUOTES, 'UTF-8') ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
@@ -658,7 +672,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 <label for="complemento_pac">Complemento</label>
                 <input type="text" class="form-control" id="complemento_pac" name="complemento_pac">
             </div>
-            <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
+            <p class="internacao-card__eyebrow paciente-inline-section-title">Endereços adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="end_tipo_inline">Tipo</label><input type="text" class="form-control" id="end_tipo_inline" placeholder="Cobrança"></div>
@@ -706,7 +720,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                         placeholder="exemplo@dominio.com">
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Emails adicionais</p>
+            <p class="internacao-card__eyebrow paciente-inline-section-title">Emails adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-3 mb-2"><label for="email_tipo_inline">Tipo</label><input type="text" class="form-control" id="email_tipo_inline" placeholder="Responsável"></div>
@@ -733,7 +747,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     </div>
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
+            <p class="internacao-card__eyebrow paciente-inline-section-title">Telefones adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="tel_tipo_inline">Tipo</label><input type="text" class="form-control" id="tel_tipo_inline" placeholder="Celular"></div>
@@ -746,7 +760,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Número</th><th>Ramal</th><th>Contato</th><th>P</th><th>Ação</th></tr></thead><tbody id="telefonesTableBody"><tr id="telefonesTableEmpty"><td colspan="6" class="text-muted text-center">Nenhum telefone adicional.</td></tr></tbody></table></div>
                 <div id="telefonesHiddenContainer"></div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Contatos adicionais</p>
+            <p class="internacao-card__eyebrow paciente-inline-section-title">Contatos adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="cont_nome_inline">Nome</label><input type="text" class="form-control" id="cont_nome_inline"></div>

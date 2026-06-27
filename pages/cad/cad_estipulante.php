@@ -259,19 +259,27 @@ if (empty($id_estipulante)) {
     }
 
     #main-container.internacao-page.cadastro-estipulante-page .entity-step-toggle::after {
-        content: "\f078";
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        font-size: .58rem;
+        content: "";
+        width: .42rem;
+        height: .42rem;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        flex: 0 0 auto;
+        transform: rotate(45deg);
         transition: transform .15s ease;
     }
 
     #main-container.internacao-page.cadastro-estipulante-page .entity-step-card--collapsible:not(.is-collapsed) .entity-step-toggle::after {
-        transform: rotate(180deg);
+        transform: rotate(225deg);
     }
 
     #main-container.internacao-page.cadastro-estipulante-page .entity-step-panel {
         padding-top: 4px;
+    }
+
+    #main-container.internacao-page.cadastro-estipulante-page .estipulante-inline-section-title {
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
     }
 
     #main-container.internacao-page.cadastro-estipulante-page .entity-form .row {
@@ -433,7 +441,6 @@ if (empty($id_estipulante)) {
         <div class="internacao-card internacao-card--general">
             <div class="internacao-card__header">
                 <div>
-                    <p class="internacao-card__eyebrow">Etapa 1</p>
                     <h2 class="internacao-card__title">Dados do estipulante</h2>
                 </div>
                 <span class="internacao-card__tag internacao-card__tag--critical">Cadastro comercial</span>
@@ -510,7 +517,7 @@ if (empty($id_estipulante)) {
                     <input type="text" class="form-control" id="numero_est" name="numero_est" placeholder="Número">
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
+            <p class="internacao-card__eyebrow estipulante-inline-section-title">Endereços adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="end_tipo_inline">Tipo</label><input type="text" class="form-control" id="end_tipo_inline"></div>
@@ -579,7 +586,7 @@ if (empty($id_estipulante)) {
                         placeholder="Nome do responsável">
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
+            <p class="internacao-card__eyebrow estipulante-inline-section-title">Telefones adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="tel_tipo_inline">Tipo</label><input type="text" class="form-control" id="tel_tipo_inline"></div>
@@ -593,7 +600,7 @@ if (empty($id_estipulante)) {
                 <div id="telefonesHiddenContainer"></div>
             </div>
 
-            <p class="internacao-card__eyebrow mb-3">Contatos adicionais</p>
+            <p class="internacao-card__eyebrow estipulante-inline-section-title">Contatos adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row">
                     <div class="form-group col-md-2 mb-2"><label for="cont_nome_inline">Nome</label><input type="text" class="form-control" id="cont_nome_inline"></div>

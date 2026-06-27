@@ -122,6 +122,11 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
         font-weight: 700 !important;
     }
 
+    #main-container.compact-edit-layout .seguradora-inline-section-title {
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
+    }
+
     #multi-step-form .form-control {
         min-height: 42px;
         border-radius: 8px;
@@ -191,7 +196,6 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
             <div class="internacao-card internacao-card--general">
                 <div class="internacao-card__header">
                     <div>
-                        <p class="internacao-card__eyebrow">Etapa 1</p>
                         <h2 class="internacao-card__title">Dados da seguradora</h2>
                     </div>
                     <span class="internacao-card__tag internacao-card__tag--critical">Edição contratual</span>
@@ -278,7 +282,7 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                             value="<?= $seguradora->numero_seg ?>" placeholder="Número do endereço">
                     </div>
                 </div>
-                <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
+                <p class="internacao-card__eyebrow seguradora-inline-section-title">Endereços adicionais</p>
                 <div class="inline-manager-card mb-3">
                     <div class="row">
                         <div class="form-group col-md-2 mb-2"><label for="end_tipo_inline">Tipo</label><input type="text" class="form-control" id="end_tipo_inline"></div>
@@ -341,7 +345,7 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                             placeholder="(00) 0000-0000">
                     </div>
                 </div>
-                <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
+                <p class="internacao-card__eyebrow seguradora-inline-section-title">Telefones adicionais</p>
                 <div class="inline-manager-card mb-3">
                     <div class="row">
                         <div class="form-group col-md-2 mb-2"><label for="tel_tipo_inline">Tipo</label><input type="text" class="form-control" id="tel_tipo_inline"></div>
@@ -385,7 +389,7 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                             value="<?= $seguradora->contato_seg ?>" placeholder="Nome do contato na seguradora">
                     </div>
                 </div>
-                <p class="internacao-card__eyebrow mb-3">Contatos adicionais</p>
+                <p class="internacao-card__eyebrow seguradora-inline-section-title">Contatos adicionais</p>
                 <div class="inline-manager-card mb-3">
                     <div class="row">
                         <div class="form-group col-md-2 mb-2"><label for="cont_nome_inline">Nome</label><input type="text" class="form-control" id="cont_nome_inline"></div>

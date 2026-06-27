@@ -201,4 +201,43 @@ body.bi-theme #myFooterSimple {
         font-size: 0.54rem;
     }
 }
+
+#main-container.internacao-page .entity-form select.form-control.select-placeholder-empty,
+#main-container.internacao-page #multi-step-form select.form-control.select-placeholder-empty,
+#main-container.internacao-page .entity-form select.form-control.select-placeholder-empty:focus,
+#main-container.internacao-page #multi-step-form select.form-control.select-placeholder-empty:focus {
+    color: #c4c4c4 !important;
+    font-weight: 500 !important;
+}
+
+#main-container.internacao-page .entity-form select.form-control.select-placeholder-empty option,
+#main-container.internacao-page #multi-step-form select.form-control.select-placeholder-empty option {
+    color: #2f3742 !important;
+}
+
+#main-container.internacao-page .entity-form select.form-control.select-placeholder-empty option[value=""],
+#main-container.internacao-page #multi-step-form select.form-control.select-placeholder-empty option[value=""] {
+    color: #c4c4c4 !important;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function syncSelectPlaceholder(select) {
+        var selected = select.options && select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
+        var selectedText = selected ? selected.textContent.replace(/\s+/g, ' ').trim().toLowerCase() : '';
+        var isPlaceholderText = selectedText === 'selecione' ||
+            selectedText === 'selecione...' ||
+            selectedText === 'selecione o estado';
+        var isPlaceholder = select.value === '' || isPlaceholderText || (selected && selected.value === '' && selected.disabled);
+        select.classList.toggle('select-placeholder-empty', isPlaceholder);
+    }
+
+    document.querySelectorAll('#main-container.internacao-page select.form-control').forEach(function (select) {
+        syncSelectPlaceholder(select);
+        select.addEventListener('change', function () {
+            syncSelectPlaceholder(select);
+        });
+    });
+});
+</script>

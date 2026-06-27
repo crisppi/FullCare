@@ -252,15 +252,18 @@ if (empty($telefonesPaciente)) {
     }
 
     #main-container.internacao-page .entity-step-toggle::after {
-        content: "\f078";
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        font-size: .62rem;
+        content: "";
+        width: .42rem;
+        height: .42rem;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        flex: 0 0 auto;
+        transform: rotate(45deg);
         transition: transform .15s ease;
     }
 
     #main-container.internacao-page .entity-step-card--collapsible:not(.is-collapsed) .entity-step-toggle::after {
-        transform: rotate(180deg);
+        transform: rotate(225deg);
     }
 
     #main-container.internacao-page .entity-step-card--collapsible.is-collapsed {
@@ -269,6 +272,11 @@ if (empty($telefonesPaciente)) {
 
     #main-container.internacao-page .entity-step-panel {
         padding-top: 4px;
+    }
+
+    #main-container.internacao-page .paciente-inline-section-title {
+        margin-top: 14px !important;
+        margin-bottom: 6px !important;
     }
 
     #main-container.compact-edit-layout #step-2 .paciente-endereco-row {
@@ -506,7 +514,6 @@ if (empty($telefonesPaciente)) {
         <div class="internacao-card internacao-card--general">
             <div class="internacao-card__header">
                 <div>
-                    <p class="internacao-card__eyebrow">Etapa 1</p>
                     <h2 class="internacao-card__title">Dados do paciente</h2>
                 </div>
                 <span class="internacao-card__tag internacao-card__tag--critical">Edição cadastral</span>
@@ -649,12 +656,26 @@ if (empty($telefonesPaciente)) {
                 <div class="form-group col-md-3 mb-3">
                     <label for="fk_seguradora_pac">Estipulante</label>
                     <select class="form-control" id="fk_estipulante_pac" name="fk_estipulante_pac">
+                        <?php
+                        $nomeEstipulanteAtual = (string)($paciente['0']['nome_est'] ?? '');
+                        $nomeEstipulanteAtualNorm = mb_strtolower(trim($nomeEstipulanteAtual), 'UTF-8');
+                        $nomeEstipulanteAtualDisplay = in_array($nomeEstipulanteAtualNorm, ['sem informações', 'sem informacoes'], true)
+                            ? 'Sem informações'
+                            : $nomeEstipulanteAtual;
+                        ?>
                         <option value="<?= $paciente['0']['fk_estipulante_pac'] ?>" selected>
-                            <?= $paciente['0']['nome_est'] ?>
+                            <?= htmlspecialchars($nomeEstipulanteAtualDisplay, ENT_QUOTES, 'UTF-8') ?>
                         </option>
                         <?php foreach ($estipulantesSelect as $estipulanteItem): ?>
                             <?php if ((string) $estipulanteItem['id_estipulante'] === (string) $paciente['0']['fk_estipulante_pac']) continue; ?>
-                            <option value="<?= $estipulanteItem['id_estipulante'] ?>"><?= $estipulanteItem['nome_est'] ?>
+                            <?php
+                            $nomeEstipulanteOption = (string)($estipulanteItem['nome_est'] ?? '');
+                            $nomeEstipulanteNorm = mb_strtolower(trim($nomeEstipulanteOption), 'UTF-8');
+                            $nomeEstipulanteDisplay = in_array($nomeEstipulanteNorm, ['sem informações', 'sem informacoes'], true)
+                                ? 'Sem informações'
+                                : $nomeEstipulanteOption;
+                            ?>
+                            <option value="<?= $estipulanteItem['id_estipulante'] ?>"><?= htmlspecialchars($nomeEstipulanteDisplay, ENT_QUOTES, 'UTF-8') ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -728,7 +749,7 @@ if (empty($telefonesPaciente)) {
                 <input type="text" class="form-control" id="complemento_pac" name="complemento_pac"
                     value="<?= $paciente['0']['complemento_pac'] ?>">
             </div>
-            <p class="internacao-card__eyebrow mb-3">Endereços adicionais</p>
+            <p class="internacao-card__eyebrow paciente-inline-section-title">Endereços adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row paciente-endereco-inline-row paciente-endereco-inline-row--main">
                     <div class="form-group col-md-2 mb-2"><label for="end_tipo_inline">Tipo</label><input type="text" class="form-control" id="end_tipo_inline"></div>
@@ -780,7 +801,7 @@ if (empty($telefonesPaciente)) {
                         value="<?= $paciente['0']['email02_pac'] ?>" placeholder="exemplo@dominio.com">
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Emails adicionais</p>
+            <p class="internacao-card__eyebrow paciente-inline-section-title">Emails adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row paciente-contato-row paciente-contato-row--email-inline">
                     <div class="form-group col-md-3 mb-2"><label for="email_tipo_inline">Tipo</label><input type="text" class="form-control" id="email_tipo_inline"></div>
@@ -812,7 +833,7 @@ if (empty($telefonesPaciente)) {
                     <div class="invalid-feedback">Por favor, insira um número de celular válido.</div>
                 </div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Telefones adicionais</p>
+            <p class="internacao-card__eyebrow paciente-inline-section-title">Telefones adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row paciente-contato-row paciente-contato-row--telefone-inline">
                     <div class="form-group col-md-2 mb-2"><label for="tel_tipo_inline">Tipo</label><input type="text" class="form-control" id="tel_tipo_inline"></div>
@@ -830,7 +851,7 @@ if (empty($telefonesPaciente)) {
                 </tbody></table></div>
                 <div id="telefonesHiddenContainer"></div>
             </div>
-            <p class="internacao-card__eyebrow mb-3">Contatos adicionais</p>
+            <p class="internacao-card__eyebrow paciente-inline-section-title">Contatos adicionais</p>
             <div class="inline-manager-card mb-3">
                 <div class="row paciente-contato-row paciente-contato-row--contato-inline">
                     <div class="form-group col-md-2 mb-2"><label for="cont_nome_inline">Nome</label><input type="text" class="form-control" id="cont_nome_inline"></div>
