@@ -516,7 +516,6 @@ if (empty($telefonesPaciente)) {
                 <div>
                     <h2 class="internacao-card__title">Dados do paciente</h2>
                 </div>
-                <span class="internacao-card__tag internacao-card__tag--critical">Edição cadastral</span>
             </div>
             <div class="internacao-card__body">
 

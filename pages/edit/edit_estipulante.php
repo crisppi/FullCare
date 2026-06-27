@@ -312,7 +312,6 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                 <div>
                     <h2 class="internacao-card__title">Dados do estipulante</h2>
                 </div>
-                <span class="internacao-card__tag internacao-card__tag--critical">Edição comercial</span>
             </div>
             <div class="internacao-card__body">
 

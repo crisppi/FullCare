@@ -219,7 +219,6 @@ if (empty($id_usuario)) {
                     <div>
                         <h2 class="internacao-card__title">Dados do usuário</h2>
                     </div>
-                    <span class="internacao-card__tag">Cadastro base</span>
                 </div>
                 <div class="internacao-card__body">
                     <div class="entity-step-card">

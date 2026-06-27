@@ -403,7 +403,6 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                     <p class="internacao-card__eyebrow">Etapa 1</p>
                     <h2 class="internacao-card__title">Dados do hospital</h2>
                 </div>
-                <span class="internacao-card__tag internacao-card__tag--critical">Edição institucional</span>
             </div>
             <div class="internacao-card__body">
         <input type="hidden" name="type" value="update">

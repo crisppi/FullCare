@@ -127,6 +127,74 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
         margin-bottom: 6px !important;
     }
 
+    #main-container.seguradora-edit-layout [hidden] {
+        display: none !important;
+    }
+
+    #main-container.seguradora-edit-layout .entity-form .row:not([hidden]) {
+        display: grid !important;
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        gap: 4px 10px !important;
+        align-items: flex-end !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #main-container.seguradora-edit-layout .entity-form .row > [class*="col-"] {
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        flex: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #main-container.seguradora-edit-layout .entity-form .row > .col-md-1 {
+        grid-column: span 1 !important;
+    }
+
+    #main-container.seguradora-edit-layout .entity-form .row > .col-md-2 {
+        grid-column: span 2 !important;
+    }
+
+    #main-container.seguradora-edit-layout .entity-form .row > .col-md-3 {
+        grid-column: span 3 !important;
+    }
+
+    #main-container.seguradora-edit-layout .entity-form .row > .col-md-4 {
+        grid-column: span 4 !important;
+    }
+
+    #main-container.seguradora-edit-layout .entity-form .row > .col-md-6 {
+        grid-column: span 6 !important;
+    }
+
+    #main-container.seguradora-edit-layout #step-1 .seguradora-identificacao-row {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1.35fr) minmax(0, .9fr);
+        gap: 10px;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #main-container.seguradora-edit-layout #step-1 .seguradora-identificacao-row > [class*="col-"] {
+        width: auto !important;
+        max-width: none !important;
+        flex: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    @media (max-width: 575.98px) {
+        #main-container.seguradora-edit-layout .entity-form .row > .col-md-1,
+        #main-container.seguradora-edit-layout .entity-form .row > .col-md-2,
+        #main-container.seguradora-edit-layout .entity-form .row > .col-md-3,
+        #main-container.seguradora-edit-layout .entity-form .row > .col-md-4,
+        #main-container.seguradora-edit-layout .entity-form .row > .col-md-6 {
+            grid-column: span 6 !important;
+        }
+    }
+
     #multi-step-form .form-control {
         min-height: 42px;
         border-radius: 8px;
@@ -183,7 +251,7 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
     }
 </style>
 
-<div id="main-container" class="internacao-page cadastro-layout compact-edit-layout">
+<div id="main-container" class="internacao-page cadastro-layout compact-edit-layout seguradora-edit-layout">
     <div class="internacao-page__hero">
         <div><h1>Editar seguradora</h1></div>
         <div class="hero-actions">
@@ -198,7 +266,6 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                     <div>
                         <h2 class="internacao-card__title">Dados da seguradora</h2>
                     </div>
-                    <span class="internacao-card__tag internacao-card__tag--critical">Edição contratual</span>
                 </div>
                 <div class="internacao-card__body">
             <input type="hidden" name="type" value="update">
@@ -215,7 +282,7 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                     </div>
                     <span class="entity-step-badge">Dados base</span>
                 </div>
-                <div class="row">
+                <div class="row seguradora-identificacao-row">
                     <div class="form-group col-md-6">
                         <label for="seguradora_seg"><span style="color:red;">*</span> Seguradora</label>
                         <input type="text" class="form-control" id="seguradora_seg" name="seguradora_seg"
@@ -451,7 +518,6 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                     <?php endif; ?>
                 </div>
                 <div class="entity-actions-bar">
-                    <div class="entity-actions-copy">Revise contatos, logo e parâmetros operacionais antes de salvar ou excluir este registro.</div>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-check"></i> Atualizar
