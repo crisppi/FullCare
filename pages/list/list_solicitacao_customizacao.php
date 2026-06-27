@@ -110,9 +110,9 @@ $rows = $dao->findAll([
                                 <td><?= e($row['status'] ?? '') ?></td>
                                 <td><?= e($row['resolvido_em'] ?? '') ?></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#scViewModal" data-id="<?= (int)($row['id_solicitacao'] ?? 0) ?>" title="Ver">
+                                    <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#scViewModal" data-id="<?= (int)($row['id_solicitacao'] ?? 0) ?>" title="Visualização">
                                         <i class="bi bi-eye"></i>
-                                        <span class="ms-1">Ver</span>
+                                        <span class="ms-1">Visualização</span>
                                     </button>
                                     <a class="btn btn-sm btn-outline-primary" href="solicitacao_customizacao.php?id=<?= (int)($row['id_solicitacao'] ?? 0) ?>" title="Editar">
                                         <i class="bi bi-pencil-square"></i>

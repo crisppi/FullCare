@@ -288,7 +288,7 @@ if ($qtdIntItens > $limite) {
                                             <a class="dropdown-item" style="font-size: .9rem;"
                                                 href="<?= $BASE_URL ?>usuarios/ver/<?= $id_usuario ?>">
                                                 <i class="bi bi-eye"
-                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver</a>
+                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Visualização</a>
                                         </li>
                                         <li>
                                             <a class="dropdown-item" style="font-size: .9rem;"

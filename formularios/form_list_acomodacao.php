@@ -211,7 +211,7 @@ $totalcasos = ceil($qtdIntItens / 5);
                                             <button class="dropdown-item" style="font-size: .9rem;"
                                                 onclick="openModal('<?= $BASE_URL ?>show_acomodacao.php?id_acomodacao=<?= $id_acomodacao ?>')"
                                                 data-bs-toggle="modal" data-bs-target="#myModal"><i class="bi bi-eye"
-                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Ver</button>
+                                                    style="font-size:1rem;margin-right:8px;color:#16a34a;"></i>Visualização</button>
                                         </li>
                                         <li>
                                             <button class="dropdown-item" style="font-size: .9rem;"

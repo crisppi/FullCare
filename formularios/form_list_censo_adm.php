@@ -271,7 +271,7 @@ $user = $_SESSION['id_usuario'];
                                         <li>
                                             <button class="btn btn-default"
                                                 onclick="openModal('<?= $BASE_URL ?>show_censo_adm.php?id_censo=<?= $intern['id_censo'] ?>')"
-                                                data-bs-toggle="modal" data-bs-target="#myModal"><i class="bi bi-eye text-success"></i>Ver</button>
+                                                data-bs-toggle="modal" data-bs-target="#myModal"><i class="bi bi-eye text-success"></i>Visualização</button>
                                         </li>
                                         <li>
                                             <form class="d-inline-block delete-form" action="process_censo_int.php"

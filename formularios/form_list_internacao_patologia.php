@@ -337,7 +337,7 @@ $internacao = new internacaoDAO($conn, $BASE_URL);
                                             <button class="btn btn-default"
                                                 onclick="edit('<?= $BASE_URL ?>show_internacao_patologia.php?id_internacao=<?= $intern['id_internacao'] ?>')"
                                                 style="font-size: .9rem;"><i class="bi bi-eye text-success"></i>
-                                                Ver</button>
+                                                Visualização</button>
                                         </li>
                                         <li>
                                             <?php

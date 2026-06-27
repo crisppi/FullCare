@@ -464,7 +464,7 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
                                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                         <li>
                                             <button class="btn btn-default"
-                                                onclick="edit('<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern['id_internacao'] ?>')"><i class="bi bi-eye text-success"></i>Ver</button>
+                                                onclick="edit('<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern['id_internacao'] ?>')"><i class="bi bi-eye text-success"></i>Visualização</button>
                                         </li>
                                         <li>
                                             <form class="d-inline-block delete-form" action="edit_alta_uti.php"

@@ -618,7 +618,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                                         href="<?= htmlspecialchars($pdfPreviewUrl, ENT_QUOTES, 'UTF-8') ?>"
                                                         style="color:#0d6efd !important; font-weight:400 !important; text-transform:none;">
                                                         <i class="bi bi-eye me-1" style="color:#0d6efd;"></i>
-                                                        <span style="color:#0d6efd !important; font-weight:400 !important; text-transform:none;">Ver RAH</span>
+                                                        <span style="color:#0d6efd !important; font-weight:400 !important; text-transform:none;">Visualização RAH</span>
                                                     </a>
                                                 </li>
                                                 <li>
@@ -634,7 +634,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                                     <span class="dropdown-item disabled text-muted fw-normal"
                                                         style="color:#6c757d !important; font-weight:400 !important; text-transform:none;">
                                                         <i class="bi bi-eye me-1" style="color:#6c757d;"></i>
-                                                        <span style="color:#6c757d !important; font-weight:400 !important; text-transform:none;">Ver RAH</span>
+                                                        <span style="color:#6c757d !important; font-weight:400 !important; text-transform:none;">Visualização RAH</span>
                                                     </span>
                                                 </li>
                                                 <li>
@@ -802,7 +802,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                                         href="<?= htmlspecialchars($pdfPreviewUrl, ENT_QUOTES, 'UTF-8') ?>"
                                                         style="color:#0d6efd !important; font-weight:400 !important;">
                                                         <i class="bi bi-eye me-1" style="color:#0d6efd;"></i>
-                                                        <span style="color:#0d6efd !important; font-weight:400 !important;">Ver RAH</span>
+                                                        <span style="color:#0d6efd !important; font-weight:400 !important;">Visualização RAH</span>
                                                     </a>
                                                 </li>
                                                 <li>
@@ -818,7 +818,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                                     <span class="dropdown-item disabled text-muted fw-normal"
                                                         style="color:#6c757d !important; font-weight:400 !important;">
                                                         <i class="bi bi-eye me-1" style="color:#6c757d;"></i>
-                                                        <span style="color:#6c757d !important; font-weight:400 !important;">Ver RAH</span>
+                                                        <span style="color:#6c757d !important; font-weight:400 !important;">Visualização RAH</span>
                                                     </span>
                                                 </li>
                                                 <li>

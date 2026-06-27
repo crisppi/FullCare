@@ -588,7 +588,7 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                                             <li>
                                                 <a class="dropdown-item"
                                                     href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/internacoes/visualizar/' . (int)$intern["fk_id_int_alt"], ENT_QUOTES, 'UTF-8') ?>">
-                                                    <i class="bi bi-eye text-success"></i> Ver
+                                                    <i class="bi bi-eye text-success"></i> Visualização
                                                 </a>
                                             </li>
                                             <li>

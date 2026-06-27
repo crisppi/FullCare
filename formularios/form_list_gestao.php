@@ -582,7 +582,7 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                             <button class="btn btn-default"
                                                 onclick="edit('<?= $BASE_URL ?>show_gestao.php?id_gestao=<?= $intern['id_gestao'] ?>')"><i class="bi bi-eye text-success"></i>
-                                                Ver</button>
+                                                Visualização</button>
                                         </ul>
                                     </div>
                                 </td>
