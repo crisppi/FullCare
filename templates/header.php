@@ -717,12 +717,137 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .account-user-trigger {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
             display: inline-flex;
             align-items: center;
             min-height: 38px;
             font-size: 0.9rem;
             font-weight: 600;
             color: #28354d;
+            cursor: pointer;
+        }
+
+        .header-actions .account-dropdown {
+            min-width: 260px;
+            top: 52px;
+            right: -8px;
+            z-index: 2050;
+            border: 1px solid rgba(76, 142, 187, 0.16);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 18px 38px rgba(31, 45, 61, .16);
+        }
+
+        .header-actions .account-dropdown::after {
+            right: 26px;
+            border-bottom-color: #f8fbff;
+        }
+
+        .account-dropdown__summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .account-dropdown__summary-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef7fb;
+            color: #2f6f9f;
+            font-size: 1rem;
+            flex: 0 0 auto;
+        }
+
+        .account-dropdown__summary-title {
+            display: block;
+            color: #24384f;
+            font-size: .82rem;
+            font-weight: 800;
+            line-height: 1.12;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .account-dropdown__summary-subtitle {
+            display: block;
+            margin-top: 2px;
+            color: #6b7a90;
+            font-size: .66rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .header-actions .account-dropdown__body {
+            padding: 6px;
+        }
+
+        .header-actions .account-dropdown__item a,
+        .header-actions .account-dropdown__footer a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 38px;
+            margin: 0;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: #24384f;
+            font-size: .76rem;
+            font-weight: 700;
+            line-height: 1.12;
+            text-decoration: none;
+            transition: background .16s ease, color .16s ease;
+        }
+
+        .header-actions .account-dropdown__item a:hover {
+            background: #eef7fb;
+            color: #2f6f9f;
+        }
+
+        .header-actions .account-dropdown__item a i,
+        .header-actions .account-dropdown__footer a i {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0;
+            font-size: .9rem;
+            flex: 0 0 auto;
+            background: #f3f7fb;
+            color: #2f6f9f;
+        }
+
+        .header-actions .account-dropdown__footer {
+            padding: 6px;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .header-actions .account-dropdown__footer a {
+            color: #9f1d35;
+        }
+
+        .header-actions .account-dropdown__footer a:hover {
+            background: #fff1f3;
+            color: #9f1d35;
+        }
+
+        .header-actions .account-dropdown__footer a i {
+            background: #fff1f3;
+            color: #d62f4b;
         }
 
         @media (max-width: 991.98px) {
@@ -1690,21 +1815,40 @@ if (!empty($sessionIdUsuario)) {
                                 onerror="this.onerror=null;this.src='<?= $defaultFoto ?>';" />
                         </div>
                         <div class="content">
-                            <a class="js-acc-btn account-user-trigger" href="#">
+                            <button type="button" class="js-acc-btn account-user-trigger" aria-expanded="false">
                                 <?php print $sessionUsuario ?>
                                 <i class="bi bi-chevron-down account-user-caret" aria-hidden="true"></i>
-                            </a>
+                            </button>
                         </div>
                         <div class="account-dropdown js-dropdown">
+                            <div class="account-dropdown__summary">
+                                <span class="account-dropdown__summary-icon">
+                                    <i class="bi bi-person-circle" aria-hidden="true"></i>
+                                </span>
+                                <span>
+                                    <span class="account-dropdown__summary-title"><?= htmlspecialchars((string)$sessionUsuario, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="account-dropdown__summary-subtitle">Conta FullCare</span>
+                                </span>
+                            </div>
                             <div class="account-dropdown__body">
+                                <?php if (!empty($sessionIdUsuario)): ?>
+                                <div class="account-dropdown__item">
+                                    <a href="<?= $BASE_URL ?>usuarios/ver/<?= (int)$sessionIdUsuario ?>">
+                                        <i class="bi bi-person" aria-hidden="true"></i>Meu perfil</a>
+                                </div>
+                                <?php endif; ?>
                                 <div class="account-dropdown__item">
                                     <a href="<?= $BASE_URL ?>mfa_configuracao.php">
-                                        <i class="zmdi zmdi-shield-security"></i>Segurança e MFA</a>
+                                        <i class="bi bi-shield-lock" aria-hidden="true"></i>Segurança e MFA</a>
+                                </div>
+                                <div class="account-dropdown__item">
+                                    <a href="<?= $BASE_URL ?>usuario/sessoes">
+                                        <i class="bi bi-display" aria-hidden="true"></i>Sessões ativas</a>
                                 </div>
                             </div>
                             <div class="account-dropdown__footer">
                                 <a href="<?= $BASE_URL ?>destroi.php">
-                                    <i class="zmdi zmdi-power"></i>Sair</a>
+                                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>Sair</a>
                             </div>
                         </div>
                     </div>
@@ -1828,11 +1972,57 @@ if (!empty($sessionIdUsuario)) {
             .catch(() => {});
     }
 
+    function setupHeaderAccountDropdown() {
+        var items = document.querySelectorAll('.js-item-menu');
+        if (!items.length) return;
+
+        items.forEach(function(item) {
+            var trigger = item.querySelector('.js-acc-btn');
+            var dropdown = item.querySelector('.js-dropdown');
+            if (!trigger || !dropdown || trigger.dataset.accountDropdownBound === '1') return;
+            trigger.dataset.accountDropdownBound = '1';
+
+            trigger.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                items.forEach(function(otherItem) {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('show-dropdown');
+                        var otherTrigger = otherItem.querySelector('.js-acc-btn');
+                        if (otherTrigger) {
+                            otherTrigger.setAttribute('aria-expanded', 'false');
+                        }
+                    }
+                });
+
+                var willOpen = !item.classList.contains('show-dropdown');
+                item.classList.toggle('show-dropdown', willOpen);
+                trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            });
+
+            dropdown.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+        });
+
+        document.addEventListener('click', function() {
+            items.forEach(function(item) {
+                item.classList.remove('show-dropdown');
+                var trigger = item.querySelector('.js-acc-btn');
+                if (trigger) {
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         try {
             localStorage.removeItem('fcx_zoom');
         } catch (e) {}
         document.documentElement.style.zoom = '';
+        setupHeaderAccountDropdown();
         updateHeaderChatBadge(document.getElementById('header-chat-launcher')?.dataset.unreadCount || 0);
         refreshHeaderChatBadge();
         window.setInterval(refreshHeaderChatBadge, 30000);
