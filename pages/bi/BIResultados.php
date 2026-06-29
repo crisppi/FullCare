@@ -94,6 +94,32 @@ bi_render_kpis([
 ]);
 ?>
 
+<style>
+.bi-results-bottom-grid {
+    grid-template-columns: minmax(360px, 0.9fr) minmax(520px, 1.25fr);
+    grid-auto-rows: 340px;
+}
+
+.bi-results-monthly-panel .bi-chart {
+    min-height: 286px;
+}
+
+@media (max-width: 1100px) {
+    .bi-results-bottom-grid {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+    }
+
+    .bi-results-monthly-panel {
+        min-height: 340px;
+    }
+
+    .bi-results-monthly-panel .bi-chart {
+        min-height: 286px;
+    }
+}
+</style>
+
 <div class="bi-strategic-grid">
     <?php bi_render_table('Resultado por hospital', ['Hospital', 'Casos', 'Contas', 'Apresentado', 'Glosa', 'Final'], $byHospital, [
         'label',
@@ -112,7 +138,7 @@ bi_render_kpis([
     ]); ?>
 </div>
 
-<div class="bi-strategic-grid">
+<div class="bi-strategic-grid bi-results-bottom-grid">
     <?php bi_render_table('Resultado por seguradora', ['Seguradora', 'Casos', 'Contas', 'Apresentado', 'Final'], $bySeguradora, [
         'label',
         fn($r) => bi_num($r['casos'] ?? 0),
@@ -121,24 +147,89 @@ bi_render_kpis([
         fn($r) => bi_money($r['final'] ?? 0),
     ]); ?>
 
-    <div class="bi-panel bi-strategic-chart">
+    <div class="bi-panel bi-strategic-chart bi-results-monthly-panel">
         <h3>Executivo mensal</h3>
         <div class="bi-chart"><canvas id="chartResultadosMensal"></canvas></div>
     </div>
 </div>
 
 <script>
+const moneyFull = function (value) {
+    return 'R$ ' + Number(value || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+};
+
+const monthlyScales = window.biChartScales ? window.biChartScales() : {
+    xAxes: [{ ticks: {}, gridLines: {} }],
+    yAxes: [{ ticks: {}, gridLines: {} }]
+};
+monthlyScales.xAxes[0].stacked = true;
+monthlyScales.xAxes[0].ticks.maxRotation = 0;
+monthlyScales.xAxes[0].ticks.autoSkip = true;
+monthlyScales.yAxes[0].stacked = true;
+monthlyScales.yAxes[0].ticks.callback = function (value) {
+    return window.biMoneyTick ? window.biMoneyTick(value) : value;
+};
+
 new Chart(document.getElementById('chartResultadosMensal'), {
     type: 'bar',
     data: {
         labels: <?= json_encode(array_column($monthly, 'mes')) ?>,
         datasets: [
-            { label: 'Apresentado', data: <?= json_encode(array_map('floatval', array_column($monthly, 'apresentado'))) ?>, backgroundColor: 'rgba(118, 213, 255, 0.76)' },
-            { label: 'Final', data: <?= json_encode(array_map('floatval', array_column($monthly, 'final'))) ?>, backgroundColor: 'rgba(121, 230, 196, 0.76)' },
-            { label: 'Glosa', data: <?= json_encode(array_map('floatval', array_column($monthly, 'glosa'))) ?>, backgroundColor: 'rgba(241, 132, 181, 0.76)' }
+            {
+                type: 'line',
+                label: 'Apresentado',
+                data: <?= json_encode(array_map('floatval', array_column($monthly, 'apresentado'))) ?>,
+                borderColor: 'rgba(118, 213, 255, 0.95)',
+                backgroundColor: 'rgba(118, 213, 255, 0.16)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 4,
+                fill: false,
+                lineTension: 0.28,
+                stack: 'apresentado'
+            },
+            {
+                label: 'Final',
+                data: <?= json_encode(array_map('floatval', array_column($monthly, 'final'))) ?>,
+                backgroundColor: 'rgba(121, 230, 196, 0.76)',
+                stack: 'resultado'
+            },
+            {
+                label: 'Glosa',
+                data: <?= json_encode(array_map('floatval', array_column($monthly, 'glosa'))) ?>,
+                backgroundColor: 'rgba(241, 132, 181, 0.76)',
+                stack: 'resultado'
+            }
         ]
     },
-    options: { responsive: true, maintainAspectRatio: false, scales: window.biChartScales ? window.biChartScales() : undefined }
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        biValueLabels: false,
+        legend: {
+            position: 'top',
+            labels: {
+                fontColor: '#eaf6ff',
+                boxWidth: 12,
+                padding: 10,
+                usePointStyle: true
+            }
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    const dataset = data.datasets[tooltipItem.datasetIndex] || {};
+                    return (dataset.label ? dataset.label + ': ' : '') + moneyFull(tooltipItem.yLabel);
+                }
+            }
+        },
+        scales: monthlyScales
+    }
 });
 </script>
 

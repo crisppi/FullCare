@@ -392,20 +392,23 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
     }
 
     .alta-list-page .alta-filter-row :is(input.form-control, select.form-control) {
-        height: 32px;
-        min-height: 32px;
-        border-radius: 8px;
+        height: 34px;
+        min-height: 34px;
+        margin: 0 !important;
+        border-radius: 10px;
         border: 1px solid #b8c4d6;
         color: #1f2937;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .10);
-        font-size: .72rem;
+        font-size: .68rem;
         font-weight: 600;
+        line-height: 1.2;
     }
 
     .alta-list-page .alta-filter-actions .btn {
-        height: 32px;
-        min-height: 32px;
-        border-radius: 8px;
+        height: 34px;
+        min-height: 34px;
+        margin: 0 !important;
+        border-radius: 10px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -437,6 +440,15 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
         box-shadow: 0 1px 2px rgba(15, 23, 42, .10);
     }
 
+    .alta-list-page .alta-remove-selected-btn {
+        min-height: 30px;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: .78rem;
+        font-weight: 600;
+        line-height: 1.1;
+    }
+
 </style>
 
 <div class="container-fluid form_container listagem-page alta-list-page" id="main-container">
@@ -445,7 +457,6 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
         <div class="listagem-hero__copy">
             <div class="listagem-kicker">Gestão</div>
             <h1 class="listagem-title">Alta hospitalar</h1>
-            <p class="listagem-subtitle">Consulta, filtros, exportação e reversão de altas registradas</p>
         </div>
 
         <div class="listagem-hero__actions">
@@ -670,7 +681,7 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
 
                     <?php if (!$somenteListaAltas): ?>
                     <div class="col-sm-3">
-                        <button id="btnRemoveAltas" class="btn btn-outline-danger">
+                        <button id="btnRemoveAltas" class="btn btn-sm btn-outline-danger alta-remove-selected-btn">
                             <i class="fa-solid fa-trash-can me-1"></i> Remover alta(s) selecionada(s)
                         </button>
                     </div>

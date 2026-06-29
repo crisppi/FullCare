@@ -83,7 +83,7 @@ $totalFinal = array_sum($series['valor_final']);
 $desvio = $totalApresentado > 0 ? (($totalApresentado - $totalFinal) / $totalApresentado) * 100 : 0;
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260628-select-arrow">
 <script src="diversos/chartjs/Chart.min.js"></script>
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260614-select-neutral"></script>
 <script>

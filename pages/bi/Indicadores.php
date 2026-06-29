@@ -153,7 +153,7 @@ $idxAltoCusto = $totalInternacoes > 0 ? ($altoCusto / $totalInternacoes) * 100 :
 $idxObitos = $totalInternacoes > 0 ? ($obitos / $totalInternacoes) * 100 : 0.0;
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260628-select-arrow">
 <script src="diversos/chartjs/Chart.min.js"></script>
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260614-select-neutral"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
@@ -203,15 +203,168 @@ $idxObitos = $totalInternacoes > 0 ? ($obitos / $totalInternacoes) * 100 : 0.0;
         border-color: #c270bc;
     }
 
+    .bi-indicadores-page .performance-kpis {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 14px;
+        align-items: stretch;
+        margin-top: 14px;
+    }
+
+    .bi-indicadores-page .performance-card {
+        position: relative;
+        grid-column: span 3;
+        min-height: 118px;
+        min-width: 0;
+        padding: 14px 14px 12px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: rgba(13, 48, 77, 0.54);
+        border: 1px solid rgba(169, 222, 255, 0.22);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 22px rgba(5, 24, 44, 0.18);
+    }
+
+    .bi-indicadores-page .performance-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto;
+        height: 4px;
+        background: var(--performance-accent, #64d8ff);
+    }
+
+    .bi-indicadores-page .performance-card-main {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: start;
+    }
+
+    .bi-indicadores-page .performance-card-icon {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--performance-accent, #64d8ff);
+        font-size: 0.92rem;
+    }
+
+    .bi-indicadores-page .performance-card small {
+        display: block;
+        margin-bottom: 8px;
+        color: rgba(229, 244, 255, 0.82);
+        font-size: 0.58rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        line-height: 1.2;
+        text-transform: uppercase;
+    }
+
+    .bi-indicadores-page .performance-card strong {
+        display: block;
+        color: #ffffff;
+        font-size: clamp(1.12rem, 1.55vw, 1.55rem);
+        line-height: 1;
+    }
+
+    .bi-indicadores-page .performance-chip {
+        justify-self: end;
+        min-width: 58px;
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: rgba(244, 250, 255, 0.94);
+        font-size: 0.64rem;
+        font-weight: 800;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .bi-indicadores-page .performance-chip-muted {
+        color: rgba(215, 232, 247, 0.9);
+    }
+
+    .bi-indicadores-page .performance-bar {
+        height: 5px;
+        margin-top: 18px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.13);
+    }
+
+    .bi-indicadores-page .performance-bar span {
+        display: block;
+        width: var(--metric-pct, 0%);
+        max-width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--performance-accent, #64d8ff);
+    }
+
+    .bi-indicadores-page .performance-card-base .performance-bar span {
+        width: 100%;
+        opacity: 0.55;
+    }
+
+    .bi-indicadores-page .performance-card-blue { --performance-accent: #63c6ff; }
+    .bi-indicadores-page .performance-card-violet { --performance-accent: #a78bfa; }
+    .bi-indicadores-page .performance-card-teal { --performance-accent: #5eead4; }
+    .bi-indicadores-page .performance-card-rose { --performance-accent: #fb7bc7; }
+    .bi-indicadores-page .performance-card-cyan { --performance-accent: #67e8f9; }
+    .bi-indicadores-page .performance-card-amber { --performance-accent: #fbbf24; }
+
+    .bi-indicadores-page .performance-kpis .performance-card:nth-child(-n + 4) {
+        grid-column: span 3;
+    }
+
+    .bi-indicadores-page .performance-kpis .performance-card:nth-child(n + 5) {
+        grid-column: span 4;
+    }
+
     @media (max-width: 1100px) {
         .bi-indicadores-page .bi-kpis.kpi-auditor-v2 {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .bi-indicadores-page .performance-kpis {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .bi-indicadores-page .performance-kpis .performance-card {
+            grid-column: auto;
+        }
+
+        .bi-indicadores-page .performance-kpis .performance-card:last-child {
+            grid-column: 1 / -1;
         }
     }
 
     @media (max-width: 640px) {
         .bi-indicadores-page .bi-kpis.kpi-auditor-v2 {
             grid-template-columns: 1fr;
+        }
+
+        .bi-indicadores-page .performance-kpis {
+            grid-template-columns: 1fr;
+        }
+
+        .bi-indicadores-page .performance-kpis .performance-card:last-child {
+            grid-column: auto;
+        }
+
+        .bi-indicadores-page .performance-card-main {
+            grid-template-columns: 34px minmax(0, 1fr);
+        }
+
+        .bi-indicadores-page .performance-chip {
+            grid-column: 2;
+            justify-self: start;
+            margin-top: 4px;
         }
     }
 </style>
@@ -341,83 +494,83 @@ $idxObitos = $totalInternacoes > 0 ? ($obitos / $totalInternacoes) * 100 : 0.0;
 
     <div class="bi-panel" style="margin-top:16px;">
         <h3>Indicadores de performance</h3>
-        <div class="bi-kpis kpi-auditor-v2" style="margin-top:12px;">
-            <div class="bi-kpi kpi-card-v2 kpi-card-v2-1">
-                <div class="kpi-card-v2-head">
-                    <span class="kpi-card-v2-icon"><i class="bi bi-hospital"></i></span>
-                    <small>Internações</small>
+        <div class="performance-kpis">
+            <div class="performance-card performance-card-base performance-card-blue">
+                <div class="performance-card-main">
+                    <span class="performance-card-icon"><i class="bi bi-hospital"></i></span>
+                    <div>
+                        <small>Internações</small>
+                        <strong><?= number_format($totalInternacoes, 0, ',', '.') ?></strong>
+                    </div>
+                    <span class="performance-chip performance-chip-muted">Base</span>
                 </div>
-                <strong><?= number_format($totalInternacoes, 0, ',', '.') ?></strong>
-                <div class="kpi-trend kpi-trend-neutral">
-                    <i class="bi bi-pie-chart"></i>
-                    <span>Base de cálculo</span>
-                </div>
+                <div class="performance-bar"><span></span></div>
             </div>
-            <div class="bi-kpi kpi-card-v2 kpi-card-v2-2">
-                <div class="kpi-card-v2-head">
-                    <span class="kpi-card-v2-icon"><i class="bi bi-person-check"></i></span>
-                    <small>Internados</small>
+            <div class="performance-card performance-card-base performance-card-violet">
+                <div class="performance-card-main">
+                    <span class="performance-card-icon"><i class="bi bi-person-check"></i></span>
+                    <div>
+                        <small>Internados</small>
+                        <strong><?= number_format($internados, 0, ',', '.') ?></strong>
+                    </div>
+                    <span class="performance-chip performance-chip-muted">Base</span>
                 </div>
-                <strong><?= number_format($internados, 0, ',', '.') ?></strong>
-                <div class="kpi-trend kpi-trend-neutral">
-                    <i class="bi bi-pie-chart"></i>
-                    <span>Base de cálculo</span>
-                </div>
+                <div class="performance-bar"><span></span></div>
             </div>
-            <div class="bi-kpi kpi-card-v2 kpi-card-v2-3">
-                <div class="kpi-card-v2-head">
-                    <span class="kpi-card-v2-icon"><i class="bi bi-exclamation-triangle"></i></span>
-                    <small>Evento adverso</small>
+            <div class="performance-card performance-card-teal" style="--metric-pct: <?= min(100, max(0, round($idxEventoAdverso, 1))) ?>%;">
+                <div class="performance-card-main">
+                    <span class="performance-card-icon"><i class="bi bi-exclamation-triangle"></i></span>
+                    <div>
+                        <small>Evento adverso</small>
+                        <strong><?= number_format($eventoAdverso, 0, ',', '.') ?></strong>
+                    </div>
+                    <span class="performance-chip"><?= fmtPct($idxEventoAdverso) ?></span>
                 </div>
-                <strong><?= number_format($eventoAdverso, 0, ',', '.') ?></strong>
-                <div class="kpi-trend kpi-trend-neutral">
-                    <i class="bi bi-percent"></i>
-                    <span><?= fmtPct($idxEventoAdverso) ?></span>
-                </div>
+                <div class="performance-bar"><span></span></div>
             </div>
-            <div class="bi-kpi kpi-card-v2 kpi-card-v2-4">
-                <div class="kpi-card-v2-head">
-                    <span class="kpi-card-v2-icon"><i class="bi bi-house-heart"></i></span>
-                    <small>Home care</small>
+            <div class="performance-card performance-card-rose" style="--metric-pct: <?= min(100, max(0, round($idxHomeCare, 1))) ?>%;">
+                <div class="performance-card-main">
+                    <span class="performance-card-icon"><i class="bi bi-house-heart"></i></span>
+                    <div>
+                        <small>Home care</small>
+                        <strong><?= number_format($homeCare, 0, ',', '.') ?></strong>
+                    </div>
+                    <span class="performance-chip"><?= fmtPct($idxHomeCare) ?></span>
                 </div>
-                <strong><?= number_format($homeCare, 0, ',', '.') ?></strong>
-                <div class="kpi-trend kpi-trend-neutral">
-                    <i class="bi bi-percent"></i>
-                    <span><?= fmtPct($idxHomeCare) ?></span>
-                </div>
+                <div class="performance-bar"><span></span></div>
             </div>
-            <div class="bi-kpi kpi-card-v2 kpi-card-v2-1">
-                <div class="kpi-card-v2-head">
-                    <span class="kpi-card-v2-icon"><i class="bi bi-gear"></i></span>
-                    <small>OPME</small>
+            <div class="performance-card performance-card-cyan" style="--metric-pct: <?= min(100, max(0, round($idxOpme, 1))) ?>%;">
+                <div class="performance-card-main">
+                    <span class="performance-card-icon"><i class="bi bi-gear"></i></span>
+                    <div>
+                        <small>OPME</small>
+                        <strong><?= number_format($opme, 0, ',', '.') ?></strong>
+                    </div>
+                    <span class="performance-chip"><?= fmtPct($idxOpme) ?></span>
                 </div>
-                <strong><?= number_format($opme, 0, ',', '.') ?></strong>
-                <div class="kpi-trend kpi-trend-neutral">
-                    <i class="bi bi-percent"></i>
-                    <span><?= fmtPct($idxOpme) ?></span>
-                </div>
+                <div class="performance-bar"><span></span></div>
             </div>
-            <div class="bi-kpi kpi-card-v2 kpi-card-v2-2">
-                <div class="kpi-card-v2-head">
-                    <span class="kpi-card-v2-icon"><i class="bi bi-cash-stack"></i></span>
-                    <small>Alto custo</small>
+            <div class="performance-card performance-card-amber" style="--metric-pct: <?= min(100, max(0, round($idxAltoCusto, 1))) ?>%;">
+                <div class="performance-card-main">
+                    <span class="performance-card-icon"><i class="bi bi-cash-stack"></i></span>
+                    <div>
+                        <small>Alto custo</small>
+                        <strong><?= number_format($altoCusto, 0, ',', '.') ?></strong>
+                    </div>
+                    <span class="performance-chip"><?= fmtPct($idxAltoCusto) ?></span>
                 </div>
-                <strong><?= number_format($altoCusto, 0, ',', '.') ?></strong>
-                <div class="kpi-trend kpi-trend-neutral">
-                    <i class="bi bi-percent"></i>
-                    <span><?= fmtPct($idxAltoCusto) ?></span>
-                </div>
+                <div class="performance-bar"><span></span></div>
             </div>
-            <div class="bi-kpi kpi-card-v2 kpi-card-v2-4">
-                <div class="kpi-card-v2-head">
-                    <span class="kpi-card-v2-icon"><i class="bi bi-heartbreak"></i></span>
-                    <small>Óbitos</small>
+            <div class="performance-card performance-card-rose" style="--metric-pct: <?= min(100, max(0, round($idxObitos, 1))) ?>%;">
+                <div class="performance-card-main">
+                    <span class="performance-card-icon"><i class="bi bi-heartbreak"></i></span>
+                    <div>
+                        <small>Óbitos</small>
+                        <strong><?= number_format($obitos, 0, ',', '.') ?></strong>
+                    </div>
+                    <span class="performance-chip"><?= fmtPct($idxObitos) ?></span>
                 </div>
-                <strong><?= number_format($obitos, 0, ',', '.') ?></strong>
-                <div class="kpi-trend kpi-trend-neutral">
-                    <i class="bi bi-percent"></i>
-                    <span><?= fmtPct($idxObitos) ?></span>
-                </div>
+                <div class="performance-bar"><span></span></div>
             </div>
         </div>
     </div>

@@ -505,13 +505,13 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .header-actions #global-patient-search .global-search-type {
-            width: 118px;
-            max-width: 118px;
+            width: 104px;
+            max-width: 104px;
             border-left: 0;
             border-right: 0;
             padding: 0 1.75rem 0 0.55rem !important;
             color: #24384f;
-            font-weight: 700;
+            font-weight: 400;
             background-color: #f8fbff;
         }
 
@@ -724,10 +724,18 @@ if (!empty($sessionIdUsuario)) {
             display: inline-flex;
             align-items: center;
             min-height: 38px;
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             font-weight: 600;
             color: #28354d;
             cursor: pointer;
+        }
+
+        .account-user-name {
+            display: inline-block;
+            max-width: 96px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .header-actions .account-dropdown {
@@ -1816,7 +1824,7 @@ if (!empty($sessionIdUsuario)) {
                         </div>
                         <div class="content">
                             <button type="button" class="js-acc-btn account-user-trigger" aria-expanded="false">
-                                <?php print $sessionUsuario ?>
+                                <span class="account-user-name"><?= htmlspecialchars((string)$sessionUsuario, ENT_QUOTES, 'UTF-8') ?></span>
                                 <i class="bi bi-chevron-down account-user-caret" aria-hidden="true"></i>
                             </button>
                         </div>

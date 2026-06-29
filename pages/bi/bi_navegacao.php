@@ -140,6 +140,7 @@ $navGroups = [
         'title' => 'Tops',
         'key' => 'tops',
         'items' => [
+            ['label' => 'Distribuição geográfica', 'href' => 'bi/distribuicao-geografica'],
             ['label' => 'Top Hospitais', 'href' => 'bi/tops-hospitais'],
             ['label' => 'Top Pacientes', 'href' => 'bi/tops-pacientes'],
             ['label' => 'Top Patologia', 'href' => 'bi/tops-patologia'],
@@ -261,7 +262,7 @@ $featuredLinks = [
 $totalLinks = array_sum(array_map(static fn($group) => count($group['items']), $navGroups));
 ?>
 
-<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260614-select-bg-compact">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260628-select-arrow">
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi-navegacao.css?v=20260523-productive-nav">
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260614-select-neutral"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme', 'bi-navegacao'));</script>

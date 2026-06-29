@@ -11,35 +11,6 @@ function e($v)
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
 
-function fmtMoney($value): string
-{
-    return 'R$ ' . number_format((float)$value, 2, ',', '.');
-}
-
-function fmtInt($value): string
-{
-    return number_format((int)$value, 0, ',', '.');
-}
-
-function fmtFloat($value, int $dec = 1): string
-{
-    return number_format((float)$value, $dec, ',', '.');
-}
-
-function fmtPct($value, int $dec = 1): string
-{
-    return number_format((float)$value, $dec, ',', '.') . '%';
-}
-
-function shortLabel(string $value, int $limit = 18): string
-{
-    $clean = trim($value);
-    if (mb_strlen($clean, 'UTF-8') <= $limit) {
-        return $clean;
-    }
-    return mb_substr($clean, 0, $limit - 3, 'UTF-8') . '...';
-}
-
 function brStateCode($value): string
 {
     $value = trim((string)$value);
@@ -89,18 +60,6 @@ function parseCoordinate($value): ?float
         return null;
     }
     return (float)$value;
-}
-
-function topMetric(array $rows, string $metric, int $limit = 10): array
-{
-    $sorted = $rows;
-    usort($sorted, function ($a, $b) use ($metric) {
-        return (float)($b[$metric] ?? 0) <=> (float)($a[$metric] ?? 0);
-    });
-    $slice = array_slice($sorted, 0, $limit);
-    $labels = array_map(fn($r) => shortLabel((string)($r['label'] ?? 'Sem informações')), $slice);
-    $values = array_map(fn($r) => round((float)($r[$metric] ?? 0), 2), $slice);
-    return [$labels, $values];
 }
 
 $internado = trim((string)(filter_input(INPUT_GET, 'internado') ?? ''));
@@ -190,13 +149,6 @@ foreach ($rows as &$row) {
 }
 unset($row);
 
-[$labelsInternacoes, $valsInternacoes] = topMetric($rows, 'internacoes');
-[$labelsMp, $valsMp] = topMetric($rows, 'mp');
-[$labelsPctUti, $valsPctUti] = topMetric($rows, 'pct_uti');
-[$labelsCustoTotal, $valsCustoTotal] = topMetric($rows, 'custo_total');
-[$labelsCustoDiaria, $valsCustoDiaria] = topMetric($rows, 'custo_diaria');
-[$labelsReinternacoes, $valsReinternacoes] = topMetric($rows, 'reinternacoes');
-
 $stateCentroids = [
     'AC' => [-9.02, -70.81], 'AL' => [-9.57, -36.78], 'AP' => [1.41, -51.77],
     'AM' => [-3.47, -65.1], 'BA' => [-12.96, -41.7], 'CE' => [-5.2, -39.53],
@@ -245,10 +197,14 @@ $mapData = array_values(array_filter(array_map(static function ($row) use ($stat
 ?>
 
 <link rel="stylesheet" href="<?= $BASE_URL ?>css/bi.css?v=20260628-select-arrow">
-<script src="diversos/CoolAdmin-master/vendor/chartjs/Chart.bundle.min.js"></script>
 <script src="<?= $BASE_URL ?>js/bi.js?v=20260614-select-neutral"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.body.classList.add('bi-theme'));</script>
 <style>
+    .hospital-geo-page .hospital-geo-map {
+        height: min(72vh, 820px);
+        min-height: 620px;
+    }
+
     .hospital-map-head {
         display: flex;
         align-items: center;
@@ -444,14 +400,13 @@ $mapData = array_values(array_filter(array_map(static function ($row) use ($stat
     }
 </style>
 
-<div class="bi-wrapper bi-theme bi-ie-page">
+<div class="bi-wrapper bi-theme bi-ie-page hospital-geo-page">
     <div class="bi-header">
         <div>
-            <h1 class="bi-title">Top Hospitais</h1>
-            <div style="color: var(--bi-muted); font-size: 0.95rem;">Internações, MP, % UTI, custo total, custo diária e reinternações.</div>
+            <h1 class="bi-title">Distribuição geográfica</h1>
+            <div style="color: var(--bi-muted); font-size: 0.95rem;">Mapa de hospitais por internações, MP ou custo.</div>
         </div>
         <div class="bi-header-actions">
-            <a class="bi-btn bi-btn-secondary" href="<?= $BASE_URL ?>bi/distribuicao-geografica">Distribuição geográfica</a>
             <a class="bi-nav-icon" href="<?= $BASE_URL ?>bi/navegacao" title="Navegação BI">
                 <i class="bi bi-grid-3x3-gap"></i>
             </a>
@@ -501,70 +456,21 @@ $mapData = array_values(array_filter(array_map(static function ($row) use ($stat
             </div>
             <div class="bi-actions">
                 <button class="bi-btn" type="submit">Aplicar</button>
-                <a class="bi-btn bi-btn-secondary" href="<?= $BASE_URL ?>bi/tops-hospitais">Limpar</a>
+                <a class="bi-btn bi-btn-secondary" href="<?= $BASE_URL ?>bi/distribuicao-geografica">Limpar</a>
             </div>
         </div>
     </form>
 
     <div class="bi-panel">
-        <h3>Resumo</h3>
-        <table class="bi-table">
-            <thead>
-                <tr>
-                    <th>Hospital</th>
-                    <th>Internações</th>
-                    <th>MP</th>
-                    <th>% UTI / Internação</th>
-                    <th>Custo total</th>
-                    <th>Custo diária</th>
-                    <th>Reinternações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!$rows): ?>
-                    <tr><td colspan="7" class="bi-empty">Sem dados com os filtros atuais.</td></tr>
-                <?php else: ?>
-                    <?php foreach ($rows as $row): ?>
-                        <tr>
-                            <td><?= e($row['label'] ?? 'Sem informações') ?></td>
-                            <td><?= fmtInt($row['internacoes'] ?? 0) ?></td>
-                            <td><?= fmtFloat($row['mp'] ?? 0) ?></td>
-                            <td><?= fmtPct($row['pct_uti'] ?? 0) ?></td>
-                            <td><?= fmtMoney($row['custo_total'] ?? 0) ?></td>
-                            <td><?= fmtMoney($row['custo_diaria'] ?? 0) ?></td>
-                            <td><?= fmtInt($row['reinternacoes'] ?? 0) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="bi-grid fixed-2">
-        <div class="bi-panel">
-            <h3>Internações</h3>
-            <div class="bi-chart ie-chart-sm"><canvas id="chartInternacoes"></canvas></div>
+        <div class="hospital-map-head">
+            <h3>Mapa por internações, MP ou custo</h3>
+            <div class="hospital-map-modes" aria-label="Métrica do mapa">
+                <button type="button" class="hospital-map-mode is-active" data-map-metric="internacoes">Internações</button>
+                <button type="button" class="hospital-map-mode" data-map-metric="mp">MP</button>
+                <button type="button" class="hospital-map-mode" data-map-metric="custo">Custo</button>
+            </div>
         </div>
-        <div class="bi-panel">
-            <h3>MP</h3>
-            <div class="bi-chart ie-chart-sm"><canvas id="chartMp"></canvas></div>
-        </div>
-        <div class="bi-panel">
-            <h3>% UTI em relação à internação</h3>
-            <div class="bi-chart ie-chart-sm"><canvas id="chartPctUti"></canvas></div>
-        </div>
-        <div class="bi-panel">
-            <h3>Custo total</h3>
-            <div class="bi-chart ie-chart-sm"><canvas id="chartCustoTotal"></canvas></div>
-        </div>
-        <div class="bi-panel">
-            <h3>Custo diária</h3>
-            <div class="bi-chart ie-chart-sm"><canvas id="chartCustoDiaria"></canvas></div>
-        </div>
-        <div class="bi-panel">
-            <h3>Reinternações</h3>
-            <div class="bi-chart ie-chart-sm"><canvas id="chartReinternacoes"></canvas></div>
-        </div>
+        <div id="hospitalGeoMap" class="hospital-geo-map" aria-label="Mapa de internações por hospital"></div>
     </div>
 </div>
 
@@ -856,93 +762,8 @@ document.querySelectorAll('[data-map-metric]').forEach((button) => {
     });
 });
 
-const biBarValueLabelPlugin = {
-    afterDatasetsDraw: function(chart) {
-        const ctx = chart.ctx;
-        ctx.save();
-
-        chart.data.datasets.forEach(function(dataset, datasetIndex) {
-            const meta = chart.getDatasetMeta(datasetIndex);
-            if (!meta || meta.hidden) return;
-
-            meta.data.forEach(function(element, index) {
-                const value = Number(dataset.data[index] || 0);
-                if (!Number.isFinite(value) || value === 0) return;
-
-                const labelFormatter = dataset.valueFormatter || function(v) {
-                    return Number(v || 0).toLocaleString('pt-BR');
-                };
-
-                ctx.font = '600 12px Inter, Arial, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.fillStyle = '#f5fbff';
-                ctx.shadowColor = 'rgba(8, 20, 38, 0.35)';
-                ctx.shadowBlur = 6;
-
-                const topY = Math.min(element._model.base, element._model.y);
-                ctx.fillText(labelFormatter(value), element._model.x, topY - 8);
-            });
-        });
-
-        ctx.restore();
-    }
-};
-
-function buildBarChart(canvasId, labels, values, tickFormatter) {
-    const el = document.getElementById(canvasId);
-    if (!el || !window.Chart) return;
-    const scales = window.biChartScales ? window.biChartScales() : undefined;
-    if (tickFormatter && scales && scales.yAxes && scales.yAxes[0] && scales.yAxes[0].ticks) {
-        scales.yAxes[0].ticks.callback = tickFormatter;
-    }
-    new Chart(el, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: values,
-                backgroundColor: 'rgba(126,150,255,0.82)',
-                borderRadius: 10,
-                maxBarThickness: 48,
-                valueFormatter: tickFormatter || function(v) {
-                    return Number(v || 0).toLocaleString('pt-BR');
-                }
-            }]
-        },
-        plugins: [biBarValueLabelPlugin],
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 28
-                }
-            },
-            biValueLabels: false,
-            legend: { display: false },
-            scales: scales,
-            tooltips: {
-                callbacks: {
-                    label: function (tooltipItem) {
-                        const v = tooltipItem.yLabel || tooltipItem.value || 0;
-                        return tickFormatter ? tickFormatter(v) : Number(v || 0).toLocaleString('pt-BR');
-                    }
-                }
-            }
-        }
-    });
-}
-
 renderHospitalGeoMap();
 window.addEventListener('resize', renderHospitalGeoMap);
-
-buildBarChart('chartInternacoes', <?= json_encode($labelsInternacoes) ?>, <?= json_encode($valsInternacoes) ?>);
-buildBarChart('chartMp', <?= json_encode($labelsMp) ?>, <?= json_encode($valsMp) ?>);
-buildBarChart('chartPctUti', <?= json_encode($labelsPctUti) ?>, <?= json_encode($valsPctUti) ?>, function (v) { return Number(v || 0).toLocaleString('pt-BR') + '%'; });
-buildBarChart('chartCustoTotal', <?= json_encode($labelsCustoTotal) ?>, <?= json_encode($valsCustoTotal) ?>, window.biMoneyTick);
-buildBarChart('chartCustoDiaria', <?= json_encode($labelsCustoDiaria) ?>, <?= json_encode($valsCustoDiaria) ?>, window.biMoneyTick);
-buildBarChart('chartReinternacoes', <?= json_encode($labelsReinternacoes) ?>, <?= json_encode($valsReinternacoes) ?>);
 </script>
 
 <?php require_once("templates/footer.php"); ?>

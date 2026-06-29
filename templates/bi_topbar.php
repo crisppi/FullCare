@@ -97,6 +97,7 @@ $biSections = [
         ['label' => 'Produção YTD', 'href' => 'bi/producao-ytd', 'file' => 'bi_producao_ytd.php'],
     ],
     'Tops' => [
+        ['label' => 'Distribuição geográfica', 'href' => 'bi/distribuicao-geografica', 'file' => 'bi_distribuicao_geografica.php'],
         ['label' => 'Hospitais', 'href' => 'bi/tops-hospitais', 'file' => 'bi_ranking_hospitais.php'],
         ['label' => 'Pacientes', 'href' => 'bi/tops-pacientes', 'file' => 'bi_ranking_pacientes.php'],
         ['label' => 'Patologia', 'href' => 'bi/tops-patologia', 'file' => 'bi_ranking_patologia.php'],
@@ -338,7 +339,7 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
 }
 
 .bi-sidebar-head {
-    padding: 10px 10px 8px;
+    padding: 12px 10px 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -351,20 +352,6 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     text-transform: uppercase;
     color: rgba(225, 241, 255, 0.62);
     font-weight: 700;
-}
-
-.bi-crumb {
-    margin-top: 5px;
-    color: #f1f8ff;
-    font-weight: 600;
-    font-size: 0.68rem;
-    line-height: 1.16;
-}
-
-.bi-crumb span {
-    color: rgba(225, 241, 255, 0.44);
-    font-weight: 600;
-    margin: 0 4px;
 }
 
 .bi-sidebar-navlink {
@@ -462,7 +449,7 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
 .bi-sidebar-body {
     flex: 1 1 auto;
     overflow-y: auto;
-    padding: 8px 8px 82px;
+    padding: 8px 8px 96px;
 }
 
 .bi-sidebar-body::-webkit-scrollbar {
@@ -560,42 +547,43 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
 .bi-sidebar-links {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    padding: 4px 7px 7px;
-    background: rgba(5, 18, 32, 0.12);
+    gap: 6px;
+    padding: 7px 8px 8px;
+    background: linear-gradient(180deg, rgba(5, 18, 32, 0.16), rgba(5, 18, 32, 0.23));
 }
 
 .bi-sidebar-link {
     display: flex;
     align-items: center;
-    min-height: 30px;
-    padding: 5px 8px 5px 10px;
+    min-height: 31px;
+    padding: 6px 9px 6px 11px;
     border-radius: 8px;
-    color: rgba(214, 227, 239, 0.9);
+    color: rgba(214, 227, 239, 0.88);
     text-decoration: none;
-    font-size: 0.6rem;
+    font-size: 0.59rem;
     font-weight: 500;
     line-height: 1.15;
-    border: 1px solid rgba(217, 238, 252, 0.08);
-    background: rgba(238, 247, 255, 0.055);
+    border: 1px solid rgba(217, 238, 252, 0.075);
+    background: linear-gradient(180deg, rgba(238, 247, 255, 0.07), rgba(188, 218, 238, 0.045));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
 }
 
 .bi-sidebar-link:hover {
-    background: rgba(238, 247, 255, 0.10);
+    background: linear-gradient(180deg, rgba(238, 247, 255, 0.105), rgba(188, 218, 238, 0.065));
     border-color: rgba(217, 238, 252, 0.14);
     color: #ffffff;
 }
 
 .bi-sidebar-link.is-active {
-    background: linear-gradient(135deg, #63d5c0, #2fa38c);
+    background: linear-gradient(135deg, rgba(99, 213, 192, 0.98), rgba(47, 163, 140, 0.96));
     border-color: rgba(60, 160, 140, 0.9);
     color: #0f2a25;
     font-weight: 700;
-    box-shadow: 0 6px 14px rgba(23, 103, 94, 0.22);
+    box-shadow: 0 5px 12px rgba(23, 103, 94, 0.18);
 }
 
 .bi-sidebar-foot {
-    padding: 8px 8px 12px;
+    padding: 9px 8px 14px;
     border-top: 1px solid rgba(111, 218, 205, 0.22);
     background:
         linear-gradient(180deg, rgba(18, 53, 78, 0.78), rgba(7, 25, 42, 0.86));
@@ -603,7 +591,7 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
     bottom: 0;
     z-index: 2;
     backdrop-filter: blur(10px);
-    min-height: 62px;
+    min-height: 76px;
     box-shadow: 0 -8px 18px rgba(2, 14, 24, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -631,12 +619,12 @@ body.bi-theme.bi-nav-collapsed .bi-sidebar-shell {
 .bi-topbar-select {
     width: 100%;
     border-radius: 8px;
-    padding: 6px 28px 6px 9px;
+    padding: 8px 28px 8px 9px;
     border: 1px solid rgba(99, 213, 192, 0.36);
     font-size: 0.62rem;
     color: #f1f8ff;
     background: linear-gradient(135deg, rgba(70, 151, 150, 0.26), rgba(52, 83, 145, 0.24));
-    min-height: 34px;
+    min-height: 40px;
     appearance: none;
     outline: none;
     box-shadow: 0 5px 12px rgba(4, 17, 31, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.10);
@@ -806,11 +794,6 @@ $navActive = $currentPage === 'bi_navegacao.php' || trim((string) $currentPath, 
 <aside class="bi-sidebar-shell" id="biSidebarShell">
     <div class="bi-sidebar-head">
         <div class="bi-topbar-title"><span>Navegação BI</span></div>
-        <div class="bi-crumb">
-            <?= htmlspecialchars($sectionDisplay[$activeSection] ?? $activeSection ?: 'Resumo', ENT_QUOTES, 'UTF-8') ?>
-            <span>/</span>
-            <?= htmlspecialchars($currentLabel ?: 'Painel', ENT_QUOTES, 'UTF-8') ?>
-        </div>
         <button type="button" class="bi-sidebar-search-trigger" id="biSidebarSearchTrigger" aria-label="Abrir pesquisa do BI" title="Pesquisar no BI">
             <i class="bi bi-search"></i>
         </button>

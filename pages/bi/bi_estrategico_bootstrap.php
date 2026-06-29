@@ -109,7 +109,7 @@ if (!function_exists('bi_render_page_start')) {
         $biCssVersion = @filemtime(__DIR__ . '/../../css/bi.css') ?: '20260509-filter-icons';
         $biStrategicCssVersion = @filemtime(__DIR__ . '/../../css/bi-estrategico.css') ?: '20260523-align2';
         ?>
-        <link rel="stylesheet" href="<?= $baseUrl ?>css/bi.css?v=20260614-select-bg-compact">
+        <link rel="stylesheet" href="<?= $baseUrl ?>css/bi.css?v=20260628-select-arrow">
         <link rel="stylesheet" href="<?= $baseUrl ?>css/bi-estrategico.css?v=<?= $biStrategicCssVersion ?>">
         <script src="diversos/chartjs/Chart.min.js"></script>
         <script src="<?= $baseUrl ?>js/bi.js?v=20260614-select-neutral"></script>
