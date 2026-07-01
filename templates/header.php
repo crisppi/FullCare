@@ -313,7 +313,7 @@ if (!empty($sessionIdUsuario)) {
             align-items: center;
             flex-wrap: nowrap;
             gap: 8px;
-            width: auto !important;
+            width: 100% !important;
             flex: 1 1 auto;
             min-width: 0;
         }
@@ -328,15 +328,15 @@ if (!empty($sessionIdUsuario)) {
             display: inline-flex !important;
             align-items: center;
             line-height: 1;
-            flex: 0 1 auto !important;
-            max-width: 300px;
+            flex: 0 0 auto !important;
+            max-width: 184px;
             margin-right: 4px;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
         .navbar .navbar-brand .logo-novo {
-            height: 48px !important;
+            height: 42px !important;
             width: auto !important;
             max-height: none !important;
             min-height: 0 !important;
@@ -415,9 +415,11 @@ if (!empty($sessionIdUsuario)) {
         #navbarScroll {
             flex: 1 1 auto;
             min-width: 0;
+            overflow: visible;
         }
 
         .navbar-nav.navbar-nav-scroll {
+            flex: 1 1 auto;
             flex-wrap: nowrap;
             gap: 0;
             align-items: center;
@@ -426,6 +428,13 @@ if (!empty($sessionIdUsuario)) {
             border-radius: 14px;
             box-shadow: 0 8px 22px rgba(31, 76, 110, 0.10);
             padding: 8px 8px;
+            min-width: 0;
+            max-width: 100%;
+            overflow: visible;
+        }
+
+        .navbar-nav.navbar-nav-scroll .nav-item {
+            flex: 0 1 auto;
             min-width: 0;
         }
 
@@ -461,9 +470,9 @@ if (!empty($sessionIdUsuario)) {
 
         .navbar-nav.navbar-nav-scroll .nav-link {
             white-space: nowrap;
-            padding: 0.34rem 0.22rem !important;
+            padding: 0.34rem 0.18rem !important;
             font-family: "Inter", Arial, Helvetica, sans-serif !important;
-            font-size: 0.70rem !important;
+            font-size: 0.66rem !important;
             font-weight: 400;
             line-height: 1.18;
             color: #111827 !important;
@@ -484,14 +493,16 @@ if (!empty($sessionIdUsuario)) {
         .header-actions {
             margin-left: auto !important;
             margin-right: 0 !important;
-            gap: 0.35rem !important;
-            flex: 0 0 auto;
+            gap: 0.28rem !important;
+            flex: 0 1 auto;
+            min-width: 0;
             align-items: center;
         }
 
         .header-actions #global-patient-search {
-            min-width: 170px;
-            flex: 0 0 auto;
+            min-width: 0;
+            width: clamp(230px, 22vw, 395px);
+            flex: 0 1 auto;
             margin-right: 0.2rem;
         }
 
@@ -505,8 +516,8 @@ if (!empty($sessionIdUsuario)) {
         }
 
         .header-actions #global-patient-search .global-search-type {
-            width: 104px;
-            max-width: 104px;
+            width: 96px;
+            max-width: 96px;
             border-left: 0;
             border-right: 0;
             padding: 0 1.75rem 0 0.55rem !important;
@@ -530,7 +541,7 @@ if (!empty($sessionIdUsuario)) {
             font-size: 0.76rem;
             min-height: 34px !important;
             height: 34px !important;
-            padding: 0 0.75rem !important;
+            padding: 0 0.58rem !important;
         }
 
         .header-action-btn:hover {
@@ -1769,7 +1780,6 @@ if (!empty($sessionIdUsuario)) {
                         <?php }; ?>
                     </ul> -->
                 </div>
-            </div>
 
             <div class="d-flex align-items-center gap-2 ms-auto header-actions pe-3">
                 <a href="<?= htmlspecialchars($chatAssistantLink) ?>"
@@ -1861,6 +1871,7 @@ if (!empty($sessionIdUsuario)) {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </nav>
         <?php
