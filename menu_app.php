@@ -2258,6 +2258,48 @@ try {
         font-size: .68rem !important;
     }
 
+    #dash-reinternacoes .table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    #dash-reinternacoes .table th:nth-child(1),
+    #dash-reinternacoes .table td:nth-child(1) {
+        width: 7%;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #dash-reinternacoes .table th:nth-child(2),
+    #dash-reinternacoes .table td:nth-child(2) {
+        width: 24%;
+        text-align: left;
+    }
+
+    #dash-reinternacoes .table th:nth-child(3),
+    #dash-reinternacoes .table td:nth-child(3) {
+        width: 23%;
+        text-align: left;
+    }
+
+    #dash-reinternacoes .table th:nth-child(4),
+    #dash-reinternacoes .table td:nth-child(4),
+    #dash-reinternacoes .table th:nth-child(5),
+    #dash-reinternacoes .table td:nth-child(5),
+    #dash-reinternacoes .table th:nth-child(6),
+    #dash-reinternacoes .table td:nth-child(6) {
+        width: 13%;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #dash-reinternacoes .table th:nth-child(7),
+    #dash-reinternacoes .table td:nth-child(7) {
+        width: 7%;
+        text-align: center;
+        white-space: nowrap;
+    }
+
     #dash-visitas-atraso .table thead th,
     #dash-longa-perm .table thead th,
     #dash-reinternacoes .table thead th,
