@@ -16,7 +16,7 @@
             <div class="row">
                 <div class="col-sm-3">
                     <a class="navbar-brand" href="index.php">
-                        <img src="<?php $BASE_URL ?>img/full-03.jpeg" style="width:100px; height:10  0px " alt="Full">
+                        <img src="<?php $BASE_URL ?>img/full-03.jpeg" class="footer-full-logo" alt="Full">
                     </a>
                 </div>
                 <div class="col-sm-2">
@@ -45,11 +45,11 @@
                 </div>
                 <div class="col-sm">
                     <div class="social-networks">
-                        <a href="https://www.linkedin.com/in/accertconsult/" style="font-size:1.2em" class="twitter"><i
+                        <a href="https://www.linkedin.com/in/accertconsult/" class="twitter footer-full-social-link"><i
                                 class="fa fa-twitter"></i>Linkedin</a>
-                        <a href="https://accertconsult.com.br/" style="font-size:1.2em" class="facebook"><i
+                        <a href="https://accertconsult.com.br/" class="facebook footer-full-social-link"><i
                                 class="fa fa-facebook"></i>Facebook</a>
-                        <a href="https://www.instagram.com/accert_consult/" style="font-size:1.2em" class="instagram"><i
+                        <a href="https://www.instagram.com/accert_consult/" class="instagram footer-full-social-link"><i
                                 class="fa fa-instagram"></i>Instagram</a>
                     </div>
                     <a href="https://accertconsult.com.br/contato">

@@ -306,892 +306,22 @@ if (!empty($sessionIdUsuario)) {
     <script defer src="<?= $BASE_URL ?>js/feedback.js?v=<?= @filemtime(__DIR__ . '/../js/feedback.js') ?: time() ?>"></script>
     <script defer src="<?= $BASE_URL ?>js/friendly_urls.js?v=<?= @filemtime(__DIR__ . '/../js/friendly_urls.js') ?: time() ?>"></script>
 
-    <!-- ======= APENAS DESIGN (logos alinhados e simétricos) ======= -->
-    <style>
-        .navbar .container-fluid {
-            display: flex;
-            align-items: center;
-            flex-wrap: nowrap;
-            gap: 8px;
-            width: 100% !important;
-            flex: 1 1 auto;
-            min-width: 0;
-        }
+    <link href="<?= $BASE_URL ?>css/header_layout.css?v=<?= @filemtime(__DIR__ . '/../css/header_layout.css') ?>" rel="stylesheet">
+    <?php if ($isOperationalIntelligencePage): ?>
+        <link href="<?= $BASE_URL ?>css/operational_intelligence_pages.css?v=<?= @filemtime(__DIR__ . '/../css/operational_intelligence_pages.css') ?>" rel="stylesheet">
+    <?php endif; ?>
 
-        .navbar.nav_bar_custom.fixed-top {
-            min-height: 74px;
-            padding-top: 0.5rem !important;
-            padding-bottom: 0.5rem !important;
-        }
-
-        .navbar .navbar-brand {
-            display: inline-flex !important;
-            align-items: center;
-            line-height: 1;
-            flex: 0 0 auto !important;
-            max-width: 184px;
-            margin-right: 4px;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        .navbar .navbar-brand .logo-novo {
-            height: 42px !important;
-            width: auto !important;
-            max-height: none !important;
-            min-height: 0 !important;
-            display: block !important;
-            max-width: 100% !important;
-            flex: 0 1 auto !important;
-            object-fit: contain !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        @media (max-width: 1199.98px) {
-            .navbar .navbar-brand .logo-novo {
-                height: 43px !important;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .navbar .navbar-brand .logo-novo {
-                height: 38px !important;
-            }
-        }
-
-        .navbar .navbar-brand .logo-conex {
-            height: 20px !important;
-            max-width: 92px;
-        }
-
-        @media (max-width: 1199.98px) {
-            .navbar .navbar-brand .logo-conex {
-                height: 18px !important;
-                max-width: 84px;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .navbar .navbar-brand .logo-conex {
-                height: 17px !important;
-                max-width: 76px;
-            }
-        }
-
-        .navbar .navbar-brand .brand-divider {
-            width: 1px;
-            height: 28px;
-            background: rgba(76, 142, 187, 0.35);
-        }
-
-        .navbar .navbar-brand .logo-seguradora {
-            height: 42px;
-            width: auto;
-            max-width: 120px;
-            object-fit: contain;
-            display: block;
-            flex: 0 1 auto;
-        }
-
-        @media (max-width: 1199.98px) {
-            .navbar .navbar-brand .logo-seguradora {
-                height: 38px;
-                max-width: 108px;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .navbar .navbar-brand .brand-divider {
-                height: 24px;
-            }
-
-            .navbar .navbar-brand .logo-seguradora {
-                height: 24px;
-                max-width: 72px;
-            }
-        }
-
-        #navbarScroll {
-            flex: 1 1 auto;
-            min-width: 0;
-            overflow: visible;
-        }
-
-        .navbar-nav.navbar-nav-scroll {
-            flex: 1 1 auto;
-            flex-wrap: nowrap;
-            gap: 0;
-            align-items: center;
-            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
-            border: 1px solid rgba(47, 111, 159, 0.12);
-            border-radius: 14px;
-            box-shadow: 0 8px 22px rgba(31, 76, 110, 0.10);
-            padding: 8px 8px;
-            min-width: 0;
-            max-width: 100%;
-            overflow: visible;
-        }
-
-        .navbar-nav.navbar-nav-scroll .nav-item {
-            flex: 0 1 auto;
-            min-width: 0;
-        }
-
-        .navbar .nav-tabs {
-            border-bottom: 0 !important;
-        }
-
-        .navbar .nav-tabs .nav-link {
-            border: 0 !important;
-            border-bottom: 0 !important;
-            border-radius: 8px;
-        }
-
-        .navbar .nav-tabs .nav-link:hover,
-        .navbar .nav-tabs .nav-link:focus,
-        .navbar .nav-tabs .nav-link.active {
-            border-color: transparent !important;
-        }
-
-        .navbar-nav.navbar-nav-scroll .nav-link > i,
-        .navbar-nav.navbar-nav-scroll .nav-link > span.bi {
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 1rem;
-            min-width: 1rem;
-            height: 1rem;
-            font-size: 0.82rem !important;
-            line-height: 1 !important;
-            margin-right: 4px !important;
-            vertical-align: middle;
-        }
-
-        .navbar-nav.navbar-nav-scroll .nav-link {
-            white-space: nowrap;
-            padding: 0.34rem 0.18rem !important;
-            font-family: "Inter", Arial, Helvetica, sans-serif !important;
-            font-size: 0.66rem !important;
-            font-weight: 400;
-            line-height: 1.18;
-            color: #111827 !important;
-            letter-spacing: 0;
-            text-rendering: auto;
-            -webkit-font-smoothing: subpixel-antialiased;
-            -moz-osx-font-smoothing: auto;
-            font-synthesis-weight: none;
-        }
-
-        #navbarGestorListas {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-
-        .header-actions {
-            margin-left: auto !important;
-            margin-right: 0 !important;
-            gap: 0.28rem !important;
-            flex: 0 1 auto;
-            min-width: 0;
-            align-items: center;
-        }
-
-        .header-actions #global-patient-search {
-            min-width: 0;
-            width: clamp(230px, 22vw, 395px);
-            flex: 0 1 auto;
-            margin-right: 0.2rem;
-        }
-
-        .header-actions #global-patient-search .form-control,
-        .header-actions #global-patient-search .form-select,
-        .header-actions #global-patient-search input,
-        .header-actions #global-patient-search .btn {
-            min-height: 34px !important;
-            height: 34px !important;
-            font-size: 0.78rem !important;
-        }
-
-        .header-actions #global-patient-search .global-search-type {
-            width: 96px;
-            max-width: 96px;
-            border-left: 0;
-            border-right: 0;
-            padding: 0 1.75rem 0 0.55rem !important;
-            color: #24384f;
-            font-weight: 400;
-            background-color: #f8fbff;
-        }
-
-        .header-actions #global-patient-search .input-group-text {
-            min-height: 34px !important;
-            height: 34px !important;
-            padding: 0 0.8rem !important;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .header-action-btn {
-            border: 1px solid rgba(76, 142, 187, 0.28) !important;
-            background: #fff;
-            color: #24384f;
-            font-size: 0.76rem;
-            min-height: 34px !important;
-            height: 34px !important;
-            padding: 0 0.58rem !important;
-        }
-
-        .header-action-btn:hover {
-            border-color: rgba(47, 111, 159, 0.45) !important;
-            background: #f4faff;
-        }
-
-        #navbarMenuDropdown > i { color: #24384f !important; }
-        #navbarCadastrosDropdown > i { color: #2f6f9f !important; }
-        #navbarProducaoDropdown > i { color: #0d6efd !important; }
-        #dropdownContasRah > i { color: #7c3aed !important; }
-        #navbarListasDropdown > i { color: #64748b !important; }
-        #navbarGestaoDropdown > i { color: #198754 !important; }
-        #navbarCuidadoContinuado > i { color: #d63384 !important; }
-        #navbarBiDropdown > i { color: #2f6f9f !important; }
-        #navbarInteligenciaDropdown > i { color: #5e3db8 !important; }
-        #navbarGestorListas > i { color: #2f6f9f !important; }
-
-        .header-chat-launcher {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        #header-chat-launcher .d-xl-inline {
-            display: none !important;
-        }
-
-        .account-item > .content > a {
-            font-size: 0.76rem !important;
-        }
-
-        .account-item .image {
-            width: 34px !important;
-            height: 34px !important;
-        }
-
-        .header-actions #global-patient-search .form-control,
-        .header-actions #global-patient-search .form-select,
-        .header-actions #global-patient-search input,
-        .header-actions #global-patient-search .btn {
-            font-size: 0.74rem !important;
-        }
-
-        .header-chat-launcher.has-unread {
-            border-color: rgba(220, 38, 38, .35);
-            background: #fff7f7;
-            color: #7f1d1d;
-            box-shadow: 0 8px 18px rgba(220, 38, 38, .12);
-        }
-
-        .header-chat-launcher.has-unread:hover {
-            background: #fff1f1;
-            border-color: rgba(220, 38, 38, .48);
-            color: #7f1d1d;
-        }
-
-        .header-chat-launcher .chat-unread-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 20px;
-            height: 20px;
-            padding: 0 6px;
-            border: 2px solid #fff;
-            font-size: 0.66rem;
-            font-weight: 900;
-            box-shadow: 0 7px 16px rgba(220, 38, 38, .28);
-            animation: chatUnreadPulse 1.8s ease-in-out infinite;
-        }
-
-        @keyframes chatUnreadPulse {
-            0%, 100% {
-                transform: translate(-50%, -50%) scale(1);
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.08);
-            }
-        }
-
-        #search-results-dropdown {
-            z-index: 2000;
-        }
-
-        #search-results-dropdown .dropdown-item {
-            white-space: normal;
-            line-height: 1.2;
-        }
-
-        #search-results-dropdown .dropdown-item.active,
-        #search-results-dropdown .dropdown-item:focus,
-        #search-results-dropdown .dropdown-item:hover {
-            background: #f2f6ff;
-            color: #1f1f1f;
-        }
-
-        #search-results-dropdown .dropdown-item small {
-            color: #5c5c5c;
-        }
-
-        .navbar .dropdown-menu .dropdown-item.inteligencia-chat-featured {
-            width: calc(100% - 16px);
-            margin: 4px 8px;
-            border: 1px solid rgba(94, 61, 184, 0.18);
-            border-radius: 10px;
-            background: linear-gradient(90deg, rgba(94, 61, 184, 0.12), rgba(47, 111, 159, 0.12));
-            color: #25334a;
-            font-weight: 500;
-        }
-
-        .navbar .dropdown-menu .dropdown-item.inteligencia-chat-featured:hover,
-        .navbar .dropdown-menu .dropdown-item.inteligencia-chat-featured:focus {
-            background: linear-gradient(90deg, rgba(94, 61, 184, 0.18), rgba(47, 111, 159, 0.18));
-            color: #172133;
-        }
-
-        .navbar .dropdown-menu .dropdown-item.producao-ai-featured {
-            width: calc(100% - 16px);
-            margin: 4px 8px;
-            border: 1px solid rgba(32, 139, 122, 0.2);
-            border-radius: 10px;
-            background: linear-gradient(90deg, rgba(32, 139, 122, 0.14), rgba(47, 111, 159, 0.12));
-            color: #24384f;
-            font-weight: 500;
-        }
-
-        .navbar .dropdown-menu .dropdown-item.producao-ai-featured:hover,
-        .navbar .dropdown-menu .dropdown-item.producao-ai-featured:focus {
-            background: linear-gradient(90deg, rgba(32, 139, 122, 0.2), rgba(47, 111, 159, 0.18));
-            color: #172133;
-        }
-
-        .account-user-trigger::after {
-            display: none !important;
-        }
-
-        .header-actions .account-wrap,
-        .header-actions .account-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0;
-        }
-
-        .header-actions .account-wrap {
-            padding: 3px 10px 3px 8px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(244, 250, 255, .96));
-            border: 1px solid rgba(76, 142, 187, 0.16);
-            box-shadow: 0 8px 18px rgba(57, 73, 111, 0.12);
-        }
-
-        .header-actions .account-item {
-            flex-direction: row-reverse;
-            gap: 0.35rem;
-        }
-
-        .header-actions .account-item .image {
-            display: flex;
-            align-items: center;
-            margin-top: 0 !important;
-        }
-
-        .header-actions .account-item .content {
-            display: flex;
-            align-items: center;
-            margin-left: 0 !important;
-            padding: 0 !important;
-        }
-
-        .header-actions .account-item .image img {
-            display: block;
-            width: 38px;
-            height: 38px;
-            object-fit: cover;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(93, 63, 140, 0.18);
-        }
-
-        .account-user-caret {
-            font-size: 0.8rem;
-            margin-left: 4px;
-            color: #6b7280;
-            vertical-align: middle;
-        }
-
-        .account-user-trigger {
-            appearance: none;
-            border: 0;
-            background: transparent;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            min-height: 38px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: #28354d;
-            cursor: pointer;
-        }
-
-        .account-user-name {
-            display: inline-block;
-            max-width: 96px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .header-actions .account-dropdown {
-            min-width: 260px;
-            top: 52px;
-            right: -8px;
-            z-index: 2050;
-            border: 1px solid rgba(76, 142, 187, 0.16);
-            border-radius: 12px;
-            overflow: hidden;
-            background: #fff;
-            box-shadow: 0 18px 38px rgba(31, 45, 61, .16);
-        }
-
-        .header-actions .account-dropdown::after {
-            right: 26px;
-            border-bottom-color: #f8fbff;
-        }
-
-        .account-dropdown__summary {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 14px;
-            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
-            border-bottom: 1px solid #edf2f7;
-        }
-
-        .account-dropdown__summary-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #eef7fb;
-            color: #2f6f9f;
-            font-size: 1rem;
-            flex: 0 0 auto;
-        }
-
-        .account-dropdown__summary-title {
-            display: block;
-            color: #24384f;
-            font-size: .82rem;
-            font-weight: 800;
-            line-height: 1.12;
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .account-dropdown__summary-subtitle {
-            display: block;
-            margin-top: 2px;
-            color: #6b7a90;
-            font-size: .66rem;
-            font-weight: 700;
-            line-height: 1.1;
-        }
-
-        .header-actions .account-dropdown__body {
-            padding: 6px;
-        }
-
-        .header-actions .account-dropdown__item a,
-        .header-actions .account-dropdown__footer a {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            min-height: 38px;
-            margin: 0;
-            padding: 8px 10px;
-            border-radius: 8px;
-            color: #24384f;
-            font-size: .76rem;
-            font-weight: 700;
-            line-height: 1.12;
-            text-decoration: none;
-            transition: background .16s ease, color .16s ease;
-        }
-
-        .header-actions .account-dropdown__item a:hover {
-            background: #eef7fb;
-            color: #2f6f9f;
-        }
-
-        .header-actions .account-dropdown__item a i,
-        .header-actions .account-dropdown__footer a i {
-            width: 26px;
-            height: 26px;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0;
-            font-size: .9rem;
-            flex: 0 0 auto;
-            background: #f3f7fb;
-            color: #2f6f9f;
-        }
-
-        .header-actions .account-dropdown__footer {
-            padding: 6px;
-            border-top: 1px solid #edf2f7;
-        }
-
-        .header-actions .account-dropdown__footer a {
-            color: #9f1d35;
-        }
-
-        .header-actions .account-dropdown__footer a:hover {
-            background: #fff1f3;
-            color: #9f1d35;
-        }
-
-        .header-actions .account-dropdown__footer a i {
-            background: #fff1f3;
-            color: #d62f4b;
-        }
-
-        @media (max-width: 991.98px) {
-            #navbarScroll {
-                max-height: calc(100vh - 140px);
-                overflow-y: auto;
-                padding-bottom: 8px;
-            }
-
-            .navbar-nav.navbar-nav-scroll {
-                --bs-scroll-height: none !important;
-                max-height: none !important;
-                overflow: visible !important;
-                width: 100%;
-                align-items: flex-start !important;
-                border-radius: 12px;
-                padding: 8px;
-            }
-
-            .header-actions {
-                width: 100%;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding: 0 12px 10px;
-                margin-top: 6px;
-                gap: 0.5rem !important;
-            }
-
-            .header-actions #global-patient-search {
-                min-width: 240px;
-                flex: 1 0 auto;
-            }
-
-        }
-
-        @media (max-width: 575.98px) {
-            .header-actions {
-                width: 100%;
-            }
-
-            .header-actions #global-patient-search {
-                min-width: 0;
-                width: 100%;
-            }
-        }
-
-<?php if ($isOperationalIntelligencePage): ?>
-        body {
-            background: #f4f6fb !important;
-        }
-
-        .report-wrapper,
-        .performance-wrapper,
-        .forecast-wrapper,
-        .dashboard-wrapper,
-        .container-fluid.monthly-dashboard,
-        main.container-fluid.mt-5.pt-4,
-        body > .container-fluid {
-            padding-left: 24px !important;
-            padding-right: 24px !important;
-        }
-
-        .report-header,
-        .perf-hero,
-        .forecast-hero,
-        .dash-hero,
-        .monthly-header,
-        .automation-title-card,
-        body > .container-fluid > .row:first-child {
-            background: linear-gradient(120deg, #f4faff 0%, #e8f4fb 58%, #dff2fb 100%) !important;
-            border: 1px solid rgba(76, 142, 187, .22) !important;
-            border-radius: 16px !important;
-            box-shadow: 0 18px 36px rgba(35, 102, 147, .13) !important;
-        }
-
-        body > .container-fluid > .row:first-child {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            margin-bottom: 14px !important;
-            padding: 18px 20px !important;
-        }
-
-        .report-header h1,
-        .perf-hero h1,
-        .forecast-hero h1,
-        .dash-hero h1,
-        .automation-title-row h1 {
-            font-size: clamp(1.2rem, 1.7vw, 1.65rem) !important;
-            line-height: 1.08 !important;
-            margin-bottom: 0.2rem !important;
-            color: #24384f !important;
-            font-weight: 800 !important;
-        }
-
-        .container-fluid h2.fw-semibold,
-        .container-fluid h2.mb-0.fw-semibold {
-            font-size: clamp(1.05rem, 1.45vw, 1.35rem) !important;
-            line-height: 1.08 !important;
-        }
-
-        .container-fluid h4,
-        .dashboard-wrapper h4,
-        .perf-panel h2,
-        .insight-card h4,
-        .automation-card h4 {
-            font-size: clamp(0.95rem, 1.2vw, 1.12rem) !important;
-            line-height: 1.12 !important;
-            color: #24384f !important;
-            font-weight: 800 !important;
-        }
-
-        .report-header .text-muted,
-        .perf-hero p,
-        .forecast-hero .text-muted,
-        .dash-hero p,
-        .automation-title-card .text-muted,
-        .container-fluid > .row .text-muted,
-        .container-fluid .alert,
-        .container-fluid .alert strong {
-            font-size: clamp(0.78rem, 1vw, 0.92rem) !important;
-            line-height: 1.3 !important;
-            color: #5d6f82 !important;
-        }
-
-        .report-card,
-        .insight-card,
-        .dashboard-card,
-        .dash-table-card,
-        .perf-card,
-        .perf-panel,
-        .automation-card,
-        .automation-panel,
-        .automation-context-card {
-            background: #fff !important;
-            border: 1px solid rgba(76, 142, 187, .22) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 12px 28px rgba(35, 102, 147, .11) !important;
-        }
-
-        .report-card,
-        .insight-card,
-        .perf-panel,
-        .automation-card,
-        .automation-panel {
-            overflow: hidden;
-        }
-
-        .table-responsive {
-            border-radius: 10px !important;
-        }
-
-        .table thead,
-        .report-wrapper .table thead,
-        .insight-card .table thead,
-        .forecast-table thead,
-        .dash-table-card thead,
-        .perf-table thead {
-            background: #2f6f9f !important;
-        }
-
-        .table thead th,
-        .report-wrapper .table thead th,
-        .insight-card .table thead th,
-        .forecast-table th,
-        .dash-table-card th,
-        .perf-table th {
-            background: transparent !important;
-            background-image: none !important;
-            color: #ffffff !important;
-            border-bottom: 1px solid rgba(47, 111, 159, .35) !important;
-            font-weight: 800 !important;
-            letter-spacing: .04em !important;
-        }
-
-        .table,
-        .forecast-table,
-        .dash-table-card table,
-        .perf-table {
-            border-collapse: collapse !important;
-            font-size: .78rem !important;
-        }
-
-        .table thead th,
-        .table tbody td,
-        .forecast-table th,
-        .forecast-table td,
-        .dash-table-card th,
-        .dash-table-card td,
-        .perf-table th,
-        .perf-table td {
-            height: 34px !important;
-            min-height: 34px !important;
-            padding: 7px 12px !important;
-            line-height: 1.25 !important;
-            vertical-align: middle !important;
-        }
-
-        .table thead th,
-        .forecast-table th,
-        .dash-table-card th,
-        .perf-table th {
-            height: 30px !important;
-            min-height: 30px !important;
-            padding-top: 5px !important;
-            padding-bottom: 5px !important;
-            line-height: 1.15 !important;
-            white-space: nowrap !important;
-        }
-
-        .table tbody td,
-        .forecast-table td,
-        .dash-table-card td,
-        .perf-table td {
-            white-space: nowrap !important;
-        }
-
-        .table-sm > :not(caption) > * > * {
-            padding: 7px 12px !important;
-        }
-
-        .table thead th,
-        .forecast-table th,
-        .dash-table-card th,
-        .perf-table th {
-            height: 30px !important;
-            min-height: 30px !important;
-            padding-top: 5px !important;
-            padding-bottom: 5px !important;
-            line-height: 1.15 !important;
-            white-space: nowrap !important;
-        }
-
-        .table td,
-        .forecast-table td,
-        .dash-table-card td,
-        .perf-table td {
-            border-color: #e0edf5 !important;
-            color: #3f3b46 !important;
-        }
-
-        .table tbody tr:nth-child(odd),
-        .table tbody tr:nth-child(odd) > *,
-        .perf-table tbody tr:nth-child(odd),
-        .perf-table tbody tr:nth-child(odd) > * {
-            background: #ffffff !important;
-            --bs-table-bg: #ffffff !important;
-            --bs-table-accent-bg: #ffffff !important;
-        }
-
-        .table tbody tr:nth-child(even),
-        .table tbody tr:nth-child(even) > *,
-        .perf-table tbody tr:nth-child(even),
-        .perf-table tbody tr:nth-child(even) > * {
-            background: #f4faff !important;
-            --bs-table-bg: #f4faff !important;
-            --bs-table-accent-bg: #f4faff !important;
-        }
-
-        .table-striped > tbody > tr:nth-of-type(odd) > * {
-            --bs-table-accent-bg: #f4faff !important;
-            color: #3f3b46 !important;
-        }
-
-        .table-striped > tbody > tr:nth-of-type(even) > * {
-            --bs-table-accent-bg: #ffffff !important;
-            color: #3f3b46 !important;
-        }
-
-        .table-hover > tbody > tr:hover > * {
-            --bs-table-accent-bg: #e8f4fb !important;
-            color: #24384f !important;
-        }
-
-        .form-control,
-        .form-select {
-            border-color: #d2e4ef !important;
-            color: #2f2639 !important;
-        }
-
-        .form-label,
-        .text-uppercase,
-        .report-wrapper .form-label {
-            color: #2f6f9f !important;
-            font-weight: 800 !important;
-            letter-spacing: .04em !important;
-        }
-
-        .btn-primary {
-            background: #2f6f9f !important;
-            border-color: #2f6f9f !important;
-            box-shadow: 0 8px 18px rgba(35, 102, 147, .18) !important;
-        }
-
-        .alert-info {
-            background: #eef9fd !important;
-            border-color: #bfeaf7 !important;
-            color: #224657 !important;
-        }
-
-        @media (max-width: 768px) {
-            .report-wrapper,
-            .performance-wrapper,
-            .forecast-wrapper,
-            .dashboard-wrapper,
-            .container-fluid.monthly-dashboard,
-            main.container-fluid.mt-5.pt-4,
-            body > .container-fluid {
-                padding-left: 14px !important;
-                padding-right: 14px !important;
-            }
-        }
-<?php endif; ?>
-    </style>
 </head>
 
 <body>
-    <div class="col-md-12" style="padding:0 !important">
+    <div class="col-md-12 fc-inline-1">
         <nav class="navbar navbar-expand-lg navbar-light bg-light nav_bar_custom fixed-top">
-            <div class="bar_color" style="position:fixed;top:0;z-index:1000;width:100%;height:5px;background-image: linear-gradient(to right, #2f6f9f,#5bd9f3);
-            ">
+            <div class="bar_color fc-inline-2">
             </div>
             <div class="container-fluid">
-                <a class="navbar-brand" href="<?= $BASE_URL ?>dashboard" style="gap:12px;">
+                <a class="navbar-brand fc-header-brand-link" href="<?= $BASE_URL ?>dashboard">
                     <img src="<?= $BASE_URL ?>img/LogoFullCare.png" class="logo-novo" width="224" height="56"
-                        style="max-width:100%;height:auto;" alt="FullCare">
+                        alt="FullCare">
                     <?php if (!empty($seguradoraHeaderLogoUrl)): ?>
                     <span class="brand-divider" aria-hidden="true"></span>
                     <img src="<?= htmlspecialchars($seguradoraHeaderLogoUrl, ENT_QUOTES, 'UTF-8') ?>"
@@ -1204,8 +334,8 @@ if (!empty($sessionIdUsuario)) {
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarScroll">
-                    <ul class="nav-tabs navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll align-items-center"
-                        style="--bs-scroll-height: 75vh;">
+                    <ul class="nav-tabs navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll align-items-center fc-inline-3"
+                       >
                         <!-- Ícone de mensagem -->
 
                         <?php if ($hasHeaderMenuAccess) { ?>
@@ -1214,47 +344,47 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarMenuDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                            class="bi bi-stack edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-stack edit-icon" name="type" value="edite"
+                                           ></i>
                                         Menu
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarMenuDropdown">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>central-trabalho"><i
-                                                    class="bi bi-speedometer2"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                                    class="bi bi-speedometer2 fc-inline-5"
+                                                   ></i>
                                                 Central de trabalho</a></li>
                                         <?php if ($isDiretoria) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard-operacional"><i
-                                                        class="bi bi-activity"
-                                                        style="font-size: 1rem;margin-right:5px; color: rgb(94, 35, 99);"></i>
+                                                        class="bi bi-activity fc-inline-6"
+                                                       ></i>
                                                     Dashboard operacional</a></li>
                                         <?php } ?>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>manual.html"><i class="bi bi-person fc-inline-5"
+                                                   ></i>
                                                 Manual</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacoes/customizacao">
-                                                <i class="bi bi-file-earmark-text"
-                                                    style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                <i class="bi bi-file-earmark-text fc-inline-4"
+                                                   ></i>
                                                 Solicitação de Customização
                                             </a></li>
                                         <?php if ($isDiretoria) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacoes/customizacao/lista">
-                                                    <i class="bi bi-clipboard-check"
-                                                        style="font-size: 1rem;margin-right:5px; color: #0d6efd;"></i>
+                                                    <i class="bi bi-clipboard-check fc-inline-7"
+                                                       ></i>
                                                     Solicitações (Lista)
                                                 </a></li>
                                         <?php } ?>
                                         <?php if ($isDiretoria) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/performance-equipes"><i
-                                                        class="bi bi-trophy"
-                                                        style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                        class="bi bi-trophy fc-inline-4"
+                                                       ></i>
                                                     Performance equipes</a></li>
                                         <?php } ?>
                                         <?php if ($sessionNivel > 3) { ?>
                                             <li class="nav-item">
                                                 <a class="dropdown-item" href="<?= $BASE_URL ?>administracao/permissoes">
-                                                    <i class="bi bi-shield-lock"
-                                                        style="font-size: 1rem;margin-right:5px; color: rgb(21, 56, 210);"></i>
+                                                    <i class="bi bi-shield-lock fc-inline-8"
+                                                       ></i>
                                                     Permissões
                                                 </a>
                                             </li>
@@ -1268,42 +398,42 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarCadastrosDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                            class="bi bi-pencil-square edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-pencil-square edit-icon" name="type" value="edite"
+                                           ></i>
                                         Cadastros
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarCadastrosDropdown">
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>pacientes"><i class="bi bi-person"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>pacientes"><i class="bi bi-person fc-inline-5"
+                                                   ></i>
                                                 Pacientes</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>hospitais"><span
-                                                    class="bi bi-hospital"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(67, 125, 525);"></span>
+                                                    class="bi bi-hospital fc-inline-9"
+                                                   ></span>
                                                 Hospitais</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>seguradoras"><span
-                                                    class=" bi bi-heart-pulse"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(178, 156, 55);"></span>
+                                                    class=" bi bi-heart-pulse fc-inline-10"
+                                                   ></span>
                                                 Seguradoras</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>estipulantes"><i
-                                                    class="bi bi-building"
-                                                    style="font-size:  1rem;margin-right:5px; color: rgb(213, 12, 155);"></i>
+                                                    class="bi bi-building fc-inline-11"
+                                                   ></i>
                                                 Estipulantes</a></li>
                                         <?php if ($canSeeUsuariosCadastro) { ?>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>usuarios"><i
-                                                    class="bi bi-people-fill"
-                                                    style="font-size: 1rem; margin-right:5px; color: rgb(155, 95, 76);"></i>
+                                                    class="bi bi-people-fill fc-inline-12"
+                                                   ></i>
                                                 Usuários</a></li>
                                         <?php } ?>
                                         <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_patologia.php"><span
-                                            class=" bi bi-virus"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(178, 155, 155);"></span>
+                                            class=" bi bi-virus fc-inline-13"
+                                           ></span>
                                         Patologia</a></li>
                                 <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_antecedente.php"><i
-                                            class="bi bi-people"
-                                            style="font-size: 1rem;margin-right:5px; color: rgb(178, 156, 55);"></i>
+                                            class="bi bi-people fc-inline-10"
+                                           ></i>
                                         Antecedente</a></li> -->
                                     </ul>
                                 </li>
@@ -1313,38 +443,38 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarProducaoDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                            class="bi bi-calendar3 edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-calendar3 edit-icon" name="type" value="edite"
+                                           ></i>
                                         Produção
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarProducaoDropdown">
 
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/nova"><i
-                                                    class="bi bi-calendar2-date"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i> Nova
+                                                    class="bi bi-calendar2-date fc-inline-5"
+                                                   ></i> Nova
                                                 Internação</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book fc-inline-14"
+                                                   ></i>
                                                 Censo</a></li>
                                         <li><a class="dropdown-item producao-ai-featured" href="<?= $BASE_URL ?>producao/ia-clinica"><i
-                                                    class="bi bi-clipboard2-pulse"
-                                                    style="font-size: 1rem;margin-right:5px; color: #208b7a;"></i> IA Cl&iacute;nica</a></li>
+                                                    class="bi bi-clipboard2-pulse fc-inline-15"
+                                                   ></i> IA Cl&iacute;nica</a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
 
                                         <!-- <li><a class="dropdown-item" href="<?php $BASE_URL ?>list_internacao_uti_alta.php"><span
-                                            id="boot-icon3" class="bi bi-box-arrow-left"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(167, 25, 55);"></span>
+                                            id="boot-icon3" class="bi bi-box-arrow-left fc-inline-16"
+                                           ></span>
                                         Alta UTI</a></li> -->
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/reverter-alta"><span
-                                                    id="boot-icon3" class="bi bi-postcard-heart"
-                                                    style="font-size: 1rem; margin-right:5px; color: rgb(16, 15, 155);"></span>
+                                                    id="boot-icon3" class="bi bi-postcard-heart fc-inline-17"
+                                                   ></span>
                                                 Reverter altas</a>
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/gerar-alta"><span
-                                                    class="bi bi-clipboard-check"
-                                                    style="font-size: 1rem; margin-right:5px; color: rgb(9, 132, 227);"></span>
+                                                    class="bi bi-clipboard-check fc-inline-18"
+                                                   ></span>
                                                 Gerar altas</a>
                                         </li>
                                     </ul>
@@ -1354,7 +484,7 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="dropdownContasRah" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-journal-richtext me-1" style="color:#4b7fa5;"></i>Contas
+                                        <i class="bi bi-journal-richtext me-1 fc-inline-19"></i>Contas
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownContasRah">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/auditar">
@@ -1381,27 +511,27 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarListasDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                            class="bi bi-list-ul edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-list-ul edit-icon" name="type" value="edite"
+                                           ></i>
                                         Listas
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarListasDropdown">
 
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista"> <i
-                                                    class="bi bi-calendar2-date"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(255, 25, 55);"></i>
+                                                    class="bi bi-calendar2-date fc-inline-5"
+                                                   ></i>
                                                 Internação</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/uti"> <i
-                                                    class="bi bi-clipboard-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
+                                                    class="bi bi-clipboard-heart fc-inline-20"
+                                                   ></i>
                                                 Internação UTI</a>
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>listas/altas"><i
-                                                    class="bi bi-clipboard-check"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(9,132,227);"></i>
+                                                    class="bi bi-clipboard-check fc-inline-21"
+                                                   ></i>
                                                 Lista de altas</a></li>
-                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(222, 156, 55);"></i>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book fc-inline-14"
+                                                   ></i>
                                                 Censo</a></li>
                                     </ul>
                                 </li>
@@ -1410,65 +540,65 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarGestaoDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                            class="bi bi-receipt edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-receipt edit-icon" name="type" value="edite"
+                                           ></i>
                                         Gestão
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarGestaoDropdown">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao"><i
-                                                    class="bi bi-postcard-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(144, 17, 194);"></i>
+                                                    class="bi bi-postcard-heart fc-inline-22"
+                                                   ></i>
                                                 Gestão Assistencial</a></li>
                                         <?php if ($isDiretoria) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/logs-usuarios"><i
-                                                        class="bi bi-journal-code"
-                                                        style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                        class="bi bi-journal-code fc-inline-23"
+                                                       ></i>
                                                     Logs por Usuário</a></li>
                                         <?php } ?>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/ciclo"><i
-                                                    class="bi bi-postcard-heart"
-                                                    style="font-size:  1rem;margin-right:5px; color: rgb(27,156, 55);"></i>
+                                                    class="bi bi-postcard-heart fc-inline-20"
+                                                   ></i>
                                                 Rota do Paciente</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/sem-senha"><i
-                                                    class="bi bi-shield-exclamation"
-                                                    style="font-size:  1rem;margin-right:5px; color:#d63384;"></i>
+                                                    class="bi bi-shield-exclamation fc-inline-24"
+                                                   ></i>
                                                 Internações sem senha</a></li>
                                         <?php if (!$isPerfilMedicoMenu) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/pendencias-operacionais"><i
-                                                        class="bi bi-exclamation-diamond"
-                                                        style="font-size:  1rem;margin-right:5px; color:#fd7e14;"></i>
+                                                        class="bi bi-exclamation-diamond fc-inline-25"
+                                                       ></i>
                                                     Pendências operacionais</a></li>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes"><i
-                                                        class="bi bi-currency-dollar"
-                                                        style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                        class="bi bi-currency-dollar fc-inline-23"
+                                                       ></i>
                                                     Negociações</a></li>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>negociacoes/graficos"><i
-                                                        class="bi bi-bar-chart"
-                                                        style="font-size: 1rem;margin-right:5px; color:#20c997;"></i>
+                                                        class="bi bi-bar-chart fc-inline-26"
+                                                       ></i>
                                                     Gráfico Negociações</a></li>
                                         <?php } ?>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/fila-tarefas"><i
-                                                    class="bi bi-list-check"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(20, 120, 90);"></i>
+                                                    class="bi bi-list-check fc-inline-27"
+                                                   ></i>
                                                 Fila de Tarefas</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/prorrogacoes-pendentes"><i
-                                                    class="bi bi-hourglass-split"
-                                                    style="font-size: 1rem;margin-right:5px; color: rgb(180, 120, 20);"></i>
+                                                    class="bi bi-hourglass-split fc-inline-28"
+                                                   ></i>
                                                 Prorrogação Pendente</a></li>
                                         <?php if (!$isPerfilMedicoMenu) { ?>
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
-                                                        class="bi bi-list-check"
-                                                        style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                        class="bi bi-list-check fc-inline-4"
+                                                       ></i>
                                                     Lista Visitas</a></li>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/faturamento"><i
-                                                        class="bi bi-clipboard-check"
-                                                        style="font-size: 1rem;margin-right:5px; color:#0a4fa3;"></i>
+                                                        class="bi bi-clipboard-check fc-inline-29"
+                                                       ></i>
                                                     Faturamento Mensal</a></li>
                                         <?php } ?>
                                     </ul>
@@ -1478,33 +608,32 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarCuidadoContinuado" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"
-                                            class="bi bi-heart-pulse"></i>
+                                        <i class="fc-inline-4 bi bi-heart-pulse"></i>
                                         Cuidado Continuado
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarCuidadoContinuado">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado"><i
-                                                    class="bi bi-grid-1x2"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                    class="bi bi-grid-1x2 fc-inline-23"
+                                                   ></i>
                                                 Dashboard</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/cronicos"><i
-                                                    class="bi bi-heart-pulse-fill"
-                                                    style="font-size: 1rem;margin-right:5px; color:#c43d4b;"></i>
+                                                    class="bi bi-heart-pulse-fill fc-inline-30"
+                                                   ></i>
                                                 Gestão de Crônicos</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/medicina-preventiva"><i
-                                                    class="bi bi-shield-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#198754;"></i>
+                                                    class="bi bi-shield-check fc-inline-31"
+                                                   ></i>
                                                 Medicina Preventiva</a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/longa-permanencia"><i
-                                                    class="bi bi-hourglass-split"
-                                                    style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                    class="bi bi-hourglass-split fc-inline-4"
+                                                   ></i>
                                                 Longa Permanência</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/home-care"><i
-                                                    class="bi bi-house-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
+                                                    class="bi bi-house-heart fc-inline-32"
+                                                   ></i>
                                                 Home Care</a></li>
                                     </ul>
                                 </li>
@@ -1513,95 +642,95 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarBiDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                            class="bi bi-bar-chart-line edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-bar-chart-line edit-icon" name="type" value="edite"
+                                           ></i>
                                         BI
                                     </a>
                                     <ul class="dropdown-menu bi-dropdown" aria-labelledby="navbarBiDropdown">
                                         <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/navegacao"><i
-                                                    class="bi bi-grid-3x3-gap"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
+                                                    class="bi bi-grid-3x3-gap fc-inline-33"
+                                                   ></i>
                                                 Navegação BI</a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/resultados"><i
-                                                    class="bi bi-graph-up-arrow"
-                                                    style="font-size: 1rem;margin-right:5px; color:#7ee3c8;"></i>
+                                                    class="bi bi-graph-up-arrow fc-inline-34"
+                                                   ></i>
                                                 BI Resultados</a></li>
                                         <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/produtividade"><i
-                                                    class="bi bi-clipboard2-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
+                                                    class="bi bi-clipboard2-check fc-inline-33"
+                                                   ></i>
                                                 BI Produtividade</a></li>
                                         <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/qualidade-360"><i
-                                                    class="bi bi-award"
-                                                    style="font-size: 1rem;margin-right:5px; color:#b897ff;"></i>
+                                                    class="bi bi-award fc-inline-35"
+                                                   ></i>
                                                 BI Qualidade</a></li>
                                         <li><a class="dropdown-item bi-dropdown-featured" href="<?= $BASE_URL ?>bi/preditivo"><i
-                                                    class="bi bi-bullseye"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ffd36e;"></i>
+                                                    class="bi bi-bullseye fc-inline-36"
+                                                   ></i>
                                                 BI Preditivo</a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/indicadores"><i
-                                                    class="bi bi-speedometer2"
-                                                    style="font-size: 1rem;margin-right:5px; color:#9fd7ff;"></i>
+                                                    class="bi bi-speedometer2 fc-inline-33"
+                                                   ></i>
                                                 Resumo</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/indicadores-essenciais"><i
-                                                    class="bi bi-bar-chart-steps"
-                                                    style="font-size: 1rem;margin-right:5px; color:#7ee3c8;"></i>
+                                                    class="bi bi-bar-chart-steps fc-inline-34"
+                                                   ></i>
                                                 Indicadores Essenciais</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/uti"><i
-                                                    class="bi bi-heart-pulse"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ff9fb3;"></i>
+                                                    class="bi bi-heart-pulse fc-inline-37"
+                                                   ></i>
                                                 Clínico</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/seguradora"><i
-                                                    class="bi bi-shield-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#8dd0ff;"></i>
+                                                    class="bi bi-shield-check fc-inline-38"
+                                                   ></i>
                                                 Operacional</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/sinistro"><i
-                                                    class="bi bi-clipboard-data"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ff8fb1;"></i>
+                                                    class="bi bi-clipboard-data fc-inline-39"
+                                                   ></i>
                                                 Financeiro</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/gastos-patologia"><i
-                                                    class="bi bi-activity"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ff8fa3;"></i>
+                                                    class="bi bi-activity fc-inline-40"
+                                                   ></i>
                                                 Controle de Gastos</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/anomalias-permanencia"><i
-                                                    class="bi bi-exclamation-triangle"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ff7b7b;"></i>
+                                                    class="bi bi-exclamation-triangle fc-inline-41"
+                                                   ></i>
                                                 Anomalias &amp; Fraude</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/auditoria-documentacao"><i
-                                                    class="bi bi-clipboard-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#61d2c6;"></i>
+                                                    class="bi bi-clipboard-check fc-inline-42"
+                                                   ></i>
                                                 Conformidade &amp; Auditoria</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/risco-cronicos"><i
-                                                    class="bi bi-person-exclamation"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ffd36e;"></i>
+                                                    class="bi bi-person-exclamation fc-inline-36"
+                                                   ></i>
                                                 Segmentação de Risco</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/risco-prevencao-matriz"><i
-                                                    class="bi bi-shield-exclamation"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ff7b7b;"></i>
+                                                    class="bi bi-shield-exclamation fc-inline-41"
+                                                   ></i>
                                                 Risco &amp; Prevenção</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/rede-volume-custo"><i
-                                                    class="bi bi-bar-chart-line"
-                                                    style="font-size: 1rem;margin-right:5px; color:#72d2ff;"></i>
+                                                    class="bi bi-bar-chart-line fc-inline-43"
+                                                   ></i>
                                                 Negociação &amp; Rede</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>bi/qualidade-desfecho"><i
-                                                    class="bi bi-exclamation-octagon"
-                                                    style="font-size: 1rem;margin-right:5px; color:#b897ff;"></i>
+                                                    class="bi bi-exclamation-octagon fc-inline-35"
+                                                   ></i>
                                                 Qualidade &amp; Desfecho</a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/longa-permanencia"><i
-                                                    class="bi bi-hourglass-split"
-                                                    style="font-size: 1rem;margin-right:5px; color:#c084fc;"></i>
+                                                    class="bi bi-hourglass-split fc-inline-44"
+                                                   ></i>
                                                 Gestão Longa Permanência</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/home-care"><i
-                                                    class="bi bi-house-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color:#7dd3fc;"></i>
+                                                    class="bi bi-house-heart fc-inline-45"
+                                                   ></i>
                                                 Gestão Home Care</a></li>
                                     </ul>
                                 </li>
@@ -1610,82 +739,82 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarInteligenciaDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                            class="bi bi-robot edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-robot edit-icon" name="type" value="edite"
+                                           ></i>
                                         Inteligência Operacional
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarInteligenciaDropdown">
                                         <li><a class="dropdown-item inteligencia-chat-featured" href="<?= $BASE_URL ?>inteligencia/assistente-internacoes"><i
-                                                    class="bi bi-chat-dots"
-                                                    style="font-size: 1rem;margin-right:5px; color:#5e3db8;"></i>
+                                                    class="bi bi-chat-dots fc-inline-46"
+                                                   ></i>
                                                 IA de Internações</a></li>
                                         <li><a class="dropdown-item inteligencia-chat-featured" href="<?= $BASE_URL ?>inteligencia/ia-graficos"><i
-                                                    class="bi bi-bar-chart-line"
-                                                    style="font-size: 1rem;margin-right:5px; color:#20a37a;"></i>
+                                                    class="bi bi-bar-chart-line fc-inline-47"
+                                                   ></i>
                                                 IA Gráficos</a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/dashboard-360"><i
-                                                    class="bi bi-grid-3x3-gap"
-                                                    style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                    class="bi bi-grid-3x3-gap fc-inline-4"
+                                                   ></i>
                                                 Dashboard 360°</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/previsao-faturamento"><i
-                                                    class="bi bi-graph-up-arrow"
-                                                    style="font-size: 1rem;margin-right:5px; color:#1d9ad8;"></i>
+                                                    class="bi bi-graph-up-arrow fc-inline-48"
+                                                   ></i>
                                                 Previsão faturamento</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/painel-mensal"><i
-                                                    class="bi bi-graph-up-arrow"
-                                                    style="font-size: 1rem;margin-right:5px; color:#1d9ad8;"></i>
+                                                    class="bi bi-graph-up-arrow fc-inline-48"
+                                                   ></i>
                                                 Painel Mensal</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/inteligencia-operadora"><i
-                                                    class="bi bi-shield-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
+                                                    class="bi bi-shield-check fc-inline-32"
+                                                   ></i>
                                                 Inteligência da Operadora</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/tmp"><i
-                                                    class="bi bi-activity"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
+                                                    class="bi bi-activity fc-inline-32"
+                                                   ></i>
                                                 TMP por CID/Procedimento/Convênio</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/prorrogacao-vs-alta"><i
-                                                    class="bi bi-hourglass-split"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f59e0b;"></i>
+                                                    class="bi bi-hourglass-split fc-inline-49"
+                                                   ></i>
                                                 Prorrogação vs Alta no prazo</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/motivos-prorrogacao"><i
-                                                    class="bi bi-list-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#10b981;"></i>
+                                                    class="bi bi-list-check fc-inline-50"
+                                                   ></i>
                                                 Motivos de Prorrogação</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/backlog-autorizacoes"><i
-                                                    class="bi bi-card-checklist"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
+                                                    class="bi bi-card-checklist fc-inline-51"
+                                                   ></i>
                                                 Backlog de Autorizações</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/previsoes-operacionais"><i
-                                                    class="bi bi-robot"
-                                                    style="font-size: 1rem;margin-right:5px; color:#20c997;"></i>
+                                                    class="bi bi-robot fc-inline-26"
+                                                   ></i>
                                                 Previsões Operacionais</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/permanencias-alertas"><i
-                                                    class="bi bi-clock-history"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0d9488;"></i>
+                                                    class="bi bi-clock-history fc-inline-52"
+                                                   ></i>
                                                 Permanências e alertas</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/insights-explicaveis"><i
-                                                    class="bi bi-lightbulb"
-                                                    style="font-size: 1rem;margin-right:5px; color:#f97316;"></i>
+                                                    class="bi bi-lightbulb fc-inline-53"
+                                                   ></i>
                                                 Insights explicáveis</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/oportunidade-glosa"><i
-                                                    class="bi bi-exclamation-octagon"
-                                                    style="font-size: 1rem;margin-right:5px; color:#ef4444;"></i>
+                                                    class="bi bi-exclamation-octagon fc-inline-51"
+                                                   ></i>
                                                 Oportunidade de glosa / contas</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/clusterizacao-clinica"><i
-                                                    class="bi bi-diagram-3"
-                                                    style="font-size: 1rem;margin-right:5px; color:#0ea5e9;"></i>
+                                                    class="bi bi-diagram-3 fc-inline-32"
+                                                   ></i>
                                                 Clusterização clínica</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/assistente-textos"><i
-                                                    class="bi bi-pencil-square"
-                                                    style="font-size: 1rem;margin-right:5px; color:#fb923c;"></i>
+                                                    class="bi bi-pencil-square fc-inline-54"
+                                                   ></i>
                                                 Assistente de Textos</a></li>
                                         <?php if ($isDiretoria) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/logs-usuarios"><i
-                                                        class="bi bi-journal-code"
-                                                        style="font-size: 1rem;margin-right:5px; color:#0d6efd;"></i>
+                                                        class="bi bi-journal-code fc-inline-23"
+                                                       ></i>
                                                     Logs por Usuário</a></li>
                                         <?php } ?>
                                     </ul>
@@ -1694,8 +823,7 @@ if (!empty($sessionIdUsuario)) {
                             <?php if ($canSeeHubMenu) { ?>
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?= $BASE_URL ?>pacientes">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"
-                                            class="bi bi-person-badge edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-person-badge edit-icon"></i>
                                         HUB de Pacientes
                                     </a>
                                 </li>
@@ -1704,26 +832,25 @@ if (!empty($sessionIdUsuario)) {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarGestorListas" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"
-                                            class="bi bi-list edit-icon"></i>
+                                        <i class="fc-inline-4 bi bi-list edit-icon"></i>
                                         Lista
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarGestorListas">
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>central-trabalho">
-                                                <i class="bi bi-grid-1x2-fill"
-                                                    style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                <i class="bi bi-grid-1x2-fill fc-inline-4"
+                                                   ></i>
                                                 Central de trabalho</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/lista">
-                                                <i class="bi bi-clipboard-data"
-                                                    style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                <i class="bi bi-clipboard-data fc-inline-4"
+                                                   ></i>
                                                 Internacao</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao">
-                                                <i class="bi bi-postcard-heart"
-                                                    style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                <i class="bi bi-postcard-heart fc-inline-4"
+                                                   ></i>
                                                 Gestao Assistencial</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>listas/altas">
-                                                <i class="bi bi-clipboard-check"
-                                                    style="font-size: 1rem;margin-right:5px; color:#4b7fa5;"></i>
+                                                <i class="bi bi-clipboard-check fc-inline-4"
+                                                   ></i>
                                                 Altas</a></li>
                                     </ul>
                                 </li>
@@ -1733,15 +860,15 @@ if (!empty($sessionIdUsuario)) {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size: 1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                    class="fa-solid fa-pills edit-icon"></i>
+                                <i class="fc-inline-4 fa-solid fa-pills edit-icon" name="type" value="edite"
+                                   ></i>
                                 DRG
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                 <li><a class="dropdown-item"
                                         href="<?php $BASE_URL ?>list_internacao_patologia.php"><span id="boot-icon1"
-                                            class="bi bi-capsule-pill"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(77, 155, 67);"> </span>
+                                            class="bi bi-capsule-pill fc-inline-55"
+                                           > </span>
                                         Pesquisa internações
                                     </a></li>
                                 <li>
@@ -1753,25 +880,25 @@ if (!empty($sessionIdUsuario)) {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle " href="#" id="navbarScrollingDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <i style="font-size:  1rem;margin-right:5px; color:#4b7fa5;" name="type" value="edite"
-                                    class="fa-solid fa-print edit-icon"></i>
+                                <i class="fc-inline-4 fa-solid fa-print edit-icon" name="type" value="edite"
+                                   ></i>
                                 Relatórios
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                                 <li><a class="dropdown-item" href="<?php $BASE_URL ?>relatorios.php"><span
-                                            id="boot-icon1" class="bi bi-clipboard-data"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(77, 155, 67);">
+                                            id="boot-icon1" class="bi bi-clipboard-data fc-inline-55"
+                                           >
                                         </span> Relatórios </a></li>
                                 <li>
                                 <li><a class="dropdown-item"
                                         href="https://app.powerbi.com/reportEmbed?reportId=162595d1-241c-45dc-b282-e5134dc77636&autoAuth=true&ctid=5d8203ef-bc77-4057-86a0-56d58ebd6258">
-                                        <span id="boot-icon1" class="bi bi-clipboard-data"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(77, 155, 67);">
+                                        <span id="boot-icon1" class="bi bi-clipboard-data fc-inline-55"
+                                           >
                                         </span> Relatórios - APP</a></li>
                                 <li>
                                 <li><a class="dropdown-item" href="<?php $BASE_URL ?>relatorios_capeante.php"><span
-                                            id="boot-icon1" class="bi bi-clipboard-data"
-                                            style="font-size: 1rem; margin-right:5px; color: rgb(77, 155, 67);">
+                                            id="boot-icon1" class="bi bi-clipboard-data fc-inline-55"
+                                           >
                                         </span> Relatórios Capeantes</a></li>
                                 <li>
                             </ul>
@@ -1812,13 +939,13 @@ if (!empty($sessionIdUsuario)) {
                             aria-label="<?= $isAuditorHeaderSearch ? 'Buscar pelo tipo selecionado' : 'Buscar por senha, matrícula ou nome' ?>" />
                     </div>
 
-                    <div id="search-results-dropdown" class="dropdown-menu show"
-                        style="display:none; max-height: 350px; overflow:auto; width: 420px; position:absolute; top:100%; left:0; z-index: 2000;">
+                    <div id="search-results-dropdown" class="dropdown-menu show fc-inline-56"
+                       >
                     </div>
                 </form>
 
                 <div class="account-wrap">
-                    <div class="account-item clearfix js-item-menu" style="margin-right:0">
+                    <div class="account-item clearfix js-item-menu fc-inline-57">
                         <div class="image">
                             <?php
                             // arquivo da sessão (sanitizado) e checagem no filesystem real
@@ -1942,7 +1069,7 @@ if (!empty($sessionIdUsuario)) {
         <div class="modal fade" id="globalModal">
             <div class="modal-dialog  modal-lg modal-dialog-centered modal-xl">
                 <div class="modal-content">
-                    <div style="padding-left:20px;padding-top:20px;">
+                    <div class="fc-inline-58">
                         <h4>Paciente</h4>
                         <p class="page-description">Informações
                             do paciente</p>

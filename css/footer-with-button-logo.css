@@ -79,10 +79,19 @@
     color: #BE4342;
 }
 
+.footer-full-logo {
+    width: 100px;
+    height: 100px;
+}
+
 #myFooter .social-networks {
     text-align: center;
     padding-top: 30px;
     padding-bottom: 16px;
+}
+
+#myFooter .social-networks .footer-full-social-link {
+    font-size: 1.2em;
 }
 
 #myFooter .social-networks a {
