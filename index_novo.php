@@ -10,8 +10,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<<<<<<< HEAD
-
     <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -22,24 +20,28 @@
         overflow: hidden;
         opacity: 0;
         animation: fadeIn .35s ease-in forwards;
+        background: #f5f8fc;
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
 
     /* ── Left panel ─────────────────────────────────────── */
     .lp {
-        flex: 1 1 0;
+        flex: 0 0 61%;
         min-width: 0;
         position: relative;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 44px 104px 36px 56px;
+        padding: 44px 124px 36px 56px;
         overflow: hidden;
-        z-index: 1;
-        box-shadow:
-            18px 0 42px rgba(6, 18, 34, .40),
-            36px 0 80px rgba(6, 18, 34, .22);
+        z-index: 2;
+        margin-right: -64px;
+        clip-path: url(#loginCurveClip);
+        filter:
+            drop-shadow(18px 0 22px rgba(4, 14, 27, .46))
+            drop-shadow(38px 0 54px rgba(47, 111, 159, .26))
+            drop-shadow(58px 0 86px rgba(47, 111, 159, .14));
         background:
             radial-gradient(ellipse at 12% 0%, rgba(95, 164, 208, .14) 0%, transparent 46%),
             radial-gradient(ellipse at 86% 100%, rgba(103, 70, 139, .26) 0%, transparent 54%),
@@ -147,25 +149,15 @@
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        background: linear-gradient(90deg, #e2edf6 0%, #eff5fb 18%, #f5f8fc 44%, #f5f8fc 100%);
-        margin-left: -64px;
-        padding: 48px 56px 48px 128px;
+        background: linear-gradient(90deg, #dfeaf4 0%, #edf4fa 18%, #f5f8fc 42%, #f5f8fc 100%);
+        margin-left: 0;
+        padding: 48px 56px 48px 124px;
         position: relative;
-        overflow: visible;
-        z-index: 2;
-    }
-
-    .rp::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: -56px;
-        width: 72px;
-        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 1000' preserveAspectRatio='none'%3E%3Cpath d='M72 0 C18 210 18 790 72 1000 L72 0 Z' fill='%23e2edf6'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
-        filter: drop-shadow(-14px 0 28px rgba(6, 18, 34, .24));
-        pointer-events: none;
-        z-index: 0;
+        overflow: hidden;
+        z-index: 1;
+        box-shadow:
+            inset 30px 0 44px rgba(55, 111, 151, .22),
+            inset 10px 0 16px rgba(13, 32, 56, .12);
     }
 
     .rp-inner {
@@ -376,7 +368,12 @@
     /* ── Responsive ─────────────────────────────────────── */
     @media (max-width: 860px) {
         .lp { display: none; }
-        .rp { width: 100%; min-height: 100vh; padding: 48px 28px; }
+        .rp {
+            width: 100%;
+            min-height: 100vh;
+            margin-left: 0;
+            padding: 48px 28px;
+        }
     }
 
     @media (max-width: 480px) {
@@ -384,12 +381,17 @@
         .rp-inner { max-width: 100%; }
     }
     </style>
-=======
-    <link href="<?= $assetBase ?>/css/login_modern.css?v=<?= @filemtime(__DIR__ . '/css/login_modern.css') ?>" rel="stylesheet">
->>>>>>> 5c52156e1ac26eb0c544b2edcaba6e0bd63aa584
 </head>
 
 <body>
+    <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+        <defs>
+            <clipPath id="loginCurveClip" clipPathUnits="objectBoundingBox">
+                <path d="M0 0 H1 C0.94 0.20 0.94 0.80 1 1 H0 Z"></path>
+            </clipPath>
+        </defs>
+    </svg>
+
     <!-- ── Left panel ── -->
     <div class="lp">
         <div class="lp-logo">
