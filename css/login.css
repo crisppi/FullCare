@@ -194,3 +194,21 @@ a {
     text-align: center;
     color: #fff;
 }
+
+.login-form-input {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-access-help {
+    text-align: center;
+    margin-right: 40px;
+}
+
+.login-submit-button {
+    background-color: #421849;
+}

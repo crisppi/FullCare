@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<<<<<<< HEAD
 
     <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -157,16 +158,12 @@
     .rp::before {
         content: "";
         position: absolute;
-        top: -7%;
-        bottom: -7%;
-        left: -78px;
-        width: 156px;
-        border-radius: 50%;
-        background: linear-gradient(90deg, #dce9f3 0%, #e8f1f8 42%, #f5f8fc 100%);
-        box-shadow:
-            inset 22px 0 30px rgba(6, 18, 34, .24),
-            inset 44px 0 70px rgba(47, 111, 159, .16),
-            -14px 0 34px rgba(6, 18, 34, .20);
+        top: 0;
+        bottom: 0;
+        left: -56px;
+        width: 72px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 1000' preserveAspectRatio='none'%3E%3Cpath d='M72 0 C18 210 18 790 72 1000 L72 0 Z' fill='%23e2edf6'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+        filter: drop-shadow(-14px 0 28px rgba(6, 18, 34, .24));
         pointer-events: none;
         z-index: 0;
     }
@@ -387,6 +384,9 @@
         .rp-inner { max-width: 100%; }
     }
     </style>
+=======
+    <link href="<?= $assetBase ?>/css/login_modern.css?v=<?= @filemtime(__DIR__ . '/css/login_modern.css') ?>" rel="stylesheet">
+>>>>>>> 5c52156e1ac26eb0c544b2edcaba6e0bd63aa584
 </head>
 
 <body>
@@ -428,7 +428,7 @@
             <h2 class="rp-title">Bem-vindo</h2>
             <p class="rp-subtitle">Acesse sua conta para continuar</p>
 
-            <form action="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/check_login.php" method="post" autocomplete="off" style="width:100%">
+            <form action="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/check_login.php" method="post" autocomplete="off" class="login-form">
 
                 <div class="field-group">
                     <label for="email_login">E-mail</label>

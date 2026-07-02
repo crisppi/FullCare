@@ -1900,7 +1900,7 @@ try {
     display: block;
     color: #24384f;
     font-size: .78rem;
-    font-weight: 900;
+    font-weight: 700;
     line-height: 1.15;
 }
 
@@ -1909,7 +1909,7 @@ try {
     margin-top: 3px;
     color: #64748b;
     font-size: .62rem;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .hospital-opportunity-level {
@@ -1920,7 +1920,7 @@ try {
     padding: 0 9px;
     border-radius: 999px;
     font-size: .68rem;
-    font-weight: 900;
+    font-weight: 600;
     white-space: nowrap;
 }
 
@@ -1962,7 +1962,7 @@ try {
     display: block;
     color: #64748b;
     font-size: .58rem;
-    font-weight: 900;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .04em;
 }
@@ -1972,7 +1972,7 @@ try {
     margin-top: 4px;
     color: #24384f;
     font-size: .78rem;
-    font-weight: 900;
+    font-weight: 700;
     line-height: 1.1;
 }
 
@@ -1985,10 +1985,14 @@ try {
     display: flex;
     align-items: flex-start;
     gap: 7px;
-    color: #334155;
+    color: #3d4b5d;
     font-size: .68rem;
-    font-weight: 750;
+    font-weight: 500;
     line-height: 1.25;
+}
+
+.hospital-opportunity-line strong {
+    font-weight: 600;
 }
 
 .hospital-opportunity-line i {
@@ -2014,7 +2018,7 @@ try {
     color: inherit;
     border: 0;
     font-size: inherit;
-    font-weight: inherit;
+    font-weight: 500;
     line-height: inherit;
     text-transform: uppercase;
 }
@@ -2252,6 +2256,48 @@ try {
     #dash-longa-perm .table,
     #dash-reinternacoes .table {
         font-size: .68rem !important;
+    }
+
+    #dash-reinternacoes .table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    #dash-reinternacoes .table th:nth-child(1),
+    #dash-reinternacoes .table td:nth-child(1) {
+        width: 7%;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #dash-reinternacoes .table th:nth-child(2),
+    #dash-reinternacoes .table td:nth-child(2) {
+        width: 24%;
+        text-align: left;
+    }
+
+    #dash-reinternacoes .table th:nth-child(3),
+    #dash-reinternacoes .table td:nth-child(3) {
+        width: 23%;
+        text-align: left;
+    }
+
+    #dash-reinternacoes .table th:nth-child(4),
+    #dash-reinternacoes .table td:nth-child(4),
+    #dash-reinternacoes .table th:nth-child(5),
+    #dash-reinternacoes .table td:nth-child(5),
+    #dash-reinternacoes .table th:nth-child(6),
+    #dash-reinternacoes .table td:nth-child(6) {
+        width: 13%;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #dash-reinternacoes .table th:nth-child(7),
+    #dash-reinternacoes .table td:nth-child(7) {
+        width: 7%;
+        text-align: center;
+        white-space: nowrap;
     }
 
     #dash-visitas-atraso .table thead th,

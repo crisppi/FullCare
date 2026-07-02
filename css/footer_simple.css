@@ -1,0 +1,181 @@
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 84px;
+}
+
+body.bi-theme {
+    padding-bottom: 0;
+}
+
+body.bi-theme #myFooterSimple {
+    display: none !important;
+}
+
+#myFooterSimple {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    width: 100%;
+    background: linear-gradient(90deg, #f2ecfb 0%, #ebe5f7 52%, #e8f1fb 100%);
+    box-shadow: 0 -8px 22px rgba(95, 69, 148, 0.08);
+    border-top: 1px solid rgba(116, 100, 137, 0.14);
+}
+
+#myFooterSimple .footer-simple-inner {
+    position: relative;
+}
+
+#myFooterSimple::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -14px;
+    height: 14px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(225, 218, 242, 0.6) 100%);
+    pointer-events: none;
+}
+
+#myFooterSimple .footer-simple-main {
+    min-height: 44px;
+    padding: 6px 18px;
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr);
+    align-items: center;
+    gap: 16px;
+}
+
+#myFooterSimple .footer-simple-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    justify-self: start;
+}
+
+#myFooterSimple .footer-simple-brand img {
+    width: 50px;
+    max-width: 100%;
+    height: auto;
+}
+
+#myFooterSimple .footer-simple-brand-text {
+    color: #6a5b84;
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+#myFooterSimple .footer-simple-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    justify-self: center;
+}
+
+#myFooterSimple .footer-simple-links a {
+    color: #6a587f;
+    text-decoration: none;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+#myFooterSimple .footer-simple-links a:hover {
+    color: #4f3674;
+    text-decoration: underline;
+    text-decoration-color: rgba(79, 54, 116, 0.32);
+}
+
+#myFooterSimple .footer-simple-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    justify-self: end;
+}
+
+#myFooterSimple .footer-simple-copy,
+#myFooterSimple .footer-simple-version {
+    color: #746489;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+@media (max-width: 920px) {
+    body {
+        padding-bottom: 96px;
+    }
+
+    #myFooterSimple .footer-simple-main {
+        flex-wrap: wrap;
+        display: flex;
+        justify-content: center;
+        row-gap: 6px;
+    }
+
+    #myFooterSimple .footer-simple-brand,
+    #myFooterSimple .footer-simple-links,
+    #myFooterSimple .footer-simple-meta {
+        justify-self: auto;
+    }
+
+    #myFooterSimple .footer-simple-meta {
+        justify-self: center;
+    }
+}
+
+@media (max-width: 640px) {
+    body {
+        padding-bottom: 98px;
+    }
+
+    #myFooterSimple .footer-simple-main {
+        min-height: 52px;
+        padding: 7px 10px;
+        gap: 8px;
+    }
+
+    #myFooterSimple .footer-simple-brand img {
+        width: 44px;
+    }
+
+    #myFooterSimple .footer-simple-brand-text,
+    #myFooterSimple .footer-simple-links a,
+    #myFooterSimple .footer-simple-copy {
+        font-size: 0.56rem;
+    }
+
+    #myFooterSimple .footer-simple-version {
+        font-size: 0.54rem;
+    }
+}
+
+#main-container.internacao-page .entity-form select.form-control.select-placeholder-empty,
+#main-container.internacao-page #multi-step-form select.form-control.select-placeholder-empty,
+#main-container.internacao-page .entity-form select.form-control.select-placeholder-empty:focus,
+#main-container.internacao-page #multi-step-form select.form-control.select-placeholder-empty:focus {
+    color: #c4c4c4 !important;
+    font-weight: 500 !important;
+}
+
+#main-container.internacao-page .entity-form select.form-control.select-placeholder-empty option,
+#main-container.internacao-page #multi-step-form select.form-control.select-placeholder-empty option {
+    color: #2f3742 !important;
+}
+
+#main-container.internacao-page .entity-form select.form-control.select-placeholder-empty option[value=""],
+#main-container.internacao-page #multi-step-form select.form-control.select-placeholder-empty option[value=""] {
+    color: #c4c4c4 !important;
+}
