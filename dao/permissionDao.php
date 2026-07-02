@@ -68,8 +68,34 @@ final class PermissionDAO
               ON p." . self::COL_P_UID . " = u." . self::COL_UID . "
             ORDER BY u." . self::COL_NAME . " ASC
         ";
-        $st = $this->conn->query($sql);
-        return $st->fetchAll();
+        try {
+            $st = $this->conn->query($sql);
+            return $st->fetchAll();
+        } catch (PDOException $e) {
+            if ($e->getCode() !== '42S02') {
+                throw $e;
+            }
+            error_log('[PERMISSION_DAO][READ_FALLBACK] ' . $e->getMessage());
+            $fallbackSql = "
+                SELECT
+                    u." . self::COL_UID . " AS id_user,
+                    u." . self::COL_NAME . " AS nome,
+                    u." . self::COL_EMAIL . " AS email,
+                    u." . self::COL_CARGO . " AS cargo,
+                    1 AS " . self::COL_VIEW . ",
+                    0 AS " . self::COL_CREATE . ",
+                    0 AS " . self::COL_EDIT . ",
+                    0 AS " . self::COL_DELETE . ",
+                    0 AS " . self::COL_DISCHARGE . ",
+                    0 AS " . self::COL_CLOSE_MANAGEMENT . ",
+                    0 AS " . self::COL_GENERATE_PDF . ",
+                    NULL AS " . self::COL_UPDATED . "
+                FROM " . self::T_USERS . " u
+                ORDER BY u." . self::COL_NAME . " ASC
+            ";
+            $st = $this->conn->query($fallbackSql);
+            return $st->fetchAll();
+        }
     }
 
     /** Retorna Permission de 1 usuário (ou zeros se não houver linha) */
@@ -258,6 +284,21 @@ final class PermissionDAO
     private function ensurePermissionColumns(): void
     {
         try {
+            $this->conn->exec("
+                CREATE TABLE IF NOT EXISTS " . self::T_PERMS . " (
+                    " . self::COL_P_UID . " INT NOT NULL,
+                    " . self::COL_VIEW . " TINYINT(1) NOT NULL DEFAULT 1,
+                    " . self::COL_CREATE . " TINYINT(1) NOT NULL DEFAULT 0,
+                    " . self::COL_EDIT . " TINYINT(1) NOT NULL DEFAULT 0,
+                    " . self::COL_DELETE . " TINYINT(1) NOT NULL DEFAULT 0,
+                    " . self::COL_DISCHARGE . " TINYINT(1) NOT NULL DEFAULT 0,
+                    " . self::COL_CLOSE_MANAGEMENT . " TINYINT(1) NOT NULL DEFAULT 0,
+                    " . self::COL_GENERATE_PDF . " TINYINT(1) NOT NULL DEFAULT 0,
+                    " . self::COL_UPDATED . " TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    PRIMARY KEY (" . self::COL_P_UID . ")
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ");
+
             $st = $this->conn->query("SHOW COLUMNS FROM " . self::T_PERMS);
             $cols = $st ? $st->fetchAll(PDO::FETCH_COLUMN) : [];
             $has = array_fill_keys(array_map('strtolower', $cols ?: []), true);

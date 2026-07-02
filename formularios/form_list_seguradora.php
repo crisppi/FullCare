@@ -88,6 +88,35 @@
     ?>
 
     <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css?v=' . @filemtime(__DIR__ . '/../css/listagem_padrao.css'), ENT_QUOTES, 'UTF-8') ?>">
+    <style>
+        .seguradoras-list-table tbody tr {
+            height: 54px;
+        }
+
+        .seguradoras-list-table tbody td,
+        .seguradoras-list-table tbody th {
+            height: 54px;
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
+            vertical-align: middle !important;
+        }
+
+        .seguradora-logo-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+        }
+
+        .seguradora-list-logo {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 96px;
+            max-height: 32px;
+            object-fit: contain;
+        }
+    </style>
 
     <!--tabela evento-->
     <div class="container-fluid form_container listagem-page" style="margin-top:18px;">
@@ -177,7 +206,7 @@
                     <!-- <?php
                             include_once("check_nivel.php");
                             ?> -->
-                    <table class="table table-sm table-striped  table-hover table-condensed">
+                    <table class="table table-sm table-striped table-hover table-condensed seguradoras-list-table">
                         <thead>
                             <tr>
                                 <th scope="col">Id</th>
@@ -202,9 +231,13 @@
                                     <?= $id_seguradora ?>
                                 </td>
                                 <td scope="row" class="nome-coluna-table">
+                                    <div class="seguradora-logo-cell">
                                     <?php if ($seguradora['logo_seg']) { ?>
-                                    <img src="uploads/<?= $seguradora['logo_seg']; ?>" height="65" width="65">
+                                    <img class="seguradora-list-logo"
+                                        src="uploads/<?= htmlspecialchars($seguradora['logo_seg'], ENT_QUOTES, 'UTF-8'); ?>"
+                                        alt="Logo <?= htmlspecialchars($seguradora_seg ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                                     <?php } ?>
+                                    </div>
                                 </td>
                                 <td scope="row" class="nome-coluna-table">
                                     <?= $seguradora_seg ?>

@@ -174,7 +174,6 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
         <div class="visita-card visita-card--general">
             <div class="visita-card__header">
                 <div>
-                    <p class="visita-card__eyebrow">Etapa 1</p>
                     <h2 class="visita-card__title">Dados da visita</h2>
                 </div>
                     <span class="visita-card__tag" id="visita-main-tag">Informações principais</span>
@@ -442,13 +441,13 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
             </div>
 
             <!-- ENTRADA DE DADOS AUTOMATICOS NO INPUT-->
-            <div class="form-group col-sm-1">
+            <div style="display:none;">
                 <input type="hidden" class="form-control" value="n" id="internado_uti_int" name="internado_uti_int">
             </div>
-            <div class="form-group col-sm-1">
+            <div style="display:none;">
                 <input type="hidden" class="form-control" value="n" id="internacao_uti_int" name="internacao_uti_int">
             </div>
-            <div class="form-group col-sm-1">
+            <div style="display:none;">
                 <input type="hidden" class="form-control" value="s" id="internacao_ativa_int"
                     name="internacao_ativa_int">
             </div>
@@ -2046,6 +2045,10 @@ function aumentarTextProgramacao() {
     line-height: 1.15 !important;
 }
 
+.visita-card__eyebrow + .visita-card__title {
+    margin-top: 3px !important;
+}
+
 .visita-card__tag {
     padding: 4px 10px !important;
     border-radius: 8px !important;
@@ -2477,7 +2480,7 @@ function aumentarTextProgramacao() {
 
 /* Ajuste final dos complementos e detalhes da visita */
 #main-container .visita-page .visita-card--tabelas {
-    margin-top: -4px !important;
+    margin-top: 10px !important;
     padding: 8px 10px !important;
     border-radius: 8px !important;
     box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
@@ -3120,6 +3123,24 @@ function aumentarTextProgramacao() {
     font-weight: 750 !important;
 }
 
+.visita-card--tabelas > .visita-card__body > .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    padding-right: 26px !important;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231f4d85' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"),
+        linear-gradient(180deg, #eaf4ff 0%, #d6eaff 100%) !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-position: right 8px center, 0 0 !important;
+    background-size: 15px 15px, 100% 100% !important;
+}
+
+.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id]::after {
+    display: inline-block !important;
+    margin-left: auto !important;
+    border-top-color: #1f4d85 !important;
+}
+
 #add-visita-form .visita-summary-card__input,
 #add-visita-form .visita-head-field :is(input.form-control, select.form-control, textarea.form-control, .form-select),
 #add-visita-form .visita-card:not(.visita-card--tabelas) :is(input.form-control, select.form-control, textarea.form-control, .form-select),
@@ -3165,6 +3186,28 @@ function aumentarTextProgramacao() {
     .visita-page #container-negoc .negotiation-field-container {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
+}
+
+#main-container .visita-page .visita-card--tabelas .tabelas-selects > .tabelas-col {
+    position: relative !important;
+}
+
+#main-container .visita-page .visita-card--tabelas .tabelas-selects > .tabelas-col::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    bottom: 11px;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #1f4d85;
+    pointer-events: none;
+    z-index: 20;
+}
+
+#main-container .visita-page .visita-card--tabelas .tabelas-selects :is(select, .bootstrap-select > .dropdown-toggle) {
+    padding-right: 32px !important;
 }
 </style>
 <textarea id="visita-bootstrap-json" hidden><?= htmlspecialchars(json_encode([
