@@ -3138,4 +3138,73 @@
                 grid-template-columns: 1fr !important;
             }
         }
+
+        /* Contraste visual alinhado ao cadastro de visita. */
+        #main-container:has(.internacao-page) {
+            background: linear-gradient(180deg, #e3e9f2 0%, #d8e1ec 100%) !important;
+        }
+
+        #main-container .internacao-page {
+            padding: 2px 10px 18px !important;
+            border-radius: 12px !important;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04)),
+                #dfe7f1 !important;
+        }
+
+        #main-container .internacao-page .internacao-page__content {
+            gap: 12px !important;
+        }
+
+        #main-container .internacao-page :is(.internacao-card, .tabelas-adicionais-card, #detalhes-card-wrapper) + :is(.internacao-card, .tabelas-adicionais-card, #detalhes-card-wrapper),
+        #main-container .internacao-page .internacao-card + .tabelas-adicionais-card,
+        #main-container .internacao-page .tabelas-adicionais-card + :is(#tabelas-adicionais-paineis-edit, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc),
+        #main-container .internacao-page :is(#tabelas-adicionais-paineis-edit, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) + :is(#tabelas-adicionais-paineis-edit, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) {
+            margin-top: 12px !important;
+        }
+
+        #main-container .internacao-page .internacao-card,
+        #main-container .internacao-page .tabelas-adicionais-card,
+        #main-container .internacao-page .clinical-text-field,
+        #main-container .internacao-page .ia-highlight-box,
+        #main-container .internacao-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .adicional-card,
+        #main-container .internacao-page #detalhes-card-wrapper {
+            background: #ffffff !important;
+            border: 1px solid #cfd9e7 !important;
+            box-shadow: 0 8px 18px rgba(36, 56, 79, .10) !important;
+        }
+
+        #main-container .internacao-page .internacao-card__header,
+        #main-container .internacao-page .tabelas-adicionais-card__header,
+        #main-container .internacao-page .clinical-text-field__head,
+        #main-container .internacao-page .ia-highlight-box__header {
+            border-bottom-color: #e0e7f0 !important;
+        }
+
+        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
+        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
+            background-color: #f8fbff !important;
+            border: 1px solid #aebdce !important;
+            color: #1f2937 !important;
+            box-shadow:
+                inset 0 1px 2px rgba(15, 23, 42, .08),
+                0 1px 0 rgba(255, 255, 255, .8) !important;
+        }
+
+        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):hover,
+        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle:hover {
+            border-color: #7f94aa !important;
+            background-color: #ffffff !important;
+        }
+
+        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):focus,
+        #main-container .internacao-page #myForm .bootstrap-select.show > .dropdown-toggle,
+        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle:focus {
+            border-color: #2f89bd !important;
+            background-color: #ffffff !important;
+            box-shadow:
+                0 0 0 .14rem rgba(47, 137, 189, .18),
+                inset 0 1px 2px rgba(15, 23, 42, .08) !important;
+        }
     </style>

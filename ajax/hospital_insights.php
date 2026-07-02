@@ -31,12 +31,23 @@ try {
     }
 
     $threshold = 5;
+    $activeHospitalWhere = "
+           ac.fk_hospital_int = :hospId
+           AND LOWER(COALESCE(ac.internado_int, '')) = 's'
+           AND NOT EXISTS (
+                SELECT 1
+                  FROM tb_alta alx
+                 WHERE alx.fk_id_int_alt = ac.id_internacao
+                   AND alx.data_alta_alt IS NOT NULL
+                   AND alx.data_alta_alt <> '0000-00-00'
+           )
+    ";
 
     $stmtNeg = $conn->prepare("
         SELECT COUNT(*) AS total_negociacoes, COALESCE(SUM(ng.saving), 0) AS total_saving
           FROM tb_negociacao ng
           INNER JOIN tb_internacao ac ON ng.fk_id_int = ac.id_internacao
-         WHERE ac.fk_hospital_int = :hospId
+         WHERE {$activeHospitalWhere}
            AND UPPER(COALESCE(ng.tipo_negociacao, '')) <> 'PRORROGACAO_AUTOMATICA'
     ");
     $stmtNeg->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
@@ -50,7 +61,7 @@ try {
                COUNT(*) AS qtd
           FROM tb_negociacao ng
           INNER JOIN tb_internacao ac ON ng.fk_id_int = ac.id_internacao
-         WHERE ac.fk_hospital_int = :hospId
+         WHERE {$activeHospitalWhere}
            AND UPPER(COALESCE(ng.tipo_negociacao, '')) <> 'PRORROGACAO_AUTOMATICA'
          GROUP BY tipo
          ORDER BY qtd DESC, tipo ASC
@@ -75,7 +86,7 @@ try {
                COALESCE(SUM(ca.glosa_opme), 0) AS glosa_opme
           FROM tb_capeante ca
           INNER JOIN tb_internacao ac ON ca.fk_int_capeante = ac.id_internacao
-         WHERE ac.fk_hospital_int = :hospId
+         WHERE {$activeHospitalWhere}
            AND ca.valor_glosa_total > 0
     ");
     $stmtGlosa->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
@@ -105,20 +116,21 @@ try {
     });
 
     $stmtEA = $conn->prepare("
-        SELECT COUNT(*) AS qtd_ea
+        SELECT COUNT(DISTINCT ac.id_internacao) AS qtd_ea
           FROM tb_gestao g
           INNER JOIN tb_internacao ac ON g.fk_internacao_ges = ac.id_internacao
-         WHERE ac.fk_hospital_int = :hospId
-           AND g.evento_adverso_ges = 's'
+         WHERE {$activeHospitalWhere}
+           AND LOWER(COALESCE(g.evento_adverso_ges, '')) = 's'
+           AND (g.evento_encerrar_ges IS NULL OR LOWER(g.evento_encerrar_ges) <> 's')
     ");
     $stmtEA->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
     $stmtEA->execute();
     $eventosAdversos = (int) ($stmtEA->fetchColumn() ?: 0);
 
     $stmtTotal = $conn->prepare("
-        SELECT COUNT(*) 
+        SELECT COUNT(DISTINCT ac.id_internacao)
           FROM tb_internacao ac
-         WHERE ac.fk_hospital_int = :hospId
+         WHERE {$activeHospitalWhere}
     ");
     $stmtTotal->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
     $stmtTotal->execute();
@@ -128,7 +140,7 @@ try {
         SELECT COUNT(DISTINCT ac.id_internacao)
           FROM tb_internacao ac
           LEFT JOIN tb_uti ut ON ut.fk_internacao_uti = ac.id_internacao
-         WHERE ac.fk_hospital_int = :hospId
+         WHERE {$activeHospitalWhere}
            AND (
                 ac.internado_uti_int = 's'
              OR ac.internacao_uti_int = 's'
@@ -143,12 +155,11 @@ try {
     $longStayThreshold = 20;
     $stmtLong = $conn->prepare("
         SELECT
-            SUM(GREATEST(DATEDIFF(COALESCE(al.data_alta_alt, CURRENT_DATE), ac.data_intern_int), 0)) AS dias_total,
-            COUNT(*) AS qtd_long
+            SUM(GREATEST(DATEDIFF(CURRENT_DATE, ac.data_intern_int), 0)) AS dias_total,
+            COUNT(DISTINCT ac.id_internacao) AS qtd_long
           FROM tb_internacao ac
-          LEFT JOIN tb_alta al ON al.fk_id_int_alt = ac.id_internacao
-         WHERE ac.fk_hospital_int = :hospId
-           AND DATEDIFF(COALESCE(al.data_alta_alt, CURRENT_DATE), ac.data_intern_int) >= :dias
+         WHERE {$activeHospitalWhere}
+           AND GREATEST(DATEDIFF(CURRENT_DATE, ac.data_intern_int), 0) >= :dias
     ");
     $stmtLong->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
     $stmtLong->bindValue(':dias', $longStayThreshold, PDO::PARAM_INT);
@@ -158,10 +169,9 @@ try {
     $totalDiasLong = (int) ($longRow['dias_total'] ?? 0);
 
     $stmtDiasHospital = $conn->prepare("
-        SELECT SUM(GREATEST(DATEDIFF(COALESCE(al.data_alta_alt, CURRENT_DATE), ac.data_intern_int), 0)) AS total_dias
+        SELECT SUM(GREATEST(DATEDIFF(CURRENT_DATE, ac.data_intern_int), 0)) AS total_dias
           FROM tb_internacao ac
-          LEFT JOIN tb_alta al ON al.fk_id_int_alt = ac.id_internacao
-         WHERE ac.fk_hospital_int = :hospId
+         WHERE {$activeHospitalWhere}
     ");
     $stmtDiasHospital->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
     $stmtDiasHospital->execute();
@@ -171,7 +181,7 @@ try {
         SELECT SUM(GREATEST(DATEDIFF(COALESCE(ut.data_alta_uti, CURRENT_DATE), ut.data_internacao_uti), 0)) AS total_dias
           FROM tb_internacao ac
           INNER JOIN tb_uti ut ON ut.fk_internacao_uti = ac.id_internacao
-         WHERE ac.fk_hospital_int = :hospId
+         WHERE {$activeHospitalWhere}
     ");
     $stmtDiasUti->bindValue(':hospId', $hospitalId, PDO::PARAM_INT);
     $stmtDiasUti->execute();

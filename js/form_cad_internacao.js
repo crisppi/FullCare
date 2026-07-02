@@ -792,11 +792,11 @@ const hospitalInsightsHelper = (function() {
                 <div>Oportunidade: <strong><i class="bi ${icon}"></i> ${esc(nivel)}</strong></div>
                 <div>Tipo: <strong>${esc(tipo)}</strong></div>
                 <div>${esc(resumo)}</div>
-                <div>Negociações registradas: <strong>${esc(data.negociacoes ?? 0)}</strong></div>
-                <div>Saving registrado: <strong>${esc(saving)}</strong></div>
+                <div>Negociações atuais: <strong>${esc(data.negociacoes ?? 0)}</strong></div>
+                <div>Saving atual: <strong>${esc(saving)}</strong></div>
                 <div>Principais glosas: <strong>${glosaTipos}</strong></div>
                 <div>Internações em UTI: <strong>${data.inter_uti ?? 0}</strong></div>
-                <div>Total de internações: <strong>${data.total_internacoes ?? 0}</strong></div>
+                <div>Internações ativas: <strong>${data.total_internacoes ?? 0}</strong></div>
                 <div>UTI vs Total: <strong>${percent}%</strong></div>
                 <div>MP Hospital: <strong>${data.mp_hospital ?? 0} dias</strong></div>
                 <div>MP UTI: <strong>${data.mp_uti ?? 0} dias</strong></div>
