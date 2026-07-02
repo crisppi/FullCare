@@ -239,10 +239,21 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                                 && $editVisitaIdParam
                                 && ($visitaNoOption === (int)$editVisitaIdParam || $visitaIdOption === (int)$editVisitaIdReal)
                             );
+                            $dataVisitaOption = 'Data não informada';
+                            if (!empty($visita['data_visita_vis'])) {
+                                $dataVisitaObj = DateTime::createFromFormat('Y-m-d', (string)$visita['data_visita_vis']);
+                                if (!$dataVisitaObj) {
+                                    $dataVisitaTs = strtotime((string)$visita['data_visita_vis']);
+                                    $dataVisitaObj = $dataVisitaTs ? (new DateTime())->setTimestamp($dataVisitaTs) : null;
+                                }
+                                if ($dataVisitaObj instanceof DateTime) {
+                                    $dataVisitaOption = $dataVisitaObj->format('d/m/Y');
+                                }
+                            }
                         ?>
                         <option value="<?= $visita['visita_no_vis'] ?>" <?= $retificarSelected ? 'selected' : '' ?>>
                             Visita ID <?= $visita['visita_no_vis'] ?> -
-                            <?= isset($visita['data_visita_vis']) ? DateTime::createFromFormat('Y-m-d', $visita['data_visita_vis'])->format('d/m/Y') : 'Data não informada' ?>
+                            <?= htmlspecialchars($dataVisitaOption, ENT_QUOTES, 'UTF-8') ?>
                         </option>
                         <?php endif; ?>
                         <?php endforeach; ?>
@@ -556,13 +567,10 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
             </script>
 
             <div class="visita-actions">
-                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-                    <small id="clinical-autosave-status" class="text-muted">Rascunho automático: ativo</small>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-clinical-draft="fields">Limpar rascunho</button>
-                </div>
                 <button type="submit" class="btn btn-success btn-submit-standard" id="visita-submit-btn">
                     <i class="fas fa-check"></i> <span id="visita-submit-label">Cadastrar</span>
                 </button>
+                <button type="button" class="btn btn-sm btn-clear-draft" data-clear-clinical-draft="fields">Limpar rascunho</button>
                 <div class="alert" id="alert" role="alert"></div>
             </div>
     </form>
@@ -2801,6 +2809,28 @@ function aumentarTextProgramacao() {
     border-radius: 7px !important;
     font-size: .78rem !important;
     line-height: 1 !important;
+}
+
+#main-container .visita-page .visita-actions .btn-clear-draft {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 12px !important;
+    border: 1px solid #b8d7ea !important;
+    border-radius: 7px !important;
+    background: #edf8ff !important;
+    color: #236693 !important;
+    font-size: .76rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+#main-container .visita-page .visita-actions .btn-clear-draft:hover,
+#main-container .visita-page .visita-actions .btn-clear-draft:focus {
+    background: #dff1fb !important;
+    border-color: #8fc7e6 !important;
+    color: #1f5f8f !important;
+    outline: none !important;
 }
 
 @media (max-width: 1199.98px) {

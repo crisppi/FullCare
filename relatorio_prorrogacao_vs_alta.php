@@ -110,29 +110,30 @@ $altasComPrazo = $altasDentro + $altasFora;
 .report-wrapper {
     width: 100%;
     max-width: none;
-    margin: 8px 0 44px;
-    padding: 0 24px;
+    margin: 4px 0 24px;
+    padding: 0 14px;
 }
 .report-header {
     background: linear-gradient(120deg, #f4faff, #e8f4fb);
-    border-radius: 18px;
-    padding: 18px 22px;
+    border-radius: 12px;
+    padding: 10px 14px;
     border: 1px solid rgba(76, 142, 187, .12);
-    margin-bottom: 16px;
+    margin-bottom: 10px;
 }
 .report-header h1 {
-    margin: 0 0 4px;
-    font-weight: 700;
+    margin: 0 0 2px;
+    font-weight: 800;
     color: #24384f;
-    font-size: 1.06rem;
+    font-size: 1rem;
+    line-height: 1.12;
 }
 .report-card {
     background: #fff;
-    border-radius: 16px;
-    padding: 14px 18px;
+    border-radius: 10px;
+    padding: 8px 12px;
     border: 1px solid rgba(76, 142, 187, .08);
-    box-shadow: 0 10px 24px rgba(35, 102, 147, .08);
-    margin-bottom: 14px;
+    box-shadow: none;
+    margin-bottom: 8px;
 }
 .report-wrapper .text-muted,
 .report-wrapper .form-label,
@@ -140,41 +141,73 @@ $altasComPrazo = $altasDentro + $altasFora;
 .report-wrapper .form-select,
 .report-wrapper .table,
 .report-wrapper small {
-    font-size: .78rem;
+    font-size: .7rem;
 }
 .report-wrapper .row.g-3 {
-    --bs-gutter-y: .6rem;
-    --bs-gutter-x: .8rem;
+    --bs-gutter-y: .38rem;
+    --bs-gutter-x: .55rem;
+}
+.report-wrapper .form-label {
+    margin-bottom: .2rem;
+    line-height: 1.05;
+}
+.report-wrapper .form-control,
+.report-wrapper .form-select {
+    min-height: 28px;
+    height: 28px;
+    padding: .18rem .45rem;
+    border-radius: 6px;
+    line-height: 1.08;
+}
+.report-wrapper .btn {
+    min-height: 28px;
+    padding: .25rem .58rem;
+    border-radius: 6px;
+    font-size: .68rem;
+    line-height: 1;
+}
+.report-filter-btn {
+    width: 100%;
 }
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
 }
 .summary-card {
     background: #f4faff;
-    border-radius: 14px;
-    padding: 11px 14px;
+    border-radius: 9px;
+    padding: 7px 10px;
     border: 1px solid rgba(76, 142, 187, .08);
 }
 .summary-card h6 {
-    margin: 0 0 4px;
+    margin: 0 0 3px;
     color: #24384f;
-    font-size: .72rem;
+    font-size: .62rem;
     text-transform: uppercase;
     letter-spacing: .08em;
 }
 .summary-card div {
-    font-size: 1.08rem;
+    font-size: .86rem;
     font-weight: 700;
     color: #2f6f9f;
+    line-height: 1.1;
 }
 .table thead th {
     background: #2f6f9f;
     color: #fff;
-    font-size: .7rem;
-    padding-top: .65rem;
-    padding-bottom: .65rem;
+    font-size: .62rem;
+    padding: .42rem .58rem;
+}
+.report-wrapper .table tbody td {
+    padding: .35rem .58rem;
+    font-size: .68rem;
+    line-height: 1.12;
+}
+.report-card h5 {
+    margin-bottom: .45rem !important;
+    font-size: .82rem;
+    line-height: 1.12;
 }
 .report-wrapper .table-striped > tbody > tr:nth-of-type(odd) > * {
     --bs-table-accent-bg: #f4faff;
@@ -186,6 +219,7 @@ $altasComPrazo = $altasDentro + $altasFora;
     --bs-table-accent-bg: #e8f4fb;
 }
 </style>
+<link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 
 <div class="report-wrapper">
     <div class="report-header">
@@ -195,11 +229,11 @@ $altasComPrazo = $altasDentro + $altasFora;
 
     <form class="report-card" method="get">
         <div class="row g-3 align-items-end">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label">Data inicial</label>
                 <input type="date" class="form-control" name="data_ini" value="<?= e($dataIni) ?>">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label">Data final</label>
                 <input type="date" class="form-control" name="data_fim" value="<?= e($dataFim) ?>">
             </div>
@@ -225,8 +259,8 @@ $altasComPrazo = $altasDentro + $altasFora;
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-12">
-                <button class="btn btn-primary" type="submit">Aplicar filtros</button>
+            <div class="col-md-2">
+                <button class="btn btn-primary report-filter-btn" type="submit">Aplicar filtros</button>
             </div>
         </div>
     </form>
