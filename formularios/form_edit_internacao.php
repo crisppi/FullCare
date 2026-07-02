@@ -2270,7 +2270,11 @@
             visibility: visible;
         }
 
-        /* coloca no seu <head> ou no final do CSS carregado */
+        /* coloca no seu <head>
+    <link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="apple-touch-icon" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+ ou no final do CSS carregado */
         .accordion .accordion-button {
             background-color: #5e2363;
             color: #fff;

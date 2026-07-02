@@ -227,6 +227,10 @@ endif;
 <html lang="pt-br">
 
 <head>
+    <link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="apple-touch-icon" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+
     <meta charset="utf-8">
     <?php
     $exportTitle = isset($pageTitle) && $pageTitle ? $pageTitle : 'Lista de Visitas';

@@ -77,8 +77,9 @@ class InternacaoChartService
         $rows = $this->fetchRows($spec['key'], $filters, $ctx);
         $chart = $this->buildChart($spec, $rows);
         $insight = $this->buildLocalInsight($question, $spec, $filters, $rows);
+        $hasInsufficientTrendData = $this->hasInsufficientMonthlyTrendData($spec, $rows);
 
-        if ($source === 'openai') {
+        if ($source === 'openai' && !$hasInsufficientTrendData) {
             try {
                 $insight = $this->requestInsight($question, $spec, $filters, $rows);
             } catch (Throwable $e) {
@@ -551,14 +552,22 @@ class InternacaoChartService
         $stmt = $this->conn->prepare($sql);
         $this->bindParams($stmt, $params);
         $stmt->execute();
-        return array_map(function (array $row) use ($templateKey): array {
+        $rows = array_map(function (array $row): array {
             $label = (string)($row['label'] ?? 'Sem identificação');
             return [
-                'label' => $this->formatChartLabel($label, $templateKey),
+                'label' => $label,
                 'value' => round((float)($row['value'] ?? 0), 2),
                 'extra' => isset($row['extra']) ? (string)$row['extra'] : '',
+                'is_missing' => false,
             ];
         }, $stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
+
+        $rows = $this->normalizeMonthlyRows($templateKey, $rows, $filters);
+
+        return array_map(function (array $row) use ($templateKey): array {
+            $row['label'] = $this->formatChartLabel((string)($row['label'] ?? ''), $templateKey);
+            return $row;
+        }, $rows);
     }
 
     private function sqlParts(string $templateKey): array
@@ -685,7 +694,7 @@ class InternacaoChartService
                 ];
             case 'media_permanencia_por_hospital':
                 return [
-                    "COALESCE(NULLIF(h.nome_hosp, ''), 'Sem hospital') AS label, AVG(GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1)) AS value, CONCAT(COUNT(DISTINCT i.id_internacao), ' internações') AS extra",
+                    "COALESCE(NULLIF(h.nome_hosp, ''), 'Sem hospital') AS label, AVG(GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1)) AS value, CONCAT(COUNT(DISTINCT i.id_internacao), CASE WHEN COUNT(DISTINCT i.id_internacao) = 1 THEN ' internação' ELSE ' internações' END) AS extra",
                     $altaJoin,
                     '',
                     'GROUP BY h.id_hospital, h.nome_hosp',
@@ -695,7 +704,7 @@ class InternacaoChartService
                 ];
             case 'media_permanencia_mensal':
                 return [
-                    "DATE_FORMAT(i.data_intern_int, '%Y-%m') AS label, AVG(GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1)) AS value, CONCAT(COUNT(DISTINCT i.id_internacao), ' internações') AS extra",
+                    "DATE_FORMAT(i.data_intern_int, '%Y-%m') AS label, AVG(GREATEST(1, DATEDIFF(COALESCE(al.data_alta_alt, CURDATE()), i.data_intern_int) + 1)) AS value, CONCAT(COUNT(DISTINCT i.id_internacao), CASE WHEN COUNT(DISTINCT i.id_internacao) = 1 THEN ' internação' ELSE ' internações' END) AS extra",
                     $altaJoin,
                     '',
                     'GROUP BY label',
@@ -1014,13 +1023,81 @@ class InternacaoChartService
         return $months[$month] . '/' . substr($m[1], -2);
     }
 
+    private function normalizeMonthlyRows(string $templateKey, array $rows, array $filters): array
+    {
+        if (!$this->isMonthlyTemplate($templateKey)) {
+            return $rows;
+        }
+
+        $months = $this->monthKeysForPeriod((int)($filters['days'] ?? 180));
+        $indexed = [];
+        foreach ($rows as $row) {
+            $key = (string)($row['label'] ?? '');
+            if ($key !== '') {
+                $indexed[$key] = $row;
+            }
+        }
+
+        $filled = [];
+        foreach ($months as $monthKey) {
+            if (isset($indexed[$monthKey])) {
+                $filled[] = $indexed[$monthKey];
+                continue;
+            }
+
+            $filled[] = [
+                'label' => $monthKey,
+                'value' => $this->usesNullableMissingMonthlyValue($templateKey) ? null : 0,
+                'extra' => 'Sem dados no mês',
+                'is_missing' => true,
+            ];
+        }
+
+        return $filled;
+    }
+
+    private function monthKeysForPeriod(int $days): array
+    {
+        $monthCount = max(1, min(24, (int)ceil(max(1, $days) / 31)));
+        $currentMonth = new DateTimeImmutable('first day of this month');
+        $startMonth = $currentMonth->modify('-' . ($monthCount - 1) . ' months');
+        $months = [];
+
+        for ($i = 0; $i < $monthCount; $i++) {
+            $months[] = $startMonth->modify('+' . $i . ' months')->format('Y-m');
+        }
+
+        return $months;
+    }
+
+    private function isMonthlyTemplate(string $templateKey): bool
+    {
+        return in_array($templateKey, [
+            'internacoes_por_mes',
+            'media_permanencia_mensal',
+            'saving_mensal',
+            'faturamento_apresentado_mensal',
+            'faturamento_final_mensal',
+            'glosa_mensal',
+            'visitas_faturadas_mensal',
+        ], true);
+    }
+
+    private function usesNullableMissingMonthlyValue(string $templateKey): bool
+    {
+        return in_array($templateKey, [
+            'media_permanencia_mensal',
+        ], true);
+    }
+
     private function buildChart(array $spec, array $rows): array
     {
         return [
             'type' => $spec['chart_type'],
             'labels' => array_column($rows, 'label'),
             'dataset_label' => $spec['metric'],
-            'values' => array_map(fn($row) => (float)$row['value'], $rows),
+            'values' => array_map(fn($row) => $row['value'] === null ? null : (float)$row['value'], $rows),
+            'missing' => array_map(fn($row) => !empty($row['is_missing']), $rows),
             'dimension' => $spec['dimension'],
             'metric' => $spec['metric'],
         ];
@@ -1118,8 +1195,18 @@ class InternacaoChartService
             return "Não encontrei dados para montar esse gráfico com os filtros atuais.";
         }
 
-        $total = array_sum(array_map(fn($row) => (float)$row['value'], $rows));
-        $top = $rows[0];
+        if ($this->hasInsufficientMonthlyTrendData($spec, $rows)) {
+            $filledRows = array_values(array_filter($rows, fn($row) => empty($row['is_missing']) && $row['value'] !== null));
+            $onlyLabel = $filledRows ? (string)$filledRows[0]['label'] : 'nenhum mês';
+            return "Leitura local do gráfico:\n"
+                . "- A série mensal tem dado real apenas em {$onlyLabel}.\n"
+                . "- Com menos de dois meses com dados, não existe evolução confiável para desenhar uma linha.\n"
+                . "- Próximo passo: ampliar o período ou conferir se os meses anteriores têm internações fechadas/cadastradas para esse indicador.";
+        }
+
+        $rowsWithValues = array_values(array_filter($rows, fn($row) => $row['value'] !== null));
+        $total = array_sum(array_map(fn($row) => (float)$row['value'], $rowsWithValues));
+        $top = $rowsWithValues[0] ?? $rows[0];
         $topValue = (float)$top['value'];
         $share = $total > 0 ? round(($topValue / $total) * 100, 1) : 0;
         $period = (int)$filters['days'];
@@ -1132,6 +1219,22 @@ class InternacaoChartService
         $text .= "- Total exibido no gráfico: {$totalFormatted}.\n";
         $text .= "- Próximo passo: revisar os primeiros itens do ranking e cruzar com visitas, permanência e pendências operacionais.";
         return $text;
+    }
+
+    private function hasInsufficientMonthlyTrendData(array $spec, array $rows): bool
+    {
+        if (($spec['chart_type'] ?? '') !== 'line' || ($spec['dimension'] ?? '') !== 'Mês') {
+            return false;
+        }
+
+        $validPoints = 0;
+        foreach ($rows as $row) {
+            if (empty($row['is_missing']) && $row['value'] !== null) {
+                $validPoints++;
+            }
+        }
+
+        return $validPoints < 2;
     }
 
     private function formatMetricValue(float $value, string $metric): string

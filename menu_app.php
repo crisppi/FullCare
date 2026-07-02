@@ -834,6 +834,9 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gráficos de Internações</title>
+    <link rel="icon" type="image/png" href="<?= $BASE_URL ?>assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
+    <link rel="shortcut icon" type="image/png" href="<?= $BASE_URL ?>assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= $BASE_URL ?>assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Fontfaces CSS-->
     <link href="diversos/CoolAdmin-master/vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet"

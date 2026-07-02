@@ -637,6 +637,8 @@ $hospitais = $chartService->listHospitals($ctx);
         const chart = payload.chart || {};
         const labels = chart.labels || [];
         const values = chart.values || [];
+        const missing = chart.missing || [];
+        const type = chart.type || 'bar';
         title.textContent = payload.title || 'Gráfico';
         meta.textContent = (chart.metric || 'Indicador') + ' por ' + (chart.dimension || 'dimensão');
         insight.textContent = payload.insight || 'Sem leitura disponível.';
@@ -654,13 +656,26 @@ $hospitais = $chartService->listHospitals($ctx);
             return;
         }
 
+        const validLinePoints = values.filter(function(value, index) {
+            return !missing[index] && value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
+        }).length;
+        if (type === 'line' && validLinePoints < 2) {
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+            wrap.style.display = 'none';
+            empty.style.display = 'flex';
+            empty.textContent = 'Há dados em menos de dois meses. Não dá para desenhar uma evolução confiável com este período.';
+            return;
+        }
+
         empty.style.display = 'none';
         wrap.style.display = '';
         if (chartInstance) {
             chartInstance.destroy();
         }
 
-        const type = chart.type || 'bar';
         const colors = palette(labels.length);
         const lineColor = metricColor(chart);
         const ctx = canvas.getContext('2d');
@@ -734,7 +749,9 @@ $hospitais = $chartService->listHospitals($ctx);
         const metric = escapeHtml(chart.metric || 'Valor');
         table.innerHTML = '<table><thead><tr><th>' + dimension + '</th><th>Observação</th><th>' + metric + '</th></tr></thead><tbody>' +
             rows.map(function(row) {
-                return '<tr><td>' + escapeHtml(row.label || '-') + '</td><td>' + escapeHtml(formatExtraValue(row.extra)) + '</td><td>' + escapeHtml(formatMetricValue(row.value || 0, chart)) + '</td></tr>';
+                const hasValue = row.value !== null && row.value !== undefined && row.value !== '';
+                const valueText = hasValue ? formatMetricValue(row.value, chart) : 'Sem dado';
+                return '<tr><td>' + escapeHtml(row.label || '-') + '</td><td>' + escapeHtml(formatExtraValue(row.extra)) + '</td><td>' + escapeHtml(valueText) + '</td></tr>';
             }).join('') +
             '</tbody></table>';
     }

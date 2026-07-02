@@ -3,6 +3,12 @@ include_once("check_logado.php");
 
 include_once("models/pagination.php");
 
+$appBasePath = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+if ($appBasePath === '.' || $appBasePath === '/') {
+    $appBasePath = '';
+}
+$fullCareFavicon = $appBasePath . '/assets/fullcare-icon.png?v=' . (@filemtime(__DIR__ . '/../../assets/fullcare-icon.png') ?: time());
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -12,7 +18,10 @@ include_once("models/pagination.php");
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão Hospitalar - Lista Hospitais</title> <!-- Título da página -->
+    <title>FullCare - Hospitais</title>
+    <link rel="icon" type="image/png" href="<?= htmlspecialchars($fullCareFavicon, ENT_QUOTES, 'UTF-8') ?>">
+    <link rel="shortcut icon" type="image/png" href="<?= htmlspecialchars($fullCareFavicon, ENT_QUOTES, 'UTF-8') ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars($fullCareFavicon, ENT_QUOTES, 'UTF-8') ?>">
     <link rel="stylesheet" href="./css/table_style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/timeout.js"></script>

@@ -74,8 +74,9 @@ $canSeeCadastrosMenuHeaderFull = $sessionNivelHeaderFull > 3
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
 
-    <link rel="icon" type="image/x-icon" href="img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/../img/full-ico.ico') ?>">
-    <link rel="shortcut icon" type="image/x-icon" href="img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/../img/full-ico.ico') ?>">
+    <link rel="icon" type="image/png" href="assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
+    <link rel="shortcut icon" type="image/png" href="assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
+    <link rel="apple-touch-icon" href="assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
 
     <title>Full-2023</title>
     <!-- Boostrap -->
