@@ -2833,6 +2833,64 @@ function aumentarTextProgramacao() {
     outline: none !important;
 }
 
+/* Reforca a separacao visual entre fundo, cards e campos. */
+#main-container:has(.visita-page) {
+    background: linear-gradient(180deg, #e3e9f2 0%, #d8e1ec 100%) !important;
+}
+
+#main-container .visita-page {
+    padding: 2px 10px 18px !important;
+    border-radius: 12px !important;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04)),
+        #dfe7f1 !important;
+}
+
+#main-container .visita-page .visita-card,
+#main-container .visita-page .visita-summary-card,
+#main-container .visita-page .visita-head-field,
+#main-container .visita-page .clinical-text-field,
+#main-container .visita-page .ia-highlight-box,
+#main-container .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .adicional-card,
+#main-container .visita-page #detalhes-card-wrapper {
+    background: #ffffff !important;
+    border: 1px solid #cfd9e7 !important;
+    box-shadow: 0 8px 18px rgba(36, 56, 79, .10) !important;
+}
+
+#main-container .visita-page .visita-card__header,
+#main-container .visita-page .tabelas-adicionais-card__header {
+    border-bottom-color: #e0e7f0 !important;
+}
+
+#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
+#main-container #add-visita-form .bootstrap-select > .dropdown-toggle,
+#main-container .visita-page .visita-summary-card__input,
+#main-container .visita-page .visita-card--tabelas .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
+    background-color: #f8fbff !important;
+    border: 1px solid #aebdce !important;
+    color: #1f2937 !important;
+    box-shadow:
+        inset 0 1px 2px rgba(15, 23, 42, .08),
+        0 1px 0 rgba(255, 255, 255, .8) !important;
+}
+
+#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):hover,
+#main-container #add-visita-form .bootstrap-select > .dropdown-toggle:hover {
+    border-color: #7f94aa !important;
+    background-color: #ffffff !important;
+}
+
+#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):focus,
+#main-container #add-visita-form .bootstrap-select.show > .dropdown-toggle,
+#main-container #add-visita-form .bootstrap-select > .dropdown-toggle:focus {
+    border-color: #2f89bd !important;
+    background-color: #ffffff !important;
+    box-shadow:
+        0 0 0 .14rem rgba(47, 137, 189, .18),
+        inset 0 1px 2px rgba(15, 23, 42, .08) !important;
+}
+
 @media (max-width: 1199.98px) {
     #main-container .visita-page .visita-card--tabelas .tabelas-selects,
     #main-container .visita-page #detalhes-card-wrapper .row {
