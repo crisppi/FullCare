@@ -7,6 +7,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FullCare</title>
+    <link rel="icon" type="image/x-icon" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/img/full-ico.ico') ?>">
+    <link rel="shortcut icon" type="image/x-icon" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/img/full-ico.ico') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -39,9 +41,10 @@
         margin-right: -64px;
         clip-path: url(#loginCurveClip);
         filter:
-            drop-shadow(18px 0 22px rgba(4, 14, 27, .46))
-            drop-shadow(38px 0 54px rgba(47, 111, 159, .26))
-            drop-shadow(58px 0 86px rgba(47, 111, 159, .14));
+            drop-shadow(12px 0 12px rgba(4, 14, 27, .55))
+            drop-shadow(26px 0 28px rgba(4, 14, 27, .38))
+            drop-shadow(54px 0 68px rgba(47, 111, 159, .32))
+            drop-shadow(88px 0 110px rgba(47, 111, 159, .20));
         background:
             radial-gradient(ellipse at 12% 0%, rgba(95, 164, 208, .14) 0%, transparent 46%),
             radial-gradient(ellipse at 86% 100%, rgba(103, 70, 139, .26) 0%, transparent 54%),
@@ -149,15 +152,16 @@
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        background: linear-gradient(90deg, #dfeaf4 0%, #edf4fa 18%, #f5f8fc 42%, #f5f8fc 100%);
+        background:
+            linear-gradient(90deg, rgba(188, 211, 229, .92) 0%, rgba(218, 232, 243, .78) 13%, rgba(239, 246, 251, .92) 34%, #f5f8fc 62%, #f5f8fc 100%);
         margin-left: 0;
         padding: 48px 56px 48px 124px;
         position: relative;
         overflow: hidden;
         z-index: 1;
         box-shadow:
-            inset 30px 0 44px rgba(55, 111, 151, .22),
-            inset 10px 0 16px rgba(13, 32, 56, .12);
+            inset 46px 0 58px rgba(55, 111, 151, .30),
+            inset 18px 0 22px rgba(13, 32, 56, .18);
     }
 
     .rp-inner {
