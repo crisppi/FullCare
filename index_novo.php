@@ -33,13 +33,17 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 44px 56px 36px;
+        padding: 44px 104px 36px 56px;
         overflow: hidden;
+        z-index: 1;
+        box-shadow:
+            18px 0 42px rgba(6, 18, 34, .40),
+            36px 0 80px rgba(6, 18, 34, .22);
         background:
-            radial-gradient(ellipse at 12% 0%,   rgba(92, 150, 205, .16) 0%, transparent 46%),
-            radial-gradient(ellipse at 88% 100%,  rgba(132, 75, 154, .36) 0%, transparent 54%),
-            radial-gradient(ellipse at 20% 78%, rgba(118, 78, 166, .18) 0%, transparent 46%),
-            linear-gradient(160deg, #0b1f34 0%, #183250 48%, #1b2541 100%);
+            radial-gradient(ellipse at 12% 0%, rgba(95, 164, 208, .14) 0%, transparent 46%),
+            radial-gradient(ellipse at 86% 100%, rgba(103, 70, 139, .26) 0%, transparent 54%),
+            radial-gradient(ellipse at 18% 80%, rgba(55, 118, 168, .12) 0%, transparent 46%),
+            linear-gradient(158deg, #0f2a42 0%, #244762 52%, #2b2f55 100%);
     }
 
     /* noise overlay */
@@ -58,12 +62,14 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        margin-left: -4px;
     }
 
     .lp-logo img {
-        height: 46px;
+        height: 92px;
         width: auto;
-        filter: brightness(0) invert(1);
+        opacity: .9;
+        filter: drop-shadow(0 16px 26px rgba(3, 16, 31, .26)) drop-shadow(0 0 1px rgba(255, 255, 255, .42));
     }
 
     .lp-body {
@@ -71,7 +77,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 48px 0 24px;
+        padding: 36px 0 24px;
     }
 
     .lp-headline {
@@ -84,7 +90,7 @@
 
     .lp-headline span {
         display: block;
-        background: linear-gradient(90deg, #4facde 0%, #8b5be8 100%);
+        background: linear-gradient(90deg, #6fc0ec 0%, #8a78de 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -123,8 +129,8 @@
         height: 7px;
         border-radius: 50%;
         flex-shrink: 0;
-        background: linear-gradient(135deg, #4facde, #8b5be8);
-        box-shadow: 0 0 8px rgba(79, 172, 222, .5);
+        background: linear-gradient(135deg, #6fc0ec, #8a78de);
+        box-shadow: 0 0 8px rgba(111, 192, 236, .34);
     }
 
     .lp-footer {
@@ -139,20 +145,30 @@
         flex-shrink: 0;
         display: flex;
         align-items: center;
-        justify-content: center;
-        background: #f5f8fc;
-        padding: 48px 40px;
+        justify-content: flex-start;
+        background: linear-gradient(90deg, #e2edf6 0%, #eff5fb 18%, #f5f8fc 44%, #f5f8fc 100%);
+        margin-left: -64px;
+        padding: 48px 56px 48px 128px;
         position: relative;
+        overflow: visible;
+        z-index: 2;
     }
 
     .rp::before {
         content: "";
         position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background: linear-gradient(180deg, transparent 0%, rgba(47, 111, 159, .18) 30%, rgba(107, 43, 116, .14) 70%, transparent 100%);
+        top: -7%;
+        bottom: -7%;
+        left: -78px;
+        width: 156px;
+        border-radius: 50%;
+        background: linear-gradient(90deg, #dce9f3 0%, #e8f1f8 42%, #f5f8fc 100%);
+        box-shadow:
+            inset 22px 0 30px rgba(6, 18, 34, .24),
+            inset 44px 0 70px rgba(47, 111, 159, .16),
+            -14px 0 34px rgba(6, 18, 34, .20);
+        pointer-events: none;
+        z-index: 0;
     }
 
     .rp-inner {
@@ -161,13 +177,29 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        position: relative;
+        z-index: 1;
     }
 
-    .rp-logo {
-        height: 68px;
-        width: auto;
-        object-fit: contain;
-        margin-bottom: 28px;
+    .rp-mark {
+        width: 58px;
+        height: 58px;
+        display: grid;
+        place-items: center;
+        border-radius: 18px;
+        margin-bottom: 24px;
+        color: #2f6f9f;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(239, 247, 253, .96)),
+            radial-gradient(circle at 30% 20%, rgba(95, 188, 226, .18), transparent 58%);
+        border: 1px solid rgba(194, 211, 226, .86);
+        box-shadow: 0 18px 42px rgba(47, 111, 159, .13);
+    }
+
+    .rp-mark svg {
+        width: 26px;
+        height: 26px;
+        stroke: currentColor;
     }
 
     .rp-title {
@@ -361,7 +393,7 @@
     <!-- ── Left panel ── -->
     <div class="lp">
         <div class="lp-logo">
-            <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/logo_branco.png" alt="FullCare" />
+            <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/logo_branco.svg" alt="FullCare" />
         </div>
 
         <div class="lp-body">
@@ -386,7 +418,12 @@
     <!-- ── Right panel ── -->
     <div class="rp">
         <div class="rp-inner">
-            <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/LogoFullCare.png" alt="FullCare" class="rp-logo" />
+            <div class="rp-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
+            </div>
 
             <h2 class="rp-title">Bem-vindo</h2>
             <p class="rp-subtitle">Acesse sua conta para continuar</p>
