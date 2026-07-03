@@ -1688,17 +1688,17 @@ function aumentarTextProgramacao() {
     padding-top: 10px !important;
     padding-bottom: 10px !important;
     line-height: 1.2 !important;
-    padding-right: 42px !important;
-    background-repeat: no-repeat !important;
-    background-position: right 14px center !important;
-    background-size: 16px 16px !important;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111827'><path d='M7 10l5 5 5-5z'/></svg>") !important;
+    padding-right: 24px !important;
+    background-repeat: initial !important;
+    background-position: initial !important;
+    background-size: initial !important;
+    background-image: none !important;
     border-radius: 14px !important;
     font-weight: 400 !important;
     transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
     opacity: 1 !important;
-    -webkit-appearance: none;
-    appearance: none;
+    -webkit-appearance: auto !important;
+    appearance: auto !important;
 }
 
 .visita-card--tabelas .detail-select,
@@ -3212,21 +3212,29 @@ function aumentarTextProgramacao() {
 }
 
 .visita-card--tabelas > .visita-card__body > .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    padding-right: 26px !important;
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231f4d85' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"),
-        linear-gradient(180deg, #eaf4ff 0%, #d6eaff 100%) !important;
-    background-repeat: no-repeat, no-repeat !important;
-    background-position: right 8px center, 0 0 !important;
-    background-size: 15px 15px, 100% 100% !important;
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    padding-right: 24px !important;
+    background-image: none !important;
+    background-repeat: initial !important;
+    background-position: initial !important;
+    background-size: initial !important;
 }
 
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id]::after {
-    display: inline-block !important;
-    margin-left: auto !important;
-    border-top-color: #1f4d85 !important;
+    content: "" !important;
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    display: block !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: -2px 0 0 0 !important;
+    border-top: 5px solid #111827 !important;
+    border-right: 5px solid transparent !important;
+    border-bottom: 0 !important;
+    border-left: 5px solid transparent !important;
+    pointer-events: none !important;
 }
 
 #add-visita-form .visita-summary-card__input,
@@ -3281,7 +3289,8 @@ function aumentarTextProgramacao() {
 }
 
 #main-container .visita-page .visita-card--tabelas .tabelas-selects > .tabelas-col::after {
-    content: "";
+    content: none !important;
+    display: none !important;
     position: absolute;
     right: 12px;
     bottom: 11px;

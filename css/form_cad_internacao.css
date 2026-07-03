@@ -19,13 +19,13 @@
         .select-purple,
         .detail-select,
         #relatorio-detalhado {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 42px !important;
-            background-repeat: no-repeat !important;
-            background-position: right 14px center !important;
-            background-size: 16px 16px !important;
+            appearance: auto !important;
+            -webkit-appearance: auto !important;
+            -moz-appearance: auto !important;
+            padding-right: 24px !important;
+            background-repeat: initial !important;
+            background-position: initial !important;
+            background-size: initial !important;
         }
 
         .select-purple,
@@ -34,7 +34,7 @@
         .detail-select:focus,
         #relatorio-detalhado,
         #relatorio-detalhado:focus {
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111827'><path d='M7 10l5 5 5-5z'/></svg>") !important;
+            background-image: none !important;
         }
 
         .bootstrap-select .dropdown-toggle.select-purple,
@@ -4379,9 +4379,18 @@
 #main-container .internacao-page .assist-select-clear {
     position: relative !important;
     overflow: visible !important;
+    min-height: 32px !important;
+    height: 32px !important;
+}
+
+#main-container .internacao-page .assist-select-clear .bootstrap-select {
+    min-height: 32px !important;
+    height: 32px !important;
 }
 
 #main-container .internacao-page .assist-select-clear .bootstrap-select > .dropdown-toggle {
+    min-height: 32px !important;
+    height: 32px !important;
     padding-right: 42px !important;
 }
 
@@ -4409,7 +4418,89 @@
     line-height: 16px !important;
 }
 
+#main-container .internacao-page .assist-select-clear:not(.has-value) .assist-clear-btn {
+    display: none !important;
+}
+
+#main-container .internacao-page .assist-select-clear.has-value .assist-clear-btn {
+    display: inline-flex !important;
+}
+
 #main-container .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
 #main-container .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
     grid-column: 1 / -1 !important;
+}
+
+/* Equaliza a primeira linha com o respiro e placeholders dos demais campos. */
+#main-container .internacao-page .internacao-card--general .internacao-head-grid {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    box-sizing: border-box !important;
+}
+
+#main-container .internacao-page .internacao-head-grid > .form-group:first-of-type {
+    margin-left: 0 !important;
+}
+
+#main-container .internacao-page .internacao-head-grid > .form-group:last-of-type {
+    margin-right: 0 !important;
+}
+
+#main-container .internacao-page .internacao-head-grid #matricula_paciente_display::placeholder {
+    color: #a8adb6 !important;
+    opacity: 1 !important;
+}
+
+#main-container .internacao-page .internacao-head-grid .bootstrap-select > .dropdown-toggle.bs-placeholder,
+#main-container .internacao-page .internacao-head-grid .bootstrap-select > .dropdown-toggle.bs-placeholder .filter-option,
+#main-container .internacao-page .internacao-head-grid .bootstrap-select > .dropdown-toggle.bs-placeholder .filter-option-inner,
+#main-container .internacao-page .internacao-head-grid .bootstrap-select > .dropdown-toggle.bs-placeholder .filter-option-inner-inner {
+    color: #a8adb6 !important;
+}
+
+#main-container .internacao-page .internacao-head-grid input.is-empty-date::-webkit-datetime-edit,
+#main-container .internacao-page .internacao-head-grid input.is-empty-date::-webkit-datetime-edit-text,
+#main-container .internacao-page .internacao-head-grid input.is-empty-date::-webkit-datetime-edit-day-field,
+#main-container .internacao-page .internacao-head-grid input.is-empty-date::-webkit-datetime-edit-month-field,
+#main-container .internacao-page .internacao-head-grid input.is-empty-date::-webkit-datetime-edit-year-field,
+#main-container .internacao-page .internacao-head-grid input.is-empty-date::-webkit-datetime-edit-hour-field,
+#main-container .internacao-page .internacao-head-grid input.is-empty-date::-webkit-datetime-edit-minute-field {
+    color: #a8adb6 !important;
+}
+
+/* Padrao unico de seta dos selects: igual ao select nativo de Acomodacao. */
+#main-container .internacao-page select.form-control,
+#main-container .internacao-page select.form-select,
+#main-container .internacao-page .tabelas-selects select,
+#main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) select {
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+    background-image: none !important;
+    background-repeat: initial !important;
+    background-position: initial !important;
+    background-size: initial !important;
+    padding-right: 24px !important;
+}
+
+#main-container .internacao-page .bootstrap-select > .dropdown-toggle {
+    position: relative !important;
+    padding-right: 24px !important;
+}
+
+#main-container .internacao-page .bootstrap-select > .dropdown-toggle::after {
+    content: "" !important;
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    display: block !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: -2px 0 0 0 !important;
+    vertical-align: 0 !important;
+    border-top: 5px solid #111827 !important;
+    border-right: 5px solid transparent !important;
+    border-bottom: 0 !important;
+    border-left: 5px solid transparent !important;
+    pointer-events: none !important;
 }

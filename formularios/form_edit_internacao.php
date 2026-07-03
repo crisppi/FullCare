@@ -1852,6 +1852,33 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            function syncAssistClearButtons() {
+                document.querySelectorAll('.assist-select-clear').forEach(function(wrapper) {
+                    var select = wrapper.querySelector('select');
+                    if (!select) return;
+                    var hasPicker = !!wrapper.querySelector('.bootstrap-select');
+                    wrapper.classList.toggle('has-value', !!select.value);
+                    if (hasPicker || !select.classList.contains('selectpicker')) {
+                        wrapper.classList.add('picker-ready');
+                    }
+                });
+            }
+
+            syncAssistClearButtons();
+
+            document.querySelectorAll('.assist-select-clear select').forEach(function(select) {
+                select.addEventListener('change', syncAssistClearButtons);
+            });
+
+            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
+                window.jQuery('#fk_cid_int, #fk_patologia2').on('loaded.bs.select rendered.bs.select refreshed.bs.select changed.bs.select change', function() {
+                    syncAssistClearButtons();
+                });
+                setTimeout(syncAssistClearButtons, 0);
+                setTimeout(syncAssistClearButtons, 120);
+                setTimeout(syncAssistClearButtons, 300);
+            }
+
             document.querySelectorAll('[data-clear-select]').forEach(function(button) {
                 button.addEventListener('click', function() {
                     var targetId = button.getAttribute('data-clear-select');
@@ -1862,6 +1889,7 @@
                         window.jQuery(select).selectpicker('val', '');
                     }
                     select.dispatchEvent(new Event('change', { bubbles: true }));
+                    syncAssistClearButtons();
                 });
             });
         });
@@ -3306,9 +3334,18 @@
         #main-container .internacao-page .assist-select-clear {
             position: relative !important;
             overflow: visible !important;
+            min-height: 32px !important;
+            height: 32px !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear .bootstrap-select {
+            min-height: 32px !important;
+            height: 32px !important;
         }
 
         #main-container .internacao-page .assist-select-clear .bootstrap-select > .dropdown-toggle {
+            min-height: 32px !important;
+            height: 32px !important;
             padding-right: 42px !important;
         }
 
@@ -3336,7 +3373,52 @@
             line-height: 16px !important;
         }
 
+        #main-container .internacao-page .assist-select-clear:not(.has-value) .assist-clear-btn {
+            display: none !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear.has-value .assist-clear-btn {
+            display: inline-flex !important;
+        }
+
         #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {
             grid-column: 1 / -1 !important;
+        }
+
+        /* Padrao unico de seta dos selects: igual ao select nativo de Acomodacao. */
+        #main-container .internacao-page select.form-control,
+        #main-container .internacao-page select.form-select,
+        #main-container .internacao-page .tabelas-selects select,
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #tabelas-adicionais-paineis-edit, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) select {
+            appearance: auto !important;
+            -webkit-appearance: auto !important;
+            -moz-appearance: auto !important;
+            background-image: none !important;
+            background-repeat: initial !important;
+            background-position: initial !important;
+            background-size: initial !important;
+            padding-right: 24px !important;
+        }
+
+        #main-container .internacao-page .bootstrap-select > .dropdown-toggle {
+            position: relative !important;
+            padding-right: 24px !important;
+        }
+
+        #main-container .internacao-page .bootstrap-select > .dropdown-toggle::after {
+            content: "" !important;
+            position: absolute !important;
+            right: 12px !important;
+            top: 50% !important;
+            display: block !important;
+            width: 0 !important;
+            height: 0 !important;
+            margin: -2px 0 0 0 !important;
+            vertical-align: 0 !important;
+            border-top: 5px solid #111827 !important;
+            border-right: 5px solid transparent !important;
+            border-bottom: 0 !important;
+            border-left: 5px solid transparent !important;
+            pointer-events: none !important;
         }
     </style>

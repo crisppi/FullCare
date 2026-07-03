@@ -1245,6 +1245,8 @@
                     var select = wrapper.querySelector('select');
                     if (!select) return;
                     var hasPicker = !!wrapper.querySelector('.bootstrap-select');
+                    var hasValue = !!select.value;
+                    wrapper.classList.toggle('has-value', hasValue);
                     if (hasPicker || !select.classList.contains('selectpicker')) {
                         wrapper.classList.add('picker-ready');
                     }
@@ -1253,8 +1255,15 @@
 
             syncAssistClearButtons();
 
+            document.querySelectorAll('.assist-select-clear select').forEach(function(select) {
+                select.addEventListener('change', syncAssistClearButtons);
+            });
+
             if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
                 window.jQuery('#fk_cid_int, #fk_patologia2').on('loaded.bs.select rendered.bs.select refreshed.bs.select', function() {
+                    syncAssistClearButtons();
+                });
+                window.jQuery('#fk_cid_int, #fk_patologia2').on('changed.bs.select change', function() {
                     syncAssistClearButtons();
                 });
                 setTimeout(syncAssistClearButtons, 0);
@@ -1272,6 +1281,7 @@
                         window.jQuery(select).selectpicker('val', '');
                     }
                     select.dispatchEvent(new Event('change', { bubbles: true }));
+                    syncAssistClearButtons();
                 });
             });
         });
