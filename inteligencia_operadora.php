@@ -252,86 +252,11 @@ include_once("templates/header.php");
 
     <meta charset="UTF-8">
     <title>Inteligência da Operadora</title>
-    <style>
-        .report-wrapper {
-            width: 100%;
-            max-width: none;
-            margin: 8px 0 44px;
-            padding: 0 24px;
-        }
-        .report-header {
-            background: linear-gradient(120deg, #f4faff 0%, #e8f4fb 58%, #dff2fb 100%);
-            border-radius: 18px;
-            padding: 18px 22px;
-            border: 1px solid rgba(76, 142, 187, .22);
-            margin-bottom: 16px;
-        }
-        .report-header h1 {
-            margin: 0 0 4px;
-            font-weight: 700;
-            color: #24384f;
-            font-size: 1.06rem;
-        }
-        .report-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 14px 18px;
-            border: 1px solid rgba(76, 142, 187, .18);
-            box-shadow: 0 10px 24px rgba(35, 102, 147, .08);
-            margin-bottom: 14px;
-        }
-        .report-wrapper .text-muted,
-        .report-wrapper .form-label,
-        .report-wrapper .form-control,
-        .report-wrapper .form-select,
-        .report-wrapper .table,
-        .report-wrapper small {
-            font-size: .78rem;
-        }
-        .report-wrapper .row.g-3 {
-            --bs-gutter-y: .6rem;
-            --bs-gutter-x: .8rem;
-        }
-        .table thead th {
-            background: #2f6f9f;
-            color: #ffffff;
-            font-size: .7rem;
-            padding-top: .65rem;
-            padding-bottom: .65rem;
-        }
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 0.2rem 0.7rem;
-            border-radius: 999px;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-        .status-excesso { background: #fee2e2; color: #991b1b; }
-        .status-alerta { background: #fff1c3; color: #a15c00; }
-        .status-ok { background: #dcfce7; color: #166534; }
-        .risk-pill.alto {background:#fee2e2;color:#991b1b;}
-        .risk-pill.moderado {background:#fff1c3;color:#a15c00;}
-        .risk-pill.baixo {background:#dcfce7;color:#166534;}
-        .scope-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 5px 10px;
-            border-radius: 999px;
-            font-size: .72rem;
-            font-weight: 700;
-            background: #eef7fc;
-            border: 1px solid rgba(76, 142, 187, .28);
-            color: #2f6f9f;
-        }
-    </style>
+    <link href="<?= $BASE_URL ?>css/listagem_padrao.css?v=<?= @filemtime(__DIR__ . '/css/listagem_padrao.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 </head>
 <body>
-    <div class="report-wrapper">
+    <div class="report-wrapper operator-report-wrapper">
         <div class="report-header">
             <h1>Inteligência da Operadora</h1>
             <div class="text-muted">Foco em redução de custo assistencial e priorização de ações de auditoria.</div>
@@ -342,20 +267,17 @@ include_once("templates/header.php");
             <?php endif; ?>
         </div>
 
-        <form class="report-card" method="get">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Data inicial</label>
-                    <input type="date" class="form-control" name="data_ini" value="<?= e($dataIni) ?>">
+        <form class="report-card operator-filter-card listagem-panel" method="get">
+            <div class="operator-filter-row filter-inline-row">
+                <div class="operator-filter-field filter-inline-field filter-inline--date">
+                    <input type="date" class="form-control form-control-sm" name="data_ini" value="<?= e($dataIni) ?>" aria-label="Data inicial">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Data final</label>
-                    <input type="date" class="form-control" name="data_fim" value="<?= e($dataFim) ?>">
+                <div class="operator-filter-field filter-inline-field filter-inline--date">
+                    <input type="date" class="form-control form-control-sm" name="data_fim" value="<?= e($dataFim) ?>" aria-label="Data final">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Hospital</label>
-                    <select class="form-select" name="hospital_id">
-                        <option value="">Todos</option>
+                <div class="operator-filter-field filter-inline-field filter-inline--wide">
+                    <select class="form-select form-control-sm" name="hospital_id" aria-label="Hospital">
+                        <option value="">Hospital: todos</option>
                         <?php foreach ($hospitais as $h): ?>
                             <option value="<?= (int)$h['id_hospital'] ?>" <?= $hospitalId == $h['id_hospital'] ? 'selected' : '' ?>>
                                 <?= e($h['nome_hosp']) ?>
@@ -363,14 +285,13 @@ include_once("templates/header.php");
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Operadora</label>
+                <div class="operator-filter-field filter-inline-field filter-inline--wide">
                     <?php if ($isSeguradoraRole): ?>
                         <input type="hidden" name="seguradora_id" value="<?= (int)$seguradoraId ?>">
-                        <input type="text" class="form-control" readonly value="<?= e($seguradoras[0]['seguradora_seg'] ?? 'Minha operadora') ?>">
+                        <input type="text" class="form-control form-control-sm" readonly value="<?= e($seguradoras[0]['seguradora_seg'] ?? 'Minha operadora') ?>" aria-label="Operadora">
                     <?php else: ?>
-                        <select class="form-select" name="seguradora_id">
-                            <option value="">Todas</option>
+                        <select class="form-select form-control-sm" name="seguradora_id" aria-label="Operadora">
+                            <option value="">Operadora: todas</option>
                             <?php foreach ($seguradoras as $s): ?>
                                 <option value="<?= (int)$s['id_seguradora'] ?>" <?= $seguradoraId == $s['id_seguradora'] ? 'selected' : '' ?>>
                                     <?= e($s['seguradora_seg']) ?>
@@ -379,9 +300,13 @@ include_once("templates/header.php");
                         </select>
                     <?php endif; ?>
                 </div>
-                <div class="col-12">
-                    <button class="btn btn-primary" type="submit">Aplicar filtros</button>
-                    <a class="btn btn-outline-secondary btn-filtro-limpar" href="<?= htmlspecialchars($BASE_URL . 'inteligencia_operadora.php', ENT_QUOTES, 'UTF-8') ?>">Limpar filtros</a>
+                <div class="operator-filter-actions filter-inline-field filter-inline--icon">
+                    <button class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon" type="submit" title="Pesquisar" aria-label="Pesquisar">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                    </button>
+                    <a class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon" href="<?= htmlspecialchars($BASE_URL . 'inteligencia/inteligencia-operadora', ENT_QUOTES, 'UTF-8') ?>" title="Limpar filtros" aria-label="Limpar filtros">
+                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                    </a>
                 </div>
             </div>
         </form>
@@ -389,8 +314,8 @@ include_once("templates/header.php");
         <div class="report-card">
             <h5 class="mb-2">Detecção precoce de permanência excessiva</h5>
             <div class="text-muted small mb-3">Baseado na média da patologia e nos prazos definidos pela operadora.</div>
-            <div class="table-responsive">
-                <table class="table table-sm table-striped align-middle">
+            <div class="table-responsive listagem-table-wrap operator-list-table-wrap">
+                <table class="table table-sm table-striped table-hover table-condensed align-middle">
                     <thead>
                         <tr>
                             <th>Paciente</th>
@@ -434,8 +359,8 @@ include_once("templates/header.php");
         <div class="report-card">
             <h5 class="mb-2">Indicação de alta provável</h5>
             <div class="text-muted small mb-3">Casos no prazo esperado, sem indicação de prorrogação.</div>
-            <div class="table-responsive">
-                <table class="table table-sm table-striped align-middle">
+            <div class="table-responsive listagem-table-wrap operator-list-table-wrap">
+                <table class="table table-sm table-striped table-hover table-condensed align-middle">
                     <thead>
                         <tr>
                             <th>Paciente</th>
@@ -474,8 +399,8 @@ include_once("templates/header.php");
             <?php if (empty($glosaData['available'])): ?>
                 <div class="text-muted"><?= e($glosaData['message'] ?? 'Sem dados disponíveis.') ?></div>
             <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-sm table-striped align-middle">
+                <div class="table-responsive listagem-table-wrap operator-list-table-wrap">
+                    <table class="table table-sm table-striped table-hover table-condensed align-middle">
                         <thead>
                             <tr>
                                 <th>Conta / Paciente</th>
@@ -516,8 +441,8 @@ include_once("templates/header.php");
             <div class="text-muted small mb-3">OPME, UTI não pertinente, duplicidades e itens fora de protocolo.</div>
 
             <h6>OPME sinalizada</h6>
-            <div class="table-responsive mb-4">
-                <table class="table table-sm table-striped align-middle">
+            <div class="table-responsive listagem-table-wrap operator-list-table-wrap mb-4">
+                <table class="table table-sm table-striped table-hover table-condensed align-middle">
                     <thead>
                         <tr>
                             <th>Paciente</th>
@@ -543,8 +468,8 @@ include_once("templates/header.php");
             </div>
 
             <h6>UTI não pertinente</h6>
-            <div class="table-responsive mb-4">
-                <table class="table table-sm table-striped align-middle">
+            <div class="table-responsive listagem-table-wrap operator-list-table-wrap mb-4">
+                <table class="table table-sm table-striped table-hover table-condensed align-middle">
                     <thead>
                         <tr>
                             <th>Paciente</th>
@@ -570,8 +495,8 @@ include_once("templates/header.php");
             </div>
 
             <h6>Duplicidades TUSS</h6>
-            <div class="table-responsive mb-4">
-                <table class="table table-sm table-striped align-middle">
+            <div class="table-responsive listagem-table-wrap operator-list-table-wrap mb-4">
+                <table class="table table-sm table-striped table-hover table-condensed align-middle">
                     <thead>
                         <tr>
                             <th>Paciente</th>
@@ -599,8 +524,8 @@ include_once("templates/header.php");
             </div>
 
             <h6>Fora de protocolo / pendências</h6>
-            <div class="table-responsive">
-                <table class="table table-sm table-striped align-middle">
+            <div class="table-responsive listagem-table-wrap operator-list-table-wrap">
+                <table class="table table-sm table-striped table-hover table-condensed align-middle">
                     <thead>
                         <tr>
                             <th>Paciente</th>

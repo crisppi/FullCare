@@ -3298,6 +3298,7 @@ function aumentarTextProgramacao() {
     padding-right: 32px !important;
 }
 </style>
+<link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
 <textarea id="visita-bootstrap-json" hidden><?= htmlspecialchars(json_encode([
     'dataInternacaoVis' => !empty($ultimaVis['data_intern_int']) ? date('Y-m-d', strtotime($ultimaVis['data_intern_int'])) : '',
     'tussPorVisita' => $tussPorVisita,

@@ -106,141 +106,26 @@ $altasFora = (int)($summary['altas_fora_prazo'] ?? 0);
 $altasComPrazo = $altasDentro + $altasFora;
 ?>
 
-<style>
-.report-wrapper {
-    width: 100%;
-    max-width: none;
-    margin: 4px 0 24px;
-    padding: 0 14px;
-}
-.report-header {
-    background: linear-gradient(120deg, #f4faff, #e8f4fb);
-    border-radius: 12px;
-    padding: 10px 14px;
-    border: 1px solid rgba(76, 142, 187, .12);
-    margin-bottom: 10px;
-}
-.report-header h1 {
-    margin: 0 0 2px;
-    font-weight: 800;
-    color: #24384f;
-    font-size: 1rem;
-    line-height: 1.12;
-}
-.report-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 8px 12px;
-    border: 1px solid rgba(76, 142, 187, .08);
-    box-shadow: none;
-    margin-bottom: 8px;
-}
-.report-wrapper .text-muted,
-.report-wrapper .form-label,
-.report-wrapper .form-control,
-.report-wrapper .form-select,
-.report-wrapper .table,
-.report-wrapper small {
-    font-size: .7rem;
-}
-.report-wrapper .row.g-3 {
-    --bs-gutter-y: .38rem;
-    --bs-gutter-x: .55rem;
-}
-.report-wrapper .form-label {
-    margin-bottom: .2rem;
-    line-height: 1.05;
-}
-.report-wrapper .form-control,
-.report-wrapper .form-select {
-    min-height: 28px;
-    height: 28px;
-    padding: .18rem .45rem;
-    border-radius: 6px;
-    line-height: 1.08;
-}
-.report-wrapper .btn {
-    min-height: 28px;
-    padding: .25rem .58rem;
-    border-radius: 6px;
-    font-size: .68rem;
-    line-height: 1;
-}
-.report-filter-btn {
-    width: 100%;
-}
-.summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 8px;
-}
-.summary-card {
-    background: #f4faff;
-    border-radius: 9px;
-    padding: 7px 10px;
-    border: 1px solid rgba(76, 142, 187, .08);
-}
-.summary-card h6 {
-    margin: 0 0 3px;
-    color: #24384f;
-    font-size: .62rem;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-}
-.summary-card div {
-    font-size: .86rem;
-    font-weight: 700;
-    color: #2f6f9f;
-    line-height: 1.1;
-}
-.table thead th {
-    background: #2f6f9f;
-    color: #fff;
-    font-size: .62rem;
-    padding: .42rem .58rem;
-}
-.report-wrapper .table tbody td {
-    padding: .35rem .58rem;
-    font-size: .68rem;
-    line-height: 1.12;
-}
-.report-card h5 {
-    margin-bottom: .45rem !important;
-    font-size: .82rem;
-    line-height: 1.12;
-}
-.report-wrapper .table-striped > tbody > tr:nth-of-type(odd) > * {
-    --bs-table-accent-bg: #f4faff;
-}
-.report-wrapper .table-striped > tbody > tr:nth-of-type(even) > * {
-    --bs-table-accent-bg: #fff;
-}
-.report-wrapper .table-hover > tbody > tr:hover > * {
-    --bs-table-accent-bg: #e8f4fb;
-}
-</style>
+<link href="<?= $BASE_URL ?>css/listagem_padrao.css?v=<?= @filemtime(__DIR__ . '/css/listagem_padrao.css') ?>" rel="stylesheet">
 <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 
-<div class="report-wrapper">
+<div class="report-wrapper prorrog-report-wrapper">
     <div class="report-header">
         <h1>Indicação de permanência vs. alta no prazo</h1>
         <div class="text-muted">Indicação clara considera prorrogação registrada ou marcação de gestão, apoiando decisão de pagamento.</div>
     </div>
 
-    <form class="report-card" method="get">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-2">
-                <label class="form-label">Data inicial</label>
-                <input type="date" class="form-control" name="data_ini" value="<?= e($dataIni) ?>">
+    <form class="report-card prorrog-filter-card listagem-panel" method="get">
+        <div class="prorrog-filter-row filter-inline-row">
+            <div class="prorrog-filter-field filter-inline-field filter-inline--date">
+                <input type="date" class="form-control form-control-sm" name="data_ini" value="<?= e($dataIni) ?>" aria-label="Data inicial">
             </div>
-            <div class="col-md-2">
-                <label class="form-label">Data final</label>
-                <input type="date" class="form-control" name="data_fim" value="<?= e($dataFim) ?>">
+            <div class="prorrog-filter-field filter-inline-field filter-inline--date">
+                <input type="date" class="form-control form-control-sm" name="data_fim" value="<?= e($dataFim) ?>" aria-label="Data final">
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Hospital</label>
-                <select class="form-select" name="hospital_id">
-                    <option value="">Todos</option>
+            <div class="prorrog-filter-field filter-inline-field filter-inline--wide">
+                <select class="form-select form-control-sm" name="hospital_id" aria-label="Hospital">
+                    <option value="">Hospital: todos</option>
                     <?php foreach ($hospitais as $h): ?>
                         <option value="<?= (int)$h['id_hospital'] ?>" <?= $hospitalId == $h['id_hospital'] ? 'selected' : '' ?>>
                             <?= e($h['nome_hosp']) ?>
@@ -248,10 +133,9 @@ $altasComPrazo = $altasDentro + $altasFora;
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Operadora</label>
-                <select class="form-select" name="seguradora_id">
-                    <option value="">Todos</option>
+            <div class="prorrog-filter-field filter-inline-field filter-inline--wide">
+                <select class="form-select form-control-sm" name="seguradora_id" aria-label="Operadora">
+                    <option value="">Operadora: todas</option>
                     <?php foreach ($seguradoras as $s): ?>
                         <option value="<?= (int)$s['id_seguradora'] ?>" <?= $seguradoraId == $s['id_seguradora'] ? 'selected' : '' ?>>
                             <?= e($s['seguradora_seg']) ?>
@@ -259,41 +143,47 @@ $altasComPrazo = $altasDentro + $altasFora;
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary report-filter-btn" type="submit">Aplicar filtros</button>
+            <div class="prorrog-filter-actions filter-inline-field filter-inline--icon">
+                <button class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon" type="submit" title="Pesquisar" aria-label="Pesquisar">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                </button>
+                <a class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon" href="<?= htmlspecialchars($BASE_URL . 'inteligencia/prorrogacao-vs-alta', ENT_QUOTES, 'UTF-8') ?>" title="Limpar filtros" aria-label="Limpar filtros">
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                </a>
             </div>
         </div>
     </form>
 
     <div class="report-card">
-        <div class="summary-grid">
-            <div class="summary-card">
-                <h6>Internações</h6>
-                <div><?= $totalIntern ?></div>
-            </div>
-            <div class="summary-card">
-                <h6>Indicações de permanência</h6>
-                <div><?= $totalIndicacoes ?></div>
-            </div>
-            <div class="summary-card">
-                <h6>Altas</h6>
-                <div><?= $totalAltas ?></div>
-            </div>
-            <div class="summary-card">
-                <h6>Altas dentro do prazo</h6>
-                <div><?= $altasDentro ?><?= $altasComPrazo ? ' (' . round(($altasDentro / $altasComPrazo) * 100, 1) . '%)' : '' ?></div>
-            </div>
-            <div class="summary-card">
-                <h6>Altas fora do prazo</h6>
-                <div><?= $altasFora ?><?= $altasComPrazo ? ' (' . round(($altasFora / $altasComPrazo) * 100, 1) . '%)' : '' ?></div>
-            </div>
+        <h5 class="prorrog-section-title">Resumo</h5>
+        <div class="table-responsive listagem-table-wrap prorrog-list-table-wrap">
+            <table class="table table-sm table-striped table-hover table-condensed align-middle">
+                <thead>
+                    <tr>
+                        <th>Internações</th>
+                        <th>Indicações de permanência</th>
+                        <th>Altas</th>
+                        <th>Altas dentro do prazo</th>
+                        <th>Altas fora do prazo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><?= $totalIntern ?></td>
+                        <td><?= $totalIndicacoes ?></td>
+                        <td><?= $totalAltas ?></td>
+                        <td><?= $altasDentro ?><?= $altasComPrazo ? ' (' . round(($altasDentro / $altasComPrazo) * 100, 1) . '%)' : '' ?></td>
+                        <td><?= $altasFora ?><?= $altasComPrazo ? ' (' . round(($altasFora / $altasComPrazo) * 100, 1) . '%)' : '' ?></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <div class="report-card">
-        <h5 class="mb-3">Detalhe por Operadora</h5>
-        <div class="table-responsive">
-            <table class="table table-sm table-striped align-middle">
+        <h5 class="prorrog-section-title">Detalhe por Operadora</h5>
+        <div class="table-responsive listagem-table-wrap prorrog-list-table-wrap">
+            <table class="table table-sm table-striped table-hover table-condensed align-middle">
                 <thead>
                     <tr>
                         <th>Operadora</th>

@@ -398,6 +398,7 @@
 
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
     <style>
         .internacao-page {
             visibility: hidden;
@@ -496,11 +497,22 @@
         }
 
         .edit-secondary-row {
-            display: grid;
-            grid-template-columns: 3fr 3fr 2fr 1fr 1fr 2fr;
-            gap: 12px;
-            align-items: end;
-            width: 100%;
+            display: grid !important;
+            grid-template-columns: minmax(260px, 2fr) minmax(260px, 2fr) minmax(170px, 1.15fr) minmax(150px, 1fr) minmax(130px, .8fr) minmax(170px, 1fr) !important;
+            gap: 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin: 4px 0 0 !important;
+        }
+
+        .edit-secondary-row > .form-group {
+            width: auto !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            flex: none !important;
+            margin: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
         }
 
         .edit-alta-row {
@@ -517,6 +529,9 @@
         .edit-primary-row .form-control-sm,
         .edit-top-row .form-control,
         .edit-top-row .form-control-sm,
+        .edit-secondary-row .form-control,
+        .edit-secondary-row .form-control-sm,
+        .edit-secondary-row .bootstrap-select > .dropdown-toggle,
         .edit-alta-row .form-control,
         .edit-alta-row .form-control-sm {
             min-height: 44px;
@@ -532,6 +547,18 @@
         .assist-select-clear .bootstrap-select,
         .assist-select-clear>select {
             width: 100% !important;
+        }
+
+        @media (max-width: 1199.98px) {
+            .edit-secondary-row {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .edit-secondary-row {
+                grid-template-columns: 1fr !important;
+            }
         }
 
         #fk_cid_int.selectpicker.bs-select-hidden,
@@ -3142,14 +3169,35 @@
         /* Contraste visual alinhado ao cadastro de visita. */
         #main-container:has(.internacao-page) {
             background: linear-gradient(180deg, #e3e9f2 0%, #d8e1ec 100%) !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding: 6px 4px 18px !important;
         }
 
         #main-container .internacao-page {
-            padding: 2px 10px 18px !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding: 4px 6px 18px !important;
             border-radius: 12px !important;
             background:
                 linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04)),
                 #dfe7f1 !important;
+        }
+
+        @media (max-width: 575.98px) {
+            #main-container:has(.internacao-page) {
+                padding-left: 2px !important;
+                padding-right: 2px !important;
+            }
+
+            #main-container .internacao-page {
+                padding-left: 4px !important;
+                padding-right: 4px !important;
+            }
         }
 
         #main-container .internacao-page .internacao-page__content {
@@ -3206,5 +3254,89 @@
             box-shadow:
                 0 0 0 .14rem rgba(47, 137, 189, .18),
                 inset 0 1px 2px rgba(15, 23, 42, .08) !important;
+        }
+
+        /* Reparos finais das tabelas adicionais na edicao: setas e escala compacta. */
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card .tabelas-selects select,
+            #tabelas-adicionais-paineis-edit select.form-control,
+            #detalhes-card-wrapper select.form-control
+        ) {
+            appearance: auto !important;
+            -webkit-appearance: auto !important;
+            -moz-appearance: auto !important;
+            background-image: initial !important;
+            padding-right: 24px !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects .bootstrap-select > .dropdown-toggle::after,
+        #main-container .internacao-page #tabelas-adicionais-paineis-edit .bootstrap-select > .dropdown-toggle::after,
+        #main-container .internacao-page #detalhes-card-wrapper .bootstrap-select > .dropdown-toggle::after {
+            display: inline-block !important;
+            margin-left: .255em !important;
+            vertical-align: .255em !important;
+            content: "" !important;
+            border-top: .3em solid !important;
+            border-right: .3em solid transparent !important;
+            border-bottom: 0 !important;
+            border-left: .3em solid transparent !important;
+        }
+
+        #main-container .internacao-page :is(
+            #tabelas-adicionais-paineis-edit #container-tuss,
+            #tabelas-adicionais-paineis-edit #container-prorrog,
+            #tabelas-adicionais-paineis-edit #container-gestao,
+            #tabelas-adicionais-paineis-edit #container-uti,
+            #tabelas-adicionais-paineis-edit #container-negoc
+        ) {
+            font-size: .78rem !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {
+            grid-column: span 6 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea textarea.form-control {
+            min-height: 56px !important;
+            height: auto !important;
+            font-size: .7rem !important;
+            line-height: 1.2 !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear {
+            position: relative !important;
+            overflow: visible !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear .bootstrap-select > .dropdown-toggle {
+            padding-right: 42px !important;
+        }
+
+        #main-container .internacao-page .assist-clear-btn {
+            position: absolute !important;
+            top: 50% !important;
+            right: 25px !important;
+            z-index: 6 !important;
+            width: 16px !important;
+            height: 16px !important;
+            min-width: 16px !important;
+            min-height: 16px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: translateY(-50%) !important;
+            border: 0 !important;
+            border-radius: 999px !important;
+            background: rgba(94, 35, 99, .10) !important;
+            color: #5e2363 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            line-height: 16px !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {
+            grid-column: 1 / -1 !important;
         }
     </style>

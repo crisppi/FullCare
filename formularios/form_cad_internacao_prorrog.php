@@ -139,17 +139,17 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
 }
 .adicional-card {
     background:#f5f5f9;
-    border-radius:22px;
+    border-radius:12px;
     border:1px solid #ebe1f5;
-    box-shadow:0 12px 28px rgba(45,18,70,.08);
-    padding:22px 24px;
+    box-shadow:0 6px 14px rgba(45,18,70,.06);
+    padding:14px 16px;
 }
 .adicional-card__header {
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:.75rem;
-    margin-bottom:18px;
+    margin-bottom:10px;
 }
 .adicional-card__title {
     display:flex;
@@ -157,19 +157,21 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
     margin:0;
     color:#3a184f;
     font-weight:600;
+    font-size:1rem;
+    line-height:1.15;
 }
 .adicional-card__marker {
-    width:6px;
-    height:26px;
+    width:5px;
+    height:22px;
     border-radius:10px;
-    margin-right:12px;
+    margin-right:10px;
     background:linear-gradient(180deg,#8f5ff3,#b995ff);
 }
 
 #container-prorrog .adicional-card .field-container {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-    gap: 14px;
+    grid-template-columns: 1.15fr 1.15fr 1.15fr 1fr 1.15fr 42px;
+    gap: 8px 10px;
     align-items: end;
     width: 100%;
 }
@@ -190,13 +192,54 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
 #container-prorrog .adicional-card .form-control,
 #container-prorrog .adicional-card .form-control-sm.form-control {
     width: 100% !important;
-    min-height: 42px !important;
-    height: 42px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 3px 24px 3px 8px !important;
+    font-size: .74rem !important;
+    line-height: 1.15 !important;
+}
+
+#container-prorrog .adicional-card select.form-control {
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+    background-image: initial !important;
+}
+
+#container-prorrog .adicional-card label {
+    min-height: 0 !important;
+    margin-bottom: 2px !important;
+    font-size: .68rem !important;
+    line-height: 1.08 !important;
+    font-weight: 600 !important;
 }
 
 #container-prorrog .adicional-card textarea.form-control {
-    min-height: 92px !important;
+    min-height: 76px !important;
     height: auto !important;
+    padding: 6px 8px !important;
+}
+
+#container-prorrog .adicional-card .btn-add,
+#container-prorrog .adicional-card .btn-remove {
+    min-width: 32px !important;
+    width: 32px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    font-size: .9rem !important;
+    line-height: 1 !important;
+}
+
+#container-prorrog .adicional-card .form-group[style*="margin-top:25px"],
+#container-prorrog .adicional-card .form-group[style*="margin-top: 25px"] {
+    margin-top: 0 !important;
+}
+
+@media (max-width: 1199.98px) {
+    #container-prorrog .adicional-card .field-container {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
