@@ -114,41 +114,45 @@ class gestaoDAO implements gestaoDAOInterface
     {
         $gestao = new gestao();
 
-        $gestao->id_gestao = $data["id_gestao"];
-        $gestao->alto_custo_ges = $data["alto_custo_ges"];
-        $gestao->rel_alto_custo_ges = $data["rel_alto_custo_ges"];
+        $flag = static fn(string $key): string => trim((string)($data[$key] ?? '')) !== '' ? (string)$data[$key] : 'n';
+        $text = static fn(string $key): ?string => array_key_exists($key, $data) && $data[$key] !== null ? (string)$data[$key] : '';
+        $int = static fn(string $key): ?int => array_key_exists($key, $data) && $data[$key] !== null && $data[$key] !== '' ? (int)$data[$key] : null;
 
-        $gestao->opme_ges = $data["opme_ges"];
-        $gestao->rel_opme_ges = $data["rel_opme_ges"];
+        $gestao->id_gestao = $int("id_gestao");
+        $gestao->alto_custo_ges = $flag("alto_custo_ges");
+        $gestao->rel_alto_custo_ges = $text("rel_alto_custo_ges");
 
-        $gestao->home_care_ges = $data["home_care_ges"];
-        $gestao->rel_home_care_ges = $data["rel_home_care_ges"];
+        $gestao->opme_ges = $flag("opme_ges");
+        $gestao->rel_opme_ges = $text("rel_opme_ges");
 
-        $gestao->desospitalizacao_ges = $data["desospitalizacao_ges"];
-        $gestao->rel_desospitalizacao_ges = $data["rel_desospitalizacao_ges"];
+        $gestao->home_care_ges = $flag("home_care_ges");
+        $gestao->rel_home_care_ges = $text("rel_home_care_ges");
 
-        $gestao->fk_user_ges = $data["fk_user_ges"];
-        $gestao->fk_visita_ges = $data["fk_visita_ges"];
-        $gestao->fk_internacao_ges = $data["fk_internacao_ges"];
+        $gestao->desospitalizacao_ges = $flag("desospitalizacao_ges");
+        $gestao->rel_desospitalizacao_ges = $text("rel_desospitalizacao_ges");
 
-        $gestao->evento_adverso_ges = $data["evento_adverso_ges"];
-        $gestao->rel_evento_adverso_ges = $data["rel_evento_adverso_ges"];
-        $gestao->tipo_evento_adverso_gest = $data["tipo_evento_adverso_gest"];
-        $gestao->evento_sinalizado_ges = $data["evento_sinalizado_ges"];
-        $gestao->evento_discutido_ges = $data["evento_discutido_ges"];
-        $gestao->evento_negociado_ges = $data["evento_negociado_ges"];
-        $gestao->evento_valor_negoc_ges = $data["evento_valor_negoc_ges"];
-        $gestao->evento_prorrogar_ges = $data["evento_prorrogar_ges"];
-        $gestao->evento_fech_ges = $data["evento_fech_ges"];
+        $gestao->fk_user_ges = $int("fk_user_ges");
+        $gestao->fk_visita_ges = $int("fk_visita_ges");
+        $gestao->fk_internacao_ges = $int("fk_internacao_ges");
 
-        $gestao->evento_retorno_qual_hosp_ges = $data["evento_retorno_qual_hosp_ges"];
-        $gestao->evento_classificado_hospital_ges = $data["evento_classificado_hospital_ges"];
-        $gestao->evento_data_ges = $data["evento_data_ges"];
-        $gestao->evento_encerrar_ges = $data["evento_encerrar_ges"];
-        $gestao->evento_impacto_financ_ges = $data["evento_impacto_financ_ges"];
-        $gestao->evento_prolongou_internacao_ges = $data["evento_prolongou_internacao_ges"];
-        $gestao->evento_concluido_ges = $data["evento_concluido_ges"];
-        $gestao->evento_classificacao_ges = $data["evento_classificacao_ges"];
+        $gestao->evento_adverso_ges = $flag("evento_adverso_ges");
+        $gestao->rel_evento_adverso_ges = $text("rel_evento_adverso_ges");
+        $gestao->tipo_evento_adverso_gest = $text("tipo_evento_adverso_gest");
+        $gestao->evento_sinalizado_ges = $flag("evento_sinalizado_ges");
+        $gestao->evento_discutido_ges = $flag("evento_discutido_ges");
+        $gestao->evento_negociado_ges = $flag("evento_negociado_ges");
+        $gestao->evento_valor_negoc_ges = $text("evento_valor_negoc_ges");
+        $gestao->evento_prorrogar_ges = $flag("evento_prorrogar_ges");
+        $gestao->evento_fech_ges = $flag("evento_fech_ges");
+
+        $gestao->evento_retorno_qual_hosp_ges = $text("evento_retorno_qual_hosp_ges");
+        $gestao->evento_classificado_hospital_ges = $text("evento_classificado_hospital_ges");
+        $gestao->evento_data_ges = $text("evento_data_ges");
+        $gestao->evento_encerrar_ges = $text("evento_encerrar_ges");
+        $gestao->evento_impacto_financ_ges = $text("evento_impacto_financ_ges");
+        $gestao->evento_prolongou_internacao_ges = $text("evento_prolongou_internacao_ges");
+        $gestao->evento_concluido_ges = $text("evento_concluido_ges");
+        $gestao->evento_classificacao_ges = $text("evento_classificacao_ges");
 
         return $gestao;
     }

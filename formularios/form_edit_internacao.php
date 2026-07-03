@@ -1586,7 +1586,7 @@
                             </select>
                         </div>
 
-                        <div id="medicacaoDet" class="form-group col-sm-3">
+                        <div id="medicacaoDet" class="form-group col-sm-3<?= $val('medic_alto_custo_det') === 's' ? '' : ' is-hidden' ?>">
                             <label class="control-label" for="qual_medicamento_det">Medicação alto custo</label>
                             <input class="form-control-sm form-control" type="text" name="qual_medicamento_det"
                                 id="qual_medicamento_det" value="<?= $val('qual_medicamento_det') ?>">
@@ -1661,9 +1661,6 @@
                             </select>
                         </div>
 
-                    </div>
-                    <div>
-                        <hr>
                     </div>
                 </div>
                 </div>
@@ -1869,6 +1866,23 @@
             document.querySelectorAll('.assist-select-clear select').forEach(function(select) {
                 select.addEventListener('change', syncAssistClearButtons);
             });
+
+            var medicacaoSelect = document.getElementById('medic_alto_custo_det');
+            var medicacaoDetalhe = document.getElementById('medicacaoDet');
+
+            function syncMedicacaoDetalhe() {
+                if (!medicacaoSelect || !medicacaoDetalhe) return;
+                medicacaoDetalhe.classList.toggle('is-hidden', medicacaoSelect.value !== 's');
+            }
+
+            syncMedicacaoDetalhe();
+
+            if (medicacaoSelect) {
+                medicacaoSelect.addEventListener('change', syncMedicacaoDetalhe);
+                if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
+                    window.jQuery(medicacaoSelect).on('changed.bs.select rendered.bs.select refreshed.bs.select change', syncMedicacaoDetalhe);
+                }
+            }
 
             if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
                 window.jQuery('#fk_cid_int, #fk_patologia2').on('loaded.bs.select rendered.bs.select refreshed.bs.select changed.bs.select change', function() {
@@ -3420,5 +3434,66 @@
             border-bottom: 0 !important;
             border-left: 5px solid transparent !important;
             pointer-events: none !important;
+        }
+
+        /* Padrao atual do bloco Detalhes do relatorio no edit de internacao. */
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+            display: grid !important;
+            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+            gap: 8px 10px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .form-group {
+            width: auto !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            flex: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-1 {
+            grid-column: span 1 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-2 {
+            grid-column: span 2 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-3 {
+            grid-column: span 3 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .detalhes-full-textarea {
+            grid-column: 1 / -1 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper #medicacaoDet.is-hidden {
+            display: none !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper #qual_medicamento_det {
+            width: 100% !important;
+        }
+
+        @media (max-width: 1200px) {
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+                grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-1,
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-2,
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-3 {
+                grid-column: span 1 !important;
+            }
         }
     </style>
