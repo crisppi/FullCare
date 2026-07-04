@@ -4504,3 +4504,40 @@
     border-left: 5px solid transparent !important;
     pointer-events: none !important;
 }
+
+/* Placeholder de select vazio nos blocos adicionais/detalhes. */
+#main-container .internacao-page :is(
+    .tabelas-adicionais-card,
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) select.select-placeholder,
+#main-container .internacao-page .tabelas-adicionais-card .tabelas-selects :is(
+    #relatorio-detalhado.select-placeholder,
+    #select_tuss.select-placeholder,
+    #select_prorrog.select-placeholder,
+    #select_gestao.select-placeholder,
+    #select_uti.select-placeholder,
+    #select_negoc.select-placeholder
+),
+#main-container .internacao-page #detalhes-card-wrapper :is(
+    #curativo_det.select-placeholder,
+    #dieta_det.select-placeholder,
+    #nivel_consc_det.select-placeholder,
+    #oxig_det.select-placeholder,
+    #hemoderivados_det.select-placeholder,
+    #dialise_det.select-placeholder,
+    #oxigenio_hiperbarica_det.select-placeholder,
+    #qt_det.select-placeholder,
+    #rt_det.select-placeholder,
+    #acamado_det.select-placeholder,
+    #atb_det.select-placeholder,
+    #braden_det.select-placeholder
+) {
+    color: #c4c4c4 !important;
+    opacity: 1 !important;
+    font-weight: 500 !important;
+}

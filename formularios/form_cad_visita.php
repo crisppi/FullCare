@@ -3306,6 +3306,33 @@ function aumentarTextProgramacao() {
 #main-container .visita-page .visita-card--tabelas .tabelas-selects :is(select, .bootstrap-select > .dropdown-toggle) {
     padding-right: 32px !important;
 }
+
+#main-container .visita-page .visita-card--tabelas .tabelas-selects :is(
+    #relatorio-detalhado.select-placeholder,
+    #select_tuss.select-placeholder,
+    #select_prorrog.select-placeholder,
+    #select_gestao.select-placeholder,
+    #select_uti.select-placeholder,
+    #select_negoc.select-placeholder
+),
+#main-container .visita-page #detalhes-card-wrapper :is(
+    #curativo_det.select-placeholder,
+    #dieta_det.select-placeholder,
+    #nivel_consc_det.select-placeholder,
+    #oxig_det.select-placeholder,
+    #hemoderivados_det.select-placeholder,
+    #dialise_det.select-placeholder,
+    #oxigenio_hiperbarica_det.select-placeholder,
+    #qt_det.select-placeholder,
+    #rt_det.select-placeholder,
+    #acamado_det.select-placeholder,
+    #atb_det.select-placeholder,
+    #braden_det.select-placeholder
+) {
+    color: #c4c4c4 !important;
+    opacity: 1 !important;
+    font-weight: 500 !important;
+}
 </style>
 <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
 <textarea id="visita-bootstrap-json" hidden><?= htmlspecialchars(json_encode([
@@ -3405,10 +3432,6 @@ document.addEventListener("DOMContentLoaded", function() {
 function updateVisitaSelectPlaceholders() {
     const selects = document.querySelectorAll('#add-visita-form select');
     selects.forEach((selectEl) => {
-        if (selectEl.closest('.visita-card--tabelas')) {
-            selectEl.classList.remove('select-placeholder');
-            return;
-        }
         const empty = !selectEl.value;
         selectEl.classList.toggle('select-placeholder', empty);
     });

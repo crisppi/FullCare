@@ -379,6 +379,78 @@ body #main-container .internacao-page .internacao-head-grid input.is-empty-date:
     color: #a8adb6 !important;
 }
 
+/* Placeholder dos selects nas tabelas adicionais: apenas option vazio. */
+body #main-container :is(.internacao-page, .visita-page) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) select:is(.form-control, .form-control-sm, .form-select, .select-purple, .detail-select):has(> option[value=""]:checked),
+body #main-container :is(.internacao-page, .visita-page) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) .bootstrap-select > .dropdown-toggle.bs-placeholder,
+body #main-container :is(.internacao-page, .visita-page) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) .bootstrap-select > .dropdown-toggle.bs-placeholder :is(.filter-option, .filter-option-inner, .filter-option-inner-inner) {
+    color: #c4c4c4 !important;
+    opacity: 1 !important;
+    font-weight: 500 !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) select.select-placeholder,
+body #main-container :is(.internacao-page, .visita-page) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) select.select-placeholder:focus {
+    color: #c4c4c4 !important;
+    opacity: 1 !important;
+    font-weight: 500 !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) select option {
+    color: #1f2937 !important;
+}
+
 /* Padrao unico de seta dos selects: igual ao select nativo de Acomodacao. */
 body #main-container :is(.internacao-page, .visita-page) select.form-control,
 body #main-container :is(.internacao-page, .visita-page) select.form-select,

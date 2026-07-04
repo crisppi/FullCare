@@ -1867,6 +1867,18 @@
                 select.addEventListener('change', syncAssistClearButtons);
             });
 
+            function syncSelectPlaceholders() {
+                document.querySelectorAll('.internacao-page .tabelas-adicionais-card select, #tabelas-adicionais-paineis-edit select, #detalhes-card-wrapper select').forEach(function(select) {
+                    select.classList.toggle('select-placeholder', !select.value);
+                });
+            }
+
+            syncSelectPlaceholders();
+
+            document.querySelectorAll('.internacao-page .tabelas-adicionais-card select, #tabelas-adicionais-paineis-edit select, #detalhes-card-wrapper select').forEach(function(select) {
+                select.addEventListener('change', syncSelectPlaceholders);
+            });
+
             var medicacaoSelect = document.getElementById('medic_alto_custo_det');
             var medicacaoDetalhe = document.getElementById('medicacaoDet');
 
@@ -1888,9 +1900,14 @@
                 window.jQuery('#fk_cid_int, #fk_patologia2').on('loaded.bs.select rendered.bs.select refreshed.bs.select changed.bs.select change', function() {
                     syncAssistClearButtons();
                 });
+                window.jQuery('.internacao-page .tabelas-adicionais-card select, #tabelas-adicionais-paineis-edit select, #detalhes-card-wrapper select')
+                    .on('loaded.bs.select rendered.bs.select refreshed.bs.select changed.bs.select change', syncSelectPlaceholders);
                 setTimeout(syncAssistClearButtons, 0);
                 setTimeout(syncAssistClearButtons, 120);
                 setTimeout(syncAssistClearButtons, 300);
+                setTimeout(syncSelectPlaceholders, 0);
+                setTimeout(syncSelectPlaceholders, 120);
+                setTimeout(syncSelectPlaceholders, 300);
             }
 
             document.querySelectorAll('[data-clear-select]').forEach(function(button) {
@@ -3495,5 +3512,104 @@
             #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-3 {
                 grid-column: span 1 !important;
             }
+        }
+
+        /* Placeholder dos selects nas tabelas adicionais: apenas option vazio. */
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #detalhes-card-wrapper,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) select:is(.form-control, .form-control-sm, .form-select, .select-purple, .detail-select):has(> option[value=""]:checked),
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) .bootstrap-select > .dropdown-toggle.bs-placeholder,
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) .bootstrap-select > .dropdown-toggle.bs-placeholder :is(.filter-option, .filter-option-inner, .filter-option-inner-inner) {
+            color: #c4c4c4 !important;
+            opacity: 1 !important;
+            font-weight: 500 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects :is(
+            #select_relatorio_detalhado.select-placeholder,
+            #select_tuss.select-placeholder,
+            #select_prorrog.select-placeholder,
+            #select_gestao.select-placeholder,
+            #select_uti.select-placeholder,
+            #select_negoc.select-placeholder
+        ),
+        #main-container .internacao-page #detalhes-card-wrapper :is(
+            #curativo_det.select-placeholder,
+            #dieta_det.select-placeholder,
+            #nivel_consc_det.select-placeholder,
+            #oxig_det.select-placeholder,
+            #hemoderivados_det.select-placeholder,
+            #dialise_det.select-placeholder,
+            #oxigenio_hiperbarica_det.select-placeholder,
+            #qt_det.select-placeholder,
+            #rt_det.select-placeholder,
+            #acamado_det.select-placeholder,
+            #atb_det.select-placeholder,
+            #braden_det.select-placeholder
+        ) {
+            color: #c4c4c4 !important;
+            opacity: 1 !important;
+            font-weight: 500 !important;
+        }
+
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #detalhes-card-wrapper,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) select.select-placeholder,
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #detalhes-card-wrapper,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) select.select-placeholder:focus {
+            color: #c4c4c4 !important;
+            opacity: 1 !important;
+            font-weight: 500 !important;
+        }
+
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #detalhes-card-wrapper,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) select option {
+            color: #1f2937 !important;
         }
     </style>
