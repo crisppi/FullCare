@@ -626,7 +626,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     <div class="block" data-group="diarias">
         <!-- TÍTULO / TOGGLER -->
         <h5>
-            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+            <button class="block-toggle collapsed" type="button" data-rah-toggle="collapse"
                 data-bs-target="#grp-diarias" aria-expanded="false" aria-controls="grp-diarias">
                 Diárias
             </button>
@@ -774,7 +774,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     <!-- SETOR: APTO / ENFERMARIA -->
     <div class="block apto" data-group="apto">
         <h5>
-            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+            <button class="block-toggle collapsed" type="button" data-rah-toggle="collapse"
                 data-bs-target="#grp-apto" aria-expanded="false" aria-controls="grp-apto">
                 Apto / Enfermaria
             </button>
@@ -923,7 +923,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     <!-- SETOR: UTI -->
     <div class="block uti" data-group="uti">
         <h5>
-            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+            <button class="block-toggle collapsed" type="button" data-rah-toggle="collapse"
                 data-bs-target="#grp-uti" aria-expanded="false" aria-controls="grp-uti">
                 UTI
             </button>
@@ -1071,7 +1071,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     <!-- SETOR: CENTRO CIRÚRGICO -->
     <div class="block cc" data-group="cc">
         <h5>
-            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+            <button class="block-toggle collapsed" type="button" data-rah-toggle="collapse"
                 data-bs-target="#grp-cc" aria-expanded="false" aria-controls="grp-cc">
                 Centro Cirúrgico
             </button>
@@ -1218,7 +1218,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     <!-- SETOR: OUTROS -->
     <div class="block" data-group="outros">
         <h5>
-            <button class="block-toggle collapsed" type="button" data-bs-toggle="collapse"
+            <button class="block-toggle collapsed" type="button" data-rah-toggle="collapse"
                 data-bs-target="#grp-outros" aria-expanded="false" aria-controls="grp-outros">
                 Outros
             </button>
@@ -1286,16 +1286,15 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
         <div id="alertPeriodo" class="alert alert-danger d-none" role="alert">
             A data final não pode ser anterior à data inicial.
         </div>
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-            <div class="flex-grow-1">
+        <div class="rah-notes-row">
+            <div class="rah-notes-main">
                 <label class="form-label">Observações finais</label>
-                <div id="comentarios_obs_preview" class="border rounded p-3 bg-light"
-                    style="min-height:80px; white-space:pre-wrap;">
+                <div id="comentarios_obs_preview" class="rah-notes-preview">
                     <?= $h($fv('comentarios_obs') ?: 'Nenhuma observação adicionada.') ?>
                 </div>
             </div>
-            <div class="text-end">
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+            <div class="rah-notes-actions">
+                <button type="button" class="btn btn-outline-primary rah-btn rah-btn-outline" data-bs-toggle="modal"
                     data-bs-target="#modalComentariosObs">
                     <i class="bi bi-pencil-square me-1"></i>Editar observações
                 </button>
@@ -1305,11 +1304,11 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
 
     <!-- AÇÕES -->
     <div class="block">
-        <div class="actions">
-            <button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i> Salvar</button>
-            <button type="button" class="btn btn-outline-primary" id="btnSalvarPDF"><i class="bi bi-download"></i>
+        <div class="actions rah-actions">
+            <button type="submit" class="btn btn-success rah-btn rah-btn-primary"><i class="bi bi-check-lg"></i> Salvar</button>
+            <button type="button" class="btn btn-outline-primary rah-btn rah-btn-outline" id="btnSalvarPDF"><i class="bi bi-download"></i>
                 Salvar PDF</button>
-            <button type="button" class="btn btn-outline-secondary" id="btnEnviarEmail"><i
+            <button type="button" class="btn btn-outline-secondary rah-btn rah-btn-muted" id="btnEnviarEmail"><i
                     class="bi bi-envelope-fill"></i>
                 Enviar PDF por e-mail</button>
         </div>
@@ -1333,8 +1332,8 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                         placeholder="Digite as observações que devem aparecer no final do RAH"><?= $h($fv('comentarios_obs')) ?></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="btnSalvarComentariosObs">Salvar observações</button>
+                    <button type="button" class="btn btn-outline-secondary rah-btn rah-btn-muted" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary rah-btn rah-btn-primary" id="btnSalvarComentariosObs">Salvar observações</button>
                 </div>
             </div>
         </div>
@@ -1457,12 +1456,12 @@ $listaParciaisData = base64_encode(json_encode($parciaisLista ?? [], JSON_UNESCA
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" defer></script>
 
 <!-- RAH (agora em /js) -->
-<script src="<?= $h($BASE_URL) ?>js/rah-core.js" defer></script>
-<script src="<?= $h($BASE_URL) ?>js/rah-calc.js" defer></script>
-<script src="<?= $h($BASE_URL) ?>js/rah-ui.js" defer></script>
-<script src="<?= $h($BASE_URL) ?>js/rah-pdf.js" defer></script>
-<script src="<?= $h($BASE_URL) ?>js/rah-cadcentral.js" defer></script>
-<script src="<?= $h($BASE_URL) ?>js/form_cad_capeante_timer.js" defer></script>
+<script src="<?= $h($BASE_URL) ?>js/rah-core.js?v=<?= @filemtime(__DIR__ . '/../js/rah-core.js') ?: time() ?>" defer></script>
+<script src="<?= $h($BASE_URL) ?>js/rah-calc.js?v=<?= @filemtime(__DIR__ . '/../js/rah-calc.js') ?: time() ?>" defer></script>
+<script src="<?= $h($BASE_URL) ?>js/rah-ui.js?v=<?= @filemtime(__DIR__ . '/../js/rah-ui.js') ?: time() ?>" defer></script>
+<script src="<?= $h($BASE_URL) ?>js/rah-pdf.js?v=<?= @filemtime(__DIR__ . '/../js/rah-pdf.js') ?: time() ?>" defer></script>
+<script src="<?= $h($BASE_URL) ?>js/rah-cadcentral.js?v=<?= @filemtime(__DIR__ . '/../js/rah-cadcentral.js') ?: time() ?>" defer></script>
+<script src="<?= $h($BASE_URL) ?>js/form_cad_capeante_timer.js?v=<?= @filemtime(__DIR__ . '/../js/form_cad_capeante_timer.js') ?: time() ?>" defer></script>
 <script defer>
 document.addEventListener('DOMContentLoaded', function () {
     var textarea = document.getElementById('comentarios_obs');
