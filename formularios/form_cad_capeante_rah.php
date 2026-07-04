@@ -1342,18 +1342,18 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     <!-- Modal informações da parcial anterior -->
     <div class="modal fade" id="modalInfoParcial" tabindex="-1" aria-labelledby="modalInfoParcialLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content">
-                <div class="modal-header" style="background:#f2f2f2;border-bottom:1px solid #dadada;">
+        <div class="modal-dialog modal-dialog-centered modal-xl rah-prev-modal-dialog">
+            <div class="modal-content rah-modal-content">
+                <div class="modal-header rah-modal-header">
                     <h5 class="modal-title" id="modalInfoParcialLabel">Parcial anterior</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" style="color:#3a3a3a;">
+                <div class="modal-body rah-modal-body">
                     <div id="prevParcialEmpty" class="text-muted" style="<?= !empty($parciaisLista) ? 'display:none' : '' ?>">
                         Nenhuma parcial anterior registrada.
                     </div>
                     <div id="prevParcialContent" style="<?= !empty($parciaisLista) ? '' : 'display:none' ?>">
-                        <div class="row g-3 mb-3 parciais-header" id="prevParcialTituloRow">
+                        <div class="row g-3 mb-3 parciais-header rah-prev-summary" id="prevParcialTituloRow">
                             <div class="col-12 col-md-4">
                                 <strong>Nome</strong>
                                 <div id="prevParcial_nome" class="text-uppercase fw-semibold"></div>
@@ -1367,8 +1367,8 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                                 <div id="prevParcial_matricula" class="text-muted"></div>
                             </div>
                         </div>
-                        <div class="table-responsive mt-4">
-                            <table class="table table-striped align-middle" id="prevParcialTabela">
+                        <div class="table-responsive rah-prev-table-wrap">
+                            <table class="table table-striped align-middle rah-prev-table" id="prevParcialTabela">
                                 <thead class="table-light text-dark fw-semibold capeante-rah-preview-head">
                                     <tr>
                                         <th>Parcial</th>
@@ -1389,7 +1389,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendido</button>
+                    <button type="button" class="btn btn-primary rah-btn rah-btn-primary" data-bs-dismiss="modal">Entendido</button>
                 </div>
             </div>
         </div>
@@ -1413,30 +1413,6 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
         </div>
     </div>
 </form>
-
-<style>
-#modalInfoParcial .modal-dialog.modal-xl {
-    max-width: 1200px;
-    width: 95%;
-}
-#modalInfoParcial .parciais-header strong {
-    display: block;
-    font-size: 0.95rem;
-    color: #5c5c5c;
-}
-#modalInfoParcial .parciais-header div {
-    font-size: 1.15rem;
-}
-#modalInfoParcial #prevParcialTabela thead th {
-    font-size: 1.2rem;
-    background-color: #dfe9ff !important;
-    color: #1f2a44 !important;
-    border-bottom: 2px solid #c0cde6;
-}
-#modalInfoParcial #prevParcialTabela td {
-    font-size: 1.15rem;
-}
-</style>
 
 <?php
 $prevParcialData = base64_encode(json_encode($prevParcialInfo ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));

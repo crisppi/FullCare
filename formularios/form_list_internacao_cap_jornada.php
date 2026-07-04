@@ -616,7 +616,7 @@ th.th-acoes {
         </div>
     </div>
 
-    <form action="<?= htmlspecialchars($actionUrl) ?>" id="filtros-form" method="GET" class="listagem-panel jornada-filter-panel">
+    <form action="<?= htmlspecialchars($actionUrl) ?>" id="filtros-form" method="GET" class="listagem-panel table-filters jornada-filter-panel">
         <div class="row legacy-filter-row align-items-end jornada-filter-row">
             <div class="col-sm-3">
                 <label class="form-label mb-0 small text-muted">Hospital</label>
@@ -698,7 +698,7 @@ th.th-acoes {
     </form>
 
     <div id="table-container" class="mt-3">
-        <div class="table-responsive">
+        <div class="table-responsive listagem-table-wrap jornada-table-wrap">
             <table class="table table-sm table-striped table-hover align-middle">
                 <thead>
                     <tr>

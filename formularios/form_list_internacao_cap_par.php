@@ -91,14 +91,15 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
     }
 </style>
 <!-- FORMULARIO DE PESQUISAS -->
-<div class="container-fluid listagem-page" id="main-container">
+<div class="container-fluid listagem-page paradas-list-page" id="main-container">
     <div class="listagem-hero listagem-hero--module listagem-hero--contas">
         <div class="listagem-hero__copy">
             <div class="listagem-kicker">Capeantes</div>
             <h1 class="listagem-title">Contas paradas</h1>
         </div>
     </div>
-    <div id="navbarToggleExternalContent">
+    <div class="complete-table listagem-panel contas-filter-card">
+    <div id="navbarToggleExternalContent" class="table-filters">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script src="./js/ajaxNav.js"></script>
         <script src="js/scriptPdf.js" defer> </script>
@@ -135,14 +136,14 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
                 <div class="col-sm-1" style="padding:2px !important">
                     <select class="form-control mb-3 form-control-sm" id="limite" style="font-size:.8em; color:#878787"
                         name="limite">
-                        <option value="">Reg por pag</option>
-                        <option value="5" <?= $limite == '5' ? 'selected' : null ?>>Reg por pág = 5
+                        <option value="">Reg/pág</option>
+                        <option value="5" <?= $limite == '5' ? 'selected' : null ?>>5
                         </option>
-                        <option value="10" <?= $limite == '10' ? 'selected' : null ?>>Reg por pág = 10
+                        <option value="10" <?= $limite == '10' ? 'selected' : null ?>>10
                         </option>
-                        <option value="20" <?= $limite == '20' ? 'selected' : null ?>>Reg por pág = 20
+                        <option value="20" <?= $limite == '20' ? 'selected' : null ?>>20
                         </option>
-                        <option value="50" <?= $limite == '50' ? 'selected' : null ?>>Reg por pág = 50
+                        <option value="50" <?= $limite == '50' ? 'selected' : null ?>>50
                         </option>
                     </select>
                 </div>
@@ -211,6 +212,7 @@ $data_intern_int_max = filter_input(INPUT_GET, 'data_intern_int_max') ?: null;
                         <i class="bi bi-trash3"></i>
                     </a>
                 </div>
+            </div>
         </form>
     </div>
 </div>
@@ -299,10 +301,23 @@ if ($qtdIntItens > $limite) {
 
 ?>
 <div>
-    <div id="table-content">
+    <div id="table-content" class="listagem-table-wrap contas-table-wrap">
+        <div class="fc-bulk-print-bar" data-bulk-print-root>
+            <span class="fc-bulk-print-count" data-bulk-print-count>0 selecionados</span>
+            <button type="button" class="fc-bulk-print-btn" data-bulk-print-modelo="resumido">
+                <i class="bi bi-printer"></i> Imprimir selecionados
+            </button>
+            <button type="button" class="fc-bulk-print-btn fc-bulk-print-btn--primary" data-bulk-print-modelo="completo">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Imprimir completos
+            </button>
+        </div>
         <table class="table table-sm table-striped  table-hover table-condensed">
             <thead>
                 <tr>
+                    <th scope="col" class="th-w-4">
+                        <input type="checkbox" class="fc-bulk-print-check js-capeante-select-all"
+                            aria-label="Selecionar todos os capeantes desta página">
+                    </th>
                     <th scope="col" class="th-w-4">Reg</th>
                     <th scope="col" class="th-w-6">Conta No.</th>
                     <th scope="col" class="th-w-23">Hospital</th>
@@ -320,6 +335,11 @@ if ($qtdIntItens > $limite) {
 
                 ?>
                 <tr>
+                    <td scope="row" class="col-id">
+                        <input type="checkbox" class="fc-bulk-print-check js-capeante-print-check"
+                            value="<?= $intern['id_capeante'] ?>"
+                            aria-label="Selecionar capeante <?= $intern['id_capeante'] ?>">
+                    </td>
                     <td scope="row" class="col-id">
                         <?= $intern["id_internacao"]; ?>
                     </td>
@@ -358,8 +378,14 @@ if ($qtdIntItens > $limite) {
                                 </li>
                                 <li>
                                     <button class="dropdown-item"
-                                        onclick="edit('<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>')">
-                                        <i style="color:brown; margin-right:10px" class="bi bi-printer"></i> Imprimir
+                                        onclick="window.location.href='<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>'">
+                                        <i style="color:brown; margin-right:10px" class="bi bi-printer"></i> Imprimir resumido
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item"
+                                        onclick="window.location.href='<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>?modelo=completo'">
+                                        <i style="color:brown; margin-right:10px" class="bi bi-file-earmark-spreadsheet"></i> Imprimir completo
                                     </button>
                                 </li>
                         </div>
@@ -370,7 +396,7 @@ if ($qtdIntItens > $limite) {
                 <?php endforeach; ?>
                 <?php if ($qtdIntItens == 0): ?>
                 <tr>
-                    <td colspan="11" scope="row" class="col-id">
+                    <td colspan="12" scope="row" class="col-id">
                         Não foram encontrados registros
                     </td>
                 </tr>
@@ -378,8 +404,6 @@ if ($qtdIntItens > $limite) {
                 <?php endif ?>
             </tbody>
         </table>
-
-
         <!-- salvar variavel qtdIntItens no PHP para passar para JS -->
         <div style="text-align:right;margin-top:20px;">
             <input type="hidden" id="qtd" value="<?php echo $qtdIntItens ?>">
@@ -439,6 +463,60 @@ if ($qtdIntItens > $limite) {
 </div>
 </div>
 <script>
+if (!window.__fcBulkPrintBound) {
+    window.__fcBulkPrintBound = true;
+    window.__fcBulkPrintBaseUrl = <?= json_encode(rtrim($BASE_URL, '/') . '/show_capeantePrt.php') ?>;
+
+    function fcBulkPrintTableFrom(element) {
+        return element ? element.closest('#table-content') : null;
+    }
+
+    function fcBulkPrintChecks(tableContent) {
+        return Array.from(tableContent ? tableContent.querySelectorAll('.js-capeante-print-check') : []);
+    }
+
+    function fcBulkPrintSelectedIds(tableContent) {
+        return fcBulkPrintChecks(tableContent).filter((check) => check.checked).map((check) => check.value);
+    }
+
+    function fcBulkPrintUpdate(tableContent) {
+        const countEl = tableContent ? tableContent.querySelector('[data-bulk-print-count]') : null;
+        const selectAll = tableContent ? tableContent.querySelector('.js-capeante-select-all') : null;
+        const checks = fcBulkPrintChecks(tableContent);
+        const selected = fcBulkPrintSelectedIds(tableContent).length;
+        if (countEl) countEl.textContent = selected + (selected === 1 ? ' selecionado' : ' selecionados');
+        if (selectAll) {
+            selectAll.checked = checks.length > 0 && checks.every((check) => check.checked);
+            selectAll.indeterminate = selected > 0 && selected < checks.length;
+        }
+    }
+
+    document.addEventListener('change', function(event) {
+        if (event.target.matches('.js-capeante-select-all')) {
+            const tableContent = fcBulkPrintTableFrom(event.target);
+            fcBulkPrintChecks(tableContent).forEach((check) => {
+                check.checked = event.target.checked;
+            });
+            fcBulkPrintUpdate(tableContent);
+        }
+        if (event.target.matches('.js-capeante-print-check')) {
+            fcBulkPrintUpdate(fcBulkPrintTableFrom(event.target));
+        }
+    });
+
+    document.addEventListener('click', function(event) {
+        const button = event.target.closest('[data-bulk-print-modelo]');
+        if (!button) return;
+        const tableContent = fcBulkPrintTableFrom(button);
+        const ids = fcBulkPrintSelectedIds(tableContent);
+        if (!ids.length) {
+            alert('Selecione pelo menos um capeante para imprimir.');
+            return;
+        }
+        const modelo = button.dataset.bulkPrintModelo || 'resumido';
+        window.location.href = window.__fcBulkPrintBaseUrl + '?modelo=' + encodeURIComponent(modelo) + '&ids=' + encodeURIComponent(ids.join(','));
+    });
+}
 // ajax para submit do formulario de pesquisa
 $(document).ready(function() {
     $('#select-internacao-form').submit(function(e) {

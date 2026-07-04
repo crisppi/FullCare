@@ -505,7 +505,19 @@ form#form-capeante-rah .sec-body > .row.g-3 {
 }
 
 form#form-capeante-rah .form-line-grid {
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns:
+    minmax(0, .95fr)
+    minmax(0, .95fr)
+    minmax(0, .95fr)
+    minmax(0, .95fr)
+    minmax(0, 1.15fr)
+    minmax(0, .95fr)
+    minmax(0, .95fr)
+    minmax(0, .95fr);
+}
+
+form#form-capeante-rah .form-line-grid .fg-parcial-num {
+  grid-column: auto !important;
 }
 
 form#form-capeante-rah .form-group {
@@ -724,6 +736,97 @@ form#form-capeante-rah .rah-btn-muted {
 
 form#form-capeante-rah .rah-btn:hover {
   filter: brightness(.98);
+}
+
+#modalInfoParcial .rah-prev-modal-dialog {
+  max-width: 1120px;
+  width: min(94vw, 1120px);
+}
+
+#modalInfoParcial .rah-modal-content {
+  border: 1px solid #d8e1ec;
+  border-radius: 10px;
+  box-shadow: 0 18px 46px rgba(15, 23, 42, .18);
+  overflow: hidden;
+}
+
+#modalInfoParcial .rah-modal-header {
+  background: #fff;
+  border-bottom: 1px solid #e8edf4;
+  padding: 10px 14px;
+}
+
+#modalInfoParcial .modal-title {
+  color: #2f3947;
+  font-size: .92rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+#modalInfoParcial .btn-close {
+  height: 28px;
+  opacity: .65;
+  padding: 4px;
+  width: 28px;
+}
+
+#modalInfoParcial .rah-modal-body {
+  color: #394150;
+  padding: 12px 14px;
+}
+
+#modalInfoParcial .rah-prev-summary {
+  --bs-gutter-x: 8px;
+  --bs-gutter-y: 6px;
+  margin-bottom: 10px !important;
+}
+
+#modalInfoParcial .parciais-header strong {
+  color: #5d6572;
+  display: block;
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 3px;
+}
+
+#modalInfoParcial .parciais-header div {
+  color: #2f3947;
+  font-size: .78rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+#modalInfoParcial .rah-prev-table-wrap {
+  margin-top: 8px;
+}
+
+#modalInfoParcial .rah-prev-table {
+  margin-bottom: 0;
+}
+
+#modalInfoParcial .rah-prev-table thead th {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #d8e1ec !important;
+  color: #394150 !important;
+  font-size: .68rem !important;
+  font-weight: 800 !important;
+  line-height: 1.1;
+  padding: 7px 8px !important;
+  text-transform: uppercase;
+}
+
+#modalInfoParcial .rah-prev-table td {
+  color: #2f3947;
+  font-size: .78rem !important;
+  line-height: 1.15;
+  padding: 6px 8px !important;
+  vertical-align: middle;
+}
+
+#modalInfoParcial .modal-footer {
+  border-top: 1px solid #e8edf4;
+  padding: 10px 14px;
 }
 
 @media (max-width: 1199.98px) {
