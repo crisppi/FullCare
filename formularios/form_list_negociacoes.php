@@ -92,7 +92,13 @@ $paginationBlock = (int)floor(($pagAtual - 1) / $paginationWindowSize);
 $firstPageInWindow = ($paginationBlock * $paginationWindowSize) + 1;
 $lastPageInWindow = min($totalPages, $firstPageInWindow + $paginationWindowSize - 1);
 
-$exportUrl = $BASE_URL . 'exportar_excel_negociacoes.php?' . http_build_query($paginationParams);
+$exportParamsFiltered = array_merge($paginationParams, ['export_scope' => 'filtered']);
+$exportParamsCurrent = array_merge($paginationParams, [
+    'export_scope' => 'current_page',
+    'pag' => $pagAtual,
+]);
+$exportUrl = $BASE_URL . 'exportar_excel_negociacoes.php?' . http_build_query($exportParamsFiltered);
+$exportCurrentPageUrl = $BASE_URL . 'exportar_excel_negociacoes.php?' . http_build_query($exportParamsCurrent);
 
 $tiposDisponiveis = [
     "TROCA UTI/APTO",
@@ -251,10 +257,23 @@ sort($tiposDisponiveis);
             <h1 class="listagem-title">Negociações realizadas</h1>
         </div>
         <div class="listagem-hero__actions">
-            <a href="<?= $exportUrl ?>" class="btn listagem-btn-top negociacoes-export-btn">
-                <i class="fa-solid fa-file-excel listagem-btn-top__icon" aria-hidden="true"></i>
-                Exportar Excel
-            </a>
+            <div class="dropdown fc-export-dropdown">
+                <button type="button" class="btn listagem-btn-top negociacoes-export-btn dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-file-excel listagem-btn-top__icon" aria-hidden="true"></i>
+                    Exportar Excel
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a href="<?= htmlspecialchars($exportUrl, ENT_QUOTES, 'UTF-8') ?>" class="dropdown-item">
+                        <span class="fc-export-dropdown__title">Exportar todos os resultados filtrados</span>
+                        <span class="fc-export-dropdown__help">Inclui todos os registros encontrados pelos filtros atuais.</span>
+                    </a>
+                    <a href="<?= htmlspecialchars($exportCurrentPageUrl, ENT_QUOTES, 'UTF-8') ?>" class="dropdown-item">
+                        <span class="fc-export-dropdown__title">Exportar apenas esta página</span>
+                        <span class="fc-export-dropdown__help">Inclui somente os registros visíveis agora.</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 

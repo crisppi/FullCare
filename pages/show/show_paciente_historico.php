@@ -128,67 +128,86 @@ if (($pacienteRow['recem_nascido_pac'] ?? '') === 's' && trim((string)($paciente
 ?>
 <script src="js/timeout.js"></script>
 <link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(dirname(__DIR__, 2) . '/css/form_cad_internacao.css') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css?v=' . @filemtime(dirname(__DIR__, 2) . '/css/listagem_padrao.css'), ENT_QUOTES, 'UTF-8') ?>">
 
 <style>
 .pac-historico-page {
-    padding: 0 16px 96px;
+    padding: 0 4px 18px;
+    margin-top: 8px !important;
 }
 
-.pac-historico-page .internacao-page__hero {
-    margin-bottom: 14px;
+.pac-historico-hero {
+    --module-start: #2f6f9f;
+    --module-mid: #3f93bd;
+    --module-end: #5eb4d8;
+    --module-shadow: rgba(47, 111, 159, .18);
+}
+
+.pac-historico-record-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 5px 10px;
+    border: 1px solid rgba(255, 255, 255, .32);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .14);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 800;
+    line-height: 1;
 }
 
 .pac-historico-grid {
     display: grid;
-    grid-template-columns: minmax(240px, 310px) minmax(0, 1fr);
-    gap: 16px;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    gap: 10px;
     align-items: start;
 }
 
 .pac-historico-summary,
 .pac-historico-card {
     background: #fff;
-    border: 1px solid rgba(47, 111, 159, 0.12);
-    border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(47, 60, 85, 0.08);
+    border: 1px solid #dbe4ef;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, .06);
 }
 
 .pac-historico-summary {
-    padding: 18px;
+    padding: 14px;
 }
 
 .pac-historico-avatar {
-    width: 96px;
-    height: 96px;
-    border-radius: 24px;
+    width: 58px;
+    height: 58px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     background: #eef6fb;
     color: #2f6f9f;
-    font-size: 2.6rem;
-    border: 4px solid #eef6fb;
-    box-shadow: 0 10px 24px rgba(47, 111, 159, 0.16);
+    font-size: 1.85rem;
+    border: 1px solid #d9eaf5;
 }
 
 .pac-historico-name {
-    margin: 0 0 4px;
+    margin: 0 0 3px;
     color: #1f2937;
-    font-size: 1.22rem;
+    font-size: 1rem;
     font-weight: 800;
+    line-height: 1.15;
 }
 
 .pac-historico-subtitle {
     margin: 0;
     color: #667085;
-    font-size: 0.9rem;
+    font-size: .78rem;
 }
 
 .pac-historico-meta {
     display: grid;
-    gap: 9px;
-    margin-top: 18px;
-    padding-top: 16px;
+    gap: 7px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid #edf2f7;
 }
 
@@ -197,7 +216,7 @@ if (($pacienteRow['recem_nascido_pac'] ?? '') === 's' && trim((string)($paciente
     justify-content: space-between;
     gap: 12px;
     color: #667085;
-    font-size: 0.84rem;
+    font-size: .76rem;
 }
 
 .pac-historico-meta strong {
@@ -208,84 +227,103 @@ if (($pacienteRow['recem_nascido_pac'] ?? '') === 's' && trim((string)($paciente
 .pac-historico-kpis {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
+    gap: 8px;
 }
 
 .pac-historico-kpi {
-    min-height: 92px;
-    padding: 14px;
-    border: 1px solid #e5edf4;
-    border-radius: 12px;
+    min-height: 72px;
+    padding: 10px 12px;
+    border: 1px solid #dbe4ef;
+    border-radius: 8px;
     background: #f8fbfd;
 }
 
 .pac-historico-kpi label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 7px;
     color: #64748b;
-    font-size: 0.72rem;
+    font-size: .68rem;
     font-weight: 800;
-    letter-spacing: 0.04em;
+    letter-spacing: 0;
     text-transform: uppercase;
 }
 
 .pac-historico-kpi div {
     color: #1f2937;
-    font-size: 1.25rem;
+    font-size: 1.05rem;
     font-weight: 800;
 }
 
 .pac-historico-stack {
     display: grid;
-    gap: 14px;
+    gap: 10px;
 }
 
 .pac-historico-card {
-    padding: 16px;
+    padding: 14px;
 }
 
 .pac-historico-card h3 {
     margin: 0;
     color: #24384f;
-    font-size: 1rem;
+    font-size: .94rem;
     font-weight: 800;
 }
 
 .pac-historico-card-subtitle {
     margin: 3px 0 0;
     color: #64748b;
-    font-size: 0.84rem;
+    font-size: .76rem;
 }
 
 .pac-historico-table-wrap {
     overflow-x: auto;
-    margin-top: 14px;
-    border: 1px solid #e5edf4;
-    border-radius: 12px;
+    margin-top: 8px;
+    border: 0;
+    border-radius: 0;
+    background: #f8f9fa;
 }
 
 .pac-historico-table {
     margin: 0;
     min-width: 760px;
+    font-size: 10px !important;
+}
+
+.pac-historico-table thead {
+    height: 24px !important;
+    background: #2f6f9f;
+    color: #fff;
 }
 
 .pac-historico-table thead th {
-    background: #2f6f9f;
-    color: #fff;
+    height: 24px !important;
+    min-height: 24px !important;
+    padding: 2px 6px !important;
     border: 0;
-    font-size: 0.78rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    color: inherit;
+    font-size: .66rem !important;
+    font-weight: 600 !important;
+    line-height: 1.02 !important;
+    letter-spacing: .025em !important;
+    text-align: center;
+    text-transform: uppercase !important;
+    vertical-align: middle !important;
+    white-space: nowrap;
 }
 
 .pac-historico-table tbody td {
+    height: 26px !important;
+    min-height: 26px !important;
+    padding: 2px 6px !important;
     vertical-align: middle;
     color: #334155;
-    font-size: 0.9rem;
+    font-size: 10px !important;
+    line-height: 1.05 !important;
 }
 
 .pac-historico-empty {
-    padding: 18px;
+    padding: 10px !important;
     text-align: center;
     color: #64748b;
     background: #f8fbfd;
@@ -299,26 +337,30 @@ if (($pacienteRow['recem_nascido_pac'] ?? '') === 's' && trim((string)($paciente
 }
 
 .pac-historico-actions .btn {
-    border-radius: 9px;
+    border-radius: 7px;
     line-height: 1;
+    min-width: 26px;
+    min-height: 24px;
+    padding: 3px 7px;
+    font-size: 10px;
 }
 
 .pac-historico-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
+    gap: 6px;
+    margin-top: 10px;
 }
 
 .pac-historico-tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 7px 10px;
+    padding: 6px 9px;
     border-radius: 999px;
     background: #f4f0fa;
     color: #5e2363;
-    font-size: 0.84rem;
+    font-size: .76rem;
     font-weight: 800;
 }
 
@@ -330,16 +372,17 @@ if (($pacienteRow['recem_nascido_pac'] ?? '') === 's' && trim((string)($paciente
 }
 </style>
 
-<main id="main-container" class="internacao-page cadastro-layout pac-historico-page">
-    <div class="internacao-page__hero">
-        <div class="internacao-page__hero-main">
-            <h1>Histórico do paciente</h1>
+<main id="main-container" class="container-fluid form_container listagem-page pac-historico-page">
+    <div class="listagem-hero listagem-hero--module listagem-hero--cadastros pac-historico-hero">
+        <div class="listagem-hero__copy">
+            <div class="listagem-kicker">Pacientes</div>
+            <h1 class="listagem-title">Histórico do paciente</h1>
         </div>
-        <div class="hero-actions">
-            <a href="<?= $BASE_URL ?>pacientes" class="hero-back-btn">Voltar para lista</a>
-            <a href="<?= $BASE_URL ?>pacientes/ver/<?= (int)$id_paciente ?>" class="hero-back-btn">Ver paciente</a>
-            <a href="<?= $BASE_URL ?>internacoes/nova?id_paciente=<?= (int)$id_paciente ?>" class="hero-back-btn">Lançar internação</a>
-            <span class="internacao-page__tag">Registro #<?= (int)$id_paciente ?></span>
+        <div class="listagem-hero__actions">
+            <a href="<?= $BASE_URL ?>pacientes" class="btn listagem-btn-top">Voltar para lista</a>
+            <a href="<?= $BASE_URL ?>pacientes/ver/<?= (int)$id_paciente ?>" class="btn listagem-btn-top">Ver paciente</a>
+            <a href="<?= $BASE_URL ?>internacoes/nova?id_paciente=<?= (int)$id_paciente ?>" class="btn listagem-btn-top listagem-btn-top--blue">Lançar internação</a>
+            <span class="pac-historico-record-badge">Registro #<?= (int)$id_paciente ?></span>
         </div>
     </div>
 

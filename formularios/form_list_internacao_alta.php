@@ -460,9 +460,22 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
         </div>
 
         <div class="listagem-hero__actions">
-            <a href="#" id="btnExportExcelAlta" class="btn listagem-btn-top listagem-btn-top--green">
-                <i class="fa-solid fa-file-excel me-1"></i> Exportar Excel
-            </a>
+            <div class="dropdown fc-export-dropdown">
+                <button type="button" id="btnExportExcelAlta" class="btn listagem-btn-top listagem-btn-top--green dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-file-excel me-1"></i> Exportar Excel
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <button type="button" class="dropdown-item js-alta-export-scope" data-export-scope="filtered">
+                        <span class="fc-export-dropdown__title">Exportar todos os resultados filtrados</span>
+                        <span class="fc-export-dropdown__help">Inclui todos os registros encontrados pelos filtros atuais.</span>
+                    </button>
+                    <button type="button" class="dropdown-item js-alta-export-scope" data-export-scope="current_page">
+                        <span class="fc-export-dropdown__title">Exportar apenas esta página</span>
+                        <span class="fc-export-dropdown__help">Inclui somente os registros visíveis agora.</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -740,6 +753,10 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
             </div>
 
             <div class="modal-body">
+                <input type="hidden" id="altaExportScope" value="filtered">
+                <div class="fc-export-scope-summary" id="altaExportScopeSummary">
+                    <strong>Exportação:</strong> todos os resultados encontrados pelos filtros atuais.
+                </div>
 
                 <!-- Barra Selecionar todos / Limpar -->
                 <div class="export-pill-toolbar">
@@ -940,10 +957,18 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
             });
         }
 
-        // Abre modal de campos ao clicar em Exportar Excel
-        $(document).on('click', '#btnExportExcelAlta', function(e) {
+        function setAltaExportScope(scope) {
+            var normalizedScope = scope === 'current_page' ? 'current_page' : 'filtered';
+            $('#altaExportScope').val(normalizedScope);
+            var summary = normalizedScope === 'current_page'
+                ? '<strong>Exportação:</strong> apenas os registros visíveis nesta página.'
+                : '<strong>Exportação:</strong> todos os resultados encontrados pelos filtros atuais.';
+            $('#altaExportScopeSummary').html(summary);
+        }
+
+        $(document).on('click', '.js-alta-export-scope', function(e) {
             e.preventDefault();
-            e.stopPropagation();
+            setAltaExportScope($(this).data('export-scope'));
             new bootstrap.Modal(document.getElementById('modalExportAltaCampos')).show();
         });
 
@@ -996,6 +1021,14 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                 query += '&' + colsParam;
             } else {
                 query = colsParam;
+            }
+
+            var exportScope = $('#altaExportScope').val() || 'filtered';
+            query += '&export_scope=' + encodeURIComponent(exportScope);
+            if (exportScope === 'current_page') {
+                var currentParams = new URLSearchParams(window.location.search || '');
+                var currentPage = currentParams.get('pag') || currentParams.get('pg') || '1';
+                query += '&pag=' + encodeURIComponent(currentPage);
             }
 
             var url = '<?= $BASE_URL ?>exportar_excel_list_alta.php';

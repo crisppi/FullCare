@@ -1146,12 +1146,12 @@ $enderecoPaciente = trim(implode(' ', array_filter([
 
             <div class="paciente-danger-card">
                 <div>
-                    <h3>Inativar paciente</h3>
-                    <p>Use esta ação apenas quando o cadastro não deve aparecer como ativo nas listas operacionais.</p>
+                    <h3>Deletar paciente</h3>
+                    <p>Deletar cadastro do paciente.</p>
                 </div>
                 <div class="paciente-actions">
                     <a href="<?= $BASE_URL ?>pacientes" class="btn btn-outline-secondary">Cancelar</a>
-                    <button class="btn btn-danger" type="submit" form="delete-paciente-form" id="deletar-btn" name="deletar">Inativar</button>
+                    <button class="btn btn-danger" type="submit" form="delete-paciente-form" id="deletar-btn" name="deletar">Deletar</button>
                 </div>
                 <form id="delete-paciente-form" action="process_paciente.php?id_paciente=<?= (int)$id_paciente ?>" method="POST" style="display:none;">
                     <input type="hidden" name="type" value="delUpdate">

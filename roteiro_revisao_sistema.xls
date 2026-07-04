@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    table { border-collapse: collapse; font-family: Arial, sans-serif; font-size: 11pt; }
+    th { background: #d9eaf7; font-weight: bold; text-align: left; }
+    th, td { border: 1px solid #9fb3c8; padding: 6px; vertical-align: top; }
+    .secao { background: #efe7f7; font-weight: bold; }
+    .ok { background: #e8f5e9; }
+    .atencao { background: #fff8e1; }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <th colspan="8">Roteiro de revis&atilde;o visual e funcional - FullCare</th>
+    </tr>
+    <tr>
+      <th>Ordem</th>
+      <th>P&aacute;gina / M&oacute;dulo</th>
+      <th>Tipo</th>
+      <th>O que revisar</th>
+      <th>Padr&otilde;es visuais</th>
+      <th>Teste funcional</th>
+      <th>Status</th>
+      <th>Observa&ccedil;&otilde;es</th>
+    </tr>
+    <tr class="secao"><td>1</td><td>Login</td><td>Acesso</td><td>Entrar, sair, sess&atilde;o expirada</td><td>Logo, inputs, bot&otilde;es, mensagens</td><td>Login v&aacute;lido/inv&aacute;lido</td><td></td><td></td></tr>
+    <tr><td>2</td><td>Home / Menu principal</td><td>Navega&ccedil;&atilde;o</td><td>Header, menus, busca, usu&aacute;rio</td><td>Altura do header, espa&ccedil;os, alinhamento</td><td>Abrir menus e buscar paciente</td><td></td><td></td></tr>
+    <tr><td>3</td><td>Lista de Interna&ccedil;&otilde;es</td><td>Lista</td><td>Filtros, tabela, a&ccedil;&otilde;es, pagina&ccedil;&atilde;o</td><td>Fonte, bot&otilde;es, labels, responsivo</td><td>Filtrar, abrir cadastro/edi&ccedil;&atilde;o</td><td></td><td></td></tr>
+    <tr class="secao"><td>4</td><td>Cadastro de Interna&ccedil;&atilde;o</td><td>Formul&aacute;rio</td><td>Dados iniciais, assistenciais, relat&oacute;rios, tabelas adicionais</td><td>Margens, altura dos inputs, placeholders, setas dos selects</td><td>Salvar interna&ccedil;&atilde;o nova</td><td></td><td></td></tr>
+    <tr><td>5</td><td>Cadastro de Interna&ccedil;&atilde;o - Tabelas Adicionais</td><td>Bloco</td><td>Relat&oacute;rio detalhado, TUSS, Prorroga&ccedil;&atilde;o, Gest&atilde;o, UTI, Negocia&ccedil;&otilde;es</td><td>Selects, placeholders, bot&otilde;es +/-, grid</td><td>Abrir/fechar cada bloco</td><td></td><td></td></tr>
+    <tr><td>6</td><td>Cadastro de Interna&ccedil;&atilde;o - Detalhes do relat&oacute;rio</td><td>Bloco</td><td>Curativo, dieta, consci&ecirc;ncia, oxig&ecirc;nio, dispositivos, exames, oportunidades</td><td>Exames e oportunidades em linha inteira; selects vazios cinza claro</td><td>Preencher e salvar</td><td></td><td></td></tr>
+    <tr class="secao"><td>7</td><td>Editar Interna&ccedil;&atilde;o</td><td>Formul&aacute;rio</td><td>Mesmos blocos do cadastro, com dados existentes</td><td>Sem regress&atilde;o visual; sem tela branca</td><td>Atualizar interna&ccedil;&atilde;o</td><td></td><td></td></tr>
+    <tr><td>8</td><td>Editar Interna&ccedil;&atilde;o - Tabelas Adicionais</td><td>Bloco</td><td>Relat&oacute;rio detalhado, TUSS, Prorroga&ccedil;&atilde;o, Gest&atilde;o, UTI, Negocia&ccedil;&otilde;es</td><td>Selects, placeholders, indicadores de registro salvo</td><td>Abrir/fechar e atualizar</td><td></td><td></td></tr>
+    <tr><td>9</td><td>Editar Interna&ccedil;&atilde;o - Alta</td><td>Fluxo</td><td>Campos de alta e motivo</td><td>Inputs compactos, bot&otilde;es padronizados</td><td>Informar/remover alta</td><td></td><td></td></tr>
+    <tr><td>10</td><td>Editar Interna&ccedil;&atilde;o - Prorroga&ccedil;&atilde;o</td><td>Fluxo</td><td>Editar per&iacute;odos, per&iacute;odo em aberto, alta na prorroga&ccedil;&atilde;o</td><td>Fonte, bot&otilde;es +/-, bot&otilde;es N&atilde;o/Sim</td><td>Adicionar/remover linha e salvar</td><td></td><td></td></tr>
+    <tr class="secao"><td>11</td><td>Cadastro de Visita</td><td>Formul&aacute;rio</td><td>Dados da visita, relat&oacute;rios, tabelas adicionais</td><td>Mesmos padr&otilde;es da interna&ccedil;&atilde;o</td><td>Salvar visita nova</td><td></td><td></td></tr>
+    <tr><td>12</td><td>Cadastro de Visita - Tabelas Adicionais</td><td>Bloco</td><td>Relat&oacute;rio detalhado, TUSS, Prorroga&ccedil;&atilde;o, Gest&atilde;o, UTI, Negocia&ccedil;&otilde;es</td><td>Selects, placeholders, setas, grids</td><td>Abrir/fechar cada bloco</td><td></td><td></td></tr>
+    <tr><td>13</td><td>Cadastro de Visita - Detalhes do relat&oacute;rio</td><td>Bloco</td><td>Campos cl&iacute;nicos, exames, oportunidades</td><td>Sem sobreposi&ccedil;&atilde;o; textareas em linha inteira</td><td>Preencher e salvar</td><td></td><td></td></tr>
+    <tr class="secao"><td>14</td><td>Editar Visita</td><td>Formul&aacute;rio</td><td>Abrir visita existente e revisar todos os blocos</td><td>Mesmo padr&atilde;o do cadastro de visita</td><td>Atualizar visita</td><td></td><td></td></tr>
+    <tr><td>15</td><td>TUSS</td><td>Tabela adicional</td><td>C&oacute;digo, descri&ccedil;&atilde;o, quantidade, valor</td><td>Grid, bot&otilde;es +/-, fontes</td><td>Adicionar/remover item</td><td></td><td></td></tr>
+    <tr><td>16</td><td>Prorroga&ccedil;&atilde;o</td><td>Tabela adicional</td><td>Acomoda&ccedil;&atilde;o, datas, di&aacute;rias, isolamento</td><td>Campos compactos, bot&otilde;es padronizados</td><td>Validar datas e salvar</td><td></td><td></td></tr>
+    <tr><td>17</td><td>Gest&atilde;o Assistencial</td><td>Tabela adicional</td><td>Blocos condicionais e textareas</td><td>Sem campos colados, sem textarea distorcendo</td><td>Ativar op&ccedil;&otilde;es e salvar</td><td></td><td></td></tr>
+    <tr><td>18</td><td>UTI</td><td>Tabela adicional</td><td>Crit&eacute;rios, SAPS, relat&oacute;rio UTI</td><td>Campos em linha, labels, bot&otilde;es/links</td><td>Calcular SAPS e salvar</td><td></td><td></td></tr>
+    <tr><td>19</td><td>Negocia&ccedil;&otilde;es</td><td>Tabela adicional</td><td>Campos, valores, datas</td><td>Grid e bot&otilde;es +/-, sem quebra estranha</td><td>Adicionar/remover negocia&ccedil;&atilde;o</td><td></td><td></td></tr>
+    <tr class="secao"><td>20</td><td>Listas / Produ&ccedil;&atilde;o / Contas</td><td>Operacional</td><td>Filtros, tabelas, exporta&ccedil;&otilde;es, pagina&ccedil;&atilde;o</td><td>Densidade visual, bot&otilde;es, responsivo</td><td>Filtrar, exportar, abrir registro</td><td></td><td></td></tr>
+    <tr><td>21</td><td>BI / Relat&oacute;rios</td><td>Relat&oacute;rio</td><td>Cards, gr&aacute;ficos, filtros</td><td>Alinhamento, legenda, responsivo</td><td>Aplicar filtros e carregar dados</td><td></td><td></td></tr>
+    <tr><td>22</td><td>Responsivo</td><td>Geral</td><td>Desktop, notebook menor, mobile</td><td>Sem sobreposi&ccedil;&atilde;o; texto dentro dos bot&otilde;es</td><td>Navegar fluxo principal</td><td></td><td></td></tr>
+  </table>
+</body>
+</html>
