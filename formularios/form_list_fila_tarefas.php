@@ -438,8 +438,8 @@ try {
                     }
                     ?>
                     <?php if ($visita_pag > 1): ?>
-                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['v_pag' => 1])) ?>">&laquo;</a></li>
-                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['v_pag' => $visita_pag - 1])) ?>">&lsaquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['v_pag' => 1])) ?>"><i class="fas fa-angle-double-left"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['v_pag' => $visita_pag - 1])) ?>"><i class="fas fa-angle-left"></i></a></li>
                     <?php endif; ?>
                     <?php for ($i = $v_start; $i <= $v_end; $i++): ?>
                     <li class="page-item <?= $i === $visita_pag ? 'active' : '' ?>">
@@ -447,8 +447,8 @@ try {
                     </li>
                     <?php endfor; ?>
                     <?php if ($visita_pag < $visita_total_pag): ?>
-                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['v_pag' => $visita_pag + 1])) ?>">&rsaquo;</a></li>
-                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['v_pag' => $visita_total_pag])) ?>">&raquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['v_pag' => $visita_pag + 1])) ?>"><i class="fas fa-angle-right"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['v_pag' => $visita_total_pag])) ?>"><i class="fas fa-angle-double-right"></i></a></li>
                     <?php endif; ?>
                 </ul>
             </nav>
@@ -534,8 +534,8 @@ try {
                     }
                     ?>
                     <?php if ($conta_pag > 1): ?>
-                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['c_pag' => 1])) ?>">&laquo;</a></li>
-                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['c_pag' => $conta_pag - 1])) ?>">&lsaquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['c_pag' => 1])) ?>"><i class="fas fa-angle-double-left"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['c_pag' => $conta_pag - 1])) ?>"><i class="fas fa-angle-left"></i></a></li>
                     <?php endif; ?>
                     <?php for ($i = $c_start; $i <= $c_end; $i++): ?>
                     <li class="page-item <?= $i === $conta_pag ? 'active' : '' ?>">
@@ -543,8 +543,8 @@ try {
                     </li>
                     <?php endfor; ?>
                     <?php if ($conta_pag < $conta_total_pag): ?>
-                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['c_pag' => $conta_pag + 1])) ?>">&rsaquo;</a></li>
-                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['c_pag' => $conta_total_pag])) ?>">&raquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['c_pag' => $conta_pag + 1])) ?>"><i class="fas fa-angle-right"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="list_fila_tarefas.php?<?= h(http_build_query($baseQuery + ['c_pag' => $conta_total_pag])) ?>"><i class="fas fa-angle-double-right"></i></a></li>
                     <?php endif; ?>
                 </ul>
             </nav>

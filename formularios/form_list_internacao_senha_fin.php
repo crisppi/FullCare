@@ -110,62 +110,113 @@ $exportCurrentPageUrl = rtrim($BASE_URL, '/') . '/exportar_excel_senhas_finaliza
 ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css?v=' . @filemtime(__DIR__ . '/../css/listagem_padrao.css'), ENT_QUOTES, 'UTF-8') ?>">
 <style>
+    body {
+        background: #e5e7eb !important;
+        min-height: 100vh;
+    }
     .listagem-page { padding: 4px 4px 14px; }
+    .senhas-list-page {
+        min-height: calc(100vh - 126px);
+        padding: 10px 8px 18px !important;
+        background: #e5e7eb !important;
+    }
     .listagem-title { font-size: .96rem; line-height: 1.05; }
     .listagem-panel { padding: 8px 8px 6px; }
+    .senhas-list-page .listagem-panel {
+        border: 1px solid #eef2f7 !important;
+        border-radius: 12px !important;
+        background: #fff !important;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, .08) !important;
+    }
+    .senhas-list-page .table-filters {
+        padding: 0 !important;
+        background: transparent !important;
+    }
     #table-content { margin-top: 0; }
     #table-content tbody td, #table-content tbody th { padding:6px 10px; font-size:.7rem; vertical-align:middle; }
-    .senhas-filter-row {
-        gap: 0 !important;
+    .senhas-list-page .senhas-filter-row {
+        gap: 6px !important;
         margin: 0 !important;
         row-gap: 4px;
+        border: 0 !important;
+        background: transparent !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
     }
-    .senhas-filter-row + .senhas-filter-row {
+    .senhas-list-page .senhas-filter-row + .senhas-filter-row {
         margin-top: 6px !important;
     }
-    .senhas-filter-row > [class*="col-"],
-    .senhas-filter-row > .form-group {
+    .senhas-list-page .senhas-filter-row > [class*="col-"],
+    .senhas-list-page .senhas-filter-row > .form-group {
         display: flex;
         align-items: center;
-        padding: 2px !important;
+        padding: 0 !important;
     }
-    .senhas-filter-row .form-control,
-    .senhas-filter-row .form-control-sm,
-    .senhas-filter-row .btn {
-        min-height: 34px !important;
-        height: 34px !important;
+    .senhas-list-page .senhas-filter-row .form-control,
+    .senhas-list-page .senhas-filter-row .form-control-sm,
+    .senhas-list-page .senhas-filter-row .btn {
+        min-height: 36px !important;
+        height: 36px !important;
         margin: 0 !important;
-        border-radius: 10px;
-        font-size: .68rem !important;
-        line-height: 1.2;
+        border-radius: 8px;
+        font-size: .74rem !important;
+        line-height: 1.25;
     }
-    .senhas-filter-actions {
+    .senhas-list-page .senhas-filter-row .form-control,
+    .senhas-list-page .senhas-filter-row .form-control-sm {
+        border: 1px solid #cbd5e1 !important;
+        background-color: #f8fbff !important;
+        background-image: none !important;
+        color: #344054 !important;
+        font-weight: 500 !important;
+        padding: 0 28px 0 10px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 2px rgba(15, 23, 42, .08) !important;
+    }
+    .senhas-list-page .senhas-filter-row .form-control::placeholder,
+    .senhas-list-page .senhas-filter-row .form-control-sm::placeholder {
+        color: #8a94a6 !important;
+        font-size: .74rem !important;
+        font-weight: 500 !important;
+        opacity: 1 !important;
+    }
+    .senhas-list-page .senhas-filter-row .form-control:focus,
+    .senhas-list-page .senhas-filter-row .form-control-sm:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16) !important;
+    }
+    .senhas-list-page .senhas-filter-row select.form-control,
+    .senhas-list-page .senhas-filter-row select.form-control-sm {
+        background-color: #f8fbff !important;
+        color: #344054 !important;
+    }
+    .senhas-list-page .senhas-filter-actions {
         gap: 8px;
     }
-    .senhas-filter-row--top {
+    .senhas-list-page .senhas-filter-row--top {
         display: flex !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
         column-gap: 6px !important;
         row-gap: 0 !important;
     }
-    .senhas-filter-row--top > [class*="col-"],
-    .senhas-filter-row--top > .form-group {
+    .senhas-list-page .senhas-filter-row--top > [class*="col-"],
+    .senhas-list-page .senhas-filter-row--top > .form-group {
         flex: 1 1 0 !important;
         max-width: none !important;
         min-width: 0 !important;
         padding: 0 !important;
     }
-    .senhas-filter-row--top > :nth-child(1),
-    .senhas-filter-row--top > :nth-child(2) {
+    .senhas-list-page .senhas-filter-row--top > :nth-child(1),
+    .senhas-list-page .senhas-filter-row--top > :nth-child(2) {
         flex-grow: 1.55 !important;
     }
-    .senhas-filter-row--top > :nth-child(3),
-    .senhas-filter-row--top > :nth-child(6) {
+    .senhas-list-page .senhas-filter-row--top > :nth-child(3),
+    .senhas-list-page .senhas-filter-row--top > :nth-child(6) {
         flex-grow: 1.02 !important;
     }
-    .senhas-filter-row--top > :nth-child(4),
-    .senhas-filter-row--top > :nth-child(5) {
+    .senhas-list-page .senhas-filter-row--top > :nth-child(4),
+    .senhas-list-page .senhas-filter-row--top > :nth-child(5) {
         flex-grow: .62 !important;
     }
 </style>
@@ -483,14 +534,14 @@ if ($qtdIntItens > $limite) {
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&lote=<?php print $lote ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
-                        <i class="fa-solid fa-angles-left"></i></a>
+                        <i class="fas fa-angle-double-left"></i></a>
                 </li>
                 <?php endif; ?>
                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1) : ?>
                 <li class="page-item">
                     <a class="page-link" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&lote=<?php print $lote ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print print $paginaAtual - 1 ?>&bl=<?php print print $blocoAtual - 5 ?>')">
-                        <i class="fa-solid fa-angle-left"></i> </a>
+                        <i class="fas fa-angle-left"></i> </a>
                 </li>
                 <?php endif; ?>
 
@@ -508,14 +559,14 @@ if ($qtdIntItens > $limite) {
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&lote=<?php print $lote ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print $paginaAtual + 1 ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
-                            class="fa-solid fa-angle-right"></i></a>
+                            class="fas fa-angle-right"></i></a>
                 </li>
                 <?php endif; ?>
                 <?php if ($current_block < $last_block) : ?>
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&lote=<?php print $lote ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print print count($paginas) ?>&bl=<?php print print ($last_block - 1) * 5 ?>')"><i
-                            class="fa-solid fa-angles-right"></i></a>
+                            class="fas fa-angle-double-right"></i></a>
                 </li>
                 <?php endif; ?>
             </ul>

@@ -200,20 +200,20 @@ if ($isPartial): ?>
     <nav>
         <ul class="pagination m-0">
             <li class="page-item <?= $pag <= 1 ? 'disabled' : '' ?>">
-                <a class="page-link" href="?<?= qs_keep(['pag' => 1, 'partial' => 1]) ?>">&laquo;</a>
+                <a class="page-link" href="?<?= qs_keep(['pag' => 1, 'partial' => 1]) ?>"><i class="fas fa-angle-double-left"></i></a>
             </li>
             <li class="page-item <?= $pag <= 1 ? 'disabled' : '' ?>">
-                <a class="page-link" href="?<?= qs_keep(['pag' => max(1, $pag - 1), 'partial' => 1]) ?>">&lsaquo;</a>
+                <a class="page-link" href="?<?= qs_keep(['pag' => max(1, $pag - 1), 'partial' => 1]) ?>"><i class="fas fa-angle-left"></i></a>
             </li>
             <li class="page-item disabled">
                 <span class="page-link">Página <?= $pag ?> de <?= $totalPages ?></span>
             </li>
             <li class="page-item <?= $pag >= $totalPages ? 'disabled' : '' ?>">
                 <a class="page-link"
-                    href="?<?= qs_keep(['pag' => min($totalPages, $pag + 1), 'partial' => 1]) ?>">&rsaquo;</a>
+                    href="?<?= qs_keep(['pag' => min($totalPages, $pag + 1), 'partial' => 1]) ?>"><i class="fas fa-angle-right"></i></a>
             </li>
             <li class="page-item <?= $pag >= $totalPages ? 'disabled' : '' ?>">
-                <a class="page-link" href="?<?= qs_keep(['pag' => $totalPages, 'partial' => 1]) ?>">&raquo;</a>
+                <a class="page-link" href="?<?= qs_keep(['pag' => $totalPages, 'partial' => 1]) ?>"><i class="fas fa-angle-double-right"></i></a>
             </li>
         </ul>
     </nav>
@@ -300,18 +300,18 @@ endif;
             <nav>
                 <ul class="pagination m-0">
                     <li class="page-item <?= $pag <= 1 ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?<?= qs_keep(['pag' => 1]) ?>">&laquo;</a>
+                        <a class="page-link" href="?<?= qs_keep(['pag' => 1]) ?>"><i class="fas fa-angle-double-left"></i></a>
                     </li>
                     <li class="page-item <?= $pag <= 1 ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?<?= qs_keep(['pag' => max(1, $pag - 1)]) ?>">&lsaquo;</a>
+                        <a class="page-link" href="?<?= qs_keep(['pag' => max(1, $pag - 1)]) ?>"><i class="fas fa-angle-left"></i></a>
                     </li>
                     <li class="page-item disabled"><span class="page-link">Página <?= $pag ?> de
                             <?= $totalPages ?></span></li>
                     <li class="page-item <?= $pag >= $totalPages ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?<?= qs_keep(['pag' => min($totalPages, $pag + 1)]) ?>">&rsaquo;</a>
+                        <a class="page-link" href="?<?= qs_keep(['pag' => min($totalPages, $pag + 1)]) ?>"><i class="fas fa-angle-right"></i></a>
                     </li>
                     <li class="page-item <?= $pag >= $totalPages ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?<?= qs_keep(['pag' => $totalPages]) ?>">&raquo;</a>
+                        <a class="page-link" href="?<?= qs_keep(['pag' => $totalPages]) ?>"><i class="fas fa-angle-double-right"></i></a>
                     </li>
                 </ul>
             </nav>

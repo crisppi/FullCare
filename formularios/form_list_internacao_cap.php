@@ -652,14 +652,14 @@ if ($havePages) {
                                 <?php if ($current_block > $first_block): ?>
                                     <li class="page-item">
                                         <a class="page-link" id="blocoNovo" href="<?= $url ?>&pag=1&bl=0">
-                                            <i class="fa-solid fa-angles-left"></i></a>
+                                            <i class="fas fa-angle-double-left"></i></a>
                                     </li>
                                 <?php endif; ?>
 
                                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                                     <li class="page-item">
                                         <a class="page-link" href="<?= $url ?>&pag=<?= max(1, $paginaAtual - 1) ?>&bl=<?= max(0, $blocoAtual - 5) ?>">
-                                            <i class="fa-solid fa-angle-left"></i></a>
+                                            <i class="fas fa-angle-left"></i></a>
                                     </li>
                                 <?php endif; ?>
 
@@ -674,14 +674,14 @@ if ($havePages) {
                                 <?php if ($current_block < $last_block): ?>
                                     <li class="page-item">
                                         <a class="page-link" id="blocoNovo" href="<?= $url ?>&pag=<?= $paginaAtual + 1 ?>&bl=<?= $blocoAtual + 5 ?>">
-                                            <i class="fa-solid fa-angle-right"></i></a>
+                                            <i class="fas fa-angle-right"></i></a>
                                     </li>
                                 <?php endif; ?>
 
                                 <?php if ($current_block < $last_block): ?>
                                     <li class="page-item">
                                         <a class="page-link" id="blocoNovo" href="<?= $url ?>&pag=<?= $total_pages ?>&bl=<?= ($last_block - 1) * 5 ?>">
-                                            <i class="fa-solid fa-angles-right"></i></a>
+                                            <i class="fas fa-angle-double-right"></i></a>
                                     </li>
                                 <?php endif; ?>
                             </ul>

@@ -319,7 +319,7 @@
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($firstPageUrl) ?>"
                                         onclick="return paginateSeguradoras('<?= htmlspecialchars($firstPageUrl, ENT_QUOTES) ?>');">
-                                        <i class="fa-solid fa-angles-left"></i></a>
+                                        <i class="fas fa-angle-double-left"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
@@ -332,7 +332,7 @@
                                 <li class="page-item">
                                     <a class="page-link" href="<?= htmlspecialchars($prevPageUrl) ?>"
                                         onclick="return paginateSeguradoras('<?= htmlspecialchars($prevPageUrl, ENT_QUOTES) ?>');">
-                                        <i class="fa-solid fa-angle-left"></i> </a>
+                                        <i class="fas fa-angle-left"></i> </a>
                                 </li>
                                 <?php endif; ?>
 
@@ -362,7 +362,7 @@
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($nextPageUrl) ?>"
                                         onclick="return paginateSeguradoras('<?= htmlspecialchars($nextPageUrl, ENT_QUOTES) ?>');"><i
-                                            class="fa-solid fa-angle-right"></i></a>
+                                            class="fas fa-angle-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block < $last_block): ?>
@@ -375,7 +375,7 @@
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($lastPageUrl) ?>"
                                         onclick="return paginateSeguradoras('<?= htmlspecialchars($lastPageUrl, ENT_QUOTES) ?>');"><i
-                                            class="fa-solid fa-angles-right"></i></a>
+                                            class="fas fa-angle-double-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                             </ul>

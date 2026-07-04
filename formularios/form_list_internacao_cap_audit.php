@@ -501,8 +501,8 @@ if ($qtdIntItens > $limite) {
                     </tbody>
                 </table>
 
-                <div style="display:flex;margin:10px 25px 25px 25px;align-items:center;gap:16px;">
-                    <div class="pagination" style="margin:10px auto;">
+                <div>
+                    <div class="pagination" style="margin: 0 auto;">
                         <?php if (!empty($havePages) && $havePages): ?>
                         <ul class="pagination">
                             <?php
@@ -513,7 +513,7 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
                                     onclick="loadContent('<?= $url ?>&pag=1&bl=0&limite=<?= (int)$limite ?>&ordernar=<?= htmlspecialchars((string)$ordenar) ?>')">
-                                    <i class="fa-solid fa-angles-left"></i></a>
+                                    <i class="fas fa-angle-double-left"></i></a>
                             </li>
                             <?php endif; ?>
 
@@ -521,7 +521,7 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" href="#"
                                     onclick="loadContent('<?= $url ?>&pag=<?= max(1, $paginaAtual - 1) ?>&bl=<?= max(0, $blocoAtual - 5) ?>&limite=<?= (int)$limite ?>&ordernar=<?= htmlspecialchars((string)$ordenar) ?>')">
-                                    <i class="fa-solid fa-angle-left"></i></a>
+                                    <i class="fas fa-angle-left"></i></a>
                             </li>
                             <?php endif; ?>
 
@@ -538,7 +538,7 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
                                     onclick="loadContent('<?= $url ?>&pag=<?= $paginaAtual + 1 ?>&bl=<?= $blocoAtual + 5 ?>&limite=<?= (int)$limite ?>&ordernar=<?= htmlspecialchars((string)$ordenar) ?>')">
-                                    <i class="fa-solid fa-angle-right"></i></a>
+                                    <i class="fas fa-angle-right"></i></a>
                             </li>
                             <?php endif; ?>
 
@@ -546,7 +546,7 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
                                     onclick="loadContent('<?= $url ?>&pag=<?= count($paginas) ?>&bl=<?= ($last_block - 1) * 5 ?>&limite=<?= (int)$limite ?>&ordernar=<?= htmlspecialchars((string)$ordenar) ?>')">
-                                    <i class="fa-solid fa-angles-right"></i></a>
+                                    <i class="fas fa-angle-double-right"></i></a>
                             </li>
                             <?php endif; ?>
                         </ul>
@@ -554,8 +554,8 @@ if ($qtdIntItens > $limite) {
                     </div>
 
                     <div class="table-counter">
-                        <p
-                            style="font-size:1em;font-weight:600;font-family:var(--bs-font-sans-serif);text-align:right;margin:0;">
+                        <p style="margin-bottom:18px;font-size:.82rem; font-weight:600;
+                                  font-family:var(--bs-font-sans-serif); text-align:right">
                             <?php echo "Total: " . (int)$qtdIntItens ?>
                         </p>
                     </div>

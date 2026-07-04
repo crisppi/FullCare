@@ -420,14 +420,14 @@ if ($qtdIntItens > $limite) {
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
-                        <i class="fa-solid fa-angles-left"></i></a>
+                        <i class="fas fa-angle-double-left"></i></a>
                 </li>
                 <?php endif; ?>
                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                 <li class="page-item">
                     <a class="page-link" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print print $paginaAtual - 1 ?>&bl=<?php print print $blocoAtual - 5 ?>')">
-                        <i class="fa-solid fa-angle-left"></i> </a>
+                        <i class="fas fa-angle-left"></i> </a>
                 </li>
                 <?php endif; ?>
 
@@ -445,14 +445,14 @@ if ($qtdIntItens > $limite) {
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print $paginaAtual + 1 ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
-                            class="fa-solid fa-angle-right"></i></a>
+                            class="fas fa-angle-right"></i></a>
                 </li>
                 <?php endif; ?>
                 <?php if ($current_block < $last_block): ?>
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print print count($paginas) ?>&bl=<?php print print ($last_block - 1) * 5 ?>')"><i
-                            class="fa-solid fa-angles-right"></i></a>
+                            class="fas fa-angle-double-right"></i></a>
                 </li>
                 <?php endif; ?>
             </ul>

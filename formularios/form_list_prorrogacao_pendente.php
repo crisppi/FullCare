@@ -488,12 +488,12 @@ $baseParams = [
                         <?php if ($paginaAtual > 1): ?>
                         <li class="page-item">
                             <a class="page-link" href="<?= e(buildListUrl($baseParams + ['pag' => 1])) ?>">
-                                <i class="fa-solid fa-angles-left"></i>
+                                <i class="fas fa-angle-double-left"></i>
                             </a>
                         </li>
                         <li class="page-item">
                             <a class="page-link" href="<?= e(buildListUrl($baseParams + ['pag' => $paginaAtual - 1])) ?>">
-                                <i class="fa-solid fa-angle-left"></i>
+                                <i class="fas fa-angle-left"></i>
                             </a>
                         </li>
                         <?php endif; ?>
@@ -509,12 +509,12 @@ $baseParams = [
                         <?php if ($paginaAtual < $totalPaginas): ?>
                         <li class="page-item">
                             <a class="page-link" href="<?= e(buildListUrl($baseParams + ['pag' => $paginaAtual + 1])) ?>">
-                                <i class="fa-solid fa-angle-right"></i>
+                                <i class="fas fa-angle-right"></i>
                             </a>
                         </li>
                         <li class="page-item">
                             <a class="page-link" href="<?= e(buildListUrl($baseParams + ['pag' => $totalPaginas])) ?>">
-                                <i class="fa-solid fa-angles-right"></i>
+                                <i class="fas fa-angle-double-right"></i>
                             </a>
                         </li>
                         <?php endif; ?>

@@ -676,11 +676,11 @@ $urlBase = $self . '?' . $urlParams;
                     <nav aria-label="Navegação das páginas">
                         <ul class="pagination m-0">
                             <li class="page-item <?= !$temPagAnterior ? 'disabled' : '' ?>">
-                                <a class="page-link ajax-link" href="<?= $urlBase ?>&pag=1" aria-label="Primeira">&laquo;</a>
+                                <a class="page-link ajax-link" href="<?= $urlBase ?>&pag=1" aria-label="Primeira"><i class="fas fa-angle-double-left"></i></a>
                             </li>
                             <li class="page-item <?= !$temPagAnterior ? 'disabled' : '' ?>">
                                 <a class="page-link ajax-link" href="<?= $urlBase ?>&pag=<?= max(1, $paginaAtual - 1) ?>"
-                                    aria-label="Anterior">&lsaquo;</a>
+                                    aria-label="Anterior"><i class="fas fa-angle-left"></i></a>
                             </li>
 
                             <?php foreach ($paginasSimples as $p): ?>
@@ -694,11 +694,11 @@ $urlBase = $self . '?' . $urlParams;
                             <li class="page-item <?= !$temPagProxima ? 'disabled' : '' ?>">
                                 <a class="page-link ajax-link"
                                     href="<?= $urlBase ?>&pag=<?= min($totalPaginas, $paginaAtual + 1) ?>"
-                                    aria-label="Próxima">&rsaquo;</a>
+                                    aria-label="Próxima"><i class="fas fa-angle-right"></i></a>
                             </li>
                             <li class="page-item <?= !$temPagProxima ? 'disabled' : '' ?>">
                                 <a class="page-link ajax-link" href="<?= $urlBase ?>&pag=<?= $totalPaginas ?>"
-                                    aria-label="Última">&raquo;</a>
+                                    aria-label="Última"><i class="fas fa-angle-double-right"></i></a>
                             </li>
                         </ul>
                     </nav>

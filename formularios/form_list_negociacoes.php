@@ -396,12 +396,12 @@ sort($tiposDisponiveis);
                             <?php if ($firstPageInWindow > 1): ?>
                             <li class="page-item">
                                 <a class="page-link" href="<?= htmlspecialchars($buildLink(1), ENT_QUOTES, 'UTF-8') ?>">
-                                    <i class="fa-solid fa-angles-left"></i>
+                                    <i class="fas fa-angle-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
                                 <a class="page-link" href="<?= htmlspecialchars($buildLink(max(1, $pagAtual - 1)), ENT_QUOTES, 'UTF-8') ?>">
-                                    <i class="fa-solid fa-angle-left"></i>
+                                    <i class="fas fa-angle-left"></i>
                                 </a>
                             </li>
                             <?php endif; ?>
@@ -415,12 +415,12 @@ sort($tiposDisponiveis);
                             <?php if ($lastPageInWindow < $totalPages): ?>
                             <li class="page-item">
                                 <a class="page-link" href="<?= htmlspecialchars($buildLink(min($totalPages, $pagAtual + 1)), ENT_QUOTES, 'UTF-8') ?>">
-                                    <i class="fa-solid fa-angle-right"></i>
+                                    <i class="fas fa-angle-right"></i>
                                 </a>
                             </li>
                             <li class="page-item">
                                 <a class="page-link" href="<?= htmlspecialchars($buildLink($totalPages), ENT_QUOTES, 'UTF-8') ?>">
-                                    <i class="fa-solid fa-angles-right"></i>
+                                    <i class="fas fa-angle-double-right"></i>
                                 </a>
                             </li>
                             <?php endif; ?>

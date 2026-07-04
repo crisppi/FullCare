@@ -646,8 +646,8 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                     <input type="hidden" id="qtd" value="<?= (int)$qtdIntItens ?>">
                 </div>
 
-                <div class="listagem-footer-row">
-                    <div class="pagination">
+                <div>
+                    <div class="pagination" style="margin: 0 auto;">
 
                         <?php if (($total_pages ?? 1) > 1): ?>
                             <ul class="pagination">
@@ -658,13 +658,13 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                                 <?php if ($current_block > $first_block): ?>
                                     <li class="page-item">
                                         <a class="page-link" href="<?= $buildListaAltaLink(1, 0) ?>">
-                                            <i class="fa-solid fa-angles-left"></i></a>
+                                            <i class="fas fa-angle-double-left"></i></a>
                                     </li>
                                 <?php endif; ?>
                                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                                     <li class="page-item">
                                         <a class="page-link" href="<?= $buildListaAltaLink($paginaAtual - 1, $blocoAtual - 5) ?>">
-                                            <i class="fa-solid fa-angle-left"></i> </a>
+                                            <i class="fas fa-angle-left"></i> </a>
                                     </li>
                                 <?php endif; ?>
 
@@ -679,13 +679,13 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                                 <?php if ($current_block < $last_block): ?>
                                     <li class="page-item">
                                         <a class="page-link" href="<?= $buildListaAltaLink($paginaAtual + 1, $blocoAtual + 5) ?>">
-                                            <i class="fa-solid fa-angle-right"></i></a>
+                                            <i class="fas fa-angle-right"></i></a>
                                     </li>
                                 <?php endif; ?>
                                 <?php if ($current_block < $last_block): ?>
                                     <li class="page-item">
                                         <a class="page-link" href="<?= $buildListaAltaLink(count($paginas), ($last_block - 1) * 5) ?>">
-                                            <i class="fa-solid fa-angles-right"></i></a>
+                                            <i class="fas fa-angle-double-right"></i></a>
                                     </li>
                                 <?php endif; ?>
                             </ul>
@@ -700,8 +700,11 @@ $buildListaAltaLink = function($pagina, $bloco) use ($paginationParams, $BASE_UR
                     </div>
                     <?php endif; ?>
 
-                    <div class="listagem-total">
-                        <p><?= "Total: " . (int)$qtdIntItens ?></p>
+                    <div class="table-counter">
+                        <p style="margin-bottom:18px;font-size:.82rem; font-weight:600;
+                                  font-family:var(--bs-font-sans-serif); text-align:right">
+                            <?= "Total: " . (int)$qtdIntItens ?>
+                        </p>
                     </div>
                 </div>
             </div>

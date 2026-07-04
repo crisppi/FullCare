@@ -166,9 +166,9 @@
             echo "</div>";
             echo "<nav aria-label='Page navigation example'>";
             echo " <ul class='pagination'>";
-            echo " <li class='page-item'><a class='page-link' href='list_imagem.php?pag=1&" . $gets . "''><span aria-hidden='true'>&laquo;</span></a></li>"; ?>
+            echo " <li class='page-item'><a class='page-link' href='list_imagem.php?pag=1&" . $gets . "''><i class='fas fa-angle-double-left'></i></a></li>"; ?>
             <?= $paginacao ?>
-            <?php echo "<li class='page-item'><a class='page-link' href='list_imagem.php?pag=$totalcasos&" . $gets . "''><span aria-hidden='true'>&raquo;</span></a></li>";
+            <?php echo "<li class='page-item'><a class='page-link' href='list_imagem.php?pag=$totalcasos&" . $gets . "''><i class='fas fa-angle-double-right'></i></a></li>";
             echo " </ul>";
             echo "</nav>";
             echo "</div>"; ?>

@@ -256,7 +256,7 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($firstPageUrl) ?>"
                                     onclick="return paginateEstipulantes('<?= htmlspecialchars($firstPageUrl, ENT_QUOTES) ?>');">
-                                    <i class="fa-solid fa-angles-left"></i></a>
+                                    <i class="fas fa-angle-double-left"></i></a>
                             </li>
                             <?php endif; ?>
                             <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
@@ -269,7 +269,7 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" href="<?= htmlspecialchars($prevPageUrl) ?>"
                                     onclick="return paginateEstipulantes('<?= htmlspecialchars($prevPageUrl, ENT_QUOTES) ?>');">
-                                    <i class="fa-solid fa-angle-left"></i> </a>
+                                    <i class="fas fa-angle-left"></i> </a>
                             </li>
                             <?php endif; ?>
 
@@ -299,7 +299,7 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($nextPageUrl) ?>"
                                     onclick="return paginateEstipulantes('<?= htmlspecialchars($nextPageUrl, ENT_QUOTES) ?>');"><i
-                                        class="fa-solid fa-angle-right"></i></a>
+                                        class="fas fa-angle-right"></i></a>
                             </li>
                             <?php endif; ?>
                             <?php if ($current_block < $last_block): ?>
@@ -312,7 +312,7 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($lastPageUrl) ?>"
                                     onclick="return paginateEstipulantes('<?= htmlspecialchars($lastPageUrl, ENT_QUOTES) ?>');"><i
-                                        class="fa-solid fa-angles-right"></i></a>
+                                        class="fas fa-angle-double-right"></i></a>
                             </li>
                             <?php endif; ?>
                         </ul>

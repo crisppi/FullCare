@@ -638,14 +638,14 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                 <li class="page-item">
                                     <a class="page-link ajax-link" id="blocoNovo"
                                         href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=1&bl=0', ENT_QUOTES, 'UTF-8') ?>">
-                                        <i class="fa-solid fa-angles-left"></i></a>
+                                        <i class="fas fa-angle-double-left"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                                 <li class="page-item">
                                     <a class="page-link ajax-link"
                                         href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=' . urlencode((string)($paginaAtual - 1)) . '&bl=' . urlencode((string)($blocoAtual - 5)), ENT_QUOTES, 'UTF-8') ?>">
-                                        <i class="fa-solid fa-angle-left"></i> </a>
+                                        <i class="fas fa-angle-left"></i> </a>
                                 </li>
                                 <?php endif; ?>
 
@@ -663,22 +663,22 @@ $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar
                                 <li class="page-item">
                                     <a class="page-link ajax-link" id="blocoNovo"
                                         href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=' . urlencode((string)$i) . '&bl=' . urlencode((string)($blocoAtual + 5)), ENT_QUOTES, 'UTF-8') ?>"><i
-                                            class="fa-solid fa-angle-right"></i></a>
+                                            class="fas fa-angle-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block < $last_block): ?>
                                 <li class="page-item">
                                     <a class="page-link ajax-link" id="blocoNovo"
                                         href="<?= htmlspecialchars($gestaoListBaseUrl . '?pesqGestao=' . urlencode((string)$pesqGestao) . '&pesquisa_nome=' . urlencode((string)$pesquisa_nome) . '&data_intern_int=' . urlencode((string)$data_intern_int) . '&senha_int=' . urlencode((string)$senha_int) . '&pesquisa_pac=' . urlencode((string)$pesquisa_pac) . '&limite_pag=' . urlencode((string)$limite_pag) . '&pag=' . urlencode((string)count($paginas)) . '&bl=' . urlencode((string)(($last_block - 1) * 5)), ENT_QUOTES, 'UTF-8') ?>"><i
-                                            class="fa-solid fa-angles-right"></i></a>
+                                            class="fas fa-angle-double-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                             </ul>
                             <?php endif; ?>
                         </div>
                         <div class="table-counter">
-                            <p
-                                style="font-size:1em; font-weight:600; font-family:var(--bs-font-sans-serif); text-align:right">
+                            <p style="margin-bottom:18px;font-size:.82rem; font-weight:600;
+                                      font-family:var(--bs-font-sans-serif); text-align:right">
                                 <?php echo "Total: " . $qtdIntItens ?>
                             </p>
                         </div>
