@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('APP_VERSION_DEFAULT')) {
-    define('APP_VERSION_DEFAULT', '1.3.6');
+    define('APP_VERSION_DEFAULT', '1.5');
 }
 
 if (!defined('APP_VERSION')) {
