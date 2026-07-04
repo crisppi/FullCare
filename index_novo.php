@@ -22,7 +22,11 @@
         overflow: hidden;
         opacity: 0;
         animation: fadeIn .35s ease-in forwards;
-        background: #f5f8fc;
+        padding: clamp(18px, 2vw, 30px);
+        background:
+            radial-gradient(circle at 9% 12%, rgba(79, 172, 222, .14), transparent 28%),
+            radial-gradient(circle at 92% 85%, rgba(107, 43, 116, .10), transparent 32%),
+            #e9f0f7;
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
@@ -39,7 +43,7 @@
         overflow: hidden;
         z-index: 2;
         margin-right: -64px;
-        clip-path: url(#loginCurveClip);
+        border-radius: 28px 68px 68px 28px;
         filter:
             drop-shadow(12px 0 12px rgba(4, 14, 27, .55))
             drop-shadow(26px 0 28px rgba(4, 14, 27, .38))
@@ -159,7 +163,9 @@
         position: relative;
         overflow: hidden;
         z-index: 1;
+        border-radius: 0 28px 28px 0;
         box-shadow:
+            0 24px 72px rgba(16, 35, 56, .18),
             inset 46px 0 58px rgba(55, 111, 151, .30),
             inset 18px 0 22px rgba(13, 32, 56, .18);
     }
@@ -371,12 +377,18 @@
 
     /* ── Responsive ─────────────────────────────────────── */
     @media (max-width: 860px) {
+        body {
+            padding: 0;
+            background: #f5f8fc;
+        }
+
         .lp { display: none; }
         .rp {
             width: 100%;
             min-height: 100vh;
             margin-left: 0;
             padding: 48px 28px;
+            border-radius: 0;
         }
     }
 
