@@ -2977,11 +2977,12 @@ function aumentarTextProgramacao() {
 }
 
 .visita-page #tutorial_alto {
+    grid-column: span 3 !important;
     margin: 0 !important;
-    padding: 5px 7px !important;
-    border: 1px solid #e3dde9 !important;
+    padding: 7px 10px !important;
+    border: 1px solid #fed7aa !important;
     border-radius: 7px !important;
-    background: #fff !important;
+    background: #fff7ed !important;
     align-self: end !important;
 }
 
@@ -2989,8 +2990,19 @@ function aumentarTextProgramacao() {
     margin: 0 !important;
     margin-left: 0 !important;
     text-align: left !important;
-    font-size: .6rem !important;
+    font-size: .72rem !important;
     line-height: 1.18 !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 768px) {
+    .visita-page #tutorial_alto {
+        grid-column: 1 / -1 !important;
+    }
+
+    .visita-page #tutorial_alto p {
+        white-space: normal !important;
+    }
 }
 
 .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) label {

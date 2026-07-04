@@ -17,14 +17,9 @@
                         <option value="s">Sim</option>
                     </select>
                 </div>
-                <div style="display:none; border: 1px solid red;margin-top:25px" class="form-group col-sm-5"
-                    id="tutorial_alto">
-                    <p style="font-size:0.8em; font-weight:600; text-align:center;margin-left:-100px">Considerar alto
-                        custo</p>
-                    <p style="font-size:0.8em;text-align:center;margin-left:-100px">Antifúngicos como: Ambisome,
-                        Linfotericina, Micafungina</p>
-                    <p style="font-size:0.8em;text-align:center; margin-left:-100px">Imunoglobulinas, Imunobiológicos
-                    </p>
+                <div style="display:none" class="form-group col-sm-5 alto-custo-help" id="tutorial_alto">
+                    <p><span class="alto-custo-help__title">Considerar alto custo:</span> Ambisome, Linfotericina, Micafungina.</p>
+                    <p>Imunoglobulinas e Imunobiológicos.</p>
                 </div>
 
                 <div style="display:none" id="div_rel_alto_custo">

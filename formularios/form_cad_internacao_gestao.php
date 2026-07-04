@@ -57,6 +57,35 @@
     max-width: none !important;
 }
 
+#container-gestao .alto-custo-help {
+    align-self: end;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    color: #431407;
+    grid-column: span 3;
+    margin: 0 !important;
+    min-width: 0 !important;
+    padding: 7px 10px;
+}
+
+#container-gestao .alto-custo-help p {
+    font-size: .72rem;
+    line-height: 1.18;
+    margin: 0;
+    overflow-wrap: anywhere;
+    text-align: left;
+    white-space: nowrap;
+}
+
+#container-gestao .alto-custo-help p + p {
+    margin-top: 3px;
+}
+
+#container-gestao .alto-custo-help__title {
+    font-weight: 700;
+}
+
 #container-gestao .adicional-card > .form-group.row > [style*="display:none"] {
     display: none !important;
 }
@@ -102,6 +131,14 @@
     #container-gestao .adicional-card > .form-group.row {
         grid-template-columns: 1fr;
     }
+
+    #container-gestao .alto-custo-help {
+        grid-column: 1 / -1;
+    }
+
+    #container-gestao .alto-custo-help p {
+        white-space: normal;
+    }
 }
 </style>
 
@@ -129,11 +166,9 @@
                 <option value="s">Sim</option>
             </select>
         </div>
-        <div style="display:none; border: 1px solid red;margin-top:25px" class="form-group col-sm-5" id="tutorial_alto">
-            <p style="font-size:0.8em; font-weight:600; text-align:center;margin-left:-100px">Considerar alto custo</p>
-            <p style="font-size:0.8em;text-align:center;margin-left:-100px">Antifúngicos como: Ambisome, Linfotericina,
-                Micafungina</p>
-            <p style="font-size:0.8em;text-align:center; margin-left:-100px">Imunoglobulinas, Imunobiológicos</p>
+        <div style="display:none" class="form-group col-sm-5 alto-custo-help" id="tutorial_alto">
+            <p><span class="alto-custo-help__title">Considerar alto custo:</span> Ambisome, Linfotericina, Micafungina.</p>
+            <p>Imunoglobulinas e Imunobiológicos.</p>
         </div>
 
         <div style="display:none" id="div_rel_alto_custo">
