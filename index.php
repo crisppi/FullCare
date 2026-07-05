@@ -22,6 +22,8 @@
     body {
         font-family: 'Inter', sans-serif;
         display: flex;
+        align-items: center;
+        justify-content: center;
         min-height: 100vh;
         overflow: hidden;
         opacity: 0;
@@ -34,6 +36,20 @@
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
+
+    .login-shell {
+        width: min(100%, 1840px);
+        min-height: calc(100vh - clamp(36px, 4vw, 60px));
+        display: flex;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        border-radius: 28px;
+        background: #f5f8fc;
+        box-shadow:
+            0 26px 80px rgba(14, 40, 68, .28),
+            0 8px 24px rgba(14, 40, 68, .12);
+    }
 
     /* ── Left panel ─────────────────────────────────────── */
     .lp {
@@ -48,11 +64,9 @@
         z-index: 2;
         margin-right: -64px;
         border-radius: 28px 68px 68px 28px;
-        filter:
-            drop-shadow(12px 0 12px rgba(4, 14, 27, .55))
-            drop-shadow(26px 0 28px rgba(4, 14, 27, .38))
-            drop-shadow(54px 0 68px rgba(47, 111, 159, .32))
-            drop-shadow(88px 0 110px rgba(47, 111, 159, .20));
+        box-shadow:
+            18px 0 26px rgba(4, 14, 27, .32),
+            46px 0 72px rgba(47, 111, 159, .22);
         background:
             radial-gradient(ellipse at 12% 0%, rgba(95, 164, 208, .14) 0%, transparent 46%),
             radial-gradient(ellipse at 86% 100%, rgba(103, 70, 139, .26) 0%, transparent 54%),
@@ -155,8 +169,8 @@
 
     /* ── Right panel ────────────────────────────────────── */
     .rp {
-        width: min(42%, 560px);
-        flex-shrink: 0;
+        flex: 1 1 auto;
+        min-width: 420px;
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -167,9 +181,8 @@
         position: relative;
         overflow: hidden;
         z-index: 1;
-        border-radius: 0 28px 28px 0;
+        border-radius: 0;
         box-shadow:
-            0 24px 72px rgba(16, 35, 56, .18),
             inset 46px 0 58px rgba(55, 111, 151, .30),
             inset 18px 0 22px rgba(13, 32, 56, .18);
     }
@@ -386,9 +399,18 @@
             background: #f5f8fc;
         }
 
+        .login-shell {
+            width: 100%;
+            min-height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+            background: #f5f8fc;
+        }
+
         .lp { display: none; }
         .rp {
             width: 100%;
+            min-width: 0;
             min-height: 100vh;
             margin-left: 0;
             padding: 48px 28px;
@@ -412,6 +434,7 @@
         </defs>
     </svg>
 
+    <main class="login-shell" aria-label="Acesso FullCare">
     <!-- ── Left panel ── -->
     <div class="lp">
         <div class="lp-logo">
@@ -497,6 +520,7 @@
 
         <div class="version-badge">v<?= htmlspecialchars($currentAppVersion) ?></div>
     </div>
+    </main>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {
