@@ -1,5 +1,10 @@
 RewriteEngine On
 
+# Entrada publica do login. Mantem a raiz fora de index.php para evitar OPcache antigo no deploy.
+DirectoryIndex login_fullcare.php index.php
+RewriteRule ^$ login_fullcare.php [L,QSA]
+RewriteRule ^index\.php$ login_fullcare.php [L,QSA]
+
 # --------------------------------------------------
 # Performance: cache e compressao de arquivos estaticos
 # --------------------------------------------------
