@@ -7,6 +7,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FullCare</title>
+    <link rel="icon" type="image/png" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
+    <link rel="shortcut icon" type="image/png" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
     <link rel="icon" type="image/x-icon" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/img/full-ico.ico') ?>">
     <link rel="shortcut icon" type="image/x-icon" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/img/full-ico.ico') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
