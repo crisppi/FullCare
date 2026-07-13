@@ -5,6 +5,10 @@ $assetVersion = '20260322b';
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="apple-touch-icon" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>FullCare Mobile Web</title>

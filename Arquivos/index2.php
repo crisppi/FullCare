@@ -9,7 +9,9 @@ require_once("models/usuario.php");
 $usuarioDao = new userDAO($conn, $BASE_URL);
 ?>
 <!DOCTYPE html>
-<link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+<link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+<link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+<link rel="apple-touch-icon" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
 
 <html>
 

@@ -5,7 +5,7 @@ if (defined('FULLCARE_FOOTER_RENDERED')) {
 define('FULLCARE_FOOTER_RENDERED', true);
 require_once(__DIR__ . '/../app/security/bi_access.php');
 
-$footerVersion = '1.4';
+$footerVersion = app_latest_version($conn);
 $footerYear = date('Y');
 $canSeeBiLink = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_access() : false;
 ?>

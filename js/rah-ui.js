@@ -10,6 +10,63 @@
     });
   }
 
+  function setupBlockCollapse() {
+    function rahCollapseEvent(name, panel) {
+      const ev = new Event(name, { bubbles: true, cancelable: false });
+      panel.dispatchEvent(ev);
+    }
+
+    function setButtonState(panel, expanded) {
+      const id = panel && panel.id;
+      if (!id) return;
+      document.querySelectorAll('.block-toggle[data-bs-target="#' + id + '"]').forEach((btn) => {
+        btn.classList.toggle('collapsed', !expanded);
+        btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      });
+    }
+
+    document.querySelectorAll('.block-toggle[data-bs-target]').forEach((btn) => {
+      btn.removeAttribute('data-bs-toggle');
+      const selector = btn.getAttribute('data-bs-target');
+      const panel = selector ? document.querySelector(selector) : null;
+      if (!panel) return;
+      panel.classList.remove('collapsing');
+      panel.style.display = panel.classList.contains('show') ? 'block' : 'none';
+      setButtonState(panel, panel.classList.contains('show'));
+    });
+
+    document.addEventListener('click', function (ev) {
+      const btn = ev.target && ev.target.closest ? ev.target.closest('.block-toggle[data-bs-target]') : null;
+      if (!btn) return;
+
+      const selector = btn.getAttribute('data-bs-target');
+      const panel = selector ? document.querySelector(selector) : null;
+      if (!panel) return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+
+      const isOpen = panel.classList.contains('show');
+      panel.classList.remove('collapsing');
+      if (isOpen) {
+        rahCollapseEvent('hide.bs.collapse', panel);
+        panel.classList.remove('show');
+        panel.style.display = 'none';
+        setButtonState(panel, false);
+        rahCollapseEvent('hidden.bs.collapse', panel);
+      } else {
+        rahCollapseEvent('show.bs.collapse', panel);
+        panel.style.display = 'block';
+        panel.classList.add('show');
+        setButtonState(panel, true);
+        rahCollapseEvent('shown.bs.collapse', panel);
+      }
+    }, true);
+
+    document.addEventListener('shown.bs.collapse', (ev) => setButtonState(ev.target, true));
+    document.addEventListener('hidden.bs.collapse', (ev) => setButtonState(ev.target, false));
+  }
+
   // Espelho “Período e Totais”
   (function setupPeriodMirror() {
     function syncPeriodTotals(tCob, tLib) {
@@ -163,6 +220,7 @@
   // Boot
   $(function () {
     applyMask(document);
+    setupBlockCollapse();
     setupCadastroCentral();
     hydrateSelects();
   });

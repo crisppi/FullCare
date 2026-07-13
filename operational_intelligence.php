@@ -90,6 +90,10 @@ include_once("templates/header.php");
 <html lang="pt-br">
 
 <head>
+    <link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="apple-touch-icon" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+
     <meta charset="UTF-8">
     <title>Previsões Operacionais</title>
     <style>

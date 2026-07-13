@@ -139,17 +139,17 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
 }
 .adicional-card {
     background:#f5f5f9;
-    border-radius:22px;
+    border-radius:12px;
     border:1px solid #ebe1f5;
-    box-shadow:0 12px 28px rgba(45,18,70,.08);
-    padding:22px 24px;
+    box-shadow:0 6px 14px rgba(45,18,70,.06);
+    padding:14px 16px;
 }
 .adicional-card__header {
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:.75rem;
-    margin-bottom:18px;
+    margin-bottom:10px;
 }
 .adicional-card__title {
     display:flex;
@@ -157,19 +157,21 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
     margin:0;
     color:#3a184f;
     font-weight:600;
+    font-size:1rem;
+    line-height:1.15;
 }
 .adicional-card__marker {
-    width:6px;
-    height:26px;
+    width:5px;
+    height:22px;
     border-radius:10px;
-    margin-right:12px;
+    margin-right:10px;
     background:linear-gradient(180deg,#8f5ff3,#b995ff);
 }
 
 #container-prorrog .adicional-card .field-container {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-    gap: 14px;
+    grid-template-columns: 1.15fr 1.15fr 1.15fr 1fr 1.15fr 42px;
+    gap: 8px 10px;
     align-items: end;
     width: 100%;
 }
@@ -190,13 +192,54 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
 #container-prorrog .adicional-card .form-control,
 #container-prorrog .adicional-card .form-control-sm.form-control {
     width: 100% !important;
-    min-height: 42px !important;
-    height: 42px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 3px 24px 3px 8px !important;
+    font-size: .74rem !important;
+    line-height: 1.15 !important;
+}
+
+#container-prorrog .adicional-card select.form-control {
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+    background-image: initial !important;
+}
+
+#container-prorrog .adicional-card label {
+    min-height: 0 !important;
+    margin-bottom: 2px !important;
+    font-size: .68rem !important;
+    line-height: 1.08 !important;
+    font-weight: 600 !important;
 }
 
 #container-prorrog .adicional-card textarea.form-control {
-    min-height: 92px !important;
+    min-height: 76px !important;
     height: auto !important;
+    padding: 6px 8px !important;
+}
+
+#container-prorrog .adicional-card .btn-add,
+#container-prorrog .adicional-card .btn-remove {
+    min-width: 32px !important;
+    width: 32px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    font-size: .9rem !important;
+    line-height: 1 !important;
+}
+
+#container-prorrog .adicional-card .form-group[style*="margin-top:25px"],
+#container-prorrog .adicional-card .form-group[style*="margin-top: 25px"] {
+    margin-top: 0 !important;
+}
+
+@media (max-width: 1199.98px) {
+    #container-prorrog .adicional-card .field-container {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
@@ -235,42 +278,46 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
     font-size: 1.5rem
 }
 .prorrog-alta-box {
-    margin-top: 18px;
-    padding: 16px 18px;
-    border: 1px solid #e6dced;
-    border-radius: 16px;
-    background: linear-gradient(180deg, #fcf9ff 0%, #f7f2fb 100%);
+    margin-top: 12px;
+    padding: 12px 0 0;
+    border-top: 1px solid #e8eef6;
+    background: transparent;
 }
 .prorrog-alta-box__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 10px;
+    min-height: 34px;
+    margin-bottom: 8px;
 }
 .prorrog-alta-box__title {
     margin: 0;
-    color: #3a184f;
-    font-size: 1rem;
-    font-weight: 600;
+    color: #2f2240;
+    font-size: .82rem;
+    font-weight: 800;
+    line-height: 1.15;
 }
 .prorrog-alta-box__hint {
-    margin: 4px 0 0;
-    color: #6f5a7e;
-    font-size: .84rem;
+    display: none;
 }
 .prorrog-alta-toggle {
     display: inline-flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
 }
 .prorrog-alta-toggle .btn {
-    min-width: 84px;
-    border-radius: 999px;
-    border: 1px solid #cbb7d8;
+    min-width: 62px;
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 0 12px !important;
+    border-radius: 8px;
+    border: 1px solid #d7c5e4;
     background: #fff;
     color: #5e2363;
-    font-weight: 600;
+    font-size: .76rem !important;
+    font-weight: 800;
+    line-height: 1 !important;
 }
 .prorrog-alta-toggle .btn.is-active {
     background: #5e2363;
@@ -282,14 +329,15 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
 }
 .prorrog-alta-fields.is-visible {
     display: block;
+    padding-top: 4px;
 }
 .prorrog-alta-fields > .form-group.row {
     display: grid !important;
-    grid-template-columns: minmax(220px, 260px) minmax(260px, 320px);
-    gap: 14px 18px;
+    grid-template-columns: minmax(180px, 220px) minmax(240px, 320px);
+    gap: 8px 10px;
     align-items: end;
     width: 100% !important;
-    max-width: 620px !important;
+    max-width: 560px !important;
     margin: 0 !important;
 }
 .prorrog-alta-fields > .form-group.row > .form-group[class*="col-"] {
@@ -314,63 +362,75 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
     white-space: nowrap;
 }
 .prorrog-ia-box {
-    margin-top: 18px;
-    padding: 14px;
+    margin-top: 12px;
+    padding: 12px 0 0;
     width: 100%;
     max-width: none;
-    border-radius: 16px;
-    border: 1px solid #bfdbfe;
-    background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 48%, #f8fafc 100%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 14px 30px rgba(37,99,235,.08);
+    border-top: 1px solid #e8eef6;
+    background: transparent;
+    box-shadow: none;
 }
 .prorrog-ia-box__header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    gap: 14px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 12px;
+    min-height: 34px;
+    margin-bottom: 8px;
 }
 .prorrog-ia-box__title-wrap {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 .prorrog-ia-box__eyebrow {
     margin: 0 0 2px;
-    font-size: .72rem;
+    color: #2563eb;
+    font-size: .58rem;
     font-weight: 800;
-    letter-spacing: .14em;
+    letter-spacing: .08em;
     text-transform: uppercase;
-    color: #1d4ed8;
+    line-height: 1;
 }
 .prorrog-ia-box__title {
     margin: 0;
-    font-size: 1.08rem;
+    color: #2f2240;
+    font-size: .82rem;
     font-weight: 800;
-    color: #0f172a;
+    line-height: 1.15;
 }
 .prorrog-ia-powered {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    min-height: 28px;
-    padding: 4px 10px;
+    gap: 5px;
+    min-height: 24px;
+    padding: 3px 9px;
     border-radius: 999px;
-    background: rgba(255,255,255,.78);
-    border: 1px solid rgba(99,102,241,.22);
+    background: #fff;
+    border: 1px solid #dbe4ef;
     color: #1d4ed8;
-    font-size: .76rem;
+    font-size: .68rem;
     font-weight: 800;
-    letter-spacing: .03em;
+    letter-spacing: 0;
     text-transform: uppercase;
 }
 .prorrog-ia-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
+}
+
+.prorrog-ia-actions .btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 12px !important;
+    border-radius: 8px !important;
+    font-size: .78rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
 }
 .prorrog-ia-context-row {
     display: block !important;
@@ -395,54 +455,58 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
-    min-height: 96px !important;
+    min-height: 42px !important;
+    height: 42px !important;
     box-sizing: border-box !important;
 }
 .prorrog-ia-card {
     width: 100%;
     max-width: none;
-    border: 1px solid #c7d2fe;
-    border-radius: 12px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    margin-top: 8px;
+    border: 1px solid #dbe4ef;
+    border-radius: 8px;
+    background: #fff;
     overflow: hidden;
-    box-shadow: 0 12px 28px rgba(37,99,235,.10);
+    box-shadow: none;
 }
 .prorrog-ia-card__header {
-    min-height: 44px;
+    min-height: 34px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 8px 12px;
-    background: linear-gradient(135deg, #dbeafe 0%, #eef2ff 50%, #ecfeff 100%);
-    border-bottom: 1px solid #c7d2fe;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e8eef6;
 }
 .prorrog-ia-card__header h5 {
     margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #111827;
+    color: #1f2937;
+    font-size: .82rem;
+    font-weight: 800;
+    line-height: 1.15;
 }
 .prorrog-ia-toggle {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    border-radius: 7px;
     background: #fff;
     color: #374151;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
 }
 .prorrog-ia-card__body {
-    padding: 12px;
+    padding: 10px;
 }
 .prorrog-ia-status {
-    margin: 10px 12px 0;
-    padding: 8px 10px;
-    border-radius: 8px;
+    margin: 8px 10px 0;
+    padding: 6px 8px;
+    border-radius: 7px;
     font-weight: 700;
-    font-size: .88rem;
+    font-size: .76rem;
 }
 .prorrog-ia-status--info { background: #e0f2fe; color: #075985; }
 .prorrog-ia-status--success { background: #dcfce7; color: #166534; }

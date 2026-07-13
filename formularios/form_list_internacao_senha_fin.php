@@ -82,48 +82,171 @@ if (empty($data_intern_int_max)) {
 }
 // $buscaAtivo = in_array($buscaAtivo, ['s', 'n']) ?: "";
 
+$paginaAtualExport = max(1, (int)($_GET['pag'] ?? 1));
+$exportBaseParams = [
+    'pesquisa_nome' => $pesquisa_nome,
+    'pesquisa_pac' => $pesquisa_pac,
+    'senha_int' => $senha_int,
+    'lote' => $lote,
+    'med_check' => $med_check,
+    'enf_check' => $enf_check,
+    'adm_check' => $adm_check,
+    'data_intern_int' => $data_intern_int,
+    'data_intern_int_max' => $data_intern_int_max,
+    'ordenar' => $ordenar,
+    'limite' => $limite,
+];
+$exportBaseParams = array_filter($exportBaseParams, static function ($value) {
+    return $value !== null && $value !== '';
+});
+$exportFilteredUrl = rtrim($BASE_URL, '/') . '/exportar_excel_senhas_finalizadas.php?' . http_build_query(array_merge($exportBaseParams, [
+    'export_scope' => 'filtered',
+]));
+$exportCurrentPageUrl = rtrim($BASE_URL, '/') . '/exportar_excel_senhas_finalizadas.php?' . http_build_query(array_merge($exportBaseParams, [
+    'export_scope' => 'current_page',
+    'pag' => $paginaAtualExport,
+]));
+
 ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css?v=' . @filemtime(__DIR__ . '/../css/listagem_padrao.css'), ENT_QUOTES, 'UTF-8') ?>">
 <style>
+    body {
+        background: #e5e7eb !important;
+        min-height: 100vh;
+    }
     .listagem-page { padding: 4px 4px 14px; }
+    .senhas-list-page {
+        min-height: calc(100vh - 126px);
+        padding: 10px 8px 18px !important;
+        background: #e5e7eb !important;
+    }
     .listagem-title { font-size: .96rem; line-height: 1.05; }
     .listagem-panel { padding: 8px 8px 6px; }
+    .senhas-list-page .listagem-panel {
+        border: 1px solid #eef2f7 !important;
+        border-radius: 12px !important;
+        background: #fff !important;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, .08) !important;
+    }
+    .senhas-list-page .table-filters {
+        padding: 0 !important;
+        background: transparent !important;
+    }
     #table-content { margin-top: 0; }
     #table-content tbody td, #table-content tbody th { padding:6px 10px; font-size:.7rem; vertical-align:middle; }
-    .senhas-filter-row {
-        gap: 0 !important;
+    .senhas-list-page .senhas-filter-row {
+        gap: 6px !important;
         margin: 0 !important;
         row-gap: 4px;
+        border: 0 !important;
+        background: transparent !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
     }
-    .senhas-filter-row + .senhas-filter-row {
+    .senhas-list-page .senhas-filter-row + .senhas-filter-row {
         margin-top: 6px !important;
     }
-    .senhas-filter-row > [class*="col-"],
-    .senhas-filter-row > .form-group {
+    .senhas-list-page .senhas-filter-row > [class*="col-"],
+    .senhas-list-page .senhas-filter-row > .form-group {
         display: flex;
         align-items: center;
-        padding: 2px !important;
+        padding: 0 !important;
     }
-    .senhas-filter-row .form-control,
-    .senhas-filter-row .form-control-sm,
-    .senhas-filter-row .btn {
-        min-height: 34px !important;
-        height: 34px !important;
+    .senhas-list-page .senhas-filter-row .form-control,
+    .senhas-list-page .senhas-filter-row .form-control-sm,
+    .senhas-list-page .senhas-filter-row .btn {
+        min-height: 36px !important;
+        height: 36px !important;
         margin: 0 !important;
-        border-radius: 10px;
-        font-size: .68rem !important;
-        line-height: 1.2;
+        border-radius: 8px;
+        font-size: .74rem !important;
+        line-height: 1.25;
     }
-    .senhas-filter-actions {
+    .senhas-list-page .senhas-filter-row .form-control,
+    .senhas-list-page .senhas-filter-row .form-control-sm {
+        border: 1px solid #cbd5e1 !important;
+        background-color: #f8fbff !important;
+        background-image: none !important;
+        color: #344054 !important;
+        font-weight: 500 !important;
+        padding: 0 28px 0 10px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 2px rgba(15, 23, 42, .08) !important;
+    }
+    .senhas-list-page .senhas-filter-row .form-control::placeholder,
+    .senhas-list-page .senhas-filter-row .form-control-sm::placeholder {
+        color: #8a94a6 !important;
+        font-size: .74rem !important;
+        font-weight: 500 !important;
+        opacity: 1 !important;
+    }
+    .senhas-list-page .senhas-filter-row .form-control:focus,
+    .senhas-list-page .senhas-filter-row .form-control-sm:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16) !important;
+    }
+    .senhas-list-page .senhas-filter-row select.form-control,
+    .senhas-list-page .senhas-filter-row select.form-control-sm {
+        background-color: #f8fbff !important;
+        color: #344054 !important;
+    }
+    .senhas-list-page .senhas-filter-actions {
         gap: 8px;
+    }
+    .senhas-list-page .senhas-filter-row--top {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        column-gap: 6px !important;
+        row-gap: 0 !important;
+    }
+    .senhas-list-page .senhas-filter-row--top > [class*="col-"],
+    .senhas-list-page .senhas-filter-row--top > .form-group {
+        flex: 1 1 0 !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+    }
+    .senhas-list-page .senhas-filter-row--top > :nth-child(1),
+    .senhas-list-page .senhas-filter-row--top > :nth-child(2) {
+        flex-grow: 1.55 !important;
+    }
+    .senhas-list-page .senhas-filter-row--top > :nth-child(3),
+    .senhas-list-page .senhas-filter-row--top > :nth-child(6) {
+        flex-grow: 1.02 !important;
+    }
+    .senhas-list-page .senhas-filter-row--top > :nth-child(4),
+    .senhas-list-page .senhas-filter-row--top > :nth-child(5) {
+        flex-grow: .62 !important;
     }
 </style>
 <!-- FORMULARIO DE PESQUISAS -->
-<div class="container-fluid listagem-page" id="main-container">
+<div class="container-fluid listagem-page senhas-list-page" id="main-container">
     <div class="listagem-hero listagem-hero--module listagem-hero--contas">
         <div class="listagem-hero__copy">
             <div class="listagem-kicker">Contas finalizadas</div>
             <h1 class="listagem-title">Capeantes com senha finalizada</h1>
+        </div>
+        <div class="listagem-hero__actions">
+            <div class="dropdown fc-export-dropdown">
+                <button type="button" class="btn listagem-btn-top listagem-btn-top--green dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-file-excel listagem-btn-top__icon" aria-hidden="true"></i>
+                    Exportar Excel
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a href="<?= htmlspecialchars($exportFilteredUrl, ENT_QUOTES, 'UTF-8') ?>"
+                        class="dropdown-item js-senhas-export-link" data-export-scope="filtered">
+                        <span class="fc-export-dropdown__title">Exportar todos os resultados filtrados</span>
+                        <span class="fc-export-dropdown__help">Inclui todos os registros encontrados pelos filtros atuais.</span>
+                    </a>
+                    <a href="<?= htmlspecialchars($exportCurrentPageUrl, ENT_QUOTES, 'UTF-8') ?>"
+                        class="dropdown-item js-senhas-export-link" data-export-scope="current_page">
+                        <span class="fc-export-dropdown__title">Exportar apenas esta página</span>
+                        <span class="fc-export-dropdown__help">Inclui somente os registros visíveis agora.</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
     <div class="complete-table listagem-panel">
@@ -136,7 +259,7 @@ if (empty($data_intern_int_max)) {
                 crossorigin="anonymous" referrerpolicy="no-referrer"></script>
             <form action="" id="select-internacao-form" method="GET">
 
-                <div class="row filter-inline-row senhas-filter-row">
+                <div class="row filter-inline-row senhas-filter-row senhas-filter-row--top">
                     <div class="form-group col-sm-3">
                         <input class="form-control form-control-sm" style="margin-top:7px;font-size:.8em; color:#878787"
                             type="text" name="pesquisa_nome" placeholder="Selecione o Hospital"
@@ -156,14 +279,14 @@ if (empty($data_intern_int_max)) {
                     </div>
                     <div class="col-sm-1" style="padding:2px !important">
                         <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="limite" name="limite">
-                            <option value="">Reg por página</option>
-                            <option value="5" <?= $limite == '5' ? 'selected' : null ?>>Reg por pág = 5
+                            <option value="">Reg/pág</option>
+                            <option value="5" <?= $limite == '5' ? 'selected' : null ?>>5
                             </option>
-                            <option value="10" <?= $limite == '10' ? 'selected' : null ?>>Reg por pág = 10
+                            <option value="10" <?= $limite == '10' ? 'selected' : null ?>>10
                             </option>
-                            <option value="20" <?= $limite == '20' ? 'selected' : null ?>>Reg por pág = 20
+                            <option value="20" <?= $limite == '20' ? 'selected' : null ?>>20
                             </option>
-                            <option value="50" <?= $limite == '50' ? 'selected' : null ?>>Reg por pág = 50
+                            <option value="50" <?= $limite == '50' ? 'selected' : null ?>>50
                             </option>
                         </select>
                     </div>
@@ -227,6 +350,7 @@ if (empty($data_intern_int_max)) {
                             <i class="bi bi-trash3"></i>
                         </a>
                     </div>
+                </div>
             </form>
         </div>
     </div>
@@ -288,10 +412,23 @@ if ($qtdIntItens > $limite) {
 
 ?>
 <div>
-    <div id="table-content">
+    <div id="table-content" class="listagem-table-wrap contas-table-wrap">
+        <div class="fc-bulk-print-bar" data-bulk-print-root>
+            <span class="fc-bulk-print-count" data-bulk-print-count>0 selecionados</span>
+            <button type="button" class="fc-bulk-print-btn" data-bulk-print-modelo="resumido">
+                <i class="bi bi-printer"></i> Imprimir selecionados
+            </button>
+            <button type="button" class="fc-bulk-print-btn fc-bulk-print-btn--primary" data-bulk-print-modelo="completo">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Imprimir completos
+            </button>
+        </div>
         <table class="table table-sm table-striped  table-hover table-condensed">
             <thead>
                 <tr>
+                    <th scope="col" class="th-w-4">
+                        <input type="checkbox" class="fc-bulk-print-check js-capeante-select-all"
+                            aria-label="Selecionar todos os capeantes desta página">
+                    </th>
                     <th scope="col" class="th-w-4">Reg</th>
                     <th scope="col" class="th-w-6">Conta No.</th>
                     <th scope="col" class="th-w-23">Hospital</th>
@@ -309,6 +446,11 @@ if ($qtdIntItens > $limite) {
 
                 ?>
                         <tr>
+                    <td scope="row" class="col-id">
+                        <input type="checkbox" class="fc-bulk-print-check js-capeante-print-check"
+                            value="<?= $intern['id_capeante'] ?>"
+                            aria-label="Selecionar capeante <?= $intern['id_capeante'] ?>">
+                    </td>
                     <td scope="row" class="col-id">
                         <?= $intern["id_internacao"]; ?>
                     </td>
@@ -350,8 +492,14 @@ if ($qtdIntItens > $limite) {
                                 </li>
                                 <li>
                                     <button class="dropdown-item"
-                                        onclick="edit('<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>')">
-                                        <i style="color:brown; margin-right:10px" class="bi bi-printer"></i> Imprimir
+                                        onclick="window.location.href='<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>'">
+                                        <i style="color:brown; margin-right:10px" class="bi bi-printer"></i> Imprimir resumido
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item"
+                                        onclick="window.location.href='<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>?modelo=completo'">
+                                        <i style="color:brown; margin-right:10px" class="bi bi-file-earmark-spreadsheet"></i> Imprimir completo
                                     </button>
                                 </li>
                         </div>
@@ -362,7 +510,7 @@ if ($qtdIntItens > $limite) {
                 <?php endforeach; ?>
                 <?php if ($qtdIntItens == 0) : ?>
                 <tr>
-                    <td colspan="11" scope="row" class="col-id">
+                    <td colspan="12" scope="row" class="col-id">
                         Não foram encontrados registros
                     </td>
                 </tr>
@@ -370,8 +518,6 @@ if ($qtdIntItens > $limite) {
                 <?php endif ?>
             </tbody>
         </table>
-
-
         <!-- salvar variavel qtdIntItens no PHP para passar para JS -->
         <div style="text-align:right;margin-top:20px">
             <input type="hidden" id="qtd" value="<?php echo $qtdIntItens ?>">
@@ -388,14 +534,14 @@ if ($qtdIntItens > $limite) {
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&lote=<?php print $lote ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
-                        <i class="fa-solid fa-angles-left"></i></a>
+                        <i class="fas fa-angle-double-left"></i></a>
                 </li>
                 <?php endif; ?>
                 <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1) : ?>
                 <li class="page-item">
                     <a class="page-link" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&lote=<?php print $lote ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print print $paginaAtual - 1 ?>&bl=<?php print print $blocoAtual - 5 ?>')">
-                        <i class="fa-solid fa-angle-left"></i> </a>
+                        <i class="fas fa-angle-left"></i> </a>
                 </li>
                 <?php endif; ?>
 
@@ -413,14 +559,14 @@ if ($qtdIntItens > $limite) {
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&lote=<?php print $lote ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print $paginaAtual + 1 ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
-                            class="fa-solid fa-angle-right"></i></a>
+                            class="fas fa-angle-right"></i></a>
                 </li>
                 <?php endif; ?>
                 <?php if ($current_block < $last_block) : ?>
                 <li class="page-item">
                     <a class="page-link" id="blocoNovo" href="#"
                         onclick="loadContent('list_internacao_cap_new.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&data_intern_int=<?php print $data_intern_int ?>&senha_int=<?php print $senha_int ?>&lote=<?php print $lote ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&med_check=<?php print $med_check ?>&enf_check=<?php print $enf_check ?>&adm_check=<?php print $adm_check ?>&senha_fin=<?php print $senha_fin ?>&pag=<?php print print count($paginas) ?>&bl=<?php print print ($last_block - 1) * 5 ?>')"><i
-                            class="fa-solid fa-angles-right"></i></a>
+                            class="fas fa-angle-double-right"></i></a>
                 </li>
                 <?php endif; ?>
             </ul>
@@ -431,8 +577,87 @@ if ($qtdIntItens > $limite) {
 </div>
 </div>
 <script>
+if (!window.__fcBulkPrintBound) {
+    window.__fcBulkPrintBound = true;
+    window.__fcBulkPrintBaseUrl = <?= json_encode(rtrim($BASE_URL, '/') . '/show_capeantePrt.php') ?>;
+
+    function fcBulkPrintTableFrom(element) {
+        return element ? element.closest('#table-content') : null;
+    }
+
+    function fcBulkPrintChecks(tableContent) {
+        return Array.from(tableContent ? tableContent.querySelectorAll('.js-capeante-print-check') : []);
+    }
+
+    function fcBulkPrintSelectedIds(tableContent) {
+        return fcBulkPrintChecks(tableContent).filter((check) => check.checked).map((check) => check.value);
+    }
+
+    function fcBulkPrintUpdate(tableContent) {
+        const countEl = tableContent ? tableContent.querySelector('[data-bulk-print-count]') : null;
+        const selectAll = tableContent ? tableContent.querySelector('.js-capeante-select-all') : null;
+        const checks = fcBulkPrintChecks(tableContent);
+        const selected = fcBulkPrintSelectedIds(tableContent).length;
+        if (countEl) countEl.textContent = selected + (selected === 1 ? ' selecionado' : ' selecionados');
+        if (selectAll) {
+            selectAll.checked = checks.length > 0 && checks.every((check) => check.checked);
+            selectAll.indeterminate = selected > 0 && selected < checks.length;
+        }
+    }
+
+    document.addEventListener('change', function(event) {
+        if (event.target.matches('.js-capeante-select-all')) {
+            const tableContent = fcBulkPrintTableFrom(event.target);
+            fcBulkPrintChecks(tableContent).forEach((check) => {
+                check.checked = event.target.checked;
+            });
+            fcBulkPrintUpdate(tableContent);
+        }
+        if (event.target.matches('.js-capeante-print-check')) {
+            fcBulkPrintUpdate(fcBulkPrintTableFrom(event.target));
+        }
+    });
+
+    document.addEventListener('click', function(event) {
+        const button = event.target.closest('[data-bulk-print-modelo]');
+        if (!button) return;
+        const tableContent = fcBulkPrintTableFrom(button);
+        const ids = fcBulkPrintSelectedIds(tableContent);
+        if (!ids.length) {
+            alert('Selecione pelo menos um capeante para imprimir.');
+            return;
+        }
+        const modelo = button.dataset.bulkPrintModelo || 'resumido';
+        window.location.href = window.__fcBulkPrintBaseUrl + '?modelo=' + encodeURIComponent(modelo) + '&ids=' + encodeURIComponent(ids.join(','));
+    });
+}
 // ajax para submit do formulario de pesquisa
 $(document).ready(function() {
+    function getCurrentPageNumber() {
+        var activeText = $('.pagination .page-item.active .page-link').first().text();
+        var activePage = parseInt(activeText, 10);
+        if (activePage > 0) {
+            return activePage;
+        }
+        var urlPage = parseInt(new URLSearchParams(window.location.search).get('pag') || '1', 10);
+        return urlPage > 0 ? urlPage : 1;
+    }
+
+    function buildSenhasExportUrl(scope) {
+        var params = new URLSearchParams($('#select-internacao-form').serialize());
+        params.set('export_scope', scope === 'current_page' ? 'current_page' : 'filtered');
+        if (scope === 'current_page') {
+            params.set('pag', getCurrentPageNumber());
+        } else {
+            params.delete('pag');
+        }
+        return '<?= rtrim($BASE_URL, '/') ?>/exportar_excel_senhas_finalizadas.php?' + params.toString();
+    }
+
+    $(document).on('click', '.js-senhas-export-link', function() {
+        this.href = buildSenhasExportUrl($(this).data('export-scope'));
+    });
+
     $('#select-internacao-form').submit(function(e) {
         e.preventDefault(); // Impede o comportamento padrão de enviar o formulário
 

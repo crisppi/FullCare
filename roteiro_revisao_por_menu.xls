@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #1f2937;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 4px 0;
+      color: #3b2154;
+    }
+    .subtitle {
+      font-size: 12px;
+      margin: 0 0 14px 0;
+      color: #6b7280;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th {
+      background: #ede7f6;
+      color: #3b2154;
+      font-weight: bold;
+      border: 1px solid #cfc7dd;
+      padding: 8px;
+      font-size: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    td {
+      border: 1px solid #d9e2ef;
+      padding: 7px;
+      font-size: 11px;
+      vertical-align: top;
+    }
+    .section td {
+      background: #f4f0fb;
+      color: #4c1d67;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .status {
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+  <h1>Roteiro de revis&atilde;o por p&aacute;ginas do menu - FullCare</h1>
+  <p class="subtitle">Use este arquivo para navegar menu por menu e validar padr&otilde;es visuais, formul&aacute;rios, tabelas, bot&otilde;es e fluxos antes da vers&atilde;o inicial.</p>
+
+  <table>
+    <tr>
+      <th>Ordem</th>
+      <th>Menu</th>
+      <th>P&aacute;gina / Submenu</th>
+      <th>URL / Caminho sugerido</th>
+      <th>Perfil / Acesso</th>
+      <th>O que revisar</th>
+      <th>Padr&otilde;es visuais</th>
+      <th>Teste funcional</th>
+      <th>Status</th>
+      <th>Observa&ccedil;&otilde;es</th>
+    </tr>
+
+    <tr class="section"><td colspan="10">Menu / Entrada do sistema</td></tr>
+    <tr>
+      <td>1</td>
+      <td>Menu</td>
+      <td>P&aacute;gina inicial / dashboard</td>
+      <td>/FullCare/menu_app.php</td>
+      <td>Diretor / Auditor / Gestor</td>
+      <td>Validar carregamento inicial, cabe&ccedil;alho, busca global, avatar, menus e atalhos.</td>
+      <td>Logo, barra superior, espa&ccedil;amentos, fontes, &iacute;cones, hover, alinhamento e responsividade.</td>
+      <td>Abrir menus, usar busca, trocar perfil/hospital quando aplic&aacute;vel e voltar para a tela inicial.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Menu</td>
+      <td>Menu operacional legado</td>
+      <td>/FullCare/menu.php</td>
+      <td>Administrador</td>
+      <td>Confirmar se ainda ser&aacute; usado e se os links levam para as telas corretas.</td>
+      <td>Cards, bot&otilde;es, t&iacute;tulos, cores, margens e consist&ecirc;ncia com o padr&atilde;o atual.</td>
+      <td>Clicar nos principais atalhos e confirmar abertura sem tela branca ou erro.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">Cadastros</td></tr>
+    <tr>
+      <td>3</td>
+      <td>Cadastros</td>
+      <td>Pacientes - lista</td>
+      <td>/FullCare/pacientes</td>
+      <td>Diretor / Auditor / Cadastro</td>
+      <td>Lista, filtros, busca, pagina&ccedil;&atilde;o, a&ccedil;&otilde;es de editar/visualizar e estados vazios.</td>
+      <td>Tabela, fonte compacta, cabe&ccedil;alhos, bot&otilde;es, badges e alinhamento das colunas.</td>
+      <td>Pesquisar paciente, abrir cadastro, retornar &agrave; lista e validar manuten&ccedil;&atilde;o dos filtros.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Cadastros</td>
+      <td>Novo paciente / editar paciente</td>
+      <td>/FullCare/pacientes/novo</td>
+      <td>Cadastro / Administrador</td>
+      <td>Campos obrigat&oacute;rios, CPF/cart&atilde;o, datas, conv&ecirc;nio, hospital e bot&otilde;es de salvar/cancelar.</td>
+      <td>Inputs, selects, placeholders cinza claro, labels, mensagens de erro e margens laterais.</td>
+      <td>Salvar sem obrigat&oacute;rios, salvar completo, editar e confirmar persist&ecirc;ncia dos dados.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Cadastros</td>
+      <td>Hospitais</td>
+      <td>/FullCare/hospitais e /FullCare/hospitais/novo</td>
+      <td>Administrador</td>
+      <td>Lista, cadastro, edi&ccedil;&atilde;o, status ativo/inativo e v&iacute;nculos usados em interna&ccedil;&otilde;es.</td>
+      <td>Formul&aacute;rio, tabela, bot&otilde;es, espa&ccedil;amento entre campos e padr&atilde;o de selects.</td>
+      <td>Criar hospital teste, editar, inativar quando existir op&ccedil;&atilde;o e validar busca.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Cadastros</td>
+      <td>Seguradoras</td>
+      <td>/FullCare/seguradoras e /FullCare/seguradoras/nova</td>
+      <td>Administrador</td>
+      <td>Cadastro, lista, edi&ccedil;&atilde;o, obrigat&oacute;rios e uso nos fluxos de paciente/interna&ccedil;&atilde;o.</td>
+      <td>Inputs, selects, bot&otilde;es, tabela e mensagens padronizadas.</td>
+      <td>Cadastrar, editar, pesquisar e validar se aparece nos combos relacionados.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Cadastros</td>
+      <td>Estipulantes</td>
+      <td>/FullCare/estipulantes e /FullCare/estipulantes/novo</td>
+      <td>Administrador</td>
+      <td>Lista, cadastro, v&iacute;nculo com seguradora e edi&ccedil;&atilde;o.</td>
+      <td>Consist&ecirc;ncia de campos, filtros, bot&otilde;es e tabela.</td>
+      <td>Cadastrar item teste, editar, buscar e confirmar v&iacute;nculos.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Cadastros</td>
+      <td>Usu&aacute;rios</td>
+      <td>/FullCare/usuarios e /FullCare/usuarios/novo</td>
+      <td>Administrador</td>
+      <td>Cadastro, permiss&otilde;es, perfil, hospital, senha, ativo/inativo e lista.</td>
+      <td>Campos compactos, bot&otilde;es, tabela, badges de perfil e mensagens de valida&ccedil;&atilde;o.</td>
+      <td>Criar usu&aacute;rio teste, alterar perfil/hospital, editar e validar permiss&otilde;es b&aacute;sicas.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Cadastros</td>
+      <td>Usu&aacute;rios por hospital</td>
+      <td>/FullCare/usuarios/hospitais</td>
+      <td>Administrador</td>
+      <td>V&iacute;nculos, filtros por hospital, usu&aacute;rio e perfil.</td>
+      <td>Tabela, selects, placeholders e bot&otilde;es de a&ccedil;&atilde;o.</td>
+      <td>Filtrar por hospital, vincular/desvincular e revisar permiss&atilde;o resultante.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Cadastros</td>
+      <td>Acomoda&ccedil;&atilde;o</td>
+      <td>/FullCare/acomodacoes e /FullCare/acomodacoes/nova</td>
+      <td>Administrador</td>
+      <td>Cadastro, edi&ccedil;&atilde;o, listagem e uso no cadastro/edi&ccedil;&atilde;o de interna&ccedil;&atilde;o.</td>
+      <td>Inputs, tabela, bot&otilde;es pequenos, fontes e espa&ccedil;amentos.</td>
+      <td>Cadastrar op&ccedil;&atilde;o teste e confirmar se aparece nos selects de interna&ccedil;&atilde;o/visita.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Cadastros</td>
+      <td>Patologias</td>
+      <td>/FullCare/patologias e /FullCare/patologias/nova</td>
+      <td>Administrador</td>
+      <td>Cadastro de CID/patologia, grupo, busca e edi&ccedil;&atilde;o.</td>
+      <td>Autocomplete/select, placeholder, seta do select, tabela e mensagens.</td>
+      <td>Cadastrar, pesquisar e selecionar em interna&ccedil;&atilde;o/visita.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>Cadastros</td>
+      <td>Antecedentes</td>
+      <td>/FullCare/antecedentes e /FullCare/antecedentes/novo</td>
+      <td>Administrador</td>
+      <td>Cadastro, edi&ccedil;&atilde;o, busca e uso no formul&aacute;rio assistencial.</td>
+      <td>Selects, placeholders, tabela, bot&otilde;es e alinhamento.</td>
+      <td>Cadastrar item teste, buscar e selecionar nas telas de interna&ccedil;&atilde;o/visita.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">Produ&ccedil;&atilde;o</td></tr>
+    <tr>
+      <td>13</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>Censo - novo</td>
+      <td>/FullCare/censo/novo</td>
+      <td>Auditor / Produ&ccedil;&atilde;o</td>
+      <td>Campos de hospital, paciente, leito, datas, status e integra&ccedil;&atilde;o com interna&ccedil;&atilde;o.</td>
+      <td>Inputs, selects, placeholders, calend&aacute;rios, bot&otilde;es e margens.</td>
+      <td>Criar registro teste, validar obrigat&oacute;rios e conferir se aparece na lista.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>Censo - lista</td>
+      <td>/FullCare/censo/lista</td>
+      <td>Auditor / Gestor</td>
+      <td>Filtros, tabela, a&ccedil;&otilde;es, exporta&ccedil;&atilde;o quando existir e estados vazios.</td>
+      <td>Tabela compacta, colunas alinhadas, bot&otilde;es, badges e pagina&ccedil;&atilde;o.</td>
+      <td>Filtrar por hospital/data, abrir item, retornar e validar filtros.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>Cadastro de interna&ccedil;&atilde;o</td>
+      <td>/FullCare/internacoes/nova</td>
+      <td>Auditor / Produ&ccedil;&atilde;o</td>
+      <td>Dados iniciais, assistenciais, relat&oacute;rios, tabelas adicionais, detalhes do relat&oacute;rio, UTI e prorroga&ccedil;&atilde;o.</td>
+      <td>Distribui&ccedil;&atilde;o dos inputs, fontes, bot&otilde;es, selects, placeholder cinza claro, margens e responsivo.</td>
+      <td>Salvar cadastro completo, validar obrigat&oacute;rios, abrir se&ccedil;&otilde;es condicionais e revisar sem tela branca.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>Edi&ccedil;&atilde;o de interna&ccedil;&atilde;o</td>
+      <td>/FullCare/edit_internacao.php?id_internacao=...</td>
+      <td>Auditor / Gestor</td>
+      <td>Carregamento, edi&ccedil;&atilde;o de dados, tabelas adicionais, visita, UTI, alta, prorroga&ccedil;&atilde;o e IA.</td>
+      <td>Mesmo padr&atilde;o do cadastro: fontes, espa&ccedil;os, bot&otilde;es, cards, selects e placeholders.</td>
+      <td>Abrir uma interna&ccedil;&atilde;o real, alterar campos, concluir atualiza&ccedil;&atilde;o e conferir persist&ecirc;ncia.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>Visitas - lista / nova visita</td>
+      <td>/FullCare/visitas/lista</td>
+      <td>Auditor / Produ&ccedil;&atilde;o</td>
+      <td>Lista, cria&ccedil;&atilde;o de visita, v&iacute;nculo com interna&ccedil;&atilde;o, relat&oacute;rios e tabelas adicionais.</td>
+      <td>Inputs, cards, selects, setas, placeholders, fontes e bot&otilde;es no padr&atilde;o atual.</td>
+      <td>Criar visita, editar, validar campos condicionais e concluir sem quebrar layout.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>Prorroga&ccedil;&otilde;es</td>
+      <td>/FullCare/form_list_prorrogacao_pendente.php</td>
+      <td>Auditor / Gestor</td>
+      <td>Lista de prorroga&ccedil;&otilde;es, edi&ccedil;&atilde;o, alta na prorroga&ccedil;&atilde;o e parecer IA.</td>
+      <td>Tamanho de fontes, bot&otilde;es, inputs, datas, toggle Sim/N&atilde;o e cards.</td>
+      <td>Incluir prorroga&ccedil;&atilde;o, editar, remover linha, marcar alta quando aplic&aacute;vel e salvar.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>Alta UTI</td>
+      <td>/FullCare/internacoes/uti/alta</td>
+      <td>Auditor / Gestor</td>
+      <td>Lista/fluxo de alta UTI, filtros, altera&ccedil;&atilde;o de status e datas.</td>
+      <td>Tabela, filtros, bot&otilde;es e mensagens de confirma&ccedil;&atilde;o.</td>
+      <td>Filtrar paciente, executar alta e validar reflexo na interna&ccedil;&atilde;o.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>Alta hospitalar / reverter alta</td>
+      <td>/FullCare/internacoes/reverter-alta</td>
+      <td>Auditor / Gestor</td>
+      <td>Fluxo de alta, revers&atilde;o, permiss&otilde;es, datas e hist&oacute;rico.</td>
+      <td>Bot&otilde;es, modais, alertas e tabela no mesmo padr&atilde;o visual.</td>
+      <td>Localizar interna&ccedil;&atilde;o com alta, reverter quando permitido e validar status.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>Produ&ccedil;&atilde;o</td>
+      <td>DRG</td>
+      <td>/FullCare/internacoes/drg</td>
+      <td>Auditor / Gestor</td>
+      <td>Campos de DRG, filtros, indicadores e integra&ccedil;&atilde;o com interna&ccedil;&atilde;o.</td>
+      <td>Inputs, tabelas, bot&otilde;es e densidade visual.</td>
+      <td>Pesquisar, editar/salvar registro e confirmar consist&ecirc;ncia de dados.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">Contas</td></tr>
+    <tr>
+      <td>22</td>
+      <td>Contas</td>
+      <td>Contas para Auditoria</td>
+      <td>/FullCare/contas/auditoria</td>
+      <td>Auditor de contas / Gestor</td>
+      <td>Fila, filtros, status, respons&aacute;vel, abertura da conta e a&ccedil;&otilde;es.</td>
+      <td>Tabela, bot&otilde;es, filtros, badges, alinhamento e responsividade.</td>
+      <td>Filtrar conta, abrir, alterar status e retornar para a fila.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>Contas</td>
+      <td>Capeante / RAH</td>
+      <td>/FullCare/form_cad_capeante_rah.php</td>
+      <td>Auditor de contas</td>
+      <td>Cadastro/edi&ccedil;&atilde;o, anexos quando existir, totais, datas e valida&ccedil;&otilde;es.</td>
+      <td>Campos num&eacute;ricos, calend&aacute;rios, bot&otilde;es, cards e mensagens.</td>
+      <td>Salvar registro completo, editar valores e validar totais.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>Contas</td>
+      <td>Contas paradas / acompanhamento</td>
+      <td>/FullCare/contas</td>
+      <td>Gestor / Auditor de contas</td>
+      <td>Indicadores, filtros, lista de pend&ecirc;ncias e prazos.</td>
+      <td>Tabela, indicadores, badges de prazo e bot&otilde;es de a&ccedil;&atilde;o.</td>
+      <td>Filtrar por status/per&iacute;odo, abrir conta e validar retorno.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">Listas</td></tr>
+    <tr>
+      <td>25</td>
+      <td>Listas</td>
+      <td>Interna&ccedil;&otilde;es</td>
+      <td>/FullCare/internacoes</td>
+      <td>Auditor / Gestor</td>
+      <td>Filtros por hospital, paciente, data, status, a&ccedil;&otilde;es de editar/visualizar.</td>
+      <td>Tabela compacta, bot&otilde;es, pagina&ccedil;&atilde;o, alinhamento e estados vazios.</td>
+      <td>Pesquisar interna&ccedil;&atilde;o, abrir edi&ccedil;&atilde;o, voltar e validar filtros.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>Listas</td>
+      <td>Visitas</td>
+      <td>/FullCare/visitas/lista</td>
+      <td>Auditor / Gestor</td>
+      <td>Filtros, colunas, status, acesso &agrave; visita e consist&ecirc;ncia com interna&ccedil;&atilde;o.</td>
+      <td>Tabela, bot&otilde;es, badges e fontes.</td>
+      <td>Filtrar, abrir visita, editar e retornar.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>Listas</td>
+      <td>Pacientes</td>
+      <td>/FullCare/pacientes</td>
+      <td>Auditor / Cadastro</td>
+      <td>Busca, filtros, edi&ccedil;&atilde;o e dados principais do paciente.</td>
+      <td>Colunas, bot&otilde;es, fontes, labels e vazios.</td>
+      <td>Pesquisar por nome/matr&iacute;cula, abrir e voltar.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>Listas</td>
+      <td>Cadastros auxiliares</td>
+      <td>/FullCare/usuarios, /hospitais, /acomodacoes, /patologias, /antecedentes</td>
+      <td>Administrador</td>
+      <td>Listas administrativas e a&ccedil;&otilde;es de manuten&ccedil;&atilde;o.</td>
+      <td>Mesmo padr&atilde;o de tabela, busca, filtros e bot&otilde;es.</td>
+      <td>Abrir cada lista, pesquisar e editar um item de teste.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">Gest&atilde;o</td></tr>
+    <tr>
+      <td>29</td>
+      <td>Gest&atilde;o</td>
+      <td>Dashboard operacional</td>
+      <td>/FullCare/dashboard-operacional</td>
+      <td>Diretor / Gestor</td>
+      <td>Indicadores, filtros, cards, gr&aacute;ficos, per&iacute;odos e drill-down.</td>
+      <td>Cards, n&uacute;meros, gr&aacute;ficos, espa&ccedil;amentos, cores e responsivo.</td>
+      <td>Trocar per&iacute;odo/hospital, abrir detalhes e conferir carregamento.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>Gest&atilde;o</td>
+      <td>Performance equipes</td>
+      <td>/FullCare/inteligencia/performance-equipes</td>
+      <td>Diretor / Gestor</td>
+      <td>M&eacute;tricas por equipe, filtros e ranking.</td>
+      <td>Cards, tabelas, filtros, gr&aacute;ficos e indicadores.</td>
+      <td>Filtrar equipe/per&iacute;odo e validar n&uacute;meros exibidos.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>Gest&atilde;o</td>
+      <td>Previs&atilde;o de faturamento</td>
+      <td>/FullCare/inteligencia/previsao-faturamento</td>
+      <td>Diretor / Gestor</td>
+      <td>Filtros, proje&ccedil;&otilde;es, cards e exporta&ccedil;&atilde;o quando existir.</td>
+      <td>N&uacute;meros, tabela, gr&aacute;ficos e responsividade.</td>
+      <td>Alterar per&iacute;odo, conferir totais e abrir detalhes.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>Gest&atilde;o</td>
+      <td>Longa perman&ecirc;ncia / acompanhamento</td>
+      <td>/FullCare/longa_permanencia_editar.php</td>
+      <td>Gestor / Auditor</td>
+      <td>Lista ou edi&ccedil;&atilde;o de casos, motivos, prazos, observa&ccedil;&otilde;es e hist&oacute;rico.</td>
+      <td>Formul&aacute;rios, tabelas, alertas de prazo e bot&otilde;es.</td>
+      <td>Abrir caso, editar acompanhamento e validar salvamento.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">Cuidado Continuado</td></tr>
+    <tr>
+      <td>33</td>
+      <td>Cuidado Continuado</td>
+      <td>Home Care</td>
+      <td>/FullCare/cuidado-continuado/home-care</td>
+      <td>Auditor / Gestor</td>
+      <td>Elegibilidade, plano, pacientes vinculados, datas e observa&ccedil;&otilde;es.</td>
+      <td>Formul&aacute;rios, listas, bot&otilde;es e mensagens no padr&atilde;o atual.</td>
+      <td>Pesquisar paciente, abrir caso, editar informa&ccedil;&otilde;es e salvar.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>Cuidado Continuado</td>
+      <td>Desospitaliza&ccedil;&atilde;o</td>
+      <td>/FullCare/cuidado-continuado/desospitalizacao</td>
+      <td>Auditor / Gestor</td>
+      <td>Plano de transi&ccedil;&atilde;o, barreiras, pend&ecirc;ncias e respons&aacute;veis.</td>
+      <td>Cards, tabelas, badges de status e campos de observa&ccedil;&atilde;o.</td>
+      <td>Criar/editar acompanhamento e validar altera&ccedil;&atilde;o de status.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>35</td>
+      <td>Cuidado Continuado</td>
+      <td>Readmiss&atilde;o / riscos</td>
+      <td>/FullCare/cuidado-continuado/readmissao</td>
+      <td>Gestor / Auditor</td>
+      <td>Indicadores de risco, filtros e lista de pacientes.</td>
+      <td>Tabela, filtros, cards e alertas.</td>
+      <td>Filtrar paciente/per&iacute;odo e abrir caso vinculado.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">BI</td></tr>
+    <tr>
+      <td>36</td>
+      <td>BI</td>
+      <td>Navega&ccedil;&atilde;o BI</td>
+      <td>/FullCare/bi/navegacao</td>
+      <td>Diretor / Gestor</td>
+      <td>Hub de dashboards, cards, filtros gerais e links.</td>
+      <td>Cards, &iacute;cones, t&iacute;tulos, espa&ccedil;amento e responsivo.</td>
+      <td>Abrir cada card e validar retorno ao hub.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>BI</td>
+      <td>Indicadores essenciais</td>
+      <td>/FullCare/IndicadoresEssenciaisHubBI.php</td>
+      <td>Diretor / Gestor</td>
+      <td>KPIs principais, filtros, per&iacute;odos e gr&aacute;ficos.</td>
+      <td>Cards, gr&aacute;ficos, legibilidade, cores e alinhamento.</td>
+      <td>Trocar filtros e validar atualiza&ccedil;&atilde;o dos indicadores.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>BI</td>
+      <td>Resultados</td>
+      <td>/FullCare/bi/resultados</td>
+      <td>Diretor / Gestor</td>
+      <td>Resultado operacional, tabelas, cards e gr&aacute;ficos.</td>
+      <td>Gr&aacute;ficos, cards, filtros e tabelas.</td>
+      <td>Filtrar per&iacute;odo/hospital e conferir carregamento.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>BI</td>
+      <td>Produtividade</td>
+      <td>/FullCare/bi/produtividade</td>
+      <td>Diretor / Gestor</td>
+      <td>Produ&ccedil;&atilde;o por equipe/usu&aacute;rio, filtros e ranking.</td>
+      <td>Tabelas, gr&aacute;ficos, cards e badges.</td>
+      <td>Alterar filtros e validar ranking.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>40</td>
+      <td>BI</td>
+      <td>Qualidade 360</td>
+      <td>/FullCare/bi/qualidade-360</td>
+      <td>Diretor / Gestor</td>
+      <td>Indicadores de qualidade, alertas, gr&aacute;ficos e detalhes.</td>
+      <td>Layout de indicadores, cores sem exagero, legibilidade e responsivo.</td>
+      <td>Filtrar, abrir detalhe e validar dados.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>41</td>
+      <td>BI</td>
+      <td>Preditivo</td>
+      <td>/FullCare/bi/preditivo</td>
+      <td>Diretor / Gestor</td>
+      <td>Modelos, scores, explica&ccedil;&otilde;es e listas de risco.</td>
+      <td>Cards, tabelas, tooltips e visual de risco.</td>
+      <td>Filtrar amostra, abrir explica&ccedil;&atilde;o e validar sem erro.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>42</td>
+      <td>BI</td>
+      <td>Sinistro</td>
+      <td>/FullCare/bi/sinistro</td>
+      <td>Diretor / Gestor</td>
+      <td>Valores, indicadores, filtros e detalhamento.</td>
+      <td>Gr&aacute;ficos, n&uacute;meros, tabela e responsividade.</td>
+      <td>Alterar per&iacute;odo e validar totais/detalhes.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">Intelig&ecirc;ncia Operacional</td></tr>
+    <tr>
+      <td>43</td>
+      <td>Intelig&ecirc;ncia Operacional</td>
+      <td>Dashboard operacional</td>
+      <td>/FullCare/dashboard-operacional</td>
+      <td>Diretor / Gestor</td>
+      <td>Painel, alertas, indicadores e caminhos para a&ccedil;&atilde;o.</td>
+      <td>Cards, gr&aacute;ficos, filtros, bot&otilde;es e densidade visual.</td>
+      <td>Filtrar, abrir alerta e conferir navega&ccedil;&atilde;o.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>44</td>
+      <td>Intelig&ecirc;ncia Operacional</td>
+      <td>Automa&ccedil;&atilde;o de texto</td>
+      <td>/FullCare/text_automation.php</td>
+      <td>Gestor / Auditor</td>
+      <td>Entrada de texto, prompts, resultado, limpar/copiar e erros.</td>
+      <td>Textareas, bot&otilde;es, cards de resultado, estados de loading e mensagens.</td>
+      <td>Executar um prompt simples, copiar resultado e limpar campos.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>45</td>
+      <td>Intelig&ecirc;ncia Operacional</td>
+      <td>Risco de glosa</td>
+      <td>/FullCare/risco_glosa.php</td>
+      <td>Gestor / Auditor de contas</td>
+      <td>Lista de risco, filtros, score, explica&ccedil;&atilde;o e a&ccedil;&otilde;es.</td>
+      <td>Tabelas, badges de risco, cards e filtros.</td>
+      <td>Filtrar, abrir item e validar explica&ccedil;&atilde;o do risco.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>46</td>
+      <td>Intelig&ecirc;ncia Operacional</td>
+      <td>Perman&ecirc;ncia - alertas</td>
+      <td>/FullCare/permanencia_alertas.php</td>
+      <td>Gestor / Auditor</td>
+      <td>Pacientes em alerta, filtros, prazos, status e detalhes.</td>
+      <td>Badges, tabela, filtros, cards e bot&otilde;es de a&ccedil;&atilde;o.</td>
+      <td>Filtrar alertas, abrir paciente e confirmar navega&ccedil;&atilde;o para interna&ccedil;&atilde;o.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>47</td>
+      <td>Intelig&ecirc;ncia Operacional</td>
+      <td>Explicabilidade / insights</td>
+      <td>/FullCare/explicabilidade_insights.php</td>
+      <td>Gestor / Diretor</td>
+      <td>Cards explicativos, filtros, listas e links de detalhe.</td>
+      <td>Texto, cards, tabelas, espa&ccedil;amento e leitura dos insights.</td>
+      <td>Trocar filtros, abrir insight e conferir dados.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>48</td>
+      <td>Intelig&ecirc;ncia Operacional</td>
+      <td>Clusteriza&ccedil;&atilde;o cl&iacute;nica</td>
+      <td>/FullCare/clusterizacao_clinica.php</td>
+      <td>Gestor / Diretor</td>
+      <td>Segmentos, filtros, gr&aacute;ficos, tabela de pacientes e explica&ccedil;&atilde;o.</td>
+      <td>Gr&aacute;ficos, cards, tabela e legibilidade.</td>
+      <td>Selecionar cluster, abrir detalhe e validar carregamento.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>49</td>
+      <td>Intelig&ecirc;ncia Operacional</td>
+      <td>Logs / uso da intelig&ecirc;ncia</td>
+      <td>/FullCare/inteligencia_logs_usuario.php</td>
+      <td>Administrador / Diretor</td>
+      <td>Hist&oacute;rico de uso, usu&aacute;rio, data, tipo de prompt e resultado.</td>
+      <td>Tabela, filtros, badges, bot&otilde;es e pagina&ccedil;&atilde;o.</td>
+      <td>Filtrar por usu&aacute;rio/per&iacute;odo, abrir detalhe e validar retorno.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+
+    <tr class="section"><td colspan="10">Checklist transversal para cada p&aacute;gina</td></tr>
+    <tr>
+      <td>50</td>
+      <td>Todos</td>
+      <td>Responsivo desktop / notebook</td>
+      <td>Todas as p&aacute;ginas acima</td>
+      <td>Todos</td>
+      <td>Validar em largura grande e notebook: sem campos colados, sem overflow e sem quebras estranhas.</td>
+      <td>Margens laterais, grid, fontes, cards, tabelas e rodap&eacute; sem sobreposi&ccedil;&atilde;o.</td>
+      <td>Reduzir largura da janela e navegar os principais fluxos.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>51</td>
+      <td>Todos</td>
+      <td>Inputs e selects</td>
+      <td>Todas as p&aacute;ginas com formul&aacute;rio</td>
+      <td>Todos</td>
+      <td>Validar cor de placeholder, seta do select, altura, foco, disabled, erro e preenchido.</td>
+      <td>Placeholder cinza claro quando vazio; texto preenchido mais forte; setas uniformes.</td>
+      <td>Abrir selects vazios/preenchidos, tabular campos e salvar com erros.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>52</td>
+      <td>Todos</td>
+      <td>Tabelas</td>
+      <td>Todas as listas e dashboards</td>
+      <td>Todos</td>
+      <td>Validar cabe&ccedil;alho, largura, scroll, pagina&ccedil;&atilde;o, filtros, a&ccedil;&otilde;es e estados vazios.</td>
+      <td>Fonte compacta, alinhamento, zebra/linhas, bot&otilde;es pequenos e sem quebra visual.</td>
+      <td>Pesquisar, paginar, ordenar quando existir e abrir item.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>53</td>
+      <td>Todos</td>
+      <td>Salvar / editar / excluir</td>
+      <td>Todas as p&aacute;ginas com a&ccedil;&atilde;o</td>
+      <td>Todos</td>
+      <td>Confirmar mensagens de sucesso/erro, loading, bloqueio de duplo clique e retorno.</td>
+      <td>Toasts/modais padronizados, bot&otilde;es alinhados e estados vis&iacute;veis.</td>
+      <td>Salvar v&aacute;lido, salvar inv&aacute;lido, cancelar e voltar.</td>
+      <td class="status">Pendente</td>
+      <td></td>
+    </tr>
+  </table>
+</body>
+</html>

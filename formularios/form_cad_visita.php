@@ -239,10 +239,21 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                                 && $editVisitaIdParam
                                 && ($visitaNoOption === (int)$editVisitaIdParam || $visitaIdOption === (int)$editVisitaIdReal)
                             );
+                            $dataVisitaOption = 'Data não informada';
+                            if (!empty($visita['data_visita_vis'])) {
+                                $dataVisitaObj = DateTime::createFromFormat('Y-m-d', (string)$visita['data_visita_vis']);
+                                if (!$dataVisitaObj) {
+                                    $dataVisitaTs = strtotime((string)$visita['data_visita_vis']);
+                                    $dataVisitaObj = $dataVisitaTs ? (new DateTime())->setTimestamp($dataVisitaTs) : null;
+                                }
+                                if ($dataVisitaObj instanceof DateTime) {
+                                    $dataVisitaOption = $dataVisitaObj->format('d/m/Y');
+                                }
+                            }
                         ?>
                         <option value="<?= $visita['visita_no_vis'] ?>" <?= $retificarSelected ? 'selected' : '' ?>>
                             Visita ID <?= $visita['visita_no_vis'] ?> -
-                            <?= isset($visita['data_visita_vis']) ? DateTime::createFromFormat('Y-m-d', $visita['data_visita_vis'])->format('d/m/Y') : 'Data não informada' ?>
+                            <?= htmlspecialchars($dataVisitaOption, ENT_QUOTES, 'UTF-8') ?>
                         </option>
                         <?php endif; ?>
                         <?php endforeach; ?>
@@ -556,13 +567,10 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
             </script>
 
             <div class="visita-actions">
-                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-                    <small id="clinical-autosave-status" class="text-muted">Rascunho automático: ativo</small>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-clinical-draft="fields">Limpar rascunho</button>
-                </div>
                 <button type="submit" class="btn btn-success btn-submit-standard" id="visita-submit-btn">
                     <i class="fas fa-check"></i> <span id="visita-submit-label">Cadastrar</span>
                 </button>
+                <button type="button" class="btn btn-sm btn-clear-draft" data-clear-clinical-draft="fields">Limpar rascunho</button>
                 <div class="alert" id="alert" role="alert"></div>
             </div>
     </form>
@@ -1680,17 +1688,17 @@ function aumentarTextProgramacao() {
     padding-top: 10px !important;
     padding-bottom: 10px !important;
     line-height: 1.2 !important;
-    padding-right: 42px !important;
-    background-repeat: no-repeat !important;
-    background-position: right 14px center !important;
-    background-size: 16px 16px !important;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111827'><path d='M7 10l5 5 5-5z'/></svg>") !important;
+    padding-right: 24px !important;
+    background-repeat: initial !important;
+    background-position: initial !important;
+    background-size: initial !important;
+    background-image: none !important;
     border-radius: 14px !important;
     font-weight: 400 !important;
     transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
     opacity: 1 !important;
-    -webkit-appearance: none;
-    appearance: none;
+    -webkit-appearance: auto !important;
+    appearance: auto !important;
 }
 
 .visita-card--tabelas .detail-select,
@@ -2803,6 +2811,86 @@ function aumentarTextProgramacao() {
     line-height: 1 !important;
 }
 
+#main-container .visita-page .visita-actions .btn-clear-draft {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 12px !important;
+    border: 1px solid #b8d7ea !important;
+    border-radius: 7px !important;
+    background: #edf8ff !important;
+    color: #236693 !important;
+    font-size: .76rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+#main-container .visita-page .visita-actions .btn-clear-draft:hover,
+#main-container .visita-page .visita-actions .btn-clear-draft:focus {
+    background: #dff1fb !important;
+    border-color: #8fc7e6 !important;
+    color: #1f5f8f !important;
+    outline: none !important;
+}
+
+/* Reforca a separacao visual entre fundo, cards e campos. */
+#main-container:has(.visita-page) {
+    background: linear-gradient(180deg, #e3e9f2 0%, #d8e1ec 100%) !important;
+}
+
+#main-container .visita-page {
+    padding: 2px 10px 18px !important;
+    border-radius: 12px !important;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04)),
+        #dfe7f1 !important;
+}
+
+#main-container .visita-page .visita-card,
+#main-container .visita-page .visita-summary-card,
+#main-container .visita-page .visita-head-field,
+#main-container .visita-page .clinical-text-field,
+#main-container .visita-page .ia-highlight-box,
+#main-container .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .adicional-card,
+#main-container .visita-page #detalhes-card-wrapper {
+    background: #ffffff !important;
+    border: 1px solid #cfd9e7 !important;
+    box-shadow: 0 8px 18px rgba(36, 56, 79, .10) !important;
+}
+
+#main-container .visita-page .visita-card__header,
+#main-container .visita-page .tabelas-adicionais-card__header {
+    border-bottom-color: #e0e7f0 !important;
+}
+
+#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
+#main-container #add-visita-form .bootstrap-select > .dropdown-toggle,
+#main-container .visita-page .visita-summary-card__input,
+#main-container .visita-page .visita-card--tabelas .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
+    background-color: #f8fbff !important;
+    border: 1px solid #aebdce !important;
+    color: #1f2937 !important;
+    box-shadow:
+        inset 0 1px 2px rgba(15, 23, 42, .08),
+        0 1px 0 rgba(255, 255, 255, .8) !important;
+}
+
+#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):hover,
+#main-container #add-visita-form .bootstrap-select > .dropdown-toggle:hover {
+    border-color: #7f94aa !important;
+    background-color: #ffffff !important;
+}
+
+#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):focus,
+#main-container #add-visita-form .bootstrap-select.show > .dropdown-toggle,
+#main-container #add-visita-form .bootstrap-select > .dropdown-toggle:focus {
+    border-color: #2f89bd !important;
+    background-color: #ffffff !important;
+    box-shadow:
+        0 0 0 .14rem rgba(47, 137, 189, .18),
+        inset 0 1px 2px rgba(15, 23, 42, .08) !important;
+}
+
 @media (max-width: 1199.98px) {
     #main-container .visita-page .visita-card--tabelas .tabelas-selects,
     #main-container .visita-page #detalhes-card-wrapper .row {
@@ -2889,11 +2977,12 @@ function aumentarTextProgramacao() {
 }
 
 .visita-page #tutorial_alto {
+    grid-column: span 3 !important;
     margin: 0 !important;
-    padding: 5px 7px !important;
-    border: 1px solid #e3dde9 !important;
+    padding: 7px 10px !important;
+    border: 1px solid #fed7aa !important;
     border-radius: 7px !important;
-    background: #fff !important;
+    background: #fff7ed !important;
     align-self: end !important;
 }
 
@@ -2901,8 +2990,19 @@ function aumentarTextProgramacao() {
     margin: 0 !important;
     margin-left: 0 !important;
     text-align: left !important;
-    font-size: .6rem !important;
+    font-size: .72rem !important;
     line-height: 1.18 !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 768px) {
+    .visita-page #tutorial_alto {
+        grid-column: 1 / -1 !important;
+    }
+
+    .visita-page #tutorial_alto p {
+        white-space: normal !important;
+    }
 }
 
 .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) label {
@@ -3124,21 +3224,29 @@ function aumentarTextProgramacao() {
 }
 
 .visita-card--tabelas > .visita-card__body > .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    padding-right: 26px !important;
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231f4d85' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"),
-        linear-gradient(180deg, #eaf4ff 0%, #d6eaff 100%) !important;
-    background-repeat: no-repeat, no-repeat !important;
-    background-position: right 8px center, 0 0 !important;
-    background-size: 15px 15px, 100% 100% !important;
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    padding-right: 24px !important;
+    background-image: none !important;
+    background-repeat: initial !important;
+    background-position: initial !important;
+    background-size: initial !important;
 }
 
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id]::after {
-    display: inline-block !important;
-    margin-left: auto !important;
-    border-top-color: #1f4d85 !important;
+    content: "" !important;
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    display: block !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: -2px 0 0 0 !important;
+    border-top: 5px solid #111827 !important;
+    border-right: 5px solid transparent !important;
+    border-bottom: 0 !important;
+    border-left: 5px solid transparent !important;
+    pointer-events: none !important;
 }
 
 #add-visita-form .visita-summary-card__input,
@@ -3193,7 +3301,8 @@ function aumentarTextProgramacao() {
 }
 
 #main-container .visita-page .visita-card--tabelas .tabelas-selects > .tabelas-col::after {
-    content: "";
+    content: none !important;
+    display: none !important;
     position: absolute;
     right: 12px;
     bottom: 11px;
@@ -3209,7 +3318,35 @@ function aumentarTextProgramacao() {
 #main-container .visita-page .visita-card--tabelas .tabelas-selects :is(select, .bootstrap-select > .dropdown-toggle) {
     padding-right: 32px !important;
 }
+
+#main-container .visita-page .visita-card--tabelas .tabelas-selects :is(
+    #relatorio-detalhado.select-placeholder,
+    #select_tuss.select-placeholder,
+    #select_prorrog.select-placeholder,
+    #select_gestao.select-placeholder,
+    #select_uti.select-placeholder,
+    #select_negoc.select-placeholder
+),
+#main-container .visita-page #detalhes-card-wrapper :is(
+    #curativo_det.select-placeholder,
+    #dieta_det.select-placeholder,
+    #nivel_consc_det.select-placeholder,
+    #oxig_det.select-placeholder,
+    #hemoderivados_det.select-placeholder,
+    #dialise_det.select-placeholder,
+    #oxigenio_hiperbarica_det.select-placeholder,
+    #qt_det.select-placeholder,
+    #rt_det.select-placeholder,
+    #acamado_det.select-placeholder,
+    #atb_det.select-placeholder,
+    #braden_det.select-placeholder
+) {
+    color: #c4c4c4 !important;
+    opacity: 1 !important;
+    font-weight: 500 !important;
+}
 </style>
+<link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
 <textarea id="visita-bootstrap-json" hidden><?= htmlspecialchars(json_encode([
     'dataInternacaoVis' => !empty($ultimaVis['data_intern_int']) ? date('Y-m-d', strtotime($ultimaVis['data_intern_int'])) : '',
     'tussPorVisita' => $tussPorVisita,
@@ -3307,10 +3444,6 @@ document.addEventListener("DOMContentLoaded", function() {
 function updateVisitaSelectPlaceholders() {
     const selects = document.querySelectorAll('#add-visita-form select');
     selects.forEach((selectEl) => {
-        if (selectEl.closest('.visita-card--tabelas')) {
-            selectEl.classList.remove('select-placeholder');
-            return;
-        }
         const empty = !selectEl.value;
         selectEl.classList.toggle('select-placeholder', empty);
     });

@@ -211,207 +211,7 @@
     ?>
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
-    <style>
-        .internacao-page {
-            visibility: hidden;
-        }
-
-        .assist-select-clear {
-            position: relative;
-        }
-
-        .assist-select-clear .bootstrap-select,
-        .assist-select-clear > select {
-            width: 100% !important;
-        }
-
-        .assist-select-clear .bootstrap-select > .dropdown-toggle {
-            padding-right: 34px !important;
-        }
-
-        .assist-clear-btn {
-            position: absolute;
-            top: 50%;
-            right: 14px;
-            transform: translateY(-50%);
-            z-index: 4;
-            width: 18px;
-            height: 18px;
-            border: 0;
-            border-radius: 999px;
-            background: rgba(94, 35, 99, 0.10);
-            color: #5e2363;
-            font-size: 12px;
-            font-weight: 700;
-            line-height: 18px;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .assist-select-clear:not(.picker-ready) .assist-clear-btn {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .assist-clear-btn:hover {
-            background: rgba(94, 35, 99, 0.18);
-            color: #4b1850;
-        }
-
-        .internacao-page select.selectpicker.bs-select-hidden,
-        .internacao-page select.selectpicker[data-fcx-picker-locked="1"] {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 1px !important;
-            min-width: 1px !important;
-            max-width: 1px !important;
-            height: 1px !important;
-            min-height: 1px !important;
-            max-height: 1px !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border: 0 !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            clip-path: inset(50%) !important;
-        }
-
-        .internacao-page .hospital-select-wrapper,
-        .internacao-page .assist-select-clear,
-        .internacao-page .hospital-select-wrapper .bootstrap-select,
-        .internacao-page .patient-col .bootstrap-select,
-        .internacao-page .assist-select-clear .bootstrap-select {
-            min-height: 30px !important;
-            height: 30px !important;
-        }
-
-        .internacao-page .bootstrap-select > button.dropdown-toggle.input-lg-fullcare[data-id="hospital_selected"],
-        .internacao-page .bootstrap-select > button.dropdown-toggle.input-lg-fullcare[data-id="fk_paciente_int"],
-        .internacao-page .bootstrap-select > button.dropdown-toggle.input-lg-fullcare[data-id="fk_cid_int"],
-        .internacao-page .bootstrap-select > button.dropdown-toggle.input-lg-fullcare[data-id="fk_patologia2"],
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="hospital_selected"],
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_paciente_int"],
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_cid_int"],
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_patologia2"] {
-            display: flex !important;
-            align-items: center !important;
-            min-height: 30px !important;
-            height: 30px !important;
-            padding: 0 28px 0 8px !important;
-            border-radius: 7px !important;
-            border-width: 1px !important;
-            box-shadow: none !important;
-            font-size: .68rem !important;
-            line-height: 1 !important;
-        }
-
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="hospital_selected"] .filter-option,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_paciente_int"] .filter-option,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_cid_int"] .filter-option,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_patologia2"] .filter-option,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="hospital_selected"] .filter-option-inner,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_paciente_int"] .filter-option-inner,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_cid_int"] .filter-option-inner,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_patologia2"] .filter-option-inner,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="hospital_selected"] .filter-option-inner-inner,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_paciente_int"] .filter-option-inner-inner,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_cid_int"] .filter-option-inner-inner,
-        .internacao-page .bootstrap-select > button.dropdown-toggle[data-id="fk_patologia2"] .filter-option-inner-inner {
-            height: 22px !important;
-            min-height: 0 !important;
-            line-height: 22px !important;
-            font-size: .68rem !important;
-            font-weight: 500 !important;
-        }
-
-        .internacao-page .internacao-head-grid > .form-group > .form-control,
-        .internacao-page .internacao-head-grid > .form-group > select.form-control,
-        .internacao-page .internacao-head-grid > .form-group .bootstrap-select,
-        .internacao-page .internacao-head-grid > .form-group .bootstrap-select > .dropdown-toggle {
-            min-height: 30px !important;
-            height: 30px !important;
-        }
-
-        .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control),
-        .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle {
-            background-color: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            color: #1f2937 !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, .95),
-                0 1px 2px rgba(15, 23, 42, .10) !important;
-        }
-
-        .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):hover,
-        .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle:hover {
-            border-color: #94a3b8 !important;
-        }
-
-        .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):focus,
-        .internacao-page .internacao-card .bootstrap-select.show > .dropdown-toggle,
-        .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle:focus {
-            border-color: #3b82f6 !important;
-            box-shadow:
-                0 0 0 .14rem rgba(59, 130, 246, .16),
-                0 1px 2px rgba(15, 23, 42, .10) !important;
-            outline: none !important;
-        }
-
-        .internacao-page .internacao-card :is(input.form-control, textarea.form-control)::placeholder {
-            color: #8b95a5 !important;
-            opacity: 1 !important;
-        }
-
-        .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):disabled,
-        .internacao-page .internacao-card :is(input.form-control, textarea.form-control)[readonly] {
-            background-color: #f8fafc !important;
-            border-color: #d4dce8 !important;
-            color: #6b7280 !important;
-        }
-
-        .assistenciais-row-full {
-            display: grid;
-            grid-template-columns: 3fr 3fr 2fr 1fr 1fr 2fr;
-            column-gap: 12px;
-            row-gap: 4px;
-            width: 100%;
-            align-items: end;
-        }
-
-        @media (max-width: 991.98px) {
-            .assistenciais-row-full {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .assistenciais-row-full {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Selects azuis - Tabelas Adicionais (nativo) */
-        #main-container .tabelas-adicionais-card select.select-purple,
-        #main-container .tabelas-adicionais-card select.detail-select {
-            background-color: #d7ebff !important;
-            color: #111827 !important;
-            border-color: #8fc7f5 !important;
-        }
-        /* Selects azuis - bootstrap-select: alvo é o BOTÃO */
-        #main-container .tabelas-adicionais-card .tabelas-selects .bootstrap-select > button.dropdown-toggle,
-        #main-container .tabelas-adicionais-card .tabelas-selects .bootstrap-select > button.dropdown-toggle .filter-option-inner-inner {
-            background-color: #d7ebff !important;
-            color: #111827 !important;
-            border-color: #8fc7f5 !important;
-            font-weight: 400 !important;
-        }
-    </style>
-
+    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
 
     <div class="internacao-page">
         <div class="internacao-page__hero">
@@ -1153,6 +953,7 @@
                 <?php include_once('formularios/form_cad_internacao_uti.php'); ?>
                 <?php include_once('formularios/form_cad_internacao_prorrog.php'); ?>
                 <?php include_once('formularios/form_cad_internacao_negoc.php'); ?>
+<<<<<<< HEAD
             </div>
 
         <style>
@@ -1642,6 +1443,9 @@
         </style>
 
         <input type="hidden" class="form-control" value="<?= ($ultimoReg + 1) ?>" id="fk_int_capeante"
+=======
+            </div><input type="hidden" class="form-control" value="<?= ($ultimoReg + 1) ?>" id="fk_int_capeante"
+>>>>>>> 408cc9d9544ef44cfea008b3fd4716458c7d6c66
             name="fk_int_capeante">
         <input type="hidden" class="form-control" value="n" id="encerrado_cap" name="encerrado_cap">
         <input type="hidden" class="form-control" value="s" id="aberto_cap" name="aberto_cap">
@@ -1694,38 +1498,49 @@
                         <span>Carregando dados do hospital…</span>
                     </div>
                     <div id="hospModalContent" style="display:none;">
-                        <div class="hosp-kpi-grid">
-                            <div class="hosp-kpi hosp-kpi--opportunity-low">
-                                <div class="hosp-kpi__icon" id="hkpi-opportunity-icon"><i class="bi bi-dash-circle-fill"></i></div>
-                                <small>Oportunidade de Negociação</small>
-                                <strong id="hkpi-opportunity-level">—</strong>
-                                <span class="hosp-kpi__sub" id="hkpi-opportunity-type">Tipo: —</span>
-                                <span class="hosp-kpi__sub" id="hkpi-neg-count">— negociações</span>
-                            </div>
-                            <div class="hosp-kpi hosp-kpi--red">
-                                <div class="hosp-kpi__icon"><i class="bi bi-x-circle"></i></div>
-                                <small>Glosas</small>
-                                <strong id="hkpi-glosa">—</strong>
-                                <span class="hosp-kpi__sub" id="hkpi-glosa-count">— contas com glosa</span>
-                            </div>
-                            <div class="hosp-kpi hosp-kpi--blue">
-                                <div class="hosp-kpi__icon"><i class="bi bi-calendar-week"></i></div>
-                                <small>Média de Permanência</small>
-                                <strong id="hkpi-mp">—</strong>
-                                <span class="hosp-kpi__sub" id="hkpi-mp-sub">— internações</span>
-                            </div>
-                            <div class="hosp-kpi hosp-kpi--orange">
-                                <div class="hosp-kpi__icon"><i class="bi bi-exclamation-triangle"></i></div>
-                                <small>Eventos Adversos</small>
-                                <strong id="hkpi-ea">—</strong>
-                                <span class="hosp-kpi__sub">registrados</span>
-                            </div>
-                            <div class="hosp-kpi hosp-kpi--purple">
-                                <div class="hosp-kpi__icon"><i class="bi bi-clock-history"></i></div>
-                                <small>Longa Permanência</small>
-                                <strong id="hkpi-lp">—</strong>
-                                <span class="hosp-kpi__sub" id="hkpi-lp-sub">MP: — dias</span>
-                            </div>
+                        <div class="hosp-kpi-table-wrap listagem-table-wrap">
+                            <table class="table table-sm table-striped table-hover table-condensed hosp-kpi-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Indicador</th>
+                                        <th scope="col">Valor</th>
+                                        <th scope="col">Detalhe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hosp-kpi-row hosp-kpi--opportunity-low" data-opportunity-row>
+                                        <td>
+                                            <span class="hosp-kpi__icon" id="hkpi-opportunity-icon"><i class="bi bi-dash-circle-fill"></i></span>
+                                            Oportunidade de Negociação
+                                        </td>
+                                        <td><strong id="hkpi-opportunity-level">—</strong></td>
+                                        <td>
+                                            <span id="hkpi-opportunity-type">Tipo: —</span>
+                                            <span id="hkpi-neg-count">— negociações</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="hosp-kpi-row hosp-kpi--red">
+                                        <td><span class="hosp-kpi__icon"><i class="bi bi-x-circle"></i></span>Glosas</td>
+                                        <td><strong id="hkpi-glosa">—</strong></td>
+                                        <td><span id="hkpi-glosa-count">— contas com glosa</span></td>
+                                    </tr>
+                                    <tr class="hosp-kpi-row hosp-kpi--blue">
+                                        <td><span class="hosp-kpi__icon"><i class="bi bi-calendar-week"></i></span>Média de Permanência</td>
+                                        <td><strong id="hkpi-mp">—</strong></td>
+                                        <td><span id="hkpi-mp-sub">— internações</span></td>
+                                    </tr>
+                                    <tr class="hosp-kpi-row hosp-kpi--orange">
+                                        <td><span class="hosp-kpi__icon"><i class="bi bi-exclamation-triangle"></i></span>Eventos Adversos</td>
+                                        <td><strong id="hkpi-ea">—</strong></td>
+                                        <td><span>em aberto</span></td>
+                                    </tr>
+                                    <tr class="hosp-kpi-row hosp-kpi--purple">
+                                        <td><span class="hosp-kpi__icon"><i class="bi bi-clock-history"></i></span>Longa Permanência</td>
+                                        <td><strong id="hkpi-lp">—</strong></td>
+                                        <td><span id="hkpi-lp-sub">MP: — dias</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div id="hospModalError" style="display:none;" class="alert alert-warning mb-0">
@@ -1734,64 +1549,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    <style>
-    .internacao-page { visibility: visible; }
-
-    .hosp-modal { border:0; border-radius:16px; overflow:hidden; }
-    .hosp-modal__header {
-        display:flex; align-items:center; justify-content:space-between;
-        padding:18px 24px;
-        background: linear-gradient(120deg, #1c4f80 0%, #2f6f9f 55%, #4a1d55 100%);
-        color:#fff;
-    }
-    .hosp-modal__title-wrap { display:flex; align-items:center; gap:14px; }
-    .hosp-modal__icon {
-        width:42px; height:42px; border-radius:10px;
-        background:rgba(255,255,255,.15);
-        display:flex; align-items:center; justify-content:center;
-        font-size:20px;
-    }
-    .hosp-modal__eyebrow { margin:0; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; opacity:.7; }
-    .hosp-modal__title   { margin:0; font-size:17px; font-weight:700; }
-    .hosp-modal__body    { padding:22px 24px; background:#f5f7fb; }
-    .hosp-modal__loading { display:flex; align-items:center; gap:12px; color:#6b7a8d; padding:12px 0; }
-    .hosp-kpi-grid {
-        display:grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap:12px;
-    }
-    @media(max-width:860px) { .hosp-kpi-grid { grid-template-columns: repeat(3,1fr); } }
-    @media(max-width:540px) { .hosp-kpi-grid { grid-template-columns: repeat(2,1fr); } }
-    .hosp-kpi {
-        background:#fff;
-        border-radius:12px;
-        padding:16px 14px 14px;
-        display:flex; flex-direction:column; align-items:center; text-align:center;
-        border-top:3px solid transparent;
-        box-shadow:0 2px 10px rgba(31,42,63,.07);
-        gap:4px;
-    }
-    .hosp-kpi__icon { font-size:22px; margin-bottom:4px; }
-    .hosp-kpi small { font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#7a8ea8; line-height:1.2; }
-    .hosp-kpi strong { font-size:20px; font-weight:800; color:#1a2d3e; line-height:1.1; }
-    .hosp-kpi__sub { font-size:11px; color:#9baab8; }
-    .hosp-kpi--opportunity-low { border-color:#22c55e; }
-    .hosp-kpi--opportunity-low .hosp-kpi__icon,
-    .hosp-kpi--opportunity-low strong { color:#16a34a; }
-    .hosp-kpi--opportunity-medium { border-color:#f59e0b; }
-    .hosp-kpi--opportunity-medium .hosp-kpi__icon,
-    .hosp-kpi--opportunity-medium strong { color:#b7791f; }
-    .hosp-kpi--opportunity-high { border-color:#ef4444; }
-    .hosp-kpi--opportunity-high .hosp-kpi__icon,
-    .hosp-kpi--opportunity-high strong { color:#dc2626; }
-    .hosp-kpi--green  { border-color:#22c55e; } .hosp-kpi--green  .hosp-kpi__icon { color:#16a34a; }
-    .hosp-kpi--red    { border-color:#ef4444; } .hosp-kpi--red    .hosp-kpi__icon { color:#dc2626; }
-    .hosp-kpi--blue   { border-color:#2f6f9f; } .hosp-kpi--blue   .hosp-kpi__icon { color:#2f6f9f; }
-    .hosp-kpi--orange { border-color:#f97316; } .hosp-kpi--orange .hosp-kpi__icon { color:#ea6c10; }
-    .hosp-kpi--purple { border-color:#6b2b74; } .hosp-kpi--purple .hosp-kpi__icon { color:#6b2b74; }
-    </style>
-    <script>
+    </div><script>
     (function() {
         function set(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
         function setOpportunityKpi(op) {
@@ -1801,7 +1559,7 @@
             var icon = /^[a-z0-9-]+$/i.test(String(op.icon || '')) ? op.icon : 'bi-check-circle-fill';
             var type = op.tipo || 'Monitoramento preventivo';
             var iconWrap = document.getElementById('hkpi-opportunity-icon');
-            var card = iconWrap ? iconWrap.closest('.hosp-kpi') : null;
+            var card = iconWrap ? iconWrap.closest('[data-opportunity-row]') : null;
 
             if (iconWrap) {
                 iconWrap.innerHTML = '<i class="bi ' + icon + '"></i>';
@@ -1845,14 +1603,14 @@
                     if (!payload.success || !payload.data) { errBox.style.display = 'block'; return; }
                     var d = payload.data;
                     setOpportunityKpi(d.oportunidade_negociacao);
-                    set('hkpi-neg-count',  (d.negociacoes ?? 0) + ' negociações');
+                    set('hkpi-neg-count',  (d.negociacoes ?? 0) + ' negociações atuais');
                     set('hkpi-glosa',      'R$ ' + Number(d.total_glosa ?? 0).toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0}));
                     var glosaTipos = Array.isArray(d.glosa_tipos) ? d.glosa_tipos : [];
                     set('hkpi-glosa-count', glosaTipos.length
                         ? 'Top: ' + glosaTipos.map(function(item) { return item.tipo || 'Glosa'; }).join(', ')
-                        : (d.qtd_glosa ?? 0) + ' contas com glosa');
+                        : (d.qtd_glosa ?? 0) + ' contas ativas com glosa');
                     set('hkpi-mp',         (d.mp_hospital ?? 0) + ' dias');
-                    set('hkpi-mp-sub',     (d.total_internacoes ?? 0) + ' internações');
+                    set('hkpi-mp-sub',     (d.total_internacoes ?? 0) + ' internações ativas');
                     set('hkpi-ea',         d.eventos_adversos ?? 0);
                     set('hkpi-lp',         (d.long_stay ?? 0) + ' casos');
                     set('hkpi-lp-sub',     'MP: ' + (d.mp_long ?? 0) + ' dias');
@@ -1979,6 +1737,8 @@
                     var select = wrapper.querySelector('select');
                     if (!select) return;
                     var hasPicker = !!wrapper.querySelector('.bootstrap-select');
+                    var hasValue = !!select.value;
+                    wrapper.classList.toggle('has-value', hasValue);
                     if (hasPicker || !select.classList.contains('selectpicker')) {
                         wrapper.classList.add('picker-ready');
                     }
@@ -1987,8 +1747,15 @@
 
             syncAssistClearButtons();
 
+            document.querySelectorAll('.assist-select-clear select').forEach(function(select) {
+                select.addEventListener('change', syncAssistClearButtons);
+            });
+
             if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
                 window.jQuery('#fk_cid_int, #fk_patologia2').on('loaded.bs.select rendered.bs.select refreshed.bs.select', function() {
+                    syncAssistClearButtons();
+                });
+                window.jQuery('#fk_cid_int, #fk_patologia2').on('changed.bs.select change', function() {
                     syncAssistClearButtons();
                 });
                 setTimeout(syncAssistClearButtons, 0);
@@ -2006,6 +1773,7 @@
                         window.jQuery(select).selectpicker('val', '');
                     }
                     select.dispatchEvent(new Event('change', { bubbles: true }));
+                    syncAssistClearButtons();
                 });
             });
         });

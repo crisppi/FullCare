@@ -203,6 +203,18 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
         'ordenar'           => $ordenar,
         'limite_pag'        => $limite_pag,
     ];
+    $rahExportBaseParams = array_filter(array_merge($rahPaginationBaseParams, [
+        'rah_context' => $rahListContext,
+    ]), function ($value) {
+        return $value !== null && $value !== '';
+    });
+    $rahExportFilteredUrl = rtrim($BASE_URL, '/') . '/exportar_excel_capeantes_rah.php?' . http_build_query(array_merge($rahExportBaseParams, [
+        'export_scope' => 'filtered',
+    ]));
+    $rahExportCurrentPageUrl = rtrim($BASE_URL, '/') . '/exportar_excel_capeantes_rah.php?' . http_build_query(array_merge($rahExportBaseParams, [
+        'export_scope' => 'current_page',
+        'pag' => max(1, (int)($_GET['pag'] ?? 1)),
+    ]));
 
     if (!function_exists('buildRahPaginationUrl')) {
         function buildRahPaginationUrl(string $action, array $baseParams, array $override = []): string
@@ -351,6 +363,27 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                 }
                 ?>
                 </h1>
+            </div>
+            <div class="listagem-hero__actions">
+                <div class="dropdown fc-export-dropdown">
+                    <button type="button" class="btn listagem-btn-top listagem-btn-top--green dropdown-toggle"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-file-excel listagem-btn-top__icon" aria-hidden="true"></i>
+                        Exportar Excel
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a href="<?= htmlspecialchars($rahExportFilteredUrl, ENT_QUOTES, 'UTF-8') ?>"
+                            class="dropdown-item js-rah-export-link" data-export-scope="filtered">
+                            <span class="fc-export-dropdown__title">Exportar todos os resultados filtrados</span>
+                            <span class="fc-export-dropdown__help">Inclui todos os registros encontrados pelos filtros atuais.</span>
+                        </a>
+                        <a href="<?= htmlspecialchars($rahExportCurrentPageUrl, ENT_QUOTES, 'UTF-8') ?>"
+                            class="dropdown-item js-rah-export-link" data-export-scope="current_page">
+                            <span class="fc-export-dropdown__title">Exportar apenas esta página</span>
+                            <span class="fc-export-dropdown__help">Inclui somente os registros visíveis agora.</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -847,8 +880,8 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                     </table>
                     <?php endif; ?>
 
-                    <div style="display:flex;margin:10px 25px 25px 25px;align-items:center;gap:16px;">
-                        <div class="pagination" style="margin:10px auto;">
+                    <div>
+                        <div class="pagination" style="margin: 0 auto;">
                             <?php if (!empty($havePages) && $havePages): ?>
                             <ul class="pagination">
                                 <?php
@@ -865,7 +898,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($firstPageUrl) ?>"
                                         onclick="return paginateRah('<?= htmlspecialchars($firstPageUrl, ENT_QUOTES) ?>');">
-                                        <i class="fa-solid fa-angles-left"></i>
+                                        <i class="fas fa-angle-double-left"></i>
                                     </a>
                                 </li>
                                 <?php endif; ?>
@@ -880,7 +913,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                 <li class="page-item">
                                     <a class="page-link" href="<?= htmlspecialchars($prevPageUrl) ?>"
                                         onclick="return paginateRah('<?= htmlspecialchars($prevPageUrl, ENT_QUOTES) ?>');">
-                                        <i class="fa-solid fa-angle-left"></i>
+                                        <i class="fas fa-angle-left"></i>
                                     </a>
                                 </li>
                                 <?php endif; ?>
@@ -910,7 +943,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($nextPageUrl) ?>"
                                         onclick="return paginateRah('<?= htmlspecialchars($nextPageUrl, ENT_QUOTES) ?>');">
-                                        <i class="fa-solid fa-angle-right"></i>
+                                        <i class="fas fa-angle-right"></i>
                                     </a>
                                 </li>
                                 <?php endif; ?>
@@ -925,7 +958,7 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($lastPageUrl) ?>"
                                         onclick="return paginateRah('<?= htmlspecialchars($lastPageUrl, ENT_QUOTES) ?>');">
-                                        <i class="fa-solid fa-angles-right"></i>
+                                        <i class="fas fa-angle-double-right"></i>
                                     </a>
                                 </li>
                                 <?php endif; ?>
@@ -934,8 +967,8 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                         </div>
 
                         <div class="table-counter">
-                            <p
-                                style="font-size:1em;font-weight:600;font-family:var(--bs-font-sans-serif);text-align:right;margin:0;">
+                            <p style="margin-bottom:18px;font-size:.82rem; font-weight:600;
+                                      font-family:var(--bs-font-sans-serif); text-align:right">
                                 <?php echo "Total: " . (int)$qtdIntItens ?>
                             </p>
                         </div>
@@ -1029,6 +1062,33 @@ $(document).ready(function() {
 
     $('#id_hosp_nome').on('input change blur', syncHospitalIdFromName);
     $('#select-internacao-form').on('submit', syncHospitalIdFromName);
+
+    function getRahCurrentPageNumber() {
+        var activeText = $('.pagination .page-item.active .page-link').first().text();
+        var activePage = parseInt(activeText, 10);
+        if (activePage > 0) {
+            return activePage;
+        }
+        var urlPage = parseInt(new URLSearchParams(window.location.search).get('pag') || '1', 10);
+        return urlPage > 0 ? urlPage : 1;
+    }
+
+    function buildRahExportUrl(scope) {
+        syncHospitalIdFromName();
+        var params = new URLSearchParams($('#select-internacao-form').serialize());
+        params.set('rah_context', '<?= htmlspecialchars($rahListContext, ENT_QUOTES, 'UTF-8') ?>');
+        params.set('export_scope', scope === 'current_page' ? 'current_page' : 'filtered');
+        if (scope === 'current_page') {
+            params.set('pag', getRahCurrentPageNumber());
+        } else {
+            params.delete('pag');
+        }
+        return '<?= rtrim($BASE_URL, '/') ?>/exportar_excel_capeantes_rah.php?' + params.toString();
+    }
+
+    $(document).on('click', '.js-rah-export-link', function() {
+        this.href = buildRahExportUrl($(this).data('export-scope'));
+    });
 });
 
 // Carregamento inicial

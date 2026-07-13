@@ -7,6 +7,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FullCare</title>
+    <link rel="icon" type="image/png" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
+    <link rel="shortcut icon" type="image/png" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/assets/fullcare-icon.png') ?>">
     <link rel="icon" type="image/x-icon" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/img/full-ico.ico') ?>">
     <link rel="shortcut icon" type="image/x-icon" href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/img/full-ico.ico') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,14 +21,34 @@
     body {
         font-family: 'Inter', sans-serif;
         display: flex;
+        align-items: center;
+        justify-content: center;
         min-height: 100vh;
         overflow: hidden;
         opacity: 0;
         animation: fadeIn .35s ease-in forwards;
-        background: #f5f8fc;
+        padding: clamp(18px, 2vw, 30px);
+        background:
+            radial-gradient(circle at 9% 12%, rgba(79, 172, 222, .14), transparent 28%),
+            radial-gradient(circle at 92% 85%, rgba(107, 43, 116, .10), transparent 32%),
+            #e9f0f7;
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
+
+    .login-shell {
+        width: min(100%, 1840px);
+        min-height: calc(100vh - clamp(36px, 4vw, 60px));
+        display: flex;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        border-radius: 28px;
+        background: #f5f8fc;
+        box-shadow:
+            0 26px 80px rgba(14, 40, 68, .28),
+            0 8px 24px rgba(14, 40, 68, .12);
+    }
 
     /* ── Left panel ─────────────────────────────────────── */
     .lp {
@@ -39,12 +62,10 @@
         overflow: hidden;
         z-index: 2;
         margin-right: -64px;
-        clip-path: url(#loginCurveClip);
-        filter:
-            drop-shadow(12px 0 12px rgba(4, 14, 27, .55))
-            drop-shadow(26px 0 28px rgba(4, 14, 27, .38))
-            drop-shadow(54px 0 68px rgba(47, 111, 159, .32))
-            drop-shadow(88px 0 110px rgba(47, 111, 159, .20));
+        border-radius: 28px 68px 68px 28px;
+        box-shadow:
+            18px 0 26px rgba(4, 14, 27, .32),
+            46px 0 72px rgba(47, 111, 159, .22);
         background:
             radial-gradient(ellipse at 12% 0%, rgba(95, 164, 208, .14) 0%, transparent 46%),
             radial-gradient(ellipse at 86% 100%, rgba(103, 70, 139, .26) 0%, transparent 54%),
@@ -147,8 +168,8 @@
 
     /* ── Right panel ────────────────────────────────────── */
     .rp {
-        width: min(42%, 560px);
-        flex-shrink: 0;
+        flex: 1 1 auto;
+        min-width: 420px;
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -159,6 +180,7 @@
         position: relative;
         overflow: hidden;
         z-index: 1;
+        border-radius: 0;
         box-shadow:
             inset 46px 0 58px rgba(55, 111, 151, .30),
             inset 18px 0 22px rgba(13, 32, 56, .18);
@@ -371,12 +393,27 @@
 
     /* ── Responsive ─────────────────────────────────────── */
     @media (max-width: 860px) {
+        body {
+            padding: 0;
+            background: #f5f8fc;
+        }
+
+        .login-shell {
+            width: 100%;
+            min-height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+            background: #f5f8fc;
+        }
+
         .lp { display: none; }
         .rp {
             width: 100%;
+            min-width: 0;
             min-height: 100vh;
             margin-left: 0;
             padding: 48px 28px;
+            border-radius: 0;
         }
     }
 
@@ -396,6 +433,7 @@
         </defs>
     </svg>
 
+    <main class="login-shell" aria-label="Acesso FullCare">
     <!-- ── Left panel ── -->
     <div class="lp">
         <div class="lp-logo">
@@ -481,6 +519,7 @@
 
         <div class="version-badge">v<?= htmlspecialchars($currentAppVersion) ?></div>
     </div>
+    </main>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {

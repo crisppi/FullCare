@@ -124,7 +124,7 @@ $int_gestao = $gestao->findByIdInt($intern['id_internacao']);
 $tussGeral = $tuss->findAll();
 
 ?>
-<div id="main-container" style="background-color:#f0f2f4ff;padding:12px 10px;">
+<div id="main-container" class="form-surface-shell internacao-surface-shell">
 
     <?php include_once('formularios/form_edit_internacao.php'); ?>
 

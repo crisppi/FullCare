@@ -944,7 +944,9 @@ $pageContents = <<< EOPAGE
   	<meta name="viewport" content="width=device-width">
   	<link id="stylecall" rel="stylesheet" href="wampthemes/classic/style.css" />
   	<link id="stylecall" rel="stylesheet" href="wampthemes/popupmodal.css" />
-		<link rel="shortcut icon" href="favicon.ico" type="image/ico" />
+		<link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2" />
+		<link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2" />
+		<link rel="apple-touch-icon" href="/FullCare/assets/fullcare-icon.png?v=fullcare2" />
 		<style>
 			#divleft {
 				width:69%;float:left;border-right:1px solid black;

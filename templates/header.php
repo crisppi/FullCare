@@ -57,6 +57,10 @@ $defaultFoto = $BASE_URL . 'uploads/usuarios/default-user.jpeg';
 
 $sessionNivel = isset($_SESSION['nivel']) ? (int) $_SESSION['nivel'] : 0;
 $sessionUsuario = $_SESSION['usuario_user'] ?? '';
+$sessionUsuarioPrimeiroNome = trim((string)$sessionUsuario);
+if ($sessionUsuarioPrimeiroNome !== '') {
+    $sessionUsuarioPrimeiroNome = preg_split('/\s+/u', $sessionUsuarioPrimeiroNome)[0] ?? $sessionUsuarioPrimeiroNome;
+}
 $sessionIdUsuario = $_SESSION['id_usuario'] ?? null;
 $normAccess = function ($txt) {
     $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
@@ -261,8 +265,9 @@ if (!empty($sessionIdUsuario)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FullCare</title>
     <base href="<?= $BASE_URL ?>">
-    <link rel="icon" type="image/x-icon" href="<?= $BASE_URL ?>img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/../img/full-ico.ico') ?>">
-    <link rel="shortcut icon" type="image/x-icon" href="<?= $BASE_URL ?>img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/../img/full-ico.ico') ?>">
+    <link rel="icon" type="image/png" href="<?= $BASE_URL ?>assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
+    <link rel="shortcut icon" type="image/png" href="<?= $BASE_URL ?>assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= $BASE_URL ?>assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -961,7 +966,7 @@ if (!empty($sessionIdUsuario)) {
                         </div>
                         <div class="content">
                             <button type="button" class="js-acc-btn account-user-trigger" aria-expanded="false">
-                                <span class="account-user-name"><?= htmlspecialchars((string)$sessionUsuario, ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="account-user-name" title="<?= htmlspecialchars((string)$sessionUsuario, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$sessionUsuarioPrimeiroNome, ENT_QUOTES, 'UTF-8') ?></span>
                                 <i class="bi bi-chevron-down account-user-caret" aria-hidden="true"></i>
                             </button>
                         </div>

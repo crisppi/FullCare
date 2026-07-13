@@ -5,6 +5,10 @@
 <!-- Versão: 1.0 -->
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br">
 	<head>
+    <link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="apple-touch-icon" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+
 		<title>Simples Formulário Ajax - Thiengo [Calopsita]</title>
 	</head>
 	

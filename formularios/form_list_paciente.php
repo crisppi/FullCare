@@ -490,7 +490,7 @@
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($firstPageUrl) ?>"
                                         onclick="return paginatePacientes('<?= htmlspecialchars($firstPageUrl, ENT_QUOTES) ?>');">
-                                        <i class="fa-solid fa-angles-left"></i>
+                                        <i class="fas fa-angle-double-left"></i>
                                     </a>
                                 </li>
                                 <?php endif; ?>
@@ -504,7 +504,7 @@
                                 <li class="page-item">
                                     <a class="page-link" href="<?= htmlspecialchars($prevPageUrl) ?>"
                                         onclick="return paginatePacientes('<?= htmlspecialchars($prevPageUrl, ENT_QUOTES) ?>');">
-                                        <i class="fa-solid fa-angle-left"></i>
+                                        <i class="fas fa-angle-left"></i>
                                     </a>
                                 </li>
                                 <?php endif; ?>
@@ -535,7 +535,7 @@
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($nextPageUrl) ?>"
                                         onclick="return paginatePacientes('<?= htmlspecialchars($nextPageUrl, ENT_QUOTES) ?>');"><i
-                                            class="fa-solid fa-angle-right"></i></a>
+                                            class="fas fa-angle-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                                 <?php if ($current_block < $last_block): ?>
@@ -548,7 +548,7 @@
                                 <li class="page-item">
                                     <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($lastPageUrl) ?>"
                                         onclick="return paginatePacientes('<?= htmlspecialchars($lastPageUrl, ENT_QUOTES) ?>');"><i
-                                            class="fa-solid fa-angles-right"></i></a>
+                                            class="fas fa-angle-double-right"></i></a>
                                 </li>
                                 <?php endif; ?>
                             </ul>

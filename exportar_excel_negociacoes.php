@@ -33,6 +33,17 @@ $data_ini       = getParam('data_ini', '');
 $data_fim       = getParam('data_fim', '');
 $saving_min     = getParam('saving_min', '');
 $ordenar        = getParam('ordenar', 'ng.data_inicio_neg DESC');
+$limite         = max(1, min(5000, (int)getParam('limite', 20)));
+$paginaAtual    = max(1, (int)getParam('pag', 1));
+$exportScope    = getParam('export_scope', 'filtered') === 'current_page' ? 'current_page' : 'filtered';
+
+$orderOptions = [
+    'data_recente' => 'ng.data_inicio_neg DESC',
+    'data_antiga'  => 'ng.data_inicio_neg ASC',
+    'saving_desc'  => 'ng.saving DESC',
+    'saving_asc'   => 'ng.saving ASC',
+];
+$ordenar = $orderOptions[$ordenar] ?? $ordenar;
 
 if ($data_ini && !$data_fim) {
     $data_fim = $data_ini;
@@ -59,11 +70,32 @@ if ($saving_min !== '' && is_numeric($saving_min)) {
 }
 
 $where = implode(' AND ', $condicoes);
-$dados = $negociacaoDao->selectNegociacoesDetalhes($where, $ordenar, null);
+$limiteExport = null;
+if ($exportScope === 'current_page') {
+    $offsetExport = ($paginaAtual - 1) * $limite;
+    $limiteExport = $offsetExport . ',' . $limite;
+}
+$dados = $negociacaoDao->selectNegociacoesDetalhes($where, $ordenar, $limiteExport);
 
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle('Negociacoes');
+
+$headers = [
+    'ID Internação',
+    'Senha',
+    'Matrícula',
+    'Hospital',
+    'Paciente',
+    'Tipo',
+    'Troca de',
+    'Troca para',
+    'Quantidade',
+    'Saving',
+    'Data início',
+    'Data fim',
+    'Auditor'
+];
 
 $logoPath = __DIR__ . '/img/LogoConexAud.png';
 if (file_exists($logoPath)) {
@@ -87,22 +119,6 @@ $sheet->mergeCells('D2:' . $lastCol . '2');
 
 $sheet->setShowGridlines(false);
 $headerRow = 6;
-
-$headers = [
-    'ID Internação',
-    'Senha',
-    'Matrícula',
-    'Hospital',
-    'Paciente',
-    'Tipo',
-    'Troca de',
-    'Troca para',
-    'Quantidade',
-    'Saving',
-    'Data início',
-    'Data fim',
-    'Auditor'
-];
 
 $sheet->fromArray($headers, null, 'A' . $headerRow);
 

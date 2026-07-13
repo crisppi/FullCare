@@ -300,14 +300,14 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
                                     onclick="loadContent('list_hospitalUser.php?pesquisa_nome=<?php print $pesquisa_nome ?>&pesquisa_user=<?php print $busca_user ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print 1 ?>&bl=<?php print 0 ?>')">
-                                    <i class="fa-solid fa-angles-left"></i></a>
+                                    <i class="fas fa-angle-double-left"></i></a>
                             </li>
                             <?php endif; ?>
                             <?php if ($current_block <= $last_block && $last_block > 1 && $current_block != 1): ?>
                             <li class="page-item">
                                 <a class="page-link" href="#"
                                     onclick="loadContent('list_hospitalUser.php?pesquisa_nome=<?php print $busca ?>&pesquisa_user=<?php print $busca_user ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual - 1 ?>&bl=<?php print $blocoAtual - 5 ?>')">
-                                    <i class="fa-solid fa-angle-left"></i> </a>
+                                    <i class="fas fa-angle-left"></i> </a>
                             </li>
                             <?php endif; ?>
 
@@ -325,14 +325,14 @@ if ($qtdIntItens > $limite) {
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
                                     onclick="loadContent('list_hospitalUser.php?pesquisa_nome=<?php print $busca ?>&pesquisa_user=<?php print $busca_user ?>&limite=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print $paginaAtual + 1 ?>&bl=<?php print $blocoAtual + 5 ?>')"><i
-                                        class="fa-solid fa-angle-right"></i></a>
+                                        class="fas fa-angle-right"></i></a>
                             </li>
                             <?php endif; ?>
                             <?php if ($current_block < $last_block): ?>
                             <li class="page-item">
                                 <a class="page-link" id="blocoNovo" href="#"
                                     onclick="loadContent('list_hospitalUser.php?pesquisa_nome=<?php print $busca ?>&pesquisa_user=<?php print $busca_user ?>&pesquisa_pac=<?php print $pesquisa_pac ?>&pesqInternado=<?php print $pesqInternado ?>&limite_pag=<?php print $limite ?>&ordenar=<?php print $ordenar ?>&pag=<?php print count($paginas) ?>&bl=<?php print ($last_block - 1) * 5 ?>')"><i
-                                        class="fa-solid fa-angles-right"></i></a>
+                                        class="fas fa-angle-double-right"></i></a>
                             </li>
                             <?php endif; ?>
                         </ul>

@@ -344,14 +344,58 @@ if (!function_exists('sel')) {
 
 ?>
 <style>
+    #container-negoc .edit-negoc-card {
+        margin: 0 !important;
+        padding: 14px 16px !important;
+        border: 1px solid #dbe4ef !important;
+        border-radius: 12px !important;
+        background: #fff !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .05) !important;
+    }
+
+    #container-negoc .edit-negoc-card__header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    #container-negoc .edit-negoc-card__marker {
+        width: 5px;
+        height: 22px;
+        border-radius: 999px;
+        background: #8b5cf6;
+        flex: 0 0 auto;
+    }
+
+    #container-negoc .edit-negoc-card__title {
+        margin: 0;
+        color: #1f2937;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
     .negoc-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-        gap: 14px;
+        grid-template-columns: minmax(180px, 1.25fr) minmax(120px, .7fr) minmax(120px, .7fr) minmax(170px, 1.1fr) minmax(170px, 1.1fr) minmax(80px, .45fr) minmax(100px, .55fr) 86px;
+        gap: 8px;
         align-items: end;
         width: 100%;
-        margin-bottom: 12px;
-        background: #f5f5f9
+        margin: 0 0 10px;
+        padding: 0;
+        background: transparent;
+    }
+
+    #container-negoc .edit-negoc-card .negoc-row {
+        display: grid !important;
+        grid-template-columns: minmax(180px, 1.25fr) minmax(120px, .7fr) minmax(120px, .7fr) minmax(170px, 1.1fr) minmax(170px, 1.1fr) minmax(80px, .45fr) minmax(100px, .55fr) 86px !important;
+        gap: 8px !important;
+        align-items: end !important;
+        width: 100% !important;
+        margin: 0 0 10px !important;
+        padding: 0 !important;
+        background: transparent !important;
     }
 
     .negoc-row > .form-group[class*="col-"] {
@@ -364,21 +408,39 @@ if (!function_exists('sel')) {
     }
 
     .negoc-row label {
+        min-height: 0 !important;
+        margin-bottom: 2px !important;
+        color: #5b6472;
         font-weight: 600;
-        font-size: .9rem;
-        margin-bottom: 4px
+        font-size: .68rem !important;
+        line-height: 1.08;
     }
 
     .negoc-row .form-control {
         width: 100%;
-        min-height: 42px;
-        font-size: .9rem;
-        padding: 4px 6px
+        min-height: 32px !important;
+        height: 32px !important;
+        padding: 3px 10px !important;
+        border-color: #cbd8e6 !important;
+        border-radius: 8px !important;
+        background-color: #f8fafc !important;
+        color: #1f2937;
+        font-size: .74rem !important;
+        font-weight: 600;
+        line-height: 1.15 !important;
+        box-shadow: none !important;
     }
 
     .negoc-row .btn {
-        font-size: .85rem;
-        padding: 4px 8px
+        min-width: 32px;
+        width: 32px;
+        height: 32px;
+        min-height: 32px;
+        padding: 0;
+        border-radius: 8px;
+        font-size: .9rem;
+        font-weight: 800;
+        line-height: 1;
     }
 
     .negoc-row__actions {
@@ -439,6 +501,16 @@ if (!function_exists('sel')) {
 
     #container-negoc {
 
+    }
+
+    @media (max-width: 1500px) {
+        #container-negoc .edit-negoc-card .negoc-row {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+        }
+
+        .negoc-row__actions {
+            justify-content: flex-start;
+        }
     }
 </style>
 
@@ -608,8 +680,11 @@ if (!function_exists('sel')) {
     };
 </script>
 
-<div>
-    <h4 class="mb-3">Editar Negociação</h4>
+<div class="adicional-card adicional-card--negoc edit-negoc-card">
+    <div class="edit-negoc-card__header">
+        <span class="edit-negoc-card__marker"></span>
+        <h4 class="edit-negoc-card__title">Editar Negociação</h4>
+    </div>
 
 
     <!-- garante que cai no fluxo UPDATE/CREATE -->
@@ -677,7 +752,7 @@ if (!function_exists('sel')) {
                 }
             }
             ?>
-            <div  class="negociation-field-container negoc-row">
+            <div class="negociation-field-container negotiation-field-container negoc-row">
                 <input type="hidden" name="neg_id" value="<?= h($neg['id_negociacao'] ?? '') ?>">
                 <div class="form-group col-sm-2">
                     <label>
@@ -753,7 +828,7 @@ if (!function_exists('sel')) {
         <?php endforeach; ?>
     </div>
     <template id="negotiationRowTemplate">
-        <div class="negociation-field-container negoc-row">
+        <div class="negociation-field-container negotiation-field-container negoc-row">
             <input type="hidden" name="neg_id" value="">
             <div class="form-group col-sm-2">
                 <label>
@@ -801,7 +876,6 @@ if (!function_exists('sel')) {
             </div>
         </div>
     </template>
-    <hr>
 </div>
 
 <script>

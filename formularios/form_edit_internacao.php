@@ -398,6 +398,7 @@
 
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
+    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
     <style>
         .internacao-page {
             visibility: hidden;
@@ -496,11 +497,22 @@
         }
 
         .edit-secondary-row {
-            display: grid;
-            grid-template-columns: 3fr 3fr 2fr 1fr 1fr 2fr;
-            gap: 12px;
-            align-items: end;
-            width: 100%;
+            display: grid !important;
+            grid-template-columns: minmax(260px, 2fr) minmax(260px, 2fr) minmax(170px, 1.15fr) minmax(150px, 1fr) minmax(130px, .8fr) minmax(170px, 1fr) !important;
+            gap: 8px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin: 4px 0 0 !important;
+        }
+
+        .edit-secondary-row > .form-group {
+            width: auto !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            flex: none !important;
+            margin: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
         }
 
         .edit-alta-row {
@@ -517,6 +529,9 @@
         .edit-primary-row .form-control-sm,
         .edit-top-row .form-control,
         .edit-top-row .form-control-sm,
+        .edit-secondary-row .form-control,
+        .edit-secondary-row .form-control-sm,
+        .edit-secondary-row .bootstrap-select > .dropdown-toggle,
         .edit-alta-row .form-control,
         .edit-alta-row .form-control-sm {
             min-height: 44px;
@@ -532,6 +547,18 @@
         .assist-select-clear .bootstrap-select,
         .assist-select-clear>select {
             width: 100% !important;
+        }
+
+        @media (max-width: 1199.98px) {
+            .edit-secondary-row {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .edit-secondary-row {
+                grid-template-columns: 1fr !important;
+            }
         }
 
         #fk_cid_int.selectpicker.bs-select-hidden,
@@ -1559,7 +1586,7 @@
                             </select>
                         </div>
 
-                        <div id="medicacaoDet" class="form-group col-sm-3">
+                        <div id="medicacaoDet" class="form-group col-sm-3<?= $val('medic_alto_custo_det') === 's' ? '' : ' is-hidden' ?>">
                             <label class="control-label" for="qual_medicamento_det">Medicação alto custo</label>
                             <input class="form-control-sm form-control" type="text" name="qual_medicamento_det"
                                 id="qual_medicamento_det" value="<?= $val('qual_medicamento_det') ?>">
@@ -1634,9 +1661,6 @@
                             </select>
                         </div>
 
-                    </div>
-                    <div>
-                        <hr>
                     </div>
                 </div>
                 </div>
@@ -1825,6 +1849,67 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            function syncAssistClearButtons() {
+                document.querySelectorAll('.assist-select-clear').forEach(function(wrapper) {
+                    var select = wrapper.querySelector('select');
+                    if (!select) return;
+                    var hasPicker = !!wrapper.querySelector('.bootstrap-select');
+                    wrapper.classList.toggle('has-value', !!select.value);
+                    if (hasPicker || !select.classList.contains('selectpicker')) {
+                        wrapper.classList.add('picker-ready');
+                    }
+                });
+            }
+
+            syncAssistClearButtons();
+
+            document.querySelectorAll('.assist-select-clear select').forEach(function(select) {
+                select.addEventListener('change', syncAssistClearButtons);
+            });
+
+            function syncSelectPlaceholders() {
+                document.querySelectorAll('.internacao-page .tabelas-adicionais-card select, #tabelas-adicionais-paineis-edit select, #detalhes-card-wrapper select').forEach(function(select) {
+                    select.classList.toggle('select-placeholder', !select.value);
+                });
+            }
+
+            syncSelectPlaceholders();
+
+            document.querySelectorAll('.internacao-page .tabelas-adicionais-card select, #tabelas-adicionais-paineis-edit select, #detalhes-card-wrapper select').forEach(function(select) {
+                select.addEventListener('change', syncSelectPlaceholders);
+            });
+
+            var medicacaoSelect = document.getElementById('medic_alto_custo_det');
+            var medicacaoDetalhe = document.getElementById('medicacaoDet');
+
+            function syncMedicacaoDetalhe() {
+                if (!medicacaoSelect || !medicacaoDetalhe) return;
+                medicacaoDetalhe.classList.toggle('is-hidden', medicacaoSelect.value !== 's');
+            }
+
+            syncMedicacaoDetalhe();
+
+            if (medicacaoSelect) {
+                medicacaoSelect.addEventListener('change', syncMedicacaoDetalhe);
+                if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
+                    window.jQuery(medicacaoSelect).on('changed.bs.select rendered.bs.select refreshed.bs.select change', syncMedicacaoDetalhe);
+                }
+            }
+
+            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
+                window.jQuery('#fk_cid_int, #fk_patologia2').on('loaded.bs.select rendered.bs.select refreshed.bs.select changed.bs.select change', function() {
+                    syncAssistClearButtons();
+                });
+                window.jQuery('.internacao-page .tabelas-adicionais-card select, #tabelas-adicionais-paineis-edit select, #detalhes-card-wrapper select')
+                    .on('loaded.bs.select rendered.bs.select refreshed.bs.select changed.bs.select change', syncSelectPlaceholders);
+                setTimeout(syncAssistClearButtons, 0);
+                setTimeout(syncAssistClearButtons, 120);
+                setTimeout(syncAssistClearButtons, 300);
+                setTimeout(syncSelectPlaceholders, 0);
+                setTimeout(syncSelectPlaceholders, 120);
+                setTimeout(syncSelectPlaceholders, 300);
+            }
+
             document.querySelectorAll('[data-clear-select]').forEach(function(button) {
                 button.addEventListener('click', function() {
                     var targetId = button.getAttribute('data-clear-select');
@@ -1835,6 +1920,7 @@
                         window.jQuery(select).selectpicker('val', '');
                     }
                     select.dispatchEvent(new Event('change', { bubbles: true }));
+                    syncAssistClearButtons();
                 });
             });
         });
@@ -2270,7 +2356,11 @@
             visibility: visible;
         }
 
-        /* coloca no seu <head> ou no final do CSS carregado */
+        /* coloca no seu <head>
+    <link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+    <link rel="apple-touch-icon" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
+ ou no final do CSS carregado */
         .accordion .accordion-button {
             background-color: #5e2363;
             color: #fff;
@@ -3133,5 +3223,393 @@
             #tabelas-adicionais-paineis-edit .negotiation-field-container {
                 grid-template-columns: 1fr !important;
             }
+        }
+
+        /* Contraste visual alinhado ao cadastro de visita. */
+        #main-container:has(.internacao-page) {
+            background: linear-gradient(180deg, #e3e9f2 0%, #d8e1ec 100%) !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding: 6px 4px 18px !important;
+        }
+
+        #main-container .internacao-page {
+            width: 100% !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding: 4px 6px 18px !important;
+            border-radius: 12px !important;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04)),
+                #dfe7f1 !important;
+        }
+
+        @media (max-width: 575.98px) {
+            #main-container:has(.internacao-page) {
+                padding-left: 2px !important;
+                padding-right: 2px !important;
+            }
+
+            #main-container .internacao-page {
+                padding-left: 4px !important;
+                padding-right: 4px !important;
+            }
+        }
+
+        #main-container .internacao-page .internacao-page__content {
+            gap: 12px !important;
+        }
+
+        #main-container .internacao-page :is(.internacao-card, .tabelas-adicionais-card, #detalhes-card-wrapper) + :is(.internacao-card, .tabelas-adicionais-card, #detalhes-card-wrapper),
+        #main-container .internacao-page .internacao-card + .tabelas-adicionais-card,
+        #main-container .internacao-page .tabelas-adicionais-card + :is(#tabelas-adicionais-paineis-edit, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc),
+        #main-container .internacao-page :is(#tabelas-adicionais-paineis-edit, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) + :is(#tabelas-adicionais-paineis-edit, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) {
+            margin-top: 12px !important;
+        }
+
+        #main-container .internacao-page .internacao-card,
+        #main-container .internacao-page .tabelas-adicionais-card,
+        #main-container .internacao-page .clinical-text-field,
+        #main-container .internacao-page .ia-highlight-box,
+        #main-container .internacao-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .adicional-card,
+        #main-container .internacao-page #detalhes-card-wrapper {
+            background: #ffffff !important;
+            border: 1px solid #cfd9e7 !important;
+            box-shadow: 0 8px 18px rgba(36, 56, 79, .10) !important;
+        }
+
+        #main-container .internacao-page .internacao-card__header,
+        #main-container .internacao-page .tabelas-adicionais-card__header,
+        #main-container .internacao-page .clinical-text-field__head,
+        #main-container .internacao-page .ia-highlight-box__header {
+            border-bottom-color: #e0e7f0 !important;
+        }
+
+        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
+        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
+            background-color: #f8fbff !important;
+            border: 1px solid #aebdce !important;
+            color: #1f2937 !important;
+            box-shadow:
+                inset 0 1px 2px rgba(15, 23, 42, .08),
+                0 1px 0 rgba(255, 255, 255, .8) !important;
+        }
+
+        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):hover,
+        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle:hover {
+            border-color: #7f94aa !important;
+            background-color: #ffffff !important;
+        }
+
+        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):focus,
+        #main-container .internacao-page #myForm .bootstrap-select.show > .dropdown-toggle,
+        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle:focus {
+            border-color: #2f89bd !important;
+            background-color: #ffffff !important;
+            box-shadow:
+                0 0 0 .14rem rgba(47, 137, 189, .18),
+                inset 0 1px 2px rgba(15, 23, 42, .08) !important;
+        }
+
+        /* Reparos finais das tabelas adicionais na edicao: setas e escala compacta. */
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card .tabelas-selects select,
+            #tabelas-adicionais-paineis-edit select.form-control,
+            #detalhes-card-wrapper select.form-control
+        ) {
+            appearance: auto !important;
+            -webkit-appearance: auto !important;
+            -moz-appearance: auto !important;
+            background-image: initial !important;
+            padding-right: 24px !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects .bootstrap-select > .dropdown-toggle::after,
+        #main-container .internacao-page #tabelas-adicionais-paineis-edit .bootstrap-select > .dropdown-toggle::after,
+        #main-container .internacao-page #detalhes-card-wrapper .bootstrap-select > .dropdown-toggle::after {
+            display: inline-block !important;
+            margin-left: .255em !important;
+            vertical-align: .255em !important;
+            content: "" !important;
+            border-top: .3em solid !important;
+            border-right: .3em solid transparent !important;
+            border-bottom: 0 !important;
+            border-left: .3em solid transparent !important;
+        }
+
+        #main-container .internacao-page :is(
+            #tabelas-adicionais-paineis-edit #container-tuss,
+            #tabelas-adicionais-paineis-edit #container-prorrog,
+            #tabelas-adicionais-paineis-edit #container-gestao,
+            #tabelas-adicionais-paineis-edit #container-uti,
+            #tabelas-adicionais-paineis-edit #container-negoc
+        ) {
+            font-size: .78rem !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {
+            grid-column: span 6 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea textarea.form-control {
+            min-height: 56px !important;
+            height: auto !important;
+            font-size: .7rem !important;
+            line-height: 1.2 !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear {
+            position: relative !important;
+            overflow: visible !important;
+            min-height: 32px !important;
+            height: 32px !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear .bootstrap-select {
+            min-height: 32px !important;
+            height: 32px !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear .bootstrap-select > .dropdown-toggle {
+            min-height: 32px !important;
+            height: 32px !important;
+            padding-right: 42px !important;
+        }
+
+        #main-container .internacao-page .assist-clear-btn {
+            position: absolute !important;
+            top: 50% !important;
+            right: 25px !important;
+            z-index: 6 !important;
+            width: 16px !important;
+            height: 16px !important;
+            min-width: 16px !important;
+            min-height: 16px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: translateY(-50%) !important;
+            border: 0 !important;
+            border-radius: 999px !important;
+            background: rgba(94, 35, 99, .10) !important;
+            color: #5e2363 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            line-height: 16px !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear:not(.has-value) .assist-clear-btn {
+            display: none !important;
+        }
+
+        #main-container .internacao-page .assist-select-clear.has-value .assist-clear-btn {
+            display: inline-flex !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {
+            grid-column: 1 / -1 !important;
+        }
+
+        /* Padrao unico de seta dos selects: igual ao select nativo de Acomodacao. */
+        #main-container .internacao-page select.form-control,
+        #main-container .internacao-page select.form-select,
+        #main-container .internacao-page .tabelas-selects select,
+        #main-container .internacao-page :is(#detalhes-card-wrapper, #tabelas-adicionais-paineis-edit, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) select {
+            appearance: auto !important;
+            -webkit-appearance: auto !important;
+            -moz-appearance: auto !important;
+            background-image: none !important;
+            background-repeat: initial !important;
+            background-position: initial !important;
+            background-size: initial !important;
+            padding-right: 24px !important;
+        }
+
+        #main-container .internacao-page .bootstrap-select > .dropdown-toggle {
+            position: relative !important;
+            padding-right: 24px !important;
+        }
+
+        #main-container .internacao-page .bootstrap-select > .dropdown-toggle::after {
+            content: "" !important;
+            position: absolute !important;
+            right: 12px !important;
+            top: 50% !important;
+            display: block !important;
+            width: 0 !important;
+            height: 0 !important;
+            margin: -2px 0 0 0 !important;
+            vertical-align: 0 !important;
+            border-top: 5px solid #111827 !important;
+            border-right: 5px solid transparent !important;
+            border-bottom: 0 !important;
+            border-left: 5px solid transparent !important;
+            pointer-events: none !important;
+        }
+
+        /* Padrao atual do bloco Detalhes do relatorio no edit de internacao. */
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+            display: grid !important;
+            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+            gap: 8px 10px !important;
+            align-items: end !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .form-group {
+            width: auto !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            flex: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-1 {
+            grid-column: span 1 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-2 {
+            grid-column: span 2 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-3 {
+            grid-column: span 3 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .detalhes-full-textarea {
+            grid-column: 1 / -1 !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper #medicacaoDet.is-hidden {
+            display: none !important;
+        }
+
+        #main-container .internacao-page #detalhes-card-wrapper #qual_medicamento_det {
+            width: 100% !important;
+        }
+
+        @media (max-width: 1200px) {
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+                grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-1,
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-2,
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-3 {
+                grid-column: span 1 !important;
+            }
+        }
+
+        /* Placeholder dos selects nas tabelas adicionais: apenas option vazio. */
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #detalhes-card-wrapper,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) select:is(.form-control, .form-control-sm, .form-select, .select-purple, .detail-select):has(> option[value=""]:checked),
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) .bootstrap-select > .dropdown-toggle.bs-placeholder,
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) .bootstrap-select > .dropdown-toggle.bs-placeholder :is(.filter-option, .filter-option-inner, .filter-option-inner-inner) {
+            color: #c4c4c4 !important;
+            opacity: 1 !important;
+            font-weight: 500 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects :is(
+            #select_relatorio_detalhado.select-placeholder,
+            #select_tuss.select-placeholder,
+            #select_prorrog.select-placeholder,
+            #select_gestao.select-placeholder,
+            #select_uti.select-placeholder,
+            #select_negoc.select-placeholder
+        ),
+        #main-container .internacao-page #detalhes-card-wrapper :is(
+            #curativo_det.select-placeholder,
+            #dieta_det.select-placeholder,
+            #nivel_consc_det.select-placeholder,
+            #oxig_det.select-placeholder,
+            #hemoderivados_det.select-placeholder,
+            #dialise_det.select-placeholder,
+            #oxigenio_hiperbarica_det.select-placeholder,
+            #qt_det.select-placeholder,
+            #rt_det.select-placeholder,
+            #acamado_det.select-placeholder,
+            #atb_det.select-placeholder,
+            #braden_det.select-placeholder
+        ) {
+            color: #c4c4c4 !important;
+            opacity: 1 !important;
+            font-weight: 500 !important;
+        }
+
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #detalhes-card-wrapper,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) select.select-placeholder,
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #detalhes-card-wrapper,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) select.select-placeholder:focus {
+            color: #c4c4c4 !important;
+            opacity: 1 !important;
+            font-weight: 500 !important;
+        }
+
+        #main-container .internacao-page :is(
+            .tabelas-adicionais-card,
+            #tabelas-adicionais-paineis-edit,
+            #detalhes-card-wrapper,
+            #container-tuss,
+            #container-prorrog,
+            #container-gestao,
+            #container-uti,
+            #container-negoc
+        ) select option {
+            color: #1f2937 !important;
         }
     </style>

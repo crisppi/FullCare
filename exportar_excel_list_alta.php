@@ -72,10 +72,19 @@ $ordenar         = getParam('ordenar', 'id_internacao');
 $data_alta       = getParam('data_alta', '');
 $data_alta_max   = getParam('data_alta_max', '');
 $colsParam       = getParam('cols', ''); // campos vindos do modal (ex: "id_int,hosp,pac,tipo_alta,data_alta,uti")
+$exportScope     = getParam('export_scope', 'filtered') === 'current_page' ? 'current_page' : 'filtered';
+$paginaAtual     = max(1, (int)(getParam('pag', getParam('pg', 1))));
 
 // Se veio data_alta sem data_alta_max, usar hoje
 if ($data_alta && !$data_alta_max) {
     $data_alta_max = date('Y-m-d');
+}
+
+$limite = max(1, min(5000, $limite > 0 ? $limite : 10));
+$limiteExport = null;
+if ($exportScope === 'current_page') {
+    $offsetExport = ($paginaAtual - 1) * $limite;
+    $limiteExport = $offsetExport . ',' . $limite;
 }
 
 // -----------------------------------------------------
@@ -143,15 +152,14 @@ $labelsMap = [
 
 
 // -----------------------------------------------------
-// 5) Buscar dados na DAO (SEM paginação)
+// 5) Buscar dados na DAO
 // -----------------------------------------------------
 
 $altaDao = new altaDAO($conn, $BASE_URL);
 
 try {
     // assinatura: findAltaWhere($where, $order, $limit)
-    // para export, sem limite (pega todos os registros filtrados)
-    $registros = $altaDao->findAltaWhere($where, $order ?: null, null);
+    $registros = $altaDao->findAltaWhere($where, $order ?: null, $limiteExport);
 } catch (Throwable $e) {
     header('Content-Type: text/plain; charset=utf-8');
     echo "Erro ao buscar altas para exportação:\n\n";

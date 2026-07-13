@@ -571,10 +571,22 @@ $complexInfo = $complexMap[$effectiveLevel];
           <span class="badge bg-light text-dark border"><?= count($audHubPending) ?> item(ns)</span>
         </div>
         <div class="auditor-hub-kpis">
-          <div><small>Internações ativas</small><strong><?= (int)($audHubCounts['internacoes_ativas'] ?? 0) ?></strong></div>
-          <div><small>Visitas atrasadas</small><strong><?= (int)($audHubCounts['visitas_atrasadas'] ?? 0) ?></strong></div>
-          <div><small>Eventos</small><strong><?= (int)($audHubCounts['eventos_abertos'] ?? 0) ?></strong></div>
-          <div><small>Contas</small><strong><?= (int)($audHubCounts['contas_pendentes'] ?? 0) ?></strong></div>
+          <div class="auditor-hub-kpi">
+            <span class="auditor-hub-kpi__icon"><i class="bi bi-hospital"></i></span>
+            <span class="auditor-hub-kpi__text"><small>Internações ativas</small><strong><?= (int)($audHubCounts['internacoes_ativas'] ?? 0) ?></strong></span>
+          </div>
+          <div class="auditor-hub-kpi">
+            <span class="auditor-hub-kpi__icon"><i class="bi bi-calendar2-x"></i></span>
+            <span class="auditor-hub-kpi__text"><small>Visitas atrasadas</small><strong><?= (int)($audHubCounts['visitas_atrasadas'] ?? 0) ?></strong></span>
+          </div>
+          <div class="auditor-hub-kpi">
+            <span class="auditor-hub-kpi__icon"><i class="bi bi-exclamation-circle"></i></span>
+            <span class="auditor-hub-kpi__text"><small>Eventos</small><strong><?= (int)($audHubCounts['eventos_abertos'] ?? 0) ?></strong></span>
+          </div>
+          <div class="auditor-hub-kpi">
+            <span class="auditor-hub-kpi__icon"><i class="bi bi-receipt"></i></span>
+            <span class="auditor-hub-kpi__text"><small>Contas</small><strong><?= (int)($audHubCounts['contas_pendentes'] ?? 0) ?></strong></span>
+          </div>
         </div>
         <div class="auditor-hub-pending">
           <?php if (!$audHubPending): ?>
@@ -967,34 +979,59 @@ $complexInfo = $complexMap[$effectiveLevel];
   .auditor-hub-kpis {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 5px;
-    margin-bottom: 5px;
+    gap: 6px;
+    margin-bottom: 7px;
   }
 
-  .auditor-hub-kpis > div {
-    min-height: 36px;
-    border: 1px solid rgba(47, 111, 159, .22);
-    background: #ffffff;
+  .auditor-hub-kpi {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    border: 0;
+    background: #f8fbff;
     border-radius: 8px;
-    padding: 4px 6px;
-    box-shadow: none;
+    padding: 5px 7px;
+    box-shadow: inset 0 0 0 1px rgba(47, 111, 159, .08);
+  }
+
+  .auditor-hub-kpi__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    background: rgba(47, 111, 159, .10);
+    color: #2f6f9f;
+    font-size: .78rem;
+  }
+
+  .auditor-hub-kpi__text {
+    display: grid;
+    min-width: 0;
   }
 
   .auditor-hub-kpis small {
     display: block;
-    color: #6b7280;
-    font-size: .48rem;
+    color: #64748b;
+    font-size: .52rem;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: .04em;
+    letter-spacing: .02em;
     line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .auditor-hub-kpis strong {
     display: block;
     color: #16324f;
     font-size: .82rem;
-    line-height: 1.15;
+    font-weight: 800;
+    line-height: 1;
   }
 
   .auditor-hub-pending,
@@ -1721,22 +1758,30 @@ $complexInfo = $complexMap[$effectiveLevel];
   }
 
   .auditor-hub-kpis {
-    gap: 4px !important;
-    margin-bottom: 5px !important;
+    gap: 6px !important;
+    margin-bottom: 7px !important;
   }
 
-  .auditor-hub-kpis > div {
-    min-height: 31px !important;
-    border-radius: 6px !important;
-    padding: 3px 6px !important;
+  .auditor-hub-kpi {
+    grid-template-columns: 22px minmax(0, 1fr) !important;
+    min-height: 32px !important;
+    border-radius: 8px !important;
+    padding: 5px 7px !important;
+  }
+
+  .auditor-hub-kpi__icon {
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 7px !important;
+    font-size: .72rem !important;
   }
 
   .auditor-hub-kpis small {
-    font-size: .43rem !important;
+    font-size: .5rem !important;
   }
 
   .auditor-hub-kpis strong {
-    font-size: .74rem !important;
+    font-size: .78rem !important;
   }
 
   .auditor-hub-task,

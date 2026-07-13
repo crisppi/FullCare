@@ -792,11 +792,11 @@ const hospitalInsightsHelper = (function() {
                 <div>Oportunidade: <strong><i class="bi ${icon}"></i> ${esc(nivel)}</strong></div>
                 <div>Tipo: <strong>${esc(tipo)}</strong></div>
                 <div>${esc(resumo)}</div>
-                <div>Negociações registradas: <strong>${esc(data.negociacoes ?? 0)}</strong></div>
-                <div>Saving registrado: <strong>${esc(saving)}</strong></div>
+                <div>Negociações atuais: <strong>${esc(data.negociacoes ?? 0)}</strong></div>
+                <div>Saving atual: <strong>${esc(saving)}</strong></div>
                 <div>Principais glosas: <strong>${glosaTipos}</strong></div>
                 <div>Internações em UTI: <strong>${data.inter_uti ?? 0}</strong></div>
-                <div>Total de internações: <strong>${data.total_internacoes ?? 0}</strong></div>
+                <div>Internações ativas: <strong>${data.total_internacoes ?? 0}</strong></div>
                 <div>UTI vs Total: <strong>${percent}%</strong></div>
                 <div>MP Hospital: <strong>${data.mp_hospital ?? 0} dias</strong></div>
                 <div>MP UTI: <strong>${data.mp_uti ?? 0} dias</strong></div>
@@ -2822,9 +2822,27 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(applyInternacaoPickerCompact, 100);
     setTimeout(applyInternacaoPickerCompact, 400);
 
+    function syncInternacaoSelectPlaceholders() {
+        document.querySelectorAll('.internacao-page .tabelas-adicionais-card select, #detalhes-card-wrapper select, #container-tuss select, #container-prorrog select, #container-gestao select, #container-uti select, #container-negoc select').forEach(function(select) {
+            select.classList.toggle('select-placeholder', !select.value);
+        });
+    }
+
+    syncInternacaoSelectPlaceholders();
+    setTimeout(syncInternacaoSelectPlaceholders, 100);
+    setTimeout(syncInternacaoSelectPlaceholders, 400);
+
+    document.addEventListener('change', function(event) {
+        if (event.target && event.target.matches('.internacao-page .tabelas-adicionais-card select, #detalhes-card-wrapper select, #container-tuss select, #container-prorrog select, #container-gestao select, #container-uti select, #container-negoc select')) {
+            syncInternacaoSelectPlaceholders();
+        }
+    });
+
     if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
         window.jQuery('#hospital_selected, #fk_paciente_int, #fk_cid_int, #fk_patologia2')
             .on('loaded.bs.select rendered.bs.select refreshed.bs.select changed.bs.select', applyInternacaoPickerCompact);
+        window.jQuery('.internacao-page .tabelas-adicionais-card select, #detalhes-card-wrapper select, #container-tuss select, #container-prorrog select, #container-gestao select, #container-uti select, #container-negoc select')
+            .on('loaded.bs.select rendered.bs.select refreshed.bs.select changed.bs.select change', syncInternacaoSelectPlaceholders);
     }
 });
 

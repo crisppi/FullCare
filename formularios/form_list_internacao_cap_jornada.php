@@ -616,7 +616,7 @@ th.th-acoes {
         </div>
     </div>
 
-    <form action="<?= htmlspecialchars($actionUrl) ?>" id="filtros-form" method="GET" class="listagem-panel jornada-filter-panel">
+    <form action="<?= htmlspecialchars($actionUrl) ?>" id="filtros-form" method="GET" class="listagem-panel table-filters jornada-filter-panel">
         <div class="row legacy-filter-row align-items-end jornada-filter-row">
             <div class="col-sm-3">
                 <label class="form-label mb-0 small text-muted">Hospital</label>
@@ -698,7 +698,7 @@ th.th-acoes {
     </form>
 
     <div id="table-container" class="mt-3">
-        <div class="table-responsive">
+        <div class="table-responsive listagem-table-wrap jornada-table-wrap">
             <table class="table table-sm table-striped table-hover align-middle">
                 <thead>
                     <tr>
@@ -846,10 +846,10 @@ th.th-acoes {
               $blocoAnterior = max(0, $blocoAtual - 5);
               ?>
                     <li class="page-item"><a class="page-link ajax-link" href="<?= $urlBase ?>&pag=1&bl=0"
-                            aria-label="Primeira">&laquo;</a></li>
+                            aria-label="Primeira"><i class="fas fa-angle-double-left"></i></a></li>
                     <li class="page-item"><a class="page-link ajax-link"
                             href="<?= $urlBase ?>&pag=<?= $pagAnterior ?>&bl=<?= $blocoAnterior ?>"
-                            aria-label="Anterior">&lsaquo;</a></li>
+                            aria-label="Anterior"><i class="fas fa-angle-left"></i></a></li>
                     <?php endif; ?>
 
                     <?php foreach ($paginasBloco as $p): ?>
@@ -872,10 +872,10 @@ th.th-acoes {
               ?>
                     <li class="page-item"><a class="page-link ajax-link"
                             href="<?= $urlBase ?>&pag=<?= $pagProxima ?>&bl=<?= $blocoProximo ?>"
-                            aria-label="Próxima">&rsaquo;</a></li>
+                            aria-label="Próxima"><i class="fas fa-angle-right"></i></a></li>
                     <li class="page-item"><a class="page-link ajax-link"
                             href="<?= $urlBase ?>&pag=<?= count($paginas) ?>&bl=<?= $blocoUltima ?>"
-                            aria-label="Última">&raquo;</a></li>
+                            aria-label="Última"><i class="fas fa-angle-double-right"></i></a></li>
                     <?php endif; ?>
                 </ul>
             </nav>

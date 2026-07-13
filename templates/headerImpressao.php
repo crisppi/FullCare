@@ -12,8 +12,9 @@ header("Content-type: text/html; charset=utf-8");
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/../img/full-ico.ico') ?>">
-  <link rel="shortcut icon" type="image/x-icon" href="img/full-ico.ico?v=<?= @filemtime(__DIR__ . '/../img/full-ico.ico') ?>">
+  <link rel="icon" type="image/png" href="assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
+  <link rel="shortcut icon" type="image/png" href="assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
+  <link rel="apple-touch-icon" href="assets/fullcare-icon.png?v=<?= @filemtime(__DIR__ . '/../assets/fullcare-icon.png') ?>">
 
   <title>Full-2023</title>
   <!-- Boostrap -->

@@ -345,3 +345,68 @@ body {
     .rp { padding: 40px 20px; }
     .rp-inner { max-width: 100%; }
 }
+
+/* Mantem o layout publicado com a mesma separacao arredondada do login inline. */
+body {
+    padding: clamp(18px, 2vw, 30px);
+    background:
+        radial-gradient(circle at 9% 12%, rgba(79, 172, 222, .14), transparent 28%),
+        radial-gradient(circle at 92% 85%, rgba(107, 43, 116, .10), transparent 32%),
+        #e9f0f7;
+}
+
+.lp {
+    flex: 0 0 61%;
+    margin-right: -64px;
+    padding: 44px 124px 36px 56px;
+    border-radius: 28px 68px 68px 28px;
+    z-index: 2;
+    filter:
+        drop-shadow(12px 0 12px rgba(4, 14, 27, .55))
+        drop-shadow(26px 0 28px rgba(4, 14, 27, .38))
+        drop-shadow(54px 0 68px rgba(47, 111, 159, .32))
+        drop-shadow(88px 0 110px rgba(47, 111, 159, .20));
+    background:
+        radial-gradient(ellipse at 12% 0%, rgba(95, 164, 208, .14) 0%, transparent 46%),
+        radial-gradient(ellipse at 86% 100%, rgba(103, 70, 139, .26) 0%, transparent 54%),
+        radial-gradient(ellipse at 18% 80%, rgba(55, 118, 168, .12) 0%, transparent 46%),
+        linear-gradient(158deg, #0f2a42 0%, #244762 52%, #2b2f55 100%);
+}
+
+.lp-logo {
+    margin-left: -4px;
+}
+
+.lp-logo img {
+    height: 92px;
+    filter: drop-shadow(0 16px 26px rgba(3, 16, 31, .26)) drop-shadow(0 0 1px rgba(255, 255, 255, .42));
+}
+
+.rp {
+    justify-content: flex-start;
+    padding: 48px 56px 48px 124px;
+    border-radius: 0 28px 28px 0;
+    overflow: hidden;
+    background:
+        linear-gradient(90deg, rgba(188, 211, 229, .92) 0%, rgba(218, 232, 243, .78) 13%, rgba(239, 246, 251, .92) 34%, #f5f8fc 62%, #f5f8fc 100%);
+    box-shadow:
+        0 24px 72px rgba(16, 35, 56, .18),
+        inset 46px 0 58px rgba(55, 111, 151, .30),
+        inset 18px 0 22px rgba(13, 32, 56, .18);
+}
+
+.rp::before {
+    display: none;
+}
+
+@media (max-width: 860px) {
+    body {
+        padding: 0;
+        background: #f5f8fc;
+    }
+
+    .rp {
+        margin-left: 0;
+        border-radius: 0;
+    }
+}

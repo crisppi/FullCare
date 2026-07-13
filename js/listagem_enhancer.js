@@ -87,13 +87,20 @@
         const saveBtn = buildButton('bi-bookmark-check', 'Salvar filtros', 'Salvar filtros atuais');
         const restoreBtn = buildButton('bi-arrow-counterclockwise', 'Meus filtros', 'Voltar para meus filtros salvos');
         const columnsBtn = buildButton('bi-layout-three-columns', 'Colunas', 'Configurar colunas visíveis');
-        const exportBtn = buildButton('bi-file-earmark-spreadsheet', 'Exportar Excel', 'Exportar tabela visível para Excel');
+        const hasDedicatedExport = Boolean(qs('.fc-export-dropdown'));
+        const exportBtn = hasDedicatedExport
+            ? null
+            : buildButton('bi-file-earmark-spreadsheet', 'Exportar Excel', 'Exportar tabela visível para Excel');
 
         const columnsMenu = document.createElement('div');
         columnsMenu.className = 'fc-list-columns-menu';
         columnsMenu.hidden = true;
 
-        toolbar.append(saveBtn, restoreBtn, columnsBtn, exportBtn, columnsMenu);
+        toolbar.append(saveBtn, restoreBtn, columnsBtn);
+        if (exportBtn) {
+            toolbar.append(exportBtn);
+        }
+        toolbar.append(columnsMenu);
         filters.parentElement.insertBefore(toolbar, filters.nextSibling);
         installEmptyResultHint(form, table, toolbar);
 
@@ -122,7 +129,9 @@
             columnsMenu.hidden = !columnsMenu.hidden;
         });
 
-        exportBtn.addEventListener('click', () => exportVisibleTable(table));
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => exportVisibleTable(table));
+        }
 
         form.addEventListener('submit', () => {
             sessionStorage.setItem(storageKey('last_filters'), JSON.stringify(serializeForm(form)));

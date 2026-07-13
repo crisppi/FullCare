@@ -108,11 +108,17 @@ $senha_int            = getParamAlias('senha_int', 'sn', '');
 $data_intern_int      = getParamAlias('data_intern_int', 'di', '');
 $data_intern_int_max  = getParamAlias('data_intern_int_max', 'df', '');
 $sem_senha            = getParamAlias('sem_senha', 'ss', '0');
+$exportScope          = getParam('export_scope', 'filtered') === 'current_page' ? 'current_page' : 'filtered';
+$paginaAtualExport    = max(1, (int)getParamAlias('pag', 'pg', 1));
 // Campos selecionados no modal
 $camposSelecionados   = getCamposSelecionados();
 
-// Limite grande só para exportar
-$limiteExport = 1000000;
+$limite_pag = max(1, min(5000, $limite_pag > 0 ? $limite_pag : 10));
+$limiteExport = null;
+if ($exportScope === 'current_page') {
+    $offsetExport = ($paginaAtualExport - 1) * $limite_pag;
+    $limiteExport = $offsetExport . ',' . $limite_pag;
+}
 
 // -----------------------------------------------------
 // 2) Montar WHERE (copiar mesma lógica da listagem)

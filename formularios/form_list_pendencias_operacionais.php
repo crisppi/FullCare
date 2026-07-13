@@ -573,8 +573,8 @@ function pendenciasUrl(array $params): string
                     <?php if ($totalPaginas > 1): ?>
                     <ul class="pagination">
                         <?php if ($paginaAtual > 1): ?>
-                        <li class="page-item"><a class="page-link" href="<?= e(pendenciasUrl($baseParams + ['pag' => 1])) ?>"><i class="fa-solid fa-angles-left"></i></a></li>
-                        <li class="page-item"><a class="page-link" href="<?= e(pendenciasUrl($baseParams + ['pag' => $paginaAtual - 1])) ?>"><i class="fa-solid fa-angle-left"></i></a></li>
+                        <li class="page-item"><a class="page-link" href="<?= e(pendenciasUrl($baseParams + ['pag' => 1])) ?>"><i class="fas fa-angle-double-left"></i></a></li>
+                        <li class="page-item"><a class="page-link" href="<?= e(pendenciasUrl($baseParams + ['pag' => $paginaAtual - 1])) ?>"><i class="fas fa-angle-left"></i></a></li>
                         <?php endif; ?>
 
                         <?php
@@ -588,8 +588,8 @@ function pendenciasUrl(array $params): string
                         <?php endfor; ?>
 
                         <?php if ($paginaAtual < $totalPaginas): ?>
-                        <li class="page-item"><a class="page-link" href="<?= e(pendenciasUrl($baseParams + ['pag' => $paginaAtual + 1])) ?>"><i class="fa-solid fa-angle-right"></i></a></li>
-                        <li class="page-item"><a class="page-link" href="<?= e(pendenciasUrl($baseParams + ['pag' => $totalPaginas])) ?>"><i class="fa-solid fa-angles-right"></i></a></li>
+                        <li class="page-item"><a class="page-link" href="<?= e(pendenciasUrl($baseParams + ['pag' => $paginaAtual + 1])) ?>"><i class="fas fa-angle-right"></i></a></li>
+                        <li class="page-item"><a class="page-link" href="<?= e(pendenciasUrl($baseParams + ['pag' => $totalPaginas])) ?>"><i class="fas fa-angle-double-right"></i></a></li>
                         <?php endif; ?>
                     </ul>
                     <?php endif; ?>

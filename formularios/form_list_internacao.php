@@ -746,10 +746,22 @@ if (typeof jQuery !== 'undefined') {
         ?>
 
         <div class="fc-module-header__actions internacao-list-hero__actions">
-            <!-- Botão de Exportar para Excel (abre modal) -->
-            <a href="#" id="btn-exportar-excel" class="btn btn-success btn-list-top btn-export">
-                Exportar para Excel
-            </a>
+            <div class="dropdown fc-export-dropdown">
+                <button type="button" id="btn-exportar-excel" class="btn btn-success btn-list-top btn-export dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Exportar Excel
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <button type="button" class="dropdown-item js-intern-export-scope" data-export-scope="filtered">
+                        <span class="fc-export-dropdown__title">Exportar todos os resultados filtrados</span>
+                        <span class="fc-export-dropdown__help">Inclui todos os registros encontrados pelos filtros atuais.</span>
+                    </button>
+                    <button type="button" class="dropdown-item js-intern-export-scope" data-export-scope="current_page">
+                        <span class="fc-export-dropdown__title">Exportar apenas esta página</span>
+                        <span class="fc-export-dropdown__help">Inclui somente os registros visíveis agora.</span>
+                    </button>
+                </div>
+            </div>
 
             <!-- Botão de Nova Internação -->
             <a class="btn btn-success btn-list-top btn-new" href="<?= $BASE_URL ?>internacoes/nova">
@@ -1542,6 +1554,10 @@ if (typeof jQuery !== 'undefined') {
             </div>
 
             <div class="modal-body">
+                <input type="hidden" id="internExportScope" value="filtered">
+                <div class="fc-export-scope-summary" id="internExportScopeSummary">
+                    <strong>Exportação:</strong> todos os resultados encontrados pelos filtros atuais.
+                </div>
 
                 <form id="formCamposExcelIntern">
                     <!-- Pills – use a mesma classe de pill do modal Alta se já existir -->
@@ -1884,12 +1900,18 @@ $(document).ready(function() {
         loadInternacaoList(href, null);
     });
 
-    // ==========================================
-    // 2) ABRIR MODAL DE CAMPOS DO EXCEL
-    // ==========================================
-    $('#btn-exportar-excel').on('click', function(e) {
+    function setInternExportScope(scope) {
+        var normalizedScope = scope === 'current_page' ? 'current_page' : 'filtered';
+        $('#internExportScope').val(normalizedScope);
+        var summary = normalizedScope === 'current_page'
+            ? '<strong>Exportação:</strong> apenas os registros visíveis nesta página.'
+            : '<strong>Exportação:</strong> todos os resultados encontrados pelos filtros atuais.';
+        $('#internExportScopeSummary').html(summary);
+    }
+
+    $(document).on('click', '.js-intern-export-scope', function(e) {
         e.preventDefault();
-        e.stopPropagation();
+        setInternExportScope($(this).data('export-scope'));
         new bootstrap.Modal(document.getElementById('modalExportInternCampos')).show();
     });
 
@@ -1972,6 +1994,14 @@ $(document).ready(function() {
 
         // 3) Param "campos" em CSV
         queryParts.push('campos=' + encodeURIComponent(campos.join(',')));
+        var exportScope = $('#internExportScope').val() || 'filtered';
+        queryParts.push('export_scope=' + encodeURIComponent(exportScope));
+
+        if (exportScope === 'current_page') {
+            var currentParams = new URLSearchParams(window.location.search || '');
+            var currentPage = currentParams.get('pag') || currentParams.get('pg') || '1';
+            queryParts.push('pag=' + encodeURIComponent(currentPage));
+        }
 
         // 4) Filtro adicional de profissional
 
