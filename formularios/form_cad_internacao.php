@@ -1481,6 +1481,19 @@
             box-shadow: inset 0 0 0 1px rgba(62, 113, 198, .12) !important;
         }
 
+        .tabelas-adicionais-card > .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image:
+                url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231f4d85'><path d='M7 10l5 5 5-5z'/></svg>"),
+                linear-gradient(180deg, #eaf4ff 0%, #d6eaff 100%) !important;
+            background-position: right 10px center, 0 0 !important;
+            background-repeat: no-repeat, repeat !important;
+            background-size: 14px 14px, auto !important;
+            padding-right: 30px !important;
+        }
+
         .tabelas-adicionais-card > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="relatorio-detalhado"] .filter-option-inner-inner,
         .tabelas-adicionais-card > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_tuss"] .filter-option-inner-inner,
         .tabelas-adicionais-card > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_prorrog"] .filter-option-inner-inner,
@@ -1534,7 +1547,7 @@
 
         .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
         .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
-            grid-column: span 3 !important;
+            grid-column: 1 / -1 !important;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado label {
@@ -1556,6 +1569,21 @@
             border-radius: 7px !important;
             font-size: .66rem !important;
             line-height: 1.05 !important;
+        }
+
+        .internacao-page #detalhes-card-wrapper #div-detalhado select.form-control {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23111827'><path d='M7 10l5 5 5-5z'/></svg>") !important;
+            background-position: right 8px center !important;
+            background-repeat: no-repeat !important;
+            background-size: 13px 13px !important;
+            padding-right: 26px !important;
+        }
+
+        .internacao-page #detalhes-card-wrapper #div-detalhado select.form-control::-ms-expand {
+            display: none;
         }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado textarea.form-control {
