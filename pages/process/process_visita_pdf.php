@@ -317,7 +317,7 @@ $pdf->setPrintHeader(false);
 $pdf->setPrintFooter(true);
 $pdf->AddPage();
 
-$logoPath = 'img/LogoConexAud.png';
+$logoPath = __DIR__ . '/../../img/LogoFullCare.png';
 renderHeader($pdf, $logoPath);
 
 $corAzulHeader = [0, 86, 143];

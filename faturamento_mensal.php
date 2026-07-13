@@ -121,11 +121,11 @@ SELECT
     $sheet = $spreadsheet->getActiveSheet();
     $sheet->setTitle('Faturamento Mensal Visitas');
 
-    $logoPath = __DIR__ . '/img/LogoConexAud.png';
+    $logoPath = __DIR__ . '/img/LogoFullCare.png';
     if (file_exists($logoPath)) {
         $logo = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
         $logo->setName('Logo');
-        $logo->setDescription('Logo Conex');
+        $logo->setDescription('Logo FullCare');
         $logo->setPath($logoPath);
         $logo->setHeight(32);
         $logo->setCoordinates('A2');

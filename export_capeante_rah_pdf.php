@@ -1012,7 +1012,7 @@ $pdf->Line($__left, $__y, $__left + $__usableW, $__y);
 $pdf->Ln(2.5);
 
 $pdf->SetFont('helvetica', '', $BODY_SIZE_PT);
-$pdf->Cell(0, 6, 'Gerado por FullCareConex • ' . date('d/m/Y H:i'), 0, 1, 'R');
+$pdf->Cell(0, 6, 'Gerado por FullCare • ' . date('d/m/Y H:i'), 0, 1, 'R');
 
 /* ===================== FIM DO BLOCO FINAL – NADA MAIS ALTERADO ===================== */
 

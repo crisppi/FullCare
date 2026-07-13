@@ -119,7 +119,7 @@ $headers = [
     'Valor final',
 ];
 
-$logoPath = __DIR__ . '/img/LogoConexAud.png';
+$logoPath = __DIR__ . '/img/LogoFullCare.png';
 if (file_exists($logoPath)) {
     $logo = new Drawing();
     $logo->setName('Logo');

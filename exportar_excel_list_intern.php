@@ -441,7 +441,6 @@ $sheet->setShowGridlines(false);
 $logoCandidates = [
     __DIR__ . '/img/LogoFullCare.png',
     __DIR__ . '/img/full-03.png',
-    __DIR__ . '/img/LogoConexAud.png',
 ];
 $logoPath = null;
 foreach ($logoCandidates as $candidatePath) {

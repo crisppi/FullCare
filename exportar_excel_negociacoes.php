@@ -97,11 +97,11 @@ $headers = [
     'Auditor'
 ];
 
-$logoPath = __DIR__ . '/img/LogoConexAud.png';
+$logoPath = __DIR__ . '/img/LogoFullCare.png';
 if (file_exists($logoPath)) {
     $logo = new Drawing();
     $logo->setName('Logo');
-    $logo->setDescription('Logo Conex');
+    $logo->setDescription('Logo FullCare');
     $logo->setPath($logoPath);
     $logo->setHeight(32);
     $logo->setCoordinates('A2');

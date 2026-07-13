@@ -400,13 +400,9 @@ $visitaPdfHref = $initId ? $visitaPdfBase . urlencode((string)$initId) : '#';
 $visitaRangePdfBase = $BASE_URL . 'process_visita_pdf.php?range=1&id_internacao=' . urlencode((string)$id_internacao);
 $visitaEditBase = $BASE_URL . 'visitas/nova/internacao/' . (int)$id_internacao . '?edit_visita=';
 
-// Evita duplicar no layout a visita já destacada no card principal.
+// Exibe os relatórios juntos; a visita selecionada também permanece na lista
+// para evitar que o usuário precise procurar registros em blocos diferentes.
 $visitas_recent_exibicao = $visitas_recent;
-if ($initId) {
-    $visitas_recent_exibicao = array_values(array_filter($visitas_recent_exibicao, function ($item) use ($initId) {
-        return (int)($item['_id'] ?? 0) !== (int)$initId;
-    }));
-}
 $visitas_recent_exibicao = array_slice($visitas_recent_exibicao, 0, $recentLimit);
 $visitas_recent_exibicao_count = count($visitas_recent_exibicao);
 
@@ -825,7 +821,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                         <?php if (!$visitas_norm): ?>
                             <div class="ux-empty-state">
                                 <div class="ux-empty-title">Nenhuma visita registrada para esta internação</div>
-                                <div class="ux-empty-text">Cadastre a primeira visita para iniciar o histórico clínico e liberar relatórios por período.</div>
                                 <?php if (!$isGestorSeguradora): ?>
                                     <div class="mt-2">
                                         <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white" style="background:#5e2363;border-color:#5e2363;">
@@ -873,7 +868,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                                     <button type="button" id="btnLimparVisitas" class="btn btn-sm btn-outline-secondary">Limpar</button>
                                                 </div>
                                             </form>
-                                            <div class="small text-muted mt-2">As visitas fora do intervalo selecionado são escondidas da tabela.</div>
                                         </div>
                                     <?php endif; ?>
 
@@ -981,16 +975,16 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                                 aria-disabled="<?= $rangeEnabled ? 'false' : 'true' ?>">
                                                 <i class="fas fa-file-pdf me-1"></i> PDF (período)
                                                 <span id="btn-visitas-range-info" class="d-block small mt-1 text-start text-muted">
-                                                    <?= $rangeEnabled ? ('Período: ' . e($minLabel) . ' — ' . e($maxLabel)) : 'Use o filtro de datas' ?>
+                                                    <?= $rangeEnabled ? ('Período: ' . e($minLabel) . ' — ' . e($maxLabel)) : '' ?>
                                                 </span>
                                             </a>
                                         </div>
 
                                         <div class="border-top mt-3 mb-3"></div>
 
-                                        <div class="p-3 rounded-4 shadow-sm" style="background:#f9f9fb;border:1px solid #e0e3ea;">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <h6 class="mb-0 text-secondary fw-semibold">Relatório da visita:
+                                        <div class="visita-report-card">
+                                            <div class="visita-report-card__header">
+                                                <h6 class="mb-0 text-secondary fw-semibold">Pré-visualização da visita selecionada:
                                                     <span id="v-rel-date" class="text-dark"><?= e($initDateLabel) ?></span>
                                                 </h6>
                                                 <div class="d-flex align-items-center gap-2">
@@ -1004,19 +998,21 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                                 </div>
                                             </div>
 
-                                            <div class="mt-3 p-3 rounded bg-white border" style="border-color:#e0e3ea;">
-                                                <div class="v2-relatorio" id="v-rel-text" style="white-space:pre-wrap"><?= e($initText) ?></div>
+                                            <div class="visita-report-card__body">
+                                                <div class="v2-relatorio" id="v-rel-text"><?= e($initText) ?></div>
                                             </div>
 
                                             <div id="v-rel-auditor-wrap"
-                                                style="font-size:0.85rem;color:#5e2363;font-weight:600;margin-top:10px;display:<?= !empty($initAuditor) ? 'block' : 'none' ?>;">
+                                                class="visita-report-card__meta visita-report-card__meta--auditor"
+                                                style="display:<?= !empty($initAuditor) ? 'block' : 'none' ?>;">
                                                 <i class="fas fa-user-md" style="margin-right:5px;"></i>
                                                 Visita realizada pelo(a) Auditor(a):
                                                 <span id="v-rel-auditor"><?= e($initAuditor) ?></span>
                                             </div>
 
                                             <div id="v-rel-cargo-wrap"
-                                                style="font-size:0.85rem;color:#475467;font-weight:600;margin-top:6px;display:<?= !empty($initCargo) && $initCargo !== '-' ? 'block' : 'none' ?>;">
+                                                class="visita-report-card__meta visita-report-card__meta--cargo"
+                                                style="display:<?= !empty($initCargo) && $initCargo !== '-' ? 'block' : 'none' ?>;">
                                                 <i class="fas fa-briefcase" style="margin-right:5px;"></i>
                                                 Cargo:
                                                 <span id="v-rel-cargo"><?= e($initCargo) ?></span>
@@ -1030,73 +1026,87 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                             </div>
 
                             <?php if ($visitas_recent_exibicao_count > 0): ?>
-                                <div class="ux-recent-wrap card shadow-sm mt-4" style="border:1px solid #dbe5f1;border-left:5px solid #1d8fe1;border-radius:16px;background:linear-gradient(180deg,#fbfcff 0%,#f4f8ff 100%);box-shadow:0 8px 24px rgba(17,24,39,.06);">
-                                    <div class="card-body">
-                                    <div class="ux-recent-header">
-                                        <h6 class="ux-recent-title mb-0">
-                                            <i class="fas fa-layer-group me-2"></i>
-                                            Últimas <?= e($visitas_recent_exibicao_count) ?> visitas registradas
-                                        </h6>
-                                        <form class="ux-recent-controls d-flex flex-wrap align-items-center gap-2" method="get" action="<?= e($_SERVER['PHP_SELF']) ?>#visitas">
+                                <section class="visitas-report-section">
+                                    <div class="visitas-report-section__header">
+                                        <div class="visitas-report-section__heading">
+                                            <span class="visitas-report-section__icon" aria-hidden="true">
+                                                <i class="fas fa-history"></i>
+                                            </span>
+                                            <div>
+                                            <div class="visitas-report-section__eyebrow">Histórico clínico</div>
+                                            <h6 class="visitas-report-section__title mb-0">
+                                                Relatórios das visitas registradas
+                                                <span class="badge bg-secondary-subtle text-secondary-emphasis ms-2"><?= e($visitas_recent_exibicao_count) ?></span>
+                                            </h6>
+                                            </div>
+                                        </div>
+                                        <form class="visitas-report-controls" method="get" action="<?= e($_SERVER['PHP_SELF']) ?>#visitas">
                                             <input type="hidden" name="id_internacao" value="<?= (int)$id_internacao ?>">
                                             <input type="hidden" name="aba" value="visitas">
                                             <?php if (!empty($vid_req)): ?>
                                                 <input type="hidden" name="vid" value="<?= (int)$vid_req ?>">
                                             <?php endif; ?>
 
-                                            <label class="small text-muted mb-0">Qtd
-                                                <select name="recent_limit" class="form-select form-select-sm d-inline-block" style="width:auto;">
+                                            <label class="visitas-report-control">
+                                                <span>Qtd</span>
+                                                <select name="recent_limit" class="form-select form-select-sm">
                                                     <?php foreach ([3, 5, 10, 15, 20] as $opt): ?>
                                                         <option value="<?= $opt ?>" <?= $recentLimit == $opt ? 'selected' : '' ?>><?= $opt ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </label>
 
-                                            <label class="small text-muted mb-0">Ordem
-                                                <select name="recent_order" class="form-select form-select-sm d-inline-block" style="width:auto;">
+                                            <label class="visitas-report-control visitas-report-control--order">
+                                                <span>Ordem</span>
+                                                <select name="recent_order" class="form-select form-select-sm">
                                                     <option value="desc" <?= $recentOrder === 'desc' ? 'selected' : '' ?>>Recente</option>
                                                     <option value="asc" <?= $recentOrder === 'asc' ? 'selected' : '' ?>>Antiga</option>
                                                 </select>
                                             </label>
 
-                                            <button class="btn btn-sm btn-outline-secondary" type="submit">Aplicar</button>
+                                            <button class="btn btn-sm btn-outline-secondary visitas-report-apply" type="submit">Aplicar</button>
                                         </form>
                                     </div>
 
-                                    <div class="d-flex flex-column gap-3 mt-3">
+                                    <div class="visitas-report-section__body">
                                         <?php foreach ($visitas_recent_exibicao as $recent):
                                             $recentDate = $recent['_date'] ? date('d/m/Y', strtotime($recent['_date'])) : '—';
                                             $recentText = trim((string)($recent['_text'] ?? ''));
                                             $recentAud  = trim((string)($recent['_auditor'] ?? ''));
+                                            $recentCargo = trim((string)($recent['_cargo'] ?? '-'));
                                             $recentId   = $recent['_id'] ?? ($recent['_raw']['id_visita'] ?? null);
                                         ?>
-                                            <div class="ux-recent-item" style="border:1px solid #e3e6ee;border-left:4px solid #1d8fe1;border-radius:14px;background:#fff;box-shadow:0 4px 16px rgba(17,24,39,.04);padding:16px 18px;">
-                                                <div class="ux-recent-meta">
-                                                    <div class="ux-recent-meta-block">
-                                                        <span class="ux-recent-meta-label">Data da visita</span>
-                                                        <span class="ux-recent-date-chip" style="display:inline-block;width:fit-content;padding:3px 11px;border-radius:999px;background:#e7f3ff;color:#0f4f8e;font-weight:700;"><?= e($recentDate) ?></span>
-                                                    </div>
-                                                    <div class="ux-recent-meta-block">
-                                                        <span class="ux-recent-meta-label">Profissional</span>
-                                                        <span class="ux-recent-meta-value"><?= e($recentAud !== '' ? $recentAud : '-') ?></span>
-                                                    </div>
+                                            <div class="visita-report-card visita-report-card--compact">
+                                                <div class="visita-report-card__header">
+                                                    <h6 class="mb-0 text-secondary fw-semibold">Relatório da visita:
+                                                        <span class="text-dark"><?= e($recentDate) ?></span>
+                                                    </h6>
                                                     <?php if ($recentId): ?>
-                                                        <div class="ux-recent-meta-block">
-                                                            <span class="ux-recent-meta-label">ID</span>
-                                                            <span class="ux-recent-meta-id" style="display:inline-flex;align-items:center;width:fit-content;padding:2px 10px;border-radius:999px;border:1px solid #d8e5f2;background:#f8fbff;color:#2d4059;font-size:.82rem;font-weight:700;">#<?= e($recentId) ?></span>
-                                                        </div>
+                                                        <span class="badge bg-secondary-subtle text-secondary-emphasis">ID <?= e($recentId) ?></span>
                                                     <?php endif; ?>
                                                 </div>
 
-                                                <div class="ux-recent-evolucao mt-3" style="border:1px solid #e7e9f0;border-radius:10px;background:#fdfefe;padding:12px 14px;line-height:1.55;">
-                                                    <div class="small text-muted text-uppercase mb-2">Relatório / Evolução</div>
-                                                    <p class="mb-0"><?= nl2br(e($recentText !== '' ? $recentText : '-')) ?></p>
+                                                <div class="visita-report-card__body">
+                                                    <div class="v2-relatorio"><?= e($recentText !== '' ? $recentText : '-') ?></div>
                                                 </div>
+
+                                                <?php if ($recentAud !== ''): ?>
+                                                    <div class="visita-report-card__meta visita-report-card__meta--auditor">
+                                                        <i class="fas fa-user-md" style="margin-right:5px;"></i>
+                                                        Visita realizada pelo(a) Auditor(a): <?= e($recentAud) ?>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                                <?php if ($recentCargo !== '' && $recentCargo !== '-'): ?>
+                                                    <div class="visita-report-card__meta visita-report-card__meta--cargo">
+                                                        <i class="fas fa-briefcase" style="margin-right:5px;"></i>
+                                                        Cargo: <?= e($recentCargo) ?>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
-                                    </div>
-                                </div>
+                                </section>
                             <?php endif; ?>
 
                         <?php endif; ?>
@@ -1138,28 +1148,33 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                                     $d = $vis['_date'] ? date('d/m/Y', strtotime($vis['_date'])) : '-';
                                                     $relatorio = trim((string)($vis['_text'] ?? ''));
                                                     $idVis = $vis['_id'] ?? ($vis['_raw']['id_visita'] ?? null);
+                                                    $auditorVis = trim((string)($vis['_auditor'] ?? ''));
+                                                    $cargoVis = trim((string)($vis['_cargo'] ?? '-'));
                                                 ?>
-                                                    <div class="visita-item rounded-4 shadow-sm mb-3 p-3" style="border:1px solid #e0e3ea;border-left:4px solid #1d8fe1;background:#f9f9fb;">
-                                                        <div class="ux-recent-meta">
-                                                            <div class="ux-recent-meta-block">
-                                                                <span class="ux-recent-meta-label">Data da visita</span>
-                                                                <span class="ux-recent-date-chip" style="display:inline-block;width:fit-content;padding:3px 11px;border-radius:999px;background:#e7f3ff;color:#0f4f8e;font-weight:700;"><?= e($d) ?></span>
-                                                            </div>
-                                                            <div class="ux-recent-meta-block">
-                                                                <span class="ux-recent-meta-label">Profissional</span>
-                                                                <span class="ux-recent-meta-value"><?= e($vis['_auditor'] ?: '-') ?></span>
-                                                            </div>
+                                                    <div class="visita-report-card visita-report-card--compact">
+                                                        <div class="visita-report-card__header">
+                                                            <h6 class="mb-0 text-secondary fw-semibold">Relatório da visita:
+                                                                <span class="text-dark"><?= e($d) ?></span>
+                                                            </h6>
                                                             <?php if ($idVis): ?>
-                                                                <div class="ux-recent-meta-block">
-                                                                    <span class="ux-recent-meta-label">ID</span>
-                                                                    <span class="ux-recent-meta-id" style="display:inline-flex;align-items:center;width:fit-content;padding:2px 10px;border-radius:999px;border:1px solid #d8e5f2;background:#f8fbff;color:#2d4059;font-size:.82rem;font-weight:700;">#<?= e($idVis) ?></span>
-                                                                </div>
+                                                                <span class="badge bg-secondary-subtle text-secondary-emphasis">ID <?= e($idVis) ?></span>
                                                             <?php endif; ?>
                                                         </div>
-                                                        <div class="mt-3 p-3 rounded bg-white border" style="border-color:#e0e3ea;">
-                                                            <span class="small text-muted d-block mb-2 text-uppercase">Relatório / Evolução</span>
-                                                            <p class="mb-0"><?= nl2br(e($relatorio !== '' ? $relatorio : '-')) ?></p>
+                                                        <div class="visita-report-card__body">
+                                                            <div class="v2-relatorio"><?= e($relatorio !== '' ? $relatorio : '-') ?></div>
                                                         </div>
+                                                        <?php if ($auditorVis !== ''): ?>
+                                                            <div class="visita-report-card__meta visita-report-card__meta--auditor">
+                                                                <i class="fas fa-user-md" style="margin-right:5px;"></i>
+                                                                Visita realizada pelo(a) Auditor(a): <?= e($auditorVis) ?>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                        <?php if ($cargoVis !== '' && $cargoVis !== '-'): ?>
+                                                            <div class="visita-report-card__meta visita-report-card__meta--cargo">
+                                                                <i class="fas fa-briefcase" style="margin-right:5px;"></i>
+                                                                Cargo: <?= e($cargoVis) ?>
+                                                            </div>
+                                                        <?php endif; ?>
                                                     </div>
                                                 <?php endforeach; ?>
                                             </div>
@@ -1246,7 +1261,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                 </form>
                                 <div class="mb-2">
                                     <input type="search" class="form-control form-control-sm js-local-filter" data-target-table="table-prorrog"
-                                        placeholder="Buscar nesta aba (acomodação, período, isolamento...)">
+                                        placeholder="Buscar">
                                 </div>
 
                                 <?php if (!empty($pr_filtered)): ?>
@@ -1286,7 +1301,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                 <?php else: ?>
                                     <div class="ux-empty-state">
                                         <div class="ux-empty-title">Nenhuma prorrogação<?= ($pr_ini || $pr_fim) ? ' no período selecionado' : ' registrada para esta internação' ?></div>
-                                        <div class="ux-empty-text">Revise o período de filtro ou edite a internação para lançar prorrogações.</div>
                                         <div class="mt-2">
                                             <a class="btn btn-sm btn-outline-secondary" href="<?= e($editarProrrogUrl) ?>">
                                                 <i class="fas fa-edit me-1"></i>Editar prorrogações
@@ -1339,7 +1353,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                 </form>
                                 <div class="mb-2">
                                     <input type="search" class="form-control form-control-sm js-local-filter" data-target-table="table-tuss"
-                                        placeholder="Buscar nesta aba (código, terminologia, status...)">
+                                        placeholder="Buscar">
                                 </div>
 
                                 <?php if (!empty($tuss_filtered)): ?>
@@ -1384,7 +1398,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                 <?php else: ?>
                                     <div class="ux-empty-state">
                                         <div class="ux-empty-title">Nenhum item TUSS<?= ($tuss_ini || $tuss_fim) ? ' no período selecionado' : ' para esta internação' ?></div>
-                                        <div class="ux-empty-text">Ajuste o período ou edite a internação para cadastrar itens TUSS.</div>
                                         <div class="mt-2">
                                             <a class="btn btn-sm btn-outline-secondary" href="<?= e($editarTussUrl) ?>">
                                                 <i class="fas fa-edit me-1"></i>Editar TUSS
@@ -1438,7 +1451,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                 </form>
                                 <div class="mb-2">
                                     <input type="search" class="form-control form-control-sm js-local-filter" data-target-table="table-neg"
-                                        placeholder="Buscar nesta aba (tipo, troca, período, saving...)">
+                                        placeholder="Buscar">
                                 </div>
 
                                 <?php if (!empty($neg_filtered)): ?>
@@ -1480,7 +1493,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                 <?php else: ?>
                                     <div class="ux-empty-state">
                                         <div class="ux-empty-title">Nenhuma negociação<?= ($neg_ini || $neg_fim) ? ' no período selecionado' : ' para esta internação' ?></div>
-                                        <div class="ux-empty-text">Você pode ajustar o filtro ou lançar uma negociação na edição da internação.</div>
                                         <div class="mt-2">
                                             <a class="btn btn-sm btn-outline-secondary" href="<?= e($editarNegocUrl) ?>">
                                                 <i class="fas fa-edit me-1"></i>Editar negociações
@@ -1839,7 +1851,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                     rangeBtn.setAttribute('aria-disabled', 'true');
                     rangeBtn.href = '#';
                     if (rangeInfo) {
-                        rangeInfo.textContent = 'Use o filtro de datas';
+                        rangeInfo.textContent = '';
                         rangeInfo.classList.add('text-muted');
                     }
                     if (rangeSel) {
@@ -2188,11 +2200,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         margin-bottom: 2px;
     }
 
-    .ux-empty-text {
-        color: #6f6790;
-        font-size: .78rem;
-    }
-
     .ux-focus-text {
         border: 1px solid #e8e1f0;
         background: #fcfbfe;
@@ -2299,6 +2306,155 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         font-size: .68rem;
         line-height: 1.32;
         min-height: 24px;
+        white-space: pre-wrap;
+    }
+
+    .visita-report-card {
+        background: #f9f9fb;
+        border: 1px solid #e0e3ea;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(17, 24, 39, .04);
+        padding: 14px 16px;
+    }
+
+    .visita-report-card--compact {
+        background: #fff;
+    }
+
+    .visita-report-card__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .visita-report-card__body {
+        background: #fff;
+        border: 1px solid #e0e3ea;
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+
+    .visita-report-card__meta {
+        font-size: .85rem;
+        font-weight: 600;
+        margin-top: 8px;
+    }
+
+    .visita-report-card__meta--auditor {
+        color: #5e2363;
+    }
+
+    .visita-report-card__meta--cargo {
+        color: #475467;
+    }
+
+    .visitas-report-section {
+        margin-top: 22px;
+        padding: 0;
+        border: 1px solid #dde4ee;
+        border-radius: 16px;
+        background: #f8fafc;
+        box-shadow: 0 8px 20px rgba(17, 24, 39, .045);
+        overflow: hidden;
+    }
+
+    .visitas-report-section__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(90deg, #f4ecfb 0%, #f8fafc 58%, #f1f5f9 100%);
+        box-shadow: inset 5px 0 0 #6a1b6d;
+    }
+
+    .visitas-report-section__heading {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 240px;
+    }
+
+    .visitas-report-section__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: #ffffff;
+        border: 1px solid #eadcf3;
+        color: #6a1b6d;
+        box-shadow: 0 3px 9px rgba(106, 27, 109, .12);
+        flex: 0 0 auto;
+    }
+
+    .visitas-report-section__eyebrow {
+        color: #6a1b6d;
+        font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: .09em;
+        line-height: 1.1;
+        margin-bottom: 3px;
+        text-transform: uppercase;
+    }
+
+    .visitas-report-section__title {
+        color: #251238;
+        font-size: .95rem;
+        font-weight: 800;
+        line-height: 1.25;
+    }
+
+    .visitas-report-section__body {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 14px 16px;
+    }
+
+    .visitas-report-controls {
+        display: flex;
+        align-items: end;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .visitas-report-control {
+        display: grid;
+        gap: 4px;
+        margin: 0;
+        color: #667085;
+        font-size: .68rem;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+
+    .visitas-report-control select {
+        width: 66px;
+        min-height: 34px;
+        border-radius: 7px;
+        color: #344054;
+        font-size: .74rem;
+        font-weight: 600;
+        padding-left: 9px;
+        padding-right: 28px;
+    }
+
+    .visitas-report-control--order select {
+        width: 106px;
+    }
+
+    .visitas-report-apply {
+        min-height: 34px;
+        border-radius: 7px;
+        font-size: .76rem;
+        font-weight: 700;
+        padding-inline: 14px;
     }
 
     .ov-card.ov-int {
@@ -2648,43 +2804,45 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         line-height: 1.25 !important;
     }
 
-    .internacao-show-page .ux-chip-label {
-        font-size: .66rem !important;
+    #main-container.internacao-show-page .ux-chip-label {
+        font-size: .58rem !important;
+        letter-spacing: .05em !important;
     }
 
-    .internacao-show-page .ux-chip-value {
-        font-size: .82rem !important;
-    }
-
-    .internacao-show-page .ux-chip-sub {
+    #main-container.internacao-show-page .ux-chip-value {
         font-size: .72rem !important;
+        font-weight: 700 !important;
     }
 
-    .internacao-show-page .ux-summary-strip {
+    #main-container.internacao-show-page .ux-chip-sub {
+        font-size: .62rem !important;
+    }
+
+    #main-container.internacao-show-page .ux-summary-strip {
         align-items: center !important;
     }
 
-    .internacao-show-page .ux-summary-chip {
-        min-height: 34px !important;
-        padding: 0 10px !important;
+    #main-container.internacao-show-page .ux-summary-chip {
+        min-height: 30px !important;
+        padding: 4px 8px !important;
         display: inline-flex !important;
         align-items: center !important;
-        gap: 6px !important;
-        flex-wrap: nowrap !important;
-        line-height: 1 !important;
+        gap: 5px !important;
+        flex-wrap: wrap !important;
+        line-height: 1.05 !important;
         white-space: nowrap !important;
     }
 
-    .internacao-show-page .ux-chip-label,
-    .internacao-show-page .ux-chip-value,
-    .internacao-show-page .ux-chip-sub {
+    #main-container.internacao-show-page .ux-chip-label,
+    #main-container.internacao-show-page .ux-chip-value,
+    #main-container.internacao-show-page .ux-chip-sub {
         display: inline-flex !important;
         align-items: center !important;
-        line-height: 1 !important;
+        line-height: 1.05 !important;
         margin: 0 !important;
     }
 
-    .internacao-show-page .ux-priority-chip .ux-chip-value {
+    #main-container.internacao-show-page .ux-priority-chip .ux-chip-value {
         align-items: center !important;
     }
 
@@ -2780,6 +2938,33 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     #main-container .tab-pane .v2-relatorio {
         font-size: .82rem !important;
         line-height: 1.36 !important;
+    }
+
+    .internacao-show-page .visita-report-card__header h6,
+    #main-container .tab-pane .visita-report-card__header h6 {
+        font-size: .76rem !important;
+        line-height: 1.25 !important;
+        font-weight: 700 !important;
+    }
+
+    .internacao-show-page .visita-report-card .v2-relatorio,
+    #main-container .tab-pane .visita-report-card .v2-relatorio {
+        font-size: .76rem !important;
+        line-height: 1.35 !important;
+        font-weight: 400 !important;
+    }
+
+    .internacao-show-page .visita-report-card__meta,
+    #main-container .tab-pane .visita-report-card__meta {
+        font-size: .76rem !important;
+        line-height: 1.3 !important;
+        font-weight: 600 !important;
+    }
+
+    .internacao-show-page .visita-report-card .badge,
+    #main-container .tab-pane .visita-report-card .badge {
+        font-size: .68rem !important;
+        font-weight: 700 !important;
     }
 </style>
 
