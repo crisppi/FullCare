@@ -1037,22 +1037,24 @@ if (!empty($sessionIdUsuario)) {
                 if (!is_array($item) || empty($item['message'])) continue;
                 $feedbackItems[] = [
                     'type' => function_exists('fullcare_feedback_type') ? fullcare_feedback_type($item['type'] ?? 'info') : ($item['type'] ?? 'info'),
-                    'title' => $item['title'] ?? null,
+                    'title' => $item['title'] ?? (function_exists('fullcare_feedback_title') ? fullcare_feedback_title($item['type'] ?? 'info', $item['message'] ?? '') : null),
                     'message' => (string)$item['message'],
                 ];
             }
         }
         if (!empty($_SESSION['mensagem'])) {
+            $feedbackType = function_exists('fullcare_feedback_type') ? fullcare_feedback_type($_SESSION['mensagem_tipo'] ?? 'danger') : ($_SESSION['mensagem_tipo'] ?? 'danger');
             $feedbackItems[] = [
-                'type' => function_exists('fullcare_feedback_type') ? fullcare_feedback_type($_SESSION['mensagem_tipo'] ?? 'danger') : ($_SESSION['mensagem_tipo'] ?? 'danger'),
-                'title' => null,
+                'type' => $feedbackType,
+                'title' => function_exists('fullcare_feedback_title') ? fullcare_feedback_title($feedbackType, $_SESSION['mensagem']) : null,
                 'message' => (string)$_SESSION['mensagem'],
             ];
         }
         if (!empty($_SESSION['msg'])) {
+            $feedbackType = function_exists('fullcare_feedback_type') ? fullcare_feedback_type($_SESSION['type'] ?? 'info') : ($_SESSION['type'] ?? 'info');
             $feedbackItems[] = [
-                'type' => function_exists('fullcare_feedback_type') ? fullcare_feedback_type($_SESSION['type'] ?? 'info') : ($_SESSION['type'] ?? 'info'),
-                'title' => null,
+                'type' => $feedbackType,
+                'title' => function_exists('fullcare_feedback_title') ? fullcare_feedback_title($feedbackType, $_SESSION['msg']) : null,
                 'message' => trim(strip_tags((string)$_SESSION['msg'])),
             ];
         }

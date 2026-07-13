@@ -104,7 +104,7 @@
         }
         return {
             type: 'info',
-            title: form.dataset.feedbackSavingTitle || 'Salvando alterações',
+            title: form.dataset.feedbackSavingTitle || 'Salvando dados',
             message: form.dataset.feedbackSavingMessage || 'Aguarde enquanto registramos as informações.',
             duration: 2600,
         };

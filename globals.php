@@ -351,6 +351,28 @@ if (!function_exists('fullcare_feedback_type')) {
     }
 }
 
+if (!function_exists('fullcare_feedback_title')) {
+    function fullcare_feedback_title(?string $type, ?string $message = null): string
+    {
+        $type = fullcare_feedback_type($type);
+        $text = mb_strtolower(trim((string)$message), 'UTF-8');
+
+        if ($type === 'success') {
+            if (preg_match('/\b(remov|delet|exclu|apag)/u', $text)) {
+                return 'Registro removido';
+            }
+            return 'Registro salvo';
+        }
+        if ($type === 'warning') {
+            return 'Atenção';
+        }
+        if ($type === 'error') {
+            return 'Não foi possível salvar';
+        }
+        return 'Aviso';
+    }
+}
+
 if (!function_exists('fullcare_flash')) {
     function fullcare_flash(string $message, string $type = 'info', ?string $title = null): void
     {
@@ -362,7 +384,7 @@ if (!function_exists('fullcare_flash')) {
         }
         $_SESSION['fullcare_feedback'][] = [
             'type' => fullcare_feedback_type($type),
-            'title' => $title,
+            'title' => $title ?? fullcare_feedback_title($type, $message),
             'message' => $message,
         ];
     }
