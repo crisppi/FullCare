@@ -222,7 +222,9 @@
         </div>
         <div class="internacao-page__content">
             <form class="visible" action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/process_internacao.php', ENT_QUOTES, 'UTF-8') ?>" id="myForm" method="POST"
-                enctype="multipart/form-data">
+                enctype="multipart/form-data"
+                data-feedback-saving-title="Salvando dados"
+                data-feedback-saving-message="Aguarde enquanto registramos a internação.">
                 <div class="internacao-card internacao-card--general">
                     <div class="internacao-card__header">
                         <div class="internacao-card__title-wrap">
@@ -953,7 +955,6 @@
                 <?php include_once('formularios/form_cad_internacao_uti.php'); ?>
                 <?php include_once('formularios/form_cad_internacao_prorrog.php'); ?>
                 <?php include_once('formularios/form_cad_internacao_negoc.php'); ?>
-<<<<<<< HEAD
             </div>
 
         <style>
@@ -1443,9 +1444,6 @@
         </style>
 
         <input type="hidden" class="form-control" value="<?= ($ultimoReg + 1) ?>" id="fk_int_capeante"
-=======
-            </div><input type="hidden" class="form-control" value="<?= ($ultimoReg + 1) ?>" id="fk_int_capeante"
->>>>>>> 408cc9d9544ef44cfea008b3fd4716458c7d6c66
             name="fk_int_capeante">
         <input type="hidden" class="form-control" value="n" id="encerrado_cap" name="encerrado_cap">
         <input type="hidden" class="form-control" value="s" id="aberto_cap" name="aberto_cap">

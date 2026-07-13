@@ -810,9 +810,9 @@ const hospitalInsightsHelper = (function() {
                 hideAlert();
             }
         } catch (err) {
-            if (button) button.disabled = true;
-            setPopover(`Não foi possível carregar os dados. ${err.message}`);
-            showAlert('Não foi possível verificar os pacientes em UTI agora.');
+            if (button) button.disabled = false;
+            setPopover(`Indicadores indisponíveis no momento. ${esc(err.message || '')}`);
+            hideAlert();
         }
     }
 
@@ -1859,6 +1859,27 @@ $("#myForm").submit(function(event) {
         }
     };
 
+    const showFeedbackToast = function(type, title, message, duration = 4600) {
+        if (window.FullCareFeedback && typeof window.FullCareFeedback.show === 'function') {
+            window.FullCareFeedback.show({
+                type: type,
+                title: title,
+                message: message,
+                duration: duration
+            });
+            return true;
+        }
+        document.dispatchEvent(new CustomEvent('fullcare:feedback', {
+            detail: {
+                type: type,
+                title: title,
+                message: message,
+                duration: duration
+            }
+        }));
+        return false;
+    };
+
 
     $.ajax({
         url: post_url,
@@ -1896,7 +1917,8 @@ $("#myForm").submit(function(event) {
 
             // Sucesso (resposta vazia ou texto padrão)
             {
-                showSubmitAlert('success', "Cadastrado com sucesso", 3000);
+                $('#alert').hide();
+                showFeedbackToast('success', 'Registro salvo', 'Internação cadastrada com sucesso.');
 
                 const regIntInput = $("#RegInt");
                 if (regIntInput.length) {

@@ -869,7 +869,9 @@
                 </div>
                 <div class="internacao-card__body">
                     <form class="visible" action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/process_internacao_editar.php', ENT_QUOTES, 'UTF-8') ?>" id="myForm" method="POST"
-                        enctype="multipart/form-data">
+                        enctype="multipart/form-data"
+                        data-feedback-saving-title="Salvando dados"
+                        data-feedback-saving-message="Aguarde enquanto atualizamos a internação.">
                 <!-- ID da internação (necessário no update) -->
                 <input type="hidden" id="id_internacao" name="id_internacao" value="<?= $intern['id_internacao'] ?>">
 

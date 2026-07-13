@@ -1068,6 +1068,12 @@ try {
     $conn->commit();
     internacaoEditarDebugLog('COMMIT ok id_int=' . (int)$idInternacao);
 
+    $_SESSION['fullcare_feedback'][] = [
+        'type' => 'success',
+        'title' => 'Registro salvo',
+        'message' => 'Internação atualizada com sucesso.',
+    ];
+
     // redirect único após todo o processamento
     header('Location: internacoes/lista');
     exit;
