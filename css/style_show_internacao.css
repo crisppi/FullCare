@@ -1,10 +1,10 @@
 
     :root {
-        --brand: #5e2363;
-        --brand-050: #f9f3fc;
-        --brand-100: #f2e8f7;
-        --brand-700: #4b1c50;
-        --brand-800: #431945;
+        --brand: #2f78a8;
+        --brand-050: #f2f8fc;
+        --brand-100: #dceefa;
+        --brand-700: #24628c;
+        --brand-800: #1d4f72;
         --teal: #0f766e;
         --ink: #111827;
         --muted: #6b7280;
@@ -12,19 +12,19 @@
 
     /* Variáveis das nav-pills aplicadas ao contêiner das abas */
     #internTabs {
-        --bs-nav-pills-link-active-bg: #5e2363 !important;
+        --bs-nav-pills-link-active-bg: #2f78a8 !important;
         --bs-nav-pills-link-active-color: #fff !important;
-        --bs-nav-link-color: #5e2363 !important;
-        --bs-nav-link-hover-color: #5e2363 !important;
+        --bs-nav-link-color: #2f78a8 !important;
+        --bs-nav-link-hover-color: #24628c !important;
     }
 
-    /* Header card com faixa roxa */
+    /* Header card com faixa azul */
     .card.shadow-sm.mb-3 {
         position: relative !important;
         overflow: hidden !important;
         border-radius: 14px !important;
-        border: 1px solid #e9ddf2 !important;
-        box-shadow: 0 14px 28px rgba(94, 35, 99, .12), 0 8px 22px rgba(0, 0, 0, .06) !important;
+        border: 1px solid #d7e5ef !important;
+        box-shadow: 0 14px 28px rgba(47, 120, 168, .12), 0 8px 22px rgba(0, 0, 0, .06) !important;
         background: #fff !important;
     }
 
@@ -35,22 +35,22 @@
         top: 0;
         bottom: 0;
         width: 8px;
-        background: #5e2363;
+        background: #2f78a8;
         border-radius: 14px 0 0 14px;
         pointer-events: none;
     }
 
-    /* Abas roxas */
+    /* Abas azuis */
     #internTabs button.nav-link {
         background: var(--brand-050) !important;
         color: var(--brand) !important;
-        border: 1px solid rgba(94, 35, 99, .15) !important;
+        border: 1px solid rgba(47, 120, 168, .18) !important;
         border-radius: 12px !important;
         font-weight: 700 !important;
     }
 
     #internTabs button.nav-link:not(.active):hover {
-        background: rgba(94, 35, 99, .18) !important;
+        background: rgba(47, 120, 168, .14) !important;
         color: var(--brand) !important;
     }
 
@@ -106,7 +106,7 @@
         width: 64px;
         height: 64px;
         border-radius: 50%;
-        background: #ecd5f9;
+        background: #dceefa;
         color: var(--brand);
         font-weight: 700;
         font-size: 1.25rem;
@@ -152,14 +152,14 @@
     .ht-label {
         display: inline-block;
         font-size: 12px;
-        color: #5e2363;
+        color: #24628c;
         margin-bottom: 6px;
         padding: 4px 8px;
         border-radius: 8px;
         font-weight: 600;
         transition: .2s;
-        background: #f9f3fc;
-        border: 1px solid rgba(94, 35, 99, .15);
+        background: #f2f8fc;
+        border: 1px solid rgba(47, 120, 168, .18);
     }
 
     .ht-dot {
@@ -167,14 +167,14 @@
         width: 14px;
         height: 14px;
         border-radius: 50%;
-        background: #5e2363;
+        background: #2f78a8;
         border: 2px solid #fff;
-        box-shadow: 0 0 0 3px #f2e8f7, 0 2px 4px rgba(0, 0, 0, .1);
+        box-shadow: 0 0 0 3px #dceefa, 0 2px 4px rgba(0, 0, 0, .1);
         transition: .2s;
     }
 
     .ht-marker:hover .ht-label {
-        background: #f2e8f7;
+        background: #dceefa;
     }
 
     .ht-marker:hover .ht-dot {
@@ -182,14 +182,14 @@
     }
 
     .ht-marker.active .ht-label {
-        background: #5e2363;
+        background: #2f78a8;
         color: #fff;
-        border-color: #5e2363;
+        border-color: #2f78a8;
     }
 
     .ht-marker.active .ht-dot {
-        background: #431945;
-        box-shadow: 0 0 0 4px #f2e8f7, 0 4px 8px rgba(0, 0, 0, .15);
+        background: #1d4f72;
+        box-shadow: 0 0 0 4px #dceefa, 0 4px 8px rgba(0, 0, 0, .15);
     }
 
     .ht-pop {
@@ -534,6 +534,12 @@
 }
 
 /* Ajuste fino da tabela da aba Visitas */
+#main-container #visitas .visitas-table thead {
+    height: auto !important;
+    min-height: 0 !important;
+    line-height: 1 !important;
+}
+
 #main-container #visitas .visitas-table > :not(caption) > * > * {
     padding: 2px 7px !important;
     font-size: .58rem !important;
@@ -543,15 +549,20 @@
 
 #main-container #visitas .visitas-table thead tr,
 #main-container #visitas .visitas-table thead th {
-    height: 26px !important;
+    height: 24px !important;
+    min-height: 0 !important;
+    max-height: 24px !important;
 }
 
 #main-container #visitas .visitas-table thead th {
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    font-size: .57rem !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: .62rem !important;
     font-weight: 600 !important;
     letter-spacing: .02em !important;
+    line-height: 1.05 !important;
 }
 
 #main-container #visitas .visitas-table tbody tr,

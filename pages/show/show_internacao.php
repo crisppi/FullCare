@@ -632,7 +632,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                         <div class="d-flex flex-wrap gap-2 text-secondary small">
                             <span><i class="fas fa-hospital me-1"></i><?= e($data['nome_hosp'] ?? '-') ?></span>
                             <span>•</span>
-                            <span><i class="fas fa-procedures me-1"></i>Internação <?= e($data['id_internacao'] ?? '-') ?></span>
+                            <span><i class="fas fa-hospital me-1"></i>Internação <?= e($data['id_internacao'] ?? '-') ?></span>
                             <span>•</span>
                             <span><i class="far fa-calendar-alt me-1"></i>Data da internação: <?= e($data_intern_format) ?></span>
                         </div>
@@ -671,7 +671,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                     <ul class="nav nav-pills mb-0" id="internTabs" role="tablist"
-                        style="--bs-nav-pills-link-active-bg:#5e2363; --bs-nav-pills-link-active-color:#fff; --bs-nav-link-color:#5e2363; --bs-nav-link-hover-color:#5e2363;">
+                        style="--bs-nav-pills-link-active-bg:#2f78a8; --bs-nav-pills-link-active-color:#fff; --bs-nav-link-color:#2f78a8; --bs-nav-link-hover-color:#24628c;">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link<?= $abaAtual === 'resumo' ? ' active' : '' ?>"
                                 id="resumo-tab"
@@ -734,7 +734,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                     <div class="internacao-action-row d-flex flex-wrap gap-2 align-items-center">
                         <?php if (!$isGestorSeguradora): ?>
                             <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white shadow-sm"
-                                style="background-color:#5e2363;border-color:#5e2363;">
+                                style="background-color:#2f78a8;border-color:#2f78a8;">
                                 <i class="fas fa-plus me-1"></i>Nova Visita
                             </a>
                             <a href="<?= e($editarInternacaoUrl) ?>" class="btn btn-sm btn-outline-secondary shadow-sm">
@@ -760,10 +760,10 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                         <div class="row g-3">
                             <div class="col-12 col-lg-6">
                                 <div class="card ov-card ov-int"
-                                    style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #5e2363) 6px, #fff 6px);">
+                                    style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #2f78a8) 6px, #fff 6px);">
                                     <div class="card-body">
                                         <div class="ov-head">
-                                            <div class="ov-icon"><i class="fas fa-procedures"></i></div>
+                                            <div class="ov-icon"><i class="fas fa-hospital"></i></div>
                                             <h6 class="ov-title mb-0">Internação</h6>
                                         </div>
                                         <dl class="details-dl">
@@ -802,7 +802,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                         <div class="row g-3 mt-1">
                             <div class="col-12">
                                 <div class="card ov-card ov-int"
-                                    style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #5e2363) 6px, #fff 6px);">
+                                    style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #2f78a8) 6px, #fff 6px);">
                                     <div class="card-body">
                                         <div class="ov-head">
                                             <h6 class="ov-title mb-0">Relatório Internação</h6>
@@ -823,7 +823,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                 <div class="ux-empty-title">Nenhuma visita registrada para esta internação</div>
                                 <?php if (!$isGestorSeguradora): ?>
                                     <div class="mt-2">
-                                        <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white" style="background:#5e2363;border-color:#5e2363;">
+                                        <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white" style="background:#2f78a8;border-color:#2f78a8;">
                                             <i class="fas fa-plus me-1"></i>Cadastrar visita
                                         </a>
                                     </div>
@@ -832,7 +832,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                         <?php else: ?>
 
                             <div class="card ov-card ov-int"
-                                style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #5e2363) 6px, #fff 6px);">
+                                style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #2f78a8) 6px, #fff 6px);">
                                 <div class="card-body">
                                     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center ov-head gap-2">
                                         <div>
@@ -862,7 +862,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                                 </div>
                                                 <div class="col-auto">
                                                     <button type="button" id="btnAplicarVisitas" class="btn btn-sm btn-primary"
-                                                        style="background:#5e2363;border-color:#5e2363;">Aplicar</button>
+                                                        style="background:#2f78a8;border-color:#2f78a8;">Aplicar</button>
                                                 </div>
                                                 <div class="col-auto">
                                                     <button type="button" id="btnLimparVisitas" class="btn btn-sm btn-outline-secondary">Limpar</button>
@@ -873,7 +873,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
                                     <div class="visitas-table-wrap mb-3">
                                         <div class="table-responsive">
-                                            <table class="table table-hover align-middle mb-0 visitas-table">
+                                            <table class="table table-hover mb-0 visitas-table">
                                                 <thead>
                                                     <tr>
                                                         <th>ID visita</th>
@@ -1222,7 +1222,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                         id="prorrog" role="tabpanel" aria-labelledby="prorrog-tab" tabindex="0">
 
                         <div class="card ov-card ov-int"
-                            style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #5e2363) 6px, #fff 6px);">
+                            style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #2f78a8) 6px, #fff 6px);">
                             <div class="card-body">
                                 <div class="ov-head ov-head-space">
                                     <h6 class="ov-title mb-0">Prorrogações</h6>
@@ -1253,7 +1253,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <button class="btn btn-sm btn-primary" style="background:#5e2363;border-color:#5e2363;">Filtrar</button>
+                                        <button class="btn btn-sm btn-primary" style="background:#2f78a8;border-color:#2f78a8;">Filtrar</button>
                                     </div>
                                     <div class="col-auto">
                                         <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=prorrog') ?>#prorrog">Limpar</a>
@@ -1316,7 +1316,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                     <div class="tab-pane fade<?= $abaAtual === 'tuss' ? ' show active' : '' ?>"
                         id="tuss" role="tabpanel" aria-labelledby="tuss-tab" tabindex="0">
                         <div class="card ov-card ov-int"
-                            style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #5e2363) 6px, #fff 6px);">
+                            style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #2f78a8) 6px, #fff 6px);">
                             <div class="card-body">
                                 <div class="ov-head ov-head-space">
                                     <h6 class="ov-title mb-0">TUSS</h6>
@@ -1345,7 +1345,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <button class="btn btn-sm btn-primary" style="background:#5e2363;border-color:#5e2363;">Filtrar</button>
+                                        <button class="btn btn-sm btn-primary" style="background:#2f78a8;border-color:#2f78a8;">Filtrar</button>
                                     </div>
                                     <div class="col-auto">
                                         <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=tuss') ?>#tuss">Limpar</a>
@@ -1414,7 +1414,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                         id="neg" role="tabpanel" aria-labelledby="neg-tab" tabindex="0">
 
                         <div class="card ov-card ov-int"
-                            style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #5e2363) 6px, #fff 6px);">
+                            style="border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.06);background-image:linear-gradient(to right, var(--ov, #2f78a8) 6px, #fff 6px);">
                             <div class="card-body">
                                 <div class="ov-head ov-head-space">
                                     <h6 class="ov-title mb-0">Negociações</h6>
@@ -1443,7 +1443,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <button class="btn btn-sm btn-primary" style="background:#5e2363;border-color:#5e2363;">Filtrar</button>
+                                        <button class="btn btn-sm btn-primary" style="background:#2f78a8;border-color:#2f78a8;">Filtrar</button>
                                     </div>
                                     <div class="col-auto">
                                         <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=neg') ?>#neg">Limpar</a>
@@ -1965,11 +1965,11 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
 <style>
     :root {
-        --brand: #5e2363;
-        --brand-700: #4b1c50;
-        --brand-800: #431945;
-        --brand-100: #f2e8f7;
-        --brand-050: #f9f3fc;
+        --brand: #2f78a8;
+        --brand-700: #24628c;
+        --brand-800: #1d4f72;
+        --brand-100: #dceefa;
+        --brand-050: #f2f8fc;
         --teal: #0f766e;
         --teal-100: #d1fae5;
         --padX: 56px;
@@ -1979,12 +1979,12 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         width: 42px;
         height: 42px;
         border-radius: 50%;
-        background: #ecd5f9;
+        background: #dceefa;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
-        color: #5e2363;
+        color: #1d4f72;
         font-size: 1rem;
         flex: 0 0 auto;
     }
@@ -2012,8 +2012,8 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .ux-summary-chip {
-        border: 1px solid #eadcf3;
-        background: #fbf7fe;
+        border: 1px solid #c9dfef;
+        background: #f2f8fc;
         border-radius: 10px;
         padding: 4px 7px;
         display: flex;
@@ -2030,7 +2030,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .ux-chip-value {
-        color: #5e2363;
+        color: #1d4f72;
         font-size: .72rem;
         font-weight: 700;
     }
@@ -2081,9 +2081,9 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         margin-left: 6px;
         font-size: 0.64rem;
         font-weight: 700;
-        border: 1px solid #ddcfe8;
-        background: #f5edf9;
-        color: #5e2363;
+        border: 1px solid #b9d6e9;
+        background: #dceefa;
+        color: #1d4f72;
         vertical-align: middle;
     }
 
@@ -2098,7 +2098,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         top: 68px;
         z-index: 10;
         background: #fff;
-        border: 1px solid #ece7f1;
+        border: 1px solid #d7e5ef;
         border-radius: 10px;
         padding: 6px;
     }
@@ -2124,7 +2124,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     #main-container .ov-card {
-        border: 1px solid #ede7f3;
+        border: 1px solid #d7e5ef;
         border-radius: 10px;
     }
 
@@ -2154,7 +2154,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .ux-table-wrap {
-        border: 1px solid #ece7f1;
+        border: 1px solid #d7e5ef;
         border-radius: 12px;
         overflow: auto;
         background: #fff;
@@ -2168,16 +2168,16 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         position: sticky;
         top: 0;
         z-index: 2;
-        background: #f6f2fa;
-        border-bottom: 1px solid #e7dff0;
+        background: #eef7fc;
+        border-bottom: 1px solid #c9dfef;
     }
 
     .ux-data-table tbody tr:not(.table-light):nth-child(odd) td {
-        background: #fcfbfe;
+        background: #fbfdff;
     }
 
     .ux-data-table tbody tr:not(.table-light):hover td {
-        background: #f4effa;
+        background: #f2f8fc;
     }
 
     .ux-data-table td {
@@ -2188,21 +2188,21 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .ux-empty-state {
-        border: 1px dashed #d9cbe7;
-        background: #faf7fd;
+        border: 1px dashed #b9d6e9;
+        background: #f2f8fc;
         border-radius: 12px;
         padding: 11px 13px;
     }
 
     .ux-empty-title {
         font-weight: 700;
-        color: #43395b;
+        color: #173f5b;
         margin-bottom: 2px;
     }
 
     .ux-focus-text {
-        border: 1px solid #e8e1f0;
-        background: #fcfbfe;
+        border: 1px solid #d7e5ef;
+        background: #fbfdff;
         border-radius: 12px;
         padding: 11px 12px;
         white-space: pre-wrap;
@@ -2343,7 +2343,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .visita-report-card__meta--auditor {
-        color: #5e2363;
+        color: #24628c;
     }
 
     .visita-report-card__meta--cargo {
@@ -2367,8 +2367,8 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         gap: 12px;
         padding: 16px 18px;
         border-bottom: 1px solid #e2e8f0;
-        background: linear-gradient(90deg, #f4ecfb 0%, #f8fafc 58%, #f1f5f9 100%);
-        box-shadow: inset 5px 0 0 #6a1b6d;
+        background: linear-gradient(90deg, #eef7fc 0%, #f8fafc 58%, #f1f5f9 100%);
+        box-shadow: inset 5px 0 0 #2f78a8;
     }
 
     .visitas-report-section__heading {
@@ -2386,14 +2386,14 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         height: 34px;
         border-radius: 9px;
         background: #ffffff;
-        border: 1px solid #eadcf3;
-        color: #6a1b6d;
-        box-shadow: 0 3px 9px rgba(106, 27, 109, .12);
+        border: 1px solid #c9dfef;
+        color: #2f78a8;
+        box-shadow: 0 3px 9px rgba(47, 120, 168, .12);
         flex: 0 0 auto;
     }
 
     .visitas-report-section__eyebrow {
-        color: #6a1b6d;
+        color: #24628c;
         font-size: .68rem;
         font-weight: 800;
         letter-spacing: .09em;
@@ -2403,7 +2403,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .visitas-report-section__title {
-        color: #251238;
+        color: #173f5b;
         font-size: .95rem;
         font-weight: 800;
         line-height: 1.25;
@@ -2470,7 +2470,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     .btn-ghost-brand {
         color: var(--brand);
         background: var(--brand-050);
-        border: 1px solid #eadcf3
+        border: 1px solid #c9dfef
     }
 
     .btn-ghost-brand:hover {
@@ -2560,8 +2560,8 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         width: fit-content;
         padding: 2px 9px;
         border-radius: 999px;
-        background: #f2e8f7;
-        color: #4b1c50;
+        background: #dceefa;
+        color: #1d4f72;
         font-weight: 700;
     }
 
@@ -2682,7 +2682,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .visitas-table-wrap {
-        border: 1px solid #ece7f1;
+        border: 1px solid #c9dfef;
         border-radius: 14px;
         overflow: hidden;
         background: #fff;
@@ -2692,16 +2692,32 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         margin-bottom: 0;
     }
 
+    .visitas-table thead {
+        height: auto !important;
+        min-height: 0 !important;
+        line-height: 1 !important;
+    }
+
+    .visitas-table thead tr {
+        height: 24px !important;
+        min-height: 0 !important;
+        max-height: 24px !important;
+    }
+
     .visitas-table thead th {
-        background: #e7d9f2;
-        color: #4b1c50;
-        font-size: .8rem;
-        font-weight: 700;
+        background: #eaf4fb;
+        color: #24628c;
+        height: 24px !important;
+        min-height: 0 !important;
+        max-height: 24px !important;
+        font-size: .62rem;
+        font-weight: 600;
+        line-height: 1.05;
         letter-spacing: .01em;
         text-transform: uppercase;
-        border-bottom: 1px solid #c9afd9;
+        border-bottom: 1px solid #c9dfef;
         white-space: nowrap;
-        padding: .82rem 1rem;
+        padding: 3px .55rem;
         vertical-align: middle;
     }
 
@@ -2715,7 +2731,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         padding-bottom: .62rem;
         padding-left: 1rem;
         padding-right: 1rem;
-        border-color: #f0eaf5;
+        border-color: #e3edf5;
         border-right: 0;
         border-left: 0;
         vertical-align: middle;
@@ -2723,17 +2739,17 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
     .visitas-table tbody tr:hover td,
     .visitas-table tbody tr:focus td {
-        background: #faf6fd;
+        background: #f2f8fc;
     }
 
     .visitas-table tbody tr.active td {
-        background: #f3ebf9;
-        border-top-color: #e4d6ef;
-        border-bottom-color: #e4d6ef;
+        background: #eaf4fb;
+        border-top-color: #c9dfef;
+        border-bottom-color: #c9dfef;
     }
 
     .visitas-table tbody tr.active td:first-child {
-        box-shadow: inset 4px 0 0 #5e2363;
+        box-shadow: inset 4px 0 0 #2f78a8;
     }
 
     .visitas-table th:first-child,
