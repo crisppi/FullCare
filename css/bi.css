@@ -132,8 +132,8 @@ body.bi-theme,
 }
 
 .bi-panel.bi-filters {
-  display: flex !important;
-  flex-wrap: wrap !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   gap: 6px;
   align-items: flex-end;
   overflow-x: visible;
@@ -201,8 +201,8 @@ body.bi-theme,
 }
 
 .bi-panel.bi-filters .bi-filter {
-  min-width: 132px;
-  flex: 1 1 132px !important;
+  min-width: 0;
+  flex: none !important;
 }
 
 .bi-filter input,
@@ -266,9 +266,13 @@ body.bi-theme,
   display: flex;
   gap: 6px;
   align-items: end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   flex: 0 0 auto !important;
-  margin-left: auto;
+  margin-left: 0;
+  justify-self: end;
+  align-self: end;
+  width: max-content;
+  max-width: 100%;
 }
 
 .bi-panel.bi-filters {
@@ -277,7 +281,7 @@ body.bi-theme,
 
 @media (max-width: 1200px) {
   .bi-panel.bi-filters {
-    flex-wrap: wrap !important;
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
     overflow-x: visible;
   }
 }
