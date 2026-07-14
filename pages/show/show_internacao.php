@@ -1259,11 +1259,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                         <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=prorrog') ?>#prorrog">Limpar</a>
                                     </div>
                                 </form>
-                                <div class="mb-2">
-                                    <input type="search" class="form-control form-control-sm js-local-filter" data-target-table="table-prorrog"
-                                        placeholder="Buscar">
-                                </div>
-
                                 <?php if (!empty($pr_filtered)): ?>
                                     <div class="table-responsive ux-table-wrap">
                                         <table id="table-prorrog" class="table table-sm align-middle mb-2 ux-data-table">
@@ -1351,11 +1346,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                         <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=tuss') ?>#tuss">Limpar</a>
                                     </div>
                                 </form>
-                                <div class="mb-2">
-                                    <input type="search" class="form-control form-control-sm js-local-filter" data-target-table="table-tuss"
-                                        placeholder="Buscar">
-                                </div>
-
                                 <?php if (!empty($tuss_filtered)): ?>
                                     <div class="table-responsive ux-table-wrap">
                                         <table id="table-tuss" class="table table-sm align-middle mb-2 ux-data-table">
@@ -1449,11 +1439,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                         <a class="btn btn-sm btn-outline-secondary" href="<?= e($visualizarInternacaoUrl . '?aba=neg') ?>#neg">Limpar</a>
                                     </div>
                                 </form>
-                                <div class="mb-2">
-                                    <input type="search" class="form-control form-control-sm js-local-filter" data-target-table="table-neg"
-                                        placeholder="Buscar">
-                                </div>
-
                                 <?php if (!empty($neg_filtered)): ?>
                                     <div class="table-responsive ux-table-wrap">
                                         <table id="table-neg" class="table table-sm align-middle mb-2 ux-data-table">
@@ -1507,10 +1492,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                 </div><!-- /.tab-content -->
 
             </div>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="small text-muted">Atualizado: <?= e(date('d/m/Y H:i')) ?></div>
         </div>
 
     </div>
@@ -1585,19 +1566,6 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
             });
         });
 
-        document.querySelectorAll('.js-local-filter').forEach(function(input) {
-            input.addEventListener('input', function() {
-                var tableId = input.getAttribute('data-target-table');
-                if (!tableId) return;
-                var table = document.getElementById(tableId);
-                if (!table) return;
-                var q = (input.value || '').toLowerCase().trim();
-                table.querySelectorAll('tbody tr:not(.table-light)').forEach(function(row) {
-                    var txt = (row.textContent || '').toLowerCase();
-                    row.style.display = (!q || txt.indexOf(q) !== -1) ? '' : 'none';
-                });
-            });
-        });
     });
 </script>
 
@@ -2311,27 +2279,27 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
     .internacao-show-page .details-dl {
         display: grid;
-        grid-template-columns: 110px 1fr;
-        column-gap: 12px;
-        row-gap: 6px;
+        grid-template-columns: 96px 1fr;
+        column-gap: 10px;
+        row-gap: 5px;
         margin: 0;
     }
 
     .internacao-show-page .details-dl dt,
     .internacao-show-page .details-dl dd {
-        font-size: .68rem;
-        line-height: 1.15;
+        font-size: .7rem;
+        line-height: 1.2;
         margin: 0;
     }
 
     .internacao-show-page .details-dl dt {
-        color: #737488;
-        font-weight: 700;
+        color: #6f7885;
+        font-weight: 600;
     }
 
     .internacao-show-page .details-dl dd {
-        color: #1f2937;
-        font-weight: 700;
+        color: #334155;
+        font-weight: 600;
     }
 
     .internacao-show-page .v2-relatorio {
@@ -2987,21 +2955,22 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     .internacao-show-page .ov-title,
     #main-container .ov-title,
     #main-container .tab-pane h6 {
-        font-size: .9rem !important;
+        font-size: .82rem !important;
         line-height: 1.2 !important;
     }
 
     .internacao-show-page .details-dl {
-        grid-template-columns: 125px 1fr;
-        row-gap: 7px;
+        grid-template-columns: 96px 1fr;
+        row-gap: 5px;
     }
 
     .internacao-show-page .details-dl dt,
     .internacao-show-page .details-dl dd,
     #main-container .details-dl dt,
     #main-container .details-dl dd {
-        font-size: .8rem !important;
-        line-height: 1.22 !important;
+        font-size: .7rem !important;
+        line-height: 1.2 !important;
+        font-weight: 600 !important;
     }
 
     .internacao-show-page .v2-relatorio,

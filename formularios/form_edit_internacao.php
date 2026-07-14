@@ -691,9 +691,28 @@
         }
 
         .edit-draft-actions .btn {
-            min-height: 38px;
-            padding: 7px 13px;
-            border-radius: 9px;
+            min-height: 32px;
+            height: 32px;
+            padding: 5px 12px;
+            border-radius: 7px;
+            font-size: .76rem;
+            line-height: 1;
+        }
+
+        .edit-draft-actions .btn-clear-draft {
+            border: 1px solid #b8d7ea !important;
+            background: #edf8ff !important;
+            color: #236693 !important;
+            font-weight: 800;
+            box-shadow: none !important;
+        }
+
+        .edit-draft-actions .btn-clear-draft:hover,
+        .edit-draft-actions .btn-clear-draft:focus {
+            border-color: #8fc7e6 !important;
+            background: #dff1fb !important;
+            color: #1f5f8f !important;
+            outline: none !important;
         }
 
         @media (max-width: 640px) {
@@ -1675,7 +1694,9 @@
                     </button>
                     <div class="edit-draft-actions">
                         <small id="clinical-autosave-status" class="text-muted">Alterações salvam somente ao clicar em Atualizar</small>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-clinical-draft>Limpar rascunho local</button>
+                        <button type="button" class="btn btn-sm btn-clear-draft" data-clear-clinical-draft>
+                            <i class="fas fa-eraser me-1"></i>Limpar rascunho
+                        </button>
                     </div>
                 </div>
 
@@ -3613,5 +3634,114 @@
             #container-negoc
         ) select option {
             color: #1f2937 !important;
+        }
+
+        /* Tipografia final das Tabelas Adicionais: discreta e alinhada ao restante da tela. */
+        #main-container .internacao-page .tabelas-adicionais-card h4.tabelas-adicionais-card__title,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-adicionais-card__title {
+            margin: 0 !important;
+            color: #4b5563 !important;
+            font-family: var(--app-font-family, "Inter", Arial, Helvetica, sans-serif) !important;
+            font-size: .72rem !important;
+            font-weight: 700 !important;
+            line-height: 1.1 !important;
+            letter-spacing: 0 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .tabelas-col > label.control-label,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects label[for="select_relatorio_detalhado"],
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects label[for="select_tuss"],
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects label[for="select_prorrog"],
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects label[for="select_gestao"],
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects label[for="select_uti"],
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects label[for="select_negoc"] {
+            min-height: 0 !important;
+            margin: 0 0 3px !important;
+            color: #6b7280 !important;
+            font-size: .66rem !important;
+            font-weight: 600 !important;
+            line-height: 1.1 !important;
+            letter-spacing: 0 !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator {
+            margin-left: 5px !important;
+            padding: 2px 5px !important;
+            border-color: #f3cf9b !important;
+            background: #fff8ed !important;
+            color: #9a5a10 !important;
+            font-size: .55rem !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+            box-shadow: none !important;
+            vertical-align: 1px !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator__icon {
+            width: 12px !important;
+            height: 12px !important;
+            font-size: .52rem !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.form-control,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.detail-select,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.select-purple,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.has-saved-record,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects .bootstrap-select > .dropdown-toggle,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_tuss,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_prorrog,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_gestao,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_uti,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_negoc {
+            border: 1px solid #8fc7f5 !important;
+            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
+            background-color: #d7ebff !important;
+            color: #17446f !important;
+            font-size: .72rem !important;
+            font-weight: 700 !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72) !important;
+            outline: none !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-col.has-saved-record .form-control,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-col.has-saved-record select,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.has-saved-record {
+            border: 1px solid #8fc7f5 !important;
+            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
+            background-color: #d7ebff !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72) !important;
+        }
+
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.form-control:focus,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.detail-select:focus,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.select-purple:focus,
+        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects .bootstrap-select > .dropdown-toggle:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_tuss:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_prorrog:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_gestao:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_uti:focus,
+        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_negoc:focus {
+            border-color: #62aee8 !important;
+            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
+            background-color: #d7ebff !important;
+            box-shadow: 0 0 0 .10rem rgba(47, 137, 189, .10), inset 0 1px 0 rgba(255, 255, 255, .72) !important;
+        }
+
+        #main-container .internacao-page #container-negoc .edit-negoc-card,
+        #main-container .internacao-page #container-negoc .adicional-card--negoc {
+            border-color: transparent !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
+        }
+
+        #main-container .internacao-page #container-negoc .negoc-row,
+        #main-container .internacao-page #container-negoc .negociation-field-container,
+        #main-container .internacao-page #container-negoc .negotiation-field-container {
+            border: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            padding: 0 !important;
         }
     </style>

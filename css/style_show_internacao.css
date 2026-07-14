@@ -78,15 +78,15 @@
 
     .ov-title {
         margin: 0;
-        font-weight: 600;
-        font-size: 1rem;
+        font-weight: 700;
+        font-size: .84rem;
         color: var(--ink);
     }
 
     .details-dl {
         display: grid;
-        grid-template-columns: 140px 1fr;
-        gap: 10px 16px;
+        grid-template-columns: 96px 1fr;
+        gap: 5px 10px;
         margin: 0;
     }
 
@@ -399,19 +399,19 @@
 }
 
 #main-container .ov-title {
-    font-size: .9rem !important;
+    font-size: .82rem !important;
     line-height: 1.2 !important;
 }
 
 #main-container .details-dl {
-    grid-template-columns: 125px 1fr !important;
-    gap: 7px 12px !important;
+    grid-template-columns: 96px 1fr !important;
+    gap: 5px 10px !important;
 }
 
 #main-container .details-dl dt,
 #main-container .details-dl dd {
-    font-size: .8rem !important;
-    line-height: 1.22 !important;
+    font-size: .7rem !important;
+    line-height: 1.2 !important;
 }
 
 #main-container .v2-relatorio {
@@ -487,13 +487,6 @@
 #main-container .tab-pane .js-period-form {
     row-gap: 4px !important;
     margin-bottom: .45rem !important;
-}
-
-#main-container .tab-pane .js-local-filter {
-    min-height: 28px !important;
-    height: 28px !important;
-    margin-bottom: .35rem !important;
-    font-size: .62rem !important;
 }
 
 #main-container .tab-pane .ux-empty-state {
