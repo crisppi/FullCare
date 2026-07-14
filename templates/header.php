@@ -26,6 +26,10 @@ if ($basePathFromBaseUrl === '/' && preg_match('#^/(FullCare|FullConex(?:Aud)?)(
 }
 
 $currentScriptName = strtolower((string)basename((string)($_SERVER['SCRIPT_NAME'] ?? '')));
+$isInternacaoShowPage =
+    defined('FULLCARE_INTERNACAO_SHOW_PAGE')
+    || $currentScriptName === 'show_internacao.php'
+    || preg_match('#/internacoes/visualizar/\\d+/?#i', $requestUriPath) === 1;
 $isBiRequestPath = preg_match('#/bi(/|$)#i', $requestUriPath) === 1;
 $isOperationalIntelligencePage =
     preg_match('#/inteligencia(/|$)#i', $requestUriPath) === 1
@@ -302,9 +306,11 @@ if (!empty($sessionIdUsuario)) {
     <link href="<?= $BASE_URL ?>css/legendas.css?v=<?= @filemtime(__DIR__ . '/../css/legendas.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/styleMenu.css?v=<?= @filemtime(__DIR__ . '/../css/styleMenu.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/module_headers.css?v=<?= @filemtime(__DIR__ . '/../css/module_headers.css') ?>" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/style_show_internacao.css?v=<?= @filemtime(__DIR__ . '/../css/style_show_internacao.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/table_style.css?v=<?= @filemtime(__DIR__ . '/../css/table_style.css') ?>" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/listagem_padrao.css?v=<?= @filemtime(__DIR__ . '/../css/listagem_padrao.css') ?>" rel="stylesheet">
+    <?php if ($isInternacaoShowPage): ?>
+    <link href="<?= $BASE_URL ?>css/style_show_internacao.css?v=<?= @filemtime(__DIR__ . '/../css/style_show_internacao.css') ?>" rel="stylesheet">
+    <?php endif; ?>
     <link href="<?= $BASE_URL ?>css/feedback.css?v=<?= @filemtime(__DIR__ . '/../css/feedback.css') ?>" rel="stylesheet">
     <script defer src="<?= $BASE_URL ?>js/lista_header_sort.js"></script>
     <script defer src="<?= $BASE_URL ?>js/listagem_enhancer.js?v=<?= @filemtime(__DIR__ . '/../js/listagem_enhancer.js') ?: time() ?>"></script>

@@ -1313,7 +1313,7 @@ if (typeof jQuery !== 'undefined') {
                                         <?php if ($pesqInternado == "s" and $intern['censo_int'] <> "s") { ?>
                                         <li>
                                             <button class="btn btn-default"
-                                                onclick="edit('<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern['id_internacao'] ?>')"
+                                                onclick="window.location.href='<?= rtrim($BASE_URL, '/') ?>/internacoes/visualizar/<?= (int)$intern['id_internacao'] ?>'"
                                                 style="font-size: 1rem;">
                                                 <i class="bi bi-eye text-success"></i>
                                                 Visualização

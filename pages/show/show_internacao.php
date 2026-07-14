@@ -26,6 +26,9 @@
 include_once("check_logado.php");
 include_once("globals.php");
 Gate::enforceAction($conn, $BASE_URL, 'view', 'Você não tem permissão para visualizar este registro.');
+if (!defined('FULLCARE_INTERNACAO_SHOW_PAGE')) {
+    define('FULLCARE_INTERNACAO_SHOW_PAGE', true);
+}
 include_once("templates/header.php");
 
 // Models / DAOs
@@ -623,17 +626,15 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 <div id="main-container" class="container-fluid py-2 internacao-show-page">
     <div class="v2-max mx-auto">
 
-        <div class="card shadow-sm mb-2 header-card">
+        <div class="card shadow-sm mb-2 header-card patient-identity-card">
             <div class="card-body d-flex flex-wrap gap-2 align-items-center justify-content-between">
                 <div class="d-flex gap-3 align-items-center">
                     <div class="v2-avatar"><?= e($iniciais) ?></div>
-                    <div>
+                    <div class="patient-identity-main">
                         <h4 class="mb-1"><?= e(mb_strtoupper($data['nome_pac'] ?? '-')) ?></h4>
-                        <div class="d-flex flex-wrap gap-2 text-secondary small">
+                        <div class="d-flex flex-wrap gap-2 text-secondary small patient-identity-meta">
                             <span><i class="fas fa-hospital me-1"></i><?= e($data['nome_hosp'] ?? '-') ?></span>
-                            <span>•</span>
                             <span><i class="fas fa-hospital me-1"></i>Internação <?= e($data['id_internacao'] ?? '-') ?></span>
-                            <span>•</span>
                             <span><i class="far fa-calendar-alt me-1"></i>Data da internação: <?= e($data_intern_format) ?></span>
                         </div>
                     </div>
@@ -733,8 +734,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                 <div class="ux-actions-sticky mb-3">
                     <div class="internacao-action-row d-flex flex-wrap gap-2 align-items-center">
                         <?php if (!$isGestorSeguradora): ?>
-                            <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white shadow-sm"
-                                style="background-color:#2f78a8;border-color:#2f78a8;">
+                            <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm shadow-sm btn-new-visit">
                                 <i class="fas fa-plus me-1"></i>Nova Visita
                             </a>
                             <a href="<?= e($editarInternacaoUrl) ?>" class="btn btn-sm btn-outline-secondary shadow-sm">
@@ -823,7 +823,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                 <div class="ux-empty-title">Nenhuma visita registrada para esta internação</div>
                                 <?php if (!$isGestorSeguradora): ?>
                                     <div class="mt-2">
-                                        <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm text-white" style="background:#2f78a8;border-color:#2f78a8;">
+                                        <a href="<?= e($novaVisitaUrl) ?>" class="btn btn-sm btn-new-visit">
                                             <i class="fas fa-plus me-1"></i>Cadastrar visita
                                         </a>
                                     </div>
@@ -1976,33 +1976,61 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .v2-avatar {
-        width: 42px;
-        height: 42px;
+        width: 46px;
+        height: 46px;
         border-radius: 50%;
-        background: #dceefa;
+        background: linear-gradient(135deg, #dceefa 0%, #b8dbf0 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
         color: #1d4f72;
-        font-size: 1rem;
+        font-size: 1.02rem;
         flex: 0 0 auto;
+        border: 1px solid #9bc4df;
+        box-shadow: 0 4px 10px rgba(47, 120, 168, .16);
+    }
+
+    .patient-identity-card {
+        border: 1px solid #c4dceb !important;
+        border-left: 5px solid #2f78a8 !important;
+        background: linear-gradient(90deg, #f2f8fc 0%, #ffffff 44%, #fbfdff 100%) !important;
+        box-shadow: 0 8px 18px rgba(47, 120, 168, .08) !important;
     }
 
     .header-card .card-body {
-        padding: .62rem .9rem;
+        padding: .72rem 1rem;
     }
 
     .header-card h4 {
-        font-size: .86rem;
-        margin-bottom: .12rem !important;
+        font-size: 1rem;
+        margin-bottom: .24rem !important;
         line-height: 1.15;
+        color: #0f2538;
+        font-weight: 800;
     }
 
     .header-card .small,
     .header-card .text-secondary {
-        font-size: .66rem !important;
+        font-size: .72rem !important;
         line-height: 1.2;
+    }
+
+    .patient-identity-main {
+        min-width: 0;
+    }
+
+    .patient-identity-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #ffffff;
+        border: 1px solid #d6e6f1;
+        color: #5d6b7a;
+        font-weight: 600;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .035);
     }
 
     .ux-summary-strip {
@@ -2188,10 +2216,11 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .ux-empty-state {
-        border: 1px dashed #b9d6e9;
-        background: #f2f8fc;
+        border: 1px solid #b9d6e9;
+        background: #eef7fc;
         border-radius: 12px;
         padding: 11px 13px;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .7);
     }
 
     .ux-empty-title {
@@ -2201,15 +2230,18 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .ux-focus-text {
-        border: 1px solid #d7e5ef;
-        background: #fbfdff;
+        border: 1px solid #c1d5e5;
+        background: #f3f5f8;
         border-radius: 12px;
         padding: 11px 12px;
         white-space: pre-wrap;
         max-height: 60vh;
         overflow: auto;
-        line-height: 1.38;
-        font-size: .78rem;
+        line-height: 1.32;
+        font-size: .7rem;
+        color: #5f6b7a;
+        font-weight: 400;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, .045), 0 1px 0 rgba(255, 255, 255, .8);
     }
     .ov-head-space {
         display: flex;
@@ -2303,10 +2335,16 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     }
 
     .internacao-show-page .v2-relatorio {
-        font-size: .68rem;
+        font-size: .7rem;
         line-height: 1.32;
         min-height: 24px;
         white-space: pre-wrap;
+        background: #f3f5f8;
+        border: 1px solid #c1d5e5;
+        border-radius: 9px;
+        color: #5f6b7a;
+        font-weight: 400;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, .045), 0 1px 0 rgba(255, 255, 255, .8);
     }
 
     .visita-report-card {
@@ -2476,6 +2514,20 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
     .btn-ghost-brand:hover {
         background: var(--brand-100);
         color: var(--brand-800)
+    }
+
+    .btn-new-visit {
+        background: #0f766e !important;
+        border: 1px solid #0f766e !important;
+        color: #fff !important;
+        box-shadow: 0 4px 10px rgba(15, 118, 110, .16) !important;
+    }
+
+    .btn-new-visit:hover,
+    .btn-new-visit:focus {
+        background: #0b5f59 !important;
+        border-color: #0b5f59 !important;
+        color: #fff !important;
     }
 
     .ux-recent-wrap {
@@ -2811,13 +2863,15 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
     .internacao-show-page .header-card h4 {
         font-size: 1.02rem !important;
-        line-height: 1.18 !important;
+        line-height: 1.16 !important;
+        color: #0f2538 !important;
+        font-weight: 800 !important;
     }
 
     .internacao-show-page .header-card .small,
     .internacao-show-page .header-card .text-secondary {
-        font-size: .76rem !important;
-        line-height: 1.25 !important;
+        font-size: .72rem !important;
+        line-height: 1.2 !important;
     }
 
     #main-container.internacao-show-page .ux-chip-label {
@@ -2952,8 +3006,11 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
     .internacao-show-page .v2-relatorio,
     #main-container .tab-pane .v2-relatorio {
-        font-size: .82rem !important;
-        line-height: 1.36 !important;
+        font-size: .7rem !important;
+        line-height: 1.32 !important;
+        font-weight: 400 !important;
+        color: #5f6b7a !important;
+        background: #f3f5f8 !important;
     }
 
     .internacao-show-page .visita-report-card__header h6,
@@ -2965,9 +3022,11 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
 
     .internacao-show-page .visita-report-card .v2-relatorio,
     #main-container .tab-pane .visita-report-card .v2-relatorio {
-        font-size: .76rem !important;
-        line-height: 1.35 !important;
+        font-size: .68rem !important;
+        line-height: 1.3 !important;
         font-weight: 400 !important;
+        color: #5f6b7a !important;
+        background: #f3f5f8 !important;
     }
 
     .internacao-show-page .visita-report-card__meta,
