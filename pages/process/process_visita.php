@@ -54,6 +54,21 @@ function fullcareResolveUserId(PDO $conn, ?int ...$candidates): ?int
     return null;
 }
 
+function fullcareTussLiberadoSn($qtdLiberada): string
+{
+    $raw = trim((string)($qtdLiberada ?? ''));
+    if ($raw === '') {
+        return 'n';
+    }
+
+    $normalized = str_replace(',', '.', $raw);
+    if (is_numeric($normalized) && (float)$normalized != 0.0) {
+        return 's';
+    }
+
+    return 'n';
+}
+
 function fullcareNormalizeVisitResponsible(array $payload): array
 {
     $cargoSessao = (string)($_SESSION['cargo'] ?? ($_SESSION['cargo_user'] ?? ''));
@@ -511,9 +526,9 @@ function processTussEntries(
         $tuss->fk_int_tuss = $fkInternacao;
         $tuss->fk_vis_tuss = $visitaId;
         $tuss->tuss_solicitado = $descricao;
-        $tuss->tuss_liberado_sn = strOrNull($row['tuss_liberado_sn'] ?? null);
         $tuss->qtd_tuss_solicitado = toIntOrNull($row['qtd_tuss_solicitado'] ?? null);
         $tuss->qtd_tuss_liberado = toIntOrNull($row['qtd_tuss_liberado'] ?? null);
+        $tuss->tuss_liberado_sn = fullcareTussLiberadoSn($row['qtd_tuss_liberado'] ?? null);
         $tuss->data_realizacao_tuss = strOrNull($row['data_realizacao_tuss'] ?? null);
         $tuss->fk_usuario_tuss = toIntOrNull($row['fk_usuario_tuss'] ?? $fkUsuarioVis);
         $tuss->data_create_tuss = date('Y-m-d H:i:s');

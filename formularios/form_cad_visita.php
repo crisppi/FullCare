@@ -466,7 +466,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                 <div class="visita-card__header tabelas-adicionais-card__header" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(111,69,162,.10);">
                     <div>
                         <p class="visita-card__eyebrow tabelas-adicionais-card__eyebrow" style="margin:0;text-transform:uppercase;letter-spacing:.18em;font-size:.72rem;font-weight:800;line-height:1.2;color:#6e4a96;">Tabelas adicionais</p>
-                        <h3 class="visita-card__title tabelas-adicionais-card__title" style="margin:2px 0 0;font-size:1.22rem;font-weight:800;color:#2a1b43;">Complementos da visita</h3>
+                        <h3 class="visita-card__title tabelas-adicionais-card__title" style="margin:5px 0 0;font-size:1.22rem;font-weight:800;color:#2a1b43;">Complementos da visita</h3>
                     </div>
                 </div>
                 <div class="visita-card__body">
@@ -2507,6 +2507,7 @@ function aumentarTextProgramacao() {
 }
 
 #main-container .visita-page .visita-card--tabelas .tabelas-adicionais-card__title {
+    margin-top: 5px !important;
     font-size: .82rem !important;
     line-height: 1.05 !important;
 }

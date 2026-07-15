@@ -240,10 +240,7 @@
         </div>
         <div class="form-group">
             <label for="prorrog-ia-contexto">Contexto complementar</label>
-            <textarea class="form-control" id="prorrog-ia-contexto" rows="3" placeholder="Opcional: acrescente observações clínicas, barreiras de alta ou plano de desospitalização."></textarea>
-            <small style="display:block;margin-top:6px;color:#475569;font-weight:600;">
-                A IA já considera automaticamente o relatório da auditoria, as ações da auditoria e a programação terapêutica desta tela.
-            </small>
+            <textarea class="form-control" id="prorrog-ia-contexto" rows="3"></textarea>
         </div>
         <div style="margin:10px 0 12px;">
             <button type="button" class="btn btn-primary" id="btn-executar-prorrog-ia">

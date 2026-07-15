@@ -1658,7 +1658,7 @@
         }
 
         .tabelas-adicionais-card__title {
-            margin: 0;
+            margin: 5px 0 0;
             font-size: .82rem;
             font-weight: 800;
             color: #0d3052;
@@ -4610,4 +4610,29 @@
     color: #c4c4c4 !important;
     opacity: 1 !important;
     font-weight: 500 !important;
+}
+
+/* Acoes do assistente IA no cadastro: compactas e alinhadas ao padrao da tela. */
+#main-container .internacao-page .ia-highlight-box .auditoria-actions {
+    gap: 8px !important;
+}
+
+#main-container .internacao-page .ia-highlight-box .auditoria-action-btn {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+    font-size: .78rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+}
+
+#main-container .internacao-page .ia-highlight-box .auditoria-action-btn i {
+    font-size: .86rem !important;
+    line-height: 1 !important;
+}
+
+#main-container .internacao-page .ia-highlight-box .auditoria-action-btn--subtle-ia {
+    font-weight: 700 !important;
 }

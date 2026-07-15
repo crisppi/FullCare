@@ -3311,6 +3311,26 @@
             border-bottom-color: #e0e7f0 !important;
         }
 
+        #main-container .internacao-page .ia-highlight-box .auditoria-actions {
+            gap: 8px !important;
+        }
+
+        #main-container .internacao-page .ia-highlight-box .auditoria-action-btn {
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 4px 10px !important;
+            border-radius: 8px !important;
+            font-size: .78rem !important;
+            line-height: 1 !important;
+            font-weight: 700 !important;
+            letter-spacing: 0 !important;
+        }
+
+        #main-container .internacao-page .ia-highlight-box .auditoria-action-btn i {
+            font-size: .86rem !important;
+            line-height: 1 !important;
+        }
+
         #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
         #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle,
         #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {

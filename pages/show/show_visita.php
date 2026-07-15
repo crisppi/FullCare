@@ -75,6 +75,49 @@ function initials_from_name($name)
     return strtoupper($first . $second);
 }
 
+function firstFilled(array $row, array $keys): string
+{
+    foreach ($keys as $key) {
+        if (!array_key_exists($key, $row)) {
+            continue;
+        }
+        $value = trim((string)$row[$key]);
+        if ($value !== '') {
+            return $value;
+        }
+    }
+    return '';
+}
+
+function yesNoLabel($value): string
+{
+    $value = strtolower(trim((string)$value));
+    if ($value === '') return '';
+    if (in_array($value, ['s', 'sim', '1', 'yes', 'true'], true)) return 'Sim';
+    if (in_array($value, ['n', 'nao', 'não', '0', 'no', 'false'], true)) return 'Não';
+    return ucfirst($value);
+}
+
+function compactRowsBySql(PDO $conn, string $sql, array $params): array
+{
+    try {
+        $stmt = $conn->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, (int)$value, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    } catch (Throwable $e) {
+        return [];
+    }
+}
+
+function nonEmptyText($value): string
+{
+    $text = trim((string)$value);
+    return $text === '' ? '' : $text;
+}
+
 /* ============== GET / Base ============== */
 $id_visita = filter_input(INPUT_GET, 'id_visita', FILTER_SANITIZE_NUMBER_INT);
 $vpage     = max(1, (int)($_GET['vpage'] ?? 1));
@@ -109,6 +152,75 @@ $data_visita    = formatDateBr($dv_norm);
 
 $data_intern    = formatDateBr($v['data_intern_int'] ?? '');
 $acomodacao     = $v['acomodacao_int']  ?? '';
+
+$relatorioVisita = nonEmptyText($v['rel_visita_vis'] ?? '');
+$acoesAuditoria  = nonEmptyText($v['acoes_int_vis'] ?? '');
+$programacao     = nonEmptyText($v['programacao_enf'] ?? '');
+$auditorVisita   = firstFilled($v, ['usuario_vis', 'usuario_create', 'visita_auditor_prof_med', 'visita_auditor_prof_enf', 'nome_usuario']);
+
+$detalhesRows = ($conn instanceof PDO)
+    ? compactRowsBySql(
+        $conn,
+        "SELECT * FROM tb_detalhes WHERE fk_vis_det = :visita ORDER BY fk_vis_det DESC LIMIT 1",
+        [':visita' => (int)$id_visita_row]
+    )
+    : [];
+$detalhes = $detalhesRows[0] ?? [];
+
+$utiRows = ($conn instanceof PDO)
+    ? compactRowsBySql(
+        $conn,
+        "SELECT * FROM tb_uti WHERE fk_visita_uti = :visita ORDER BY id_uti DESC",
+        [':visita' => (int)$id_visita_row]
+    )
+    : [];
+
+$prorrogacaoRows = ($conn instanceof PDO)
+    ? compactRowsBySql(
+        $conn,
+        "SELECT * FROM tb_prorrogacao WHERE fk_visita_pror = :visita ORDER BY id_prorrogacao DESC",
+        [':visita' => (int)$id_visita_row]
+    )
+    : [];
+
+$tussRows = ($conn instanceof PDO)
+    ? compactRowsBySql(
+        $conn,
+        "SELECT * FROM tb_tuss WHERE fk_vis_tuss = :visita ORDER BY id_tuss DESC",
+        [':visita' => (int)$id_visita_row]
+    )
+    : [];
+
+$negociacaoRows = ($conn instanceof PDO)
+    ? compactRowsBySql(
+        $conn,
+        "SELECT * FROM tb_negociacao WHERE fk_visita_neg = :visita ORDER BY id_negociacao DESC",
+        [':visita' => (int)$id_visita_row]
+    )
+    : [];
+
+$detalhesClinicos = [
+    'Nível de consciência' => firstFilled($detalhes, ['nivel_consc_det']),
+    'Dieta' => firstFilled($detalhes, ['dieta_det']),
+    'Oxigênio' => trim(firstFilled($detalhes, ['oxig_det']) . ' ' . firstFilled($detalhes, ['oxig_uso_det'])),
+    'Antibiótico' => trim(firstFilled($detalhes, ['atb_det']) . ' ' . firstFilled($detalhes, ['atb_uso_det'])),
+    'Curativo' => firstFilled($detalhes, ['curativo_det']),
+    'Dispositivo' => firstFilled($detalhes, ['dispositivo_det']),
+    'Diálise' => firstFilled($detalhes, ['dialise_det']),
+    'Hemoderivados' => firstFilled($detalhes, ['hemoderivados_det']),
+    'Acamado' => firstFilled($detalhes, ['acamado_det']),
+    'TQT' => firstFilled($detalhes, ['tqt_det']),
+    'SVD' => firstFilled($detalhes, ['svd_det']),
+    'GTT' => firstFilled($detalhes, ['gtt_det']),
+    'Dreno' => firstFilled($detalhes, ['dreno_det']),
+    'Lesões de pele' => firstFilled($detalhes, ['lesoes_pele_det']),
+    'Medicamento alto custo' => trim(firstFilled($detalhes, ['medic_alto_custo_det']) . ' ' . firstFilled($detalhes, ['qual_medicamento_det'])),
+    'Paliativos' => firstFilled($detalhes, ['paliativos_det']),
+    'Braden' => firstFilled($detalhes, ['braden_det']),
+    'Liminar' => firstFilled($detalhes, ['liminar_det']),
+    'Parto' => firstFilled($detalhes, ['parto_det']),
+];
+$detalhesClinicos = array_filter($detalhesClinicos, fn($item) => trim((string)$item) !== '');
 
 /* ============== Descobrir id_paciente (se disponível) ============== */
 $id_paciente = $v['id_paciente'] ?? ($v['fk_paciente_int'] ?? ($v['id_pac'] ?? null));
@@ -200,28 +312,24 @@ $queryBase   = "id_visita={$id_visita_row}&tab=timeline";
 $prevUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . max(1, $vpage - 1);      // mais antigas
 $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); // mais recentes
 ?>
-<div class="container-fluid py-3">
+<div id="main-container" class="container-fluid py-2 visita-show-page">
     <!-- Cabeçalho -->
-    <div class="card shadow-sm mb-3" style="border-radius:14px;">
+    <div class="card shadow-sm mb-2 header-card patient-identity-card">
         <div class="card-body d-flex flex-wrap gap-3 align-items-center justify-content-between">
             <div class="d-flex gap-3 align-items-center">
-                <div
-                    style="width:64px;height:64px;border-radius:50%;background:#ecd5f9;display:flex;align-items:center;justify-content:center;font-weight:700;color:#5e2363">
+                <div class="v2-avatar visit-avatar">
                     <?= safe($ini) ?>
                 </div>
-                <div>
+                <div class="patient-identity-main">
                     <h4 class="mb-1"><?= safe($nome_pac ?: 'Paciente') ?></h4>
-                    <div class="d-flex flex-wrap gap-2 text-secondary small">
+                    <div class="d-flex flex-wrap gap-2 text-secondary small patient-identity-meta">
                         <span><i
-                                class="fa-solid fa-hospital me-1"></i><?= safe($hospital_nome ?: 'Hospital não informado') ?></span>
-                        <span>•</span>
-                        <span><i class="fa-solid fa-bed-pulse me-1"></i>Internação
+                                class="bi bi-hospital me-1"></i><?= safe($hospital_nome ?: 'Hospital não informado') ?></span>
+                        <span><i class="bi bi-heart-pulse me-1"></i>Internação
                             #<?= safe($id_internacao ?: '—') ?></span>
-                        <span>•</span>
-                        <span><i class="fa-solid fa-user-nurse me-1"></i>Visita
+                        <span><i class="bi bi-person-badge me-1"></i>Visita
                             #<?= safe($id_visita_row ?: '—') ?></span>
-                        <span>•</span>
-                        <span><i class="fa-regular fa-calendar me-1"></i>Data da visita:
+                        <span><i class="bi bi-calendar-event me-1"></i>Data da visita:
                             <?= safe($data_visita ?: '—') ?></span>
                     </div>
                 </div>
@@ -237,19 +345,19 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     </div>
 
     <!-- Abas -->
-    <div class="card shadow-sm" style="border-radius:14px;">
+    <div class="card shadow-sm visita-main-card">
         <div class="card-body">
             <ul class="nav nav-pills mb-3" role="tablist">
                 <li class="nav-item">
                     <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-resumo" type="button"
                         role="tab">
-                        <i class="fa-solid fa-stream me-2"></i>Resumo
+                        <i class="bi bi-list-ul me-2"></i>Resumo
                     </button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-timeline" type="button"
                         role="tab">
-                        <i class="fa-solid fa-clock-rotate-left me-2"></i>Linha do tempo
+                        <i class="bi bi-clock-history me-2"></i>Linha do tempo
                     </button>
                 </li>
             </ul>
@@ -262,15 +370,17 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             <div class="card ov-card ov-int">
                                 <div class="card-body">
                                     <div class="ov-head">
-                                        <div class="ov-icon"><i class="fa-solid fa-bed-pulse"></i></div>
+                                        <div class="ov-icon"><i class="bi bi-hospital"></i></div>
                                         <h6 class="ov-title mb-0">Internação</h6>
                                     </div>
-                                    <div class="small text-secondary">Código</div>
-                                    <div class="fw-semibold mb-2">#<?= safe($id_internacao ?: '—') ?></div>
-                                    <div class="small text-secondary">Data de internação</div>
-                                    <div class="fw-semibold mb-2"><?= safe($data_intern ?: '—') ?></div>
-                                    <div class="small text-secondary">Acomodação</div>
-                                    <div class="fw-semibold"><?= safe($acomodacao ?: '—') ?></div>
+                                    <dl class="details-dl">
+                                        <dt>Código</dt>
+                                        <dd>#<?= safe($id_internacao ?: '—') ?></dd>
+                                        <dt>Data internação</dt>
+                                        <dd><?= safe($data_intern ?: '—') ?></dd>
+                                        <dt>Acomodação</dt>
+                                        <dd><?= safe($acomodacao ?: '—') ?></dd>
+                                    </dl>
                                 </div>
                             </div>
                         </div>
@@ -279,18 +389,213 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             <div class="card ov-card ov-vis">
                                 <div class="card-body">
                                     <div class="ov-head">
-                                        <div class="ov-icon"><i class="fa-solid fa-user-nurse"></i></div>
+                                        <div class="ov-icon"><i class="bi bi-person-badge"></i></div>
                                         <h6 class="ov-title mb-0">Visita</h6>
                                     </div>
-                                    <div class="small text-secondary">Código</div>
-                                    <div class="fw-semibold mb-2">#<?= safe($id_visita_row ?: '—') ?></div>
-                                    <div class="small text-secondary">Data</div>
-                                    <div class="fw-semibold mb-2"><?= safe($data_visita ?: '—') ?></div>
-                                    <div class="small text-secondary">Hospital</div>
-                                    <div class="fw-semibold"><?= safe($hospital_nome ?: '—') ?></div>
+                                    <dl class="details-dl">
+                                        <dt>Código</dt>
+                                        <dd>#<?= safe($id_visita_row ?: '—') ?></dd>
+                                        <dt>Data</dt>
+                                        <dd><?= safe($data_visita ?: '—') ?></dd>
+                                        <dt>Hospital</dt>
+                                        <dd><?= safe($hospital_nome ?: '—') ?></dd>
+                                    </dl>
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="visit-summary-grid">
+                        <section class="visit-panel visit-panel-wide">
+                            <div class="visit-panel-head">
+                                <span class="visit-panel-icon"><i class="bi bi-clipboard2-pulse"></i></span>
+                                <div>
+                                    <h6>Relatório da visita</h6>
+                                    <span>Auditoria clínica</span>
+                                </div>
+                            </div>
+                            <div class="visit-text-box">
+                                <?= $relatorioVisita !== '' ? nl2br(safe($relatorioVisita)) : '<span class="visit-empty">Sem relatório registrado.</span>' ?>
+                            </div>
+                        </section>
+
+                        <section class="visit-panel">
+                            <div class="visit-panel-head">
+                                <span class="visit-panel-icon"><i class="bi bi-person-badge"></i></span>
+                                <div>
+                                    <h6>Profissional</h6>
+                                    <span>Dados da visita</span>
+                                </div>
+                            </div>
+                            <dl class="visit-info-list">
+                                <div><dt>Auditor</dt><dd><?= safe($auditorVisita ?: '—') ?></dd></div>
+                                <div><dt>Data</dt><dd><?= safe($data_visita ?: '—') ?></dd></div>
+                                <div><dt>Hospital</dt><dd><?= safe($hospital_nome ?: '—') ?></dd></div>
+                            </dl>
+                        </section>
+
+                        <section class="visit-panel">
+                            <div class="visit-panel-head">
+                                <span class="visit-panel-icon"><i class="bi bi-list-check"></i></span>
+                                <div>
+                                    <h6>Ações da auditoria</h6>
+                                    <span>Condutas registradas</span>
+                                </div>
+                            </div>
+                            <div class="visit-text-box visit-text-box-compact">
+                                <?= $acoesAuditoria !== '' ? nl2br(safe($acoesAuditoria)) : '<span class="visit-empty">Sem ações registradas.</span>' ?>
+                            </div>
+                        </section>
+
+                        <section class="visit-panel">
+                            <div class="visit-panel-head">
+                                <span class="visit-panel-icon"><i class="bi bi-calendar2-heart"></i></span>
+                                <div>
+                                    <h6>Programação terapêutica</h6>
+                                    <span>Plano assistencial</span>
+                                </div>
+                            </div>
+                            <div class="visit-text-box visit-text-box-compact">
+                                <?= $programacao !== '' ? nl2br(safe($programacao)) : '<span class="visit-empty">Sem programação registrada.</span>' ?>
+                            </div>
+                        </section>
+
+                        <section class="visit-panel visit-panel-wide">
+                            <div class="visit-panel-head">
+                                <span class="visit-panel-icon"><i class="bi bi-activity"></i></span>
+                                <div>
+                                    <h6>Detalhes clínicos</h6>
+                                    <span>Itens assistenciais</span>
+                                </div>
+                            </div>
+                            <?php if ($detalhesClinicos): ?>
+                                <div class="visit-chip-grid">
+                                    <?php foreach ($detalhesClinicos as $label => $value): ?>
+                                        <div class="visit-chip">
+                                            <span><?= safe($label) ?></span>
+                                            <strong><?= safe(yesNoLabel($value) ?: $value) ?></strong>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="visit-empty-box">Sem detalhes clínicos registrados.</div>
+                            <?php endif; ?>
+                        </section>
+
+                        <section class="visit-panel">
+                            <div class="visit-panel-head">
+                                <span class="visit-panel-icon"><i class="bi bi-hospital"></i></span>
+                                <div>
+                                    <h6>UTI</h6>
+                                    <span><?= count($utiRows) ?> registro(s)</span>
+                                </div>
+                            </div>
+                            <?php if ($utiRows): ?>
+                                <?php foreach ($utiRows as $uti): ?>
+                                    <div class="visit-mini-card">
+                                        <div><span>Internado</span><strong><?= safe(yesNoLabel($uti['internado_uti'] ?? '') ?: '—') ?></strong></div>
+                                        <div><span>Entrada</span><strong><?= safe(formatDateBr(normalize_date_ymd_from_string($uti['data_internacao_uti'] ?? '')) ?: '—') ?></strong></div>
+                                        <div><span>VM</span><strong><?= safe(yesNoLabel($uti['vm_uti'] ?? '') ?: '—') ?></strong></div>
+                                        <div><span>Score</span><strong><?= safe($uti['score_uti'] ?? '—') ?></strong></div>
+                                        <?php $utiRel = nonEmptyText(($uti['rel_uti'] ?? '') ?: ($uti['justifique_uti'] ?? '') ?: ($uti['motivo_uti'] ?? '')); ?>
+                                        <?php if ($utiRel !== ''): ?>
+                                            <p><?= nl2br(safe($utiRel)) ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="visit-empty-box">Sem registro de UTI nesta visita.</div>
+                            <?php endif; ?>
+                        </section>
+
+                        <section class="visit-panel visit-panel-wide">
+                            <div class="visit-panel-head">
+                                <span class="visit-panel-icon"><i class="bi bi-table"></i></span>
+                                <div>
+                                    <h6>Tabelas adicionais</h6>
+                                    <span>Prorrogações, TUSS e negociações</span>
+                                </div>
+                            </div>
+
+                            <div class="visit-table-group">
+                                <div class="visit-table-block">
+                                    <div class="visit-subtitle"><i class="bi bi-arrow-repeat"></i> Prorrogações <span><?= count($prorrogacaoRows) ?></span></div>
+                                    <?php if ($prorrogacaoRows): ?>
+                                        <div class="table-responsive">
+                                            <table class="table visit-mini-table">
+                                                <thead><tr><th>Acomodação</th><th>Início</th><th>Fim</th><th>Diárias</th><th>Isolamento</th></tr></thead>
+                                                <tbody>
+                                                    <?php foreach ($prorrogacaoRows as $pror): ?>
+                                                        <tr>
+                                                            <td><?= safe($pror['acomod1_pror'] ?? '—') ?></td>
+                                                            <td><?= safe(formatDateBr(normalize_date_ymd_from_string($pror['prorrog1_ini_pror'] ?? '')) ?: '—') ?></td>
+                                                            <td><?= safe(formatDateBr(normalize_date_ymd_from_string($pror['prorrog1_fim_pror'] ?? '')) ?: '—') ?></td>
+                                                            <td><?= safe($pror['diarias_1'] ?? '—') ?></td>
+                                                            <td><?= safe(yesNoLabel($pror['isol_1_pror'] ?? '') ?: '—') ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="visit-empty-line">Sem prorrogação vinculada.</div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="visit-table-block">
+                                    <div class="visit-subtitle"><i class="bi bi-receipt"></i> TUSS <span><?= count($tussRows) ?></span></div>
+                                    <?php if ($tussRows): ?>
+                                        <div class="table-responsive">
+                                            <table class="table visit-mini-table">
+                                                <thead><tr><th>Solicitado</th><th>Qtd. solic.</th><th>Liberado</th><th>Qtd. lib.</th><th>Data</th></tr></thead>
+                                                <tbody>
+                                                    <?php foreach ($tussRows as $tuss): ?>
+                                                        <tr>
+                                                            <td><?= safe($tuss['tuss_solicitado'] ?? '—') ?></td>
+                                                            <td><?= safe($tuss['qtd_tuss_solicitado'] ?? '—') ?></td>
+                                                            <td><?= safe(yesNoLabel($tuss['tuss_liberado_sn'] ?? '') ?: '—') ?></td>
+                                                            <td><?= safe($tuss['qtd_tuss_liberado'] ?? '—') ?></td>
+                                                            <td><?= safe(formatDateBr(normalize_date_ymd_from_string($tuss['data_realizacao_tuss'] ?? '')) ?: '—') ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="visit-empty-line">Sem TUSS vinculada.</div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="visit-table-block">
+                                    <div class="visit-subtitle"><i class="bi bi-diagram-3"></i> Negociações <span><?= count($negociacaoRows) ?></span></div>
+                                    <?php if ($negociacaoRows): ?>
+                                        <div class="table-responsive">
+                                            <table class="table visit-mini-table">
+                                                <thead><tr><th>Tipo</th><th>De</th><th>Para</th><th>Período</th><th>Qtd.</th><th>Saving</th></tr></thead>
+                                                <tbody>
+                                                    <?php foreach ($negociacaoRows as $neg): ?>
+                                                        <tr>
+                                                            <td><?= safe($neg['tipo_negociacao'] ?? '—') ?></td>
+                                                            <td><?= safe($neg['troca_de'] ?? '—') ?></td>
+                                                            <td><?= safe($neg['troca_para'] ?? '—') ?></td>
+                                                            <td>
+                                                                <?= safe(formatDateBr(normalize_date_ymd_from_string($neg['data_inicio_neg'] ?? '')) ?: '—') ?>
+                                                                —
+                                                                <?= safe(formatDateBr(normalize_date_ymd_from_string($neg['data_fim_neg'] ?? '')) ?: '—') ?>
+                                                            </td>
+                                                            <td><?= safe($neg['qtd'] ?? '—') ?></td>
+                                                            <td><?= safe($neg['saving'] ?? '—') ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="visit-empty-line">Sem negociação vinculada.</div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
@@ -307,7 +612,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                                 <?php if (empty($v['retificado']) && $total_intern > 1): ?>
                                     <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#modalDeleteVisita" data-delete-visita="<?= (int) $id_visita_row ?>">
-                                        <i class="fa-solid fa-trash-can me-1"></i>Remover visita
+                                        <i class="bi bi-trash3 me-1"></i>Remover visita
                                     </button>
                                 <?php endif; ?>
                                 <div class="btn-group btn-group-sm" role="group" aria-label="pager">
@@ -361,9 +666,9 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                                         <div class="ht-pop">
                                             <?php if ($responsavel): ?>
                                                 <div class="small text-secondary mb-1"><i
-                                                        class="fa-solid fa-user-nurse me-1"></i><?= safe($responsavel) ?></div>
+                                                        class="bi bi-person-badge me-1"></i><?= safe($responsavel) ?></div>
                                             <?php endif; ?>
-                                            <div class="small"><i class="fa-solid fa-hospital me-1"></i><?= safe($hosp) ?></div>
+                                            <div class="small"><i class="bi bi-hospital me-1"></i><?= safe($hosp) ?></div>
                                             <div class="small mt-1">Visita #<?= $idv ?></div>
                                         </div>
                                     </a>
@@ -376,16 +681,16 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                                     <h6 class="mb-0">
-                                        <i class="fa-regular fa-clipboard me-2"></i>
+                                        <i class="bi bi-clipboard2-pulse me-2"></i>
                                         Relatório da visita <span id="tl-id" class="badge bg-secondary"></span>
                                     </h6>
                                     <div class="d-flex align-items-center gap-2 flex-wrap">
                                         <div class="small text-secondary">
-                                            <i class="fa-regular fa-calendar me-1"></i><span id="tl-date"></span>
+                                            <i class="bi bi-calendar-event me-1"></i><span id="tl-date"></span>
                                             <span id="tl-sep1" style="display:none;"> • </span>
-                                            <i class="fa-solid fa-user-nurse ms-2 me-1"></i><span id="tl-user"></span>
+                                            <i class="bi bi-person-badge ms-2 me-1"></i><span id="tl-user"></span>
                                             <span id="tl-sep2" style="display:none;"> • </span>
-                                            <i class="fa-solid fa-hospital ms-2 me-1"></i><span id="tl-hosp"></span>
+                                            <i class="bi bi-hospital ms-2 me-1"></i><span id="tl-hosp"></span>
                                             <span id="tl-sep3" style="display:none;"> • </span>
                                             <span id="tl-total-wrap" style="display:none;">Total visitas: <span
                                                     id="tl-total"></span></span>
@@ -393,7 +698,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                                         <button type="button" id="tl-delete-btn" class="btn btn-outline-danger btn-sm d-none"
                                             data-bs-toggle="modal" data-bs-target="#modalDeleteVisita"
                                             data-delete-visita="<?= (int) $id_visita_row ?>">
-                                            <i class="fa-solid fa-trash-can me-1"></i>Remover
+                                            <i class="bi bi-trash3 me-1"></i>Remover
                                         </button>
                                     </div>
                                 </div>
@@ -423,7 +728,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                     $backHref = !empty($_SERVER['HTTP_REFERER']) ? 'javascript:history.back()' : $BASE_URL . 'internacoes.php';
                     ?>
                     <a href="<?= safe($backHref) ?>" class="btn btn-ghost-brand btn-sm rounded-pill shadow-sm">
-                        <i class="fa-solid fa-arrow-left me-2"></i>
+                        <i class="bi bi-arrow-left me-2"></i>
                         Voltar
                     </a>
                 </div>
@@ -436,7 +741,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Remover visita</h5>
+                <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Remover visita</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
@@ -466,52 +771,52 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         /* respiro lateral maior para não cortar etiquetas */
     }
 
-    .btn-primary {
+    .visita-show-page .btn-primary {
         background-color: var(--brand) !important;
         border-color: var(--brand) !important;
     }
 
-    .btn-primary:hover {
+    .visita-show-page .btn-primary:hover {
         background-color: var(--brand-700) !important;
         border-color: var(--brand-700) !important;
     }
 
-    .btn-primary:focus,
-    .btn-primary:active {
+    .visita-show-page .btn-primary:focus,
+    .visita-show-page .btn-primary:active {
         background-color: var(--brand-800) !important;
         border-color: var(--brand-800) !important;
         box-shadow: 0 0 0 .2rem rgba(94, 35, 99, .25) !important;
     }
 
-    .btn-outline-secondary {
+    .visita-show-page .btn-outline-secondary {
         border-color: #e0d4ea !important;
     }
 
-    .btn-outline-secondary:hover {
+    .visita-show-page .btn-outline-secondary:hover {
         background: var(--brand-050) !important;
     }
 
-    .nav-pills .nav-link {
+    .visita-show-page .nav-pills .nav-link {
         color: var(--brand);
     }
 
-    .nav-pills .nav-link:hover {
+    .visita-show-page .nav-pills .nav-link:hover {
         background: var(--brand-050);
     }
 
-    .nav-pills .nav-link.active {
+    .visita-show-page .nav-pills .nav-link.active {
         background-color: var(--brand) !important;
     }
 
-    .card {
+    .visita-show-page .card {
         border-radius: 14px;
     }
 
-    .card.shadow-sm {
+    .visita-show-page .card.shadow-sm {
         box-shadow: 0 8px 24px rgba(0, 0, 0, .06) !important;
     }
 
-    .ov-card {
+    .visita-show-page .ov-card {
         position: relative;
         border: 0 !important;
         border-radius: 14px;
@@ -519,7 +824,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         background: #fff;
     }
 
-    .ov-card::before {
+    .visita-show-page .ov-card::before {
         content: "";
         position: absolute;
         left: 0;
@@ -532,14 +837,14 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         opacity: .9;
     }
 
-    .ov-head {
+    .visita-show-page .ov-head {
         display: flex;
         align-items: center;
         gap: .5rem;
         margin-bottom: .5rem;
     }
 
-    .ov-icon {
+    .visita-show-page .ov-icon {
         width: 36px;
         height: 36px;
         border-radius: 10px;
@@ -552,20 +857,420 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         font-size: 16px;
     }
 
-    .ov-title {
+    .visita-show-page .ov-title {
         margin: 0;
         font-weight: 600;
         color: var(--ov-accent, var(--brand));
     }
 
-    .ov-int {
+    .visita-show-page .ov-int {
         --ov-accent: var(--brand);
         --ov-accent-100: var(--brand-100);
     }
 
-    .ov-vis {
+    .visita-show-page .ov-vis {
         --ov-accent: var(--teal);
         --ov-accent-100: var(--teal-100);
+    }
+
+    .visita-show-page {
+        font-size: .78rem;
+    }
+
+    .visita-show-page .patient-identity-card {
+        border: 1px solid #c4dceb !important;
+        border-left: 5px solid #2f78a8 !important;
+        background: linear-gradient(90deg, #f2f8fc 0%, #ffffff 44%, #fbfdff 100%) !important;
+        box-shadow: 0 8px 18px rgba(47, 120, 168, .08) !important;
+        border-radius: 12px !important;
+    }
+
+    .visita-show-page .header-card .card-body {
+        padding: .72rem 1rem !important;
+    }
+
+    .visita-show-page .visit-avatar,
+    .visita-show-page .v2-avatar {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        border-radius: 50% !important;
+        background: #dff0fb !important;
+        color: #1d4f72 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: .8rem !important;
+        font-weight: 800 !important;
+    }
+
+    .visita-show-page .header-card h4 {
+        font-size: 1rem !important;
+        line-height: 1.15 !important;
+        margin-bottom: .22rem !important;
+        color: #0f2538 !important;
+        font-weight: 800 !important;
+    }
+
+    .visita-show-page .header-card .small,
+    .visita-show-page .header-card .text-secondary {
+        font-size: .72rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .visita-show-page .patient-identity-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid #d6e6f1;
+        color: #5d6b7a;
+        font-weight: 600;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .035);
+    }
+
+    .visita-show-page .text-end .small {
+        font-size: .68rem !important;
+    }
+
+    .visita-show-page .text-end .fw-semibold {
+        font-size: .78rem !important;
+        color: #4b5563;
+    }
+
+    .visita-show-page .visita-main-card {
+        border-radius: 12px !important;
+        border: 1px solid #d7e5ef !important;
+    }
+
+    .visita-show-page .visita-main-card > .card-body {
+        padding: .8rem .9rem .65rem !important;
+    }
+
+    .visita-show-page .nav-pills {
+        margin-bottom: .65rem !important;
+        gap: .25rem;
+    }
+
+    .visita-show-page .nav-pills .nav-link {
+        padding: .42rem .68rem !important;
+        font-size: .72rem !important;
+        font-weight: 700 !important;
+        border-radius: 10px !important;
+        line-height: 1.15 !important;
+        color: #2f78a8 !important;
+    }
+
+    .visita-show-page .nav-pills .nav-link i {
+        font-size: .72rem !important;
+        margin-right: .32rem !important;
+    }
+
+    .visita-show-page .nav-pills .nav-link:hover {
+        background: #edf7fc !important;
+    }
+
+    .visita-show-page .nav-pills .nav-link.active {
+        background: #2f78a8 !important;
+        color: #fff !important;
+    }
+
+    .visita-show-page .row.g-3 {
+        --bs-gutter-x: .7rem;
+        --bs-gutter-y: .7rem;
+    }
+
+    .visita-show-page .ov-card {
+        border: 1px solid #d7e5ef !important;
+        border-radius: 10px !important;
+        box-shadow: 0 8px 18px rgba(47, 120, 168, .06) !important;
+    }
+
+    .visita-show-page .ov-card::before {
+        width: 5px;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+
+    .visita-show-page .ov-card .card-body {
+        padding: .76rem .9rem !important;
+    }
+
+    .visita-show-page .ov-head {
+        gap: .36rem !important;
+        margin-bottom: .38rem !important;
+    }
+
+    .visita-show-page .ov-icon {
+        width: 28px !important;
+        height: 28px !important;
+        flex-basis: 28px !important;
+        border-radius: 8px !important;
+        font-size: .78rem !important;
+    }
+
+    .visita-show-page .ov-title,
+    .visita-show-page .tab-pane h6 {
+        font-size: .82rem !important;
+        line-height: 1.2 !important;
+        font-weight: 700 !important;
+    }
+
+    .visita-show-page .details-dl {
+        display: grid;
+        grid-template-columns: 96px minmax(0, 1fr);
+        row-gap: 5px;
+        column-gap: 10px;
+        margin: 0;
+    }
+
+    .visita-show-page .details-dl dt,
+    .visita-show-page .details-dl dd {
+        font-size: .7rem !important;
+        line-height: 1.2 !important;
+        font-weight: 600 !important;
+        margin: 0;
+    }
+
+    .visita-show-page .details-dl dt {
+        color: #6f7785;
+    }
+
+    .visita-show-page .details-dl dd {
+        color: #303947;
+        overflow-wrap: anywhere;
+    }
+
+    .visit-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .7rem;
+    }
+
+    #main-container.visita-show-page #tab-resumo > .row.g-3 + .visit-summary-grid {
+        margin-top: .35rem !important;
+    }
+
+    .visit-panel {
+        border: 1px solid #dbeafe;
+        border-left: 5px solid #2f78a8;
+        border-radius: 10px;
+        background: #fff;
+        padding: .76rem .9rem;
+        box-shadow: 0 8px 18px rgba(47, 120, 168, .06);
+        min-width: 0;
+    }
+
+    .visit-panel-wide {
+        grid-column: 1 / -1;
+    }
+
+    .visit-panel-head {
+        display: flex;
+        align-items: center;
+        gap: .45rem;
+        margin-bottom: .45rem;
+    }
+
+    .visit-panel-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #e8f4fb;
+        color: #2f78a8;
+        flex: 0 0 28px;
+        font-size: .78rem;
+    }
+
+    .visit-panel h6 {
+        margin: 0;
+        color: #1f2937;
+        font-size: .82rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .visit-panel-head span:not(.visit-panel-icon) {
+        color: #7b8794;
+        font-size: .68rem;
+        font-weight: 600;
+    }
+
+    .visit-text-box {
+        border: 1px solid #d7e3ee;
+        background: #f3f5f8;
+        color: #5f6b7a;
+        border-radius: 8px;
+        padding: .65rem .75rem;
+        font-size: .7rem;
+        line-height: 1.32;
+        white-space: normal;
+        max-height: 220px;
+        overflow: auto;
+    }
+
+    .visit-text-box-compact {
+        min-height: 58px;
+        max-height: 150px;
+    }
+
+    .visit-empty,
+    .visit-empty-line,
+    .visit-empty-box {
+        color: #8a94a3;
+        font-size: .7rem;
+        font-weight: 500;
+    }
+
+    .visit-empty-box,
+    .visit-empty-line {
+        border: 1px dashed #cbd5e1;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: .6rem .7rem;
+    }
+
+    .visit-info-list {
+        display: grid;
+        gap: 5px;
+        margin: 0;
+    }
+
+    .visit-info-list div {
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        gap: 8px;
+        align-items: baseline;
+    }
+
+    .visit-info-list dt {
+        color: #6b7280;
+        font-size: .7rem;
+        font-weight: 700;
+    }
+
+    .visit-info-list dd {
+        margin: 0;
+        color: #1f2937;
+        font-size: .72rem;
+        font-weight: 600;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .visit-chip-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: .45rem;
+    }
+
+    .visit-chip {
+        border: 1px solid #d7e3ee;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: .52rem .62rem;
+        display: grid;
+        gap: 3px;
+    }
+
+    .visit-chip span,
+    .visit-mini-card span {
+        color: #6b7280;
+        font-size: .66rem;
+        font-weight: 700;
+    }
+
+    .visit-chip strong,
+    .visit-mini-card strong {
+        color: #273444;
+        font-size: .72rem;
+        font-weight: 700;
+    }
+
+    .visit-mini-card {
+        border: 1px solid #d7e3ee;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: .62rem;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .45rem;
+    }
+
+    .visit-mini-card p {
+        grid-column: 1 / -1;
+        margin: 2px 0 0;
+        color: #4b5563;
+        font-size: .7rem;
+        line-height: 1.32;
+    }
+
+    .visit-table-group {
+        display: grid;
+        gap: .7rem;
+    }
+
+    .visit-table-block {
+        border: 1px solid #d7e3ee;
+        border-radius: 8px;
+        padding: .62rem;
+        background: #fbfdff;
+    }
+
+    .visit-subtitle {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        color: #2f78a8;
+        font-size: .74rem;
+        font-weight: 800;
+        margin-bottom: .42rem;
+    }
+
+    .visit-subtitle span {
+        background: #e8f4fb;
+        color: #2f78a8;
+        border-radius: 999px;
+        min-width: 18px;
+        height: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .62rem;
+    }
+
+    .visit-mini-table {
+        margin: 0;
+        font-size: .7rem;
+        color: #374151;
+    }
+
+    .visit-mini-table thead th {
+        background: #edf7fc;
+        color: #2f6f98;
+        border-bottom: 1px solid #c8ddeb;
+        font-size: .62rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 6px 8px;
+        white-space: nowrap;
+    }
+
+    .visit-mini-table tbody td {
+        padding: 6px 8px;
+        border-color: #e5edf5;
+        vertical-align: middle;
+    }
+
+    @media (max-width: 991.98px) {
+        .visit-summary-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* Timeline centralizada e SEM corte nas bordas */

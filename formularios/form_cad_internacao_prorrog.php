@@ -740,10 +740,7 @@ if (isset($dados_alta) && is_array($dados_alta)) {
         <div class="prorrog-ia-context-row">
             <div class="prorrog-ia-context-field">
                 <label class="control-label" for="prorrog-ia-contexto">Contexto complementar</label>
-                <textarea class="form-control-sm form-control" id="prorrog-ia-contexto" rows="3" placeholder="Opcional: acrescente observações clínicas, plano de transição de cuidado, home care, barreiras de alta ou contexto assistencial relevante."></textarea>
-                <small style="display:block;margin-top:6px;color:#475569;font-weight:600;">
-                    A IA já considera automaticamente o relatório da auditoria, as ações da auditoria e a programação terapêutica desta tela.
-                </small>
+                <textarea class="form-control-sm form-control" id="prorrog-ia-contexto" rows="3"></textarea>
             </div>
         </div>
         <div class="prorrog-ia-card">
