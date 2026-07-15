@@ -290,9 +290,25 @@ $jsonTuss = htmlspecialchars(json_encode($tussInt, JSON_UNESCAPED_UNICODE), ENT_
         });
     }
 
+    function parseTussQtdLiberada(value) {
+        var raw = String(value || '').trim();
+        if (!raw) return 0;
+        var parsed = Number(raw.replace(',', '.'));
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function syncTussLiberadoFromQtd(row) {
+        if (!row) return;
+        var qtdLiberada = row.querySelector('[name$="[qtd_tuss_liberado]"]');
+        var liberado = row.querySelector('[name$="[tuss_liberado_sn]"]');
+        if (!qtdLiberada || !liberado) return;
+        liberado.value = parseTussQtdLiberada(qtdLiberada.value) !== 0 ? 's' : 'n';
+    }
+
     function rebuildJson() {
         var arr = [];
         document.querySelectorAll('#tussFieldsContainer .tuss-field').forEach(function(f) {
+            syncTussLiberadoFromQtd(f);
             arr.push({
                 id_tuss:              (f.querySelector('[name$="[id_tuss]"]')              || {}).value || '',
                 fk_int_tuss:          (f.querySelector('[name$="[fk_int_tuss]"]')          || {}).value || '',
@@ -356,7 +372,12 @@ $jsonTuss = htmlspecialchars(json_encode($tussInt, JSON_UNESCAPED_UNICODE), ENT_
     });
 
     // Qualquer mudança nos inputs/selects
-    container.addEventListener('input',  rebuildJson);
+    container.addEventListener('input', function(e) {
+        if (e.target && e.target.matches('[name$="[qtd_tuss_liberado]"]')) {
+            syncTussLiberadoFromQtd(e.target.closest('.tuss-field'));
+        }
+        rebuildJson();
+    });
     container.addEventListener('change', rebuildJson);
 
     // Antes do submit

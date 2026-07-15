@@ -72,6 +72,22 @@ if (!function_exists('postArrayValues')) {
         return [$val];
     }
 }
+if (!function_exists('fullcareTussLiberadoSn')) {
+    function fullcareTussLiberadoSn($qtdLiberada, $valorAtual = null): ?string
+    {
+        $raw = trim((string)($qtdLiberada ?? ''));
+        if ($raw === '') {
+            return 'n';
+        }
+
+        $normalized = str_replace(',', '.', $raw);
+        if (is_numeric($normalized) && (float)$normalized != 0.0) {
+            return 's';
+        }
+
+        return 'n';
+    }
+}
 function limpa(?string $t, int $lim = 5000): string
 {
     $t = htmlspecialchars($t ?? '', ENT_QUOTES, 'UTF-8');
@@ -1031,9 +1047,12 @@ try {
             $tuss->id_tuss               = !empty($item['id_tuss']) ? (int) $item['id_tuss'] : null;
             $tuss->fk_int_tuss           = !empty($item['fk_int_tuss']) ? (int) $item['fk_int_tuss'] : $idInternacao;
             $tuss->tuss_solicitado       = $item['tuss_solicitado']       ?? '';
-            $tuss->tuss_liberado_sn      = $item['tuss_liberado_sn']      ?? '';
             $tuss->qtd_tuss_solicitado   = $item['qtd_tuss_solicitado']   ?? '';
             $tuss->qtd_tuss_liberado     = $item['qtd_tuss_liberado']     ?? '';
+            $tuss->tuss_liberado_sn      = fullcareTussLiberadoSn(
+                $tuss->qtd_tuss_liberado,
+                $item['tuss_liberado_sn'] ?? ''
+            );
             $tuss->data_realizacao_tuss  = $item['data_realizacao_tuss']  ?? null;
             $tuss->fk_vis_tuss           = $item['fk_vis_tuss']           ?? null;
             $tuss->fk_usuario_tuss       = $idUsuario;

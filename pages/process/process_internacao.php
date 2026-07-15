@@ -158,6 +158,23 @@ if (!function_exists('resolveOptionalForeignKey')) {
     }
 }
 
+if (!function_exists('fullcareTussLiberadoSn')) {
+    function fullcareTussLiberadoSn($qtdLiberada, $valorAtual = null): ?string
+    {
+        $raw = trim((string)($qtdLiberada ?? ''));
+        if ($raw === '') {
+            return 'n';
+        }
+
+        $normalized = str_replace(',', '.', $raw);
+        if (is_numeric($normalized) && (float)$normalized != 0.0) {
+            return 's';
+        }
+
+        return 'n';
+    }
+}
+
 if (!function_exists('internacaoCreateDebugLog')) {
     function internacaoCreateDebugLog(string $message): void
     {
@@ -1187,7 +1204,10 @@ if ($type === "create") {
                     $tuss->data_realizacao_tuss = $tussData['data_realizacao_tuss'] ?? null;
                     $tuss->qtd_tuss_solicitado = $tussData['qtd_tuss_solicitado'] ?? null;
                     $tuss->qtd_tuss_liberado = $tussData['qtd_tuss_liberado'] ?? null;
-                    $tuss->tuss_liberado_sn = $tussData['tuss_liberado_sn'] ?? null;
+                    $tuss->tuss_liberado_sn = fullcareTussLiberadoSn(
+                        $tuss->qtd_tuss_liberado,
+                        $tussData['tuss_liberado_sn'] ?? null
+                    );
                     $tussDao->create($tuss);
                 }
             } else {
@@ -1582,7 +1602,7 @@ if ($type == "update") {
         $tuss->data_realizacao_tuss = $data_realizacao_tuss;
         $tuss->qtd_tuss_solicitado = $qtd_tuss_solicitado;
         $tuss->qtd_tuss_liberado = $qtd_tuss_liberado;
-        $tuss->tuss_liberado_sn = $tuss_liberado_sn;
+        $tuss->tuss_liberado_sn = fullcareTussLiberadoSn($qtd_tuss_liberado, $tuss_liberado_sn);
         $tussDao->create($tuss);
     }
 

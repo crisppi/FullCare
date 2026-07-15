@@ -437,9 +437,27 @@ function removeTussField(button) {
 }
 
 // Gera JSON consolidado das linhas
+function parseTussQtdLiberada(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return 0;
+    const normalized = raw.replace(',', '.');
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function syncTussLiberadoFromQtd(container) {
+    if (!container) return;
+    const qtdLiberada = container.querySelector('[name="qtd_tuss_liberado"]');
+    const liberado = container.querySelector('[name="tuss_liberado_sn"]');
+    if (!qtdLiberada || !liberado) return;
+    liberado.value = parseTussQtdLiberada(qtdLiberada.value) !== 0 ? 's' : 'n';
+}
+
 function generateTussJSON() {
     const tussFieldContainers = document.querySelectorAll(".tuss-field-container");
     const entries = Array.from(tussFieldContainers).map(container => {
+        syncTussLiberadoFromQtd(container);
+
         // Pega fk_* na própria linha; se faltar, tenta pegar da linha inicial
         const fkIntInput = container.querySelector('[name="fk_int_tuss"]') || document.querySelector(
             '.tuss-field-container[data-initial="true"] [name="fk_int_tuss"]');
@@ -464,6 +482,20 @@ function generateTussJSON() {
     if (tussJsonField) tussJsonField.value = jsonString;
 
 }
+
+document.addEventListener('input', function(event) {
+    if (!event.target.matches('#container-tuss [name="qtd_tuss_liberado"]')) return;
+    const row = event.target.closest('.tuss-field-container');
+    syncTussLiberadoFromQtd(row);
+    generateTussJSON();
+});
+
+document.addEventListener('change', function(event) {
+    if (!event.target.matches('#container-tuss [name="qtd_tuss_liberado"]')) return;
+    const row = event.target.closest('.tuss-field-container');
+    syncTussLiberadoFromQtd(row);
+    generateTussJSON();
+});
 
 // Limpa inputs mantendo só a primeira linha
 function clearTussInputs() {
