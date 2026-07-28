@@ -398,8 +398,8 @@ class EstipulanteDAO implements EstipulanteDAOInterface
 
         $where = 'WHERE ' . implode(' AND ', $condicoes);
 
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
 
         //MONTA A QUERY
         $query = $this->conn->query('SELECT * FROM tb_estipulante ' . $where . ' ' . $order . ' ' . $limit);
@@ -415,9 +415,9 @@ class EstipulanteDAO implements EstipulanteDAOInterface
     {
         $estipulante = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limite = strlen((string)$limite) ? 'LIMIT ' . $limite : '';
 
         $stmt = $this->conn->query('SELECT * ,COUNT(id_estipulante) as qtd FROM tb_estipulante ' . $where . ' ' . $order . ' ' . $limite);
 

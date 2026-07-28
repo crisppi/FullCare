@@ -229,6 +229,13 @@ if (empty($capeanteIds) && (int)$id_capeante > 0) {
 }
 $capeanteIds = array_values(array_unique($capeanteIds));
 
+if ($modeloCompleto && count($capeanteIds) === 1) {
+    $rahPreviewUrl = rtrim($BASE_URL, '/') . '/export_capeante_rah_pdf.php?id_capeante='
+        . rawurlencode((string)$capeanteIds[0]) . '&download=0';
+    header('Location: ' . $rahPreviewUrl);
+    exit;
+}
+
 $capeanteDao = new capeanteDAO($conn, $BASE_URL);
 $loadCapeante = static function (capeanteDAO $dao, int $id): ?array {
     $rows = $dao->selectAllcapeante('ca.id_capeante = "' . $id . '"', null, null);
@@ -282,7 +289,7 @@ $buildPrintContext = static function (?array $capeante, int $idCapeante) use (
 
     $gruposDetalhados = [];
     $observacoesFinais = '';
-    if ($capeante && $modeloCompleto) {
+    if ($capeante) {
         $capValoresDiarDao = new CapValoresDiarDAO($conn);
         $capValoresApDao = new CapValoresAPDAO($conn);
         $capValoresUtiDao = new CapValoresUTIDAO($conn);
@@ -861,55 +868,6 @@ $printModeloJoin = strpos($printBaseUrl, '?') === false ? '?' : '&';
                     </div>
                 </div>
 
-                <?php if (!$modeloCompleto): ?>
-                    <section class="section">
-                        <h2 class="section-title">Consolidado da Conta</h2>
-                        <div class="summary-grid summary-grid--two">
-                            <?php foreach ($rowsConta as [$label, $value]): ?>
-                                <div class="value-box">
-                                    <label><?= $h($label) ?></label>
-                                    <strong><?= $h($value) ?></strong>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </section>
-
-                    <section class="section">
-                        <h2 class="section-title">Glosas Consolidadas</h2>
-                        <div class="summary-grid summary-grid--three">
-                            <?php foreach ($rowsGlosas as [$label, $value]): ?>
-                                <div class="value-box">
-                                    <label><?= $h($label) ?></label>
-                                    <strong><?= $h($value) ?></strong>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </section>
-
-                    <section class="section">
-                        <h2 class="section-title">Valores por Seguimento</h2>
-                        <div class="summary-grid summary-grid--five">
-                            <?php foreach ($rowsSeguimento as [$label, $value]): ?>
-                                <div class="value-box">
-                                    <label><?= $h($label) ?></label>
-                                    <strong><?= $h($value) ?></strong>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </section>
-
-                    <section class="section">
-                        <h2 class="section-title">Glosas por Seguimento</h2>
-                        <div class="summary-grid summary-grid--five">
-                            <?php foreach ($rowsGlosasSeguimento as [$label, $value]): ?>
-                                <div class="value-box">
-                                    <label><?= $h($label) ?></label>
-                                    <strong><?= $h($value) ?></strong>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </section>
-                <?php else: ?>
                     <section class="section">
                         <h2 class="section-title">Consolidado Detalhado</h2>
                         <div class="summary-grid summary-grid--two">
@@ -980,7 +938,6 @@ $printModeloJoin = strpos($printBaseUrl, '?') === false ? '?' : '&';
                             <?= nl2br($h($observacoesFinais)) ?>
                         </div>
                     <?php endif; ?>
-                <?php endif; ?>
 
                 <footer class="signature-area">
                     <div class="signature-grid">

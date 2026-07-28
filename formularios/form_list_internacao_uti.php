@@ -307,14 +307,14 @@ $sortDir = strtolower((string)listaUtiGetParam('sort_dir', 'desc'));
         $uti_internado = 's';
         // $buscaAtivo = in_array($buscaAtivo, ['s', 'n']) ?: "";
         $condicoes = [
-            strlen($pesquisa_nome) ? 'nome_hosp LIKE "%' . $pesquisa_nome . '%"' : null,
-            strlen($pesquisa_pac) ? 'nome_pac LIKE "%' . $pesquisa_pac . '%"' : null,
-            strlen($pesquisa_matricula) ? 'pa.matricula_pac LIKE "%' . $pesquisa_matricula . '%"' : null,
-            strlen($pesqInternado) ? 'internado_int = "' . $pesqInternado . '"' : NULL,
-            strlen($uti_internacao) ? 'uti.internacao_uti = "s"' : "s",
-            strlen($uti_internado) ? 'uti.internado_uti = "s"' : "s",
-            strlen($data_intern_int) ? 'data_intern_int = "' . $data_intern_int . '"' : NULL,
-            strlen($auditor) ? 'hos.fk_usuario_hosp = "' . $auditor . '"' : NULL,
+            strlen((string)$pesquisa_nome) ? 'nome_hosp LIKE "%' . $pesquisa_nome . '%"' : null,
+            strlen((string)$pesquisa_pac) ? 'nome_pac LIKE "%' . $pesquisa_pac . '%"' : null,
+            strlen((string)$pesquisa_matricula) ? 'pa.matricula_pac LIKE "%' . $pesquisa_matricula . '%"' : null,
+            strlen((string)$pesqInternado) ? 'internado_int = "' . $pesqInternado . '"' : NULL,
+            strlen((string)$uti_internacao) ? 'uti.internacao_uti = "s"' : "s",
+            strlen((string)$uti_internado) ? 'uti.internado_uti = "s"' : "s",
+            strlen((string)$data_intern_int) ? 'data_intern_int = "' . $data_intern_int . '"' : NULL,
+            strlen((string)$auditor) ? 'hos.fk_usuario_hosp = "' . $auditor . '"' : NULL,
 
         ];
         $condicoes = array_filter($condicoes);

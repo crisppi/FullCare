@@ -17,6 +17,43 @@ function mobileBindAll(PDOStatement $stmt, array $params): void
     }
 }
 
+function mobileFormatPatientName(?string $fullName): string
+{
+    $fullName = trim((string)preg_replace('/\s+/u', ' ', (string)$fullName));
+    if ($fullName === '') {
+        return '';
+    }
+
+    $parts = preg_split('/\s+/u', $fullName) ?: [];
+    $firstName = array_shift($parts);
+    $initials = array_map(
+        static function (string $part): string {
+            $initial = function_exists('mb_substr')
+                ? mb_substr($part, 0, 1, 'UTF-8')
+                : substr($part, 0, 1);
+            $initial = function_exists('mb_strtoupper')
+                ? mb_strtoupper($initial, 'UTF-8')
+                : strtoupper($initial);
+            return $initial . '.';
+        },
+        array_values(array_filter($parts, static fn (string $part): bool => $part !== ''))
+    );
+
+    return implode(' ', array_merge([(string)$firstName], $initials));
+}
+
+function mobileFormatPatientRows(array $rows, string $key = 'patient_name'): array
+{
+    foreach ($rows as &$row) {
+        if (is_array($row) && array_key_exists($key, $row)) {
+            $row[$key] = mobileFormatPatientName((string)$row[$key]);
+        }
+    }
+    unset($row);
+
+    return $rows;
+}
+
 function mobileValidateClinicalTextSecurity(array $fields): void
 {
     if (!class_exists('TextSecurityService')) {
@@ -79,7 +116,7 @@ function mobileSearchPatients(PDO $conn, array $authUser, string $query): array
     mobileBindAll($stmt, $params);
     $stmt->execute();
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    return mobileFormatPatientRows($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [], 'name');
 }
 
 function mobileListAdmissions(PDO $conn, array $authUser, string $query): array
@@ -135,7 +172,7 @@ function mobileListAdmissions(PDO $conn, array $authUser, string $query): array
     mobileBindAll($stmt, $params);
     $stmt->execute();
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    return mobileFormatPatientRows($stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
 }
 
 function mobileListHomeCareCases(PDO $conn, array $authUser, string $query): array
@@ -231,7 +268,7 @@ function mobileListHomeCareCases(PDO $conn, array $authUser, string $query): arr
     mobileBindAll($stmt, $params);
     $stmt->execute();
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    return mobileFormatPatientRows($stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
 }
 
 function mobileListLongStayCases(PDO $conn, array $authUser, string $query): array
@@ -315,7 +352,7 @@ function mobileListLongStayCases(PDO $conn, array $authUser, string $query): arr
     mobileBindAll($stmt, $params);
     $stmt->execute();
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    return mobileFormatPatientRows($stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
 }
 
 function mobileListLongStayStatuses(PDO $conn): array
@@ -468,7 +505,7 @@ function mobileListAdverseEventCases(PDO $conn, array $authUser, string $query):
     mobileBindAll($stmt, $params);
     $stmt->execute();
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    return mobileFormatPatientRows($stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
 }
 
 function mobileListAdverseEventTypes(): array
@@ -586,6 +623,9 @@ function mobileFindAdmission(PDO $conn, array $authUser, int $admissionId): ?arr
     $stmt->execute();
 
     $admission = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (is_array($admission) && array_key_exists('patient_name', $admission)) {
+        $admission['patient_name'] = mobileFormatPatientName((string)$admission['patient_name']);
+    }
     return is_array($admission) ? $admission : null;
 }
 

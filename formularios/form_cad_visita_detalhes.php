@@ -1,5 +1,11 @@
 <div id="detalhes-card-wrapper" class="tabelas-detalhes-block" style="display:none;">
-    <h5 class="tabelas-detalhes-title">Detalhes do relatório</h5>
+    <div class="detalhes-card">
+    <div class="detalhes-card__header">
+        <h4 class="detalhes-card__title">
+            <span class="detalhes-card__marker"></span>
+            Detalhes do relatório
+        </h4>
+    </div>
     <input type="hidden" class="form-control" id="select_detalhes" name="select_detalhes">
     <div id="div-detalhado" class="form-group" style="display:none;">
         <input type="hidden" readonly id="fk_int_det" name="fk_int_det" value="<?= ($ultimoReg + 1) ?> ">
@@ -203,5 +209,6 @@
                         </select>
             </div>
         </div>
+    </div>
     </div>
 </div>

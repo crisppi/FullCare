@@ -144,6 +144,14 @@ if (!function_exists('fullcare_sync_session_user')) {
             return;
         }
 
+        // Revalida status e permissões periodicamente, sem consultar o banco
+        // remoto em cada recurso carregado pela página.
+        $syncInterval = 120;
+        $lastSyncAt = (int)($_SESSION['user_db_synced_at'] ?? 0);
+        if ($sessionId > 0 && $lastSyncAt > 0 && $lastSyncAt >= (time() - $syncInterval)) {
+            return;
+        }
+
         try {
             $sqlBase = "
                 SELECT
@@ -210,6 +218,7 @@ if (!function_exists('fullcare_sync_session_user')) {
             $_SESSION['fk_seguradora_user'] = isset($user['fk_seguradora_user'])
                 ? (int)$user['fk_seguradora_user']
                 : ($_SESSION['fk_seguradora_user'] ?? null);
+            $_SESSION['user_db_synced_at'] = time();
 
             if ($sessionId > 0 && $sessionId !== $resolvedId) {
                 error_log('[SESSION][SYNC] id_usuario ajustado de ' . $sessionId . ' para ' . $resolvedId . ' com base no usuario atual do banco.');
@@ -278,14 +287,15 @@ if (in_array($__method, ['POST', 'PUT', 'PATCH', 'DELETE'], true) && !in_array($
     Gate::autoEnforce($conn, $BASE_URL);
 }
 
-// Em páginas públicas de login, evita checagens/DDL de schema para acelerar carregamento.
-$__schemaSkip = [
-    'index.php',
-    'index_novo.php',
-    'check_login.php',
-];
-if (!in_array($__scriptBase, $__schemaSkip, true)) {
-    require_once __DIR__ . '/app/schemaEnsurer.php';
+// Disponibiliza os helpers de schema, mas alterações estruturais são executadas
+// pelo script scripts/run_schema_maintenance.php, não em cada página.
+require_once __DIR__ . '/app/schemaEnsurer.php';
+$__ensureSchemaOnRequest = in_array(
+    strtolower(trim((string)(getenv('FULLCARE_SCHEMA_ENSURE_ON_REQUEST') ?: '0'))),
+    ['1', 'true', 'yes', 'on'],
+    true
+);
+if ($__ensureSchemaOnRequest) {
     ensure_visita_timer_column($conn);
     ensure_visita_faturamento_columns($conn);
     ensure_capeante_core_columns($conn);

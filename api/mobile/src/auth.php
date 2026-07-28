@@ -348,7 +348,15 @@ function mobileHandleLogin(PDO $conn, array $input): void
 
     mobileClearFailedLogins($email);
 
-    if (function_exists('fullcare_mfa_user_enabled') && fullcare_mfa_user_enabled($user)) {
+    $mobileMfaEnabled = filter_var(
+        getenv('MOBILE_MFA_ENABLED') ?: 'true',
+        FILTER_VALIDATE_BOOL
+    );
+
+    if ($mobileMfaEnabled
+        && function_exists('fullcare_mfa_user_enabled')
+        && fullcare_mfa_user_enabled($user)
+    ) {
         mobileJsonResponse([
             'success' => true,
             'data' => [

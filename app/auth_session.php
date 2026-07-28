@@ -33,6 +33,7 @@ if (!function_exists('fullcare_login_session_start')) {
         $_SESSION['fk_seguradora_user'] = isset($user['fk_seguradora_user'])
             ? (int)$user['fk_seguradora_user']
             : null;
+        $_SESSION['user_db_synced_at'] = time();
 
         unset(
             $_SESSION['mfa_pending_user_id'],
@@ -63,6 +64,7 @@ if (!function_exists('fullcare_login_session_clear')) {
             $_SESSION['nivel'],
             $_SESSION['cargo'],
             $_SESSION['fk_seguradora_user'],
+            $_SESSION['user_db_synced_at'],
             $_SESSION['mfa_local_bypass_email'],
             $_SESSION['mfa_local_bypass_user_id']
         );

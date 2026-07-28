@@ -17,8 +17,8 @@ $buscaAtivo = filter_input(INPUT_GET, 'ativo_pac');
 $limite = filter_input(INPUT_GET, 'limite') ? filter_input(INPUT_GET, 'limite') : 10;
 $ordenar = filter_input(INPUT_GET, 'ordenar') ? filter_input(INPUT_GET, 'ordenar') : '';
 $condicoes = [
-    strlen($busca) ? 'nome_est LIKE "%' . $busca . '%"' : null,
-    strlen($buscaAtivo) ? 'ativo_est = "' . $buscaAtivo . '"' : null,
+    strlen((string)$busca) ? 'nome_est LIKE "%' . $busca . '%"' : null,
+    strlen((string)$buscaAtivo) ? 'ativo_est = "' . $buscaAtivo . '"' : null,
 ];
 $condicoes = array_filter($condicoes);
 

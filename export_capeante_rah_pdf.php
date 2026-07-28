@@ -605,7 +605,7 @@ $pdf->SetCreator('FullCare');
 $pdf->SetAuthor('FullCare');
 $pdf->SetTitle('RAH - Capeante ' . $idCapeante);
 $pdf->SetMargins($MARGIN_LR, $MARGIN_TOP, $MARGIN_LR);
-$pdf->SetAutoPageBreak(true, 28);
+$pdf->SetAutoPageBreak(true, $MARGIN_BOT);
 $pdf->setPrintHeader(false);
 $pdf->setPrintFooter(false);
 $pdf->setFontSubsetting(true);
@@ -617,10 +617,50 @@ $pdf->SetFont('helvetica', '', $BASE_FONT);
 
 /* ========================= CABEÇALHO RAH (refatorado) ========================= */
 
-// — Título —
-$pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(0, 8, 'RELATÓRIO DE AUDITORIA HOSPITALAR - RAH', 0, 1, 'C');
-$pdf->Ln(2.5); // respiro entre o título e os dados
+// — Faixa de identificação: logo, título e número do capeante —
+$m = $pdf->getMargins();
+$left = $m['left'];
+$right = $m['right'];
+$usable = $pdf->getPageWidth() - $left - $right;
+$headerY = $pdf->GetY();
+$headerH = $ULTRA ? 13 : ($COMPACT ? 14 : 16);
+
+$pdf->SetDrawColor(205, 194, 209);
+$pdf->SetFillColor(248, 244, 250);
+$pdf->SetLineWidth(0.25);
+$pdf->Rect($left, $headerY, $usable, $headerH, 'DF');
+
+$logoPath = __DIR__ . '/img/logo_rah.jpg';
+if (is_file($logoPath)) {
+  $logoH = $headerH - 3;
+  $pdf->Image($logoPath, $left + 2.5, $headerY + 1.5, $logoH * 2, $logoH, 'JPEG', '', '', true, 300);
+}
+
+$titleLeft = $left + ($headerH * 2) + 5;
+$titleWidth = $usable - ($headerH * 2) - 46;
+$pdf->SetTextColor(55, 35, 63);
+$pdf->SetFont('helvetica', 'B', $ULTRA ? 9.5 : 11);
+$pdf->SetXY($titleLeft, $headerY + ($ULTRA ? 2.1 : 2.8));
+$pdf->Cell($titleWidth, 5, 'RELATÓRIO DE AUDITORIA HOSPITALAR', 0, 0, 'C');
+$pdf->SetFont('helvetica', 'B', $ULTRA ? 7 : 8);
+$pdf->SetTextColor(94, 35, 99);
+$pdf->SetXY($titleLeft, $headerY + ($ULTRA ? 7 : 8.5));
+$pdf->Cell($titleWidth, 4, 'RAH', 0, 0, 'C');
+
+$idWidth = 34;
+$pdf->SetDrawColor(190, 173, 196);
+$pdf->SetFillColor(255, 255, 255);
+$pdf->RoundedRect($left + $usable - $idWidth - 2, $headerY + 2, $idWidth, $headerH - 4, 1.5, '1111', 'DF');
+$pdf->SetTextColor(94, 35, 99);
+$pdf->SetFont('helvetica', 'B', $ULTRA ? 6.5 : 7);
+$pdf->SetXY($left + $usable - $idWidth - 2, $headerY + 3);
+$pdf->Cell($idWidth, 3.5, 'CAPEANTE Nº', 0, 0, 'C');
+$pdf->SetFont('helvetica', 'B', $ULTRA ? 9 : 10);
+$pdf->SetXY($left + $usable - $idWidth - 2, $headerY + ($ULTRA ? 6.5 : 7.5));
+$pdf->Cell($idWidth, 4.5, (string)$idCapeante, 0, 0, 'C');
+
+$pdf->SetTextColor(0, 0, 0);
+$pdf->SetY($headerY + $headerH + 1.2);
 
 // — Fonte padrão dos dados —
 $pdf->SetFont('helvetica', '', 9.5);
@@ -737,7 +777,7 @@ $infoHTML = '
 $pdf->writeHTML($infoHTML, true, false, true, false, '');
 
 // — Linha divisória com margem superior/inf —
-$pdf->Ln(1.5);
+$pdf->Ln(0.8);
 $m = $pdf->getMargins();
 $left = $m['left'];
 $right = $m['right'];
@@ -747,7 +787,7 @@ $pdf->SetDrawColor(120, 120, 120);
 $pdf->SetLineWidth(0.5);
 $y = $pdf->GetY();
 $pdf->Line($left, $y, $left + $usable, $y);
-$pdf->Ln(2.5); // respiro após a linha
+$pdf->Ln(1.5); // respiro após a linha
 /* ======================= FIM CABEÇALHO RAH (refatorado) ======================= */
 
 /* ---------- TABELAS DE GRUPO ---------- */

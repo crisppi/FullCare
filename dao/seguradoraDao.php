@@ -404,11 +404,11 @@ class seguradoraDAO implements seguradoraDAOInterface
     public function selectAllSeguradora($where = null, $order = null, $limit = null)
     { // filtrar apenas as seguradoras que nao foram deletados
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
         $where = $where ? ($where . ' AND deletado_seg <> "s" ') : 'WHERE deletado_seg <> "s" '; // filtrar apenas as seguradoras que nao foram deletados
 
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
 
         //MONTA A QUERY
         $query = $this->conn->query('SELECT * FROM tb_seguradora ' . $where . ' ' . $order . ' ' . $limit);
@@ -423,9 +423,9 @@ class seguradoraDAO implements seguradoraDAOInterface
     public function QtdSeguradora($where = null, $order = null, $limite = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limite = strlen((string)$limite) ? 'LIMIT ' . $limite : '';
 
         $stmt = $this->conn->query('SELECT * ,COUNT(id_seguradora) as qtd FROM tb_seguradora ' . $where . ' ' . $order . ' ' . $limite);
 

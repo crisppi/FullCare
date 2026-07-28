@@ -48,10 +48,10 @@ $obLimite = null;
 // $pag = null;
 
 $condicoes = [
-    strlen($usuario) ? 'usuario_user LIKE "%' . $usuario . '%"' : null,
-    strlen($cargo) ? 'cargo_user LIKE "%' . $cargo . '%"' : null,
-    strlen($depto) ? 'depto_user LIKE "%' . $depto . '%"' : null,
-    strlen($buscaAtivo) ? 'ativo_user = "' . $buscaAtivo . '"' : null
+    strlen((string)$usuario) ? 'usuario_user LIKE "%' . $usuario . '%"' : null,
+    strlen((string)$cargo) ? 'cargo_user LIKE "%' . $cargo . '%"' : null,
+    strlen((string)$depto) ? 'depto_user LIKE "%' . $depto . '%"' : null,
+    strlen((string)$buscaAtivo) ? 'ativo_user = "' . $buscaAtivo . '"' : null
 ];
 $condicoes = array_filter($condicoes);
 // REMOVE POSICOES VAZIAS DO FILTRO
@@ -224,7 +224,7 @@ if ($qtdIntItens > $limite) {
                         foreach ($query as $usuario):
                             extract($usuario);
 
-                            if (strlen($cpf_user) > 0) {
+                            if (strlen((string)$cpf_user) > 0) {
                                 $cpf_format = substr($cpf_user, 0, 3) . '.' .
                                     substr($cpf_user, 3, 3) . '.' .
                                     substr($cpf_user, 6, 3) . '-' .
@@ -233,7 +233,7 @@ if ($qtdIntItens > $limite) {
                                 $cpf_format = null;
                             }
 
-                            if (strlen($telefone01_user) > 0) {
+                            if (strlen((string)$telefone01_user) > 0) {
 
                                 $telefone01_format = '(' .
                                     substr($telefone01_user, 0, 2) . ') ' .

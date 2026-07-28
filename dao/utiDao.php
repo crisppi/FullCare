@@ -367,9 +367,9 @@ class utiDAO implements utiDAOInterface
     public function selectAllUTI($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
         $group = ' GROUP BY ac.id_internacao ';
 
 
@@ -434,9 +434,9 @@ class utiDAO implements utiDAOInterface
     {
         $internacao = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
         $group = ' GROUP BY ac.id_internacao ';
 
         $stmt = $this->conn->query('SELECT DISTINCT
@@ -499,9 +499,9 @@ class utiDAO implements utiDAOInterface
     public function selectAllUTIList($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
 
         //MONTA A QUERY
         $query = $this->conn->query('SELECT DISTINCT
@@ -563,7 +563,7 @@ class utiDAO implements utiDAOInterface
     public function QtdInternacaoUTIList($where = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
 
         $stmt = $this->conn->query('SELECT 
         COUNT(uti.id_uti) as qtd, 

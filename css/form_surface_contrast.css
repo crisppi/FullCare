@@ -295,6 +295,66 @@ body #main-container :is(.internacao-page, .visita-page) #detalhes-card-wrapper 
     }
 }
 
+/* Visita: ritmo compacto entre seções e maior destaque da identificação. */
+body #main-container .visita-page__content,
+body #main-container .visita-page #add-visita-form {
+    gap: 5px !important;
+}
+
+body #main-container .visita-page :is(
+    .visita-card--central,
+    .visita-card--auditoria,
+    .visita-card--tabelas
+) {
+    margin-top: 5px !important;
+}
+
+body #main-container .visita-page .visita-summary-card {
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(145deg, #ffffff 0%, #edf7fd 100%) !important;
+    border: 1px solid #a9cce2 !important;
+    border-top: 3px solid #3d93c2 !important;
+    box-shadow:
+        0 5px 12px rgba(38, 102, 139, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .95) !important;
+}
+
+body #main-container .visita-page .visita-summary-card__label {
+    color: #326c91 !important;
+    font-weight: 750 !important;
+    letter-spacing: .025em !important;
+}
+
+body #main-container .visita-page .visita-summary-card__value {
+    color: #182c45 !important;
+    font-weight: 750 !important;
+}
+
+body #main-container .visita-page .visita-summary-card__input {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    color: #182c45 !important;
+    font-size: .86rem !important;
+    font-weight: 750 !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+    box-shadow: none !important;
+    pointer-events: none;
+}
+
+body #main-container .visita-page .visita-inline-clear select {
+    padding-right: 68px !important;
+}
+
+body #main-container .visita-page .visita-inline-clear__btn {
+    right: 38px !important;
+}
+
 body #main-container :is(.internacao-page, .visita-page) .assist-select-clear {
     position: relative !important;
     overflow: visible !important;
