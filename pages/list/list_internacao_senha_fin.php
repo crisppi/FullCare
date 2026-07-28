@@ -1,4 +1,8 @@
 <?php
+if (ob_get_level() === 0) {
+    ob_start();
+}
+
 include_once("check_logado.php");
 
 include_once("models/pagination.php");

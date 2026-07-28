@@ -23,8 +23,8 @@
     $seguradoraInicio = ' 1 ';
 
     $condicoes = [
-        strlen($pesquisa_nome) ? 'seguradora_seg LIKE "%' . $pesquisa_nome . '%"' : null,
-        strlen($seguradoraInicio) ? 'id_seguradora > ' . $seguradoraInicio . ' ' : NULL,
+        strlen((string)$pesquisa_nome) ? 'seguradora_seg LIKE "%' . $pesquisa_nome . '%"' : null,
+        strlen((string)$seguradoraInicio) ? 'id_seguradora > ' . $seguradoraInicio . ' ' : NULL,
 
     ];
     $condicoes = array_filter($condicoes);

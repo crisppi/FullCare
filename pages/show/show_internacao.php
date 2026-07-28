@@ -1,3 +1,7 @@
+<?php
+include_once("check_logado.php");
+include_once("globals.php");
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -1030,7 +1034,7 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                     <div class="visitas-report-section__header">
                                         <div class="visitas-report-section__heading">
                                             <span class="visitas-report-section__icon" aria-hidden="true">
-                                                <i class="fas fa-history"></i>
+                                                <i class="bi bi-clock-history"></i>
                                             </span>
                                             <div>
                                             <div class="visitas-report-section__eyebrow">Histórico clínico</div>
@@ -1082,7 +1086,20 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                                                         <span class="text-dark"><?= e($recentDate) ?></span>
                                                     </h6>
                                                     <?php if ($recentId): ?>
-                                                        <span class="badge bg-secondary-subtle text-secondary-emphasis">ID <?= e($recentId) ?></span>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="badge bg-secondary-subtle text-secondary-emphasis">ID <?= e($recentId) ?></span>
+                                                            <a class="visita-card-action visita-card-action--view"
+                                                                href="<?= e($BASE_URL . 'visitas/ver/' . urlencode((string)$recentId)) ?>"
+                                                                target="_blank" rel="noopener">
+                                                                <i class="bi bi-eye"></i>Visualizar
+                                                            </a>
+                                                            <?php if (!$isGestorSeguradora): ?>
+                                                                <a class="visita-card-action visita-card-action--edit"
+                                                                    href="<?= e($visitaEditBase . urlencode((string)$recentId)) ?>">
+                                                                    <i class="bi bi-pencil-square"></i>Editar
+                                                                </a>
+                                                            <?php endif; ?>
+                                                        </div>
                                                     <?php endif; ?>
                                                 </div>
 
@@ -2333,6 +2350,46 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 10px;
+    }
+
+    .visita-card-action {
+        display: inline-flex;
+        min-height: 28px;
+        padding: 4px 9px;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font-size: .72rem;
+        font-weight: 700;
+        line-height: 1;
+        text-decoration: none;
+        transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    .visita-card-action--view {
+        border-color: #b8d6e8;
+        background: #edf7fc;
+        color: #246b94;
+    }
+
+    .visita-card-action--view:hover {
+        border-color: #78b7d7;
+        background: #dff1fa;
+        color: #174f70;
+    }
+
+    .visita-card-action--edit {
+        border-color: #d8cbe2;
+        background: #f7f2fa;
+        color: #6b3f78;
+    }
+
+    .visita-card-action--edit:hover {
+        border-color: #b99bc8;
+        background: #efe4f4;
+        color: #512c5c;
     }
 
     .visita-report-card__body {

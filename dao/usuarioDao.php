@@ -486,9 +486,9 @@ class UserDAO implements UserDAOInterface
     public function selectAllUsuario($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
 
         //MONTA A QUERY
         $query = $this->conn->query('SELECT * FROM tb_user ' . $where . ' ' . $order . ' ' . $limit);
@@ -502,7 +502,7 @@ class UserDAO implements UserDAOInterface
 
     public function countUsuario($where = null): int
     {
-        $where = strlen($where) ? 'WHERE ' . $where : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
         $stmt = $this->conn->query('SELECT COUNT(*) AS total FROM tb_user ' . $where);
         $stmt->execute();
         return (int) $stmt->fetchColumn();
@@ -511,9 +511,9 @@ class UserDAO implements UserDAOInterface
     {
         $estipulante = [];
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limite = strlen((string)$limite) ? 'LIMIT ' . $limite : '';
 
         $stmt = $this->conn->query('SELECT * ,COUNT(id_usuario) as qtd FROM tb_user ' . $where . ' ' . $order . ' ' . $limite);
 

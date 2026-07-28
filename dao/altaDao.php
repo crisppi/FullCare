@@ -172,9 +172,9 @@
         {
             $internacao = [];
             //DADOS DA QUERY
-            $where = strlen($where) ? 'WHERE ' . $where : '';
-            $order = strlen($order) ? 'ORDER BY ' . $order : '';
-            $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+            $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+            $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+            $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
 
             $stmt = $this->conn->query('SELECT 
         COUNT(id_alta) as qtd, 
@@ -227,9 +227,9 @@
         {
             $internacao = [];
             //DADOS DA QUERY
-            $where = strlen($where) ? 'WHERE ' . $where : '';
-            $order = strlen($order) ? 'ORDER BY ' . $order : '';
-            $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+            $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+            $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+            $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
 
             $stmt = $this->conn->query('SELECT alta.*, pa.*, ho.*, uti.* FROM tb_alta as alta LEFT JOIN tb_internacao AS ac ON alta.fk_id_int_alt = ac.id_internacao INNER JOIN tb_paciente AS pa ON ac.fk_paciente_int = pa.id_paciente iNNER JOIN tb_hospital AS ho ON  ac.fk_hospital_int = ho.id_hospital LEFT JOIN tb_uti uti ON uti.fk_internacao_uti = ac.id_internacao ' . $where . ' ' . $order . ' ' . $limit);
 

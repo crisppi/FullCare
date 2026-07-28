@@ -1,0 +1,11 @@
+name: fullcare
+
+services:
+  web:
+    build: .
+    container_name: fullcare_web
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    restart: unless-stopped

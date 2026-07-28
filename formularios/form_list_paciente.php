@@ -107,9 +107,9 @@
 
     $condicoes = [
         $nameMatClause ? '(' . $nameMatClause . ')' : null,
-        strlen($buscaSeguradora) ? 'se.seguradora_seg LIKE "%' . $buscaSeguradora . '%"' : null,
-        strlen($buscaAtivo) ? 'ativo_pac = "' . $buscaAtivo . '"' : null,
-        strlen($pacienteInicio) ? 'id_paciente > ' . $pacienteInicio . ' ' : null,
+        strlen((string)$buscaSeguradora) ? 'se.seguradora_seg LIKE "%' . $buscaSeguradora . '%"' : null,
+        strlen((string)$buscaAtivo) ? 'ativo_pac = "' . $buscaAtivo . '"' : null,
+        strlen((string)$pacienteInicio) ? 'id_paciente > ' . $pacienteInicio . ' ' : null,
         $isGestorSeguradora
             ? ($seguradoraUserId > 0 ? 'pa.fk_seguradora_pac = ' . $seguradoraUserId : '1=0')
             : null,
@@ -374,7 +374,7 @@
                             ?>
                             <?php
 
-                                if (strlen($cpf_pac) > 0) {
+                                if (strlen((string)$cpf_pac) > 0) {
                                     $cpf_format = substr($cpf_pac, 0, 3) . '.' .
                                         substr($cpf_pac, 3, 3) . '.' .
                                         substr($cpf_pac, 6, 3) . '-' .

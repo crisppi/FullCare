@@ -6,7 +6,9 @@ require_once(__DIR__ . "/../app/services/AuditorActionService.php");
 require_once(__DIR__ . "/../app/security/bi_access.php");
 require_once(__DIR__ . "/../app/security/inteligencia_access.php");
 date_default_timezone_set('America/Sao_Paulo');
-header("Content-type: text/html; charset=utf-8");
+if (!headers_sent()) {
+    header("Content-type: text/html; charset=utf-8");
+}
 
 // Fallback defensivo: se BASE_URL vier na raiz, mas a aplicacao estiver em subpasta
 // (ex.: /FullCare), forca BASE_URL para evitar links do header indo para /index.php.
@@ -537,6 +539,10 @@ if (!empty($sessionIdUsuario)) {
                                                    ></i>
                                                 Internação UTI</a>
                                         </li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>visitas/lista"><i
+                                                    class="bi bi-person-check fc-inline-4"
+                                                   ></i>
+                                                Lista Visitas</a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>listas/altas"><i
                                                     class="bi bi-clipboard-check fc-inline-21"
                                                    ></i>
@@ -574,7 +580,7 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-shield-exclamation fc-inline-24"
                                                    ></i>
                                                 Internações sem senha</a></li>
-                                        <?php if (!$isPerfilMedicoMenu) { ?>
+                                        <?php if (!$isPerfilMedicoMenu || $isDiretoria) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/pendencias-operacionais"><i
                                                         class="bi bi-exclamation-diamond fc-inline-25"
                                                        ></i>
@@ -599,7 +605,7 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-hourglass-split fc-inline-28"
                                                    ></i>
                                                 Prorrogação Pendente</a></li>
-                                        <?php if (!$isPerfilMedicoMenu) { ?>
+                                        <?php if (!$isPerfilMedicoMenu || $isDiretoria) { ?>
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>

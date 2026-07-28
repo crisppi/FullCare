@@ -168,16 +168,16 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
         strlen((string)$id_hosp) ? 'ho.id_hospital = ' . (int)$id_hosp : NULL,
 
         // Filtros usuais
-        strlen($pesquisa_nome) ? 'ho.nome_hosp LIKE "%' . $pesquisa_nome . '%"' : NULL,
-        strlen($pesquisa_pac)  ? 'pa.nome_pac  LIKE "%' . $pesquisa_pac  . '%"' : NULL,
-        strlen($pesquisa_matricula) ? 'pa.matricula_pac LIKE "%' . $pesquisa_matricula . '%"' : NULL,
-        strlen($lote)          ? 'ca.lote_cap = "' . $lote . '"'                 : NULL,
-        strlen($idcapeante)    ? 'ca.id_capeante LIKE "%' . $idcapeante . '%"'   : NULL,
-        strlen($senha_fin)     ? 'senha_finalizada = "' . $senha_fin . '"'       : NULL,
+        strlen((string)$pesquisa_nome) ? 'ho.nome_hosp LIKE "%' . $pesquisa_nome . '%"' : NULL,
+        strlen((string)$pesquisa_pac)  ? 'pa.nome_pac  LIKE "%' . $pesquisa_pac  . '%"' : NULL,
+        strlen((string)$pesquisa_matricula) ? 'pa.matricula_pac LIKE "%' . $pesquisa_matricula . '%"' : NULL,
+        strlen((string)$lote)          ? 'ca.lote_cap = "' . $lote . '"'                 : NULL,
+        strlen((string)$idcapeante)    ? 'ca.id_capeante LIKE "%' . $idcapeante . '%"'   : NULL,
+        strlen((string)$senha_fin)     ? 'senha_finalizada = "' . $senha_fin . '"'       : NULL,
         ($conta_parada === 's' || $conta_parada === 'n') ? 'ca.conta_parada_cap = "' . $conta_parada . '"' : NULL,
         ($encerrado_cap === 's' || $encerrado_cap === 'n') ? 'ca.encerrado_cap = "' . $encerrado_cap . '"' : NULL,
-        strlen($senha_int)     ? 'senha_int LIKE "%' . $senha_int . '%"'         : NULL,
-        strlen($data_intern_int) ? 'data_intern_int BETWEEN "' . $data_intern_int . '" AND "' . $data_intern_int_max . '"' : NULL,
+        strlen((string)$senha_int)     ? 'senha_int LIKE "%' . $senha_int . '%"'         : NULL,
+        strlen((string)$data_intern_int) ? 'data_intern_int BETWEEN "' . $data_intern_int . '" AND "' . $data_intern_int_max . '"' : NULL,
 
         (!$isDiretor && strlen((string)$userId)) ? 'ho.fk_usuario_hosp = "' . $userId . '"' : NULL
     ];

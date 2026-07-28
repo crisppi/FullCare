@@ -23,8 +23,8 @@
     $hospitalInicio = ' 1 ';
 
     $condicoes = [
-        strlen($busca) ? 'nome_hosp LIKE "%' . $busca . '%"' : null,
-        strlen($hospitalInicio) ? 'id_hospital > ' . $hospitalInicio . ' ' : NULL,
+        strlen((string)$busca) ? 'nome_hosp LIKE "%' . $busca . '%"' : null,
+        strlen((string)$hospitalInicio) ? 'id_hospital > ' . $hospitalInicio . ' ' : NULL,
 
     ];
 

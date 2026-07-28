@@ -4282,6 +4282,56 @@ window.addEventListener('load', signalEditAdditionalSelectsFromServer);
 window.setTimeout(signalEditAdditionalSelectsFromServer, 0);
 </script>
 
+<style>
+/* Detalhes da visita no mesmo padrão visual da internação. */
+#main-container .visita-page #detalhes-card-wrapper {
+    margin-top: 8px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#main-container .visita-page #detalhes-card-wrapper .detalhes-card {
+    padding: 8px 10px !important;
+    border: 1px solid #d9dce4 !important;
+    border-left: 4px solid #7a2d83 !important;
+    border-radius: 8px !important;
+    background: #f7f8fb !important;
+    box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
+}
+
+#main-container .visita-page #detalhes-card-wrapper .detalhes-card__header {
+    margin: 0 0 6px !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+#main-container .visita-page #detalhes-card-wrapper .detalhes-card__title {
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    color: #202938 !important;
+    font-size: .82rem !important;
+    font-weight: 700 !important;
+    line-height: 1.05 !important;
+}
+
+#main-container .visita-page #detalhes-card-wrapper .detalhes-card__marker {
+    display: inline-block !important;
+    width: 4px !important;
+    height: 18px !important;
+    margin-right: 8px !important;
+    border-radius: 999px !important;
+    background: #7a2d83 !important;
+}
+
+#main-container .visita-page #detalhes-card-wrapper #div-detalhado > .row:last-child {
+    margin-top: 7px !important;
+}
+</style>
+
 <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
 <script>
 window.visitaAiConfig = Object.assign({}, window.visitaAiConfig || {}, {

@@ -229,3 +229,5 @@ Stack trace:
 #1 /Applications/AMPPS/www/FullCare/list_internacao_cap_jornada.php(20): include_once('/Applications/A...')
 #2 {main}
   thrown in /Applications/AMPPS/www/FullCare/dao/internacaoDao.php on line 19
+[24-Jul-2026 23:47:11 America/Sao_Paulo] PHP Warning:  Cannot modify header information - headers already sent by (output started at /var/www/html/pages/list/list_internacao_ciclo.php:6) in /var/www/html/templates/header.php on line 9
+[25-Jul-2026 00:36:07 America/Sao_Paulo] PHP Warning:  Cannot modify header information - headers already sent by (output started at /var/www/html/pages/list/list_internacao_cap_jornada.php:6) in /var/www/html/templates/header.php on line 9

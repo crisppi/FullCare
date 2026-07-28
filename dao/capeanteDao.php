@@ -440,10 +440,10 @@ class capeanteDAO implements capeanteDAOInterface
     /** SELECT com filtros/paginação trazendo alias de FATURAMENTO + novos campos */
     public function selectAllcapeante($where = null, $order = null, $limite = null)
     {
-        $where  = strlen($where)  ? 'WHERE ' . $where  : '';
-        $order  = strlen($order)  ? $order : 'ca.id_capeante DESC';
+        $where  = strlen((string)$where)  ? 'WHERE ' . $where  : '';
+        $order  = strlen((string)$order)  ? $order : 'ca.id_capeante DESC';
         $order  = 'ORDER BY ' . $order;
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $limite = strlen((string)$limite) ? 'LIMIT ' . $limite : '';
         $group  = " GROUP BY ca.id_capeante ";
 
         $sql = "
@@ -538,9 +538,9 @@ class capeanteDAO implements capeanteDAOInterface
 
     public function selectAllCapeanteRah($where = null, $order = null, $limite = null)
     {
-        $whereSql  = strlen($where)  ? 'WHERE ' . $where  : '';
-        $orderSql  = strlen($order)  ? 'ORDER BY ' . $order : '';
-        $limiteSql = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $whereSql  = strlen((string)$where)  ? 'WHERE ' . $where  : '';
+        $orderSql  = strlen((string)$order)  ? 'ORDER BY ' . $order : '';
+        $limiteSql = strlen((string)$limite) ? 'LIMIT ' . $limite : '';
 
         $sql = "
         SELECT 
@@ -566,9 +566,9 @@ class capeanteDAO implements capeanteDAOInterface
     /** SELECT usado na lista (inclui novos campos) */
     public function selectInternacaoCap($where = null, $order = null, $limit = null)
     {
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
 
         $sql = "
         SELECT 
@@ -646,9 +646,9 @@ class capeanteDAO implements capeanteDAOInterface
     /** Quantidade (mantido) */
     public function Qtdcapeante($where = null, $order = null, $limite = null)
     {
-        $where  = strlen($where)  ? 'WHERE ' . $where  : '';
-        $order  = strlen($order)  ? 'ORDER BY ' . $order : '';
-        $limite = strlen($limite) ? 'LIMIT ' . $limite : '';
+        $where  = strlen((string)$where)  ? 'WHERE ' . $where  : '';
+        $order  = strlen((string)$order)  ? 'ORDER BY ' . $order : '';
+        $limite = strlen((string)$limite) ? 'LIMIT ' . $limite : '';
         $group  = ' GROUP BY ac.id_internacao ';
 
         $sql = "

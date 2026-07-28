@@ -247,15 +247,15 @@ if (empty($data_intern_int_max)) {
 // $buscaAtivo = in_array($buscaAtivo, ['s', 'n']) ?: "";
 
 $condicoes = [
-    strlen($pesquisa_nome) ? 'ho.nome_hosp LIKE "%' . $pesquisa_nome . '%"' : NULL,
-    strlen($pesquisa_pac) ? 'pa.nome_pac LIKE "%' . $pesquisa_pac . '%"' : NULL,
-    strlen($senha_int) ? 'senha_int LIKE "%' . $senha_int . '%"' : NULL,
-    strlen($senha_fin) ? 'conta_parada_cap = "' . $encerrado_cap . '"' : NULL,
-    strlen($med_check) ? 'med_check = "' . $med_check . '"' : NULL,
-    strlen($enf_check) ? 'enfer_check = "' . $enf_check . '"' : NULL,
-    strlen($adm_check) ? 'adm_check = "' . $adm_check . '"' : NULL,
-    strlen($data_intern_int) ? 'data_intern_int BETWEEN "' . $data_intern_int . '" AND "' . $data_intern_int_max . '"' : NULL,
-    strlen($auditor) ? 'hos.fk_usuario_hosp = "' . $auditor . '"' : NULL,
+    strlen((string)$pesquisa_nome) ? 'ho.nome_hosp LIKE "%' . $pesquisa_nome . '%"' : NULL,
+    strlen((string)$pesquisa_pac) ? 'pa.nome_pac LIKE "%' . $pesquisa_pac . '%"' : NULL,
+    strlen((string)$senha_int) ? 'senha_int LIKE "%' . $senha_int . '%"' : NULL,
+    strlen((string)$senha_fin) ? 'conta_parada_cap = "' . $encerrado_cap . '"' : NULL,
+    strlen((string)$med_check) ? 'med_check = "' . $med_check . '"' : NULL,
+    strlen((string)$enf_check) ? 'enfer_check = "' . $enf_check . '"' : NULL,
+    strlen((string)$adm_check) ? 'adm_check = "' . $adm_check . '"' : NULL,
+    strlen((string)$data_intern_int) ? 'data_intern_int BETWEEN "' . $data_intern_int . '" AND "' . $data_intern_int_max . '"' : NULL,
+    strlen((string)$auditor) ? 'hos.fk_usuario_hosp = "' . $auditor . '"' : NULL,
 
 ];
 $condicoes = array_filter($condicoes);
@@ -378,13 +378,13 @@ if ($qtdIntItens > $limite) {
                                 </li>
                                 <li>
                                     <button class="dropdown-item"
-                                        onclick="window.location.href='<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>'">
+                                        onclick="window.open('<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>', '_blank', 'noopener')">
                                         <i style="color:brown; margin-right:10px" class="bi bi-printer"></i> Imprimir resumido
                                     </button>
                                 </li>
                                 <li>
                                     <button class="dropdown-item"
-                                        onclick="window.location.href='<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>?modelo=completo'">
+                                        onclick="window.open('<?= $BASE_URL ?>contas/prontuario/<?= $intern['id_capeante'] ?>?modelo=completo', '_blank', 'noopener')">
                                         <i style="color:brown; margin-right:10px" class="bi bi-file-earmark-spreadsheet"></i> Imprimir completo
                                     </button>
                                 </li>
@@ -514,7 +514,8 @@ if (!window.__fcBulkPrintBound) {
             return;
         }
         const modelo = button.dataset.bulkPrintModelo || 'resumido';
-        window.location.href = window.__fcBulkPrintBaseUrl + '?modelo=' + encodeURIComponent(modelo) + '&ids=' + encodeURIComponent(ids.join(','));
+        const printUrl = window.__fcBulkPrintBaseUrl + '?modelo=' + encodeURIComponent(modelo) + '&ids=' + encodeURIComponent(ids.join(','));
+        window.open(printUrl, '_blank', 'noopener');
     });
 }
 // ajax para submit do formulario de pesquisa

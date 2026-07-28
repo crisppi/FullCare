@@ -114,9 +114,9 @@ class censoDAO implements censoDAOInterface
     public function selectAllCensoList($where = null, $order = null, $limit = null)
     {
         //DADOS DA QUERY
-        $where = strlen($where) ? 'WHERE ' . $where : '';
-        $order = strlen($order) ? 'ORDER BY ' . $order : '';
-        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
+        $where = strlen((string)$where) ? 'WHERE ' . $where : '';
+        $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
+        $limit = strlen((string)$limit) ? 'LIMIT ' . $limit : '';
 
         $group = ' GROUP BY ac.id_censo ';
 
