@@ -528,7 +528,7 @@ $hospitais = $chatService->listHospitals($ctx);
                 </select>
             </div>
             <div class="intern-chat-field">
-                <label for="chatDays">Período</label>
+                <label for="chatDays">Período dos dados operacionais</label>
                 <select id="chatDays">
                     <option value="30">Últimos 30 dias</option>
                     <option value="90">Últimos 90 dias</option>
@@ -536,6 +536,7 @@ $hospitais = $chatService->listHospitals($ctx);
                     <option value="365">Últimos 12 meses</option>
                     <option value="730">Últimos 24 meses</option>
                 </select>
+                <small>Para “Internados”, o censo inclui todos os casos ativos, mesmo os admitidos antes deste período.</small>
             </div>
 
             <div class="intern-chat-suggestions">

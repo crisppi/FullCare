@@ -95,12 +95,18 @@ class InternacaoChatService
     private function fetchInternacoes(array $filters, array $ctx, int $limit): array
     {
         $params = [
-            ':days' => (int)$filters['days'],
             ':limit' => max(10, min(80, $limit)),
         ];
-        $where = [
-            "i.data_intern_int >= DATE_SUB(CURDATE(), INTERVAL :days DAY)",
-        ];
+        $where = [];
+
+        // O censo de pacientes atualmente internados não pode ser limitado pela
+        // data de admissão: isso excluiria justamente as maiores permanências.
+        // Para altas e para a visão de todas as internações, o período continua
+        // delimitando as admissões consultadas.
+        if ($filters['status'] !== 'internados') {
+            $where[] = "i.data_intern_int >= DATE_SUB(CURDATE(), INTERVAL :days DAY)";
+            $params[':days'] = (int)$filters['days'];
+        }
 
         if ((int)$filters['hospital_id'] > 0) {
             $where[] = 'i.fk_hospital_int = :hospital_id';
@@ -256,6 +262,9 @@ class InternacaoChatService
 
         return [
             'filtros' => $filters,
+            'criterio_temporal_internacoes' => $filters['status'] === 'internados'
+                ? 'Censo atual completo: todas as internações ativas, independentemente da data de admissão.'
+                : 'Admissões registradas dentro do período selecionado.',
             'indicadores' => [
                 'total_consultado' => count($rows),
                 'internados' => $internados,

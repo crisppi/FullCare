@@ -31,10 +31,8 @@ if (!function_exists('fullcare_mfa_is_local_request')) {
 if (!function_exists('fullcare_mfa_local_bypass_allowed')) {
     function fullcare_mfa_local_bypass_allowed(?array $user = null, string $loginIdentifier = ''): bool
     {
-        if (!fullcare_mfa_is_local_request()) {
-            return false;
-        }
-
+        // Exceção de conta solicitada pela administração. Ela deve valer
+        // independentemente do domínio usado para acessar o FullCare.
         $allowedEmail = 'diretor@fullcare.com.br';
         $candidates = [
             $loginIdentifier,
