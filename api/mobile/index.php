@@ -12,11 +12,6 @@ try {
         mobileHandleLogin($conn, $input);
     }
 
-    if ($method === 'POST' && $action === 'mfa-verify') {
-        $input = mobileJsonInput();
-        mobileHandleMfaVerify($conn, $input);
-    }
-
     $authUser = mobileRequireAuth($conn);
 
     if ($method === 'GET' && $action === 'me') {

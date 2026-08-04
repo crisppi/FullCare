@@ -11,5 +11,7 @@ void main() {
 
     expect(find.text('FullCare Audit'), findsOneWidget);
     expect(find.text('Entrar'), findsOneWidget);
+    expect(find.textContaining('autenticador'), findsNothing);
+    expect(find.text('Verificar'), findsNothing);
   });
 }

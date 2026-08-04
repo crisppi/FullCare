@@ -48,17 +48,6 @@ class _FullCareMobileAppState extends State<FullCareMobileApp> {
     });
   }
 
-  Future<void> _handleMfaLogin(String challengeToken, String code) async {
-    final user = await _api.verifyMfa(
-      challengeToken: challengeToken,
-      code: code,
-    );
-    if (!mounted) return;
-    setState(() {
-      _user = user;
-    });
-  }
-
   Future<void> _handleLogout() async {
     await _api.clearSession();
     if (!mounted) return;
@@ -111,10 +100,7 @@ class _FullCareMobileAppState extends State<FullCareMobileApp> {
           _loading
               ? const Scaffold(body: Center(child: CircularProgressIndicator()))
               : (_user == null
-                  ? LoginPage(
-                    onLogin: _handleLogin,
-                    onMfaLogin: _handleMfaLogin,
-                  )
+                  ? LoginPage(onLogin: _handleLogin)
                   : HomeHubPage(
                     api: _api,
                     user: _user!,
@@ -125,10 +111,9 @@ class _FullCareMobileAppState extends State<FullCareMobileApp> {
 }
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, required this.onLogin, required this.onMfaLogin});
+  const LoginPage({super.key, required this.onLogin});
 
   final Future<void> Function(String email, String password) onLogin;
-  final Future<void> Function(String challengeToken, String code) onMfaLogin;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -137,16 +122,13 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _mfaCodeController = TextEditingController();
   bool _submitting = false;
   bool _acceptedPrivacy = false;
-  String _mfaChallengeToken = '';
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _mfaCodeController.dispose();
     super.dispose();
   }
 
@@ -166,41 +148,6 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.text.trim(),
         _passwordController.text,
       );
-    } on MfaRequiredException catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _mfaChallengeToken = error.challengeToken;
-        _mfaCodeController.clear();
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error.message)));
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString().replaceFirst('Exception: ', '')),
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _submitting = false);
-      }
-    }
-  }
-
-  Future<void> _submitMfa() async {
-    final code = _mfaCodeController.text.trim();
-    if (code.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Informe o código do autenticador.')),
-      );
-      return;
-    }
-
-    setState(() => _submitting = true);
-    try {
-      await widget.onMfaLogin(_mfaChallengeToken, code);
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -284,168 +231,114 @@ class _LoginPageState extends State<LoginPage> {
                                   'Acesso seguro para gestao de auditoria e controles operacionais.',
                                 ),
                                 const SizedBox(height: 16),
-                                if (_mfaChallengeToken.isEmpty) ...[
-                                  TextField(
-                                    controller: _emailController,
-                                    keyboardType: TextInputType.emailAddress,
-                                    autofillHints: const [AutofillHints.email],
-                                    textInputAction: TextInputAction.next,
-                                    decoration: const InputDecoration(
-                                      labelText: 'E-mail',
+                                TextField(
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  autofillHints: const [AutofillHints.email],
+                                  textInputAction: TextInputAction.next,
+                                  decoration: const InputDecoration(
+                                    labelText: 'E-mail',
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                TextField(
+                                  controller: _passwordController,
+                                  obscureText: true,
+                                  autofillHints: const [AutofillHints.password],
+                                  textInputAction: TextInputAction.done,
+                                  onSubmitted:
+                                      (_) => _submitting ? null : _submit(),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Senha',
+                                  ),
+                                ),
+                                const SizedBox(height: 14),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF5F8FC),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: const Color(0xFFD8E3F0),
                                     ),
                                   ),
-                                  const SizedBox(height: 12),
-                                  TextField(
-                                    controller: _passwordController,
-                                    obscureText: true,
-                                    autofillHints: const [
-                                      AutofillHints.password,
-                                    ],
-                                    textInputAction: TextInputAction.done,
-                                    onSubmitted:
-                                        (_) => _submitting ? null : _submit(),
-                                    decoration: const InputDecoration(
-                                      labelText: 'Senha',
-                                    ),
+                                  padding: const EdgeInsets.fromLTRB(
+                                    12,
+                                    10,
+                                    12,
+                                    8,
                                   ),
-                                  const SizedBox(height: 14),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF5F8FC),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: const Color(0xFFD8E3F0),
-                                      ),
-                                    ),
-                                    padding: const EdgeInsets.fromLTRB(
-                                      12,
-                                      10,
-                                      12,
-                                      8,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              width: 24,
-                                              height: 24,
-                                              child: Checkbox(
-                                                value: _acceptedPrivacy,
-                                                onChanged:
-                                                    (value) => setState(
-                                                      () =>
-                                                          _acceptedPrivacy =
-                                                              value ?? false,
-                                                    ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Expanded(
-                                              child: Text(
-                                                'Li e aceito a Politica de Privacidade.',
-                                                style: privacyTextStyle,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: TextButton(
-                                            onPressed:
-                                                () =>
-                                                    _showPrivacyPolicy(context),
-                                            style: TextButton.styleFrom(
-                                              minimumSize: const Size(0, 32),
-                                              padding: const EdgeInsets.only(
-                                                left: 34,
-                                                right: 8,
-                                              ),
-                                              tapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                            ),
-                                            child: const Text(
-                                              'Ver Politica de Privacidade',
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: Checkbox(
+                                              value: _acceptedPrivacy,
+                                              onChanged:
+                                                  (value) => setState(
+                                                    () =>
+                                                        _acceptedPrivacy =
+                                                            value ?? false,
+                                                  ),
                                             ),
                                           ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Text(
+                                              'Li e aceito a Politica de Privacidade.',
+                                              style: privacyTextStyle,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: TextButton(
+                                          onPressed:
+                                              () => _showPrivacyPolicy(context),
+                                          style: TextButton.styleFrom(
+                                            minimumSize: const Size(0, 32),
+                                            padding: const EdgeInsets.only(
+                                              left: 34,
+                                              right: 8,
+                                            ),
+                                            tapTargetSize:
+                                                MaterialTapTargetSize
+                                                    .shrinkWrap,
+                                          ),
+                                          child: const Text(
+                                            'Ver Politica de Privacidade',
+                                          ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  FilledButton(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: const Color(0xFF5E2363),
-                                      minimumSize: const Size.fromHeight(52),
-                                    ),
-                                    onPressed: _submitting ? null : _submit,
-                                    child:
-                                        _submitting
-                                            ? const SizedBox(
-                                              width: 20,
-                                              height: 20,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                color: Colors.white,
-                                              ),
-                                            )
-                                            : const Text('Entrar'),
-                                  ),
-                                ] else ...[
-                                  const Text(
-                                    'Digite o código de 6 dígitos do seu aplicativo autenticador.',
-                                  ),
-                                  const SizedBox(height: 14),
-                                  TextField(
-                                    controller: _mfaCodeController,
-                                    keyboardType: TextInputType.number,
-                                    autofillHints: const [
-                                      AutofillHints.oneTimeCode,
+                                      ),
                                     ],
-                                    textInputAction: TextInputAction.done,
-                                    onSubmitted:
-                                        (_) =>
-                                            _submitting ? null : _submitMfa(),
-                                    decoration: const InputDecoration(
-                                      labelText: 'Código do autenticador',
-                                    ),
                                   ),
-                                  const SizedBox(height: 18),
-                                  FilledButton(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: const Color(0xFF5E2363),
-                                      minimumSize: const Size.fromHeight(52),
-                                    ),
-                                    onPressed: _submitting ? null : _submitMfa,
-                                    child:
-                                        _submitting
-                                            ? const SizedBox(
-                                              width: 20,
-                                              height: 20,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                color: Colors.white,
-                                              ),
-                                            )
-                                            : const Text('Verificar'),
+                                ),
+                                const SizedBox(height: 16),
+                                FilledButton(
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: const Color(0xFF5E2363),
+                                    minimumSize: const Size.fromHeight(52),
                                   ),
-                                  TextButton(
-                                    onPressed:
-                                        _submitting
-                                            ? null
-                                            : () => setState(() {
-                                              _mfaChallengeToken = '';
-                                              _mfaCodeController.clear();
-                                              _passwordController.clear();
-                                            }),
-                                    child: const Text('Voltar ao login'),
-                                  ),
-                                ],
+                                  onPressed: _submitting ? null : _submit,
+                                  child:
+                                      _submitting
+                                          ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                          : const Text('Entrar'),
+                                ),
                               ],
                             ),
                           ),
@@ -3415,7 +3308,7 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
     await _load();
   }
 
-  Future<void> _addEvolution() async {
+  Future<void> _openVisits({required bool showComposerInitially}) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder:
@@ -3423,6 +3316,7 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
               api: widget.api,
               admissionId: widget.admissionId,
               patientName: _detail?.admission.patientName ?? 'Internação',
+              showComposerInitially: showComposerInitially,
             ),
       ),
     );
@@ -3506,7 +3400,12 @@ class _AdmissionDetailPageState extends State<AdmissionDetailPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    _PrimaryEvolutionCard(onTap: _addEvolution),
+                    _VisitActionsCard(
+                      onNewVisit:
+                          () => _openVisits(showComposerInitially: true),
+                      onHistory:
+                          () => _openVisits(showComposerInitially: false),
+                    ),
                     const SizedBox(height: 14),
                     const Text(
                       'Subitens da internação',
@@ -3909,10 +3808,11 @@ class _CaseBadge extends StatelessWidget {
   }
 }
 
-class _PrimaryEvolutionCard extends StatelessWidget {
-  const _PrimaryEvolutionCard({required this.onTap});
+class _VisitActionsCard extends StatelessWidget {
+  const _VisitActionsCard({required this.onNewVisit, required this.onHistory});
 
-  final VoidCallback onTap;
+  final VoidCallback onNewVisit;
+  final VoidCallback onHistory;
 
   @override
   Widget build(BuildContext context) {
@@ -3920,54 +3820,59 @@ class _PrimaryEvolutionCard extends StatelessWidget {
       color: const Color(0xFFFFF8EC),
       elevation: 2.5,
       shadowColor: const Color(0xFF8B5E1A).withValues(alpha: 0.18),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF8B5E1A).withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(
-                  Icons.edit_note,
-                  color: Color(0xFF8B5E1A),
-                  size: 28,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Expanded(
+              child: _VisitActionButton(
+                icon: Icons.add_circle_outline,
+                label: 'Nova visita',
+                onTap: onNewVisit,
               ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Visita',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF8B5E1A),
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Registrar, ditar e consultar histórico',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12, color: Color(0xFF5B6577)),
-                    ),
-                  ],
-                ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _VisitActionButton(
+                icon: Icons.history,
+                label: 'Visitas anteriores',
+                onTap: onHistory,
               ),
-              const SizedBox(width: 8),
-              const Icon(Icons.chevron_right, color: Color(0xFF8B5E1A)),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class _VisitActionButton extends StatelessWidget {
+  const _VisitActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF8B5E1A),
+        side: const BorderSide(color: Color(0xFFD9BC8B)),
+        minimumSize: const Size.fromHeight(52),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      ),
+      icon: Icon(icon, size: 21),
+      label: Text(
+        label,
+        textAlign: TextAlign.center,
+        maxLines: 2,
+        style: const TextStyle(fontWeight: FontWeight.w800),
       ),
     );
   }
@@ -4116,11 +4021,13 @@ class AdmissionEvolutionsPage extends StatefulWidget {
     required this.api,
     required this.admissionId,
     required this.patientName,
+    this.showComposerInitially = true,
   });
 
   final MobileApi api;
   final int admissionId;
   final String patientName;
+  final bool showComposerInitially;
 
   @override
   State<AdmissionEvolutionsPage> createState() =>
@@ -4135,6 +4042,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
   List<EvolutionItem> _items = const [];
   bool _loading = true;
   bool _saving = false;
+  late bool _showComposer;
 
   String _formatDateTime(String value) {
     final raw = value.trim();
@@ -4164,6 +4072,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
   @override
   void initState() {
     super.initState();
+    _showComposer = widget.showComposerInitially;
     _load();
   }
 
@@ -4252,32 +4161,54 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Card(
-              color: const Color(0xFFFFF8EC),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.patientName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
+            SegmentedButton<bool>(
+              segments: const [
+                ButtonSegment<bool>(
+                  value: true,
+                  icon: Icon(Icons.add_circle_outline),
+                  label: Text('Nova visita'),
+                ),
+                ButtonSegment<bool>(
+                  value: false,
+                  icon: Icon(Icons.history),
+                  label: Text('Anteriores'),
+                ),
+              ],
+              selected: {_showComposer},
+              showSelectedIcon: false,
+              onSelectionChanged:
+                  (selection) => setState(() {
+                    _showComposer = selection.first;
+                  }),
+            ),
+            const SizedBox(height: 12),
+            if (_showComposer)
+              Card(
+                color: const Color(0xFFFFF8EC),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.patientName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Visita clínica e programação terapêutica',
-                      style: TextStyle(
-                        color: Color(0xFF5B6577),
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Visita clínica e programação terapêutica',
+                        style: TextStyle(
+                          color: Color(0xFF5B6577),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 12),
             Card(
               child: Padding(
@@ -4366,7 +4297,7 @@ class _AdmissionEvolutionsPageState extends State<AdmissionEvolutionsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 14),
+            if (_showComposer) const SizedBox(height: 14),
             Row(
               children: [
                 const Expanded(

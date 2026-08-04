@@ -348,25 +348,6 @@ function mobileHandleLogin(PDO $conn, array $input): void
 
     mobileClearFailedLogins($email);
 
-    $mobileMfaEnabled = filter_var(
-        getenv('MOBILE_MFA_ENABLED') ?: 'true',
-        FILTER_VALIDATE_BOOL
-    );
-
-    if ($mobileMfaEnabled
-        && function_exists('fullcare_mfa_user_enabled')
-        && fullcare_mfa_user_enabled($user)
-    ) {
-        mobileJsonResponse([
-            'success' => true,
-            'data' => [
-                'mfa_required' => true,
-                'challenge_token' => mobileGenerateMfaChallengeToken($user),
-                'message' => 'Informe o código do autenticador.',
-            ],
-        ]);
-    }
-
     $token = mobileGenerateToken($user);
     mobileJsonResponse([
         'success' => true,

@@ -1,18 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/src/models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-class MfaRequiredException implements Exception {
-  const MfaRequiredException(this.challengeToken, this.message);
-
-  final String challengeToken;
-  final String message;
-
-  @override
-  String toString() => message;
-}
 
 class MobileApi {
   MobileApi();
@@ -22,6 +14,8 @@ class MobileApi {
     defaultValue: 'https://sistema.fullcareaudit.com.br/api/mobile/index.php',
   );
   static const String _tokenKey = 'fullcare_mobile_token';
+  static const int _loginAttempts = 3;
+  static const Duration _requestTimeout = Duration(seconds: 15);
 
   String? _token;
 
@@ -46,31 +40,6 @@ class MobileApi {
       method: 'POST',
       action: 'login',
       body: {'email': email, 'password': password},
-    );
-
-    final data = payload['data'] as Map<String, dynamic>;
-    if (data['mfa_required'] == true) {
-      final challengeToken = data['challenge_token'] as String? ?? '';
-      if (challengeToken.isEmpty) {
-        throw Exception('Não foi possível iniciar a verificação MFA.');
-      }
-      throw MfaRequiredException(
-        challengeToken,
-        data['message'] as String? ?? 'Informe o código do autenticador.',
-      );
-    }
-
-    return _saveSessionFromData(data);
-  }
-
-  Future<SessionUser> verifyMfa({
-    required String challengeToken,
-    required String code,
-  }) async {
-    final payload = await _request(
-      method: 'POST',
-      action: 'mfa-verify',
-      body: {'challenge_token': challengeToken, 'code': code},
     );
 
     final data = payload['data'] as Map<String, dynamic>;
@@ -462,14 +431,32 @@ class MobileApi {
     }
 
     late final http.Response response;
-    if (method == 'POST') {
-      response = await http.post(
-        uri,
-        headers: headers,
-        body: jsonEncode(body ?? <String, dynamic>{}),
-      );
-    } else {
-      response = await http.get(uri, headers: headers);
+    final attempts = action == 'login' ? _loginAttempts : 1;
+    for (var attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        response = await _send(
+          method: method,
+          uri: uri,
+          headers: headers,
+          body: body,
+        ).timeout(_requestTimeout);
+        break;
+      } on Object catch (error) {
+        final networkFailure =
+            error is SocketException ||
+            error is TimeoutException ||
+            error is http.ClientException;
+        if (!networkFailure) rethrow;
+
+        if (attempt == attempts) {
+          throw Exception(
+            'Nao foi possivel conectar ao servidor. '
+            'Verifique sua conexao e tente novamente.',
+          );
+        }
+
+        await Future<void>.delayed(Duration(milliseconds: 500 * attempt));
+      }
     }
 
     Map<String, dynamic> decoded;
@@ -488,5 +475,21 @@ class MobileApi {
     }
 
     return decoded;
+  }
+
+  Future<http.Response> _send({
+    required String method,
+    required Uri uri,
+    required Map<String, String> headers,
+    Map<String, dynamic>? body,
+  }) {
+    if (method == 'POST') {
+      return http.post(
+        uri,
+        headers: headers,
+        body: jsonEncode(body ?? <String, dynamic>{}),
+      );
+    }
+    return http.get(uri, headers: headers);
   }
 }
