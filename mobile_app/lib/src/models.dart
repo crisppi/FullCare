@@ -72,6 +72,35 @@ class AdmissionItem {
   final String dischargeType;
 }
 
+class DashboardSummary {
+  const DashboardSummary({
+    required this.activeAdmissions,
+    required this.pendingVisits,
+    required this.extensionsDue,
+    required this.longStayCases,
+    required this.openAdverseEvents,
+    required this.extensionWindowDays,
+  });
+
+  factory DashboardSummary.fromJson(Map<String, dynamic> json) {
+    return DashboardSummary(
+      activeAdmissions: _asInt(json['active_admissions']),
+      pendingVisits: _asInt(json['pending_visits']),
+      extensionsDue: _asInt(json['extensions_due']),
+      longStayCases: _asInt(json['long_stay_cases']),
+      openAdverseEvents: _asInt(json['open_adverse_events']),
+      extensionWindowDays: _asInt(json['extension_window_days']),
+    );
+  }
+
+  final int activeAdmissions;
+  final int pendingVisits;
+  final int extensionsDue;
+  final int longStayCases;
+  final int openAdverseEvents;
+  final int extensionWindowDays;
+}
+
 class TussItem {
   const TussItem({
     required this.id,
@@ -141,11 +170,15 @@ class AdmissionDetail {
     required this.admission,
     required this.tussItems,
     required this.extensions,
+    this.evolutions = const [],
+    this.adverseEvents = const [],
   });
 
   final AdmissionItem admission;
   final List<TussItem> tussItems;
   final List<ExtensionItem> extensions;
+  final List<EvolutionItem> evolutions;
+  final List<AdverseEventCase> adverseEvents;
 }
 
 class TussCatalogItem {

@@ -33,11 +33,19 @@ try {
 
     if ($method === 'GET' && $action === 'admissions') {
         $query = trim((string)($_GET['query'] ?? ''));
+        $filter = trim((string)($_GET['filter'] ?? ''));
         mobileJsonResponse([
             'success' => true,
             'data' => [
-                'items' => mobileListAdmissions($conn, $authUser, $query),
+                'items' => mobileListAdmissions($conn, $authUser, $query, $filter),
             ],
+        ]);
+    }
+
+    if ($method === 'GET' && $action === 'dashboard') {
+        mobileJsonResponse([
+            'success' => true,
+            'data' => mobileDashboardSummary($conn, $authUser),
         ]);
     }
 

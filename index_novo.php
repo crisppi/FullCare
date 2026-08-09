@@ -52,7 +52,7 @@
 
     /* ── Left panel ─────────────────────────────────────── */
     .lp {
-        flex: 0 0 61%;
+        flex: 0 0 64%;
         min-width: 0;
         position: relative;
         display: flex;
@@ -60,12 +60,10 @@
         justify-content: space-between;
         padding: 44px 124px 36px 56px;
         overflow: hidden;
-        z-index: 2;
-        margin-right: -64px;
-        border-radius: 28px 68px 68px 28px;
-        box-shadow:
-            18px 0 26px rgba(4, 14, 27, .32),
-            46px 0 72px rgba(47, 111, 159, .22);
+        z-index: 1;
+        margin-right: 0;
+        border-radius: 28px;
+        box-shadow: none;
         background:
             radial-gradient(ellipse at 12% 0%, rgba(95, 164, 208, .14) 0%, transparent 46%),
             radial-gradient(ellipse at 86% 100%, rgba(103, 70, 139, .26) 0%, transparent 54%),
@@ -173,17 +171,17 @@
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        background:
-            linear-gradient(90deg, rgba(188, 211, 229, .92) 0%, rgba(218, 232, 243, .78) 13%, rgba(239, 246, 251, .92) 34%, #f5f8fc 62%, #f5f8fc 100%);
-        margin-left: 0;
+        background: linear-gradient(90deg, #d2e0e9 0%, #dee8ef 26%, #e7eef3 60%, #eaf0f5 100%);
+        margin-left: -64px;
         padding: 48px 56px 48px 124px;
         position: relative;
         overflow: hidden;
-        z-index: 1;
-        border-radius: 0;
+        z-index: 2;
+        border-radius: 68px 28px 28px 68px;
         box-shadow:
-            inset 46px 0 58px rgba(55, 111, 151, .30),
-            inset 18px 0 22px rgba(13, 32, 56, .18);
+            -18px 0 26px rgba(4, 14, 27, .32),
+            -46px 0 72px rgba(47, 111, 159, .22),
+            inset 1px 0 1px rgba(255, 255, 255, .34);
     }
 
     .rp-inner {
@@ -411,6 +409,7 @@
             width: 100%;
             min-width: 0;
             min-height: 100vh;
+            justify-content: center;
             margin-left: 0;
             padding: 48px 28px;
             border-radius: 0;
@@ -434,7 +433,7 @@
     </svg>
 
     <main class="login-shell" aria-label="Acesso FullCare">
-    <!-- ── Left panel ── -->
+    <!-- ── Brand panel ── -->
     <div class="lp">
         <div class="lp-logo">
             <img src="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/img/logo_branco.svg" alt="FullCare" />
@@ -459,7 +458,7 @@
         </div>
     </div>
 
-    <!-- ── Right panel ── -->
+    <!-- ── Login panel ── -->
     <div class="rp">
         <div class="rp-inner">
             <div class="rp-mark" aria-hidden="true">

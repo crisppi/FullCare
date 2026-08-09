@@ -77,10 +77,13 @@ class MobileApi {
     );
   }
 
-  Future<List<AdmissionItem>> listAdmissions(String query) async {
+  Future<List<AdmissionItem>> listAdmissions(
+    String query, {
+    String filter = '',
+  }) async {
     final payload = await _request(
       action: 'admissions',
-      query: {'query': query},
+      query: {'query': query, if (filter.isNotEmpty) 'filter': filter},
     );
     final items =
         (payload['data'] as Map<String, dynamic>)['items'] as List<dynamic>? ??
@@ -90,16 +93,60 @@ class MobileApi {
         .toList();
   }
 
+  Future<DashboardSummary> dashboardSummary() async {
+    try {
+      final payload = await _request(action: 'dashboard');
+      return DashboardSummary.fromJson(payload['data'] as Map<String, dynamic>);
+    } catch (error) {
+      if (!error.toString().toLowerCase().contains('rota nao encontrada')) {
+        rethrow;
+      }
+
+      final results = await Future.wait<dynamic>([
+        listAdmissions(''),
+        listLongStayCases(''),
+        listAdverseEventCases(''),
+      ]);
+      final admissions = results[0] as List<AdmissionItem>;
+      final longStay = results[1] as List<LongStayCase>;
+      final adverseEvents = results[2] as List<AdverseEventCase>;
+
+      return DashboardSummary(
+        activeAdmissions: admissions.length,
+        pendingVisits:
+            admissions
+                .where((item) => item.evolutionReport.trim().isEmpty)
+                .length,
+        extensionsDue: -1,
+        longStayCases: longStay.length,
+        openAdverseEvents:
+            adverseEvents
+                .where(
+                  (item) =>
+                      item.concludedFlag.toLowerCase() != 's' &&
+                      item.closeFlag.toLowerCase() != 's',
+                )
+                .length,
+        extensionWindowDays: 3,
+      );
+    }
+  }
+
   Future<AdmissionDetail> fetchAdmissionDetail(int admissionId) async {
     final payload = await _request(
       action: 'admission',
       query: {'id': '$admissionId'},
     );
     final data = payload['data'] as Map<String, dynamic>;
+    final admission = AdmissionItem.fromJson(
+      data['admission'] as Map<String, dynamic>,
+    );
+    final related = await Future.wait<dynamic>([
+      listEvolutions(admissionId),
+      listAdverseEventCases(''),
+    ]);
     return AdmissionDetail(
-      admission: AdmissionItem.fromJson(
-        data['admission'] as Map<String, dynamic>,
-      ),
+      admission: admission,
       tussItems:
           ((data['tuss_items'] as List<dynamic>? ?? []))
               .map((item) => TussItem.fromJson(item as Map<String, dynamic>))
@@ -109,6 +156,11 @@ class MobileApi {
               .map(
                 (item) => ExtensionItem.fromJson(item as Map<String, dynamic>),
               )
+              .toList(),
+      evolutions: related[0] as List<EvolutionItem>,
+      adverseEvents:
+          (related[1] as List<AdverseEventCase>)
+              .where((item) => item.admissionId == admissionId)
               .toList(),
     );
   }

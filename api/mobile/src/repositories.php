@@ -119,7 +119,7 @@ function mobileSearchPatients(PDO $conn, array $authUser, string $query): array
     return mobileFormatPatientRows($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [], 'name');
 }
 
-function mobileListAdmissions(PDO $conn, array $authUser, string $query): array
+function mobileListAdmissions(PDO $conn, array $authUser, string $query, string $filter = ''): array
 {
     [$scopeSql, $scopeParams] = mobileUserScopeWhere($authUser, 'p');
     $params = $scopeParams;
@@ -137,6 +137,28 @@ function mobileListAdmissions(PDO $conn, array $authUser, string $query): array
         $params[':query_hospital'] = $like;
         $params[':query_password'] = $like;
         $params[':query_cid'] = $like;
+    }
+
+    if ($filter === 'pending-visits') {
+        $where .= " AND NOT EXISTS (
+            SELECT 1
+            FROM tb_visita v
+            WHERE v.fk_internacao_vis = i.id_internacao
+              AND (v.retificado IS NULL OR v.retificado = 0)
+              AND COALESCE(v.rel_visita_vis, '') <> ''
+              AND DATE(v.data_visita_vis) = CURRENT_DATE()
+        ) ";
+    } elseif ($filter === 'extensions-due') {
+        $where .= " AND EXISTS (
+            SELECT 1
+            FROM tb_prorrogacao pr
+            WHERE pr.id_prorrogacao = (
+                SELECT MAX(pr2.id_prorrogacao)
+                FROM tb_prorrogacao pr2
+                WHERE pr2.fk_internacao_pror = i.id_internacao
+            )
+              AND pr.prorrog1_fim_pror BETWEEN CURRENT_DATE() AND DATE_ADD(CURRENT_DATE(), INTERVAL 3 DAY)
+        ) ";
     }
 
     $sql = "
@@ -173,6 +195,87 @@ function mobileListAdmissions(PDO $conn, array $authUser, string $query): array
     $stmt->execute();
 
     return mobileFormatPatientRows($stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
+}
+
+function mobileDashboardSummary(PDO $conn, array $authUser): array
+{
+    [$scopeSql, $scopeParams] = mobileUserScopeWhere($authUser, 'p');
+
+    $queries = [
+        'active_admissions' => "
+            SELECT COUNT(*)
+            FROM tb_internacao i
+            LEFT JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+            WHERE COALESCE(i.internado_int, 's') = 's'
+            {$scopeSql}
+        ",
+        'pending_visits' => "
+            SELECT COUNT(*)
+            FROM tb_internacao i
+            LEFT JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+            WHERE COALESCE(i.internado_int, 's') = 's'
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM tb_visita v
+                  WHERE v.fk_internacao_vis = i.id_internacao
+                    AND (v.retificado IS NULL OR v.retificado = 0)
+                    AND COALESCE(v.rel_visita_vis, '') <> ''
+                    AND DATE(v.data_visita_vis) = CURRENT_DATE()
+              )
+            {$scopeSql}
+        ",
+        'extensions_due' => "
+            SELECT COUNT(*)
+            FROM tb_internacao i
+            LEFT JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+            INNER JOIN tb_prorrogacao pr ON pr.id_prorrogacao = (
+                SELECT MAX(pr2.id_prorrogacao)
+                FROM tb_prorrogacao pr2
+                WHERE pr2.fk_internacao_pror = i.id_internacao
+            )
+            WHERE COALESCE(i.internado_int, 's') = 's'
+              AND pr.prorrog1_fim_pror BETWEEN CURRENT_DATE() AND DATE_ADD(CURRENT_DATE(), INTERVAL 3 DAY)
+            {$scopeSql}
+        ",
+        'long_stay_cases' => "
+            SELECT COUNT(*)
+            FROM tb_internacao i
+            LEFT JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+            LEFT JOIN tb_seguradora se ON se.id_seguradora = p.fk_seguradora_pac
+            WHERE i.internado_int = 's'
+              AND i.data_intern_int IS NOT NULL
+              AND i.data_intern_int <> '0000-00-00'
+              AND GREATEST(1, DATEDIFF(CURRENT_DATE(), i.data_intern_int) + 1)
+                  >= COALESCE(NULLIF(se.longa_permanencia_seg, 0), 30)
+            {$scopeSql}
+        ",
+        'open_adverse_events' => "
+            SELECT COUNT(*)
+            FROM tb_internacao i
+            LEFT JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+            INNER JOIN tb_gestao ge ON ge.id_gestao = (
+                SELECT MAX(g2.id_gestao)
+                FROM tb_gestao g2
+                WHERE g2.fk_internacao_ges = i.id_internacao
+                  AND COALESCE(g2.evento_adverso_ges, 'n') = 's'
+            )
+            WHERE COALESCE(i.internado_int, 's') = 's'
+              AND COALESCE(ge.evento_concluido_ges, 'n') <> 's'
+              AND COALESCE(ge.evento_encerrar_ges, 'n') <> 's'
+            {$scopeSql}
+        ",
+    ];
+
+    $summary = [];
+    foreach ($queries as $key => $sql) {
+        $stmt = $conn->prepare($sql);
+        mobileBindAll($stmt, $scopeParams);
+        $stmt->execute();
+        $summary[$key] = (int)$stmt->fetchColumn();
+    }
+
+    $summary['extension_window_days'] = 3;
+    return $summary;
 }
 
 function mobileListHomeCareCases(PDO $conn, array $authUser, string $query): array

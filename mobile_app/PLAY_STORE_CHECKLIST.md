@@ -2,8 +2,8 @@
 
 ## Identidade do app
 
-- Nome: `FullCare Mobile`
-- Package ID: `br.com.fullcare.mobile`
+- Nome: `FullCare Audit`
+- Package ID: `br.com.fullcare.audit`
 - Dominio de producao: `https://sistema.fullcareaudit.com.br/`
 - Politica de Privacidade: `https://accertconsult.com.br/politica-privacidade-fullcare-mobile.html`
 - API mobile: `https://sistema.fullcareaudit.com.br/api/mobile/index.php`
