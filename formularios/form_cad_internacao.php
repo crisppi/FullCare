@@ -48,6 +48,9 @@
             $ultimoReg = 0;
         }
     }
+    // O ID definitivo só existe após o INSERT. Este número é apenas uma
+    // referência visual e pode mudar se outro cadastro for salvo antes.
+    $proximoIdInternacaoPrevisto = $ultimoReg + 1;
 
     /* === DAOs auxiliares / util === */
     $Internacao_geral = new internacaoDAO($conn, $BASE_URL);
@@ -211,7 +214,6 @@
     ?>
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
 
     <div class="internacao-page">
         <div class="internacao-page__hero">
@@ -230,7 +232,13 @@
                         <div class="internacao-card__title-wrap">
                             <h2 class="internacao-card__title">Dados da internação</h2>
                         </div>
-                        <span class="internacao-card__tag internacao-card__tag--critical">Campos principais</span>
+                        <div class="d-flex align-items-center" style="gap: 8px;">
+                            <span class="internacao-card__tag internacao-card__tag--critical">Campos principais</span>
+                            <span class="internacao-card__tag"
+                                title="O ID definitivo é confirmado pelo banco ao salvar.">
+                                ID previsto: #<?= (int) $proximoIdInternacaoPrevisto ?>
+                            </span>
+                        </div>
                     </div>
                     <div class="internacao-card__body">
                         <div class="internacao-head-row internacao-head-grid">
@@ -326,6 +334,7 @@
                                         <option value="<?= $pacienteId ?>"
                                             <?= $id_paciente_get > 0 && $pacienteId === $id_paciente_get ? 'selected' : '' ?>
                                             data-matricula="<?= htmlspecialchars($matriculaPac) ?>"
+                                            data-medicamentos-alto-custo="<?= htmlspecialchars(trim((string)($paciente['medicamentos_alto_custo_seg'] ?? '')), ENT_QUOTES, 'UTF-8') ?>"
                                             data-care-programs="<?= htmlspecialchars(json_encode(array_values($careData['programas']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>"
                                             data-care-condicoes="<?= htmlspecialchars((string) $careData['condicoes']) ?>"
                                             data-tokens="<?= htmlspecialchars(trim((string) $paciente["nome_pac"])) ?>">
@@ -342,6 +351,7 @@
                                             <option value="<?= (int)$id_paciente_get ?>"
                                                 selected
                                                 data-matricula="<?= htmlspecialchars(trim((string)($pacientePrefill['matricula_pac'] ?? ''))) ?>"
+                                                data-medicamentos-alto-custo="<?= htmlspecialchars(trim((string)($pacientePrefill['medicamentos_alto_custo_seg'] ?? '')), ENT_QUOTES, 'UTF-8') ?>"
                                                 data-care-programs="<?= htmlspecialchars(json_encode(array_values($careData['programas']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>"
                                                 data-care-condicoes="<?= htmlspecialchars((string)$careData['condicoes']) ?>"
                                                 data-tokens="<?= htmlspecialchars(trim((string)($pacientePrefill['nome_pac'] ?? ''))) ?>">
@@ -888,6 +898,10 @@
                         <p class="tabelas-adicionais-card__eyebrow">Tabelas adicionais</p>
                         <h3 class="tabelas-adicionais-card__title">Complementos da visita</h3>
                     </div>
+                    <span class="internacao-card__tag"
+                        title="O ID definitivo é confirmado pelo banco ao salvar.">
+                        ID previsto: #<?= (int) $proximoIdInternacaoPrevisto ?>
+                    </span>
                 </div>
 
             <div class="tabelas-selects d-flex flex-wrap justify-content-between align-items-end">
@@ -1873,4 +1887,6 @@
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <!-- Padronizacao visual carregada por ultimo para ser a fonte definitiva da tela. -->
+    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
     <!-- <script src="<?= $BASE_URL ?>js/saude-autocomplete.js?v=2"></script> -->

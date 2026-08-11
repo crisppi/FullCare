@@ -90,6 +90,17 @@ $tussInt = new tussDAO($conn, $BASE_URL);
 $negociacaoDao = new negociacaoDAO($conn, $BASE_URL);
 
 $id_internacao = filter_input(INPUT_GET, 'id_internacao', FILTER_VALIDATE_INT);
+$medicamentosAltoCustoOperadora = '';
+if ($id_internacao) {
+    $stmtMedicamentosOperadora = $conn->prepare("SELECT COALESCE(s.medicamentos_alto_custo_seg, '')
+        FROM tb_internacao i
+        LEFT JOIN tb_paciente p ON p.id_paciente = i.fk_paciente_int
+        LEFT JOIN tb_seguradora s ON s.id_seguradora = p.fk_seguradora_pac
+        WHERE i.id_internacao = :id_internacao
+        LIMIT 1");
+    $stmtMedicamentosOperadora->execute([':id_internacao' => (int)$id_internacao]);
+    $medicamentosAltoCustoOperadora = trim((string)$stmtMedicamentosOperadora->fetchColumn());
+}
 
 $visitasAntigas = $visita->findGeralByIntern($id_internacao);
 

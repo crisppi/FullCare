@@ -430,7 +430,7 @@ try {
 
     $dataVisita = filter_input(INPUT_POST, 'data_visita_int');
     if ($dataVisita !== null) {
-        $int->data_visita_int = ($dataVisita === '') ? null : $dataVisita;
+        $int->data_visita_int = ($dataVisita === '') ? null : normalizeDateTimeInput($dataVisita);
     }
 
     $dataIntern = filter_input(INPUT_POST, 'data_intern_int');
@@ -448,9 +448,15 @@ try {
         $int->senha_int = $senha;
     }
 
-    $int->rel_int         = limpa(filter_input(INPUT_POST, 'rel_int'));
-    $int->acoes_int       = limpa(filter_input(INPUT_POST, 'acoes_int'));
-    $int->programacao_int = limpa(filter_input(INPUT_POST, 'programacao_int'));
+    if (array_key_exists('rel_int', $_POST)) {
+        $int->rel_int = limpa(filter_input(INPUT_POST, 'rel_int'));
+    }
+    if (array_key_exists('acoes_int', $_POST)) {
+        $int->acoes_int = limpa(filter_input(INPUT_POST, 'acoes_int'));
+    }
+    if (array_key_exists('programacao_int', $_POST)) {
+        $int->programacao_int = limpa(filter_input(INPUT_POST, 'programacao_int'));
+    }
 
     $int->primeira_vis_int = filter_input(INPUT_POST, 'primeira_vis_int') ?? $int->primeira_vis_int;
     $int->visita_no_int    = filter_input(INPUT_POST, 'visita_no_int')    ?? $int->visita_no_int;
@@ -472,12 +478,14 @@ try {
     $int->censo_int             = filter_input(INPUT_POST, 'censo_int')             ?? $int->censo_int;
     $int->origem_int            = filter_input(INPUT_POST, 'origem_int')            ?? $int->origem_int;
     $int->int_pertinente_int    = filter_input(INPUT_POST, 'int_pertinente_int')    ?? $int->int_pertinente_int;
-    $int->rel_pertinente_int    = limpa(filter_input(INPUT_POST, 'rel_pertinente_int'));
+    if (array_key_exists('rel_pertinente_int', $_POST)) {
+        $int->rel_pertinente_int = limpa(filter_input(INPUT_POST, 'rel_pertinente_int'));
+    }
     $int->hora_intern_int       = filter_input(INPUT_POST, 'hora_intern_int')       ?? $int->hora_intern_int;
 
-    $numAtendimento = filter_input(INPUT_POST, 'num_atendimento_int', FILTER_VALIDATE_INT);
-    if ($numAtendimento !== null && $numAtendimento !== false) {
-        $int->num_atendimento_int = $numAtendimento;
+    $numAtendimento = filter_input(INPUT_POST, 'num_atendimento_int', FILTER_UNSAFE_RAW);
+    if ($numAtendimento !== null) {
+        $int->num_atendimento_int = trim((string)$numAtendimento);
     }
 
     $timerRaw = filter_input(INPUT_POST, 'timer_int', FILTER_VALIDATE_INT);
@@ -520,6 +528,7 @@ try {
         $d->oportunidades_det         = limpa(filter_input(INPUT_POST, 'oportunidades_det'));
         $d->tqt_det                   = filter_input(INPUT_POST, 'tqt_det');
         $d->svd_det                   = filter_input(INPUT_POST, 'svd_det');
+        $d->sne_det                   = filter_input(INPUT_POST, 'sne_det');
         $d->gtt_det                   = filter_input(INPUT_POST, 'gtt_det');
         $d->dreno_det                 = filter_input(INPUT_POST, 'dreno_det');
         $d->rt_det                    = filter_input(INPUT_POST, 'rt_det');
@@ -561,23 +570,35 @@ try {
 
     /*──────── UTI (CREATE/UPDATE) ────────*/
     if (filter_input(INPUT_POST, 'select_uti') === 's') {
-        $u = new uti();
-        $u->id_uti              = filter_input(INPUT_POST, 'id_uti', FILTER_VALIDATE_INT);
-        $u->fk_internacao_uti   = filter_input(INPUT_POST, 'fk_internacao_uti', FILTER_VALIDATE_INT);
-        $u->hora_internacao_uti = filter_input(INPUT_POST, 'hora_internacao_uti');
-        $u->data_internacao_uti = filter_input(INPUT_POST, 'data_internacao_uti');
-        $u->vm_uti              = filter_input(INPUT_POST, 'vm_uti');
-        $u->dva_uti             = filter_input(INPUT_POST, 'dva_uti');
-        $u->motivo_uti          = filter_input(INPUT_POST, 'motivo_uti');
-        $u->rel_uti             = limpa(filter_input(INPUT_POST, 'rel_uti'));
-        $u->just_uti            = filter_input(INPUT_POST, 'just_uti');
-        $u->saps_uti            = filter_input(INPUT_POST, 'saps_uti');
-        $u->score_uti           = filter_input(INPUT_POST, 'score_uti');
-        $u->criterios_uti       = filter_input(INPUT_POST, 'criterio_uti');
-        $u->internado_uti       = filter_input(INPUT_POST, 'internado_uti');
+        $idUti = filter_input(INPUT_POST, 'id_uti', FILTER_VALIDATE_INT);
+        $beforeUti = $idUti ? $utiDao->findById((int)$idUti) : null;
+        $u = $beforeUti ? clone $beforeUti : new uti();
+        $u->id_uti = $idUti;
+        $u->fk_internacao_uti = $idInt;
+
+        $utiFields = [
+            'fk_visita_uti', 'hora_internacao_uti', 'data_internacao_uti',
+            'data_alta_uti', 'vm_uti', 'dva_uti', 'motivo_uti', 'just_uti',
+            'saps_uti', 'score_uti', 'internado_uti', 'especialidade_uti',
+            'internacao_uti', 'fk_user_uti', 'usuario_create_uti', 'glasgow_uti',
+            'suporte_vent_uti', 'dist_met_uti', 'justifique_uti'
+        ];
+        foreach ($utiFields as $field) {
+            if (array_key_exists($field, $_POST)) {
+                $u->$field = filter_input(INPUT_POST, $field);
+            }
+        }
+        if (array_key_exists('criterio_uti', $_POST) || array_key_exists('criterios_uti', $_POST)) {
+            $u->criterios_uti = filter_input(INPUT_POST, 'criterios_uti');
+            if ($u->criterios_uti === null) {
+                $u->criterios_uti = filter_input(INPUT_POST, 'criterio_uti');
+            }
+        }
+        if (array_key_exists('rel_uti', $_POST)) {
+            $u->rel_uti = limpa(filter_input(INPUT_POST, 'rel_uti'));
+        }
 
         if (!empty($u->id_uti)) {
-            $beforeUti = $utiDao->findById((int)$u->id_uti);
             $utiDao->update($u);
             fullcareAuditLog($conn, [
                 'action' => 'update',
@@ -615,45 +636,58 @@ try {
     if ($deveSalvarGestao) {
         $idGestao = filter_input(INPUT_POST, 'id_gestao', FILTER_VALIDATE_INT);
 
-        $gestao = new gestao();
+        $beforeGestao = $idGestao ? $gestaoDao->findById((int)$idGestao) : null;
+        $gestao = $beforeGestao ? clone $beforeGestao : new gestao();
         if ($idGestao) $gestao->id_gestao = $idGestao;
 
         $gestao->fk_internacao_ges              = $idInt;
-        $gestao->fk_visita_ges                  = filter_input(INPUT_POST, 'fk_visita_ges', FILTER_VALIDATE_INT);
-        $gestao->alto_custo_ges                 = filter_input(INPUT_POST, 'alto_custo_ges');
-        $gestao->rel_alto_custo_ges             = limpa(filter_input(INPUT_POST, 'rel_alto_custo_ges'));
-        $gestao->opme_ges                       = filter_input(INPUT_POST, 'opme_ges');
-        $gestao->rel_opme_ges                   = limpa(filter_input(INPUT_POST, 'rel_opme_ges'));
-        $gestao->home_care_ges                  = filter_input(INPUT_POST, 'home_care_ges');
-        $gestao->rel_home_care_ges              = limpa(filter_input(INPUT_POST, 'rel_home_care_ges'));
-        $gestao->desospitalizacao_ges           = filter_input(INPUT_POST, 'desospitalizacao_ges');
-        $gestao->rel_desospitalizacao_ges       = limpa(filter_input(INPUT_POST, 'rel_desospitalizacao_ges'));
-        $gestao->evento_adverso_ges             = $eventoAdversoPost;
-        $gestao->rel_evento_adverso_ges         = limpa($relEventoAdversoPost);
-        $gestao->tipo_evento_adverso_gest       = $tipoEventoAdversoPost;
-        $gestao->evento_sinalizado_ges          = filter_input(INPUT_POST, 'evento_sinalizado_ges');
-        $gestao->evento_discutido_ges           = filter_input(INPUT_POST, 'evento_discutido_ges');
-        $gestao->evento_negociado_ges           = filter_input(INPUT_POST, 'evento_negociado_ges');
-        $gestao->evento_prorrogar_ges           = filter_input(INPUT_POST, 'evento_prorrogar_ges');
-        $gestao->evento_fech_ges                = filter_input(INPUT_POST, 'evento_fech_ges');
-        $gestao->evento_valor_negoc_ges         = filter_input(INPUT_POST, 'evento_valor_negoc_ges');
-        $gestao->evento_retorno_qual_hosp_ges   = filter_input(INPUT_POST, 'evento_retorno_qual_hosp_ges');
-        $gestao->evento_classificado_hospital_ges = filter_input(INPUT_POST, 'evento_classificado_hospital_ges');
-        $gestao->evento_data_ges                = filter_input(INPUT_POST, 'evento_data_ges') ?: null;
-        $gestao->evento_encerrar_ges            = filter_input(INPUT_POST, 'evento_encerrar_ges');
-        $gestao->evento_impacto_financ_ges      = filter_input(INPUT_POST, 'evento_impacto_financ_ges');
-        $gestao->evento_prolongou_internacao_ges = filter_input(INPUT_POST, 'evento_prolongou_internacao_ges');
-        $gestao->evento_concluido_ges           = filter_input(INPUT_POST, 'evento_concluido_ges');
-        $gestao->evento_classificacao_ges       = filter_input(INPUT_POST, 'evento_classificacao_ges');
-        $gestao->fk_user_ges                    = filter_input(INPUT_POST, 'fk_user_ges', FILTER_VALIDATE_INT)
-            ?? ($_SESSION['id_usuario'] ?? null);
+        $fkVisitaGestao = filter_input(INPUT_POST, 'fk_visita_ges', FILTER_VALIDATE_INT);
+        if ($fkVisitaGestao !== null && $fkVisitaGestao !== false) {
+            $gestao->fk_visita_ges = $fkVisitaGestao;
+        }
+        $gestaoTextFields = [
+            'rel_alto_custo_ges', 'rel_opme_ges', 'rel_home_care_ges',
+            'rel_desospitalizacao_ges', 'rel_evento_adverso_ges'
+        ];
+        $gestaoValueFields = [
+            'alto_custo_ges', 'opme_ges', 'home_care_ges', 'desospitalizacao_ges',
+            'evento_adverso_ges', 'tipo_evento_adverso_gest', 'evento_sinalizado_ges',
+            'evento_discutido_ges', 'evento_negociado_ges', 'evento_prorrogar_ges',
+            'evento_fech_ges', 'evento_valor_negoc_ges'
+        ];
+        foreach ($gestaoTextFields as $field) {
+            if (array_key_exists($field, $_POST)) {
+                $gestao->$field = limpa(filter_input(INPUT_POST, $field));
+            }
+        }
+        foreach ($gestaoValueFields as $field) {
+            if (array_key_exists($field, $_POST)) {
+                $gestao->$field = filter_input(INPUT_POST, $field);
+            }
+        }
+        $optionalGestaoFields = [
+            'evento_retorno_qual_hosp_ges', 'evento_classificado_hospital_ges',
+            'evento_data_ges', 'evento_encerrar_ges', 'evento_impacto_financ_ges',
+            'evento_prolongou_internacao_ges', 'evento_concluido_ges',
+            'evento_classificacao_ges'
+        ];
+        foreach ($optionalGestaoFields as $field) {
+            if (array_key_exists($field, $_POST)) {
+                $gestao->$field = filter_input(INPUT_POST, $field) ?: null;
+            }
+        }
+        $fkUserGestao = filter_input(INPUT_POST, 'fk_user_ges', FILTER_VALIDATE_INT);
+        if ($fkUserGestao !== null && $fkUserGestao !== false) {
+            $gestao->fk_user_ges = $fkUserGestao;
+        } elseif (empty($gestao->fk_user_ges)) {
+            $gestao->fk_user_ges = $_SESSION['id_usuario'] ?? null;
+        }
 
         if ($gestao->evento_encerrar_ges === 's' || $gestao->evento_fech_ges === 's') {
             Gate::enforceAction($conn, $BASE_URL, 'close_management', 'Você não tem permissão para fechar gestão.');
         }
 
         if ($idGestao) {
-            $beforeGestao = $gestaoDao->findById((int)$idGestao);
             $gestaoDao->update($gestao);
             fullcareAuditLog($conn, [
                 'action' => 'update',
@@ -682,6 +716,17 @@ try {
 
     /*──────── NEGOCIAÇÕES (UPDATE/CREATE/DELETE) ────────*/
     if (filter_input(INPUT_POST, 'select_negoc') === 's') {
+        $negRaw = $_POST['negociacoes_json'] ?? null;
+        $hasNegFallback = isset($_POST['neg_id'], $_POST['tipo_negociacao']);
+        if ((!is_string($negRaw) || trim($negRaw) === '') && !$hasNegFallback) {
+            throw new RuntimeException('Dados de negociações ausentes; nenhuma negociação foi alterada.');
+        }
+        if (is_string($negRaw) && trim($negRaw) !== '') {
+            json_decode($negRaw, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException('Dados de negociações inválidos; nenhuma negociação foi alterada.');
+            }
+        }
         $existing    = $negDao->findByInternacao($idInt);
         $existingById = [];
         foreach ($existing as $row) {
@@ -875,6 +920,14 @@ try {
 
     /*──────── PRORROGAÇÕES (UPDATE/CREATE/DELETE) ────────*/
     if (filter_input(INPUT_POST, 'select_prorrog') === 's') {
+        $prorrogRaw = $_POST['prorrogacoes_json'] ?? null;
+        if (!is_string($prorrogRaw) || trim($prorrogRaw) === '') {
+            throw new RuntimeException('Dados de prorrogações ausentes; nenhuma prorrogação foi alterada.');
+        }
+        json_decode($prorrogRaw, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Dados de prorrogações inválidos; nenhuma prorrogação foi alterada.');
+        }
         $existing    = $prorrogDao->selectInternacaoProrrog($idInt);
         $existingById = [];
         foreach ($existing as $row) {
@@ -1006,7 +1059,14 @@ try {
 
     /*──────── TUSS (CREATE / UPDATE / DELETE) ────────*/
     if (filter_input(INPUT_POST, 'select_tuss') === 's') {
-        $tussJson    = decodeArray($_POST['tuss_json'] ?? null); // sempre array
+        $tussRaw = $_POST['tuss_json'] ?? null;
+        if (!is_string($tussRaw) || trim($tussRaw) === '') {
+            throw new RuntimeException('Dados TUSS ausentes; nenhum item TUSS foi alterado.');
+        }
+        $tussJson = json_decode($tussRaw, true);
+        if (!is_array($tussJson) || json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Dados TUSS inválidos; nenhum item TUSS foi alterado.');
+        }
         $idUsuario   = (int) ($_SESSION['id_usuario'] ?? 0);
 
         // existentes
@@ -1043,8 +1103,13 @@ try {
         foreach ($tussJson as $item) {
             if (empty($item['tuss_solicitado'])) continue;
 
-            $tuss = new tuss();
-            $tuss->id_tuss               = !empty($item['id_tuss']) ? (int) $item['id_tuss'] : null;
+            $idTussAtual = !empty($item['id_tuss']) ? (int)$item['id_tuss'] : 0;
+            $tussAnterior = $idTussAtual > 0 ? ($existentesById[$idTussAtual] ?? null) : null;
+            if (is_array($tussAnterior)) {
+                $tussAnterior = $tussDao->buildtuss($tussAnterior);
+            }
+            $tuss = $tussAnterior ? clone $tussAnterior : new tuss();
+            $tuss->id_tuss               = $idTussAtual ?: null;
             $tuss->fk_int_tuss           = !empty($item['fk_int_tuss']) ? (int) $item['fk_int_tuss'] : $idInternacao;
             $tuss->tuss_solicitado       = $item['tuss_solicitado']       ?? '';
             $tuss->qtd_tuss_solicitado   = $item['qtd_tuss_solicitado']   ?? '';
@@ -1054,10 +1119,10 @@ try {
                 $item['tuss_liberado_sn'] ?? ''
             );
             $tuss->data_realizacao_tuss  = $item['data_realizacao_tuss']  ?? null;
-            $tuss->fk_vis_tuss           = $item['fk_vis_tuss']           ?? null;
+            $tuss->fk_vis_tuss           = $item['fk_vis_tuss']           ?? $tuss->fk_vis_tuss;
             $tuss->fk_usuario_tuss       = $idUsuario;
-            $tuss->data_create_tuss      = date('Y-m-d H:i:s');
-            $tuss->glosa_tuss            = null;
+            $tuss->data_create_tuss      = $item['data_create_tuss']      ?? $tuss->data_create_tuss ?? date('Y-m-d H:i:s');
+            $tuss->glosa_tuss            = $item['glosa_tuss']            ?? $tuss->glosa_tuss;
 
             if (!empty($tuss->id_tuss)) {
                 $beforeTuss = $existentesById[(int)$tuss->id_tuss] ?? null;

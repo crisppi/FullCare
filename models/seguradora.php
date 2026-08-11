@@ -24,6 +24,7 @@ class Seguradora
   public $logo_seg;
   public $deletado_seg;
   public $valor_alto_custo_seg;
+  public $medicamentos_alto_custo_seg;
   public $dias_visita_seg;
   public $dias_visita_uti_seg;
   public $longa_permanencia_seg;

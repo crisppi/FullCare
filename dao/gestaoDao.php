@@ -391,12 +391,22 @@ class gestaoDAO implements gestaoDAOInterface
             rel_home_care_ges            = :rel_home_care_ges,
             desospitalizacao_ges         = :desospitalizacao_ges,
             rel_desospitalizacao_ges     = :rel_desospitalizacao_ges,
+            fk_user_ges                  = :fk_user_ges,
+            fk_visita_ges                = :fk_visita_ges,
             evento_sinalizado_ges        = :evento_sinalizado_ges,
             evento_discutido_ges         = :evento_discutido_ges,
             evento_negociado_ges         = :evento_negociado_ges,
             evento_prorrogar_ges         = :evento_prorrogar_ges,
             evento_fech_ges              = :evento_fech_ges,
-            evento_valor_negoc_ges       = :evento_valor_negoc_ges
+            evento_valor_negoc_ges       = :evento_valor_negoc_ges,
+            evento_retorno_qual_hosp_ges = :evento_retorno_qual_hosp_ges,
+            evento_classificado_hospital_ges = :evento_classificado_hospital_ges,
+            evento_data_ges              = :evento_data_ges,
+            evento_encerrar_ges          = :evento_encerrar_ges,
+            evento_impacto_financ_ges    = :evento_impacto_financ_ges,
+            evento_prolongou_internacao_ges = :evento_prolongou_internacao_ges,
+            evento_concluido_ges         = :evento_concluido_ges,
+            evento_classificacao_ges     = :evento_classificacao_ges
         WHERE id_gestao = :id_gestao");
 
         $stmt->bindParam(':fk_internacao_ges', $gestao->fk_internacao_ges);
@@ -411,12 +421,22 @@ class gestaoDAO implements gestaoDAOInterface
         $stmt->bindParam(':rel_home_care_ges', $gestao->rel_home_care_ges);
         $stmt->bindParam(':desospitalizacao_ges', $gestao->desospitalizacao_ges);
         $stmt->bindParam(':rel_desospitalizacao_ges', $gestao->rel_desospitalizacao_ges);
+        $stmt->bindParam(':fk_user_ges', $gestao->fk_user_ges);
+        $stmt->bindParam(':fk_visita_ges', $gestao->fk_visita_ges);
         $stmt->bindParam(':evento_sinalizado_ges', $gestao->evento_sinalizado_ges);
         $stmt->bindParam(':evento_discutido_ges', $gestao->evento_discutido_ges);
         $stmt->bindParam(':evento_negociado_ges', $gestao->evento_negociado_ges);
         $stmt->bindParam(':evento_prorrogar_ges', $gestao->evento_prorrogar_ges);
         $stmt->bindParam(':evento_fech_ges', $gestao->evento_fech_ges);
         $stmt->bindParam(':evento_valor_negoc_ges', $gestao->evento_valor_negoc_ges);
+        $stmt->bindParam(':evento_retorno_qual_hosp_ges', $gestao->evento_retorno_qual_hosp_ges);
+        $stmt->bindParam(':evento_classificado_hospital_ges', $gestao->evento_classificado_hospital_ges);
+        $stmt->bindParam(':evento_data_ges', $gestao->evento_data_ges);
+        $stmt->bindParam(':evento_encerrar_ges', $gestao->evento_encerrar_ges);
+        $stmt->bindParam(':evento_impacto_financ_ges', $gestao->evento_impacto_financ_ges);
+        $stmt->bindParam(':evento_prolongou_internacao_ges', $gestao->evento_prolongou_internacao_ges);
+        $stmt->bindParam(':evento_concluido_ges', $gestao->evento_concluido_ges);
+        $stmt->bindParam(':evento_classificacao_ges', $gestao->evento_classificacao_ges);
         $stmt->bindParam(':id_gestao', $gestao->id_gestao);
 
         $stmt->execute();

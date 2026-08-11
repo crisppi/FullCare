@@ -3369,6 +3369,7 @@
         }
 
         #main-container .internacao-page .tabelas-adicionais-card__title {
+            margin-top: 7px !important;
             font-size: .82rem !important;
             line-height: 1.05 !important;
         }
@@ -3472,7 +3473,6 @@
             padding: 8px 10px !important;
             border-radius: 8px !important;
             border: 1px solid #d9dce4 !important;
-            border-left: 4px solid #7a2d83 !important;
             background: #f7f8fb !important;
             box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
         }

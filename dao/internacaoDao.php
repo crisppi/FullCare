@@ -496,10 +496,43 @@ class internacaoDAO implements internacaoDAOInterface
 
         $stmt->execute();
 
+        // Resolve o ID pela propria linha gravada. Neste banco ha triggers de
+        // auditoria que tambem executam INSERT e tornam lastInsertId() inseguro.
+        $idCriado = 0;
+        $senhaCriada = trim((string)$internacao->senha_int);
+        $atendimentoCriado = trim((string)$internacao->num_atendimento_int);
+        if ($senhaCriada !== '') {
+            $stmtId = $this->conn->prepare(
+                "SELECT id_internacao
+                   FROM tb_internacao
+                  WHERE senha_int = :senha
+                  ORDER BY id_internacao DESC
+                  LIMIT 1"
+            );
+            $stmtId->bindValue(':senha', $senhaCriada, PDO::PARAM_STR);
+            $stmtId->execute();
+            $idCriado = (int)$stmtId->fetchColumn();
+        } elseif ($atendimentoCriado !== '') {
+            $stmtId = $this->conn->prepare(
+                "SELECT id_internacao
+                   FROM tb_internacao
+                  WHERE num_atendimento_int = :atendimento
+                    AND fk_paciente_int = :paciente
+                    AND fk_hospital_int = :hospital
+                  ORDER BY id_internacao DESC
+                  LIMIT 1"
+            );
+            $stmtId->bindValue(':atendimento', $atendimentoCriado, PDO::PARAM_STR);
+            $stmtId->bindValue(':paciente', (int)$internacao->fk_paciente_int, PDO::PARAM_INT);
+            $stmtId->bindValue(':hospital', (int)$internacao->fk_hospital_int, PDO::PARAM_INT);
+            $stmtId->execute();
+            $idCriado = (int)$stmtId->fetchColumn();
+        }
+
         // Mensagem de sucesso por adicionar filme
         $this->message->setMessage("internacao adicionado com sucesso!", "success", "internacoes/lista");
 
-        return $this->findLastId();
+        return $idCriado > 0 ? [['id_intern' => $idCriado]] : $this->findLastId();
     }
 
     public function update(internacao $internacao)

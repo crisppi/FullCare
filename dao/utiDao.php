@@ -43,6 +43,7 @@ class utiDAO implements utiDAOInterface
         $uti->score_uti = $data["score_uti"];
         $uti->vm_uti = $data["vm_uti"];
         $uti->fk_user_uti = $data["fk_user_uti"];
+        $uti->usuario_create_uti = $data["usuario_create_uti"] ?? null;
         $uti->glasgow_uti = $data["glasgow_uti"];
         $uti->dist_met_uti = $data["dist_met_uti"];
         $uti->suporte_vent_uti = $data["suporte_vent_uti"];

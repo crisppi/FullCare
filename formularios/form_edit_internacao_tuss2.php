@@ -124,7 +124,6 @@ $jsonTuss = htmlspecialchars(json_encode($tussInt, JSON_UNESCAPED_UNICODE), ENT_
 <div id="tussFieldsContainer" class="mt-4">
     <h5 class="mb-3">Procedimentos TUSS</h5>
     <input type="hidden" name="tuss_json" id="tuss_json" value="<?= $jsonTuss ?>">
-    <input type="hidden" name="select_tuss" value="s">
 
     <?php foreach ($tussInt as $i => $t):
         $idx      = (int) $i;

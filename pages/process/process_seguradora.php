@@ -203,6 +203,7 @@ if ($type === "create") {
         $coord_rh_seg = filter_input(INPUT_POST, "coord_rh_seg", FILTER_SANITIZE_SPECIAL_CHARS);
         $deletado_seg = filter_input(INPUT_POST, "deletado_seg", FILTER_SANITIZE_SPECIAL_CHARS);
         $valor_alto_custo_seg = filter_input(INPUT_POST, "valor_alto_custo_seg", FILTER_SANITIZE_SPECIAL_CHARS);
+        $medicamentos_alto_custo_seg = trim((string)filter_input(INPUT_POST, "medicamentos_alto_custo_seg"));
         $dias_visita_seg = filter_input(INPUT_POST, "dias_visita_seg", FILTER_SANITIZE_SPECIAL_CHARS);
         $dias_visita_uti_seg = filter_input(INPUT_POST, "dias_visita_uti_seg", FILTER_SANITIZE_SPECIAL_CHARS);
         $longa_permanencia_seg = filter_input(INPUT_POST, "longa_permanencia_seg", FILTER_SANITIZE_SPECIAL_CHARS);
@@ -236,6 +237,7 @@ if ($type === "create") {
             $seguradora->dias_visita_seg = $dias_visita_seg;
             $seguradora->dias_visita_uti_seg = $dias_visita_uti_seg;
             $seguradora->valor_alto_custo_seg = $valor_alto_custo_seg;
+            $seguradora->medicamentos_alto_custo_seg = $medicamentos_alto_custo_seg;
             $seguradora->longa_permanencia_seg = $longa_permanencia_seg;
             $seguradora->logo_seg = $logo_seg;
             $seguradora->deletado_seg = $deletado_seg;
@@ -362,6 +364,7 @@ if ($type === "create") {
         $dias_visita_uti_seg = filter_input(INPUT_POST, "dias_visita_uti_seg");
         $longa_permanencia_seg = filter_input(INPUT_POST, "longa_permanencia_seg");
         $valor_alto_custo_seg = filter_input(INPUT_POST, "valor_alto_custo_seg");
+        $medicamentos_alto_custo_seg = trim((string)filter_input(INPUT_POST, "medicamentos_alto_custo_seg"));
         $valor_alto_custo_seg = str_replace('R$', '', $valor_alto_custo_seg);
         $valor_alto_custo_seg = str_replace('.', '', $valor_alto_custo_seg);
         // $valor_alto_custo_seg = str_replace('(', '', $valor_alto_custo_seg);
@@ -393,6 +396,7 @@ if ($type === "create") {
         $seguradoraData->ativo_seg = $ativo_seg;
         $seguradoraData->coord_rh_seg = $coord_rh_seg;
         $seguradoraData->valor_alto_custo_seg = $valor_alto_custo_seg;
+        $seguradoraData->medicamentos_alto_custo_seg = $medicamentos_alto_custo_seg;
         $seguradoraData->dias_visita_uti_seg = $dias_visita_uti_seg;
         $seguradoraData->dias_visita_seg = $dias_visita_seg;
         $seguradoraData->longa_permanencia_seg = $longa_permanencia_seg;

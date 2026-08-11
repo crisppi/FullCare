@@ -2567,7 +2567,7 @@ function aumentarTextProgramacao() {
     padding: 8px 10px !important;
     border-radius: 8px !important;
     border-top: 0 !important;
-    border-left: 4px solid #7a2d83 !important;
+    border-left: 1px solid #d9dce4 !important;
     background: #f7f8fb !important;
 }
 
@@ -3207,11 +3207,11 @@ function aumentarTextProgramacao() {
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_gestao"],
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_uti"],
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_negoc"] {
-    border-color: #83aef2 !important;
-    background: linear-gradient(180deg, #eaf4ff 0%, #d6eaff 100%) !important;
-    color: #1f4d85 !important;
-    font-weight: 750 !important;
-    box-shadow: inset 0 0 0 1px rgba(62, 113, 198, .12) !important;
+    border-color: #879bb3 !important;
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 5px rgba(30, 50, 74, .18) !important;
 }
 
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="relatorio-detalhado"] .filter-option-inner-inner,
@@ -3220,8 +3220,8 @@ function aumentarTextProgramacao() {
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_gestao"] .filter-option-inner-inner,
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_uti"] .filter-option-inner-inner,
 .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_negoc"] .filter-option-inner-inner {
-    color: #1f4d85 !important;
-    font-weight: 750 !important;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
 }
 
 .visita-card--tabelas > .visita-card__body > .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
@@ -3347,7 +3347,6 @@ function aumentarTextProgramacao() {
     font-weight: 500 !important;
 }
 </style>
-<link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
 <textarea id="visita-bootstrap-json" hidden><?= htmlspecialchars(json_encode([
     'dataInternacaoVis' => !empty($ultimaVis['data_intern_int']) ? date('Y-m-d', strtotime($ultimaVis['data_intern_int'])) : '',
     'tussPorVisita' => $tussPorVisita,
@@ -4296,7 +4295,7 @@ window.setTimeout(signalEditAdditionalSelectsFromServer, 0);
 #main-container .visita-page #detalhes-card-wrapper .detalhes-card {
     padding: 8px 10px !important;
     border: 1px solid #d9dce4 !important;
-    border-left: 4px solid #7a2d83 !important;
+    border-left: 1px solid #d9dce4 !important;
     border-radius: 8px !important;
     background: #f7f8fb !important;
     box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
@@ -4324,13 +4323,14 @@ window.setTimeout(signalEditAdditionalSelectsFromServer, 0);
     height: 18px !important;
     margin-right: 8px !important;
     border-radius: 999px !important;
-    background: #7a2d83 !important;
+    background: linear-gradient(180deg, #6b7280, #9ca3af) !important;
 }
 
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .row:last-child {
     margin-top: 7px !important;
 }
 </style>
+<link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
 
 <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
 <script>

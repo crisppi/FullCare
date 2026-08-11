@@ -161,7 +161,8 @@ class PacienteDAO implements PacienteDAOInterface
         es.id_estipulante,
         es.nome_est,
         se.id_seguradora,
-        se.seguradora_seg
+        se.seguradora_seg,
+        se.medicamentos_alto_custo_seg
 
         FROM tb_paciente as pa
 
@@ -598,7 +599,8 @@ class PacienteDAO implements PacienteDAOInterface
         $sql = "
         SELECT
             pa.*,
-            se.seguradora_seg
+            se.seguradora_seg,
+            se.medicamentos_alto_custo_seg
         FROM tb_paciente pa
         LEFT JOIN tb_seguradora se
                ON se.id_seguradora = pa.fk_seguradora_pac

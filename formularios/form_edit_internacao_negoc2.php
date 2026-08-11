@@ -691,7 +691,6 @@ if (!function_exists('sel')) {
     <input type="hidden" name="type" value="update_editar">
 
     <!-- toggle que ativa/desativa o bloco de negociações -->
-    <input type="hidden" name="select_negoc" id="select_negoc" value="s">
 
     <!-- aqui cai o JSON montado pelo JS -->
     <!-- chaves principais -->

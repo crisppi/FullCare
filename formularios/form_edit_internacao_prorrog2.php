@@ -407,7 +407,6 @@ $prorrogAltaAtiva = $prorrogAltaDataValue !== '' || !empty($altaAtual['tipo_alta
     <input type="hidden" name="type" value="edit_prorrogacao">
     <input type="hidden" id="fk_internacao_pror" name="fk_internacao_pror" value="<?= (int)$intern['id_internacao'] ?>">
     <input type="hidden" id="fk_usuario_pror" name="fk_usuario_pror" value="<?= (int)($_SESSION['id_usuario'] ?? 0) ?>">
-    <input type="hidden" name="select_prorrog" id="select_prorrog_hidden" value="s">
 
     <!-- JSON oculto -->
     <input type="hidden" id="prorrogacoes_json" name="prorrogacoes_json">

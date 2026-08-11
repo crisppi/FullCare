@@ -573,6 +573,7 @@ if ($type === "create") {
     $oportunidades_det = limitInputLength($oportunidades_det, 5000);
     $tqt_det = filter_input(INPUT_POST, "tqt_det");
     $svd_det = filter_input(INPUT_POST, "svd_det");
+    $sne_det = filter_input(INPUT_POST, "sne_det");
     $gtt_det = filter_input(INPUT_POST, "gtt_det");
     $dreno_det = filter_input(INPUT_POST, "dreno_det");
     $rt_det = filter_input(INPUT_POST, "rt_det");
@@ -626,6 +627,9 @@ if ($type === "create") {
     $fk_paciente_int = filter_input(INPUT_POST, "fk_paciente_int");
     $internado_uti = filter_input(INPUT_POST, "internado_uti");
     $criterios_uti = filter_input(INPUT_POST, "criterios_uti");
+    if ($criterios_uti === null) {
+        $criterios_uti = filter_input(INPUT_POST, "criterio_uti");
+    }
     $data_alta_uti = filter_input(INPUT_POST, "data_alta_uti");
     $data_internacao_uti = filter_input(INPUT_POST, "data_internacao_uti");
     $dva_uti = filter_input(INPUT_POST, "dva_uti");
@@ -749,10 +753,15 @@ if ($type === "create") {
         flowLog($flowCtx, 'create.internacao.persist', 'ERROR', ['status' => 'failed']);
     }
 
-    // Usa o último ID da própria conexão para evitar erro de concorrência.
-    $lastId = (int)$conn->lastInsertId();
+    // O trigger de auditoria tambem faz INSERT e pode sobrescrever o valor
+    // exposto por lastInsertId(). O DAO resolve a propria linha gravada; por
+    // isso o ID retornado por ele deve ser o preferencial.
+    $lastId = (int)($lastIntern[0]['id_intern'] ?? 0);
     if ($lastId <= 0) {
-        $lastId = (int)($internacaoDao->findLastId()['0']['id_intern'] ?? 0);
+        $lastId = (int)$conn->lastInsertId();
+    }
+    if ($lastId <= 0) {
+        $lastId = (int)($internacaoDao->findLastId()[0]['id_intern'] ?? 0);
     }
     flowLog($flowCtx, 'create.internacao.id', 'INFO', ['id_internacao_novo' => $lastId]);
     internacaoCreateDebugLog('CREATE internacao ok id=' . $lastId);
@@ -941,6 +950,7 @@ if ($type === "create") {
             $detalhes->oportunidades_det = $oportunidades_det;
             $detalhes->tqt_det = $tqt_det;
             $detalhes->svd_det = $svd_det;
+            $detalhes->sne_det = $sne_det;
             $detalhes->gtt_det = $gtt_det;
             $detalhes->dreno_det = $dreno_det;
             $detalhes->rt_det = $rt_det;
@@ -1307,6 +1317,9 @@ if ($type == "update") {
 
     $select_uti = filter_input(INPUT_POST, "select_uti");
     $criterios_uti = filter_input(INPUT_POST, "criterios_uti");
+    if ($criterios_uti === null) {
+        $criterios_uti = filter_input(INPUT_POST, "criterio_uti");
+    }
     $data_alta_uti = filter_input(INPUT_POST, "data_alta_uti");
     $data_internacao_uti = filter_input(INPUT_POST, "data_internacao_uti");
     $dva_uti = filter_input(INPUT_POST, "dva_uti");

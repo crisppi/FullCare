@@ -29,6 +29,24 @@ body #main-container .visita-page {
         #dfe7f1 !important;
 }
 
+/* Fundo comum de cadastro/edicao de internacao e visita. */
+body #main-container :is(.internacao-page, .visita-page) {
+    background: #f7f8fb !important;
+}
+
+body #main-container .internacao-page :is(
+    .internacao-card,
+    .tabelas-adicionais-card,
+    .clinical-text-field
+),
+body #main-container .visita-page :is(
+    .visita-card,
+    .tabelas-adicionais-card,
+    .clinical-text-field
+) {
+    background: #eef1f5 !important;
+}
+
 @media (max-width: 575.98px) {
     body #main-container.form-surface-shell,
     body #main-container:has(.internacao-page),
@@ -235,6 +253,74 @@ body #main-container :is(.internacao-page, .visita-page) #detalhes-card-wrapper 
     grid-column: span 2 !important;
 }
 
+/* Internacao: destaca os campos do fundo dos cartoes, inclusive adicionais. */
+body #main-container :is(.internacao-page, .visita-page) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .detail-select,
+    .select-purple
+),
+body #main-container :is(.internacao-page, .visita-page) .bootstrap-select > .dropdown-toggle {
+    background-color: #ffffff !important;
+    border-color: #879bb3 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .98),
+        0 2px 5px rgba(30, 50, 74, .18) !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) .bootstrap-select > .dropdown-toggle :is(
+    .filter-option,
+    .filter-option-inner,
+    .filter-option-inner-inner
+) {
+    background-color: transparent !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .detail-select,
+    .select-purple
+):hover,
+body #main-container :is(.internacao-page, .visita-page) .bootstrap-select > .dropdown-toggle:hover {
+    background-color: #ffffff !important;
+    border-color: #5f7895 !important;
+    box-shadow: 0 3px 7px rgba(30, 50, 74, .22) !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .detail-select,
+    .select-purple
+):focus,
+body #main-container :is(.internacao-page, .visita-page) .bootstrap-select.show > .dropdown-toggle,
+body #main-container :is(.internacao-page, .visita-page) .bootstrap-select > .dropdown-toggle:focus {
+    background-color: #ffffff !important;
+    border-color: #247eb2 !important;
+    box-shadow:
+        0 0 0 .16rem rgba(36, 126, 178, .20),
+        0 2px 5px rgba(30, 50, 74, .18) !important;
+    outline: none !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(input, textarea).form-control:disabled,
+body #main-container :is(.internacao-page, .visita-page) :is(input, textarea).form-control[readonly],
+body #main-container :is(.internacao-page, .visita-page) select.form-control:disabled {
+    background-color: #eef2f7 !important;
+    border-color: #aebdce !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08) !important;
+}
+
 body #main-container :is(.internacao-page, .visita-page) #detalhes-card-wrapper #div-detalhado #atb,
 body #main-container :is(.internacao-page, .visita-page) #detalhes-card-wrapper #div-detalhado #medicacaoDet {
     grid-column: span 3 !important;
@@ -292,6 +378,187 @@ body #main-container :is(.internacao-page, .visita-page) #detalhes-card-wrapper 
     body #main-container :is(.internacao-page, .visita-page) #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
     body #main-container :is(.internacao-page, .visita-page) #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
         grid-column: 1 / -1 !important;
+    }
+}
+
+/* Internacao: todos os modulos seguem o cartao de detalhes. */
+body #main-container .internacao-page :is(
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) .adicional-card {
+    padding: 8px 10px !important;
+    border: 1px solid #d9dce4 !important;
+    border-radius: 8px !important;
+    background: #f7f8fb !important;
+    box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
+}
+
+body #main-container .internacao-page :is(
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) .adicional-card__marker {
+    width: 4px !important;
+    height: 18px !important;
+    margin-right: 8px !important;
+    border-radius: 10px !important;
+    background: linear-gradient(180deg, #6b7280, #9ca3af) !important;
+}
+
+/* Detalhes e paineis adicionais sem card interno usam a mesma superficie. */
+body #main-container .internacao-page #detalhes-card-wrapper .detalhes-card,
+body #main-container .visita-page #detalhes-card-wrapper .detalhes-card,
+body #main-container .internacao-page #tabelas-adicionais-paineis-edit > :is(
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+):not(:has(> .adicional-card)),
+body #main-container .visita-page :is(
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) {
+    padding: 8px 10px !important;
+    border: 1px solid #d9dce4 !important;
+    border-radius: 8px !important;
+    background: #f7f8fb !important;
+    box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
+}
+
+body #main-container .visita-page #detalhes-card-wrapper .detalhes-card {
+    border-left: 1px solid #d9dce4 !important;
+}
+
+body #main-container .visita-page #detalhes-card-wrapper {
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(
+    .detalhes-card__marker,
+    .adicional-card__marker,
+    .edit-negoc-card__marker
+) {
+    width: 4px !important;
+    height: 18px !important;
+    margin-right: 8px !important;
+    border-radius: 10px !important;
+    background: linear-gradient(180deg, #6b7280, #9ca3af) !important;
+}
+
+body #main-container .visita-page #add-visita-form > :is(
+    .visita-card--general,
+    .visita-card--central,
+    .visita-card--auditoria,
+    .visita-card--tabelas
+) {
+    background: #eef1f5 !important;
+}
+
+body #main-container .visita-page #add-visita-form :is(
+    .clinical-text-field,
+    .ia-highlight-box
+) {
+    background: #eef1f5 !important;
+}
+
+body #main-container .visita-page .visita-card--tabelas > .visita-card__body > .tabelas-selects :is(
+    #relatorio-detalhado,
+    #select_tuss,
+    #select_prorrog,
+    #select_gestao,
+    #select_uti,
+    #select_negoc
+),
+body #main-container .visita-page .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id] {
+    border-color: #879bb3 !important;
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 5px rgba(30, 50, 74, .18) !important;
+}
+
+body #main-container .visita-page .visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id] :is(
+    .filter-option,
+    .filter-option-inner,
+    .filter-option-inner-inner
+) {
+    background: transparent !important;
+    color: #1f2937 !important;
+}
+
+/* Prorrogacao da internacao: neutraliza os fundos brancos proprios do modulo. */
+body #main-container .internacao-page #container-prorrog > .adicional-card {
+    background: #eef1f5 !important;
+}
+
+body #main-container .internacao-page #container-prorrog :is(
+    .prorrog-alta-box,
+    .prorrog-ia-box,
+    .prorrog-ia-card
+) {
+    background: #f7f8fb !important;
+    border-color: #d9dce4 !important;
+    box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
+}
+
+body #main-container .internacao-page #container-prorrog .prorrog-ia-card__header {
+    background: #eef1f5 !important;
+    border-bottom-color: #d9dce4 !important;
+}
+
+/* Gestao: referencia compacta para medicamentos de alto custo. */
+body #main-container .internacao-page #container-gestao #tutorial_alto.alto-custo-help {
+    align-self: end !important;
+    grid-column: span 2 !important;
+    align-items: center !important;
+    gap: 9px !important;
+    width: 100% !important;
+    max-width: 620px !important;
+    min-height: 32px !important;
+    margin: 0 !important;
+    padding: 5px 9px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+    box-shadow: 0 2px 5px rgba(30, 50, 74, .10) !important;
+}
+
+body #main-container .internacao-page #container-gestao .alto-custo-help__content {
+    min-width: 0 !important;
+}
+
+body #main-container .internacao-page #container-gestao .alto-custo-help p {
+    margin: 0 !important;
+    color: #475569 !important;
+    font-size: .64rem !important;
+    line-height: 1.18 !important;
+    white-space: normal !important;
+}
+
+body #main-container .internacao-page #container-gestao .alto-custo-help .alto-custo-help__title {
+    margin-bottom: 2px !important;
+    color: #1e3a5f !important;
+    font-size: .67rem !important;
+    font-weight: 800 !important;
+}
+
+@media (max-width: 767.98px) {
+    body #main-container .internacao-page #container-gestao #tutorial_alto.alto-custo-help {
+        grid-column: 1 / -1 !important;
+        max-width: none !important;
     }
 }
 
@@ -658,4 +925,25 @@ body #main-container .visita-page #detalhes-card-wrapper #div-detalhado .d-flex.
     body #main-container .visita-page #detalhes-card-wrapper #div-detalhado :is(.form-group[class*="col-"], .row > div, .form-group.row > div) {
         grid-column: 1 / -1 !important;
     }
+}
+
+/*
+ * Superficie definitiva dos formularios assistenciais.
+ * Nao usa filho direto: o navegador pode reparar o HTML dos parciais e alterar
+ * a hierarquia, mas todos os cards devem conservar o mesmo fundo cinza.
+ */
+body #main-container :is(.internacao-page, .visita-page) :is(
+    .internacao-card,
+    .visita-card,
+    .tabelas-adicionais-card,
+    .clinical-text-field,
+    .ia-highlight-box,
+    #detalhes-card-wrapper,
+    #container-tuss .adicional-card,
+    #container-prorrog .adicional-card,
+    #container-gestao .adicional-card,
+    #container-uti .adicional-card,
+    #container-negoc .adicional-card
+) {
+    background: #eef1f5 !important;
 }

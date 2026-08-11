@@ -897,7 +897,7 @@
                 <input type="hidden" name="type" value="update_editar">
 
                 <p style="display:none" id="proximoId_int">0</p>
-                <input type="hidden" value="n" id="censo_int" name="censo_int">
+                <input type="hidden" value="<?= htmlspecialchars((string)($intern['censo_int'] ?? 'n'), ENT_QUOTES, 'UTF-8') ?>" id="censo_int" name="censo_int">
                 <?php $responsavelInternacao = (int)($intern['fk_usuario_int'] ?? 0); ?>
                 <input type="hidden" value="<?= $responsavelInternacao > 0 ? $responsavelInternacao : (int)($_SESSION["id_usuario"] ?? 0) ?>" id="fk_usuario_int" name="fk_usuario_int">
                 <div class="edit-head-grid">
@@ -941,26 +941,12 @@
                 </div>
 
                 <!-- ENTRADA DE DADOS AUTOMATICOS NO INPUT-->
-                <input type="hidden" value="s" id="primeira_vis_int" name="primeira_vis_int">
-                <input type="hidden" value="0" id="visita_no_int" name="visita_no_int">
-                <input type="hidden" id="visita_enf_int" name="visita_enf_int" value="<?php if (($_SESSION['cargo']) === 'Enf_Auditor') {
-                                                                                            echo 's';
-                                                                                        } else {
-                                                                                            echo 'n';
-                                                                                        }; ?>">
-
-                <input type="hidden" id="visita_med_int" name="visita_med_int" value="<?php if (($_SESSION['cargo']) == 'Med_auditor') {
-                                                                                            echo 's';
-                                                                                        } else {
-                                                                                            echo 'n';
-                                                                                        }; ?>">
-
-                <input type="hidden" id="visita_auditor_prof_enf" name="visita_auditor_prof_enf" value="<?php if (($_SESSION['cargo']) === 'Enf_Auditor') {
-                                                                                                            echo ($_SESSION['email_user']);
-                                                                                                        }; ?>">
-                <input type="hidden" id="visita_auditor_prof_med" name="visita_auditor_prof_med" value="<?php if (($_SESSION['cargo']) === 'Med_auditor') {
-                                                                                                            echo ($_SESSION['email_user']);
-                                                                                                        }; ?>">
+                <input type="hidden" value="<?= htmlspecialchars((string)($intern['primeira_vis_int'] ?? 's'), ENT_QUOTES, 'UTF-8') ?>" id="primeira_vis_int" name="primeira_vis_int">
+                <input type="hidden" value="<?= htmlspecialchars((string)($intern['visita_no_int'] ?? '0'), ENT_QUOTES, 'UTF-8') ?>" id="visita_no_int" name="visita_no_int">
+                <input type="hidden" id="visita_enf_int" name="visita_enf_int" value="<?= htmlspecialchars((string)($intern['visita_enf_int'] ?? 'n'), ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" id="visita_med_int" name="visita_med_int" value="<?= htmlspecialchars((string)($intern['visita_med_int'] ?? 'n'), ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" id="visita_auditor_prof_enf" name="visita_auditor_prof_enf" value="<?= htmlspecialchars((string)($intern['visita_auditor_prof_enf'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" id="visita_auditor_prof_med" name="visita_auditor_prof_med" value="<?= htmlspecialchars((string)($intern['visita_auditor_prof_med'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
 
 
                 <?php
@@ -970,8 +956,15 @@
                 <div class="edit-primary-row">
                     <div class="form-group mb-2">
                         <label for="data_visita_int"><span style="color: red;">*</span> Data Visita</label>
-                        <input type="date" class="form-control form-control-sm" id="data_visita_int"
-                            name="data_visita_int" value="<?= date('Y-m-d'); ?>">
+                        <?php
+                        $dataVisitaEdit = trim((string)($intern['data_visita_int'] ?? ''));
+                        if ($dataVisitaEdit !== '') {
+                            $dataVisitaTs = strtotime($dataVisitaEdit);
+                            $dataVisitaEdit = $dataVisitaTs ? date('Y-m-d\TH:i', $dataVisitaTs) : '';
+                        }
+                        ?>
+                        <input type="datetime-local" class="form-control form-control-sm" id="data_visita_int"
+                            name="data_visita_int" value="<?= htmlspecialchars($dataVisitaEdit, ENT_QUOTES, 'UTF-8') ?>">
                     </div>
 
                     <div class="form-group mb-2">
@@ -1672,6 +1665,12 @@
                             <label class="control-label" for="braden_det">Escala de Braden</label>
                             <select class="form-control-sm form-control" id="braden_det" name="braden_det">
                                 <option value=""></option>
+                                <?php
+                                $bradenAtual = (string)$val('braden_det');
+                                if ($bradenAtual !== '' && !in_array($bradenAtual, ['alto', 'moderado', 'baixo'], true)):
+                                ?>
+                                    <option value="<?= htmlspecialchars($bradenAtual, ENT_QUOTES, 'UTF-8') ?>" selected><?= htmlspecialchars($bradenAtual, ENT_QUOTES, 'UTF-8') ?></option>
+                                <?php endif; ?>
                                 <option value="alto" <?= $val('braden_det') === 'alto' ? 'selected' : '' ?>>Alto
                                 </option>
                                 <option value="moderado" <?= $val('braden_det') === 'moderado' ? 'selected' : '' ?>>

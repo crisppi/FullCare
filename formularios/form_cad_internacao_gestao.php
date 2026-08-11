@@ -59,23 +59,29 @@
 
 #container-gestao .alto-custo-help {
     align-self: end;
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
+    align-items: center;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
     border-radius: 8px;
-    color: #431407;
-    grid-column: span 3;
+    color: #334155;
+    gap: 0;
+    grid-column: span 2;
     margin: 0 !important;
+    max-width: 620px;
     min-width: 0 !important;
-    padding: 7px 10px;
+    min-height: 32px;
+    padding: 5px 10px;
+    box-shadow: 0 2px 5px rgba(30, 50, 74, .10);
 }
 
 #container-gestao .alto-custo-help p {
-    font-size: .72rem;
+    color: #475569;
+    font-size: .64rem;
     line-height: 1.18;
     margin: 0;
     overflow-wrap: anywhere;
     text-align: left;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 #container-gestao .alto-custo-help p + p {
@@ -83,7 +89,9 @@
 }
 
 #container-gestao .alto-custo-help__title {
-    font-weight: 700;
+    color: #1e3a5f;
+    font-size: .67rem;
+    font-weight: 800;
 }
 
 #container-gestao .adicional-card > .form-group.row > [style*="display:none"] {
@@ -167,8 +175,16 @@
             </select>
         </div>
         <div style="display:none" class="form-group col-sm-5 alto-custo-help" id="tutorial_alto">
-            <p><span class="alto-custo-help__title">Considerar alto custo:</span> Ambisome, Linfotericina, Micafungina.</p>
-            <p>Imunoglobulinas e Imunobiológicos.</p>
+            <div class="alto-custo-help__content">
+                <p class="alto-custo-help__title">Referência de medicamentos de alto custo</p>
+                <?php
+                $listaMedicamentosAltoCusto = trim((string)($medicamentosAltoCustoOperadora ?? ''));
+                if ($listaMedicamentosAltoCusto === '') {
+                    $listaMedicamentosAltoCusto = 'Ambisome, Linfotericina, Micafungina, imunoglobulinas e imunobiológicos.';
+                }
+                ?>
+                <p id="medicamentos_alto_custo_operadora"><?= htmlspecialchars($listaMedicamentosAltoCusto, ENT_QUOTES, 'UTF-8') ?></p>
+            </div>
         </div>
 
         <div style="display:none" id="div_rel_alto_custo">
@@ -451,6 +467,23 @@ var select_alto_custo = document.querySelector('#alto_custo_ges');
 // Seleciona as divs que serão exibidas ou escondidas
 var div_rel_alto_custo = document.querySelector('#div_rel_alto_custo');
 var div_tutorial_alto = document.querySelector('#tutorial_alto');
+var medicamentos_alto_custo_label = document.querySelector('#medicamentos_alto_custo_operadora');
+var medicamentos_alto_custo_fallback = 'Ambisome, Linfotericina, Micafungina, imunoglobulinas e imunobiológicos.';
+
+function atualizarMedicamentosAltoCustoOperadora() {
+    var paciente = document.querySelector('#fk_paciente_int');
+    var opcao = paciente && paciente.selectedIndex >= 0 ? paciente.options[paciente.selectedIndex] : null;
+    var lista = opcao ? (opcao.getAttribute('data-medicamentos-alto-custo') || '').trim() : '';
+    if (medicamentos_alto_custo_label) {
+        medicamentos_alto_custo_label.textContent = lista || medicamentos_alto_custo_fallback;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', atualizarMedicamentosAltoCustoOperadora);
+document.querySelector('#fk_paciente_int')?.addEventListener('change', atualizarMedicamentosAltoCustoOperadora);
+if (window.jQuery) {
+    jQuery('#fk_paciente_int').on('changed.bs.select', atualizarMedicamentosAltoCustoOperadora);
+}
 
 // Adiciona o evento de mudança (change) ao select
 select_alto_custo.addEventListener('change', setalto_custo);
@@ -464,7 +497,7 @@ function setalto_custo() {
     if (choice_alto_custo === 's') {
         // Exibe as duas divs se o valor for 's' (Sim)
         div_rel_alto_custo.style.display = "block";
-        div_tutorial_alto.style.display = "block";
+        div_tutorial_alto.style.display = "flex";
     } else if (choice_alto_custo === 'n') {
         // Esconde as duas divs se o valor for 'n' (Não)
         div_rel_alto_custo.style.display = "none";

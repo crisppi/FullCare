@@ -18,8 +18,8 @@
                     </select>
                 </div>
                 <div style="display:none" class="form-group col-sm-5 alto-custo-help" id="tutorial_alto">
-                    <p><span class="alto-custo-help__title">Considerar alto custo:</span> Ambisome, Linfotericina, Micafungina.</p>
-                    <p>Imunoglobulinas e Imunobiológicos.</p>
+                    <p><span class="alto-custo-help__title">Referência da operadora:</span></p>
+                    <p><?= htmlspecialchars($medicamentosAltoCustoOperadora !== '' ? $medicamentosAltoCustoOperadora : 'Ambisome, Linfotericina, Micafungina, imunoglobulinas e imunobiológicos.', ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
 
                 <div style="display:none" id="div_rel_alto_custo">

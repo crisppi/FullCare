@@ -24,6 +24,7 @@ class Detalhes
 
   public $tqt_det;
   public $svd_det;
+  public $sne_det;
   public $gtt_det;
   public $dreno_det;
   public $lesoes_pele_det;

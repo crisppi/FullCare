@@ -47,6 +47,7 @@ class seguradoraDAO implements seguradoraDAOInterface
         $seguradora->logo_seg = $data["logo_seg"];
         $seguradora->deletado_seg = $data["deletado_seg"];
         $seguradora->valor_alto_custo_seg = $data["valor_alto_custo_seg"];
+        $seguradora->medicamentos_alto_custo_seg = $data["medicamentos_alto_custo_seg"] ?? null;
         $seguradora->dias_visita_seg = $data["dias_visita_seg"];
         $seguradora->dias_visita_uti_seg = $data["dias_visita_uti_seg"];
         $seguradora->longa_permanencia_seg = $data["longa_permanencia_seg"];
@@ -230,6 +231,7 @@ class seguradoraDAO implements seguradoraDAOInterface
         deletado_seg,
         usuario_create_seg,
         valor_alto_custo_seg,
+        medicamentos_alto_custo_seg,
         dias_visita_seg,
         dias_visita_uti_seg,
         longa_permanencia_seg,
@@ -257,6 +259,7 @@ class seguradoraDAO implements seguradoraDAOInterface
         :deletado_seg,
         :usuario_create_seg,
         :valor_alto_custo_seg,
+        :medicamentos_alto_custo_seg,
         :dias_visita_seg,
         :dias_visita_uti_seg,
         :longa_permanencia_seg,
@@ -283,6 +286,7 @@ class seguradoraDAO implements seguradoraDAOInterface
         $stmt->bindParam(":ativo_seg", $seguradora->ativo_seg);
         $stmt->bindParam(":deletado_seg", $seguradora->deletado_seg);
         $stmt->bindParam(":valor_alto_custo_seg", $seguradora->valor_alto_custo_seg);
+        $stmt->bindParam(":medicamentos_alto_custo_seg", $seguradora->medicamentos_alto_custo_seg);
         $stmt->bindParam(":dias_visita_seg", $seguradora->dias_visita_seg);
         $stmt->bindParam(":dias_visita_uti_seg", $seguradora->dias_visita_uti_seg);
         $stmt->bindParam(":longa_permanencia_seg", $seguradora->longa_permanencia_seg);
@@ -318,6 +322,7 @@ class seguradoraDAO implements seguradoraDAOInterface
         dias_visita_uti_seg = :dias_visita_uti_seg,
         longa_permanencia_seg = :longa_permanencia_seg,
         valor_alto_custo_seg = :valor_alto_custo_seg,
+        medicamentos_alto_custo_seg = :medicamentos_alto_custo_seg,
         deletado_seg = :deletado_seg,
         ativo_seg = :ativo_seg,
         cep_seg = :cep_seg
@@ -343,6 +348,7 @@ class seguradoraDAO implements seguradoraDAOInterface
         $stmt->bindParam(":dias_visita_uti_seg", $seguradora->dias_visita_uti_seg);
         $stmt->bindParam(":longa_permanencia_seg", $seguradora->longa_permanencia_seg);
         $stmt->bindParam(":valor_alto_custo_seg", $seguradora->valor_alto_custo_seg);
+        $stmt->bindParam(":medicamentos_alto_custo_seg", $seguradora->medicamentos_alto_custo_seg);
         $stmt->bindParam(":deletado_seg", $seguradora->deletado_seg);
         $stmt->bindParam(":ativo_seg", $seguradora->ativo_seg);
         $stmt->bindParam(":cep_seg", $seguradora->cep_seg);

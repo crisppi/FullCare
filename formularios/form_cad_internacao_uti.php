@@ -162,7 +162,7 @@
         </div>
         <div class="form-group col-sm-2">
             <label for="criterio_uti">Critério</label>
-            <select class="form-control-sm form-control" id="criterio_uti" name="criterio_uti">
+            <select class="form-control-sm form-control" id="criterio_uti" name="criterios_uti">
                 <option value=" ">Selecione</option>
                 <?php
                 sort($criterios_UTI, SORT_ASC);

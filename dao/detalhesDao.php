@@ -1,4 +1,4 @@
-    <?php
+<?php
 
     require_once("./models/detalhes.php");
     require_once("./models/message.php");
@@ -45,6 +45,7 @@
 
             $detalhes->tqt_det = $data["tqt_det"];
             $detalhes->svd_det = $data["svd_det"];
+            $detalhes->sne_det = $data["sne_det"];
             $detalhes->gtt_det = $data["gtt_det"];
             $detalhes->dreno_det = $data["dreno_det"];
             $detalhes->rt_det = $data["rt_det"];
@@ -80,6 +81,7 @@
             oportunidades_det,
             tqt_det,
             svd_det,
+            sne_det,
             gtt_det,
             dreno_det,
             rt_det,
@@ -111,6 +113,7 @@
             :oportunidades_det,
             :tqt_det,
             :svd_det,
+            :sne_det,
             :gtt_det,
             :dreno_det,
             :rt_det,
@@ -143,6 +146,7 @@
             $stmt->bindParam(":oportunidades_det", $detalhes->oportunidades_det, PDO::PARAM_STR);
             $stmt->bindParam(":tqt_det", $detalhes->tqt_det);
             $stmt->bindParam(":svd_det", $detalhes->svd_det);
+            $stmt->bindParam(":sne_det", $detalhes->sne_det);
             $stmt->bindParam(":gtt_det", $detalhes->gtt_det);
             $stmt->bindParam(":dreno_det", $detalhes->dreno_det);
             $stmt->bindParam(":rt_det", $detalhes->rt_det);
@@ -213,6 +217,7 @@
             oportunidades_det         = :oportunidades_det,
             tqt_det                   = :tqt_det,
             svd_det                   = :svd_det,
+            sne_det                   = :sne_det,
             gtt_det                   = :gtt_det,
             dreno_det                 = :dreno_det,
             rt_det                    = :rt_det,
@@ -243,6 +248,7 @@
             $stmt->bindParam(':oportunidades_det',      $detalhes->oportunidades_det,   PDO::PARAM_STR);
             $stmt->bindParam(':tqt_det',                $detalhes->tqt_det);
             $stmt->bindParam(':svd_det',                $detalhes->svd_det);
+            $stmt->bindParam(':sne_det',                $detalhes->sne_det);
             $stmt->bindParam(':gtt_det',                $detalhes->gtt_det);
             $stmt->bindParam(':dreno_det',              $detalhes->dreno_det);
             $stmt->bindParam(':rt_det',                 $detalhes->rt_det);

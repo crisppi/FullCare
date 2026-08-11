@@ -169,6 +169,30 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
         grid-column: span 6 !important;
     }
 
+    #main-container.seguradora-edit-layout .entity-form .row > .col-md-12 {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #main-container.seguradora-edit-layout #medicamentos_alto_custo_seg {
+        width: 100% !important;
+        min-height: 84px !important;
+        height: 84px !important;
+        padding: 8px 10px !important;
+        line-height: 1.35 !important;
+        resize: vertical;
+    }
+
+    #main-container.seguradora-edit-layout #medicamentos_alto_custo_seg + .form-text {
+        display: block;
+        margin-top: 4px;
+        line-height: 1.3;
+    }
+
     #main-container.seguradora-edit-layout #step-1 .seguradora-identificacao-row {
         display: grid !important;
         grid-template-columns: minmax(0, 1.35fr) minmax(0, .9fr);
@@ -498,6 +522,14 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                         <label for="longa_permanencia_seg">Longa Permanência</label>
                         <input type="text" class="form-control" id="longa_permanencia_seg" name="longa_permanencia_seg"
                             value="<?= $seguradora->longa_permanencia_seg ?>" placeholder="Longa permanência">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="medicamentos_alto_custo_seg">Medicamentos de alto custo</label>
+                        <textarea class="form-control" id="medicamentos_alto_custo_seg" name="medicamentos_alto_custo_seg"
+                            rows="3" placeholder="Informe um medicamento por linha ou separe por vírgulas"><?= htmlspecialchars((string)($seguradora->medicamentos_alto_custo_seg ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+                        <small class="form-text text-muted">Essa lista será exibida na Gestão Assistencial das internações e visitas desta operadora.</small>
                     </div>
                 </div>
 

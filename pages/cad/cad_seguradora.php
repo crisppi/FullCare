@@ -548,6 +548,15 @@ $id_seguradora = filter_input(INPUT_GET, "id_seguradora");
                                     name="longa_permanencia_seg" placeholder="Longa permanência">
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="form-group col-md-12 mb-3">
+                                <label for="medicamentos_alto_custo_seg">Medicamentos de alto custo</label>
+                                <textarea class="form-control" id="medicamentos_alto_custo_seg"
+                                    name="medicamentos_alto_custo_seg" rows="3"
+                                    placeholder="Informe um medicamento por linha ou separe por vírgulas"></textarea>
+                                <small class="form-text text-muted">Essa lista será exibida na Gestão Assistencial das internações e visitas desta operadora.</small>
+                            </div>
+                        </div>
                         </div>
                         <div class="entity-actions-bar">
                             <button type="submit" class="btn btn-primary">
