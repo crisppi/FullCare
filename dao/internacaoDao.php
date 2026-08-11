@@ -496,12 +496,30 @@ class internacaoDAO implements internacaoDAOInterface
 
         $stmt->execute();
 
-        // Resolve o ID pela propria linha gravada. Neste banco ha triggers de
-        // auditoria que tambem executam INSERT e tornam lastInsertId() inseguro.
+        // Captura imediatamente o ID produzido pelo INSERT desta conexão e o
+        // valida contra a própria internação. Isso evita depender de MAX(id),
+        // especialmente em cadastros consecutivos ou concorrentes.
+        $idInseridoPdo = (int)$this->conn->lastInsertId();
         $idCriado = 0;
+        if ($idInseridoPdo > 0) {
+            $stmtIdDireto = $this->conn->prepare(
+                "SELECT id_internacao
+                   FROM tb_internacao
+                  WHERE id_internacao = :id
+                    AND fk_paciente_int = :paciente
+                    AND fk_hospital_int = :hospital
+                  LIMIT 1"
+            );
+            $stmtIdDireto->bindValue(':id', $idInseridoPdo, PDO::PARAM_INT);
+            $stmtIdDireto->bindValue(':paciente', (int)$internacao->fk_paciente_int, PDO::PARAM_INT);
+            $stmtIdDireto->bindValue(':hospital', (int)$internacao->fk_hospital_int, PDO::PARAM_INT);
+            $stmtIdDireto->execute();
+            $idCriado = (int)$stmtIdDireto->fetchColumn();
+        }
+
         $senhaCriada = trim((string)$internacao->senha_int);
         $atendimentoCriado = trim((string)$internacao->num_atendimento_int);
-        if ($senhaCriada !== '') {
+        if ($idCriado <= 0 && $senhaCriada !== '') {
             $stmtId = $this->conn->prepare(
                 "SELECT id_internacao
                    FROM tb_internacao
@@ -512,7 +530,7 @@ class internacaoDAO implements internacaoDAOInterface
             $stmtId->bindValue(':senha', $senhaCriada, PDO::PARAM_STR);
             $stmtId->execute();
             $idCriado = (int)$stmtId->fetchColumn();
-        } elseif ($atendimentoCriado !== '') {
+        } elseif ($idCriado <= 0 && $atendimentoCriado !== '') {
             $stmtId = $this->conn->prepare(
                 "SELECT id_internacao
                    FROM tb_internacao

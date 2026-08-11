@@ -406,6 +406,12 @@ $flowCtx = flowLogStart('process_internacao', [
 
 // CREATE
 if ($type === "create") {
+    // Os DAOs legados ainda emitem mensagens/redirecionamentos. O cadastro
+    // atual é AJAX e precisa devolver somente JSON no sucesso; mantém esses
+    // efeitos em buffer e os descarta apenas após concluir toda a transação.
+    $createOutputBufferLevel = ob_get_level();
+    ob_start();
+
     flowLog($flowCtx, 'create.start', 'INFO', [
         'select_gestao' => $_POST['select_gestao'] ?? null,
         'select_uti' => $_POST['select_uti'] ?? null,
@@ -589,7 +595,7 @@ if ($type === "create") {
     $fk_internacao_ges = filter_input(INPUT_POST, "fk_internacao_ges");
     $fk_visita_ges = filter_input(INPUT_POST, "fk_visita_ges");
     $alto_custo_ges = filter_input(INPUT_POST, "alto_custo_ges") ?: 'n';
-    $rel_alto_custo_ges = filter_input(INPUT_POST, "rel_alto_custo_ges");
+    $rel_alto_custo_ges = (string)(filter_input(INPUT_POST, "rel_alto_custo_ges") ?? '');
     $rel_alto_custo_ges = str_replace(['*', '#', 'drop', 'select', 'delete'], '', $rel_alto_custo_ges);
     $rel_alto_custo_ges = str_replace(['*', '#'], '', $rel_alto_custo_ges);
     $rel_alto_custo_ges = limitInputLength($rel_alto_custo_ges, 5000);
@@ -753,9 +759,8 @@ if ($type === "create") {
         flowLog($flowCtx, 'create.internacao.persist', 'ERROR', ['status' => 'failed']);
     }
 
-    // O trigger de auditoria tambem faz INSERT e pode sobrescrever o valor
-    // exposto por lastInsertId(). O DAO resolve a propria linha gravada; por
-    // isso o ID retornado por ele deve ser o preferencial.
+    // O DAO captura e valida o ID imediatamente após o INSERT. Esse ID é a
+    // referência definitiva para todas as tabelas adicionais desta inclusão.
     $lastId = (int)($lastIntern[0]['id_intern'] ?? 0);
     if ($lastId <= 0) {
         $lastId = (int)$conn->lastInsertId();
@@ -1245,7 +1250,41 @@ if ($type === "create") {
             'source' => 'process_internacao.php',
         ], $BASE_URL);
         internacaoCreateDebugLog('END ok id=' . $lastId);
-        echo "lancado internacao";
+
+        // O formulario permanece aberto para permitir cadastros consecutivos.
+        // Retorna o ID realmente criado e uma nova referencia visual; assim o
+        // navegador nao precisa inferir o proximo ID por um contador local.
+        $proximoIdPrevisto = (int)$lastId + 1;
+        try {
+            $stmtProximoId = $conn->query(
+                "SELECT AUTO_INCREMENT
+                   FROM information_schema.TABLES
+                  WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'tb_internacao'"
+            );
+            $proximoIdBanco = $stmtProximoId ? (int)$stmtProximoId->fetchColumn() : 0;
+            if ($proximoIdBanco > 0) {
+                $proximoIdPrevisto = $proximoIdBanco;
+            }
+        } catch (Throwable $e) {
+            // O ID criado continua sendo definitivo; mantém lastId + 1 apenas
+            // como referência visual se a consulta auxiliar falhar.
+        }
+
+        while (ob_get_level() > $createOutputBufferLevel) {
+            ob_end_clean();
+        }
+        if (!headers_sent()) {
+            header_remove('Location');
+            http_response_code(200);
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode([
+            'status' => 'success',
+            'id_internacao' => (int)$lastId,
+            'proximo_id' => $proximoIdPrevisto,
+            'message' => 'Internação cadastrada com sucesso.',
+        ], JSON_UNESCAPED_UNICODE);
     }
 
 // UPDATE

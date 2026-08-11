@@ -1889,36 +1889,58 @@ $("#myForm").submit(function(event) {
         data: form_data,
         success: function(result) {
             const resposta = String(result || '').trim();
-            if (resposta === 'paciente_internado') {
+            let respostaJson = null;
+            try {
+                respostaJson = typeof result === 'object' && result !== null
+                    ? result
+                    : JSON.parse(resposta);
+            } catch (e) {
+                respostaJson = null;
+            }
+            const respostaCodigo = respostaJson?.status || resposta;
+
+            if (respostaCodigo === 'paciente_internado') {
                 showSubmitAlert('error', "Paciente possui internação ativa e precisa confirmar retroativa.");
                 return;
             }
-            if (resposta === 'retroativa_sem_alta') {
+            if (respostaCodigo === 'retroativa_sem_alta') {
                 showSubmitAlert('error', "Para retroativa, marque 'Internado = Não' e informe a data/motivo da alta.", 3500);
                 return;
             }
-            if (resposta === 'senha_duplicada') {
+            if (respostaCodigo === 'senha_duplicada') {
                 showSubmitAlert('error', "Esta senha já está cadastrada para outra internação.", 3500);
                 return;
             }
-            if (resposta === 'hospital_required') {
+            if (respostaCodigo === 'hospital_required') {
                 showSubmitAlert('error', "Selecione um hospital antes de cadastrar.", 3500);
                 return;
             }
-            if (resposta === 'conteudo_suspeito') {
+            if (respostaCodigo === 'conteudo_suspeito') {
                 showSubmitAlert('error', "O relatório contém padrões suspeitos. Revise o texto antes de salvar.", 4500);
                 return;
             }
 
-            if (resposta === '0') {
+            if (respostaCodigo === '0') {
                 showSubmitAlert('error', "Paciente possui internação ativa", 2000);
                 return;
             }
 
             // Sucesso (resposta vazia ou texto padrão)
             {
+                const idInternacaoCriada = Number(respostaJson?.id_internacao || 0);
+                const proximoIdBanco = Number(respostaJson?.proximo_id || 0);
+                const novoValorInternacao = proximoIdBanco > 0
+                    ? proximoIdBanco
+                    : (idInternacaoCriada > 0 ? idInternacaoCriada + 1 : 0);
+
                 $('#alert').hide();
-                showFeedbackToast('success', 'Registro salvo', 'Internação cadastrada com sucesso.');
+                showFeedbackToast(
+                    'success',
+                    'Registro salvo',
+                    idInternacaoCriada > 0
+                        ? 'Internação #' + idInternacaoCriada + ' cadastrada com sucesso.'
+                        : 'Internação cadastrada com sucesso.'
+                );
 
                 const regIntInput = $("#RegInt");
                 if (regIntInput.length) {
@@ -1968,23 +1990,31 @@ $("#myForm").submit(function(event) {
                     setTimeout(window.triggerInternacaoCheck, 120);
                 }
 
-                // 5. Update other values
-                const adicionarValor = parseInt(document.querySelector("#proximoId_int")
-                    .textContent) + 1;
-                const ultimoReg = Number(config.ultimoReg || 0);
-                const novoValorInternacao = parseInt(ultimoReg) + adicionarValor;
+                // 5. Usa o ID confirmado pelo INSERT e o próximo valor
+                // consultado no banco. Não tenta mais adivinhar pelo contador
+                // local, que ficava incorreto em cadastros consecutivos.
+                if (novoValorInternacao > 0) {
+                    document.querySelectorAll('.js-internacao-id-previsto').forEach((badge) => {
+                        badge.textContent = 'ID previsto: #' + novoValorInternacao;
+                    });
+                    $("#proximoId_int").text(novoValorInternacao);
+                    $("#proximoId_int").val(novoValorInternacao);
+                }
 
-                $("#proximoId_int").text(adicionarValor);
-                $("#proximoId_int").val(
-                    novoValorInternacao); // Este seletor estava incorreto, corrigido para val()
+                // Em CREATE este campo não representa a nova FK. Mantê-lo
+                // vazio evita que a segunda inclusão seja confundida com uma
+                // edição durante validações de unicidade.
+                $("#id_internacao").val('');
 
                 // $("#RegInt").val(newRegInt); // Já atualizado acima
-                $("#fk_int_tuss").val(novoValorInternacao);
-                $("#fk_internacao_uti").val(novoValorInternacao);
-                $("#fk_id_int").val(novoValorInternacao);
-                $("#fk_internacao_pror").val(novoValorInternacao);
-                $("#fk_internacao_ges").val(novoValorInternacao);
-                $("#fk_int_det").val(novoValorInternacao);
+                if (novoValorInternacao > 0) {
+                    $("#fk_int_tuss").val(novoValorInternacao);
+                    $("#fk_internacao_uti").val(novoValorInternacao);
+                    $("#fk_id_int").val(novoValorInternacao);
+                    $("#fk_internacao_pror").val(novoValorInternacao);
+                    $("#fk_internacao_ges").val(novoValorInternacao);
+                    $("#fk_int_det").val(novoValorInternacao);
+                }
                 document.getElementById("internado_int").value = "s";
                 document.getElementById("internado_int").querySelector("option[value='s']")
                     .selected = true;

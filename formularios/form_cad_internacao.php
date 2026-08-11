@@ -48,9 +48,24 @@
             $ultimoReg = 0;
         }
     }
-    // O ID definitivo só existe após o INSERT. Este número é apenas uma
-    // referência visual e pode mudar se outro cadastro for salvo antes.
+    // O ID definitivo só existe após o INSERT. Para a referência visual,
+    // prefere o próximo AUTO_INCREMENT (MAX + 1 pode ficar errado após
+    // exclusões ou rollbacks) e mantém o cálculo antigo como fallback.
     $proximoIdInternacaoPrevisto = $ultimoReg + 1;
+    try {
+        $stmtAutoIncrement = $conn->query(
+            "SELECT AUTO_INCREMENT
+               FROM information_schema.TABLES
+              WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'tb_internacao'"
+        );
+        $autoIncrement = $stmtAutoIncrement ? (int)$stmtAutoIncrement->fetchColumn() : 0;
+        if ($autoIncrement > 0) {
+            $proximoIdInternacaoPrevisto = $autoIncrement;
+        }
+    } catch (Throwable $e) {
+        // Mantém MAX + 1 apenas como referência visual.
+    }
 
     /* === DAOs auxiliares / util === */
     $Internacao_geral = new internacaoDAO($conn, $BASE_URL);
@@ -234,7 +249,7 @@
                         </div>
                         <div class="d-flex align-items-center" style="gap: 8px;">
                             <span class="internacao-card__tag internacao-card__tag--critical">Campos principais</span>
-                            <span class="internacao-card__tag"
+                            <span class="internacao-card__tag js-internacao-id-previsto"
                                 title="O ID definitivo é confirmado pelo banco ao salvar.">
                                 ID previsto: #<?= (int) $proximoIdInternacaoPrevisto ?>
                             </span>
@@ -544,7 +559,7 @@
                             <input type="hidden" id="retroativa_confirmada" name="retroativa_confirmada" value="0">
 
                             <input type="hidden" id="id_internacao" readonly class="form-control" name="id_internacao"
-                                value="<?= $ultimoReg ?>">
+                                value="">
                             <input type="hidden" value="s" id="primeira_vis_int" name="primeira_vis_int">
                             <input type="hidden" value="0" id="visita_no_int" name="visita_no_int">
 
@@ -898,7 +913,7 @@
                         <p class="tabelas-adicionais-card__eyebrow">Tabelas adicionais</p>
                         <h3 class="tabelas-adicionais-card__title">Complementos da visita</h3>
                     </div>
-                    <span class="internacao-card__tag"
+                    <span class="internacao-card__tag js-internacao-id-previsto"
                         title="O ID definitivo é confirmado pelo banco ao salvar.">
                         ID previsto: #<?= (int) $proximoIdInternacaoPrevisto ?>
                     </span>

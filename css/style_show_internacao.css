@@ -655,3 +655,14 @@
     font-size: .54rem !important;
     line-height: 1 !important;
 }
+
+/*
+ * O filtro de periodo recarrega a pagina com a ancora da aba ativa. O painel
+ * tem tabindex para o Bootstrap e recebia o outline azul nativo do navegador.
+ * Os controles internos preservam seus proprios estados de foco.
+ */
+#main-container.internacao-show-page .tab-pane:focus,
+#main-container.internacao-show-page .tab-pane:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
