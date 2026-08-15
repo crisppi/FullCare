@@ -1,0 +1,491 @@
+FULLCARE — ESCOPO DE CARGOS, NÍVEIS E PERMISSÕES
+================================================
+
+Status: documento para análise e futura implantação
+Data: 15/08/2026
+
+
+1. OBJETIVO
+-----------
+
+Separar claramente:
+
+- Cargo: função profissional ou organizacional do usuário.
+- Nível de acesso: perfil que determina o acesso ao sistema.
+- Permissão individual: exceção aplicada a um usuário específico.
+
+Princípio central:
+
+    Cargo não concede privilégios.
+    Nível de acesso concede privilégios.
+    O Superadministrador administra níveis e exceções.
+
+
+2. CARGO
+--------
+
+O cargo identifica a função profissional ou organizacional da pessoa.
+
+Exemplos:
+
+- Médico
+- Enfermeiro
+- Secretária
+- Administrativo
+- Gerente
+- Diretor
+- Coordenador
+- Supervisor
+
+O cargo será utilizado para:
+
+- Identificação profissional.
+- Responsabilidade sobre registros.
+- Exibição em relatórios.
+- Campos específicos de médico ou enfermagem.
+- Distribuição de tarefas.
+- Indicadores por função.
+
+O cargo não concederá acesso automaticamente.
+
+
+3. NÍVEL DE ACESSO
+------------------
+
+O nível será o perfil que determina o que o usuário pode visualizar e executar.
+
+Sugestão inicial:
+
+1 - Consulta
+    Somente leitura limitada.
+
+2 - Secretaria
+    Operação cadastral e administrativa básica.
+
+3 - Assistencial
+    Perfil comum para médicos e enfermeiros.
+
+4 - Administrativo
+    Contas, capeantes, RAH e operação administrativa.
+
+5 - Gerencial
+    Supervisão e decisões operacionais.
+
+6 - Diretoria
+    Visão estratégica e financeira.
+
+9 - Superadministrador
+    Administração completa do sistema e das permissões.
+
+IMPORTANTE:
+
+Os códigos não representam herança automática. Nível 6 não significa
+necessariamente “tudo do nível 5”. Cada perfil terá uma matriz explícita.
+
+Devem ser eliminadas gradualmente regras genéricas como:
+
+    nivel >= 3
+    nivel > 4
+    nivel == 5
+
+
+4. CARGO E NÍVEL INDEPENDENTES
+------------------------------
+
+Será possível combinar qualquer cargo com qualquer nível autorizado.
+
+Exemplos:
+
+Cargo: Médico
+Nível: Assistencial
+Resultado: operação clínica.
+
+Cargo: Enfermeiro
+Nível: Assistencial
+Resultado: mesma autorização sistêmica do médico.
+
+Cargo: Secretária
+Nível: Secretaria
+Resultado: cadastros e operação administrativa.
+
+Cargo: Secretária executiva
+Nível: Diretoria
+Resultado: mesmo acesso sistêmico da Diretoria.
+
+Cargo: Administrativo
+Nível: Gerencial
+Resultado: supervisão operacional.
+
+Cargo: Gerente
+Nível: Gerencial
+Resultado: gestão da operação.
+
+Cargo: Diretor
+Nível: Consulta
+Resultado: diretor com acesso somente para leitura.
+
+O sistema não deverá presumir acesso pelo nome do cargo.
+
+
+5. MATRIZ INICIAL DE ACESSO
+---------------------------
+
+Legenda:
+
+V = Visualizar
+C = Criar
+E = Editar
+X = Excluir
+A = Ação especial
+Total = Todas as ações, inclusive administração quando aplicável
+
+Módulo                    Consulta  Secretaria  Assistencial  Administrativo  Gerencial  Diretoria  Superadm
+----------------------------------------------------------------------------------------------------------------
+Pacientes                 V         V/C/E       V             V/C/E           V/C/E       V/C/E      Total
+Hospitais                 V         V/C/E       V             V/C/E           V/C/E       V/C/E      Total
+Seguradoras               V         V/C/E       V             V/C/E           V/C/E       V/C/E      Total
+Estipulantes              V         V/C/E       V             V/C/E           V/C/E       V/C/E      Total
+Censo                     V         V/C/E       V/C/E         V/C/E           V/C/E       V/C/E      Total
+Internações               V         V/C/E       V/C/E         V/C/E           V/C/E       V/C/E      Total
+Visitas                   V         V/C/E       V/C/E         V               V/C/E       V/C/E      Total
+Gestão clínica            V         V           V/C/E         V               V/C/E       V/C/E      Total
+Capeantes                 V         V           V/C/E         V/C/E           V/C/E       V/C/E      Total
+RAH                       V         V           V/C/E         V/C/E           V/C/E       V/C/E      Total
+Gerar alta                -         Opcional    A             Opcional        A           A          A
+Reverter alta             -         -           Opcional      -               A           A          A
+Fechar gestão             -         -           Opcional      Opcional        A           A          A
+Gerar PDF                 V         A           A             A               A           A          A
+BI operacional            Limitado  -           Limitado      V               V           V          Total
+BI estratégico            -         -           -             -               V           V          Total
+Usuários                  -         -           -             -               -           Limitado   Total
+Perfis e permissões       -         -           -             -               -           -          Total
+
+Essa matriz é uma proposta inicial e precisa ser validada com o fluxo real da empresa.
+
+
+6. PERFIL ASSISTENCIAL
+----------------------
+
+Médicos e enfermeiros terão o mesmo perfil de acesso: Assistencial.
+
+Variações atuais que deverão ser normalizadas para esse perfil:
+
+- Médico
+- Med_auditor
+- Enfermeiro
+- Enf_Auditor
+
+A diferença profissional continuará existindo no cargo e nos dados do negócio:
+
+- Identificação do responsável médico.
+- Identificação do responsável de enfermagem.
+- Distribuição de tarefas.
+- Campos específicos de cada profissão.
+- Indicadores separados por profissão.
+
+O menu e as permissões de CRUD serão iguais para ambos quando estiverem
+associados ao nível Assistencial.
+
+
+7. PERMISSÕES ESPECIAIS
+-----------------------
+
+Além do CRUD, alguns módulos exigem ações próprias:
+
+- Gerar alta.
+- Reverter alta.
+- Fechar gestão.
+- Reabrir gestão.
+- Finalizar conta.
+- Reabrir conta.
+- Gerar PDF.
+- Exportar dados.
+- Visualizar dados financeiros.
+- Visualizar dados clínicos sensíveis.
+- Administrar usuários.
+- Administrar perfis.
+- Excluir definitivamente.
+
+Essas ações não devem ser interpretadas genericamente como criar, editar ou excluir.
+
+
+8. EXCEÇÕES INDIVIDUAIS
+-----------------------
+
+O Superadministrador poderá ajustar um usuário sem criar um novo nível.
+
+Exemplo:
+
+Cargo: Secretária executiva
+Nível: Gerencial
+
+Exceções:
+
+- BI estratégico: permitido.
+- Reverter alta: permitido.
+- Excluir paciente: bloqueado.
+
+Regra efetiva:
+
+    Permissão do nível
+    + liberações individuais
+    - bloqueios individuais
+
+Um bloqueio individual terá prioridade sobre uma permissão do nível.
+
+
+9. AUTONOMIA DO SUPERADMINISTRADOR
+----------------------------------
+
+O Superadministrador poderá:
+
+- Criar cargos.
+- Criar níveis de acesso.
+- Associar qualquer cargo a um nível.
+- Alterar o nível de um usuário.
+- Aplicar exceções individuais.
+- Duplicar um nível existente.
+- Ativar ou desativar níveis.
+- Consultar o histórico de alterações.
+- Administrar usuários.
+
+Restrições de segurança:
+
+- Não poderá remover o último Superadministrador ativo.
+- Não poderá retirar o próprio acesso durante a sessão sem confirmação reforçada.
+- Elevação para Diretoria ou Superadministrador exigirá confirmação.
+- Todas as mudanças serão auditadas.
+- Senha ou MFA poderão ser exigidos novamente em alterações críticas.
+- Um usuário não poderá elevar o próprio nível.
+
+
+10. ESTRUTURA DE DADOS SUGERIDA
+-------------------------------
+
+10.1. Usuários
+
+Na tabela tb_user:
+
+    cargo_user
+    fk_access_profile
+
+O atual nivel_user poderá continuar temporariamente para compatibilidade.
+O destino recomendado é substituí-lo por fk_access_profile ou fazê-lo apontar
+para um perfil real, sem comparações numéricas hierárquicas.
+
+
+10.2. Perfis
+
+Tabela: tb_access_profile
+
+- id_access_profile
+- nome
+- descricao
+- ativo
+- protegido
+- criado_por
+- criado_em
+- atualizado_em
+
+Perfis iniciais:
+
+- Consulta
+- Secretaria
+- Assistencial
+- Administrativo
+- Gerencial
+- Diretoria
+- Superadministrador
+
+
+10.3. Permissões do perfil
+
+Tabela: tb_access_profile_permission
+
+- id
+- profile_id
+- module
+- action
+- allowed
+
+Exemplo:
+
+Assistencial | visitas | view   | 1
+Assistencial | visitas | create | 1
+Assistencial | visitas | edit   | 1
+Assistencial | visitas | delete | 0
+Assistencial | altas   | create | 1
+Assistencial | altas   | revert | 0
+
+
+10.4. Exceções individuais
+
+Tabela: tb_user_permission_override
+
+- id
+- user_id
+- module
+- action
+- allowed
+- motivo
+- concedido_por
+- concedido_em
+
+
+10.5. Auditoria de acesso
+
+Tabela: tb_access_audit
+
+- id
+- actor_user_id
+- target_user_id
+- evento
+- valor_anterior
+- valor_novo
+- motivo
+- ip
+- data_hora
+
+
+11. REGRA CENTRAL DO SISTEMA
+----------------------------
+
+Todas as páginas e ações deverão consultar a mesma regra central.
+
+Exemplos conceituais:
+
+    Access::can('internacoes', 'view');
+    Access::can('internacoes', 'edit');
+    Access::can('altas', 'revert');
+    Access::can('usuarios', 'manage');
+
+O mesmo resultado deverá controlar:
+
+- Visibilidade no menu.
+- Botões de criar, editar e excluir.
+- Abertura direta da página.
+- Requisições GET.
+- Endpoints POST, PUT, PATCH e DELETE.
+- Requisições AJAX.
+- APIs.
+- Exportações.
+- Geração de PDFs.
+
+Esconder uma opção do menu ou um botão não será considerado proteção.
+
+
+12. ORDEM DE DECISÃO DE ACESSO
+------------------------------
+
+Fluxo sugerido:
+
+1. Usuário está autenticado?
+2. Usuário está ativo?
+3. MFA está regular, quando exigido?
+4. O nível permite acesso ao módulo?
+5. O nível permite executar a ação?
+6. Existe exceção individual?
+7. Existe restrição de escopo dos dados?
+8. Registrar a ação sensível na auditoria.
+
+Resultado:
+
+    autenticação
+        -> nível permite módulo
+            -> nível permite ação
+                -> aplicar exceção individual
+                    -> validar escopo dos dados
+                        -> permitir ou bloquear
+
+
+13. ESCOPO DOS DADOS
+--------------------
+
+Permissão de módulo e ação não resolve sozinha quais registros podem ser vistos.
+Também será necessário definir escopo de dados quando aplicável:
+
+- Todos os hospitais.
+- Apenas hospitais associados ao usuário.
+- Todas as seguradoras.
+- Apenas a seguradora associada ao usuário.
+- Todos os pacientes.
+- Apenas pacientes das internações sob responsabilidade do usuário.
+- Dados financeiros completos ou resumidos.
+- Dados clínicos completos ou limitados.
+
+Esse escopo deverá ser aplicado nas consultas ao banco, não apenas na interface.
+
+
+14. TRANSIÇÃO DO SISTEMA ATUAL
+------------------------------
+
+Etapas sugeridas:
+
+1. Levantar todas as rotas, páginas e endpoints.
+2. Cadastrar os novos níveis de acesso.
+3. Criar a matriz por módulo e ação.
+4. Mapear os usuários atuais para os novos níveis.
+5. Manter nivel_user temporariamente por compatibilidade.
+6. Criar a função central de autorização.
+7. Aplicar primeiro aos endpoints que alteram dados.
+8. Aplicar às páginas de visualização e edição.
+9. Fazer o menu utilizar a mesma função central.
+10. Eliminar comparações diretas de nível espalhadas pelo código.
+11. Aplicar restrições de escopo nas consultas.
+12. Testar acesso pelo menu e por URL direta.
+13. Testar GET, POST, AJAX, APIs, PDFs e exportações.
+14. Registrar decisões e alterações na auditoria.
+
+
+15. PROBLEMAS ATUAIS QUE A IMPLANTAÇÃO DEVE CORRIGIR
+----------------------------------------------------
+
+- check_logado valida autenticação, mas não toda a autorização.
+- Menu e backend utilizam regras diferentes.
+- Algumas páginas GET não verificam can_view.
+- Esconder itens do menu não impede acesso direto.
+- A identificação automática de create/edit/delete é incompleta.
+- Diretoria e Administrador podem receber passe livre implícito pelo cargo.
+- Permissões atuais são globais e não distinguem módulos.
+- Gerar e reverter alta não seguem uniformemente uma permissão específica.
+- Existem variações de nomes para médicos e enfermeiros.
+- Não existe atualmente cargo Secretaria cadastrado no banco.
+
+
+16. DECISÕES PENDENTES
+----------------------
+
+Antes da implantação, definir:
+
+1. Secretaria pode gerar alta?
+2. Assistencial pode reverter alta?
+3. Assistencial pode editar RAH e capeante ou somente visualizar?
+4. Administrativo pode visualizar informações clínicas completas?
+5. Gerencial pode administrar usuários?
+6. Diretoria pode alterar permissões ou isso será exclusivo do Superadministrador?
+7. Quais níveis podem excluir registros?
+8. Exclusão será definitiva ou somente lógica?
+9. Diretoria terá acesso total por padrão ou seguirá matriz explícita?
+10. Quem pode reabrir gestão, conta ou internação encerrada?
+11. Quais dados financeiros podem ser vistos pelo perfil Assistencial?
+12. Quais dados clínicos podem ser vistos pela Secretaria e pelo Administrativo?
+13. Quais cargos e níveis iniciais serão criados na implantação?
+14. Quais usuários atuais serão os primeiros Superadministradores?
+
+
+17. RECOMENDAÇÃO FINAL
+----------------------
+
+Adotar:
+
+    Cargo livre
+    + nível de acesso configurável
+    + permissões por módulo e ação
+    + exceções individuais
+    + escopo de dados
+    + auditoria completa
+
+Isso permite, por exemplo, uma Secretária com nível de Diretoria sem conceder
+o mesmo acesso a todas as Secretárias. Também permite criar novos cargos,
+como Gerente, Coordenador ou Supervisor, sem alterar as regras do sistema.
+
