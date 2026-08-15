@@ -46,6 +46,32 @@ function postArrayEst(string $key): array
     return is_array($values) ? $values : [];
 }
 
+function uploadLogoEstipulante(string $key = 'logo_est'): ?string
+{
+    $arquivo = $_FILES[$key] ?? null;
+    if (!is_array($arquivo) || ($arquivo['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    if (($arquivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        return null;
+    }
+
+    $tamanhoPermitido = 2 * 1024 * 1024;
+    if (($arquivo['size'] ?? 0) > $tamanhoPermitido) {
+        return null;
+    }
+
+    $nomeArquivo = basename((string) ($arquivo['name'] ?? ''));
+    $arquivoTemporario = (string) ($arquivo['tmp_name'] ?? '');
+    if ($nomeArquivo === '' || $arquivoTemporario === '') {
+        return null;
+    }
+
+    $destino = 'uploads/' . $nomeArquivo;
+    return move_uploaded_file($arquivoTemporario, $destino) ? $nomeArquivo : null;
+}
+
 function insertEstipulanteRelatedRows(PDO $conn, int $idEstipulante, array $enderecos, array $telefones, array $contatos): void
 {
     if ($idEstipulante <= 0) return;
@@ -104,25 +130,8 @@ $typeDel = filter_input(INPUT_POST, "typeDel");
 
 
 if ($type === "create") {
+    $arquivo = uploadLogoEstipulante();
 
-    $tipo = ($_FILES['logo_est']['type']);
-    $tamanho_perm = 1024 * 1024 * 2;
-    $size = $_FILES['logo_est']['size'];
-
-    $erros = "";
-
-    if (($_FILES['logo_est']['size']) > $tamanho_perm) {
-        // codigo de erro caso arquivo maior que permitido
-    } else {
-        // condicao caso arquivo permitido
-
-        $tipo = ($_FILES['logo_est']['type']);
-        $arquivo = ($_FILES['logo_est']['name']);
-        $temp_arq = ($_FILES['logo_est']['tmp_name']);
-        $size = ($_FILES['logo_est']['size']);
-        $pasta = "uploads";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
         // Receber os dados dos inputs
         $nome_est = filter_input(INPUT_POST, "nome_est", FILTER_SANITIZE_SPECIAL_CHARS);
         $nome_est = strtoupper($nome_est);
@@ -167,7 +176,7 @@ if ($type === "create") {
         $cep_est = filter_input(INPUT_POST, "cep_est");
 
         $numero_est = filter_input(INPUT_POST, "numero_est");
-        $logo_est = $arquivo;
+        $logo_est = $arquivo ?? '';
 
         $estipulante = new estipulante();
 
@@ -280,29 +289,9 @@ if ($type === "create") {
             $message->setMessage("Você precisa adicionar pelo menos: nome_est do estipulante!", "error", "back");
         }
         header('Location: ' . $BASE_URL . 'estipulantes');
-    }
 }
 if ($type === "update") {
-
-    $tipo = ($_FILES['logo_est']['type']);
-    $tamanho_perm = 1024 * 1024 * 2;
-    $size = $_FILES['logo_est']['size'];
-
-    $erros = "";
-
-    if (($_FILES['logo_est']['size']) > $tamanho_perm) {
-        // codigo de erro caso arquivo maior que permitido
-    } else {
-        // condicao caso arquivo permitido
-        $tipo = ($_FILES['logo_est']['type']);
-        $arquivo = ($_FILES['logo_est']['name']);
-        $temp_arq = ($_FILES['logo_est']['tmp_name']);
-        $size = ($_FILES['logo_est']['size']);
-        $pasta = "uploads";
-
-        move_uploaded_file($temp_arq, $pasta . "/" . $arquivo);
-        $estipulanteDao = new estipulanteDAO($conn, $BASE_URL);
-    }
+    $arquivo = uploadLogoEstipulante();
     // Receber os dados dos inputs
     $id_estipulante = filter_input(INPUT_POST, "id_estipulante");
     $nome_est = filter_input(INPUT_POST, "nome_est", FILTER_SANITIZE_SPECIAL_CHARS);
@@ -347,8 +336,6 @@ if ($type === "update") {
 
     $numero_est = filter_input(INPUT_POST, "numero_est");
     $bairro_est = filter_input(INPUT_POST, "bairro_est");
-    $logo_est = $arquivo;
-
     $estipulanteData = $estipulanteDao->findById($id_estipulante);
     $estipulanteAntes = $estipulanteData ? clone $estipulanteData : null;
 
@@ -365,7 +352,9 @@ if ($type === "update") {
     $estipulanteData->numero_est = $numero_est;
 
     $estipulanteData->bairro_est = $bairro_est;
-    $estipulanteData->logo_est = $logo_est;
+    if ($arquivo !== null) {
+        $estipulanteData->logo_est = $arquivo;
+    }
     $estipulanteData->cnpj_est = $cnpj_est;
 
     $estipulanteData->data_create_est = $data_create_est;

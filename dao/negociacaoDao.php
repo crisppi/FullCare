@@ -111,10 +111,19 @@ class negociacaoDAO implements negociacaoDAOInterface
             return $this->columnCache[$key];
         }
         try {
-            $stmt = $this->conn->prepare("SHOW COLUMNS FROM {$table} LIKE :col");
-            $stmt->bindValue(':col', $column, PDO::PARAM_STR);
-            $stmt->execute();
-            $this->columnCache[$key] = (bool)$stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $this->conn->prepare(
+                "SELECT 1
+                   FROM information_schema.COLUMNS
+                  WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = :table_name
+                    AND COLUMN_NAME = :column_name
+                  LIMIT 1"
+            );
+            $stmt->execute([
+                ':table_name' => $table,
+                ':column_name' => $column,
+            ]);
+            $this->columnCache[$key] = (bool)$stmt->fetchColumn();
         } catch (Throwable $e) {
             $this->columnCache[$key] = false;
         }

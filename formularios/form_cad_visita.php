@@ -549,10 +549,12 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
             <script>
             function toggleDetalhesVisita() {
                 var select = document.getElementById('relatorio-detalhado');
+                var hidden = document.getElementById('select_detalhes');
                 var wrapper = document.getElementById('detalhes-card-wrapper');
                 var detalhes = document.getElementById('div-detalhado');
                 if (!select || !wrapper || !detalhes) return;
                 var show = select.value === 's';
+                if (hidden) hidden.value = select.value || '';
                 wrapper.style.display = show ? 'block' : 'none';
                 detalhes.style.display = show ? 'block' : 'none';
             }

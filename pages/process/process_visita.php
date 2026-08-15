@@ -276,6 +276,9 @@ require_once("dao/visitaDao.php");
 require_once("models/prorrogacao.php");
 require_once("dao/prorrogacaoDao.php");
 
+require_once("models/detalhes.php");
+require_once("dao/detalhesDao.php");
+
 require_once("models/internacao_antecedente.php");
 require_once("dao/internacaoAntecedenteDao.php");
 
@@ -296,6 +299,7 @@ $utiDao                 = new utiDAO($conn, $BASE_URL);
 $negociacaoDao          = new negociacaoDAO($conn, $BASE_URL);
 $tussDao                = new tussDAO($conn, $BASE_URL);
 $prorrogacaoDao         = new prorrogacaoDAO($conn, $BASE_URL);
+$detalhesDao            = new detalhesDAO($conn, $BASE_URL);
 $visitaDao              = new visitaDAO($conn, $BASE_URL);
 $internAntecedenteDao   = new InternacaoAntecedenteDAO($conn, $BASE_URL);
 
@@ -749,6 +753,46 @@ function processUtiData(
     $utiDao->create($uti);
 }
 
+function collectDetalhesPostData(): array
+{
+    $fields = [
+        'curativo_det', 'dieta_det', 'nivel_consc_det', 'oxig_det', 'oxig_uso_det',
+        'qt_det', 'dispositivo_det', 'atb_det', 'atb_uso_det', 'acamado_det',
+        'exames_det', 'oportunidades_det', 'tqt_det', 'svd_det', 'sne_det',
+        'gtt_det', 'dreno_det', 'rt_det', 'lesoes_pele_det', 'medic_alto_custo_det',
+        'qual_medicamento_det', 'paliativos_det', 'braden_det', 'liminar_det',
+        'parto_det', 'hemoderivados_det', 'dialise_det', 'oxigenio_hiperbarica_det'
+    ];
+    $data = [];
+    foreach ($fields as $field) {
+        $data[$field] = strOrNull($_POST[$field] ?? null);
+    }
+    return $data;
+}
+
+function processDetalhesData(
+    string $flag,
+    array $data,
+    int $visitaId,
+    int $fkInternacao,
+    detalhesDAO $detalhesDao,
+    bool $clearExisting = false
+): void {
+    if ($visitaId <= 0) return;
+    if ($clearExisting) {
+        $detalhesDao->deleteByVisita($visitaId);
+    }
+    if ($flag !== 's') return;
+
+    $detalhes = new detalhes();
+    $detalhes->fk_int_det = $fkInternacao;
+    $detalhes->fk_vis_det = $visitaId;
+    foreach ($data as $field => $value) {
+        $detalhes->$field = $value;
+    }
+    $detalhesDao->create($detalhes);
+}
+
 function processProrrogacoesEntries(
     string $flag,
     ?string $jsonRaw,
@@ -934,11 +978,13 @@ if ($type === "create") {
     $select_uti                  = strOrNull($_POST['select_uti'] ?? null);      // 's'/'n'
     $select_prorrog              = strOrNull($_POST['select_prorrog'] ?? null);  // 's'/'n'
     $select_negoc                = strOrNull($_POST['select_negoc'] ?? null);    // 's'/'n'
+    $select_detalhes             = strOrNull($_POST['select_detalhes'] ?? null); // 's'/'n'
 
     // ------------------- Dados auxiliares para módulos ----------------
     $gestaoPostData              = collectGestaoPostData();
     $utiPostData                 = collectUtiPostData($usuario_create ?? '');
     $prorrogacoesJsonRaw         = $_POST['prorrogacoes-json'] ?? '[]';
+    $detalhesPostData            = collectDetalhesPostData();
 
     // ------------------- IDs auxiliares usados por você ----------------
     $fk_int_visita               = toIntOrNull($_POST['fk_int_visita'] ?? null); // você já envia "próximo id" no form
@@ -1056,6 +1102,7 @@ if ($type === "create") {
             processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $id_visita_edit, $fk_internacao_vis, $negociacaoDao, $conn, $resolvedUsuarioNeg ?? $resolvedUsuarioVis, $autoNegociacoesProrrog);
             processGestaoData($select_gestao ?? '', $gestaoPostData, $id_visita_edit, $fk_internacao_vis, $gestaoDao, true);
             processUtiData($select_uti ?? '', $utiPostData, $id_visita_edit, $fk_internacao_vis, $utiDao, true);
+            processDetalhesData($select_detalhes ?? '', $detalhesPostData, $id_visita_edit, $fk_internacao_vis, $detalhesDao, true);
             $cronicosAtualizados = cc_process_visita_cronicos($conn, $internacaoDao, $fk_internacao_vis, $rel_visita_vis, 'edição do relatório da visita');
             $cronicosAntecedentes = cc_process_visita_cronicos_from_antecedentes($conn, $internacaoDao, $fk_internacao_vis, 'antecedentes já cadastrados do paciente');
             flowLog($flowCtx, 'create.edit_mode.finish', 'INFO', [
@@ -1137,6 +1184,7 @@ if ($type === "create") {
         processNegociacoesEntries($processaNegociacoes, $negociacoesJsonRaw, $novoIdVisita, $fk_internacao_vis, $negociacaoDao, $conn, $resolvedUsuarioNeg ?? $resolvedUsuarioVis, $autoNegociacoesProrrog);
         processGestaoData($select_gestao ?? '', $gestaoPostData, $novoIdVisita, $fk_internacao_vis, $gestaoDao);
         processUtiData($select_uti ?? '', $utiPostData, $novoIdVisita, $fk_internacao_vis, $utiDao);
+        processDetalhesData($select_detalhes ?? '', $detalhesPostData, $novoIdVisita, $fk_internacao_vis, $detalhesDao);
         $cronicosCriados = cc_process_visita_cronicos($conn, $internacaoDao, $fk_internacao_vis, $rel_visita_vis, 'relatório da visita');
         $cronicosAntecedentes = cc_process_visita_cronicos_from_antecedentes($conn, $internacaoDao, $fk_internacao_vis, 'antecedentes já cadastrados do paciente');
         flowLog($flowCtx, 'create.finish', 'INFO', [

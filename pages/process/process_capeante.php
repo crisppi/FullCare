@@ -106,7 +106,12 @@ if ($type === "create") {
     $senha_finalizada = filter_input(INPUT_POST, "senha_finalizada") ?: "n";
     $em_auditoria_cap = filter_input(INPUT_POST, "em_auditoria_cap") ?: "n";
     $negociado_desconto_cap = filter_input(INPUT_POST, "negociado_desconto_cap");
-    $desconto_valor_cap = filter_input(INPUT_POST, "desconto_valor_cap") ?: NULL;
+    $desconto_valor_cap_input = filter_input(INPUT_POST, "desconto_valor_cap");
+    $desconto_valor_cap = ($desconto_valor_cap_input === null || $desconto_valor_cap_input === '')
+        ? null
+        : limparCampo($desconto_valor_cap_input);
+    $encerrado_cap = filter_input(INPUT_POST, "encerrado_cap") ?: 'n';
+    $aberto_cap = filter_input(INPUT_POST, "aberto_cap") ?: 'n';
 
     $conta_parada_cap = filter_input(INPUT_POST, "conta_parada_cap") ?: NULL;
     $parada_motivo_cap = filter_input(INPUT_POST, "parada_motivo_cap") ?: NULL;
@@ -244,6 +249,7 @@ if ($type === "create") {
         }
 
         $capeante->adm_capeante = $adm_capeante;
+        $capeante->aud_adm_capeante = $adm_capeante;
         $capeante->adm_check = $adm_check;
         $capeante->aud_enf_capeante = $aud_enf_capeante;
         $capeante->aud_med_capeante = $aud_med_capeante;
@@ -258,6 +264,8 @@ if ($type === "create") {
         $capeante->glosa_diaria = $glosa_diaria;
         $capeante->glosa_honorarios = $glosa_honorarios;
         $capeante->glosa_matmed = $glosa_matmed;
+        $capeante->glosa_materiais = $glosa_materiais;
+        $capeante->glosa_medicamentos = $glosa_medicamentos;
         $capeante->glosa_oxig = $glosa_oxig;
         $capeante->glosa_sadt = $glosa_sadt;
         $capeante->glosa_taxas = $glosa_taxas;
@@ -359,7 +367,10 @@ if ($type === "update") {
     $parcial_num = filter_input(INPUT_POST, "parcial_num");
     $fk_int_capeante = filter_input(INPUT_POST, "fk_int_capeante");
     $negociado_desconto_cap = filter_input(INPUT_POST, "negociado_desconto_cap");
-    $desconto_valor_cap = filter_input(INPUT_POST, "desconto_valor_cap") ?: NULL;
+    $desconto_valor_cap_input = filter_input(INPUT_POST, "desconto_valor_cap");
+    $desconto_valor_cap = ($desconto_valor_cap_input === null || $desconto_valor_cap_input === '')
+        ? null
+        : limparCampo($desconto_valor_cap_input);
     $senha_finalizada = filter_input(INPUT_POST, "senha_finalizada") ?: "n";
     $em_auditoria_cap = filter_input(INPUT_POST, "em_auditoria_cap");
     $encerrado_cap = filter_input(INPUT_POST, "encerrado_cap");
@@ -405,6 +416,7 @@ if ($type === "update") {
     if (!empty(3 < 4)) {
 
         $capeanteUpdate->adm_capeante = $adm_capeante;
+        $capeanteUpdate->aud_adm_capeante = $adm_capeante;
         $capeanteUpdate->adm_check = $adm_check;
         $capeanteUpdate->aud_enf_capeante = $aud_enf_capeante;
         $capeanteUpdate->aud_med_capeante = $aud_med_capeante;

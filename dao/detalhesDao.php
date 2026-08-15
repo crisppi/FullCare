@@ -168,6 +168,13 @@
             $this->message->setMessage("detalhes adicionado com sucesso!", "success", "list_detalhes.php");
         }
 
+        public function deleteByVisita(int $visitaId): bool
+        {
+            $stmt = $this->conn->prepare("DELETE FROM tb_detalhes WHERE fk_vis_det = :visita");
+            $stmt->bindValue(':visita', $visitaId, PDO::PARAM_INT);
+            return $stmt->execute();
+        }
+
 
         public function findById($id_internacao)
         {
@@ -330,7 +337,7 @@
         }
         public function findByIdDetalhes($idDetalhes)
         {
-            $stmt = $this->conn->prepare("SELECT * FROM tb_detalhes WHERE id_det = :idDetalhes");
+            $stmt = $this->conn->prepare("SELECT * FROM tb_detalhes WHERE id_detalhes = :idDetalhes");
             $stmt->bindParam(":idDetalhes", $idDetalhes);
             $stmt->execute();
 
@@ -354,7 +361,7 @@
         }
         public function findByIdDetalhesAndVisita($idDetalhes, $idVisita)
         {
-            $stmt = $this->conn->prepare("SELECT * FROM tb_detalhes WHERE id_det = :idDetalhes AND fk_vis_det = :idVisita");
+            $stmt = $this->conn->prepare("SELECT * FROM tb_detalhes WHERE id_detalhes = :idDetalhes AND fk_vis_det = :idVisita");
             $stmt->bindParam(":idDetalhes", $idDetalhes);
             $stmt->bindParam(":idVisita", $idVisita);
             $stmt->execute();
