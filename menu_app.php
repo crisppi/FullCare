@@ -36,6 +36,9 @@ if (isset($_POST['clear_hospital']) && (int)$_POST['clear_hospital'] === 1) {
 }
 $id_usuario_sessao    = isset($_SESSION['id_usuario']) ? (int)$_SESSION['id_usuario'] : 0;
 $nivel_sessao         = isset($_SESSION['nivel']) ? (int)$_SESSION['nivel'] : 99;
+$menuAccessProfile = class_exists('FullCareAccess') ? FullCareAccess::profile($conn) : null;
+$menuAccessSlug = (string)($menuAccessProfile['slug'] ?? 'consulta');
+$restrictToUserHospitals = in_array($menuAccessSlug, ['consulta', 'secretaria', 'assistencial', 'administrativo'], true);
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -173,7 +176,7 @@ $hospitalOpportunityRows = [];
 // -----------------------------
 $condicoes = [
     $hospital_selecionado ? "ac.fk_hospital_int = {$hospital_selecionado}" : null,
-    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null,
+    (!$isSeguradoraRole && $id_usuario_sessao && $restrictToUserHospitals) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null,
     $seguradoraCondAc
 ];
 
@@ -187,22 +190,22 @@ $condicoes_vis = [
 $condicoes_hospital = [
     "DATEDIFF(CURRENT_DATE(), i.data_intern_int) > COALESCE(s.longa_permanencia_seg, 0)",
     $hospital_selecionado ? "i.fk_hospital_int = {$hospital_selecionado}" : null,
-    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null,
+    (!$isSeguradoraRole && $id_usuario_sessao && $restrictToUserHospitals) ? "hos.fk_usuario_hosp = {$id_usuario_sessao}" : null,
     "i.internado_int = 's'",
-    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
+    (!$isSeguradoraRole && $id_usuario_sessao && $restrictToUserHospitals) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
     $seguradoraCondI
 ];
 
 $condicoes_contas = [
     "c.conta_parada_cap = 's'",
     $hospital_selecionado ? "i.fk_hospital_int = {$hospital_selecionado}" : null,
-    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
+    (!$isSeguradoraRole && $id_usuario_sessao && $restrictToUserHospitals) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
     $seguradoraCondI
 ];
 
 $condicoes_gerais = [
     $hospital_selecionado ? "i.fk_hospital_int = {$hospital_selecionado}" : null,
-    (!$isSeguradoraRole && $id_usuario_sessao && $nivel_sessao <= 3) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
+    (!$isSeguradoraRole && $id_usuario_sessao && $restrictToUserHospitals) ? "i.fk_hospital_int IN (SELECT hu.fk_hospital_user FROM tb_hospitalUser hu WHERE hu.fk_usuario_hosp = {$id_usuario_sessao})" : null,
     $seguradoraCondI
 ];
 
@@ -276,7 +279,7 @@ try {
 // -----------------------------
 // LISTA DE HOSPITAIS POR PERFIL
 // -----------------------------
-if ($isSeguradoraRole || $nivel_sessao > 3) {
+if ($isSeguradoraRole || !$restrictToUserHospitals) {
     $dados_hospital = $hospital->findGeral();
 } else {
     $dados_hospital = $hospitalUser->joinHospitalUser($id_usuario_sessao);
@@ -786,7 +789,7 @@ try {
     $patientWhere = ["IFNULL(p.deletado_pac, 'n') <> 's'"];
     if ($isSeguradoraRole) {
         $patientWhere[] = $seguradoraUserId > 0 ? "p.fk_seguradora_pac = {$seguradoraUserId}" : "1=0";
-    } elseif ($id_usuario_sessao && $nivel_sessao <= 3) {
+    } elseif ($id_usuario_sessao && $restrictToUserHospitals) {
         $patientWhere[] = "EXISTS (
             SELECT 1
               FROM tb_internacao ri

@@ -3,6 +3,38 @@
     margin-top: 8px !important;
 }
 
+/* Ajuste final da barra compacta de filtros RAH.
+   A alta especificidade garante precedência sobre os estilos legados. */
+#main-container.rah-list-page .table-filters .form-group.row .form-control,
+#main-container.rah-list-page .table-filters .form-group.row .form-control-sm,
+#main-container.rah-list-page .table-filters .form-group.row select.form-control,
+#main-container.rah-list-page .table-filters .form-group.row select.form-control-sm {
+    min-height: 27px !important;
+    height: 27px !important;
+    border-radius: 8px !important;
+    padding: 0 22px 0 8px !important;
+    font-size: .61rem !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+}
+
+#main-container.rah-list-page .table-filters .form-group.row input.form-control,
+#main-container.rah-list-page .table-filters .form-group.row input.form-control-sm {
+    padding-right: 8px !important;
+}
+
+#main-container.rah-list-page .table-filters .form-group.row .form-control::placeholder,
+#main-container.rah-list-page .table-filters .form-group.row .form-control-sm::placeholder {
+    font-size: .61rem !important;
+    font-weight: 400 !important;
+}
+
+#main-container.rah-list-page .table-filters .rah-filter-actions .btn {
+    min-height: 27px !important;
+    height: 27px !important;
+    border-radius: 8px !important;
+}
+
 .listagem-hero {
     display: flex;
     align-items: flex-start;
@@ -962,7 +994,7 @@ body:has(.rah-list-page) {
 #main-container.senhas-list-page :is(.form-control, .form-control-sm)::placeholder,
 .container-fluid.jornada-page :is(.form-control, .form-control-sm)::placeholder,
 #main-container.rah-list-page :is(.form-control, .form-control-sm)::placeholder {
-    color: #8a94a6 !important;
+    color: #c4c4c4 !important;
     font-size: .74rem !important;
     font-weight: 500 !important;
     opacity: 1 !important;
@@ -979,6 +1011,41 @@ body:has(.rah-list-page) {
 #main-container.rah-list-page select.form-control,
 #main-container.rah-list-page select.form-control-sm {
     padding-right: 28px !important;
+    color: #c4c4c4 !important;
+}
+
+#main-container.finalizadas-list-page select.form-control option,
+#main-container.finalizadas-list-page select.form-control-sm option,
+#main-container.paradas-list-page select.form-control option,
+#main-container.paradas-list-page select.form-control-sm option,
+#main-container.senhas-list-page select.form-control option,
+#main-container.senhas-list-page select.form-control-sm option,
+.container-fluid.jornada-page select.form-control option,
+.container-fluid.jornada-page select.form-control-sm option,
+#main-container.rah-list-page select.form-control option,
+#main-container.rah-list-page select.form-control-sm option {
+    color: #344054 !important;
+}
+
+#main-container.finalizadas-list-page input[type="date"].form-control,
+#main-container.finalizadas-list-page input[type="date"].form-control-sm,
+#main-container.paradas-list-page input[type="date"].form-control,
+#main-container.paradas-list-page input[type="date"].form-control-sm,
+#main-container.senhas-list-page input[type="date"].form-control,
+#main-container.senhas-list-page input[type="date"].form-control-sm,
+.container-fluid.jornada-page input[type="date"].form-control,
+.container-fluid.jornada-page input[type="date"].form-control-sm,
+#main-container.rah-list-page input[type="date"].form-control,
+#main-container.rah-list-page input[type="date"].form-control-sm {
+    color: #c4c4c4 !important;
+}
+
+#main-container.finalizadas-list-page input[type="date"]::-webkit-calendar-picker-indicator,
+#main-container.paradas-list-page input[type="date"]::-webkit-calendar-picker-indicator,
+#main-container.senhas-list-page input[type="date"]::-webkit-calendar-picker-indicator,
+.container-fluid.jornada-page input[type="date"]::-webkit-calendar-picker-indicator,
+#main-container.rah-list-page input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: .42;
 }
 
 .rah-list-page .table-filters {
@@ -1003,9 +1070,8 @@ body:has(.rah-list-page) {
 
 .rah-list-page .form-group.row .form-control,
 .rah-list-page .form-group.row .btn {
-    min-height: 30px;
-    height: 30px;
-    font-size: .72rem;
+    min-height: 30px !important;
+    height: 30px !important;
     line-height: 1.2;
     border-radius: 10px;
     margin-top: 0 !important;
@@ -1014,9 +1080,19 @@ body:has(.rah-list-page) {
     padding-bottom: 0;
 }
 
+.rah-list-page .form-group.row .form-control {
+    font-size: .66rem !important;
+    font-weight: 400 !important;
+}
+
+.rah-list-page .form-group.row .btn {
+    font-size: .7rem !important;
+}
+
 .rah-list-page .form-group.row .form-control::placeholder {
-    font-size: .72rem;
-    color: #c4c4c4;
+    font-size: .66rem !important;
+    font-weight: 400 !important;
+    color: #c4c4c4 !important;
 }
 
 .rah-list-page .form-group.row .material-icons {

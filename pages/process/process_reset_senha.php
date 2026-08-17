@@ -41,21 +41,7 @@ try {
 
     $idSessao = (int)($_SESSION['id_usuario'] ?? 0);
     $ativo = strtolower((string)($_SESSION['ativo'] ?? ''));
-    $cargo = (string)($_SESSION['cargo'] ?? '');
-    $nivel = (string)($_SESSION['nivel'] ?? '');
-
-    $norm = static function ($txt): string {
-        $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
-        $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
-        $txt = $ascii !== false ? $ascii : $txt;
-        return preg_replace('/[^a-z]/', '', $txt);
-    };
-
-    $isDiretoria = in_array($norm($cargo), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-        || in_array($norm($nivel), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-        || ((int)$nivel === -1);
-
-    if ($idSessao <= 0 || $ativo !== 's' || !$isDiretoria) {
+    if ($idSessao <= 0 || $ativo !== 's' || !FullCareAccess::can($conn, 'usuarios', 'edit')) {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
         exit;

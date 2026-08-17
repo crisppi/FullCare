@@ -11,6 +11,7 @@ include_once("dao/seguradoraDao.php");
 $usuarioDao = new userDAO($conn, $BASE_URL);
 $seguradoraDao = new seguradoraDAO($conn, $BASE_URL);
 $seguradoras = $seguradoraDao->selectAllSeguradora();
+$accessProfiles = $conn->query("SELECT id_access_profile, nome, descricao FROM tb_access_profile WHERE ativo = 1 ORDER BY id_access_profile")->fetchAll(PDO::FETCH_ASSOC);
 
 // Receber id do usuário
 $id_usuario = filter_input(INPUT_GET, "id_usuario");
@@ -370,15 +371,15 @@ if (empty($id_usuario)) {
                     </select>
                 </div>
                 <div class="form-group col-sm-2 ">
-                    <label class="control-label" for="nivel_user">Nível</label>
-                    <select class="form-control" name="nivel_user">
-                        <option value="">Nível</option>
-                        <option value="1">Nível 01</option>
-                        <option value="2">Nível 02</option>
-                        <option value="3">Nível 03</option>
-                        <option value="4">Nível 04</option>
-                        <option value="5">Nível 05</option>
-                        <option value="-1">Hospital</option>
+                    <label class="control-label" for="fk_access_profile">Nível de acesso</label>
+                    <select class="form-control" id="fk_access_profile" name="fk_access_profile" required>
+                        <option value="">Selecione</option>
+                        <?php foreach ($accessProfiles as $profile): ?>
+                        <option value="<?= (int)$profile['id_access_profile'] ?>"
+                            title="<?= htmlspecialchars((string)$profile['descricao'], ENT_QUOTES, 'UTF-8') ?>">
+                            <?= htmlspecialchars((string)$profile['nome'], ENT_QUOTES, 'UTF-8') ?>
+                        </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group col-sm-2 ">

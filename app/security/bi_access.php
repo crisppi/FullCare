@@ -90,6 +90,9 @@ if (!function_exists('fullcare_has_bi_access')) {
         if ($idUsuario <= 0 || $ativo !== 's') {
             return false;
         }
+        if (class_exists('FullCareAccess') && isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof PDO) {
+            return FullCareAccess::can($GLOBALS['conn'], 'bi_operacional', 'view', $idUsuario);
+        }
         if (fullcare_is_bi_allowed_user()) {
             return true;
         }
@@ -142,7 +145,17 @@ if (!function_exists('fullcare_bi_deny_redirect')) {
         }
         $_SESSION['mensagem'] = 'Acesso ao BI permitido para gestor de seguradora e diretoria.';
         $_SESSION['mensagem_tipo'] = 'danger';
-        header('Location: central-trabalho', true, 303);
+        $baseUrl = (string)($GLOBALS['BASE_URL'] ?? '');
+        if ($baseUrl !== '') {
+            $target = rtrim($baseUrl, '/') . '/central-trabalho';
+        } else {
+            $script = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+            $basePath = preg_match('#^/(FullCare|FullConex(?:Aud)?)(/|$)#i', $script, $m)
+                ? '/' . trim($m[1], '/')
+                : '';
+            $target = $basePath . '/central-trabalho';
+        }
+        header('Location: ' . $target, true, 303);
         exit;
     }
 }

@@ -25,15 +25,14 @@ if (!defined("FLOW_LOGGER_AUTO_V1")) {
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-if (empty($_SESSION['email_user']) || ($_SESSION['ativo'] ?? 'n') !== 's') {
+require_once __DIR__ . '/globals.php';
+require_once __DIR__ . '/db.php';
+if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
     http_response_code(401);
     header('Content-Type: application/json; charset=UTF-8');
     echo json_encode(['success' => false, 'message' => 'Sessão expirada. Faça login novamente.']);
     exit;
 }
-require_once __DIR__ . '/globals.php';
-require_once __DIR__ . '/db.php';
-
 header('Content-Type: application/json; charset=UTF-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

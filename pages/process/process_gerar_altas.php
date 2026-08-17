@@ -39,7 +39,7 @@ include_once("utils/audit_logger.php");
 $message = new Message($BASE_URL);
 $redirectPage = "list_internacao_gerar_alta.php";
 
-if (!isset($_SESSION["email_user"])) {
+if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
     $message->setMessage("Sessão expirada, faça login novamente.", "error", "index.php");
     header("Location: index.php");
     exit;

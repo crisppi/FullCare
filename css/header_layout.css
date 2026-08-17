@@ -481,12 +481,34 @@
     white-space: nowrap;
 }
 
+.account-user-identity {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    max-width: 96px;
+    line-height: 1.05;
+}
+
 .account-user-name {
     display: block;
     flex: 1 1 auto;
     min-width: 0;
     max-width: 84px;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.account-user-role {
+    display: block;
+    margin-top: 3px;
+    max-width: 96px;
+    overflow: hidden;
+    color: #718096;
+    font-size: .62rem;
+    font-weight: 600;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

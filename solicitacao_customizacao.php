@@ -1,5 +1,6 @@
 <?php
 include_once("check_logado.php");
+require_once("globals.php");
 require_once("dao/solicitacaoCustomizacaoDao.php");
 
 function e($v)
@@ -10,17 +11,7 @@ function e($v)
 $dao = new SolicitacaoCustomizacaoDAO($conn, $BASE_URL);
 $id = (int)(filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT) ?: 0);
 
-$norm = function ($s) {
-    $s = mb_strtolower(trim((string)$s), 'UTF-8');
-    $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s);
-    $s = $c !== false ? $c : $s;
-    return preg_replace('/[^a-z]/', '', $s);
-};
-$cargo = (string)($_SESSION['cargo'] ?? '');
-$nivel = (string)($_SESSION['nivel'] ?? '');
-$isDiretoria = in_array($norm($cargo), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || in_array($norm($nivel), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ((int)$nivel === -1);
+$isDiretoria = FullCareAccess::can($conn, 'solicitacoes', 'edit');
 $sessionEmail = (string)($_SESSION['email_user'] ?? '');
 $emailNorm = strtolower(trim($sessionEmail));
 $isFullcare = str_ends_with($emailNorm, '@fullcare.com.br');

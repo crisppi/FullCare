@@ -19,23 +19,9 @@ function formatCargoLogUser(?string $cargo): string
     return $map[$cargo] ?? $cargo;
 }
 
-$norm = static function ($txt): string {
-    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
-    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
-    $txt = $ascii !== false ? $ascii : $txt;
-    return preg_replace('/[^a-z]/', '', $txt);
-};
-$normCargo = $norm($_SESSION['cargo'] ?? '');
-$normNivel = $norm($_SESSION['nivel'] ?? '');
-$isDiretoria = in_array($normCargo, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || (strpos($normCargo, 'diretor') !== false)
-    || (strpos($normCargo, 'diretoria') !== false)
-    || in_array($normNivel, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ((int)($_SESSION['nivel'] ?? 0) === -1);
-
-if (!$isDiretoria) {
+if (!FullCareAccess::can($conn, 'usuarios', 'view')) {
     http_response_code(403);
-    die('Acesso negado. Requer cargo/nível: Diretoria.');
+    die('Seu nível de acesso não permite visualizar os logs de usuários.');
 }
 
 $logFile = __DIR__ . '/../logs/flow_operacional.log';

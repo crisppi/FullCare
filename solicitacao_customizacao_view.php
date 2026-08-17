@@ -1,5 +1,6 @@
 <?php
 include_once("check_logado.php");
+require_once("globals.php");
 require_once("dao/solicitacaoCustomizacaoDao.php");
 
 function e($v)
@@ -13,22 +14,7 @@ function showVal($v): string
     return $val === '' ? '-' : e($val);
 }
 
-$norm = function ($s) {
-    $s = mb_strtolower(trim((string)$s), 'UTF-8');
-    $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s);
-    $s = $c !== false ? $c : $s;
-    return preg_replace('/[^a-z]/', '', $s);
-};
-$cargo = (string)($_SESSION['cargo'] ?? '');
-$nivel = (string)($_SESSION['nivel'] ?? '');
-$isDiretoria = in_array($norm($cargo), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || in_array($norm($nivel), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ((int)$nivel === -1);
-
-if (!$isDiretoria) {
-    echo "<div class='alert alert-danger'>Acesso restrito à diretoria.</div>";
-    exit;
-}
+FullCareAccess::enforce($conn, $BASE_URL, 'solicitacoes', 'view');
 
 $id = (int)(filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT) ?: 0);
 if ($id <= 0) {

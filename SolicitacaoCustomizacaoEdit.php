@@ -4,20 +4,7 @@ require_once("globals.php");
 require_once("templates/header.php");
 require_once("dao/solicitacaoCustomizacaoDao.php");
 
-$norm = function ($txt) {
-    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
-    $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
-    $txt = $c !== false ? $c : $txt;
-    return preg_replace('/[^a-z]/', '', $txt);
-};
-$isDiretoria = in_array($norm($_SESSION['cargo'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || in_array($norm($_SESSION['nivel'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ((int)($_SESSION['nivel'] ?? 0) === -1);
-
-if (!$isDiretoria) {
-    http_response_code(403);
-    die('Acesso negado. Requer cargo/nível: Diretoria.');
-}
+FullCareAccess::enforce($conn, $BASE_URL, 'solicitacoes', 'edit');
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $dao = new SolicitacaoCustomizacaoDAO($conn, $BASE_URL);

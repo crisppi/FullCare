@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manual | Cargos e níveis de acesso</title>
+    <link rel="icon" type="image/png" href="assets/fullcare-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/manual_compact.css?v=20260815">
+    <style>
+        body{margin:0;font-family:Inter,sans-serif;background:#f7f5fa;color:#291938;line-height:1.55}
+        header{background:linear-gradient(135deg,#52245f,#233f68);color:#fff;padding:42px 5vw 70px}
+        .hero{width:min(1050px,92vw);margin:auto;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+        .hero img{height:48px}.hero-copy{flex:1 1 500px}.hero h1{margin:6px 0 8px;font-size:clamp(28px,4vw,44px)}
+        .pill{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.14);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+        .back{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.45);border-radius:999px;padding:7px 13px}
+        main{width:min(1050px,92vw);margin:-30px auto 50px}.section{background:#fff;border:1px solid #e6deec;border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:0 12px 30px rgba(58,26,76,.08)}
+        h2{margin:0 0 14px;font-size:22px}h3{margin:0 0 8px;font-size:17px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+        .card{border:1px solid #e9e2ee;border-radius:14px;padding:16px;background:#fcfbfd}.example{background:#f1ebf6;border-left:4px solid #72458a;padding:12px 14px;border-radius:10px}
+        table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px;border-bottom:1px solid #e8e1ed;text-align:left;vertical-align:top}th{background:#f2edf6}.yes{color:#116b47;font-weight:700}.no{color:#9a3342;font-weight:700}
+        .scroll{overflow-x:auto}ul{margin:8px 0 0;padding-left:20px}.warning{background:#fff7e6;border-color:#f1d696}.rule{font-size:18px;font-weight:700;text-align:center;color:#552b68;padding:14px}
+        footer{text-align:center;color:#716879;padding:25px}
+    </style>
+</head>
+<body>
+<header>
+    <div class="hero">
+        <img src="img/LogoFullCare.png" alt="FullCare">
+        <div class="hero-copy">
+            <span class="pill">Manual • Segurança</span>
+            <h1>Cargos e níveis de acesso</h1>
+            <p>Entenda por que o cargo identifica a função da pessoa e o nível determina o que ela pode fazer no FullCare.</p>
+        </div>
+        <a class="back" href="manual.html">← Índice do manual</a>
+        <a class="back" href="inicio">Voltar ao sistema</a>
+    </div>
+</header>
+
+<main>
+    <section class="section">
+        <h2>A regra mais importante</h2>
+        <div class="rule">Cargo identifica a função. Nível de acesso libera as funções do sistema.</div>
+        <div class="grid">
+            <article class="card"><h3>Cargo</h3><p>É a atividade profissional ou organizacional: Médico, Enfermeiro, Secretária, Administrativo, Gerente ou Diretor.</p></article>
+            <article class="card"><h3>Nível de acesso</h3><p>É o conjunto de permissões: Consulta, Secretaria, Assistencial, Administrativo, Gerencial, Diretoria ou Superadministrador.</p></article>
+        </div>
+        <p class="example"><strong>Exemplo:</strong> uma pessoa pode ter o cargo “Secretária executiva” e o nível “Diretoria”. O cargo continua correto, mas o acesso será o da Diretoria.</p>
+    </section>
+
+    <section class="section">
+        <h2>Níveis disponíveis</h2>
+        <div class="grid">
+            <article class="card"><h3>Consulta</h3><p>Visualiza informações operacionais permitidas, sem alterar registros.</p></article>
+            <article class="card"><h3>Secretaria</h3><p>Cadastra e edita pacientes, hospitais, seguradoras, estipulantes, censo, internações e visitas. Não exclui nem executa decisões sensíveis.</p></article>
+            <article class="card"><h3>Assistencial</h3><p>Perfil comum de médicos e enfermeiros. Atua em censo, internações, visitas, gestão clínica e contas assistenciais.</p></article>
+            <article class="card"><h3>Administrativo</h3><p>Atua em cadastros, internações, contas, capeantes, RAH, PDFs e operação financeira autorizada.</p></article>
+            <article class="card"><h3>Gerencial</h3><p>Supervisiona a operação, acessa indicadores, gera e reverte altas, fecha gestão e controla contas.</p></article>
+            <article class="card"><h3>Diretoria</h3><p>Possui visão operacional, estratégica e financeira ampla. Não administra permissões por padrão.</p></article>
+            <article class="card"><h3>Superadministrador</h3><p>Administra usuários, níveis e permissões, além de possuir acesso integral aos módulos.</p></article>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Resumo prático</h2>
+        <div class="scroll">
+            <table>
+                <thead><tr><th>Nível</th><th>Cadastros</th><th>Operação clínica</th><th>Contas/RAH</th><th>Altas</th><th>BI estratégico</th><th>Usuários/perfis</th></tr></thead>
+                <tbody>
+                    <tr><td>Consulta</td><td>Visualiza</td><td>Visualiza</td><td>Visualiza</td><td>Visualiza</td><td class="no">Não</td><td class="no">Não</td></tr>
+                    <tr><td>Secretaria</td><td>Cria e edita</td><td>Censo, internação e visita</td><td>Visualiza</td><td class="no">Sem ação sensível</td><td class="no">Não</td><td class="no">Não</td></tr>
+                    <tr><td>Assistencial</td><td>Visualiza</td><td class="yes">Cria e edita</td><td>Cria e edita</td><td>Gera alta</td><td class="no">Sem acesso ao BI</td><td class="no">Não</td></tr>
+                    <tr><td>Administrativo</td><td>Cria e edita</td><td>Visualiza</td><td class="yes">Cria, edita e finaliza</td><td>Visualiza</td><td class="no">Não</td><td class="no">Não</td></tr>
+                    <tr><td>Gerencial</td><td>Cria e edita</td><td>Cria e edita</td><td>Controla</td><td class="yes">Gera e reverte</td><td class="yes">Visualiza</td><td class="no">Não</td></tr>
+                    <tr><td>Diretoria</td><td>Cria e edita</td><td>Cria e edita</td><td>Controla</td><td class="yes">Gera e reverte</td><td class="yes">Visualiza</td><td>Somente consulta</td></tr>
+                    <tr><td>Superadministrador</td><td class="yes">Total</td><td class="yes">Total</td><td class="yes">Total</td><td class="yes">Total</td><td class="yes">Total</td><td class="yes">Administra</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Como o sistema aplica a regra</h2>
+        <ul>
+            <li>O menu mostra somente módulos permitidos para o seu nível.</li>
+            <li>Os botões de cadastrar, editar, excluir, gerar alta e outras ações respeitam permissões próprias.</li>
+            <li>Digitar diretamente uma página não contorna a segurança: a rota também é verificada.</li>
+            <li>PDFs, AJAX e processos de gravação usam a mesma regra.</li>
+            <li>Bloqueios e alterações de perfil ficam registrados para auditoria.</li>
+            <li>O vínculo com hospital ou seguradora ainda pode limitar quais registros aparecem.</li>
+        </ul>
+    </section>
+
+    <section class="section warning">
+        <h2>Responsabilidade do Superadministrador</h2>
+        <ul>
+            <li>Pode atribuir qualquer nível a qualquer cargo.</li>
+            <li>Deve conceder Diretoria e Superadministrador somente quando necessário.</li>
+            <li>Não pode retirar o próprio nível de Superadministrador.</li>
+            <li>Não pode remover o último Superadministrador ativo.</li>
+            <li>Toda alteração de nível é registrada com usuário, data e perfil anterior/novo.</li>
+        </ul>
+    </section>
+
+    <section class="section">
+        <h2>Dúvidas frequentes</h2>
+        <div class="grid">
+            <article class="card"><h3>Médico e enfermeiro têm acessos diferentes?</h3><p>Não quando ambos usam o nível Assistencial. O cargo permanece diferente para identificar a profissão nos registros.</p></article>
+            <article class="card"><h3>Uma secretária pode ter acesso de Diretoria?</h3><p>Sim. O Superadministrador pode atribuir nível Diretoria mantendo o cargo Secretária.</p></article>
+            <article class="card"><h3>Um gerente sempre terá acesso Gerencial?</h3><p>Não obrigatoriamente. O cargo não libera funções; o nível escolhido é que determina o acesso.</p></article>
+            <article class="card"><h3>Não vejo uma opção no menu. É erro?</h3><p>Nem sempre. A opção pode estar oculta porque seu nível não permite aquela função. Em caso de dúvida, procure o Superadministrador.</p></article>
+        </div>
+    </section>
+</main>
+<footer>Manual FullCare • Cargos e níveis de acesso • versão 1.0</footer>
+</body>
+</html>

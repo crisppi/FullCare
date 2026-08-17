@@ -85,6 +85,45 @@ function resolveUsuarioHomeUrl(string $baseUrl, ?string $cargo, $nivel): string
     return $baseUrl . 'inicio';
 }
 
+function resolveAccessProfile(PDO $conn, int $profileId): array
+{
+    $stmt = $conn->prepare("SELECT id_access_profile, nome, slug FROM tb_access_profile WHERE id_access_profile = :id AND ativo = 1 LIMIT 1");
+    $stmt->execute([':id' => $profileId]);
+    $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$profile) {
+        throw new RuntimeException('Selecione um nível de acesso válido.');
+    }
+    return $profile;
+}
+
+function legacyLevelForAccessProfile(string $slug): int
+{
+    return [
+        'consulta' => 1,
+        'secretaria' => 2,
+        'assistencial' => 3,
+        'administrativo' => 4,
+        'gerencial' => 4,
+        'diretoria' => 5,
+        'superadministrador' => 5,
+    ][$slug] ?? 1;
+}
+
+function auditAccessProfileChange(PDO $conn, int $targetUserId, ?array $before, array $after, string $reason): void
+{
+    $stmt = $conn->prepare("INSERT INTO tb_access_audit
+        (actor_user_id, target_user_id, evento, valor_anterior, valor_novo, motivo, ip)
+        VALUES (:actor, :target, 'alteracao_perfil_usuario', :before, :after, :reason, :ip)");
+    $stmt->execute([
+        ':actor' => (int)($_SESSION['id_usuario'] ?? 0) ?: null,
+        ':target' => $targetUserId,
+        ':before' => $before ? json_encode($before, JSON_UNESCAPED_UNICODE) : null,
+        ':after' => json_encode($after, JSON_UNESCAPED_UNICODE),
+        ':reason' => $reason,
+        ':ip' => (string)($_SERVER['REMOTE_ADDR'] ?? ''),
+    ]);
+}
+
 function storeUsuarioImage(array $file, string $targetDir, int $maxBytes = 2097152): ?string
 {
     $error = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
@@ -184,7 +223,14 @@ if ($type === "create") {
         $ativo_user = filter_input(INPUT_POST, "ativo_user");
         $vinculo_user = filter_input(INPUT_POST, "vinculo_user");
         $depto_user = filter_input(INPUT_POST, "depto_user");
-        $nivel_user = filter_input(INPUT_POST, "nivel_user");
+        $fk_access_profile = (int)filter_input(INPUT_POST, "fk_access_profile", FILTER_VALIDATE_INT);
+        try {
+            $accessProfile = resolveAccessProfile($conn, $fk_access_profile);
+        } catch (Throwable $e) {
+            $message->setMessage($e->getMessage(), "error", "back");
+            exit;
+        }
+        $nivel_user = legacyLevelForAccessProfile((string)$accessProfile['slug']);
         $reg_profissional_user = filter_input(INPUT_POST, "reg_profissional_user");
         $tipo_reg_user = filter_input(INPUT_POST, "tipo_reg_user");
         $depto_user = filter_input(INPUT_POST, "depto_user");
@@ -256,6 +302,7 @@ if ($type === "create") {
 
             $usuario->vinculo_user = $vinculo_user;
             $usuario->nivel_user = $nivel_user;
+            $usuario->fk_access_profile = $fk_access_profile;
             $usuario->depto_user = $depto_user;
             $usuario->cargo_user = $cargo_user;
             $usuario->obs_user = $obs_user;
@@ -264,6 +311,7 @@ if ($type === "create") {
 
             $userDao->create($usuario);
             $novoIdUsuario = (int)$conn->lastInsertId();
+            auditAccessProfileChange($conn, $novoIdUsuario, null, $accessProfile, 'Perfil definido na criação do usuário.');
             $usuarioCriado = $novoIdUsuario > 0 ? $userDao->findById_user($novoIdUsuario) : null;
             fullcareAuditLog($conn, [
                 'action' => 'create',
@@ -274,6 +322,7 @@ if ($type === "create") {
                 'context' => [
                     'cargo_user' => $cargo_user,
                     'nivel_user' => $nivel_user,
+                    'nivel_acesso' => $accessProfile['nome'],
                 ],
                 'trace_id' => isset($__flowCtxAuto) ? ($__flowCtxAuto['trace_id'] ?? null) : null,
                 'source' => 'process_usuario.php',
@@ -332,7 +381,14 @@ if ($type === "create") {
         $cargo_user = filter_input(INPUT_POST, "cargo_user");
         $depto_user = filter_input(INPUT_POST, "depto_user");
         $vinculo_user = filter_input(INPUT_POST, "vinculo_user");
-        $nivel_user = filter_input(INPUT_POST, "nivel_user");
+        $fk_access_profile = (int)filter_input(INPUT_POST, "fk_access_profile", FILTER_VALIDATE_INT);
+        try {
+            $accessProfile = resolveAccessProfile($conn, $fk_access_profile);
+        } catch (Throwable $e) {
+            $message->setMessage($e->getMessage(), "error", "back");
+            exit;
+        }
+        $nivel_user = legacyLevelForAccessProfile((string)$accessProfile['slug']);
         $fk_seguradora_user = filter_input(INPUT_POST, "fk_seguradora_user", FILTER_VALIDATE_INT);
         if (isGestorSeguradoraCargo($cargo_user)) {
             $segNome = getSeguradoraNomeById($conn, $fk_seguradora_user);
@@ -359,6 +415,23 @@ if ($type === "create") {
 
         $usuarioData = $usuarioDao->findById_user($id_usuario);
         $usuarioAntes = $usuarioData ? clone $usuarioData : null;
+        if (!$usuarioData) {
+            $message->setMessage("Usuário não encontrado.", "error", "back");
+            exit;
+        }
+        $perfilAnterior = resolveAccessProfile($conn, (int)($usuarioData->fk_access_profile ?? 0));
+        $isSelf = (int)$id_usuario === (int)($_SESSION['id_usuario'] ?? 0);
+        if ($isSelf && ($perfilAnterior['slug'] ?? '') === 'superadministrador' && ($accessProfile['slug'] ?? '') !== 'superadministrador') {
+            $message->setMessage("Você não pode retirar o próprio nível de Superadministrador.", "error", "back");
+            exit;
+        }
+        if (($perfilAnterior['slug'] ?? '') === 'superadministrador' && ($accessProfile['slug'] ?? '') !== 'superadministrador') {
+            $qtdSuper = (int)$conn->query("SELECT COUNT(*) FROM tb_user u JOIN tb_access_profile p ON p.id_access_profile = u.fk_access_profile WHERE u.ativo_user = 's' AND p.slug = 'superadministrador'")->fetchColumn();
+            if ($qtdSuper <= 1) {
+                $message->setMessage("Não é permitido remover o último Superadministrador ativo.", "error", "back");
+                exit;
+            }
+        }
         $foto_usuario = $arquivo !== null ? $arquivo : (string)($usuarioData->foto_usuario ?? '');
 
         if ($senha_user_raw !== '') {
@@ -399,6 +472,7 @@ if ($type === "create") {
         $usuarioData->depto_user = $depto_user;
         $usuarioData->vinculo_user = $vinculo_user;
         $usuarioData->nivel_user = $nivel_user;
+        $usuarioData->fk_access_profile = $fk_access_profile;
 
         $usuarioData->senha_user = $senha_user;
         $usuarioData->ativo_user = $ativo_user;
@@ -417,6 +491,9 @@ if ($type === "create") {
         $usuarioData->fk_seguradora_user = $fk_seguradora_user;
 
         $usuarioDao->update($usuarioData);
+        if ((int)($perfilAnterior['id_access_profile'] ?? 0) !== (int)$fk_access_profile) {
+            auditAccessProfileChange($conn, (int)$id_usuario, $perfilAnterior, $accessProfile, 'Perfil alterado na edição do usuário.');
+        }
         $usuarioDepois = $usuarioDao->findById_user((int)$id_usuario);
         fullcareAuditLog($conn, [
             'action' => 'update',
@@ -427,6 +504,8 @@ if ($type === "create") {
             'after' => $usuarioDepois,
             'context' => [
                 'alterou_senha' => $senha_user_raw !== '',
+                'perfil_anterior' => $perfilAnterior['nome'] ?? null,
+                'perfil_novo' => $accessProfile['nome'] ?? null,
             ],
             'trace_id' => isset($__flowCtxAuto) ? ($__flowCtxAuto['trace_id'] ?? null) : null,
             'source' => 'process_usuario.php',

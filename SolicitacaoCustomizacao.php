@@ -24,15 +24,7 @@ if ($emailSessao !== '' && strpos(strtolower($emailSessao), '@conex.') !== false
 }
 $dataHoje = date('Y-m-d');
 
-$norm = function ($txt) {
-    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
-    $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
-    $txt = $c !== false ? $c : $txt;
-    return preg_replace('/[^a-z]/', '', $txt);
-};
-$isDiretoria = in_array($norm($_SESSION['cargo'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || in_array($norm($_SESSION['nivel'] ?? ''), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ((int)($_SESSION['nivel'] ?? 0) === -1);
+$isDiretoria = FullCareAccess::can($conn, 'solicitacoes', 'edit');
 ?>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/css/form_cad_internacao.css') ?>">

@@ -2,13 +2,13 @@
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-if (!isset($_SESSION['email_user']) || ($_SESSION['ativo'] ?? '') !== 's') {
+require_once __DIR__ . '/globals.php';
+require_once __DIR__ . '/db.php';
+if (empty($_SESSION['id_usuario']) || strtolower((string)($_SESSION['ativo'] ?? '')) !== 's') {
     http_response_code(401);
     exit('Não autorizado');
 }
 
-require_once __DIR__ . '/globals.php';
-require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;

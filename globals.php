@@ -161,6 +161,7 @@ if (!function_exists('fullcare_sync_session_user')) {
                     login_user,
                     ativo_user,
                     nivel_user,
+                    fk_access_profile,
                     cargo_user,
                     foto_usuario,
                     fk_seguradora_user
@@ -213,6 +214,9 @@ if (!function_exists('fullcare_sync_session_user')) {
             $_SESSION['login_user'] = (string)($user['login_user'] ?? ($_SESSION['login_user'] ?? $_SESSION['email_user'] ?? ''));
             $_SESSION['ativo'] = (string)($user['ativo_user'] ?? ($_SESSION['ativo'] ?? ''));
             $_SESSION['nivel'] = (int)($user['nivel_user'] ?? ($_SESSION['nivel'] ?? 99));
+            $_SESSION['fk_access_profile'] = isset($user['fk_access_profile'])
+                ? (int)$user['fk_access_profile']
+                : ($_SESSION['fk_access_profile'] ?? null);
             $_SESSION['cargo'] = (string)($user['cargo_user'] ?? ($_SESSION['cargo'] ?? ''));
             $_SESSION['foto_usuario'] = (string)($user['foto_usuario'] ?? ($_SESSION['foto_usuario'] ?? ''));
             $_SESSION['fk_seguradora_user'] = isset($user['fk_seguradora_user'])
@@ -233,6 +237,7 @@ fullcare_sync_session_user($conn);
 
 // ------------------ 6) Guard (autorização) -----------------
 require_once __DIR__ . '/authz.php';
+require_once __DIR__ . '/app/security/FullCareAccess.php';
 
 if (!function_exists('enforce_authenticated_session')) {
     function enforce_authenticated_session(string $BASE_URL): void
@@ -282,9 +287,13 @@ if (str_starts_with($__scriptBase, 'process_') && !in_array($__scriptBase, $__gu
     enforce_authenticated_session($BASE_URL);
 }
 
-// Só aplica o Gate em métodos mutantes e quando o script NÃO está na whitelist
-if (in_array($__method, ['POST', 'PUT', 'PATCH', 'DELETE'], true) && !in_array($__scriptBase, $__guardSkip, true)) {
-    Gate::autoEnforce($conn, $BASE_URL);
+// A autorização central protege páginas GET e endpoints mutantes com a mesma matriz.
+// Rotas ainda não classificadas continuam sob autenticação e guards específicos
+// até entrarem explicitamente no mapa do FullCareAccess.
+$__accessAuthenticated = (int)($_SESSION['id_usuario'] ?? 0) > 0
+    && strtolower((string)($_SESSION['ativo'] ?? '')) === 's';
+if ($__accessAuthenticated && !in_array($__scriptBase, $__guardSkip, true)) {
+    FullCareAccess::enforceCurrentRequest($conn, $BASE_URL);
 }
 
 // Disponibiliza os helpers de schema, mas alterações estruturais são executadas

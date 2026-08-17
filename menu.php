@@ -1,6 +1,8 @@
 <?php
 
 include_once("check_logado.php");
+header('Location: inicio', true, 303);
+exit;
 require_once("templates/header.php");
 ?>
 <script src="js/timeout.js"></script>

@@ -63,6 +63,7 @@ $defaultFoto = $BASE_URL . 'uploads/usuarios/default-user.jpeg';
 
 $sessionNivel = isset($_SESSION['nivel']) ? (int) $_SESSION['nivel'] : 0;
 $sessionUsuario = $_SESSION['usuario_user'] ?? '';
+$sessionCargo = trim((string)($_SESSION['cargo'] ?? ''));
 $sessionUsuarioPrimeiroNome = trim((string)$sessionUsuario);
 if ($sessionUsuarioPrimeiroNome !== '') {
     $sessionUsuarioPrimeiroNome = preg_split('/\s+/u', $sessionUsuarioPrimeiroNome)[0] ?? $sessionUsuarioPrimeiroNome;
@@ -83,26 +84,27 @@ $startsWithAnyAccess = function (string $value, array $prefixes): bool {
     return false;
 };
 $normCargoAccess = $normAccess($_SESSION['cargo'] ?? '');
+$accessCan = static function (string $module, string $action = 'view') use ($conn): bool {
+    return class_exists('FullCareAccess') && FullCareAccess::can($conn, $module, $action);
+};
+$accessProfile = class_exists('FullCareAccess') ? FullCareAccess::profile($conn) : null;
+$accessProfileSlug = (string)($accessProfile['slug'] ?? '');
 $isBiHubOnly = function_exists('fullcare_is_gestor_seguradora')
     ? fullcare_is_gestor_seguradora()
     : (strpos($normCargoAccess, 'gestorseguradora') === 0);
 $isSeguradoraRole = (strpos($normCargoAccess, 'seguradora') !== false);
-$canSeeFullMenu = ($sessionNivel > 0) && !$isBiHubOnly;
-$canSeeBiMenu = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_access() : false;
+$canSeeFullMenu = $accessCan('dashboard', 'view') && !$isBiHubOnly;
+$canSeeBiMenu = $accessCan('bi_operacional', 'view');
 $canSeeInteligenciaMenu = false;
 $canSeeHubMenu = $isBiHubOnly;
 $canSeeInternadosMenu = $isBiHubOnly;
 $canSeeGestorListas = $isBiHubOnly;
 $normNivelAccess = $normAccess($_SESSION['nivel'] ?? '');
-$isDiretoria = in_array($normCargoAccess, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || (strpos($normCargoAccess, 'diretor') !== false)
-    || (strpos($normCargoAccess, 'diretoria') !== false)
-    || in_array($normNivelAccess, ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ($sessionNivel === -1);
-$canSeeInteligenciaMenu = $isDiretoria;
-$canSeeUsuariosCadastro = $isDiretoria && in_array($sessionNivel, [5, -1], true);
-$canSeeFullMenu = (($sessionNivel > 0) || $isDiretoria) && !$isBiHubOnly;
-$hasHeaderMenuAccess = ($sessionNivel > 0) || $isDiretoria;
+$isDiretoria = in_array($accessProfileSlug, ['diretoria', 'superadministrador'], true);
+$canSeeInteligenciaMenu = $accessCan('bi_estrategico', 'view');
+$canSeeUsuariosCadastro = $accessCan('usuarios', 'view');
+$canSeeFullMenu = $accessCan('dashboard', 'view') && !$isBiHubOnly;
+$hasHeaderMenuAccess = $canSeeFullMenu || $isBiHubOnly;
 $cadastroScripts = [
     'list_paciente.php',
     'cad_paciente.php',
@@ -144,10 +146,19 @@ $isCadastroRequestPath = preg_match('#/(pacientes|hospitais|seguradoras|estipula
     || in_array($currentScriptName, $cadastroScripts, true)
     || preg_match('/^(form_)?(list|cad|edit|show)_(paciente|hospital|hospitaluser|seguradora|estipulante|usuario|acomodacao|patologia|antecedente)\.php$/i', $currentScriptName) === 1;
 $canSeeCadastrosMenu = $canSeeFullMenu && (
-    $sessionNivel > 3
+    $accessCan('pacientes', 'view')
+    || $accessCan('hospitais', 'view')
+    || $accessCan('seguradoras', 'view')
+    || $accessCan('estipulantes', 'view')
     || $canSeeUsuariosCadastro
-    || $isCadastroRequestPath
 );
+$canSeeProducaoMenu = $accessCan('internacoes', 'create') || $accessCan('censo', 'view')
+    || $accessCan('altas', 'discharge') || $accessCan('altas', 'revert_discharge');
+$canSeeContasMenu = $accessCan('contas', 'view');
+$canSeeListasMenu = $accessCan('internacoes', 'view') || $accessCan('visitas', 'view')
+    || $accessCan('altas', 'view') || $accessCan('censo', 'view');
+$canSeeGestaoMenu = $accessCan('gestao', 'view');
+$canSeeCuidadoContinuadoMenu = $accessCan('cuidado_continuado', 'view');
 $isPerfilMedicoMenu = $startsWithAnyAccess($normCargoAccess, ['medico', 'med']);
 $isAuditorHeaderSearch = class_exists('AuditorActionService')
     ? AuditorActionService::canUseOperationalSearch($_SESSION)
@@ -332,7 +343,7 @@ if (!empty($sessionIdUsuario)) {
             <div class="bar_color fc-inline-2">
             </div>
             <div class="container-fluid">
-                <a class="navbar-brand fc-header-brand-link" href="<?= $BASE_URL ?>dashboard">
+                <a class="navbar-brand fc-header-brand-link" href="<?= $BASE_URL ?>inicio">
                     <img src="<?= $BASE_URL ?>img/LogoFullCare.png" class="logo-novo" width="224" height="56"
                         alt="FullCare">
                     <?php if (!empty($seguradoraHeaderLogoUrl)): ?>
@@ -366,7 +377,7 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-speedometer2 fc-inline-5"
                                                    ></i>
                                                 Central de trabalho</a></li>
-                                        <?php if ($isDiretoria) { ?>
+                                        <?php if ($accessCan('bi_estrategico', 'view')) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>dashboard-operacional"><i
                                                         class="bi bi-activity fc-inline-6"
                                                        ></i>
@@ -380,20 +391,20 @@ if (!empty($sessionIdUsuario)) {
                                                    ></i>
                                                 Solicitação de Customização
                                             </a></li>
-                                        <?php if ($isDiretoria) { ?>
+                                        <?php if ($accessCan('usuarios', 'view')) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>solicitacoes/customizacao/lista">
                                                     <i class="bi bi-clipboard-check fc-inline-7"
                                                        ></i>
                                                     Solicitações (Lista)
                                                 </a></li>
                                         <?php } ?>
-                                        <?php if ($isDiretoria) { ?>
+                                        <?php if ($accessCan('bi_estrategico', 'view')) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/performance-equipes"><i
                                                         class="bi bi-trophy fc-inline-4"
                                                        ></i>
                                                     Performance equipes</a></li>
                                         <?php } ?>
-                                        <?php if ($sessionNivel > 3) { ?>
+                                        <?php if ($accessCan('permissoes', 'manage')) { ?>
                                             <li class="nav-item">
                                                 <a class="dropdown-item" href="<?= $BASE_URL ?>administracao/permissoes">
                                                     <i class="bi bi-shield-lock fc-inline-8"
@@ -451,7 +462,7 @@ if (!empty($sessionIdUsuario)) {
                                     </ul>
                                 </li>
                             <?php }; ?>
-                            <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
+                            <?php if ($canSeeFullMenu && $canSeeProducaoMenu) { ?>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarProducaoDropdown" role="button"
@@ -462,13 +473,17 @@ if (!empty($sessionIdUsuario)) {
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarProducaoDropdown">
 
+                                        <?php if ($accessCan('internacoes', 'create')): ?>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/nova"><i
                                                     class="bi bi-calendar2-date fc-inline-5"
                                                    ></i> Nova
                                                 Internação</a></li>
+                                        <?php endif; ?>
+                                        <?php if ($accessCan('censo', 'view')): ?>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>censo/lista"><i class="bi bi-book fc-inline-14"
                                                    ></i>
                                                 Censo</a></li>
+                                        <?php endif; ?>
                                         <li><a class="dropdown-item producao-ai-featured" href="<?= $BASE_URL ?>producao/ia-clinica"><i
                                                     class="bi bi-clipboard2-pulse fc-inline-15"
                                                    ></i> IA Cl&iacute;nica</a></li>
@@ -480,20 +495,24 @@ if (!empty($sessionIdUsuario)) {
                                             id="boot-icon3" class="bi bi-box-arrow-left fc-inline-16"
                                            ></span>
                                         Alta UTI</a></li> -->
+                                        <?php if ($accessCan('altas', 'revert_discharge')): ?>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/reverter-alta"><span
                                                     id="boot-icon3" class="bi bi-postcard-heart fc-inline-17"
                                                    ></span>
                                                 Reverter altas</a>
                                         </li>
+                                        <?php endif; ?>
+                                        <?php if ($accessCan('altas', 'discharge')): ?>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>internacoes/gerar-alta"><span
                                                     class="bi bi-clipboard-check fc-inline-18"
                                                    ></span>
                                                 Gerar altas</a>
                                         </li>
+                                        <?php endif; ?>
                                     </ul>
                                 </li>
                             <?php }; ?>
-                            <?php if ($canSeeFullMenu && $sessionNivel >= 3): ?>
+                            <?php if ($canSeeFullMenu && $canSeeContasMenu): ?>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="dropdownContasRah" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -519,7 +538,7 @@ if (!empty($sessionIdUsuario)) {
                                 </li>
                             <?php endif; ?>
 
-                            <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
+                            <?php if ($canSeeFullMenu && $canSeeListasMenu) { ?>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarListasDropdown" role="button"
@@ -553,7 +572,7 @@ if (!empty($sessionIdUsuario)) {
                                     </ul>
                                 </li>
                             <?php }; ?>
-                            <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
+                            <?php if ($canSeeFullMenu && $canSeeGestaoMenu) { ?>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle " href="#" id="navbarGestaoDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -566,7 +585,7 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-postcard-heart fc-inline-22"
                                                    ></i>
                                                 Gestão Assistencial</a></li>
-                                        <?php if ($isDiretoria) { ?>
+                                        <?php if ($accessCan('usuarios', 'view')) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/logs-usuarios"><i
                                                         class="bi bi-journal-code fc-inline-23"
                                                        ></i>
@@ -621,7 +640,7 @@ if (!empty($sessionIdUsuario)) {
                                     </ul>
                                 </li>
                             <?php }; ?>
-                            <?php if ($canSeeFullMenu && $sessionNivel >= 3) { ?>
+                            <?php if ($canSeeFullMenu && $canSeeCuidadoContinuadoMenu) { ?>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarCuidadoContinuado" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -828,7 +847,7 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-pencil-square fc-inline-54"
                                                    ></i>
                                                 Assistente de Textos</a></li>
-                                        <?php if ($isDiretoria) { ?>
+                                        <?php if ($accessCan('usuarios', 'view')) { ?>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>inteligencia/logs-usuarios"><i
                                                         class="bi bi-journal-code fc-inline-23"
                                                        ></i>
@@ -978,7 +997,12 @@ if (!empty($sessionIdUsuario)) {
                         </div>
                         <div class="content">
                             <button type="button" class="js-acc-btn account-user-trigger" aria-expanded="false">
-                                <span class="account-user-name" title="<?= htmlspecialchars((string)$sessionUsuario, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$sessionUsuarioPrimeiroNome, ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="account-user-identity">
+                                    <span class="account-user-name" title="<?= htmlspecialchars((string)$sessionUsuario, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string)$sessionUsuarioPrimeiroNome, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <?php if ($sessionCargo !== ''): ?>
+                                        <span class="account-user-role" title="Cargo: <?= htmlspecialchars($sessionCargo, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($sessionCargo, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <?php endif; ?>
+                                </span>
                                 <i class="bi bi-chevron-down account-user-caret" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -989,7 +1013,7 @@ if (!empty($sessionIdUsuario)) {
                                 </span>
                                 <span>
                                     <span class="account-dropdown__summary-title"><?= htmlspecialchars((string)$sessionUsuario, ENT_QUOTES, 'UTF-8') ?></span>
-                                    <span class="account-dropdown__summary-subtitle">Conta FullCare</span>
+                                    <span class="account-dropdown__summary-subtitle"><?= $sessionCargo !== '' ? 'Cargo: ' . htmlspecialchars($sessionCargo, ENT_QUOTES, 'UTF-8') : 'Conta FullCare' ?></span>
                                 </span>
                             </div>
                             <div class="account-dropdown__body">

@@ -34,6 +34,12 @@ final class Gate
         if (!$idUser || $ativo !== 's') {
             return false;
         }
+        if (class_exists('FullCareAccess')) {
+            $module = FullCareAccess::moduleForCurrentRequest();
+            if ($module !== null) {
+                return FullCareAccess::can($conn, $module, $action, $idUser);
+            }
+        }
         if (self::isDiretoriaSession($cargo, $nivel)) {
             return true;
         }

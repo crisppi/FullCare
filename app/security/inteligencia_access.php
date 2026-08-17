@@ -101,6 +101,11 @@ if (!function_exists('fullcare_enforce_inteligencia_access')) {
         if (!fullcare_is_inteligencia_request()) {
             return;
         }
+        if (class_exists('FullCareAccess') && isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof PDO) {
+            if (FullCareAccess::can($GLOBALS['conn'], 'bi_estrategico', 'view')) {
+                return;
+            }
+        }
         if (fullcare_is_bi_inteligencia_page() && function_exists('fullcare_has_bi_access') && fullcare_has_bi_access()) {
             return;
         }
@@ -116,7 +121,17 @@ if (!function_exists('fullcare_enforce_inteligencia_access')) {
         }
         $_SESSION['mensagem'] = 'Acesso à Inteligência Operacional permitido somente para diretoria.';
         $_SESSION['mensagem_tipo'] = 'danger';
-        header('Location: central-trabalho', true, 303);
+        $baseUrl = (string)($GLOBALS['BASE_URL'] ?? '');
+        if ($baseUrl !== '') {
+            $target = rtrim($baseUrl, '/') . '/central-trabalho';
+        } else {
+            $script = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+            $basePath = preg_match('#^/(FullCare|FullConex(?:Aud)?)(/|$)#i', $script, $m)
+                ? '/' . trim($m[1], '/')
+                : '';
+            $target = $basePath . '/central-trabalho';
+        }
+        header('Location: ' . $target, true, 303);
         exit;
     }
 }

@@ -489,3 +489,42 @@ Isso permite, por exemplo, uma Secretária com nível de Diretoria sem conceder
 o mesmo acesso a todas as Secretárias. Também permite criar novos cargos,
 como Gerente, Coordenador ou Supervisor, sem alterar as regras do sistema.
 
+
+18. MIGRAÇÃO INICIAL APLICADA NA BASE DE TESTES
+-----------------------------------------------
+
+Data da aplicação: 15/08/2026
+Script: sql/20260815_access_profiles_initial_migration.sql
+
+Resultado:
+
+- 39 usuários migrados.
+- 0 usuários sem perfil.
+- nivel_user legado preservado.
+- Nova autorização ainda não ativada nos menus e endpoints.
+- Migração registrada em tb_access_audit.
+
+Mapeamento aplicado:
+
+- Roberto Crisppi (ID 1): Superadministrador.
+- Demais usuários com cargo Diretoria: Diretoria.
+- Usuário com cargo Administrador: Diretoria.
+- Usuário com cargo Analista: Gerencial.
+- Usuário com cargo Administrativo: Administrativo.
+- Médicos, Med_auditor, Enfermeiros e Enf_Auditor: Assistencial.
+- Usuário Medico4 sem cargo, identificado pelo nome: Assistencial.
+- Gestores de seguradora: Consulta.
+- App Review: Consulta.
+- Assistente Virtual: Consulta.
+
+Não existe atualmente usuário com cargo Secretaria na base.
+
+Próxima etapa antes da ativação:
+
+- Validar a matriz de módulos e ações.
+- Definir permissões especiais pendentes.
+- Popular tb_access_profile_permission.
+- Implementar a regra central Access::can/enforce.
+- Substituir os ifs numéricos do menu gradualmente.
+- Testar todos os perfis por menu e acesso direto.
+- Decisão atual: o nível Assistencial (Médico/Enfermeiro) não acessa nenhum BI.

@@ -26,6 +26,7 @@ class Usuario
     public $depto_user;
     public $vinculo_user;
     public $nivel_user;
+    public $fk_access_profile;
     public $reg_profissional_user;
     public $tipo_reg_user;
     public $cpf_user;

@@ -29,6 +29,9 @@ if (!function_exists('fullcare_login_session_start')) {
         $_SESSION['usuario_user'] = (string)($user['usuario_user'] ?? '');
         $_SESSION['ativo'] = (string)($user['ativo_user'] ?? '');
         $_SESSION['nivel'] = (int)($user['nivel_user'] ?? 99);
+        $_SESSION['fk_access_profile'] = isset($user['fk_access_profile'])
+            ? (int)$user['fk_access_profile']
+            : null;
         $_SESSION['cargo'] = (string)($user['cargo_user'] ?? '');
         $_SESSION['fk_seguradora_user'] = isset($user['fk_seguradora_user'])
             ? (int)$user['fk_seguradora_user']
@@ -62,6 +65,7 @@ if (!function_exists('fullcare_login_session_clear')) {
             $_SESSION['usuario_user'],
             $_SESSION['ativo'],
             $_SESSION['nivel'],
+            $_SESSION['fk_access_profile'],
             $_SESSION['cargo'],
             $_SESSION['fk_seguradora_user'],
             $_SESSION['user_db_synced_at'],

@@ -11,19 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$norm = function ($s) {
-    $s = mb_strtolower(trim((string)$s), 'UTF-8');
-    $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s);
-    $s = $c !== false ? $c : $s;
-    return preg_replace('/[^a-z]/', '', $s);
-};
-$cargo = (string)($_SESSION['cargo'] ?? '');
-$nivel = (string)($_SESSION['nivel'] ?? '');
-$isDiretoria = in_array($norm($cargo), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || in_array($norm($nivel), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ((int)$nivel === -1);
-
-if (!$isDiretoria) {
+if (!FullCareAccess::can($conn, 'solicitacoes', 'delete')) {
     $message->setMessage('Acesso restrito à diretoria.', 'danger', 'list_solicitacao_customizacao.php');
     exit;
 }

@@ -104,6 +104,7 @@ try {
             senha_default_user,
             ativo_user,
             nivel_user,
+            fk_access_profile,
             cargo_user,
             foto_usuario,
             fk_seguradora_user,

@@ -11,6 +11,7 @@ require_once("dao/seguradoraDao.php");
 $usuarioDao = new UserDAO($conn, $BASE_URL);
 $seguradoraDao = new seguradoraDAO($conn, $BASE_URL);
 $seguradoras = $seguradoraDao->selectAllSeguradora();
+$accessProfiles = $conn->query("SELECT id_access_profile, nome, descricao FROM tb_access_profile WHERE ativo = 1 ORDER BY id_access_profile")->fetchAll(PDO::FETCH_ASSOC);
 
 $id_usuario = filter_input(INPUT_GET, "id_usuario", FILTER_VALIDATE_INT);
 $usuario = $id_usuario ? $usuarioDao->findById_user($id_usuario) : null;
@@ -394,14 +395,15 @@ $isGestorSeguradoraUser = strpos($cargoAtualNorm, 'gestorseguradora') === 0;
                                 </select>
                             </div>
                             <div class="form-group col-sm-2">
-                                <label class="control-label" for="nivel_user">Nível</label>
-                                <select class="form-control" id="nivel_user" name="nivel_user">
-                                    <option value="1" <?= ((string)$usuario->nivel_user === '1') ? 'selected' : '' ?>>Nível 01</option>
-                                    <option value="2" <?= ((string)$usuario->nivel_user === '2') ? 'selected' : '' ?>>Nível 02</option>
-                                    <option value="3" <?= ((string)$usuario->nivel_user === '3') ? 'selected' : '' ?>>Nível 03</option>
-                                    <option value="4" <?= ((string)$usuario->nivel_user === '4') ? 'selected' : '' ?>>Nível 04</option>
-                                    <option value="5" <?= ((string)$usuario->nivel_user === '5') ? 'selected' : '' ?>>Nível 05</option>
-                                    <option value="-1" <?= ((string)$usuario->nivel_user === '-1') ? 'selected' : '' ?>>Hospital</option>
+                                <label class="control-label" for="fk_access_profile">Nível de acesso</label>
+                                <select class="form-control" id="fk_access_profile" name="fk_access_profile" required>
+                                    <?php foreach ($accessProfiles as $profile): ?>
+                                    <option value="<?= (int)$profile['id_access_profile'] ?>"
+                                        <?= ((int)($usuario->fk_access_profile ?? 0) === (int)$profile['id_access_profile']) ? 'selected' : '' ?>
+                                        title="<?= htmlspecialchars((string)$profile['descricao'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <?= htmlspecialchars((string)$profile['nome'], ENT_QUOTES, 'UTF-8') ?>
+                                    </option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="form-group col-sm-2">

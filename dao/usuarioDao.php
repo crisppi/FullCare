@@ -80,6 +80,7 @@ class UserDAO implements UserDAOInterface
         $user->data_demissao_user = $data["data_demissao_user"];
 
         $user->nivel_user = $data["nivel_user"];
+        $user->fk_access_profile = $data["fk_access_profile"] ?? null;
         $user->cargo_user = $data["cargo_user"];
         $user->depto_user = $data["depto_user"];
         $user->reg_profissional_user = $data["reg_profissional_user"];
@@ -118,6 +119,7 @@ class UserDAO implements UserDAOInterface
             'data_admissao_user',
             'vinculo_user',
             'nivel_user',
+            'fk_access_profile',
             'cargo_user',
             'depto_user',
             'cpf_user',
@@ -160,6 +162,7 @@ class UserDAO implements UserDAOInterface
         $stmt->bindParam(":fk_usuario_user", $usuario->fk_usuario_user);
         $stmt->bindParam(":vinculo_user", $usuario->vinculo_user);
         $stmt->bindParam(":nivel_user", $usuario->nivel_user);
+        $stmt->bindParam(":fk_access_profile", $usuario->fk_access_profile);
         $stmt->bindParam(":cargo_user", $usuario->cargo_user);
         $stmt->bindParam(":depto_user", $usuario->depto_user);
         $stmt->bindParam(":cpf_user", $usuario->cpf_user);
@@ -201,6 +204,7 @@ class UserDAO implements UserDAOInterface
         "depto_user = :depto_user",
         "vinculo_user = :vinculo_user",
         "nivel_user = :nivel_user",
+        "fk_access_profile = :fk_access_profile",
         "cpf_user = :cpf_user",
         "reg_profissional_user = :reg_profissional_user",
         "tipo_reg_user = :tipo_reg_user",
@@ -247,6 +251,7 @@ class UserDAO implements UserDAOInterface
         $stmt->bindParam(":depto_user", $usuario->depto_user);
         $stmt->bindParam(":vinculo_user", $usuario->vinculo_user);
         $stmt->bindParam(":nivel_user", $usuario->nivel_user);
+        $stmt->bindParam(":fk_access_profile", $usuario->fk_access_profile);
 
         $stmt->bindParam(":cpf_user", $usuario->cpf_user);
         $stmt->bindParam(":obs_user", $usuario->obs_user);

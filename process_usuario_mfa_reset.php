@@ -23,18 +23,7 @@ if (!csrf_is_valid($csrf)) {
     exit;
 }
 
-$cargo = (string)($_SESSION['cargo'] ?? '');
-$nivel = (string)($_SESSION['nivel'] ?? '');
-$norm = static function ($txt): string {
-    $txt = mb_strtolower(trim((string)$txt), 'UTF-8');
-    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $txt);
-    $txt = $ascii !== false ? $ascii : $txt;
-    return preg_replace('/[^a-z]/', '', $txt);
-};
-$isDiretoria = in_array($norm($cargo), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || in_array($norm($nivel), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ((int)$nivel === -1);
-if (!$isDiretoria) {
+if (!FullCareAccess::can($conn, 'usuarios', 'edit')) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Você não tem permissão para resetar MFA.']);
     exit;

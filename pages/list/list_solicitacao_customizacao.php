@@ -1,5 +1,6 @@
 <?php
 include_once("check_logado.php");
+require_once("globals.php");
 require_once("dao/solicitacaoCustomizacaoDao.php");
 
 function e($v)
@@ -7,23 +8,7 @@ function e($v)
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
 
-$norm = function ($s) {
-    $s = mb_strtolower(trim((string)$s), 'UTF-8');
-    $c = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s);
-    $s = $c !== false ? $c : $s;
-    return preg_replace('/[^a-z]/', '', $s);
-};
-$cargo = (string)($_SESSION['cargo'] ?? '');
-$nivel = (string)($_SESSION['nivel'] ?? '');
-$isDiretoria = in_array($norm($cargo), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || in_array($norm($nivel), ['diretoria', 'diretor', 'administrador', 'admin', 'board'], true)
-    || ((int)$nivel === -1);
-
-if (!$isDiretoria) {
-    echo "<div class='container mt-4'><div class='alert alert-danger'>Acesso restrito à diretoria.</div></div>";
-    require_once("templates/footer.php");
-    exit;
-}
+FullCareAccess::enforce($conn, $BASE_URL, 'solicitacoes', 'view');
 
 $dao = new SolicitacaoCustomizacaoDAO($conn, $BASE_URL);
 $status = trim((string)filter_input(INPUT_GET, 'status'));
