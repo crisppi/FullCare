@@ -406,7 +406,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                     </div>
 
                     <div class="visit-summary-grid">
-                        <section class="visit-panel visit-panel-wide">
+                        <section class="visit-panel visit-panel-wide visit-panel-report">
                             <div class="visit-panel-head">
                                 <span class="visit-panel-icon"><i class="bi bi-clipboard2-pulse"></i></span>
                                 <div>
@@ -419,7 +419,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             </div>
                         </section>
 
-                        <section class="visit-panel">
+                        <section class="visit-panel visit-panel-professional">
                             <div class="visit-panel-head">
                                 <span class="visit-panel-icon"><i class="bi bi-person-badge"></i></span>
                                 <div>
@@ -434,7 +434,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             </dl>
                         </section>
 
-                        <section class="visit-panel">
+                        <section class="visit-panel visit-panel-actions">
                             <div class="visit-panel-head">
                                 <span class="visit-panel-icon"><i class="bi bi-list-check"></i></span>
                                 <div>
@@ -447,7 +447,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             </div>
                         </section>
 
-                        <section class="visit-panel">
+                        <section class="visit-panel visit-panel-wide visit-panel-program">
                             <div class="visit-panel-head">
                                 <span class="visit-panel-icon"><i class="bi bi-calendar2-heart"></i></span>
                                 <div>
@@ -460,7 +460,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             </div>
                         </section>
 
-                        <section class="visit-panel visit-panel-wide">
+                        <section class="visit-panel visit-panel-wide visit-panel-clinical">
                             <div class="visit-panel-head">
                                 <span class="visit-panel-icon"><i class="bi bi-activity"></i></span>
                                 <div>
@@ -482,7 +482,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             <?php endif; ?>
                         </section>
 
-                        <section class="visit-panel">
+                        <section class="visit-panel visit-panel-wide visit-uti-panel">
                             <div class="visit-panel-head">
                                 <span class="visit-panel-icon"><i class="bi bi-hospital"></i></span>
                                 <div>
@@ -492,7 +492,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             </div>
                             <?php if ($utiRows): ?>
                                 <?php foreach ($utiRows as $uti): ?>
-                                    <div class="visit-mini-card">
+                                    <div class="visit-mini-card visit-uti-card">
                                         <div><span>Internado</span><strong><?= safe(yesNoLabel($uti['internado_uti'] ?? '') ?: '—') ?></strong></div>
                                         <div><span>Entrada</span><strong><?= safe(formatDateBr(normalize_date_ymd_from_string($uti['data_internacao_uti'] ?? '')) ?: '—') ?></strong></div>
                                         <div><span>VM</span><strong><?= safe(yesNoLabel($uti['vm_uti'] ?? '') ?: '—') ?></strong></div>
@@ -508,7 +508,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             <?php endif; ?>
                         </section>
 
-                        <section class="visit-panel visit-panel-wide">
+                        <section class="visit-panel visit-panel-wide visit-panel-tables">
                             <div class="visit-panel-head">
                                 <span class="visit-panel-icon"><i class="bi bi-table"></i></span>
                                 <div>
@@ -602,7 +602,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                 <!-- Timeline -->
                 <div class="tab-pane fade" id="tab-timeline" role="tabpanel">
                     <?php if ($timeline && count($timeline) > 0): ?>
-                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                        <div class="timeline-toolbar d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <div class="small text-secondary">
                                 Mostrando
                                 <strong><?= $offset + 1 ?></strong>–<strong><?= min($offset + $pageSize, $total_intern) ?></strong>
@@ -615,7 +615,8 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                                         <i class="bi bi-trash3 me-1"></i>Remover visita
                                     </button>
                                 <?php endif; ?>
-                                <div class="btn-group btn-group-sm" role="group" aria-label="pager">
+                                <?php if ($pages > 1): ?>
+                                <div class="btn-group btn-group-sm timeline-pager" role="group" aria-label="pager">
                                     <a class="btn btn-outline-secondary <?= $vpage <= 1 ? 'disabled' : '' ?>"
                                         href="<?= safe($prevUrl) ?>">‹ Mais antigas</a>
                                     <span class="btn btn-outline-secondary disabled">Página
@@ -623,6 +624,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                                     <a class="btn btn-outline-secondary <?= $vpage >= $pages ? 'disabled' : '' ?>"
                                         href="<?= safe($nextUrl) ?>">Mais recentes ›</a>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
 
@@ -677,7 +679,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                         </div>
 
                         <!-- Detalhes -->
-                        <div id="tl-details" class="card border-0 shadow-sm mt-3" style="display:none;">
+                        <div id="tl-details" class="card timeline-details" style="display:none;">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                                     <h6 class="mb-0">
@@ -706,7 +708,7 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div class="timeline-caption d-flex justify-content-between align-items-center">
                             <div class="small text-secondary">
                                 <?php if ($minAllTs && $maxAllTs): ?>
                                     <?= safe(date('d/m/Y', $minAllTs)) ?> — <?= safe(date('d/m/Y', $maxAllTs)) ?>
@@ -721,15 +723,18 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex justify-content-between align-items-center mt-3 visit-page-footer">
                 <div class="small text-secondary">Atualizado: <?= safe(date('d/m/Y H:i')) ?></div>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 visit-footer-actions">
                     <?php
                     $backHref = !empty($_SERVER['HTTP_REFERER']) ? 'javascript:history.back()' : $BASE_URL . 'internacoes.php';
                     ?>
-                    <a href="<?= safe($backHref) ?>" class="btn btn-ghost-brand btn-sm rounded-pill shadow-sm">
-                        <i class="bi bi-arrow-left me-2"></i>
-                        Voltar
+                    <a href="<?= safe($BASE_URL . 'visitas/nova/internacao/' . (int)$id_internacao . '?edit_visita=' . (int)$id_visita_row) ?>"
+                        class="btn btn-sm visit-action-btn visit-action-edit">
+                        <i class="bi bi-pencil-square"></i><span>Editar visita</span>
+                    </a>
+                    <a href="<?= safe($backHref) ?>" class="btn btn-sm visit-action-btn visit-action-back">
+                        <i class="bi bi-arrow-left"></i><span>Voltar</span>
                     </a>
                 </div>
             </div>
@@ -1046,21 +1051,46 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     .visit-summary-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: .7rem;
+        gap: .45rem;
     }
 
     #main-container.visita-show-page #tab-resumo > .row.g-3 + .visit-summary-grid {
-        margin-top: .35rem !important;
+        margin-top: .12rem !important;
     }
 
     .visit-panel {
-        border: 1px solid #dbeafe;
+        border: 1px solid #cfe0ec;
         border-left: 5px solid #2f78a8;
         border-radius: 10px;
-        background: #fff;
+        background: #f8fbfd;
         padding: .76rem .9rem;
-        box-shadow: 0 8px 18px rgba(47, 120, 168, .06);
+        box-shadow: 0 8px 20px rgba(43, 72, 96, .09);
         min-width: 0;
+    }
+
+    .visit-panel-report,
+    .visit-panel-actions {
+        border-left-color: #2f78a8;
+    }
+
+    .visit-panel-program {
+        border-left-color: #7c4d9b;
+        background: #fcf9ff;
+    }
+
+    .visit-panel-clinical {
+        border-left-color: #16806c;
+        background: #f7fcfa;
+    }
+
+    .visit-uti-panel {
+        border-left-color: #b45309;
+        background: #fffbf5;
+    }
+
+    .visit-panel-tables {
+        border-left-color: #5368a6;
+        background: #f8f9ff;
     }
 
     .visit-panel-wide {
@@ -1087,6 +1117,26 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         font-size: .78rem;
     }
 
+    .visit-panel-program .visit-panel-icon {
+        background: #f0e7f7;
+        color: #713b8a;
+    }
+
+    .visit-panel-clinical .visit-panel-icon {
+        background: #dcf3ec;
+        color: #14715f;
+    }
+
+    .visit-uti-panel .visit-panel-icon {
+        background: #fff0d9;
+        color: #a34d08;
+    }
+
+    .visit-panel-tables .visit-panel-icon {
+        background: #e8ebfa;
+        color: #4e609b;
+    }
+
     .visit-panel h6 {
         margin: 0;
         color: #1f2937;
@@ -1102,9 +1152,9 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     }
 
     .visit-text-box {
-        border: 1px solid #d7e3ee;
-        background: #f3f5f8;
-        color: #5f6b7a;
+        border: 1px solid #d2dee8;
+        background: #fff;
+        color: #465465;
         border-radius: 8px;
         padding: .65rem .75rem;
         font-size: .7rem;
@@ -1149,9 +1199,12 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     }
 
     .visit-info-list dt {
-        color: #6b7280;
+        color: #28678f;
         font-size: .7rem;
         font-weight: 700;
+        background: #e7f2f9;
+        border-radius: 5px;
+        padding: .18rem .38rem;
     }
 
     .visit-info-list dd {
@@ -1170,8 +1223,8 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     }
 
     .visit-chip {
-        border: 1px solid #d7e3ee;
-        background: #f8fafc;
+        border: 1px solid #cfe3dc;
+        background: #fff;
         border-radius: 8px;
         padding: .52rem .62rem;
         display: grid;
@@ -1180,9 +1233,27 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
 
     .visit-chip span,
     .visit-mini-card span {
-        color: #6b7280;
+        color: #28678f;
         font-size: .66rem;
         font-weight: 700;
+    }
+
+    .visit-chip span,
+    .visit-uti-card > div span {
+        justify-self: start;
+        background: #e7f2f9;
+        border-radius: 5px;
+        padding: .18rem .4rem;
+    }
+
+    .visit-chip span {
+        background: #e1f2ec;
+        color: #126b59;
+    }
+
+    .visit-uti-card > div span {
+        background: #fff0d9;
+        color: #914208;
     }
 
     .visit-chip strong,
@@ -1193,13 +1264,37 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     }
 
     .visit-mini-card {
-        border: 1px solid #d7e3ee;
-        background: #f8fafc;
+        border: 1px solid #ead7bc;
+        background: #fff;
         border-radius: 8px;
         padding: .62rem;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: .45rem;
+    }
+
+    .visit-uti-panel {
+        width: 100%;
+    }
+
+    .visit-uti-card {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        column-gap: 1rem;
+        row-gap: .65rem;
+    }
+
+    .visit-uti-card > div {
+        display: grid;
+        align-content: start;
+        gap: .22rem;
+        min-width: 0;
+    }
+
+    .visit-uti-card > div span,
+    .visit-uti-card > div strong {
+        display: block;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
     }
 
     .visit-mini-card p {
@@ -1216,10 +1311,50 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     }
 
     .visit-table-block {
-        border: 1px solid #d7e3ee;
+        border: 1px solid #d6daed;
         border-radius: 8px;
         padding: .62rem;
-        background: #fbfdff;
+        background: #fff;
+    }
+
+    .visit-footer-actions {
+        align-items: center;
+    }
+
+    .visit-action-btn {
+        min-height: 34px;
+        padding: .42rem .78rem !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: .42rem;
+        font-size: .72rem !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        box-shadow: 0 4px 10px rgba(30, 55, 75, .1);
+    }
+
+    .visit-action-edit {
+        color: #fff !important;
+        background: #2f78a8 !important;
+        border: 1px solid #2f78a8 !important;
+    }
+
+    .visit-action-edit:hover {
+        background: #25658f !important;
+        border-color: #25658f !important;
+    }
+
+    .visit-action-back {
+        color: #5e2363 !important;
+        background: #fff !important;
+        border: 1px solid #cdbbd0 !important;
+    }
+
+    .visit-action-back:hover {
+        background: #f7eff8 !important;
+        border-color: #9e6fa3 !important;
     }
 
     .visit-subtitle {
@@ -1254,11 +1389,21 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         background: #edf7fc;
         color: #2f6f98;
         border-bottom: 1px solid #c8ddeb;
-        font-size: .62rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        padding: 6px 8px;
+        font-family: inherit;
+        font-size: .66rem !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        text-transform: uppercase !important;
+        letter-spacing: .025em !important;
+        height: 18px !important;
+        min-height: 18px !important;
+        padding: 1px 6px !important;
         white-space: nowrap;
+    }
+
+    .visit-mini-table thead,
+    .visit-mini-table thead tr {
+        height: 18px !important;
     }
 
     .visit-mini-table tbody td {
@@ -1271,21 +1416,83 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         .visit-summary-grid {
             grid-template-columns: 1fr;
         }
+
+        .visit-uti-card {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .visit-uti-card {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* Timeline centralizada e SEM corte nas bordas */
+    #main-container.visita-show-page #tab-timeline {
+        background: #edf2f6;
+        border: 1px solid #d9e3eb;
+        border-radius: 12px;
+        padding: .65rem;
+    }
+
+    .timeline-toolbar {
+        min-height: 32px;
+        padding: .38rem .55rem;
+        margin-bottom: .45rem;
+        border: 1px solid #d3e0e9;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+    .timeline-toolbar .small,
+    .timeline-caption .small {
+        font-size: .68rem !important;
+    }
+
+    .timeline-pager .btn {
+        min-height: 28px !important;
+        padding: .28rem .52rem !important;
+        font-size: .66rem !important;
+        line-height: 1 !important;
+    }
+
+    .timeline-toolbar .btn-outline-danger,
+    .timeline-details #tl-delete-btn {
+        min-height: 24px !important;
+        height: 24px !important;
+        padding: .2rem .42rem !important;
+        border-radius: 6px !important;
+        font-size: .62rem !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: .22rem !important;
+        box-shadow: none !important;
+    }
+
+    .timeline-toolbar .btn-outline-danger i,
+    .timeline-details #tl-delete-btn i {
+        margin-right: 0 !important;
+        font-size: .66rem !important;
+    }
+
     .ht-container {
         position: relative;
         overflow-x: auto;
-        padding: 24px var(--padX) 8px;
+        padding: 10px var(--padX) 2px;
         display: flex;
         justify-content: center;
         scroll-snap-type: x mandatory;
+        border: 1px solid #d3e0e9;
+        border-radius: 8px;
+        background: #fff;
     }
 
     .ht-track {
         position: relative;
-        height: 110px;
+        height: 64px;
         margin: 0 auto;
         max-width: 100%;
     }
@@ -1294,9 +1501,9 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
         position: absolute;
         left: var(--padX);
         right: var(--padX);
-        top: 56px;
-        height: 6px;
-        background: #eadcf3;
+        top: 39px;
+        height: 4px;
+        background: #d9c4e5;
         border-radius: 999px;
         box-shadow: inset 0 0 0 1px #e5d8ef
     }
@@ -1324,13 +1531,13 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     /* Label da data */
     .ht-label {
         display: inline-block;
-        font-size: 12px;
+        font-size: .68rem;
         color: var(--brand);
-        margin-bottom: 6px;
+        margin-bottom: 3px;
         white-space: nowrap;
         transition: all .2s ease;
-        padding: 4px 8px;
-        border-radius: 8px;
+        padding: 3px 7px;
+        border-radius: 6px;
         max-width: 220px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1350,18 +1557,22 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     }
 
     .ht-dot {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
+        display: block;
+        position: absolute;
+        top: 34px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 11px;
+        height: 11px;
         border-radius: 50%;
         background: var(--brand);
         border: 2px solid #fff;
-        box-shadow: 0 0 0 3px var(--brand-100), 0 4px 10px rgba(0, 0, 0, .08);
+        box-shadow: 0 0 0 2px var(--brand-100), 0 3px 7px rgba(0, 0, 0, .08);
         transition: all .2s ease
     }
 
     .ht-marker:hover .ht-dot {
-        transform: scale(1.1)
+        transform: translateX(-50%) scale(1.1)
     }
 
     .ht-marker.active .ht-dot {
@@ -1372,14 +1583,14 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     .ht-pop {
         display: none;
         position: absolute;
-        bottom: 78px;
+        bottom: 54px;
         left: 50%;
         transform: translateX(-50%);
         background: #fff;
         border: 1px solid #eadcf3;
-        border-radius: 10px;
-        padding: 8px 10px;
-        min-width: 220px;
+        border-radius: 8px;
+        padding: 6px 8px;
+        min-width: 180px;
         box-shadow: 0 12px 24px rgba(0, 0, 0, .08);
         z-index: 5
     }
@@ -1390,11 +1601,43 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
 
     .legend-dot {
         display: inline-block;
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background: var(--brand);
         margin-right: 6px
+    }
+
+    .timeline-details {
+        margin-top: .45rem;
+        margin-bottom: 0 !important;
+        border: 1px solid #cbd9e3 !important;
+        border-left: 5px solid #6b2a72 !important;
+        border-radius: 9px !important;
+        background: #fff !important;
+        box-shadow: 0 6px 15px rgba(35, 57, 76, .1) !important;
+    }
+
+    .timeline-details .card-body {
+        padding: .65rem .8rem !important;
+    }
+
+    .timeline-details h6 {
+        font-size: .76rem !important;
+    }
+
+    .timeline-details #tl-rel {
+        border: 1px solid #d8e2ea;
+        border-radius: 7px;
+        background: #f9fbfc;
+        padding: .52rem .65rem;
+        font-size: .7rem;
+        line-height: 1.3;
+    }
+
+    .timeline-caption {
+        padding: .38rem .2rem 0;
+        gap: .75rem;
     }
 
     /* Botão "ghost" brand */
@@ -1407,6 +1650,77 @@ $nextUrl     = "{$baseUrlSelf}?{$queryBase}&vpage=" . min($pages, $vpage + 1); /
     .btn-ghost-brand:hover {
         background: var(--brand-100);
         color: var(--brand-800);
+    }
+
+    /* Contraste final da área de resumo e ações. */
+    #main-container.visita-show-page #tab-resumo {
+        background: #edf2f6;
+        border: 1px solid #d9e3eb;
+        border-radius: 12px;
+        padding: .55rem;
+    }
+
+    #main-container.visita-show-page #tab-resumo > .row.g-3 {
+        --bs-gutter-y: .45rem;
+        margin-bottom: .12rem !important;
+    }
+
+    #main-container.visita-show-page #tab-resumo > .row.g-3 .ov-card {
+        margin-bottom: 0 !important;
+    }
+
+    #main-container.visita-show-page #tab-resumo > .row.g-3 > [class*="col-"] {
+        height: auto !important;
+    }
+
+    #main-container.visita-show-page .visit-panel {
+        background: #fff !important;
+        border-top-color: #cbd9e3 !important;
+        border-right-color: #cbd9e3 !important;
+        border-bottom-color: #cbd9e3 !important;
+        box-shadow: 0 7px 18px rgba(35, 57, 76, .13) !important;
+    }
+
+    #main-container.visita-show-page .visit-text-box,
+    #main-container.visita-show-page .visit-chip,
+    #main-container.visita-show-page .visit-mini-card,
+    #main-container.visita-show-page .visit-table-block {
+        background: #f9fbfc !important;
+    }
+
+    #main-container.visita-show-page .visit-page-footer {
+        background: #f5f7fa;
+        border: 1px solid #d5e0e8;
+        border-radius: 10px;
+        padding: .55rem .65rem;
+        margin-bottom: 4.25rem;
+    }
+
+    #main-container.visita-show-page a.visit-action-btn {
+        min-height: 36px !important;
+        padding: .5rem .9rem !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: .42rem !important;
+        text-decoration: none !important;
+        opacity: 1 !important;
+        box-shadow: 0 4px 10px rgba(31, 52, 70, .16) !important;
+    }
+
+    #main-container.visita-show-page a.visit-action-edit {
+        background-color: #2f78a8 !important;
+        background-image: none !important;
+        border: 1px solid #24658f !important;
+        color: #fff !important;
+    }
+
+    #main-container.visita-show-page a.visit-action-back {
+        background-color: #fff !important;
+        background-image: none !important;
+        border: 1px solid #8e5a94 !important;
+        color: #5e2363 !important;
     }
 </style>
 

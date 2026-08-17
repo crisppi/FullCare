@@ -8,6 +8,9 @@ include_once("dao/internacaoDao.php");
 
 include_once("models/message.php");
 
+include_once("models/censo.php");
+include_once("dao/censoDao.php");
+
 include_once("models/hospital.php");
 include_once("dao/hospitalDao.php");
 
@@ -32,6 +35,15 @@ include_once("dao/negociacaoDao.php");
 include_once("array_dados.php");
 
 $internacaoDao = new internacaoDAO($conn, $BASE_URL);
+
+$censoDao = new censoDAO($conn, $BASE_URL);
+$idCensoEdicao = filter_input(INPUT_GET, 'id_censo', FILTER_VALIDATE_INT);
+$censoEdicao = $idCensoEdicao ? $censoDao->findById((int)$idCensoEdicao) : null;
+if ($idCensoEdicao && !$censoEdicao) {
+    fullcare_flash('Censo não encontrado.', 'danger');
+    header('Location: ' . $BASE_URL . 'censo/lista');
+    exit;
+}
 
 $hospital_geral = new hospitalDAO($conn, $BASE_URL);
 $hospitals = $hospital_geral->findGeral($limite, $inicio);

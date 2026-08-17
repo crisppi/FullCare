@@ -76,6 +76,7 @@ interface InternacaoDAOInterface
 
   public function update(Internacao $internacao);
   public function updateCenso(Internacao $internacao);
+  public function deactivate($id_internacao);
   public function buildinternacao($internacao);
 
   // PUBLIC DE SELECAO DE FILTROS

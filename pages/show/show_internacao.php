@@ -747,6 +747,15 @@ $editarNegocUrl = $BASE_URL . 'internacoes/editar/' . (int)$id_internacao . '?se
                             <a href="<?= e($gerarAltaUrl) ?>" class="btn btn-sm btn-outline-danger shadow-sm">
                                 <i class="fas fa-file-alt me-1"></i>Gerar alta
                             </a>
+                            <form action="<?= e($BASE_URL) ?>process_internacao.php" method="post" class="d-inline"
+                                onsubmit="return confirm('Desativar esta internação? O histórico será preservado.');">
+                                <input type="hidden" name="type" value="deactivate">
+                                <input type="hidden" name="id_internacao" value="<?= (int)$id_internacao ?>">
+                                <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                                <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm">
+                                    <i class="fas fa-ban me-1"></i>Desativar internação
+                                </button>
+                            </form>
                         <?php endif; ?>
                         <a href="<?= !empty($_SERVER['HTTP_REFERER']) ? 'javascript:history.back()' : $BASE_URL . 'list_intenacao.php' ?>"
                             class="btn btn-ghost-brand btn-sm shadow-sm">

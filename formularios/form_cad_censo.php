@@ -5,7 +5,16 @@
         integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous">
     </script>
 
-    <h4 class="page-title">Cadastrar Censo de Internação</h4>
+    <?php
+    $editandoCenso = !empty($censoEdicao) && !empty($censoEdicao->id_censo);
+    $censoValue = static function (string $campo, $padrao = '') use ($censoEdicao, $editandoCenso) {
+        return $editandoCenso && isset($censoEdicao->{$campo}) ? $censoEdicao->{$campo} : $padrao;
+    };
+    $censoEsc = static function ($valor): string {
+        return htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF-8');
+    };
+    ?>
+    <h4 class="page-title"><?= $editandoCenso ? 'Editar Censo de Internação' : 'Cadastrar Censo de Internação' ?></h4>
 
     <?php $a = ($findMaxGesInt[0]);
     $ultimoReg = ($a["ultimoReg"]);
@@ -18,10 +27,10 @@
         <div class="form-group col-sm-2">
             <select onchange="myFunctionSelected()" class="form-select botao_select" id="hospital_selected"
                 name="hospital_selected" required>
-                <option value="<?= $hospital["nome_hosp"] ?? "Selecione o Hospital" ?>">Hospital</option>
+                <option value="">Selecione o Hospital</option>
                 <?php
                 foreach ($hospitals as $hospital): ?>
-                    <option value="<?= $hospital["id_hospital"] ?>">
+                    <option value="<?= (int)$hospital["id_hospital"] ?>" <?= (int)$censoValue('fk_hospital_censo') === (int)$hospital['id_hospital'] ? 'selected' : '' ?>>
                         <?= $hospital["nome_hosp"] ?>
                     </option>
                 <?php endforeach; ?>
@@ -33,17 +42,19 @@
     <!-- FORMULARIO DE CADASTRO DO CENSO -->
     <form id="myForm" action="<?= $BASE_URL ?>process_censo.php" id="add-internacao-form" method="POST"
         enctype="multipart/form-data">
-        <input type="hidden" name="type" value="create">
+        <input type="hidden" name="type" value="<?= $editandoCenso ? 'update' : 'create' ?>">
+        <?php if ($editandoCenso): ?>
+            <input type="hidden" name="id_censo" value="<?= (int)$censoEdicao->id_censo ?>">
+        <?php endif; ?>
         <div class="form-group row">
-            <input type="hidden" value="<?= $hospital["id_hospital"] ?>" name="fk_hospital_censo" id="fk_hospital_censo"
-                value="fk_hospital_censo">
+            <input type="hidden" value="<?= (int)$censoValue('fk_hospital_censo') ?>" name="fk_hospital_censo" id="fk_hospital_censo">
             <div class="form-group col-sm-3">
                 <label for="fk_paciente_censo">Paciente</label>
                 <select class="form-control form-control-sm selectpicker show-tick" data-size="5"
                     data-live-search="true" id="fk_paciente_censo" name="fk_paciente_censo" required>
                     <option value="">Selecione</option>
                     <?php foreach ($pacientes as $paciente): ?>
-                        <option value="<?= $paciente["id_paciente"] ?>">
+                        <option value="<?= (int)$paciente["id_paciente"] ?>" <?= (int)$censoValue('fk_paciente_censo') === (int)$paciente['id_paciente'] ? 'selected' : '' ?>>
                             <?= $paciente["nome_pac"] ?>
                         </option>
                     <?php endforeach; ?>
@@ -60,7 +71,7 @@
             <div class="form-group col-sm-2">
                 <label for="data_censo">Data Internação</label>
                 <input type="date" class="form-control-sm form-control" id="data_censo"
-                    value="<?php echo date('Y-m-d') ?>" name="data_censo">
+                    value="<?= $censoEsc($censoValue('data_censo', date('Y-m-d'))) ?>" name="data_censo">
                 <div class="notif-input oculto" id="notif-input">
                     Data inválida !
                 </div>
@@ -68,7 +79,7 @@
 
             <div class="form-group col-sm-2">
                 <label for="senha_censo">Senha</label>
-                <input type="text" class="form-control-sm form-control" id="senha_censo" name="senha_censo">
+                <input type="text" class="form-control-sm form-control" id="senha_censo" name="senha_censo" value="<?= $censoEsc($censoValue('senha_censo')) ?>">
             </div>
             <input type="hidden" class="form-control" value="s" id="censo_censo" name="censo_censo">
 
@@ -82,7 +93,7 @@
                     <?php
                     sort($dados_acomodacao, SORT_ASC);
                     foreach ($dados_acomodacao as $acomd) { ?>
-                        <option value="<?= $acomd; ?>">
+                        <option value="<?= $censoEsc($acomd) ?>" <?= (string)$censoValue('acomodacao_censo') === (string)$acomd ? 'selected' : '' ?>>
                             <?= $acomd; ?>
                         </option>
                     <?php } ?>
@@ -96,7 +107,7 @@
                     <?php
                     sort($modo_internacao, SORT_ASC);
                     foreach ($modo_internacao as $modo_censo) { ?>
-                        <option value="<?= $modo_censo; ?>">
+                        <option value="<?= $censoEsc($modo_censo) ?>" <?= (string)$censoValue('modo_internacao_censo') === (string)$modo_censo ? 'selected' : '' ?>>
                             <?= $modo_censo; ?>
                         </option>
                     <?php } ?>
@@ -110,7 +121,7 @@
                     <?php
                     sort($tipo_admissao, SORT_ASC);
                     foreach ($tipo_admissao as $modo_adm) { ?>
-                        <option value="<?= $modo_adm; ?>">
+                        <option value="<?= $censoEsc($modo_adm) ?>" <?= (string)$censoValue('tipo_admissao_censo') === (string)$modo_adm ? 'selected' : '' ?>>
                             <?= $modo_adm; ?>
                         </option>
                     <?php } ?>
@@ -119,15 +130,15 @@
             </div>
             <div class="form-group col-sm-3">
                 <label for="titular_censo">Médico</label>
-                <input type="text" class="form-control-sm form-control" id="titular_censo" name="titular_censo">
+                <input type="text" class="form-control-sm form-control" id="titular_censo" name="titular_censo" value="<?= $censoEsc($censoValue('titular_censo')) ?>">
             </div>
-            <input type="hidden" class="form-control" id="usuario_create_censo" value="<?= $_SESSION['email_user'] ?>"
+            <input type="hidden" class="form-control" id="usuario_create_censo" value="<?= $censoEsc($censoValue('usuario_create_censo', $_SESSION['email_user'])) ?>"
                 name="usuario_create_censo" readonly>
             <input type="hidden" class="form-control" id="fk_usuario_censo" value="<?= $_SESSION['id_usuario'] ?>"
                 name="fk_usuario_censo">
             <div class="form-group col-sm-1">
                 <?php $agora = date('Y-m-d H:i:s'); ?>
-                <input type="hidden" class="form-control" id="data_create_censo" value='<?= $agora; ?>'
+                <input type="hidden" class="form-control" id="data_create_censo" value='<?= $censoEsc($censoValue('data_create_censo', $agora)) ?>'
                     name="data_create_censo">
             </div>
             <div class="form-group row">
@@ -136,7 +147,10 @@
                 </div>
             </div>
             <br>
-            <div> <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <div> <button type="submit" class="btn btn-primary"><?= $editandoCenso ? 'Salvar alterações' : 'Cadastrar' ?></button>
+                <?php if ($editandoCenso): ?>
+                    <a href="<?= $BASE_URL ?>censo/lista" class="btn btn-outline-secondary">Cancelar</a>
+                <?php endif; ?>
                 <br>
             </div>
             <div style="margin-top:20px; margin-left:15px; width:500px;display:none" class="alert" id="alert"
@@ -179,7 +193,7 @@
             "border-style": "solid"
 
         });
-        textoSelecao.textContent = "Você está lançando dados do Censo no Hospital";
+        if (textoSelecao) textoSelecao.textContent = "Você está lançando dados do Censo no Hospital";
     }
 </script>
 
@@ -195,6 +209,12 @@
             type: request_method,
             data: form_data,
             success: function(result) {
+                <?php if ($editandoCenso): ?>
+                if (String(result).trim() === '1') {
+                    window.location.href = '<?= $BASE_URL ?>censo/lista';
+                    return;
+                }
+                <?php else: ?>
                 $('form').trigger("reset");
                 var btnSelected = document.querySelector("#hospital_selected").value;
                 const btnHospital = document.querySelector("#fk_hospital_censo");
@@ -203,11 +223,12 @@
                 $('#fk_paciente_censo').val('').selectpicker('refresh');
 
                 $('#fk_paciente_censo').val(null).trigger('change');
+                <?php endif; ?>
 
                 if (result != '0') {
                     $('#alert').removeClass("alert-danger");
                     $('#alert').addClass("alert-success");
-                    $('#alert').fadeIn().html("Censo cadastrado com sucesso");
+                    $('#alert').fadeIn().html("<?= $editandoCenso ? 'Censo atualizado com sucesso' : 'Censo cadastrado com sucesso' ?>");
                 } else {
                     $('#alert').removeClass("alert-success");
                     $('#alert').addClass("alert-danger");

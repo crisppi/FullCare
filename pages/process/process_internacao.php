@@ -404,6 +404,36 @@ $flowCtx = flowLogStart('process_internacao', [
     'fk_usuario_int' => $_POST['fk_usuario_int'] ?? null
 ]);
 
+if ($type === 'deactivate') {
+    $idInternacao = filter_input(INPUT_POST, 'id_internacao', FILTER_VALIDATE_INT);
+    $csrf = filter_input(INPUT_POST, 'csrf');
+
+    if (!$idInternacao || !csrf_is_valid($csrf)) {
+        fullcare_flash('Não foi possível desativar a internação. Recarregue a página e tente novamente.', 'danger');
+        header('Location: ' . $BASE_URL . 'internacoes/lista');
+        exit;
+    }
+
+    $internacaoAntes = $internacaoDao->findById((int)$idInternacao);
+    $desativada = $internacaoDao->deactivate((int)$idInternacao);
+    if ($desativada) {
+        fullcareAuditLog($conn, [
+            'action' => 'deactivate',
+            'entity_type' => 'internacao',
+            'entity_id' => (int)$idInternacao,
+            'summary' => 'Internação desativada sem exclusão do histórico.',
+            'before' => $internacaoAntes,
+            'after' => ['deletado_int' => 's', 'internacao_ativa_int' => 'n', 'internado_int' => 'n'],
+            'source' => 'process_internacao.php',
+        ], $BASE_URL);
+        fullcare_flash('Internação desativada com sucesso.', 'success');
+    } else {
+        fullcare_flash('A internação já estava desativada ou não foi encontrada.', 'warning');
+    }
+    header('Location: ' . $BASE_URL . 'internacoes/lista');
+    exit;
+}
+
 // CREATE
 if ($type === "create") {
     // Os DAOs legados ainda emitem mensagens/redirecionamentos. O cadastro

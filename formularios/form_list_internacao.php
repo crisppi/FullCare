@@ -272,6 +272,11 @@ try {
     overflow: hidden;
 }
 
+/* Os menus de ações precisam poder ultrapassar a última linha da tabela. */
+.internacao-list-page .complete-table {
+    overflow: visible;
+}
+
 .table-filters {
     padding: 0;
 }
@@ -669,6 +674,31 @@ try {
     border-radius: 10px;
 }
 
+/*
+ * O painel recorta o conteúdo para preservar seus cantos arredondados. Quando
+ * o filtro deixa poucas linhas, o menu de ações fica mais alto que a tabela.
+ * A reserva abaixo existe somente enquanto um menu estiver aberto.
+ */
+.internacao-list-page .complete-table.actions-menu-open #table-content,
+.internacao-list-page .complete-table:has(.fc-list-action .dropdown-menu.show) #table-content {
+    padding-bottom: 230px;
+}
+
+.internacao-list-page .complete-table.actions-menu-open,
+.internacao-list-page .complete-table:has(.fc-list-action .dropdown-menu.show) {
+    position: relative;
+    z-index: 1050;
+}
+
+.internacao-list-page .fc-list-action,
+.internacao-list-page .fc-list-action .dropdown {
+    position: relative;
+}
+
+.internacao-list-page .fc-list-action .dropdown-menu.show {
+    z-index: 1080;
+}
+
 .internacao-list-page .fc-list-action .dropdown-menu .btn-default,
 .internacao-list-page .fc-list-action .dropdown-menu .dropdown-item {
     min-height: 28px !important;
@@ -961,6 +991,7 @@ if (typeof jQuery !== 'undefined') {
             $condicoes[] = 'internado_int = :pesq_internado';
             $whereParams[':pesq_internado'] = $pesqInternado;
         }
+        $condicoes[] = "LOWER(COALESCE(ac.deletado_int, 'n')) <> 's'";
         if (strlen((string)$data_intern_int)) {
             $condicoes[] = 'data_intern_int BETWEEN :data_intern_int AND :data_intern_int_max';
             $whereParams[':data_intern_int'] = (string)$data_intern_int;
@@ -1394,6 +1425,18 @@ if (typeof jQuery !== 'undefined') {
                                                         style="font-size: 1rem; margin-right:5px; color: #ff7043;"></i>
                                                     PDF - Internação
                                                 </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form action="<?= $BASE_URL ?>process_internacao.php" method="post"
+                                                    onsubmit="return confirm('Desativar esta internação? O histórico será preservado.');">
+                                                    <input type="hidden" name="type" value="deactivate">
+                                                    <input type="hidden" name="id_internacao" value="<?= (int)$intern['id_internacao'] ?>">
+                                                    <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+                                                    <button type="submit" class="btn btn-default text-danger" style="font-size:.9rem;">
+                                                        <i class="bi bi-slash-circle me-1"></i>Desativar
+                                                    </button>
+                                                </form>
                                             </li>
                                         <?php } ?>
                                     </ul>
@@ -2478,6 +2521,29 @@ if (typeof window.paginateInternacao !== 'function') {
             }
         });
     }
+})();
+</script>
+
+<script>
+(function () {
+    function tablePanelFromEvent(event) {
+        var dropdown = event.target && event.target.closest
+            ? event.target.closest('.fc-list-action .dropdown')
+            : null;
+        return dropdown ? dropdown.closest('.complete-table') : null;
+    }
+
+    document.addEventListener('show.bs.dropdown', function (event) {
+        var panel = tablePanelFromEvent(event);
+        if (panel) panel.classList.add('actions-menu-open');
+    });
+
+    document.addEventListener('hidden.bs.dropdown', function (event) {
+        var panel = tablePanelFromEvent(event);
+        if (panel && !panel.querySelector('.fc-list-action .dropdown-menu.show')) {
+            panel.classList.remove('actions-menu-open');
+        }
+    });
 })();
 </script>
 

@@ -748,6 +748,17 @@ class internacaoDAO implements internacaoDAOInterface
         $this->message->setMessage("internação removida com sucesso!", "success", "internacoes/lista");
     }
 
+    public function deactivate($id_internacao)
+    {
+        $stmt = $this->conn->prepare("UPDATE tb_internacao
+            SET deletado_int = 's', internacao_ativa_int = 'n', internado_int = 'n', updated_at = NOW()
+            WHERE id_internacao = :id_internacao
+              AND LOWER(COALESCE(deletado_int, 'n')) <> 's'");
+        $stmt->bindValue(':id_internacao', (int)$id_internacao, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
+    }
+
 
     public function findGeral()
     {
@@ -3136,7 +3147,10 @@ class internacaoDAO implements internacaoDAOInterface
 
         $internacao = null;
 
-        $stmt = $this->conn->prepare("SELECT id_internacao FROM tb_internacao WHERE internado_int = 's' and fk_paciente_int = :id_paciente");
+        $stmt = $this->conn->prepare("SELECT id_internacao FROM tb_internacao
+            WHERE internado_int = 's'
+              AND LOWER(COALESCE(deletado_int, 'n')) <> 's'
+              AND fk_paciente_int = :id_paciente");
 
         $stmt->bindValue(":id_paciente", $id_paciente);
 

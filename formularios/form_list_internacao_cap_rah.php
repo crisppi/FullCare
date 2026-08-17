@@ -880,10 +880,11 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                     </table>
                     <?php endif; ?>
 
-                    <div>
-                        <div class="pagination" style="margin: 0 auto;">
+                    <div class="listagem-footer-row">
+                        <div class="listagem-pagination-slot">
                             <?php if (!empty($havePages) && $havePages): ?>
-                            <ul class="pagination">
+                            <nav aria-label="Paginação">
+                            <ul class="pagination mb-0">
                                 <?php
                                     $blocoAtual   = isset($_GET['bl']) ? (int)$_GET['bl'] : 0;
                                     $paginaAtual  = isset($_GET['pag']) ? (int)$_GET['pag'] : 1;
@@ -963,12 +964,12 @@ $idcapeante          = filter_input(INPUT_GET, 'idcapeante') ?: NULL;
                                 </li>
                                 <?php endif; ?>
                             </ul>
+                            </nav>
                             <?php endif; ?>
                         </div>
 
-                        <div class="table-counter">
-                            <p style="margin-bottom:18px;font-size:.82rem; font-weight:600;
-                                      font-family:var(--bs-font-sans-serif); text-align:right">
+                        <div class="listagem-total">
+                            <p>
                                 <?php echo "Total: " . (int)$qtdIntItens ?>
                             </p>
                         </div>

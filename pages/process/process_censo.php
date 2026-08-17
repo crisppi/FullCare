@@ -133,6 +133,8 @@ if ($type == "update") {
             'source' => 'process_censo.php',
         ], $BASE_URL);
 
+        echo '1';
+
         // header("location:censo/lista");
     };
 

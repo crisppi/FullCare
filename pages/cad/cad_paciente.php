@@ -873,6 +873,153 @@ document.addEventListener('DOMContentLoaded', function() {
 
         setExpanded(false);
     });
+
+    (function () {
+        function onlyDigits(value) {
+            return String(value || '').replace(/\D+/g, '');
+        }
+
+        function formatPhone(value) {
+            const digits = onlyDigits(value);
+            if (!digits) return '';
+            if (digits.length > 10) {
+                return digits.replace(/^(\d{2})(\d{5})(\d{0,4}).*$/, '($1) $2-$3').trim();
+            }
+            return digits.replace(/^(\d{2})(\d{4})(\d{0,4}).*$/, '($1) $2-$3').trim();
+        }
+
+        function hiddenInput(name, value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value || '';
+            return input;
+        }
+
+        function updateEmptyRow(bodyId, emptyId) {
+            const body = document.getElementById(bodyId);
+            const empty = document.getElementById(emptyId);
+            if (!body || !empty) return;
+            const rows = Array.from(body.querySelectorAll('tr')).filter(row => row.id !== emptyId);
+            empty.style.display = rows.length ? 'none' : '';
+        }
+
+        function bindInline(config) {
+            const addButton = document.getElementById(config.add);
+            const body = document.getElementById(config.body);
+            const empty = document.getElementById(config.empty);
+            const hiddenContainer = document.getElementById(config.wrap);
+            if (!addButton || !body || !empty || !hiddenContainer) return;
+
+            addButton.addEventListener('click', function () {
+                const item = config.read();
+                if (!item) return;
+
+                empty.style.display = 'none';
+                const row = document.createElement('tr');
+                row.innerHTML = config.row(item);
+
+                const holder = document.createElement('div');
+                config.hidden(item).forEach(field => {
+                    holder.appendChild(hiddenInput(field.name, field.value));
+                });
+                hiddenContainer.appendChild(holder);
+
+                row.querySelector('.btn-remove-inline').addEventListener('click', function () {
+                    row.remove();
+                    holder.remove();
+                    updateEmptyRow(config.body, config.empty);
+                });
+
+                body.appendChild(row);
+                config.clear();
+                updateEmptyRow(config.body, config.empty);
+            });
+        }
+
+        bindInline({
+            add: 'btnAddEnderecoInline', body: 'enderecosTableBody', empty: 'enderecosTableEmpty', wrap: 'enderecosHiddenContainer',
+            read: function () {
+                const item = {
+                    tipo: (document.getElementById('end_tipo_inline').value || '').trim(),
+                    cep: (document.getElementById('end_cep_inline').value || '').trim(),
+                    logradouro: (document.getElementById('end_logradouro_inline').value || '').trim(),
+                    numero: (document.getElementById('end_numero_inline').value || '').trim(),
+                    bairro: (document.getElementById('end_bairro_inline').value || '').trim(),
+                    cidade: (document.getElementById('end_cidade_inline').value || '').trim(),
+                    estado: (document.getElementById('end_estado_inline').value || '').trim(),
+                    complemento: (document.getElementById('end_complemento_inline').value || '').trim(),
+                    principal: document.getElementById('end_principal_inline').value || 'n'
+                };
+                return item.logradouro ? item : null;
+            },
+            row: item => `<td>${item.tipo || '-'}</td><td>${item.logradouro}${item.numero ? ', ' + item.numero : ''}</td><td>${item.cidade || '-'}${item.estado ? '/' + item.estado : ''}</td><td>${item.principal === 's' ? 'Sim' : 'Não'}</td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td>`,
+            hidden: item => [{name:'end_tipo[]',value:item.tipo},{name:'end_cep[]',value:item.cep},{name:'end_logradouro[]',value:item.logradouro},{name:'end_numero[]',value:item.numero},{name:'end_bairro[]',value:item.bairro},{name:'end_cidade[]',value:item.cidade},{name:'end_estado[]',value:item.estado},{name:'end_complemento[]',value:item.complemento},{name:'end_principal[]',value:item.principal}],
+            clear: function () {
+                ['end_tipo_inline','end_cep_inline','end_logradouro_inline','end_numero_inline','end_bairro_inline','end_cidade_inline','end_estado_inline','end_complemento_inline'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('end_principal_inline').value = 'n';
+            }
+        });
+
+        bindInline({
+            add: 'btnAddEmailInline', body: 'emailsTableBody', empty: 'emailsTableEmpty', wrap: 'emailsHiddenContainer',
+            read: function () {
+                const item = {
+                    tipo: (document.getElementById('email_tipo_inline').value || '').trim(),
+                    email: (document.getElementById('email_email_inline').value || '').trim(),
+                    principal: document.getElementById('email_principal_inline').value || 'n'
+                };
+                return item.email ? item : null;
+            },
+            row: item => `<td>${item.tipo || '-'}</td><td>${item.email}</td><td>${item.principal === 's' ? 'Sim' : 'Não'}</td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td>`,
+            hidden: item => [{name:'email_tipo[]',value:item.tipo},{name:'email_email[]',value:item.email},{name:'email_principal[]',value:item.principal}],
+            clear: function () {
+                ['email_tipo_inline','email_email_inline'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('email_principal_inline').value = 'n';
+            }
+        });
+
+        bindInline({
+            add: 'btnAddTelefoneInline', body: 'telefonesTableBody', empty: 'telefonesTableEmpty', wrap: 'telefonesHiddenContainer',
+            read: function () {
+                const item = {
+                    tipo: (document.getElementById('tel_tipo_inline').value || '').trim(),
+                    numero: formatPhone(document.getElementById('tel_numero_inline').value || ''),
+                    ramal: (document.getElementById('tel_ramal_inline').value || '').trim(),
+                    contato: (document.getElementById('tel_contato_inline').value || '').trim(),
+                    principal: document.getElementById('tel_principal_inline').value || 'n'
+                };
+                return item.numero ? item : null;
+            },
+            row: item => `<td>${item.tipo || '-'}</td><td>${item.numero}</td><td>${item.ramal || '-'}</td><td>${item.contato || '-'}</td><td>${item.principal === 's' ? 'Sim' : 'Não'}</td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td>`,
+            hidden: item => [{name:'tel_tipo[]',value:item.tipo},{name:'tel_numero[]',value:item.numero},{name:'tel_ramal[]',value:item.ramal},{name:'tel_contato[]',value:item.contato},{name:'tel_principal[]',value:item.principal}],
+            clear: function () {
+                ['tel_tipo_inline','tel_numero_inline','tel_ramal_inline','tel_contato_inline'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('tel_principal_inline').value = 'n';
+            }
+        });
+
+        bindInline({
+            add: 'btnAddContatoInline', body: 'contatosTableBody', empty: 'contatosTableEmpty', wrap: 'contatosHiddenContainer',
+            read: function () {
+                const item = {
+                    nome: (document.getElementById('cont_nome_inline').value || '').trim(),
+                    parentesco: (document.getElementById('cont_parentesco_inline').value || '').trim(),
+                    email: (document.getElementById('cont_email_inline').value || '').trim(),
+                    telefone: formatPhone(document.getElementById('cont_telefone_inline').value || ''),
+                    observacao: (document.getElementById('cont_observacao_inline').value || '').trim(),
+                    principal: document.getElementById('cont_principal_inline').value || 'n'
+                };
+                return item.nome ? item : null;
+            },
+            row: item => `<td>${item.nome}</td><td>${item.parentesco || '-'}</td><td>${item.email || '-'}</td><td>${item.telefone || '-'}</td><td>${item.principal === 's' ? 'Sim' : 'Não'}</td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td>`,
+            hidden: item => [{name:'cont_nome[]',value:item.nome},{name:'cont_parentesco[]',value:item.parentesco},{name:'cont_email[]',value:item.email},{name:'cont_telefone[]',value:item.telefone},{name:'cont_observacao[]',value:item.observacao},{name:'cont_principal[]',value:item.principal}],
+            clear: function () {
+                ['cont_nome_inline','cont_parentesco_inline','cont_email_inline','cont_telefone_inline','cont_observacao_inline'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('cont_principal_inline').value = 'n';
+            }
+        });
+    })();
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>

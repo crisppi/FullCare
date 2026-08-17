@@ -378,6 +378,11 @@ $censoIaUrl = rtrim($BASE_URL, '/') . '/censo/importar-ia';
                                                 data-bs-toggle="modal" data-bs-target="#myModal"><i class="bi bi-eye text-success"></i>Visualização</button>
                                         </li>
                                         <li>
+                                            <a class="btn btn-default" href="<?= $BASE_URL ?>censo/editar/<?= (int)$intern['id_censo'] ?>">
+                                                <i class="bi bi-pencil-square text-primary"></i>Editar
+                                            </a>
+                                        </li>
+                                        <li>
                                             <form class="d-inline-block delete-form" action="process_censo_int.php"
                                                 method="get">
                                                 <input type="hidden" name="type" value="create">

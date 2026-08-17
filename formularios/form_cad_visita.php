@@ -158,7 +158,8 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
         </div>
         <div class="visita-hero__actions">
             <?php if ($contarVis > 0): ?>
-            <button type="button" class="btn btn-sm btn-visita-historico" data-bs-toggle="modal" data-bs-target="#myModal1">
+            <button type="button" class="btn btn-sm btn-visita-historico"
+                onclick="var m=document.getElementById('myModal1');document.querySelectorAll('.modal-backdrop').forEach(function(b){b.remove();});m.style.display='block';m.classList.add('show');m.removeAttribute('aria-hidden');m.setAttribute('aria-modal','true');m.setAttribute('role','dialog');document.body.classList.add('modal-open');">
                 <i class="bi bi-eye me-2"></i>
                 Visitas Anteriores
             </button>
@@ -604,6 +605,8 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                 <h4 class="page-title" style="color:white">Visitas</h4>
                 <p class="page-description" style="color:white; margin-top:5px">Informações
                     sobre visitas anteriores</p>
+                <button type="button" class="btn-close btn-close-white"
+                    aria-label="Fechar" onclick="var m=document.getElementById('myModal1');m.classList.remove('show');m.style.display='none';m.setAttribute('aria-hidden','true');document.querySelectorAll('.modal-backdrop').forEach(function(b){b.remove();});document.body.classList.remove('modal-open');document.body.style.removeProperty('overflow');document.body.style.removeProperty('padding-right');"></button>
             </div>
             <div class="modal-body">
                 <?php
@@ -614,7 +617,8 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                     echo ("<br>");
                 } else { ?>
                 <h6 class="page-title">Relatórios anteriores</h6>
-                <table class="table table-sm table-striped  table-hover table-condensed">
+                <div class="visit-history-table-wrap">
+                <table class="table table-sm table-striped table-hover table-condensed visit-history-table">
                     <thead>
                         <tr>
                             <th scope="col" class="th-w-2">Visita</th>
@@ -658,7 +662,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                                 <button type="button" class="btn btn-link p-0 text-primary"
                                     onclick="selecionarVisitaParaEditar(<?= (int) $intern['id_visita'] ?>)"
                                     title="Editar esta visita">
-                                    <i class="fas fa-pen"></i>
+                                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
                                 </button>
                             </td>
                             <td class="text-center">
@@ -666,7 +670,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                                 <button type="button" class="btn btn-link p-0 text-danger"
                                     data-bs-toggle="modal" data-bs-target="#modalDeleteVisitaList"
                                     data-visita-id="<?= (int) $intern['id_visita'] ?>" title="Remover esta visita">
-                                    <i class="fas fa-trash-alt"></i>
+                                    <i class="bi bi-trash3" aria-hidden="true"></i>
                                 </button>
                                 <?php else: ?>
                                 <span class="text-muted">—</span>
@@ -676,12 +680,148 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
                 <?php }; ?>
             </div>
 
         </div>
     </div>
 </div>
+
+<style>
+    #myModal1 .modal-header {
+        min-height: 56px !important;
+        height: auto !important;
+        padding: .65rem .9rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 1rem !important;
+    }
+
+    #myModal1 .modal-header .page-title {
+        margin: 0 !important;
+        padding: .38rem .7rem !important;
+        font-size: .9rem !important;
+        line-height: 1 !important;
+        border-radius: 8px !important;
+    }
+
+    #myModal1 .modal-header .page-description {
+        margin: 0 !important;
+        font-size: .76rem !important;
+        line-height: 1.15 !important;
+    }
+
+    #myModal1 .modal-header .btn-close {
+        flex: 0 0 auto;
+        margin: 0 !important;
+        padding: .45rem !important;
+        font-size: .7rem !important;
+        opacity: .9;
+    }
+
+    #myModal1 .modal-body {
+        padding: .7rem .9rem .85rem !important;
+    }
+
+    #myModal1 .modal-body > .page-title {
+        margin: 0 0 .55rem !important;
+    }
+
+    #myModal1 .visit-history-table-wrap {
+        max-height: min(46vh, 360px);
+        overflow-y: auto;
+        overflow-x: auto;
+        border: 1px solid #d5e2eb;
+        border-radius: 8px;
+        scrollbar-gutter: stable;
+    }
+
+    #myModal1 .visit-history-table {
+        margin-bottom: 0 !important;
+    }
+
+    #myModal1 .visit-history-table thead,
+    #myModal1 .visit-history-table thead tr {
+        height: 30px !important;
+    }
+
+    #myModal1 .visit-history-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        height: 30px !important;
+        min-height: 30px !important;
+        padding: 5px 7px !important;
+        font-family: inherit !important;
+        font-size: .7rem !important;
+        font-weight: 700 !important;
+        line-height: 1.1 !important;
+        letter-spacing: .02em !important;
+        vertical-align: middle !important;
+    }
+
+    #myModal1 .visit-history-table tbody tr,
+    #myModal1 .visit-history-table tbody td {
+        height: 28px !important;
+        min-height: 28px !important;
+    }
+
+    #myModal1 .visit-history-table tbody td {
+        padding: 4px 7px !important;
+        font-size: .7rem !important;
+        line-height: 1.15 !important;
+        vertical-align: middle !important;
+    }
+
+    #myModal1 .visit-history-table tbody td .btn-link,
+    #myModal1 .visit-history-table tbody td i {
+        font-size: .72rem !important;
+        line-height: 1 !important;
+    }
+</style>
+<script>
+(function() {
+    var historyModal = document.getElementById('myModal1');
+    if (!historyModal) return;
+
+    function cleanupHistoryModal() {
+        historyModal.classList.remove('show');
+        historyModal.style.display = 'none';
+        historyModal.setAttribute('aria-hidden', 'true');
+        historyModal.removeAttribute('aria-modal');
+        historyModal.removeAttribute('role');
+        document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+            backdrop.remove();
+        });
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    }
+
+    window.abrirHistoricoVisitas = function() {
+        cleanupHistoryModal();
+        historyModal.style.display = 'block';
+        historyModal.classList.add('show');
+        historyModal.removeAttribute('aria-hidden');
+        historyModal.setAttribute('aria-modal', 'true');
+        historyModal.setAttribute('role', 'dialog');
+        document.body.classList.add('modal-open');
+    };
+
+    window.fecharHistoricoVisitas = cleanupHistoryModal;
+
+    historyModal.addEventListener('click', function(event) {
+        if (event.target === historyModal) cleanupHistoryModal();
+    });
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && historyModal.classList.contains('show')) {
+            cleanupHistoryModal();
+        }
+    });
+})();
+</script>
 <div class="modal fade" id="modalDeleteVisitaList" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -3491,6 +3631,51 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainTagEl = document.getElementById('visita-main-tag');
     const submitLabelEl = document.getElementById('visita-submit-label');
 
+    function cleanupModalState() {
+        if (modalEl) {
+            modalEl.classList.remove('show');
+            modalEl.style.display = 'none';
+            modalEl.setAttribute('aria-hidden', 'true');
+            modalEl.removeAttribute('aria-modal');
+            modalEl.removeAttribute('role');
+        }
+        document.querySelectorAll('.modal-backdrop').forEach((backdrop) => backdrop.remove());
+        if (!document.querySelector('.modal.show')) {
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+        }
+    }
+
+    window.fecharHistoricoVisitas = function() {
+        if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+            const instance = window.bootstrap.Modal.getInstance(modalEl);
+            if (instance) instance.hide();
+        } else if (modalEl && window.jQuery && typeof window.jQuery.fn.modal === 'function') {
+            window.jQuery(modalEl).modal('hide');
+        }
+        window.setTimeout(cleanupModalState, 80);
+    };
+
+    window.abrirHistoricoVisitas = function() {
+        cleanupModalState();
+        if (!modalEl) return;
+        if (window.bootstrap && window.bootstrap.Modal) {
+            window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            return;
+        }
+        modalEl.style.display = 'block';
+        modalEl.classList.add('show');
+        modalEl.removeAttribute('aria-hidden');
+        modalEl.setAttribute('aria-modal', 'true');
+        modalEl.setAttribute('role', 'dialog');
+        document.body.classList.add('modal-open');
+    };
+
+    if (modalEl) {
+        modalEl.addEventListener('hidden.bs.modal', cleanupModalState);
+    }
+
     if (!selectRet) return;
 
     function formatLancamentoDateValue(value) {
@@ -3624,12 +3809,11 @@ document.addEventListener('DOMContentLoaded', function() {
             selectRet.value = String(visita.visita_no_vis);
         }
         fillCampos(visita);
-        if (modalEl) {
-            if (window.bootstrap && window.bootstrap.Modal) {
-                const instance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                instance.hide();
-            } else if (window.jQuery) {
-                $('#myModal1').modal('hide');
+        if (modalEl && (modalEl.classList.contains('show') || modalEl.style.display === 'block')) {
+            if (typeof window.fecharHistoricoVisitas === 'function') {
+                window.fecharHistoricoVisitas();
+            } else {
+                cleanupModalState();
             }
         }
     };
@@ -4343,10 +4527,6 @@ window.visitaAiConfig = Object.assign({}, window.visitaAiConfig || {}, {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="<?= $BASE_URL ?>js/uti_audit_ai_visita.js?v=<?= filemtime(__DIR__ . '/../js/uti_audit_ai_visita.js') ?>"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
-
 
 <!-- <script src="js/text_cad_internacao.js"></script>
 <script src="js/select_internacao.js"></script> -->
