@@ -92,6 +92,14 @@ if (!$paciente || !isset($paciente['0'])) {
   exit;
 }
 $p = $paciente['0'];
+$cptCarenciasPaciente = [];
+try {
+  $stmtCptHub = $conn->prepare("SELECT c.*, s.seguradora_seg FROM tb_paciente_cpt_carencia c LEFT JOIN tb_seguradora s ON s.id_seguradora = c.fk_seguradora_cpt WHERE c.fk_paciente_cpt = :id AND c.deletado_cpt = 'n' ORDER BY (c.status_cpt = 'vigente') DESC, c.data_fim_cpt DESC, c.id_cpt_carencia DESC");
+  $stmtCptHub->execute([':id' => (int)$id_paciente]);
+  $cptCarenciasPaciente = $stmtCptHub->fetchAll(PDO::FETCH_ASSOC) ?: [];
+} catch (Throwable $e) {
+  error_log('[HUB_PAC][CPT] ' . $e->getMessage());
+}
 if ($isGestorSeguradora) {
   $segUserId = (int)($_SESSION['fk_seguradora_user'] ?? 0);
   $segPacId = (int)($p['fk_seguradora_pac'] ?? 0);
@@ -660,6 +668,12 @@ $complexInfo = $complexMap[$effectiveLevel];
               <i class="bi bi-receipt me-2"></i>Contas
             </button>
           </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-cpt-carencia" type="button" role="tab">
+              <i class="bi bi-shield-exclamation me-2"></i>CPT e carências
+              <?php if ($cptCarenciasPaciente): ?><span class="badge bg-light text-dark ms-1"><?= count($cptCarenciasPaciente) ?></span><?php endif; ?>
+            </button>
+          </li>
         </ul>
         <div class="hub-int-actions d-flex align-items-center gap-2">
           <div class="input-group input-group-sm hub-int-filter">
@@ -715,6 +729,32 @@ $complexInfo = $complexMap[$effectiveLevel];
             <nav>
               <ul class="pagination pagination-sm mb-0" id="int-pager"></ul>
             </nav>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-cpt-carencia" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Histórico de CPT e carências</h6>
+            <?php if (!$isGestorSeguradora): ?><a class="btn btn-sm btn-outline-primary" href="<?= $BASE_URL ?>pacientes/editar/<?= (int)$id_paciente ?>"><i class="bi bi-pencil me-1"></i>Gerenciar</a><?php endif; ?>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+              <thead><tr><th>Tipo</th><th>Descrição</th><th>Seguradora</th><th>Início</th><th>Fim</th><th>Situação</th><th>Observação</th></tr></thead>
+              <tbody>
+                <?php if (!$cptCarenciasPaciente): ?><tr><td colspan="7" class="text-muted text-center py-3">Nenhuma CPT ou carência registrada.</td></tr><?php endif; ?>
+                <?php foreach ($cptCarenciasPaciente as $cpt): ?>
+                <tr>
+                  <td><span class="badge <?= ($cpt['tipo_cpt'] ?? '') === 'cpt' ? 'bg-warning text-dark' : 'bg-info text-dark' ?>"><?= ($cpt['tipo_cpt'] ?? '') === 'cpt' ? 'CPT' : 'Carência' ?></span></td>
+                  <td><?= htmlspecialchars((string)($cpt['descricao_cpt'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td>
+                  <td><?= htmlspecialchars((string)($cpt['seguradora_seg'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
+                  <td><?= !empty($cpt['data_inicio_cpt']) ? date('d/m/Y', strtotime($cpt['data_inicio_cpt'])) : '—' ?></td>
+                  <td><?= !empty($cpt['data_fim_cpt']) ? date('d/m/Y', strtotime($cpt['data_fim_cpt'])) : '—' ?></td>
+                  <td><?= ucfirst(htmlspecialchars((string)($cpt['status_cpt'] ?? ''), ENT_QUOTES, 'UTF-8')) ?></td>
+                  <td><?= htmlspecialchars((string)($cpt['observacao_cpt'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
+                </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
           </div>
         </div>
 

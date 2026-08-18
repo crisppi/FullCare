@@ -779,6 +779,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 <textarea rows="5" class="form-control" id="obs_pac" name="obs_pac"></textarea>
             </div>
             </div>
+            <?php include __DIR__ . '/../../formularios/form_paciente_cpt_carencia.php'; ?>
             <div class="entity-actions-bar">
                 <button type="submit" class="btn btn-primary" id="finalizar_etapa1" name="finalizar_etapa1">
                     <i class="fas fa-check"></i> Cadastrar

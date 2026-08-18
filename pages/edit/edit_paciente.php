@@ -871,6 +871,7 @@ if (empty($telefonesPaciente)) {
             </div>
         </div>
 
+            <?php include __DIR__ . '/../../formularios/form_paciente_cpt_carencia.php'; ?>
             <div class="entity-actions-bar">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button type="submit" class="btn btn-success">

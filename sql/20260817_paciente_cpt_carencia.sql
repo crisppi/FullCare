@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS tb_paciente_cpt_carencia (
+    id_cpt_carencia INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    fk_paciente_cpt INT NOT NULL,
+    fk_seguradora_cpt INT NULL,
+    fk_internacao_cpt INT NULL,
+    tipo_cpt ENUM('cpt', 'carencia') NOT NULL,
+    descricao_cpt VARCHAR(255) NOT NULL,
+    data_inicio_cpt DATE NULL,
+    data_fim_cpt DATE NULL,
+    status_cpt ENUM('vigente', 'cumprida', 'encerrada', 'cancelada') NOT NULL DEFAULT 'vigente',
+    observacao_cpt TEXT NULL,
+    fk_usuario_cpt INT NULL,
+    deletado_cpt CHAR(1) NOT NULL DEFAULT 'n',
+    data_create_cpt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at_cpt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_cpt_carencia),
+    KEY idx_cpt_paciente (fk_paciente_cpt, deletado_cpt),
+    KEY idx_cpt_seguradora (fk_seguradora_cpt),
+    KEY idx_cpt_internacao (fk_internacao_cpt),
+    KEY idx_cpt_vigencia (status_cpt, data_inicio_cpt, data_fim_cpt)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

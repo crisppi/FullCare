@@ -243,6 +243,39 @@ function insertPacienteRelatedRows(PDO $conn, int $idPaciente, array $enderecos,
     }
 }
 
+function buildPacienteCptRowsFromPost(): array
+{
+    $tipos = postArrayPac('cpt_tipo');
+    $descricoes = postArrayPac('cpt_descricao');
+    $inicios = postArrayPac('cpt_inicio');
+    $fins = postArrayPac('cpt_fim');
+    $status = postArrayPac('cpt_status');
+    $observacoes = postArrayPac('cpt_observacao');
+    $rows = [];
+    foreach ($descricoes as $i => $descricao) {
+        $descricao = trim((string)$descricao);
+        if ($descricao === '') continue;
+        $tipo = in_array(($tipos[$i] ?? ''), ['cpt', 'carencia'], true) ? $tipos[$i] : 'carencia';
+        $situacao = in_array(($status[$i] ?? ''), ['vigente', 'cumprida', 'encerrada', 'cancelada'], true) ? $status[$i] : 'vigente';
+        $inicio = trim((string)($inicios[$i] ?? '')) ?: null;
+        $fim = trim((string)($fins[$i] ?? '')) ?: null;
+        if ($inicio && $fim && $fim < $inicio) {
+            throw new InvalidArgumentException('A data final da CPT/carência não pode ser anterior à data inicial.');
+        }
+        $rows[] = ['tipo' => $tipo, 'descricao' => $descricao, 'inicio' => $inicio, 'fim' => $fim, 'status' => $situacao, 'observacao' => trim((string)($observacoes[$i] ?? ''))];
+    }
+    return $rows;
+}
+
+function insertPacienteCptRows(PDO $conn, int $idPaciente, ?int $idSeguradora, array $rows): void
+{
+    if ($idPaciente <= 0 || !$rows) return;
+    $stmt = $conn->prepare("INSERT INTO tb_paciente_cpt_carencia (fk_paciente_cpt, fk_seguradora_cpt, tipo_cpt, descricao_cpt, data_inicio_cpt, data_fim_cpt, status_cpt, observacao_cpt, fk_usuario_cpt) VALUES (:paciente, :seguradora, :tipo, :descricao, :inicio, :fim, :status, :observacao, :usuario)");
+    foreach ($rows as $row) {
+        $stmt->execute([':paciente'=>$idPaciente, ':seguradora'=>$idSeguradora ?: null, ':tipo'=>$row['tipo'], ':descricao'=>$row['descricao'], ':inicio'=>$row['inicio'], ':fim'=>$row['fim'], ':status'=>$row['status'], ':observacao'=>$row['observacao'], ':usuario'=>isset($_SESSION['id_usuario']) ? (int)$_SESSION['id_usuario'] : null]);
+    }
+}
+
 // Resgata o tipo do formulário
 $type = filter_input(INPUT_POST, "type");
 $typeDel = filter_input(INPUT_POST, "typeDel");
@@ -459,6 +492,7 @@ if ($type === "create") {
                 'telefone02' => $telefone02_pac,
             ]);
             insertPacienteRelatedRows($conn, $novoId, $enderecosPac, $emailsPac, $telefonesPac, $contatosPac);
+            insertPacienteCptRows($conn, $novoId, (int)$fk_seguradora_pac, buildPacienteCptRowsFromPost());
             $pacienteCriado = $novoId > 0 ? $pacienteDao->findByIdSeg($novoId) : null;
             fullcareAuditLog($conn, [
                 'action' => 'create',
@@ -633,6 +667,7 @@ if ($type === "create") {
     $conn->prepare("DELETE FROM tb_paciente_email WHERE fk_paciente = :id")->execute([':id' => (int) $id_paciente]);
     $conn->prepare("DELETE FROM tb_paciente_telefone WHERE fk_paciente = :id")->execute([':id' => (int) $id_paciente]);
     $conn->prepare("DELETE FROM tb_paciente_contato WHERE fk_paciente = :id")->execute([':id' => (int) $id_paciente]);
+    $conn->prepare("DELETE FROM tb_paciente_cpt_carencia WHERE fk_paciente_cpt = :id AND fk_internacao_cpt IS NULL")->execute([':id' => (int) $id_paciente]);
     [$enderecosPac, $emailsPac, $telefonesPac, $contatosPac] = buildPacienteRelatedRowsFromPost([
         'endereco' => $endereco_pac,
         'cep' => $cep_pac,
@@ -647,6 +682,7 @@ if ($type === "create") {
         'telefone02' => $telefone02_pac,
     ]);
     insertPacienteRelatedRows($conn, (int) $id_paciente, $enderecosPac, $emailsPac, $telefonesPac, $contatosPac);
+    insertPacienteCptRows($conn, (int)$id_paciente, (int)$fk_seguradora_pac, buildPacienteCptRowsFromPost());
     $pacienteDepois = $pacienteDao->findByIdSeg((int)$id_paciente);
     fullcareAuditLog($conn, [
         'action' => 'update',
