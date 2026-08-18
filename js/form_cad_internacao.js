@@ -2874,6 +2874,22 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(applyInternacaoPickerCompact, 100);
     setTimeout(applyInternacaoPickerCompact, 400);
 
+    const internFiles = document.getElementById('intern_files');
+    const clearInternFiles = document.getElementById('btn-clear-intern-files');
+    if (internFiles && clearInternFiles) {
+        const syncClearFilesButton = function() {
+            clearInternFiles.hidden = !(internFiles.files && internFiles.files.length);
+        };
+
+        internFiles.addEventListener('change', syncClearFilesButton);
+        clearInternFiles.addEventListener('click', function() {
+            internFiles.value = '';
+            internFiles.dispatchEvent(new Event('change', { bubbles: true }));
+            internFiles.focus();
+        });
+        syncClearFilesButton();
+    }
+
     function syncInternacaoSelectPlaceholders() {
         document.querySelectorAll('.internacao-page .tabelas-adicionais-card select, #detalhes-card-wrapper select, #container-tuss select, #container-prorrog select, #container-gestao select, #container-uti select, #container-negoc select').forEach(function(select) {
             select.classList.toggle('select-placeholder', !select.value);

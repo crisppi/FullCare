@@ -598,12 +598,12 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
 </div>
 
 <!-- Modal para abrir tela de cadastro -->
-<div class="modal fade" id="myModal1">
+<div class="modal fade fc-history-modal" id="myModal1">
     <div class="modal-dialog  modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="page-title" style="color:white">Visitas</h4>
-                <p class="page-description" style="color:white; margin-top:5px">Informações
+                <h4 class="page-title">Visitas</h4>
+                <p class="page-description">Informações
                     sobre visitas anteriores</p>
                 <button type="button" class="btn-close btn-close-white"
                     aria-label="Fechar" onclick="var m=document.getElementById('myModal1');m.classList.remove('show');m.style.display='none';m.setAttribute('aria-hidden','true');document.querySelectorAll('.modal-backdrop').forEach(function(b){b.remove();});document.body.classList.remove('modal-open');document.body.style.removeProperty('overflow');document.body.style.removeProperty('padding-right');"></button>
@@ -617,8 +617,8 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                     echo ("<br>");
                 } else { ?>
                 <h6 class="page-title">Relatórios anteriores</h6>
-                <div class="visit-history-table-wrap">
-                <table class="table table-sm table-striped table-hover table-condensed visit-history-table">
+                <div class="visit-history-table-wrap fc-history-table-wrap">
+                <table class="table table-sm table-striped table-hover table-condensed visit-history-table fc-history-table">
                     <thead>
                         <tr>
                             <th scope="col" class="th-w-2">Visita</th>
@@ -688,99 +688,6 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
     </div>
 </div>
 
-<style>
-    #myModal1 .modal-header {
-        min-height: 56px !important;
-        height: auto !important;
-        padding: .65rem .9rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        gap: 1rem !important;
-    }
-
-    #myModal1 .modal-header .page-title {
-        margin: 0 !important;
-        padding: .38rem .7rem !important;
-        font-size: .9rem !important;
-        line-height: 1 !important;
-        border-radius: 8px !important;
-    }
-
-    #myModal1 .modal-header .page-description {
-        margin: 0 !important;
-        font-size: .76rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #myModal1 .modal-header .btn-close {
-        flex: 0 0 auto;
-        margin: 0 !important;
-        padding: .45rem !important;
-        font-size: .7rem !important;
-        opacity: .9;
-    }
-
-    #myModal1 .modal-body {
-        padding: .7rem .9rem .85rem !important;
-    }
-
-    #myModal1 .modal-body > .page-title {
-        margin: 0 0 .55rem !important;
-    }
-
-    #myModal1 .visit-history-table-wrap {
-        max-height: min(46vh, 360px);
-        overflow-y: auto;
-        overflow-x: auto;
-        border: 1px solid #d5e2eb;
-        border-radius: 8px;
-        scrollbar-gutter: stable;
-    }
-
-    #myModal1 .visit-history-table {
-        margin-bottom: 0 !important;
-    }
-
-    #myModal1 .visit-history-table thead,
-    #myModal1 .visit-history-table thead tr {
-        height: 30px !important;
-    }
-
-    #myModal1 .visit-history-table thead th {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        height: 30px !important;
-        min-height: 30px !important;
-        padding: 5px 7px !important;
-        font-family: inherit !important;
-        font-size: .7rem !important;
-        font-weight: 700 !important;
-        line-height: 1.1 !important;
-        letter-spacing: .02em !important;
-        vertical-align: middle !important;
-    }
-
-    #myModal1 .visit-history-table tbody tr,
-    #myModal1 .visit-history-table tbody td {
-        height: 28px !important;
-        min-height: 28px !important;
-    }
-
-    #myModal1 .visit-history-table tbody td {
-        padding: 4px 7px !important;
-        font-size: .7rem !important;
-        line-height: 1.15 !important;
-        vertical-align: middle !important;
-    }
-
-    #myModal1 .visit-history-table tbody td .btn-link,
-    #myModal1 .visit-history-table tbody td i {
-        font-size: .72rem !important;
-        line-height: 1 !important;
-    }
-</style>
 <script>
 (function() {
     var historyModal = document.getElementById('myModal1');

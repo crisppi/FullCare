@@ -466,6 +466,266 @@ body #main-container .visita-page #add-visita-form > :is(
     background: #eef1f5 !important;
 }
 
+.internacao-page .intern-files-control {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+}
+
+.internacao-page .intern-files-control #intern_files {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.internacao-page .intern-files-clear {
+    flex: 0 0 32px;
+    width: 32px;
+    min-width: 32px;
+    height: 30px;
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #e3b8c1;
+    border-radius: 7px;
+    background: #fff5f6;
+    color: #b4233f;
+    font-size: .78rem;
+    line-height: 1;
+}
+
+.internacao-page .intern-files-clear:hover,
+.internacao-page .intern-files-clear:focus {
+    border-color: #c94b62;
+    background: #fee9ed;
+    color: #8f1730;
+}
+
+.internacao-page .intern-files-clear[hidden] {
+    display: none !important;
+}
+
+/* Padrão compartilhado dos popups de históricos (Visitas e TUSS). */
+#container-tuss .form-group.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+#container-tuss .form-group { margin-bottom: 15px; }
+#container-tuss .form-group label { margin-bottom: 2px; font-weight: 400; }
+#container-tuss .form-control { width: 100%; padding: 5px; }
+#container-tuss .btn { padding: 5px 10px; font-size: .9rem; border: none; border-radius: 5px; cursor: pointer; }
+#container-tuss .btn-add { background-color: #007bff; color: #fff; }
+#container-tuss .btn-remove { background-color: #dc3545; color: #fff; }
+
+#container-tuss .adicional-card {
+    background: #f5f5f9;
+    border-radius: 22px;
+    border: 1px solid #ebe1f5;
+    box-shadow: 0 12px 28px rgba(45,18,70,.08);
+    padding: 22px 24px;
+}
+
+#container-tuss .adicional-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 18px;
+}
+
+#container-tuss .adicional-card__title {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    margin: 0;
+    color: #3a184f;
+}
+
+#container-tuss .adicional-card__marker {
+    width: 6px;
+    height: 26px;
+    border-radius: 10px;
+    margin-right: 12px;
+    background: linear-gradient(180deg,#9654c8,#b983f1);
+}
+
+#container-tuss .tuss-field-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    align-items: end;
+    width: 100%;
+}
+
+#container-tuss .tuss-field-container > .form-group[class*="col-"] {
+    flex: none !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+#container-tuss .tuss-actions-col {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 0 !important;
+    width: 56px !important;
+}
+
+#container-tuss .tuss-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 42px;
+}
+
+#container-tuss .btn-add,
+#container-tuss .btn-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 8px;
+    line-height: 1;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    #container-tuss .tuss-field-container { grid-template-columns: 1fr; }
+    #container-tuss .tuss-actions-col { width: 56px !important; }
+}
+
+body #main-container .visita-page #container-tuss .fc-history-trigger {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 11px !important;
+    border-radius: 8px !important;
+    font-family: inherit !important;
+    font-size: .72rem !important;
+    font-weight: 650 !important;
+    line-height: 1 !important;
+}
+
+.fc-history-modal .modal-dialog {
+    width: min(1180px, calc(100vw - 32px)) !important;
+    max-width: min(1180px, calc(100vw - 32px)) !important;
+}
+
+.fc-history-modal .modal-content {
+    overflow: hidden;
+    border: 1px solid #d5e2eb !important;
+    border-radius: 10px !important;
+}
+
+.fc-history-modal .modal-header {
+    min-height: 56px !important;
+    height: auto !important;
+    padding: .65rem .9rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+}
+
+.fc-history-modal .modal-header .page-title {
+    margin: 0 !important;
+    padding: .38rem .7rem !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+    font-family: inherit !important;
+    font-size: .9rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+}
+
+.fc-history-modal .modal-header .page-description {
+    margin: 0 0 0 auto !important;
+    color: #fff !important;
+    font-family: inherit !important;
+    font-size: .76rem !important;
+    line-height: 1.15 !important;
+}
+
+.fc-history-modal .modal-header .btn-close {
+    flex: 0 0 auto;
+    margin: 0 !important;
+    padding: .45rem !important;
+    font-size: .7rem !important;
+    opacity: .9;
+}
+
+.fc-history-modal .modal-body {
+    padding: .7rem .9rem .85rem !important;
+}
+
+.fc-history-modal .modal-body > .page-title {
+    margin: 0 0 .55rem !important;
+}
+
+.fc-history-modal .fc-history-table-wrap {
+    max-height: min(46vh, 360px);
+    overflow: auto;
+    border: 1px solid #d5e2eb;
+    border-radius: 8px;
+    scrollbar-gutter: stable;
+}
+
+.fc-history-modal .fc-history-table {
+    margin-bottom: 0 !important;
+}
+
+.fc-history-modal .fc-history-table thead,
+.fc-history-modal .fc-history-table thead tr,
+.fc-history-modal .fc-history-table thead th {
+    height: 30px !important;
+    min-height: 30px !important;
+}
+
+.fc-history-modal .fc-history-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 5px 7px !important;
+    font-family: inherit !important;
+    font-size: .7rem !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    letter-spacing: .02em !important;
+    vertical-align: middle !important;
+}
+
+.fc-history-modal .fc-history-table tbody tr,
+.fc-history-modal .fc-history-table tbody td {
+    min-height: 28px !important;
+}
+
+.fc-history-modal .fc-history-table tbody td {
+    padding: 4px 7px !important;
+    font-family: inherit !important;
+    font-size: .7rem !important;
+    line-height: 1.15 !important;
+    vertical-align: middle !important;
+}
+
+.fc-history-modal .fc-history-table tbody td :is(.btn-link, i) {
+    font-size: .72rem !important;
+    line-height: 1 !important;
+}
+
 body #main-container .visita-page #add-visita-form :is(
     .clinical-text-field,
     .ia-highlight-box

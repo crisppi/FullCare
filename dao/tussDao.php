@@ -206,6 +206,7 @@ class tussDAO implements tussDAOInterface
             ac.senha_int,
             tu.id_tuss,                    -- importante para diferenciar linhas
             tu.fk_int_tuss,
+            tu.fk_vis_tuss,
             tu.tuss_solicitado,
             tu.tuss_liberado_sn,
             tu.qtd_tuss_solicitado,

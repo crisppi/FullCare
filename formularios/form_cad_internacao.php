@@ -1482,8 +1482,14 @@
         <div class="row">
             <div class="form-group col-md-6">
                 <label for="intern_files">Arquivos</label>
-                <input type="file" class="form-control" name="intern_files[]" id="intern_files"
-                    accept="image/png, image/jpeg" multiple>
+                <div class="intern-files-control">
+                    <input type="file" class="form-control" name="intern_files[]" id="intern_files"
+                        accept="image/png, image/jpeg" multiple>
+                    <button type="button" class="btn intern-files-clear" id="btn-clear-intern-files"
+                        title="Remover arquivos selecionados" aria-label="Remover arquivos selecionados" hidden>
+                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                    </button>
+                </div>
                 <div class="notif-input oculto" id="notifImagem">Tamanho do arquivo inválido!</div>
             </div>
         </div>

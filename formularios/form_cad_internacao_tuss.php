@@ -1,107 +1,3 @@
-<style>
-#container-tuss .form-group.row {
-    display:flex;
-    flex-wrap:wrap;
-    gap:15px;
-    align-items:flex-end;
-}
-#container-tuss .form-group {margin-bottom:15px;}
-#container-tuss .form-group label {margin-bottom:2px;font-weight:400;}
-#container-tuss .form-control {width:100%;padding:5px;}
-#container-tuss .btn {padding:5px 10px;font-size:.9rem;border:none;border-radius:5px;cursor:pointer;}
-#container-tuss .btn-add {background-color:#007bff;color:#fff;}
-#container-tuss .btn-remove {background-color:#dc3545;color:#fff;}
-
-#container-tuss .adicional-card {
-    background:#f5f5f9;
-    border-radius:22px;
-    border:1px solid #ebe1f5;
-    box-shadow:0 12px 28px rgba(45,18,70,.08);
-    padding:22px 24px;
-}
-#container-tuss .adicional-card__header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:1rem;
-    margin-bottom:18px;
-}
-#container-tuss .adicional-card__title {
-    display:flex;
-    align-items:center;
-    font-weight:600;
-    margin:0;
-    color:#3a184f;
-}
-#container-tuss .adicional-card__marker {
-    width:6px;
-    height:26px;
-    border-radius:10px;
-    margin-right:12px;
-    background:linear-gradient(180deg,#9654c8,#b983f1);
-}
-
-#container-tuss .tuss-field-container {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 14px;
-    align-items: end;
-    width: 100%;
-}
-
-#container-tuss .tuss-field-container > .form-group[class*="col-"] {
-    flex: none !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    width: 100% !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-#container-tuss .tuss-actions-col {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    min-width: 0 !important;
-    width: 56px !important;
-}
-
-#container-tuss .tuss-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
-    min-height: 42px;
-}
-
-#container-tuss .btn-add,
-#container-tuss .btn-remove {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 38px;
-    width: 38px;
-    height: 38px;
-    padding: 0;
-    border-radius: 8px;
-    line-height: 1;
-    font-size: 1rem;
-    font-weight: 700;
-}
-
-@media (max-width: 768px) {
-    #container-tuss .tuss-field-container {
-        grid-template-columns: 1fr;
-    }
-
-    #container-tuss .tuss-actions-col {
-        width: 56px !important;
-    }
-}
-</style>
-
 <div id="container-tuss" style="display:none; margin:5px;">
     <div class="adicional-card">
         <div class="adicional-card__header">
@@ -110,7 +6,7 @@
                 TUSS
             </h4>
             <?php if (!empty($tussIntern) && count($tussIntern) > 0): ?>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTUSS"
+            <button type="button" class="btn btn-success fc-history-trigger" data-bs-toggle="modal" data-bs-target="#modalTUSS"
                 id="openmodal">
                 <i class="bi bi-eye"></i> TUSS Liberados
             </button>
@@ -179,12 +75,13 @@
 </div>
 
 <!-- ===== Modal ===== -->
-<div class="modal fade" id="modalTUSS">
+<div class="modal fade fc-history-modal" id="modalTUSS">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="page-title" style="color:white">TUSS Liberados</h4>
-                <p class="page-description" style="color:white;margin-top:5px">Informações sobre TUSS liberados</p>
+                <h4 class="page-title">TUSS Liberados</h4>
+                <p class="page-description">Informações sobre TUSS liberados</p>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
                 <?php
@@ -193,7 +90,19 @@
                     echo ("<p style='margin-left:100px'> <b>-- Esta internação ainda não possui TUSS liberados -- </b></p>");
                     echo ("<br>");
                 } else { ?>
-                <table class="table table-sm table-striped table-hover table-condensed">
+                <?php
+                $visitaIdPorData = [];
+                foreach ((array) $visitas as $visitaTuss) {
+                    $dataReferencia = $visitaTuss['data_visita_vis'] ?? $visitaTuss['data_visita_int'] ?? null;
+                    $idReferencia = (int) ($visitaTuss['id_visita'] ?? 0);
+                    if ($dataReferencia && $idReferencia > 0) {
+                        $chaveData = date('Y-m-d', strtotime($dataReferencia));
+                        $visitaIdPorData[$chaveData] = max($visitaIdPorData[$chaveData] ?? 0, $idReferencia);
+                    }
+                }
+                ?>
+                <div class="fc-history-table-wrap">
+                <table class="table table-sm table-striped table-hover table-condensed fc-history-table">
                     <thead>
                         <tr>
                             <th scope="col" class="th-w-15">TUSS Solicitado</th>
@@ -206,7 +115,13 @@
                     </thead>
                     <tbody>
                         <?php foreach ($tussIntern as $intern) {
-                                $visitaId = $intern["fk_internacao_vis"] ?? "N/A";
+                                $visitaId = (int) ($intern["fk_vis_tuss"] ?? 0);
+                                $dataTussChave = !empty($intern['data_realizacao_tuss'])
+                                    ? date('Y-m-d', strtotime($intern['data_realizacao_tuss']))
+                                    : null;
+                                if ($visitaId <= 0 && $dataTussChave && isset($visitaIdPorData[$dataTussChave])) {
+                                    $visitaId = (int) $visitaIdPorData[$dataTussChave];
+                                }
                                 $dataVisita = !empty($intern['data_visita_vis'])
                                     ? date("d/m/Y", strtotime($intern['data_visita_vis']))
                                     : date("d/m/Y", strtotime($intern['data_visita_int']));
@@ -215,7 +130,9 @@
                                 $qtdSolicitado = $intern["qtd_tuss_solicitado"] ?? "Desconhecido";
                                 $qtdLiberado = $intern["qtd_tuss_liberado"] ?? "--";
                                 $dataTuss = date("d/m/Y", strtotime($intern['data_realizacao_tuss']));
-                                $linkVisualizar = $BASE_URL . "show_visita.php?id_visita=" . $visitaId;
+                                $linkVisualizar = $visitaId > 0
+                                    ? rtrim($BASE_URL, '/') . "/visitas/ver/" . $visitaId
+                                    : null;
                             ?>
                         <tr>
                             <td><?= $tussSolicitado ?></td>
@@ -223,13 +140,22 @@
                             <td><?= $qtdSolicitado ?></td>
                             <td><?= $qtdLiberado ?></td>
                             <td><?= $dataTuss ?></td>
-                            <td><a href="<?= $linkVisualizar ?>"><i class="bi bi-eye text-success"></i></a></td>
+                            <td>
+                                <?php if ($linkVisualizar): ?>
+                                <a href="<?= htmlspecialchars($linkVisualizar, ENT_QUOTES, 'UTF-8') ?>"
+                                    title="Visualizar visita <?= $visitaId ?>">
+                                    <i class="bi bi-eye text-success"></i>
+                                </a>
+                                <?php else: ?>
+                                <span class="text-muted" title="TUSS sem visita associada">—</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <?php } ?>
                     </tbody>
                 </table>
+                </div>
                 <?php } ?>
-                <br>
             </div>
         </div>
     </div>

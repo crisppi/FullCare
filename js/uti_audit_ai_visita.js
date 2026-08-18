@@ -150,6 +150,22 @@
         const readBtn = byId('btn-ler-pdf-visita');
         const input = byId('pdf-visita-input');
         const promptBtn = byId('btn-executar-prompt-uti-visita');
+        const panelToggle = byId('btn-toggle-parecer-visita-ia');
+        const panelBody = byId('parecer-visita-ia-body');
+
+        if (panelToggle && panelBody) {
+            panelToggle.addEventListener('click', function () {
+                const shouldOpen = panelBody.hidden;
+                panelBody.hidden = !shouldOpen;
+                panelToggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+
+                const icon = panelToggle.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('bi-chevron-down', !shouldOpen);
+                    icon.classList.toggle('bi-chevron-up', shouldOpen);
+                }
+            });
+        }
 
         if (readBtn && input) {
             readBtn.addEventListener('click', function () {
