@@ -296,6 +296,23 @@ $jsonTuss = htmlspecialchars(json_encode($tussInt, JSON_UNESCAPED_UNICODE), ENT_
         return Number.isFinite(parsed) ? parsed : 0;
     }
 
+    function validateTussQuantities(row, showMessage) {
+        if (!row) return true;
+        var solicitadaInput = row.querySelector('[name$="[qtd_tuss_solicitado]"]');
+        var liberadaInput = row.querySelector('[name$="[qtd_tuss_liberado]"]');
+        if (!solicitadaInput || !liberadaInput) return true;
+        var solicitadaRaw = String(solicitadaInput.value || '').trim();
+        var liberadaRaw = String(liberadaInput.value || '').trim();
+        var solicitada = parseTussQtdLiberada(solicitadaRaw);
+        var liberada = parseTussQtdLiberada(liberadaRaw);
+        var invalid = solicitadaRaw !== '' && liberadaRaw !== '' && liberada > solicitada;
+        var message = invalid ? 'A quantidade liberada não pode ser maior que a quantidade solicitada neste TUSS.' : '';
+        liberadaInput.setCustomValidity(message);
+        liberadaInput.classList.toggle('is-invalid', invalid);
+        if (invalid && showMessage) liberadaInput.reportValidity();
+        return !invalid;
+    }
+
     function syncTussLiberadoFromQtd(row) {
         if (!row) return;
         var qtdLiberada = row.querySelector('[name$="[qtd_tuss_liberado]"]');
@@ -307,6 +324,7 @@ $jsonTuss = htmlspecialchars(json_encode($tussInt, JSON_UNESCAPED_UNICODE), ENT_
     function rebuildJson() {
         var arr = [];
         document.querySelectorAll('#tussFieldsContainer .tuss-field').forEach(function(f) {
+            validateTussQuantities(f, false);
             syncTussLiberadoFromQtd(f);
             arr.push({
                 id_tuss:              (f.querySelector('[name$="[id_tuss]"]')              || {}).value || '',
@@ -372,15 +390,35 @@ $jsonTuss = htmlspecialchars(json_encode($tussInt, JSON_UNESCAPED_UNICODE), ENT_
 
     // Qualquer mudança nos inputs/selects
     container.addEventListener('input', function(e) {
-        if (e.target && e.target.matches('[name$="[qtd_tuss_liberado]"]')) {
+        if (e.target && e.target.matches('[name$="[qtd_tuss_liberado]"], [name$="[qtd_tuss_solicitado]"]')) {
+            validateTussQuantities(e.target.closest('.tuss-field'), false);
             syncTussLiberadoFromQtd(e.target.closest('.tuss-field'));
         }
         rebuildJson();
     });
-    container.addEventListener('change', rebuildJson);
+    container.addEventListener('change', function(e) {
+        if (e.target && e.target.matches('[name$="[qtd_tuss_liberado]"], [name$="[qtd_tuss_solicitado]"]')) {
+            validateTussQuantities(e.target.closest('.tuss-field'), true);
+        }
+        rebuildJson();
+    });
 
     // Antes do submit
     var form = document.getElementById('myForm') || container.closest('form');
-    if (form) form.addEventListener('submit', rebuildJson);
+    if (form) form.addEventListener('submit', function(e) {
+        var invalidRow = Array.from(container.querySelectorAll('.tuss-field'))
+            .find(function(row) { return !validateTussQuantities(row, false); });
+        if (invalidRow) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            var input = invalidRow.querySelector('[name$="[qtd_tuss_liberado]"]');
+            if (input) {
+                input.scrollIntoView({block: 'center', behavior: 'smooth'});
+                input.reportValidity();
+            }
+            return;
+        }
+        rebuildJson();
+    }, true);
 })();
 </script>

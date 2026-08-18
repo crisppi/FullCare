@@ -518,10 +518,21 @@ function processTussEntries(
     ?int $fkUsuarioVis
 ): void {
     if ($visitaId <= 0) return;
-    $tussDao->deleteByVisita($visitaId);
-    if ($flag !== 's') return;
+    if ($flag !== 's') {
+        $tussDao->deleteByVisita($visitaId);
+        return;
+    }
     $decoded = decodeJsonArray($jsonRaw);
     if (!is_array($decoded) || !isset($decoded['tussEntries']) || !is_array($decoded['tussEntries'])) return;
+    foreach ($decoded['tussEntries'] as $row) {
+        if (!is_array($row)) continue;
+        $solicitada = toIntOrNull($row['qtd_tuss_solicitado'] ?? null);
+        $liberada = toIntOrNull($row['qtd_tuss_liberado'] ?? null);
+        if ($solicitada !== null && $liberada !== null && $liberada > $solicitada) {
+            throw new InvalidArgumentException('A quantidade liberada do TUSS não pode ser maior que a quantidade solicitada.');
+        }
+    }
+    $tussDao->deleteByVisita($visitaId);
     foreach ($decoded['tussEntries'] as $row) {
         if (!is_array($row)) continue;
         $descricao = strOrNull($row['tuss_solicitado'] ?? null);

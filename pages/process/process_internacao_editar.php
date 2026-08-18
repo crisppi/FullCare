@@ -1069,6 +1069,15 @@ try {
         }
         $idUsuario   = (int) ($_SESSION['id_usuario'] ?? 0);
 
+        foreach ($tussJson as $item) {
+            $qtdSolicitadaValidacao = filter_var($item['qtd_tuss_solicitado'] ?? null, FILTER_VALIDATE_INT);
+            $qtdLiberadaValidacao = filter_var($item['qtd_tuss_liberado'] ?? null, FILTER_VALIDATE_INT);
+            if ($qtdSolicitadaValidacao !== false && $qtdLiberadaValidacao !== false
+                && $qtdLiberadaValidacao > $qtdSolicitadaValidacao) {
+                throw new InvalidArgumentException('A quantidade liberada do TUSS não pode ser maior que a quantidade solicitada.');
+            }
+        }
+
         // existentes
         $existentes  = $tussDao->findByIdIntern($idInternacao);
         $existentesById = [];

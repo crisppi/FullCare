@@ -1319,7 +1319,8 @@ function validateProrrogAltaFields() {
 }
 
 // Calcula diárias e valida datas
-function calculateDiarias(container) {
+function calculateDiarias(container, options) {
+    const allowHistoricalFutureDates = !!(options && options.allowHistoricalFutureDates);
     const dataAtual = new Date().toISOString().split("T")[0];
     const maxDate = window.PRORROG_MAX_DATE || dataAtual;
 
@@ -1352,14 +1353,14 @@ function calculateDiarias(container) {
             diariasField.value = "";
             return;
         }
-        if (max && inicio > max) {
+        if (!allowHistoricalFutureDates && max && inicio > max) {
             errorMessage.textContent = "Não é permitido prorrogar após a data atual.";
             errorMessage.style.display = "block";
             openProrrogError("Não é permitido prorrogar após a data atual.");
             diariasField.value = "";
             return;
         }
-        if (max && fim > max) {
+        if (!allowHistoricalFutureDates && max && fim > max) {
             errorMessage.textContent = "Não é permitido prorrogar após a data atual.";
             errorMessage.style.display = "block";
             openProrrogError("Não é permitido prorrogar após a data atual.");

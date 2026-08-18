@@ -236,8 +236,8 @@
                     <option value="3">3</option>
                 </select>
             </div>
-            <div class="form-group col-sm-9" id="justifique_uti" style="display: none;">
-                <label for="justifique_uti">Justifique permanência - Critério baixo</label>
+            <div class="form-group col-sm-9" id="justifique_uti_group" style="display: none;">
+                <label for="justifique_uti" id="justifique_uti_label">Justifique permanência - Critério baixo</label>
                 <p id="criteria_message" style="display: inline; margin-left: 10px; font-size: 0.9em; color: #555;"></p>
                 <textarea type="textarea" style="resize:none" rows="2" class="form-control" id="justifique_uti"
                     name="justifique_uti"></textarea>
@@ -300,7 +300,8 @@ const dist = document.querySelector("#dist_met_uti");
 const suporteVent = document.querySelector("#suporte_vent_uti");
 const criterioSelect = document.querySelector("#criterio_uti"); // Select para critério
 var scoreSelect = document.querySelector("#score_uti");
-var justifyDiv = document.querySelector("#justifique_uti");
+var justifyDiv = document.querySelector("#justifique_uti_group");
+var justifyLabel = document.querySelector("#justifique_uti_label");
 var criteriaMessage = document.querySelector("#criteria_message");
 
 // Função para avaliar as condições
@@ -320,6 +321,7 @@ function avaliarStatus() {
         criterioSelect.value = "1"; // Alterar select para 1
         score = "1"; // Alterar score para 1
         justifyDiv.style.display = "none"; // Esconder justificativa
+        if (justifyLabel) justifyLabel.style.display = "";
         criteriaMessage.textContent = ""; // Limpar mensagem
         criteriaMessage.style.color = ""; // Resetar cor
         color = "green"; // Cor para UTI
@@ -335,6 +337,7 @@ function avaliarStatus() {
         criterioSelect.value = "2"; // Alterar select para 2
         score = "2"; // Alterar score para 2
         justifyDiv.style.display = "block"; // Mostrar justificativa
+        if (justifyLabel) justifyLabel.style.display = "";
         criteriaMessage.textContent = "Paciente com critérios para Semi";
         criteriaMessage.style.color = "orange"; // Cor para Semi
         color = "orange"; // Cor para Semi
@@ -345,6 +348,7 @@ function avaliarStatus() {
         criterioSelect.value = "3"; // Alterar select para 3
         score = "3"; // Alterar score para 3
         justifyDiv.style.display = "block"; // Mostrar justificativa
+        if (justifyLabel) justifyLabel.style.display = "none";
         criteriaMessage.textContent = "Paciente com critérios para Apto";
         criteriaMessage.style.color = "red"; // Cor para Apto
         color = "red"; // Cor para Apto

@@ -371,6 +371,25 @@ function parseTussQtdLiberada(value) {
     return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function validateTussQuantities(container, showMessage) {
+    if (!container) return true;
+    const solicitadaInput = container.querySelector('[name="qtd_tuss_solicitado"]');
+    const liberadaInput = container.querySelector('[name="qtd_tuss_liberado"]');
+    if (!solicitadaInput || !liberadaInput) return true;
+
+    const solicitadaRaw = String(solicitadaInput.value || '').trim();
+    const liberadaRaw = String(liberadaInput.value || '').trim();
+    const solicitada = parseTussQtdLiberada(solicitadaRaw);
+    const liberada = parseTussQtdLiberada(liberadaRaw);
+    const invalid = solicitadaRaw !== '' && liberadaRaw !== '' && liberada > solicitada;
+    const message = invalid ? 'A quantidade liberada não pode ser maior que a quantidade solicitada neste TUSS.' : '';
+
+    liberadaInput.setCustomValidity(message);
+    liberadaInput.classList.toggle('is-invalid', invalid);
+    if (invalid && showMessage) liberadaInput.reportValidity();
+    return !invalid;
+}
+
 function syncTussLiberadoFromQtd(container) {
     if (!container) return;
     const qtdLiberada = container.querySelector('[name="qtd_tuss_liberado"]');
@@ -382,6 +401,7 @@ function syncTussLiberadoFromQtd(container) {
 function generateTussJSON() {
     const tussFieldContainers = document.querySelectorAll(".tuss-field-container");
     const entries = Array.from(tussFieldContainers).map(container => {
+        validateTussQuantities(container, false);
         syncTussLiberadoFromQtd(container);
 
         // Pega fk_* na própria linha; se faltar, tenta pegar da linha inicial
@@ -410,18 +430,36 @@ function generateTussJSON() {
 }
 
 document.addEventListener('input', function(event) {
-    if (!event.target.matches('#container-tuss [name="qtd_tuss_liberado"]')) return;
+    if (!event.target.matches('#container-tuss [name="qtd_tuss_liberado"], #container-tuss [name="qtd_tuss_solicitado"]')) return;
     const row = event.target.closest('.tuss-field-container');
+    validateTussQuantities(row, false);
     syncTussLiberadoFromQtd(row);
     generateTussJSON();
 });
 
 document.addEventListener('change', function(event) {
-    if (!event.target.matches('#container-tuss [name="qtd_tuss_liberado"]')) return;
+    if (!event.target.matches('#container-tuss [name="qtd_tuss_liberado"], #container-tuss [name="qtd_tuss_solicitado"]')) return;
     const row = event.target.closest('.tuss-field-container');
+    validateTussQuantities(row, true);
     syncTussLiberadoFromQtd(row);
     generateTussJSON();
 });
+
+document.addEventListener('submit', function(event) {
+    const form = event.target;
+    const tussContainer = form && form.querySelector ? form.querySelector('#container-tuss') : null;
+    if (!tussContainer || tussContainer.style.display === 'none') return;
+    const invalidRow = Array.from(tussContainer.querySelectorAll('.tuss-field-container'))
+        .find(row => !validateTussQuantities(row, false));
+    if (!invalidRow) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const input = invalidRow.querySelector('[name="qtd_tuss_liberado"]');
+    if (input) {
+        input.scrollIntoView({block: 'center', behavior: 'smooth'});
+        input.reportValidity();
+    }
+}, true);
 
 // Limpa inputs mantendo só a primeira linha
 function clearTussInputs() {

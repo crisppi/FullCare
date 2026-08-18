@@ -4213,7 +4213,7 @@ function applyProrrogEntries(entries) {
         const diarias = target.querySelector('[name="diarias_1"]');
         if (diarias) diarias.value = entry.diarias_1 || '';
         if (typeof calculateDiarias === 'function') {
-            calculateDiarias(target);
+            calculateDiarias(target, { allowHistoricalFutureDates: true });
         }
     });
     if (typeof generateProrJSON === 'function') {

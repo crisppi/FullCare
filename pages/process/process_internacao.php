@@ -1242,6 +1242,12 @@ if ($type === "create") {
             $tussArray = json_decode($tussJson, true);
             if (is_array($tussArray) && isset($tussArray['tussEntries'])) {
                 foreach ($tussArray['tussEntries'] as $tussData) {
+                    $qtdSolicitadaValidacao = filter_var($tussData['qtd_tuss_solicitado'] ?? null, FILTER_VALIDATE_INT);
+                    $qtdLiberadaValidacao = filter_var($tussData['qtd_tuss_liberado'] ?? null, FILTER_VALIDATE_INT);
+                    if ($qtdSolicitadaValidacao !== false && $qtdLiberadaValidacao !== false
+                        && $qtdLiberadaValidacao > $qtdSolicitadaValidacao) {
+                        throw new InvalidArgumentException('A quantidade liberada do TUSS não pode ser maior que a quantidade solicitada.');
+                    }
                     $tuss = new tuss();
                     $tuss->fk_int_tuss = $lastId; // [FK:$lastId]
                     $tuss->fk_usuario_tuss = $tussData['fk_usuario_tuss'] ?? null;
