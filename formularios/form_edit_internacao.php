@@ -869,8 +869,6 @@
             }
         }
     </style>
-
-
     <div class="internacao-page">
         <div class="internacao-page__hero">
             <div class="internacao-page__hero-main">
@@ -3764,3 +3762,5 @@
             padding: 0 !important;
         }
     </style>
+    <!-- Fonte visual definitiva, carregada depois de todos os estilos locais. -->
+    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">

@@ -443,6 +443,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         box-shadow: 0 5px 12px rgba(21, 69, 105, .18) !important;
     }
 </style>
+<link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../../css/form_surface_contrast.css') ?>" rel="stylesheet">
 
 <div class="internacao-page cadastro-layout cadastro-hospital-page" id="main-container">
     <div class="internacao-page__hero">

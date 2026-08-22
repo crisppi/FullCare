@@ -313,6 +313,62 @@ body #main-container :is(.internacao-page, .visita-page) .bootstrap-select > .dr
     outline: none !important;
 }
 
+/* Cadastro de hospital: o container e a propria pagina, nao um descendente. */
+body #main-container.internacao-page.cadastro-hospital-page {
+    background: #e8eef5 !important;
+    border: 1px solid #c6d2df !important;
+}
+
+body #main-container.internacao-page.cadastro-hospital-page :is(
+    .internacao-card,
+    .entity-actions-bar
+) {
+    background: #ffffff !important;
+    border: 1px solid #b9c8d8 !important;
+    box-shadow: 0 8px 20px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container.internacao-page.cadastro-hospital-page :is(
+    .entity-step-card,
+    .inline-manager-card,
+    #acomodacao-inline-card
+) {
+    background: #f4f7fb !important;
+    border: 1px solid #c4d0dd !important;
+    box-shadow: 0 3px 9px rgba(30, 50, 74, .08) !important;
+}
+
+body #main-container.internacao-page.cadastro-hospital-page #multi-step-form :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control
+) {
+    background: #edf3f8 !important;
+    border: 1px solid #8297ae !important;
+    color: #172536 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .10) !important;
+}
+
+body #main-container.internacao-page.cadastro-hospital-page #multi-step-form :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control
+):hover {
+    background: #f7fbff !important;
+    border-color: #58728e !important;
+}
+
+body #main-container.internacao-page.cadastro-hospital-page #multi-step-form :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control
+):focus {
+    background: #ffffff !important;
+    border-color: #247eb2 !important;
+    box-shadow: 0 0 0 .16rem rgba(36, 126, 178, .22) !important;
+    outline: none !important;
+}
+
 body #main-container :is(.internacao-page, .visita-page) :is(input, textarea).form-control:disabled,
 body #main-container :is(.internacao-page, .visita-page) :is(input, textarea).form-control[readonly],
 body #main-container :is(.internacao-page, .visita-page) select.form-control:disabled {
@@ -1187,11 +1243,18 @@ body #main-container .visita-page #detalhes-card-wrapper #div-detalhado .d-flex.
     }
 }
 
-/*
- * Superficie definitiva dos formularios assistenciais.
- * Nao usa filho direto: o navegador pode reparar o HTML dos parciais e alterar
- * a hierarquia, mas todos os cards devem conservar o mesmo fundo cinza.
- */
+/* Garantia final: a mesma hierarquia da Visita vence qualquer legado. */
+body #main-container.form-surface-shell,
+body #main-container:has(.internacao-page),
+body #main-container:has(.visita-page) {
+    background: #dbe4ef !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) {
+    background: #e8eef5 !important;
+    border: 1px solid #c6d2df !important;
+}
+
 body #main-container :is(.internacao-page, .visita-page) :is(
     .internacao-card,
     .visita-card,
@@ -1205,5 +1268,42 @@ body #main-container :is(.internacao-page, .visita-page) :is(
     #container-uti .adicional-card,
     #container-negoc .adicional-card
 ) {
-    background: #eef1f5 !important;
+    background: #ffffff !important;
+    border: 1px solid #b9c8d8 !important;
+    box-shadow: 0 8px 20px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .detail-select,
+    .select-purple,
+    .visita-summary-card__input
+),
+body #main-container :is(.internacao-page, .visita-page) .bootstrap-select > .dropdown-toggle {
+    background: #edf3f8 !important;
+    border: 1px solid #8297ae !important;
+    color: #172536 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .10) !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .detail-select,
+    .select-purple,
+    .visita-summary-card__input
+):focus,
+body #main-container :is(.internacao-page, .visita-page) .bootstrap-select.show > .dropdown-toggle,
+body #main-container :is(.internacao-page, .visita-page) .bootstrap-select > .dropdown-toggle:focus {
+    background: #ffffff !important;
+    border-color: #247eb2 !important;
+    box-shadow: 0 0 0 .16rem rgba(36, 126, 178, .22) !important;
+    outline: none !important;
 }
