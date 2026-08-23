@@ -501,6 +501,391 @@ body #main-container .visita-page #detalhes-card-wrapper {
     box-shadow: none !important;
 }
 
+/* REGRA FINAL: contorno dos inputs, apos todo o legado dos cadastros. */
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .internacao-cid-search__input
+),
+body #main-container#main-container.cadastro-layout :is(.entity-form, #multi-step-form) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control
+),
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle {
+    border: 1px solid #9fb0c2 !important;
+    box-shadow:
+        inset 0 1px 2px rgba(30, 50, 74, .08),
+        0 1px 3px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .internacao-cid-search__input
+):focus,
+body #main-container#main-container.cadastro-layout :is(.entity-form, #multi-step-form) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control
+):focus,
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select.show > .dropdown-toggle,
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle:focus {
+    border-color: #2f89bd !important;
+    box-shadow:
+        0 0 0 .14rem rgba(47, 137, 189, .18),
+        0 1px 3px rgba(30, 50, 74, .14) !important;
+}
+
+/* Vence os seletores legados com muitas classes, mantendo a fonte externa unica. */
+body #main-container#main-container.cadastro-layout :is(.internacao-card, .entity-step-card, .entity-actions-bar),
+body #main-container#main-container.form-surface-shell :is(.internacao-card, .visita-card, .tabelas-adicionais-card) {
+    background: #fff !important;
+    border: 1px solid #cbd6e2 !important;
+    border-left: 1px solid #cbd6e2 !important;
+    border-right: 1px solid #cbd6e2 !important;
+    border-radius: 9px !important;
+    box-shadow: 0 3px 9px rgba(30, 50, 74, .08) !important;
+}
+
+body #main-container#main-container.cadastro-layout .entity-step-card::before,
+body #main-container#main-container.cadastro-layout .internacao-card::before,
+body #main-container#main-container.cadastro-layout .entity-actions-bar::before {
+    display: none !important;
+    content: none !important;
+    width: 0 !important;
+}
+
+body #main-container#main-container.cadastro-layout .entity-step-card {
+    padding-left: 9px !important;
+}
+
+body #main-container#main-container.cadastro-layout :is(.internacao-card__title, .entity-step-title),
+body #main-container#main-container.form-surface-shell :is(.internacao-card__title, .visita-card__title, .tabelas-adicionais-card__title) {
+    font-size: .82rem !important;
+    line-height: 1.15 !important;
+    font-weight: 750 !important;
+    color: #2b2140 !important;
+}
+
+body #main-container#main-container.cadastro-layout label,
+body #main-container#main-container.form-surface-shell :is(.internacao-page, .visita-page) label {
+    margin: 0 0 3px !important;
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+    font-weight: 650 !important;
+    color: #5f6570 !important;
+}
+
+body #main-container#main-container.cadastro-layout :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control
+),
+body #main-container#main-container.form-surface-shell :is(.internacao-page, .visita-page) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .internacao-cid-search__input
+),
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle {
+    min-height: 31px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #9fb0c2 !important;
+    border-radius: 7px !important;
+    background: #edf3f8 !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    line-height: 1.2 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08) !important;
+}
+
+/* Cadastros usam exatamente as metricas do cadastro de internacao. */
+body #main-container#main-container.cadastro-layout {
+    padding: 10px 10px 18px !important;
+}
+
+body #main-container#main-container.cadastro-layout .internacao-page__hero {
+    min-height: 50px !important;
+    height: 50px !important;
+    margin: 0 0 6px !important;
+    padding: 9px 12px !important;
+    border-radius: 10px !important;
+}
+
+body #main-container#main-container.cadastro-layout .internacao-page__hero h1 {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 1.02rem !important;
+    line-height: 1.1 !important;
+    font-weight: 800 !important;
+}
+
+body #main-container#main-container.cadastro-layout .internacao-page__content {
+    margin: 4px 0 0 !important;
+    padding: 0 !important;
+    gap: 8px !important;
+}
+
+body #main-container#main-container.cadastro-layout .internacao-card {
+    margin: 0 !important;
+    padding: 5px 8px 7px !important;
+    border: 1px solid #b9c8d8 !important;
+    border-radius: 9px !important;
+    background: #fff !important;
+    box-shadow: 0 8px 20px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container#main-container.cadastro-layout .internacao-card__header {
+    min-height: 34px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 6px 9px !important;
+    gap: 6px !important;
+    border-bottom: 1px solid #e1e7ef !important;
+}
+
+body #main-container#main-container.cadastro-layout .internacao-card__body {
+    margin: 0 !important;
+    padding: 8px 9px !important;
+    gap: 4px !important;
+}
+
+body #main-container#main-container.cadastro-layout .internacao-card__title {
+    margin: 0 !important;
+    padding: 10px 0 0 !important;
+    font-size: .82rem !important;
+    line-height: 1.15 !important;
+    font-weight: 750 !important;
+}
+
+body #main-container#main-container.cadastro-layout .entity-step-card {
+    margin-top: 8px !important;
+    padding: 8px 9px !important;
+    border: 1px solid #b9c8d8 !important;
+    border-radius: 9px !important;
+    background: #fff !important;
+    box-shadow: 0 8px 20px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container#main-container.cadastro-layout .entity-step-card:first-child {
+    margin-top: 0 !important;
+}
+
+body #main-container#main-container.cadastro-layout .entity-step-header {
+    min-height: 32px !important;
+    margin: 0 !important;
+    padding: 6px 9px !important;
+    border-bottom: 1px solid #e1e7ef !important;
+}
+
+/* Componentes adicionais de paciente, seguradora, estipulante e hospital. */
+body #main-container#main-container.cadastro-layout .inline-manager-card,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card {
+    margin: 0 0 8px !important;
+    padding: 7px 8px !important;
+    border: 1px solid #d3dce6 !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container.cadastro-layout :is(
+    .paciente-inline-section-title,
+    .seguradora-inline-section-title,
+    .estipulante-inline-section-title,
+    .hospital-inline-section-title,
+    .internacao-card__eyebrow
+) {
+    margin: 8px 0 4px !important;
+    color: #5f6570 !important;
+    font-size: .62rem !important;
+    line-height: 1.05 !important;
+    font-weight: 700 !important;
+    letter-spacing: .08em !important;
+}
+
+body #main-container#main-container.cadastro-layout .inline-manager-card :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control
+),
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control
+) {
+    min-height: 31px !important;
+    height: 31px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #9fb0c2 !important;
+    border-radius: 7px !important;
+    background: #edf3f8 !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    line-height: 1.2 !important;
+    box-shadow:
+        inset 0 1px 2px rgba(30, 50, 74, .08),
+        0 1px 2px rgba(30, 50, 74, .10) !important;
+}
+
+body #main-container#main-container.cadastro-layout .inline-manager-card textarea.form-control,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card textarea.form-control {
+    min-height: 58px !important;
+    height: auto !important;
+}
+
+body #main-container#main-container.cadastro-layout .inline-manager-card .table-responsive,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card .table-responsive {
+    margin-top: 6px !important;
+    border: 1px solid #d8e1eb !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    overflow: hidden !important;
+}
+
+body #main-container#main-container.cadastro-layout .inline-manager-card table,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card table {
+    margin: 0 !important;
+    border: 0 !important;
+    border-collapse: collapse !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    font-size: .62rem !important;
+}
+
+body #main-container#main-container.cadastro-layout .inline-manager-card table thead,
+body #main-container#main-container.cadastro-layout .inline-manager-card table thead tr,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card table thead,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card table thead tr {
+    height: 22px !important;
+    min-height: 22px !important;
+    background: #2f6f9f !important;
+}
+
+body #main-container#main-container.cadastro-layout .inline-manager-card table thead th,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card table thead th {
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 1px 5px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #d9e8f1 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #fff !important;
+    font-size: .60rem !important;
+    line-height: 1 !important;
+    font-weight: 650 !important;
+    letter-spacing: .025em !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    vertical-align: middle !important;
+}
+
+body #main-container#main-container.cadastro-layout .inline-manager-card table tbody td,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card table tbody td {
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 1px 5px !important;
+    border: 0 !important;
+    border-top: 1px solid #edf1f5 !important;
+    background: #fff !important;
+    color: #66717f !important;
+    font-size: .60rem !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
+}
+
+body #main-container#main-container.cadastro-layout .inline-manager-card .inline-add-btn,
+body #main-container#main-container.cadastro-layout #acomodacao-inline-card .inline-add-btn {
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    border-radius: 7px !important;
+    font-size: .8rem !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+/* Paineis de tabelas adicionais da internacao/visita seguem o mesmo fundo e campos. */
+body #main-container#main-container.form-surface-shell :is(
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) :is(.adicional-card, .detalhes-card) {
+    border: 1px solid #d3dce6 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container.form-surface-shell :is(
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control) {
+    border: 1px solid #9fb0c2 !important;
+    background: #edf3f8 !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    box-shadow:
+        inset 0 1px 2px rgba(30, 50, 74, .08),
+        0 1px 2px rgba(30, 50, 74, .10) !important;
+}
+
+/* Contorno suave comum para campos principais de cadastro e edicao. */
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .internacao-cid-search__input
+),
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle {
+    border-color: #9fb0c2 !important;
+    box-shadow:
+        inset 0 1px 2px rgba(30, 50, 74, .08),
+        0 1px 2px rgba(30, 50, 74, .10) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .internacao-cid-search__input
+):focus,
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select.show > .dropdown-toggle,
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle:focus {
+    border-color: #2f89bd !important;
+    box-shadow:
+        0 0 0 .14rem rgba(47, 137, 189, .18),
+        0 1px 3px rgba(30, 50, 74, .12) !important;
+}
+
 body #main-container :is(.internacao-page, .visita-page) :is(
     .detalhes-card__marker,
     .adicional-card__marker,
@@ -1306,4 +1691,542 @@ body #main-container :is(.internacao-page, .visita-page) .bootstrap-select > .dr
     border-color: #247eb2 !important;
     box-shadow: 0 0 0 .16rem rgba(36, 126, 178, .22) !important;
     outline: none !important;
+}
+/* Pesquisa remota de CID: evita montar milhares de opcoes no DOM. */
+.internacao-cid-search { position: relative; width: 100%; }
+.internacao-cid-search__select {
+    position: absolute !important; width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important; overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important;
+}
+.internacao-cid-search__input { width: 100%; }
+.internacao-cid-search__results {
+    position: absolute; z-index: 1060; top: calc(100% + 3px); left: 0; right: 0;
+    max-height: 280px; overflow-y: auto; background: #fff; border: 1px solid #b8c9dc;
+    border-radius: 8px; box-shadow: 0 10px 24px rgba(31, 55, 86, .16);
+}
+.internacao-cid-search__option {
+    display: block; width: 100%; padding: 8px 10px; border: 0;
+    border-bottom: 1px solid #edf1f6; background: #fff; color: #26364a;
+    text-align: left; cursor: pointer;
+}
+.internacao-cid-search__option:hover,
+.internacao-cid-search__option:focus { background: #eaf4ff; outline: 0; }
+
+/* Camada final compartilhada: cadastros, edicoes e fluxo assistencial. */
+body #main-container:is(.cadastro-layout, .form-surface-shell),
+body #main-container:has(> .internacao-page),
+body #main-container:has(> .visita-page) {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: calc(100vh - 145px) !important;
+    margin: 0 !important;
+    padding: 6px 4px 18px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #dbe4ef !important;
+}
+
+body #main-container.cadastro-layout,
+body #main-container.form-surface-shell > :is(.internacao-page, .visita-page),
+body #main-container > :is(.internacao-page, .visita-page) {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 4px 6px 18px !important;
+    border: 1px solid #c6d2df !important;
+    border-radius: 12px !important;
+    background: #e8eef5 !important;
+}
+
+body #main-container :is(.internacao-page__hero, .visita-page__hero),
+body #main-container:is(.cadastro-layout, .form-surface-shell) :is(.internacao-page__hero, .visita-page__hero) {
+    min-height: 50px !important;
+    margin: 0 0 6px !important;
+    padding: 9px 12px !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+}
+
+body #main-container :is(.internacao-page__hero, .visita-page__hero) h1,
+body #main-container:is(.cadastro-layout, .form-surface-shell) :is(.internacao-page__hero, .visita-page__hero) h1 {
+    margin: 0 !important;
+    font-size: 1.02rem !important;
+    line-height: 1.1 !important;
+    font-weight: 800 !important;
+}
+
+body #main-container :is(.internacao-page__content, .visita-page__content) {
+    gap: 8px !important;
+}
+
+body #main-container :is(.internacao-card, .visita-card, .tabelas-adicionais-card),
+body #main-container.cadastro-layout :is(.internacao-card, .entity-step-card, .entity-actions-bar) {
+    background: #fff !important;
+    border: 1px solid #cbd6e2 !important;
+    border-left: 1px solid #cbd6e2 !important;
+    border-right: 1px solid #cbd6e2 !important;
+    border-radius: 9px !important;
+    box-shadow: 0 3px 9px rgba(30, 50, 74, .08) !important;
+}
+
+body #main-container.cadastro-layout .internacao-card,
+body #main-container.cadastro-layout .entity-step-card {
+    border-left-color: #cbd6e2 !important;
+    border-right-color: #cbd6e2 !important;
+}
+
+body #main-container :is(.internacao-card__header, .visita-card__header, .tabelas-adicionais-card__header),
+body #main-container.cadastro-layout :is(.internacao-card__header, .entity-step-header) {
+    min-height: 32px !important;
+    margin: 0 !important;
+    padding: 6px 9px !important;
+    border-bottom: 1px solid #e1e7ef !important;
+}
+
+body #main-container :is(.internacao-card__title, .visita-card__title, .tabelas-adicionais-card__title),
+body #main-container.cadastro-layout :is(.internacao-card__title, .entity-step-title) {
+    margin: 0 !important;
+    font-size: .82rem !important;
+    line-height: 1.15 !important;
+    font-weight: 750 !important;
+    color: #2b2140 !important;
+}
+
+body #main-container :is(.internacao-card__body, .visita-card__body),
+body #main-container.cadastro-layout :is(.internacao-card__body, .entity-step-panel) {
+    padding: 8px 9px !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page, .cadastro-layout) label,
+body #main-container.cadastro-layout label {
+    margin: 0 0 3px !important;
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+    font-weight: 650 !important;
+    color: #5f6570 !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .internacao-cid-search__input
+),
+body #main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle {
+    min-height: 31px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #9fb0c2 !important;
+    border-radius: 7px !important;
+    background: #edf3f8 !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    line-height: 1.2 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08) !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page, .cadastro-layout) textarea.form-control {
+    min-height: 58px !important;
+    height: auto !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .form-select,
+    .form-control-sm.form-control,
+    .internacao-cid-search__input
+):focus,
+body #main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select.show > .dropdown-toggle,
+body #main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle:focus {
+    border-color: #2f89bd !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 .14rem rgba(47, 137, 189, .18) !important;
+    outline: 0 !important;
+}
+
+/* Tabelas adicionais permanecem subordinadas ao card da internacao. */
+body #main-container .internacao-page .tabelas-adicionais-card,
+body #main-container .visita-page .tabelas-adicionais-card {
+    margin-top: 8px !important;
+    padding: 8px 9px !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) .tabelas-adicionais-card > .tabelas-selects {
+    gap: 8px !important;
+    padding: 0 !important;
+}
+
+body #main-container :is(.internacao-page, .visita-page) :is(
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) .adicional-card {
+    margin-top: 8px !important;
+    padding: 8px 9px !important;
+    border: 1px solid #d3dce6 !important;
+    border-left: 1px solid #d3dce6 !important;
+    border-radius: 8px !important;
+    background: #f7f9fc !important;
+    box-shadow: none !important;
+}
+
+/* Ultima declaracao do arquivo: contorno comum inclusive no paciente. */
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control, .internacao-cid-search__input),
+body #main-container#main-container.cadastro-layout :is(.entity-form, #multi-step-form) :is(input.form-control, select.form-control, textarea.form-control),
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle {
+    border: 1px solid #9fb0c2 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08), 0 1px 3px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control, .internacao-cid-search__input):focus,
+body #main-container#main-container.cadastro-layout :is(.entity-form, #multi-step-form) :is(input.form-control, select.form-control, textarea.form-control):focus,
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select.show > .dropdown-toggle,
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .bootstrap-select > .dropdown-toggle:focus {
+    border-color: #2f89bd !important;
+    box-shadow: 0 0 0 .14rem rgba(47, 137, 189, .18), 0 1px 3px rgba(30, 50, 74, .14) !important;
+}
+
+/* Paciente: elimina o card gigante e usa secoes irmas como na internacao. */
+body #main-container#main-container.cadastro-layout:is(.cadastro-paciente-page, :has(#step-cpt-carencia)) .internacao-card--general {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container.cadastro-layout:is(.cadastro-paciente-page, :has(#step-cpt-carencia)) .internacao-card--general > .internacao-card__header {
+    min-height: 34px !important;
+    margin: 0 !important;
+    padding: 6px 9px !important;
+    border: 1px solid #b9c8d8 !important;
+    border-bottom: 0 !important;
+    border-radius: 9px 9px 0 0 !important;
+    background: #fff !important;
+    box-shadow: 0 8px 20px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container#main-container.cadastro-layout:is(.cadastro-paciente-page, :has(#step-cpt-carencia)) .internacao-card--general > .internacao-card__body {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+body #main-container#main-container.cadastro-layout:is(.cadastro-paciente-page, :has(#step-cpt-carencia)) .internacao-card--general > .internacao-card__body > #step-1 {
+    margin-top: 0 !important;
+    border-top: 1px solid #e1e7ef !important;
+    border-radius: 0 0 9px 9px !important;
+}
+
+body #main-container#main-container.cadastro-layout:is(.cadastro-paciente-page, :has(#step-cpt-carencia)) .internacao-card--general > .internacao-card__body > :is(#step-2, #step-3, .entity-actions-bar),
+body #main-container#main-container.cadastro-layout:is(.cadastro-paciente-page, :has(#step-cpt-carencia)) .internacao-card--general > .internacao-card__body > .entity-step-card:not(#step-1) {
+    margin-top: 8px !important;
+}
+
+body #main-container#main-container.cadastro-layout:is(.cadastro-paciente-page, :has(#step-cpt-carencia)) .internacao-card--general > .internacao-card__body > .entity-actions-bar {
+    padding: 8px 9px !important;
+    border: 1px solid #b9c8d8 !important;
+    border-radius: 9px !important;
+    background: #fff !important;
+    box-shadow: 0 8px 20px rgba(30, 50, 74, .14) !important;
+}
+
+/* Padrao definitivo das tabelas adicionais em cadastro e edicao. */
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    #detalhes-card-wrapper .detalhes-card,
+    #container-tuss .adicional-card,
+    #container-prorrog .adicional-card,
+    #container-gestao .adicional-card,
+    #container-uti .adicional-card,
+    #container-negoc .adicional-card
+) {
+    border: 1px solid #b9c8d8 !important;
+    border-left: 1px solid #b9c8d8 !important;
+    border-radius: 9px !important;
+    background: #fff !important;
+    box-shadow: 0 3px 9px rgba(30, 50, 74, .08) !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .tabelas-adicionais-card__header,
+    .visita-card--tabelas > .visita-card__header,
+    .adicional-card__header,
+    .detalhes-card__header
+) {
+    min-height: 32px !important;
+    margin: 0 !important;
+    padding: 6px 9px !important;
+    border-bottom: 1px solid #e1e7ef !important;
+    background: #fff !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .tabelas-adicionais-card__eyebrow,
+    .visita-card--tabelas .visita-card__eyebrow
+) {
+    margin: 0 0 2px !important;
+    color: #5f6570 !important;
+    font-size: .60rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    letter-spacing: .08em !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .tabelas-adicionais-card__title,
+    .visita-card--tabelas .visita-card__title,
+    .adicional-card__title,
+    .detalhes-card__title
+) {
+    margin: 0 !important;
+    color: #2b2140 !important;
+    font-size: .82rem !important;
+    line-height: 1.15 !important;
+    font-weight: 750 !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) label {
+    margin: 0 0 3px !important;
+    color: #5f6570 !important;
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+    font-weight: 650 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control, .bootstrap-select > .dropdown-toggle) {
+    min-height: 31px !important;
+    height: 31px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #9fb0c2 !important;
+    border-radius: 7px !important;
+    background: #edf3f8 !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    line-height: 1.2 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08), 0 1px 3px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .tabelas-adicionais-card,
+    .visita-card--tabelas,
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) textarea.form-control {
+    min-height: 58px !important;
+    height: auto !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    .adicional-card,
+    .detalhes-card
+) .table-responsive {
+    margin-top: 6px !important;
+    border: 1px solid #d8e1eb !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    overflow: hidden !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    .adicional-card,
+    .detalhes-card
+) table thead,
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    .adicional-card,
+    .detalhes-card
+) table thead tr {
+    height: 22px !important;
+    min-height: 22px !important;
+    background: #2f6f9f !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    .adicional-card,
+    .detalhes-card
+) table thead th {
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 1px 5px !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #fff !important;
+    font-size: .60rem !important;
+    line-height: 1 !important;
+    font-weight: 650 !important;
+    letter-spacing: .025em !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    vertical-align: middle !important;
+}
+
+/* Internacao e visita usam uma camada interna com a classe da pagina. */
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(.tabelas-adicionais-card, .visita-card--tabelas) .tabelas-selects :is(
+    #relatorio-detalhado,
+    #select_relatorio_detalhado,
+    #select_tuss,
+    #select_prorrog,
+    #select_gestao,
+    #select_uti,
+    #select_negoc
+),
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) .bootstrap-select > .dropdown-toggle {
+    min-height: 31px !important;
+    height: 31px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #9fb0c2 !important;
+    border-radius: 7px !important;
+    background: #edf3f8 !important;
+    background-color: #edf3f8 !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    line-height: 1.2 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08), 0 1px 3px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(
+    #relatorio-detalhado#relatorio-detalhado,
+    #select_relatorio_detalhado#select_relatorio_detalhado,
+    #select_tuss#select_tuss,
+    #select_prorrog#select_prorrog,
+    #select_gestao#select_gestao,
+    #select_uti#select_uti,
+    #select_negoc#select_negoc
+) {
+    border-color: #9fb0c2 !important;
+    background: #edf3f8 !important;
+    background-color: #edf3f8 !important;
+    background-image: none !important;
+    color: #26364a !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08), 0 1px 3px rgba(30, 50, 74, .14) !important;
+}
+
+/* Neutraliza as cores legadas dos seletores que ligam os complementos. */
+body #main-container#main-container:is(.internacao-page, .visita-page) .tabelas-adicionais-card > .tabelas-selects :is(
+    #relatorio-detalhado,
+    #select_relatorio_detalhado,
+    #select_tuss,
+    #select_prorrog,
+    #select_gestao,
+    #select_uti,
+    #select_negoc
+),
+body #main-container#main-container:is(.internacao-page, .visita-page) .visita-card--tabelas .tabelas-selects :is(
+    #relatorio-detalhado,
+    #select_relatorio_detalhado,
+    #select_tuss,
+    #select_prorrog,
+    #select_gestao,
+    #select_uti,
+    #select_negoc
+),
+body #main-container#main-container:is(.internacao-page, .visita-page) :is(
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
+body #main-container#main-container:is(.internacao-page, .visita-page) :is(
+    #detalhes-card-wrapper,
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) .bootstrap-select > .dropdown-toggle {
+    min-height: 31px !important;
+    height: 31px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #9fb0c2 !important;
+    border-radius: 7px !important;
+    background: #edf3f8 !important;
+    background-color: #edf3f8 !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    line-height: 1.2 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08), 0 1px 3px rgba(30, 50, 74, .14) !important;
+}
+
+body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .inline-manager-card,
+    #acomodacao-inline-card,
+    .adicional-card,
+    .detalhes-card
+) table tbody td {
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 1px 5px !important;
+    border: 0 !important;
+    border-top: 1px solid #edf1f5 !important;
+    background: #fff !important;
+    color: #66717f !important;
+    font-size: .60rem !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
 }

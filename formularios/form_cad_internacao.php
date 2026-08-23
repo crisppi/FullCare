@@ -689,14 +689,9 @@
                             <div class="form-group assist-col-cid">
                                 <label class="control-label" for="fk_cid_int">CID (Patologia)</label>
                                 <div class="assist-select-clear">
-                                    <select class="form-control selectpicker show-tick" data-size="10" id="fk_cid_int" name="fk_cid_int"
+                            <select class="form-control internacao-cid-select" id="fk_cid_int" name="fk_cid_int"
                                         data-live-search="true" data-width="100%" data-style="input-lg-fullcare">
                                         <option value="">CID</option>
-                                        <?php foreach ($cids as $cid): ?>
-                                            <option value="<?= $cid["id_cid"] ?>">
-                                                <?= $cid['cat'] . " - " . $cid["descricao"] ?>
-                                            </option>
-                                        <?php endforeach; ?>
                                     </select>
                                     <button type="button" class="assist-clear-btn" data-clear-select="fk_cid_int" aria-label="Limpar CID">&times;</button>
                                 </div>
@@ -705,15 +700,10 @@
                             <div class="form-group assist-col-antecedente">
                                 <label class="control-label" for="fk_patologia2">Antecedente</label>
                                 <div class="assist-select-clear">
-                                    <select class="form-control selectpicker show-tick" data-size="10" id="fk_patologia2" name="fk_patologia2"
+                            <select class="form-control internacao-cid-select" id="fk_patologia2" name="fk_patologia2"
                                         data-live-search="true" data-width="100%" data-style="input-lg-fullcare"
                                         data-live-search-placeholder="Pesquisar">
                                         <option value="">Antecedente</option>
-                                        <?php foreach ($cids as $cid): ?>
-                                            <option value="<?= (int)$cid["id_cid"] ?>">
-                                                <?= htmlspecialchars($cid['cat'] . " - " . $cid["descricao"]) ?>
-                                            </option>
-                                        <?php endforeach; ?>
                                     </select>
                                     <button type="button" class="assist-clear-btn" data-clear-select="fk_patologia2" aria-label="Limpar antecedente">&times;</button>
                                 </div>
@@ -749,27 +739,6 @@
                                     name="num_atendimento_int">
                             </div>
                         </div>
-                        <script>
-                            (function() {
-                                if (!window.jQuery || !jQuery.fn || !jQuery.fn.selectpicker) return;
-                                ['#fk_cid_int', '#fk_patologia2'].forEach(function(sel) {
-                                    var $el = jQuery(sel);
-                                    if (!$el.length) return;
-                                    var hasWrapper = $el.siblings('div.bootstrap-select').length > 0;
-                                    if (!hasWrapper && !$el.data('selectpicker')) {
-                                        $el.selectpicker();
-                                    }
-                                    if ($el.siblings('div.bootstrap-select').length > 1) {
-                                        $el.siblings('div.bootstrap-select').slice(1).remove();
-                                    }
-                                    if ($el.siblings('div.bootstrap-select').length) {
-                                        $el.addClass('bs-select-hidden');
-                                        $el.attr('data-fcx-picker-locked', '1');
-                                    }
-                                });
-                            })();
-                        </script>
-
                     </div>
                 </div>
         </div>
@@ -1723,6 +1692,7 @@
         });
     </script>
     <script src="<?= $BASE_URL ?>js/form_cad_internacao.js?v=<?= filemtime(__DIR__ . '/../js/form_cad_internacao.js') ?>"></script>
+    <script src="<?= $BASE_URL ?>js/internacao_cid_search.js?v=<?= filemtime(__DIR__ . '/../js/internacao_cid_search.js') ?>"></script>
     <script>
     /* Abre o popup de perfil do hospital para auditor médico, enfermagem e diretoria. */
     (function() {
@@ -1904,10 +1874,6 @@
             window.validateDataInternacaoFuture = validateFutureInternacaoDate;
         })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <!-- Padronizacao visual carregada por ultimo para ser a fonte definitiva da tela. -->
     <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
     <!-- <script src="<?= $BASE_URL ?>js/saude-autocomplete.js?v=2"></script> -->

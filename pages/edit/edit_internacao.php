@@ -132,17 +132,6 @@ $tussGeral = $tuss->findAll();
 
 <script src="js/timeout.js"></script>
 
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
-<!-- CSS do Bootstrap-Select -->
-<link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css">
-
-<!-- JS do Bootstrap-Select -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
-<script src="./scripts/cadastro/general.js"></script>
-
 <?php
 require_once("templates/footer.php");
 ?>

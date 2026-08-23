@@ -1079,12 +1079,13 @@
                     <div class="form-group mb-2">
                         <label class="control-label" for="fk_cid_int">CID (Patologia)</label>
                         <div class="assist-select-clear">
-                            <select class="form-control selectpicker show-tick bs-select-hidden" data-size="5" id="fk_cid_int"
-                                name="fk_cid_int" data-live-search="true" data-width="100%" data-style="input-lg-fullcare">
+                            <select class="form-control internacao-cid-select" id="fk_cid_int"
+                                name="fk_cid_int">
                                 <option value="">Cid</option>
 
                                 <?php foreach ($cids as $cid): ?>
                                     <?php $idCid = (int)$cid['id_cid']; ?>
+                                    <?php if ($cidSelecionado !== $idCid) continue; ?>
                                     <option value="<?= $idCid ?>" <?= ($cidSelecionado == $idCid) ? 'selected' : '' ?>>
                                         <?= $cid['cat'] . " - " . $cid["descricao"] ?>
                                     </option>
@@ -1097,11 +1098,12 @@
                     <div class="form-group mb-2">
                         <label class="control-label" for="fk_patologia2">Antecedente</label>
                         <div class="assist-select-clear">
-                            <select class="form-control selectpicker show-tick bs-select-hidden" data-size="5" id="fk_patologia2"
-                                name="fk_patologia2" data-live-search="true" data-width="100%" data-style="input-lg-fullcare">
+                            <select class="form-control internacao-cid-select" id="fk_patologia2"
+                                name="fk_patologia2">
                                 <option value="">Antecedente</option>
                                 <?php foreach ($cids as $cid): ?>
                                     <?php $idCidAnte = (int)$cid['id_cid']; ?>
+                                    <?php if ($antecedenteSelecionado !== $idCidAnte) continue; ?>
                                     <option value="<?= $idCidAnte ?>" <?= ($antecedenteSelecionado == $idCidAnte) ? 'selected' : '' ?>>
                                         <?= $cid['cat'] . " - " . $cid["descricao"] ?>
                                     </option>
@@ -1857,13 +1859,24 @@
     </script>
     <script>
         $(document).ready(function() {
-            // Verifica se a função existe antes de chamar
             if (typeof $.fn.selectpicker === 'function') {
-                $('.selectpicker').selectpicker();
-                // Listener para quando carregar
-                $('.selectpicker').on('loaded.bs.select', function() {
-                    $('.bs-searchbox input').attr('placeholder', 'Digite para pesquisar...');
+                $('.selectpicker').each(function() {
+                    var $select = $(this);
+
+                    // O header já pode ter inicializado componentes inseridos por modal.
+                    // Nunca recrie o bootstrap-select: listas grandes de CID geram milhares
+                    // de elementos e uma segunda montagem bloqueia a thread principal.
+                    if (!$select.data('selectpicker') && !$select.next('.bootstrap-select').length) {
+                        $select.selectpicker();
+                    }
                 });
+
+                $(document)
+                    .off('loaded.bs.select.internacaoPlaceholder', '.selectpicker')
+                    .on('loaded.bs.select.internacaoPlaceholder', '.selectpicker', function() {
+                        $(this).next('.bootstrap-select').find('.bs-searchbox input')
+                            .attr('placeholder', 'Digite para pesquisar...');
+                    });
             }
         });
     </script>
@@ -1968,6 +1981,7 @@
     </script>
     <script src="<?= $BASE_URL ?>js/clinical_text_tools.js?v=<?= filemtime(__DIR__ . '/../js/clinical_text_tools.js') ?>"></script>
     <script src="<?= $BASE_URL ?>js/select_internacao.js?v=<?= filemtime(__DIR__ . '/../js/select_internacao.js') ?>"></script>
+    <script src="<?= $BASE_URL ?>js/internacao_cid_search.js?v=<?= filemtime(__DIR__ . '/../js/internacao_cid_search.js') ?>"></script>
 
     <script>
         let pacienteStatus = null; // Variável global para armazenar o status do paciente

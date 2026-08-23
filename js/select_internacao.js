@@ -12,18 +12,14 @@ function bindInternacaoAdditionalTables() {
         const visibleButton = document.querySelector('.tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="' + select.id + '"]');
         const controls = [select, visibleButton].filter(Boolean);
         controls.forEach((control) => {
-            control.style.setProperty('border', active ? '1px solid #5b8ee8' : '1px solid #83aef2', 'important');
-            control.style.setProperty('background', active ? 'linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%)' : 'linear-gradient(180deg, #eaf4ff 0%, #d6eaff 100%)', 'important');
-            control.style.setProperty('background-color', active ? '#dbeafe' : '#eaf4ff', 'important');
-            control.style.setProperty('color', '#1f4d85', 'important');
-            control.style.setProperty('font-weight', '750', 'important');
-            control.style.setProperty('box-shadow', active ? '0 0 0 .14rem rgba(91, 142, 232, .16)' : 'inset 0 0 0 1px rgba(62, 113, 198, .12)', 'important');
+            ['border', 'background', 'background-color', 'color', 'font-weight', 'box-shadow'].forEach((property) => control.style.removeProperty(property));
+            control.classList.toggle('additional-launcher-active', active);
         });
 
         if (visibleButton) {
             visibleButton.querySelectorAll('.filter-option, .filter-option-inner, .filter-option-inner-inner').forEach((node) => {
-                node.style.setProperty('color', '#1f4d85', 'important');
-                node.style.setProperty('font-weight', '750', 'important');
+                node.style.removeProperty('color');
+                node.style.removeProperty('font-weight');
             });
         }
     }
