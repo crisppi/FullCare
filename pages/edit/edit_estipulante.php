@@ -128,21 +128,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
         align-items: center;
     }
 
-    #main-container.internacao-page .hero-back-btn {
-        border-radius: 999px;
-        border: 1px solid #d9c3f4;
-        color: #5e2363;
-        padding: 6px 12px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: .78rem;
-        background: #f4ecfb;
-    }
 
-    #main-container.internacao-page .hero-back-btn:hover {
-        color: #4a1b4e;
-        background: #eadcf8;
-    }
 
     #main-container.internacao-page .internacao-card__eyebrow {
         font-weight: 700 !important;
@@ -324,12 +310,6 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
         border-top: 1px solid #e8ebf0;
     }
 
-    .inline-manager-card {
-        background: #f7f5fb;
-        border: 1px solid #e8def1;
-        border-radius: 10px;
-        padding: 9px;
-    }
 </style>
 
 <!-- Formulário de Edição -->

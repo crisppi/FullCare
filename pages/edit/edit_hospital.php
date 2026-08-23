@@ -171,21 +171,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
         align-items: center;
     }
 
-    #main-container.internacao-page .hero-back-btn {
-        border-radius: 999px;
-        border: 1px solid #d9c3f4;
-        color: #5e2363;
-        padding: 7px 14px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: .85rem;
-        background: #f4ecfb;
-    }
 
-    #main-container.internacao-page .hero-back-btn:hover {
-        color: #4a1b4e;
-        background: #eadcf8;
-    }
 
     #main-container.internacao-page .internacao-card__eyebrow {
         font-weight: 700 !important;
@@ -239,19 +225,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
         border-top: 1px solid #e8ebf0;
     }
 
-    #acomodacao-inline-card {
-        background: #f7f5fb;
-        border: 1px solid #e8def1;
-        border-radius: 14px;
-        padding: 14px;
-    }
 
-    .inline-manager-card {
-        background: #f7f5fb;
-        border: 1px solid #e8def1;
-        border-radius: 14px;
-        padding: 14px;
-    }
 
     #main-container.compact-edit-layout .hospital-grid-row {
         display: grid !important;

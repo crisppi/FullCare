@@ -157,21 +157,7 @@ if (empty($telefonesPaciente)) {
         align-items: center;
     }
 
-    #main-container.internacao-page .hero-back-btn {
-        border-radius: 999px;
-        border: 1px solid #d9c3f4;
-        color: #5e2363;
-        padding: 7px 14px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: .85rem;
-        background: #f4ecfb;
-    }
 
-    #main-container.internacao-page .hero-back-btn:hover {
-        color: #4a1b4e;
-        background: #eadcf8;
-    }
 
     #main-container.internacao-page .internacao-card__eyebrow {
         font-weight: 700 !important;
@@ -236,20 +222,6 @@ if (empty($telefonesPaciente)) {
         background: rgba(94, 35, 99, .06);
     }
 
-    #main-container.internacao-page .entity-step-toggle {
-        border: 1px solid rgba(94, 35, 99, .22);
-        background: #fff;
-        color: #5e2363;
-        border-radius: 999px;
-        padding: 4px 9px;
-        font-size: .72rem;
-        font-weight: 700;
-        line-height: 1;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
-    }
 
     #main-container.internacao-page .entity-step-toggle::after {
         content: "";
