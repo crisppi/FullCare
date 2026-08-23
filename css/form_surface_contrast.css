@@ -2109,6 +2109,251 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     vertical-align: middle !important;
 }
 
+/* Mensagens de tabela vazia ficam neutras e compactas. */
+body #main-container#main-container#main-container.cadastro-layout :is(.inline-manager-card, .adicional-card, .detalhes-card, .tabelas-adicionais-card) table tbody td.text-muted.text-center,
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(.inline-manager-card, .adicional-card, .detalhes-card, .tabelas-adicionais-card) table tbody td.text-muted.text-center {
+    height: 24px !important;
+    padding: 5px 8px !important;
+    border-top: 1px solid #edf1f5 !important;
+    background: #fafbfd !important;
+    color: #8a94a2 !important;
+    font-size: .60rem !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
+    line-height: 1.1 !important;
+}
+
+/* Cadastros aplicam cadastro-layout no proprio container principal. */
+body #main-container#main-container.cadastro-layout [data-counter-for] {
+    display: block !important; margin: 3px 1px 0 !important; color: #7b8490 !important;
+    font-size: .60rem !important; font-weight: 500 !important; line-height: 1 !important; text-align: right !important;
+}
+
+body #main-container#main-container.cadastro-layout :is(.internacao-card__tag, .visita-card__tag) {
+    display: inline-flex !important; align-items: center !important; min-height: 24px !important;
+    padding: 3px 8px !important; border: 1px solid #ddcee2 !important; border-radius: 999px !important;
+    background: #f7f1f9 !important; color: #68406f !important; font-size: .62rem !important;
+    font-weight: 700 !important; line-height: 1 !important; white-space: nowrap !important;
+}
+
+body #main-container#main-container.cadastro-layout :is(.internacao-card__tag--critical, .visita-card__tag--critical) {
+    border-color: #efcfad !important; background: #fff7ed !important; color: #a55414 !important;
+}
+
+body #main-container#main-container.cadastro-layout .invalid-feedback {
+    margin-top: 2px !important; color: #b4232f !important; font-size: .60rem !important;
+    font-weight: 600 !important; line-height: 1.2 !important;
+}
+
+body #main-container#main-container.cadastro-layout .notif-input {
+    margin-top: 3px !important; padding: 5px 7px !important; border: 1px solid #efb6bd !important;
+    border-radius: 6px !important; background: #fff4f5 !important; color: #a61b2b !important;
+    font-size: .62rem !important; font-weight: 600 !important; line-height: 1.2 !important;
+}
+
+body #main-container#main-container.cadastro-layout .alert {
+    margin: 6px 0 !important; padding: 7px 9px !important; border-width: 1px !important;
+    border-style: solid !important; border-radius: 7px !important; box-shadow: none !important;
+    font-size: .65rem !important; line-height: 1.25 !important;
+}
+
+body #main-container#main-container.cadastro-layout :is(.parecer-ia-empty, .prorrog-ia-empty, .tuss-ac-empty) {
+    margin: 0 !important; padding: 6px 8px !important; border: 1px dashed #d7e0ea !important;
+    border-radius: 6px !important; background: #f8fafc !important; color: #7b8490 !important;
+    font-size: .62rem !important; font-style: normal !important; line-height: 1.2 !important;
+}
+
+body #main-container#main-container#main-container.cadastro-layout :is(.inline-manager-card, .adicional-card, .detalhes-card, .tabelas-adicionais-card) table tbody td.text-muted.text-center {
+    height: 24px !important; padding: 5px 8px !important; border-top: 1px solid #edf1f5 !important;
+    background: #fafbfd !important; color: #8a94a2 !important; font-size: .60rem !important;
+    font-style: normal !important; font-weight: 500 !important; line-height: 1.1 !important;
+}
+
+/* Indicadores e mensagens comuns dos formularios. */
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) [data-counter-for] {
+    display: block !important;
+    margin: 3px 1px 0 !important;
+    color: #7b8490 !important;
+    font-size: .60rem !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    text-align: right !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    #autosave-status,
+    #clinical-autosave-status
+) {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 23px !important;
+    margin: 0 !important;
+    padding: 3px 7px !important;
+    border: 1px solid #d7e0ea !important;
+    border-radius: 999px !important;
+    background: #f7f9fc !important;
+    color: #687383 !important;
+    font-size: .60rem !important;
+    font-weight: 600 !important;
+    line-height: 1.1 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .internacao-card__tag,
+    .visita-card__tag
+) {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 24px !important;
+    padding: 3px 8px !important;
+    border: 1px solid #ddcee2 !important;
+    border-radius: 999px !important;
+    background: #f7f1f9 !important;
+    color: #68406f !important;
+    font-size: .62rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .internacao-card__tag--critical,
+    .visita-card__tag--critical
+) {
+    border-color: #efcfad !important;
+    background: #fff7ed !important;
+    color: #a55414 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) .saved-indicator {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    min-height: 20px !important;
+    margin: 0 0 0 4px !important;
+    padding: 2px 6px !important;
+    border: 1px solid #efcfad !important;
+    border-radius: 999px !important;
+    background: #fff7ed !important;
+    color: #a55414 !important;
+    font-size: .58rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) .saved-indicator__icon {
+    display: inline-grid !important;
+    place-items: center !important;
+    width: 13px !important;
+    height: 13px !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: #e99935 !important;
+    color: #fff !important;
+    font-size: .50rem !important;
+    line-height: 1 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .invalid-feedback {
+    margin-top: 2px !important;
+    color: #b4232f !important;
+    font-size: .60rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .notif-input {
+    margin-top: 3px !important;
+    padding: 5px 7px !important;
+    border: 1px solid #efb6bd !important;
+    border-radius: 6px !important;
+    background: #fff4f5 !important;
+    color: #a61b2b !important;
+    font-size: .62rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert {
+    margin: 6px 0 !important;
+    padding: 7px 9px !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-radius: 7px !important;
+    box-shadow: none !important;
+    font-size: .65rem !important;
+    line-height: 1.25 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert-success {
+    border-color: #a9d8b7 !important; background: #effaf2 !important; color: #236538 !important;
+}
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert-danger {
+    border-color: #efb6bd !important; background: #fff4f5 !important; color: #a61b2b !important;
+}
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert-warning {
+    border-color: #efd39b !important; background: #fff9e9 !important; color: #81510b !important;
+}
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert-info {
+    border-color: #b8d5ee !important; background: #f0f7fd !important; color: #245d87 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .parecer-ia-status,
+    .prorrog-ia-status
+) {
+    margin: 5px 0 !important;
+    padding: 6px 8px !important;
+    border: 1px solid #b8d5ee !important;
+    border-radius: 6px !important;
+    background: #f0f7fd !important;
+    color: #245d87 !important;
+    font-size: .62rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(.parecer-ia-status--success, .prorrog-ia-status--success) {
+    border-color: #a9d8b7 !important; background: #effaf2 !important; color: #236538 !important;
+}
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(.parecer-ia-status--error, .prorrog-ia-status--error) {
+    border-color: #efb6bd !important; background: #fff4f5 !important; color: #a61b2b !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .parecer-ia-empty,
+    .prorrog-ia-empty,
+    .tuss-ac-empty
+) {
+    margin: 0 !important;
+    padding: 6px 8px !important;
+    border: 1px dashed #d7e0ea !important;
+    border-radius: 6px !important;
+    background: #f8fafc !important;
+    color: #7b8490 !important;
+    font-size: .62rem !important;
+    font-style: normal !important;
+    line-height: 1.2 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .inline-manager-card,
+    .adicional-card,
+    .detalhes-card,
+    .tabelas-adicionais-card
+) table tbody td.text-muted.text-center {
+    height: 24px !important;
+    padding: 5px 8px !important;
+    border-top: 1px solid #edf1f5 !important;
+    background: #fafbfd !important;
+    color: #8a94a2 !important;
+    font-size: .60rem !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
+    line-height: 1.1 !important;
+}
+
 /* Internacao e visita usam uma camada interna com a classe da pagina. */
 body #main-container#main-container :is(.internacao-page, .visita-page) :is(.tabelas-adicionais-card, .visita-card--tabelas) .tabelas-selects :is(
     #relatorio-detalhado,
@@ -2252,6 +2497,306 @@ body #main-container#main-container .visita-page .visita-actions button.fc-clear
     font-size: .68rem !important;
     line-height: 1 !important;
     font-weight: 650 !important;
+}
+
+/* Ritmo interno comum dos formularios. */
+body #main-container#main-container {
+    --fc-form-card-pad-y: 7px;
+    --fc-form-card-pad-x: 8px;
+    --fc-form-head-pad-y: 6px;
+    --fc-form-head-pad-x: 9px;
+    --fc-form-body-pad-y: 8px;
+    --fc-form-body-pad-x: 9px;
+    --fc-form-field-row-gap: 4px;
+    --fc-form-field-column-gap: 6px;
+    --fc-form-section-gap: 8px;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(.internacao-card, .visita-card),
+body #main-container#main-container.cadastro-layout :is(.entity-step-card, .entity-actions-bar) {
+    padding: var(--fc-form-card-pad-y) var(--fc-form-card-pad-x) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(.internacao-card__header, .visita-card__header),
+body #main-container#main-container.cadastro-layout .entity-step-header {
+    gap: var(--fc-form-field-column-gap) !important;
+    margin: 0 !important;
+    padding: var(--fc-form-head-pad-y) var(--fc-form-head-pad-x) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(.internacao-card__body, .visita-card__body),
+body #main-container#main-container.cadastro-layout .entity-step-panel {
+    gap: var(--fc-form-field-row-gap) !important;
+    margin: 0 !important;
+    padding: var(--fc-form-body-pad-y) var(--fc-form-body-pad-x) !important;
+}
+
+/* Sistema comum de botoes dos formularios. */
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) button[data-clean-text] {
+    min-height: 23px !important;
+    height: 23px !important;
+    padding: 2px 7px !important;
+    border: 1px solid #c7d1dc !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    color: #66717f !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+    font-weight: 650 !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) button[data-clean-text]:is(:hover, :focus) {
+    border-color: #9fb0c2 !important;
+    background: #f5f8fb !important;
+    color: #3f4d5e !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) button[data-ai-improve] {
+    min-height: 23px !important;
+    height: 23px !important;
+    padding: 2px 7px !important;
+    border: 1px solid #9fc7ef !important;
+    border-radius: 6px !important;
+    background: #f5f9ff !important;
+    color: #1672d4 !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) button[data-ai-improve]:is(:hover, :focus) {
+    border-color: #70abe5 !important;
+    background: #eaf3ff !important;
+    color: #0e5fac !important;
+}
+
+body #main-container#main-container.cadastro-layout .entity-step-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 23px !important;
+    padding: 2px 8px !important;
+    border: 1px solid #d8d0dd !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: #68306c !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+}
+
+body #main-container#main-container.cadastro-layout .entity-step-header:is(:hover, :focus) .entity-step-toggle {
+    border-color: #bca8c4 !important;
+    background: #faf7fc !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(.inline-add-btn, .btn-add) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    padding: 0 !important;
+    border: 1px solid #1677e8 !important;
+    border-radius: 7px !important;
+    background: #1677e8 !important;
+    color: #fff !important;
+    font-size: .82rem !important;
+    line-height: 1 !important;
+    font-weight: 750 !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(.inline-add-btn, .btn-add):is(:hover, :focus) {
+    border-color: #0f63c5 !important;
+    background: #0f63c5 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .btn-remove-inline,
+    .btn-remove-existing,
+    .btn-remove-cpt,
+    .btn-remove,
+    .btn-trash-negoc-inline
+) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 27px !important;
+    min-height: 25px !important;
+    height: 25px !important;
+    padding: 2px 7px !important;
+    border: 1px solid #d9a9ae !important;
+    border-radius: 6px !important;
+    background: #fff7f7 !important;
+    color: #b4232f !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .btn-remove-inline,
+    .btn-remove-existing,
+    .btn-remove-cpt,
+    .btn-remove,
+    .btn-trash-negoc-inline
+):is(:hover, :focus) {
+    border-color: #c7656f !important;
+    background: #fdebec !important;
+    color: #8f1823 !important;
+}
+
+body #main-container#main-container.cadastro-layout .hero-back-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 12px !important;
+    border: 1px solid #d9c8dd !important;
+    border-radius: 999px !important;
+    background: #fffafd !important;
+    color: #68306c !important;
+    font-size: .72rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+}
+
+body #main-container#main-container.cadastro-layout .hero-back-btn:is(:hover, :focus) {
+    border-color: #bfa6c5 !important;
+    background: #f8f0fa !important;
+    color: #56255a !important;
+}
+
+body #main-container#main-container .internacao-page .patient-inline-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    min-height: 22px !important;
+    height: 22px !important;
+    padding: 2px 7px !important;
+    border: 1px solid #c8d8ef !important;
+    border-radius: 999px !important;
+    background: #f5f9ff !important;
+    color: #2869bf !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+}
+
+body #main-container#main-container.cadastro-layout :is(.inline-manager-card, #acomodacao-inline-card) button.inline-add-btn,
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) button.btn-add {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    padding: 0 !important;
+    border-color: #1677e8 !important;
+    border-radius: 7px !important;
+    background: #1677e8 !important;
+    color: #fff !important;
+    font-size: .82rem !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container.cadastro-layout :is(.inline-manager-card, #acomodacao-inline-card) :is(
+    button.btn-remove-inline,
+    button.btn-remove-existing,
+    button.btn-remove-cpt
+),
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) :is(button.btn-remove, button.btn-trash-negoc-inline) {
+    min-width: 27px !important;
+    min-height: 25px !important;
+    height: 25px !important;
+    padding: 2px 7px !important;
+    border-color: #d9a9ae !important;
+    border-radius: 6px !important;
+    background: #fff7f7 !important;
+    color: #b4232f !important;
+    font-size: .62rem !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .internacao-card,
+    .visita-card,
+    .entity-step-card,
+    .inline-manager-card,
+    .tabelas-adicionais-card
+) .form-group {
+    margin-bottom: 1px !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(
+    .internacao-head-grid,
+    .edit-head-grid,
+    .edit-primary-row,
+    .edit-secondary-row,
+    .visita-summary-grid,
+    .visita-head-grid,
+    .tabelas-selects
+) {
+    column-gap: var(--fc-form-field-column-gap) !important;
+    row-gap: var(--fc-form-field-row-gap) !important;
+}
+
+body #main-container#main-container .visita-page .visita-summary-card {
+    padding: 6px 8px !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) .clinical-text-field {
+    gap: var(--fc-form-field-row-gap) !important;
+    margin: 0 !important;
+    padding: 7px 8px !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page) .clinical-text-field + .clinical-text-field {
+    margin-top: var(--fc-form-section-gap) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .internacao-form-actions,
+    .edit-form-actions,
+    .visita-actions,
+    .entity-actions-bar
+) {
+    gap: var(--fc-form-section-gap) !important;
+    padding: var(--fc-form-body-pad-y) var(--fc-form-body-pad-x) !important;
 }
 
 body #main-container#main-container :is(.internacao-page, .visita-page) :is(

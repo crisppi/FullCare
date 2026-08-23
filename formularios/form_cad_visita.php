@@ -1272,16 +1272,6 @@ function aumentarTextProgramacao() {
     font-weight: 800;
 }
 
-.visita-card__tag {
-    background: #f1ebfb;
-    color: #5c3687;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: .74rem;
-    border: 1px solid #e2d4f6;
-}
-
 .visita-card__body {
     display: flex;
     flex-direction: column;
@@ -1604,18 +1594,6 @@ function aumentarTextProgramacao() {
     padding: 12px;
 }
 
-.parecer-ia-status {
-    margin: 10px 12px 0;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: .88rem;
-}
-
-.parecer-ia-status--info { background: #e0f2fe; color: #075985; }
-.parecer-ia-status--success { background: #dcfce7; color: #166534; }
-.parecer-ia-status--error { background: #fee2e2; color: #991b1b; }
-
 .parecer-ia-result-head { margin-bottom: 10px; }
 
 .parecer-ia-chip-row {
@@ -1652,11 +1630,6 @@ function aumentarTextProgramacao() {
 .parecer-ia-section ul { margin: 4px 0 0; }
 
 .parecer-ia-section ul { padding-left: 18px; }
-
-.parecer-ia-empty {
-    margin: 0;
-    color: #6b7280;
-}
 
 .parecer-ia-final-alert {
     margin-top: 14px;
@@ -2104,12 +2077,6 @@ function aumentarTextProgramacao() {
     margin-top: 3px !important;
 }
 
-.visita-card__tag {
-    padding: 4px 10px !important;
-    border-radius: 8px !important;
-    font-size: .7rem !important;
-}
-
 .visita-card__body {
     gap: 5px !important;
 }
@@ -2232,10 +2199,8 @@ function aumentarTextProgramacao() {
     height: 28px !important;
 }
 
-.parecer-ia-status,
 .parecer-ia-badge,
-.parecer-ia-section,
-.parecer-ia-empty {
+.parecer-ia-section {
     font-size: .82rem !important;
 }
 
@@ -2331,13 +2296,6 @@ function aumentarTextProgramacao() {
     margin-top: 1px !important;
     font-size: .78rem !important;
     line-height: 1.08 !important;
-}
-
-.visita-card__tag {
-    padding: 3px 8px !important;
-    border-radius: 8px !important;
-    font-size: .58rem !important;
-    line-height: 1.05 !important;
 }
 
 .visita-card__body {
@@ -2442,8 +2400,7 @@ function aumentarTextProgramacao() {
 }
 
 .clinical-text-field small,
-.visita-card small,
-[data-counter-for] {
+.visita-card small {
     font-size: .58rem !important;
     line-height: 1 !important;
 }

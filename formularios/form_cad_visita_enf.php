@@ -126,18 +126,6 @@
             padding: 12px;
         }
 
-        .parecer-ia-status {
-            margin: 10px 12px 0;
-            padding: 8px 10px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: .88rem;
-        }
-
-        .parecer-ia-status--info { background: #e0f2fe; color: #075985; }
-        .parecer-ia-status--success { background: #dcfce7; color: #166534; }
-        .parecer-ia-status--error { background: #fee2e2; color: #991b1b; }
-
         .parecer-ia-result-head { margin-bottom: 10px; }
         .parecer-ia-chip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
@@ -163,8 +151,6 @@
         .parecer-ia-section p,
         .parecer-ia-section ul { margin: 4px 0 0; }
         .parecer-ia-section ul { padding-left: 18px; }
-        .parecer-ia-empty { margin: 0; color: #6b7280; }
-
         .parecer-ia-final-alert {
             margin-top: 14px;
             padding: 12px 14px;

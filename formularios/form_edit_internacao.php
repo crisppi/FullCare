@@ -595,40 +595,6 @@
             color: #4b1850;
         }
 
-        .saved-indicator {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin-left: 8px;
-            padding: 3px 9px 3px 6px;
-            border-radius: 999px;
-            border: 1px solid rgba(180, 83, 9, .26);
-            background: #fff7ed;
-            color: #92400e;
-            font-size: .69rem;
-            font-weight: 800;
-            line-height: 1;
-            vertical-align: middle;
-            cursor: help;
-            box-shadow: 0 5px 12px rgba(180, 83, 9, .12);
-            white-space: nowrap;
-        }
-
-        .saved-indicator__icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 999px;
-            background: #f59e0b;
-            color: #fff;
-            font-size: .68rem;
-            font-weight: 900;
-            line-height: 1;
-        }
-
         .tabelas-col.has-saved-record {
             border-radius: 13px;
             padding: 0 0 2px;
@@ -2542,19 +2508,6 @@
             box-shadow: inset 0 1px 0 rgba(255,255,255,.70), 0 1px 2px rgba(15,23,42,.08) !important;
         }
 
-        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator {
-            margin-left: 5px !important;
-            padding: 2px 6px !important;
-            font-size: .62rem !important;
-            line-height: 1 !important;
-        }
-
-        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator__icon {
-            width: 13px !important;
-            height: 13px !important;
-            font-size: .58rem !important;
-        }
-
         #tabelas-adicionais-paineis-edit #container-tuss,
         #tabelas-adicionais-paineis-edit #container-prorrog,
         #tabelas-adicionais-paineis-edit #container-uti,
@@ -2874,20 +2827,6 @@
         #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_negoc option {
             font-family: var(--app-font-family, "Inter", Arial, Helvetica, sans-serif) !important;
             font-weight: 600 !important;
-        }
-
-        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator {
-            margin-left: 4px !important;
-            padding: 2px 6px !important;
-            font-size: .58rem !important;
-            font-weight: 700 !important;
-            line-height: 1 !important;
-        }
-
-        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator__icon {
-            width: 12px !important;
-            height: 12px !important;
-            font-size: .54rem !important;
         }
 
         #tabelas-adicionais-paineis-edit .tuss-field,
@@ -3692,25 +3631,6 @@
             font-weight: 600 !important;
             line-height: 1.1 !important;
             letter-spacing: 0 !important;
-        }
-
-        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator {
-            margin-left: 5px !important;
-            padding: 2px 5px !important;
-            border-color: #f3cf9b !important;
-            background: #fff8ed !important;
-            color: #9a5a10 !important;
-            font-size: .55rem !important;
-            font-weight: 700 !important;
-            line-height: 1 !important;
-            box-shadow: none !important;
-            vertical-align: 1px !important;
-        }
-
-        #main-container .internacao-page .tabelas-adicionais-card .saved-indicator__icon {
-            width: 12px !important;
-            height: 12px !important;
-            font-size: .52rem !important;
         }
 
         #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.form-control,

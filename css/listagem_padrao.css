@@ -241,6 +241,31 @@
     transform: translateY(-1px);
 }
 
+/* Variantes devem prevalecer sobre o hover generico do cabecalho. */
+.listagem-hero--module .listagem-btn-top--blue:hover,
+.listagem-hero--module .listagem-btn-top--blue:focus {
+    background: linear-gradient(135deg, #1f5f8f 0%, #257eae 100%) !important;
+    border-color: rgba(255, 255, 255, .52) !important;
+    color: #fff !important;
+    box-shadow: 0 9px 18px rgba(21, 69, 105, .24) !important;
+}
+
+.listagem-hero--module .listagem-btn-top--purple:hover,
+.listagem-hero--module .listagem-btn-top--purple:focus {
+    background: linear-gradient(135deg, #542058 0%, #6e4689 100%) !important;
+    border-color: rgba(255, 255, 255, .52) !important;
+    color: #fff !important;
+    box-shadow: 0 9px 18px rgba(94, 35, 99, .24) !important;
+}
+
+.listagem-hero--module .listagem-btn-top--green:hover,
+.listagem-hero--module .listagem-btn-top--green:focus {
+    background: linear-gradient(135deg, #347c4f 0%, #4c9b67 100%) !important;
+    border-color: rgba(255, 255, 255, .52) !important;
+    color: #fff !important;
+    box-shadow: 0 9px 18px rgba(40, 112, 71, .24) !important;
+}
+
 .listagem-hero--cadastro {
     align-items: center;
     padding-left: 16px;
