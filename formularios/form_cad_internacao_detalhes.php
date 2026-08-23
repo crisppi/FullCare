@@ -9,7 +9,7 @@
 
         <input type="hidden" class="form-control" id="select_detalhes" name="select_detalhes">
         <input type="hidden" id="data_create_int" value='<?= $agora; ?>' name="data_create_int">
-        <div id="div-detalhado" class="form-group row" style="margin-left:-12px; display:none;">
+        <div id="div-detalhado" class="form-group row" style="display:none;">
             <div class="form-group row">
                 <input type="hidden" readonly id="fk_int_det" name="fk_int_det" value="<?= ($ultimoReg + 1) ?>">
 
@@ -68,7 +68,7 @@
                             <input class="form-check-input" type="checkbox" name="svd_det" id="svd_det"
                                 value="SVD">
                         </div>
-                        <div class="form-check" style="text-align: center;">
+                        <div class="form-check" data-centered-field>
                             <label class="control-label" for="sne_det">SNE</label>
                             <input class="form-check-input" type="checkbox" name="sne_det" id="sne_det"
                                 value="SNE">
@@ -87,7 +87,7 @@
                 </div>
             </div>
 
-            <div class="form-group row" style="margin-top: -20px;">
+            <div class="form-group row">
                 <div class="form-group col-sm-2">
                     <label class="control-label" for="hemoderivados_det">Hemoderivados</label>
                     <select class="input-lg-fullcare form-control" id="hemoderivados_det"
@@ -165,13 +165,13 @@
                 </div>
                 <div>
                     <label for="exames_det">Exames relevantes</label>
-                    <textarea data-saude-autocomplete="true" style="resize:none" maxlength="5000" rows="3"
+                    <textarea data-saude-autocomplete="true" data-no-resize maxlength="5000" rows="3"
                         onclick="aumentarText('exames_det')" onblur="reduzirText('exames_det', 3)"
                         class="form-control" id="exames_det" name="exames_det"></textarea>
                 </div>
                 <div>
                     <label for="oportunidades_det">Oportunidades</label>
-                    <textarea data-saude-autocomplete="true" style="resize:none" maxlength="5000" rows="2"
+                    <textarea data-saude-autocomplete="true" data-no-resize maxlength="5000" rows="2"
                         onclick="aumentarText('oportunidades_det')" class="form-control" id="oportunidades_det"
                         onblur="reduzirText('oportunidades_det', 3)" name="oportunidades_det"></textarea>
                 </div>

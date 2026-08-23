@@ -9,6 +9,9 @@ $footerVersion = app_latest_version($conn);
 $footerYear = date('Y');
 $canSeeBiLink = function_exists('fullcare_has_bi_access') ? fullcare_has_bi_access() : false;
 ?>
+<link href="<?= $BASE_URL ?>css/form_shared_grids.css?v=<?= @filemtime(__DIR__ . '/../css/form_shared_grids.css') ?>" rel="stylesheet">
+<link href="<?= $BASE_URL ?>css/form_shared_responsive.css?v=<?= @filemtime(__DIR__ . '/../css/form_shared_responsive.css') ?>" rel="stylesheet">
+<link href="<?= $BASE_URL ?>css/form_additional_structures.css?v=<?= @filemtime(__DIR__ . '/../css/form_additional_structures.css') ?>" rel="stylesheet">
 <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= @filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
 <link href="<?= $BASE_URL ?>css/footer_simple.css?v=<?= @filemtime(__DIR__ . '/../css/footer_simple.css') ?>" rel="stylesheet">
 <footer id="myFooterSimple" aria-label="Rodapé FullCare">

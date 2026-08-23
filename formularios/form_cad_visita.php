@@ -216,7 +216,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                 <input type="date" value="<?= $agora; ?>" class="form-control" id="data_visita_vis"
                     name="data_visita_vis">
 
-                <p id="data-visita-error" style="color: red; display: none;">Data Inválida</p>
+                <p id="data-visita-error" class="fc-inline-error" style="display:none;">Data Inválida</p>
             </div>
 
             <div class="form-group visita-head-field visita-head-field--small visita-field">
@@ -613,7 +613,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
 
                 if (!$visitas) {
                     echo ("<br>");
-                    echo ("<p style='margin-left:100px'> <b>-- Esta internação ainda não possui visita -- </b></p>");
+                    echo ("<p class='fc-empty-message'> <b>-- Esta internação ainda não possui visita -- </b></p>");
                     echo ("<br>");
                 } else { ?>
                 <h6 class="page-title">Relatórios anteriores</h6>
@@ -1283,27 +1283,8 @@ function aumentarTextProgramacao() {
     margin-right: 0;
 }
 
-.visita-dados-row {
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 14px 12px;
-    align-items: start;
-}
 
-.visita-summary-grid {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 14px 12px;
-}
 
-.visita-head-grid {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 14px 12px;
-}
 
 .visita-summary-card,
 .visita-head-field {
@@ -1333,26 +1314,10 @@ function aumentarTextProgramacao() {
     box-shadow: 0 10px 24px rgba(37, 18, 54, .07);
 }
 
-.visita-summary-card--small,
-.visita-head-field--small {
-    grid-column: span 2;
-}
 
-.visita-summary-card--medium {
-    grid-column: span 2;
-}
 
-.visita-summary-card--wide {
-    grid-column: span 3;
-}
 
-.visita-head-field--wide {
-    grid-column: span 6;
-}
 
-.visita-head-field--small {
-    grid-column: span 3;
-}
 
 .visita-summary-card__label,
 .visita-head-field label {
@@ -1971,26 +1936,7 @@ function aumentarTextProgramacao() {
     background-image: none !important;
 }
 
-#container-gestao .adicional-card > .form-group.row > #div_evento,
-#container-gestao .adicional-card > .form-group.row > #div_rel_alto_custo,
-#container-gestao .adicional-card > .form-group.row > #div_rel_home_care,
-#container-gestao .adicional-card > .form-group.row > #div_rel_opme,
-#container-gestao .adicional-card > .form-group.row > #div_rel_desospitalizacao {
-    grid-column: 1 / -1;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-}
 
-#container-gestao #div_evento > .form-group.row {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 14px;
-    align-items: end;
-    width: 100%;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
 
 #container-gestao #div_evento > .form-group.row > .form-group[class*="col-"],
 #container-gestao #div_evento #div_rel_evento {
@@ -2003,9 +1949,6 @@ function aumentarTextProgramacao() {
     margin-bottom: 0 !important;
 }
 
-#container-gestao #div_evento #div_rel_evento {
-    grid-column: 1 / -1;
-}
 
 #container-tuss .btn-add,
 #container-tuss .btn-remove,
@@ -2516,14 +2459,6 @@ function aumentarTextProgramacao() {
     line-height: 1.05 !important;
 }
 
-#main-container .visita-page .visita-card--tabelas .tabelas-selects {
-    display: grid !important;
-    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-    gap: 6px 8px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    align-items: end !important;
-}
 
 #main-container .visita-page .visita-card--tabelas .tabelas-selects > .form-group,
 #main-container .visita-page .visita-card--tabelas .tabelas-selects > .tabelas-col {
@@ -2583,13 +2518,6 @@ function aumentarTextProgramacao() {
     color: #1f2937 !important;
 }
 
-#main-container .visita-page #detalhes-card-wrapper .row {
-    display: grid !important;
-    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-    gap: 5px 8px !important;
-    margin: 0 !important;
-    align-items: end !important;
-}
 
 #main-container .visita-page #detalhes-card-wrapper .form-group[class*="col-"] {
     min-width: 0 !important;
@@ -2600,13 +2528,7 @@ function aumentarTextProgramacao() {
     padding: 0 !important;
 }
 
-#main-container .visita-page #detalhes-card-wrapper .col-12 {
-    grid-column: 1 / -1 !important;
-}
 
-#main-container .visita-page #detalhes-card-wrapper .col-sm-3 {
-    grid-column: span 2 !important;
-}
 
 #main-container .visita-page #detalhes-card-wrapper .form-control,
 #main-container .visita-page #detalhes-card-wrapper .form-control-sm.form-control,
@@ -2696,14 +2618,6 @@ function aumentarTextProgramacao() {
     padding: 0 !important;
 }
 
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado > .row,
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado > .form-group.row {
-    display: grid !important;
-    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-    gap: 5px 10px !important;
-    align-items: start !important;
-    margin: 0 0 5px !important;
-}
 
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado > input[type="hidden"] {
     display: none !important;
@@ -2718,24 +2632,9 @@ function aumentarTextProgramacao() {
     padding: 0 !important;
 }
 
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .col-sm-3,
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .form-group:has([name="atb_uso_det"]),
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .form-group:has([name="qual_medicamento_det"]) {
-    grid-column: span 2 !important;
-}
 
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .col-sm-1 {
-    grid-column: span 1 !important;
-}
 
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .col-sm-2 {
-    grid-column: span 2 !important;
-}
 
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
-    grid-column: span 3 !important;
-}
 
 #main-container .visita-page #detalhes-card-wrapper #div-detalhado label {
     min-height: 0 !important;
@@ -2765,13 +2664,6 @@ function aumentarTextProgramacao() {
     line-height: 1.22 !important;
 }
 
-#main-container .visita-page #detalhes-card-wrapper #div-detalhado .d-flex.flex-wrap.align-items-center {
-    display: grid !important;
-    grid-template-columns: repeat(5, minmax(24px, 1fr)) !important;
-    gap: 4px !important;
-    align-items: center !important;
-    min-height: 28px !important;
-}
 
 @media (max-width: 1199.98px) {
     #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .row,
@@ -2941,27 +2833,7 @@ function aumentarTextProgramacao() {
     margin-right: 8px !important;
 }
 
-.visita-page #container-tuss .tuss-field-container,
-.visita-page #container-prorrog .field-container,
-.visita-page #container-uti .uti-grid-row,
-.visita-page #container-gestao .adicional-card > .form-group.row,
-.visita-page #container-gestao #div_evento > .form-group.row {
-    display: grid !important;
-    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-    gap: 5px 8px !important;
-    align-items: end !important;
-    margin: 0 0 5px !important;
-    width: 100% !important;
-}
 
-.visita-page #container-negoc .negotiation-field-container {
-    display: grid !important;
-    grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
-    gap: 5px 8px !important;
-    align-items: end !important;
-    margin: 0 !important;
-    width: 100% !important;
-}
 
 .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .form-group[class*="col-"],
 .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .tuss-actions-col {
@@ -2973,23 +2845,7 @@ function aumentarTextProgramacao() {
     padding: 0 !important;
 }
 
-.visita-page :is(#div_rel_alto_custo, #div_rel_home_care, #div_rel_opme, #div_rel_desospitalizacao, #div_rel_evento) {
-    grid-column: 1 / -1 !important;
-    min-width: 0 !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
 
-.visita-page #tutorial_alto {
-    grid-column: span 3 !important;
-    margin: 0 !important;
-    padding: 7px 10px !important;
-    border: 1px solid #fed7aa !important;
-    border-radius: 7px !important;
-    background: #fff7ed !important;
-    align-self: end !important;
-}
 
 .visita-page #tutorial_alto p {
     margin: 0 !important;
@@ -3149,13 +3005,6 @@ function aumentarTextProgramacao() {
     line-height: 1.05 !important;
 }
 
-#container-tuss .tuss-field-container {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.05fr) minmax(0, 1.05fr) minmax(0, 1.05fr) minmax(0, 1.05fr) 42px !important;
-    gap: 5px 8px !important;
-    align-items: end !important;
-    margin: 0 !important;
-}
 
 #container-tuss .tuss-field-container > .form-group {
     min-width: 0 !important;

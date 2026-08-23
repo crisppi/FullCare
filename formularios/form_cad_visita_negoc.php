@@ -1,4 +1,4 @@
-<div id="container-negoc" style="display:none; margin:5px">
+<div id="container-negoc" style="display:none;">
     <hr>
     <h6 class="page-title">Cadastrar dados de prorrogação</h6>
     <form action="<?= $BASE_URL ?>process_negociacao.php" id="add-negociacao-form" method="POST"
@@ -30,8 +30,8 @@
                 </select>
             </div>
             <div class="form-group col-sm-2">
-                <label class="control-label" style="margin-left:10px" for="troca_para_1">Acomodação Liberada</label>
-                <select class="form-control" style="margin-left:10px" id="troca_para_1" name="troca_para_1">
+                <label class="control-label" data-field-offset for="troca_para_1">Acomodação Liberada</label>
+                <select class="form-control" data-field-offset id="troca_para_1" name="troca_para_1">
                     <option value=""></i>
                     </option>
                     <?php sort($dados_acomodacao, SORT_ASC);
@@ -41,13 +41,13 @@
                 </select>
             </div>
             <div class="form-group col-sm-2">
-                <label class="control-label" style="margin-left:10px" for="qtd_1">Qtd</label>
-                <input type="number" style="margin-left:10px" style="font-size:0.8em" class="form-control" id="qtd_1"
+                <label class="control-label" data-field-offset for="qtd_1">Qtd</label>
+                <input type="number" data-field-offset data-compact-number class="form-control" id="qtd_1"
                     name="qtd_1" min="1" max="30">
             </div>
             <div class="form-group col-sm-1">
                 <label for="adicNeg1">Adicionar</label><br>
-                <input style="margin-left:30px" type="checkbox" id="adicNeg1" name="adicNeg1" value="adicNeg1">
+                <input data-check-offset type="checkbox" id="adicNeg1" name="adicNeg1" value="adicNeg1">
             </div>
         </div>
 
@@ -64,8 +64,8 @@
                 </select>
             </div>
             <div class="form-group col-sm-2">
-                <label class="control-label" style="margin-left:10px" for="troca_para_2">Acomodação Liberada</label>
-                <select class="form-control" style="margin-left:10px" id="troca_para_2" name="troca_para_2">
+                <label class="control-label" data-field-offset for="troca_para_2">Acomodação Liberada</label>
+                <select class="form-control" data-field-offset id="troca_para_2" name="troca_para_2">
                     <option value=""> </option>
                     <?php sort($dados_acomodacao, SORT_ASC);
                     foreach ($dados_acomodacao as $acomd) { ?>
@@ -74,13 +74,13 @@
                 </select>
             </div>
             <div class="form-group col-sm-2">
-                <label class="control-label" style="margin-left:10px" for="qtd_2">Qtd </label>
-                <input type="number" style="margin-left:10px" style="font-size:0.8em" class="form-control" id="qtd_2"
+                <label class="control-label" data-field-offset for="qtd_2">Qtd </label>
+                <input type="number" data-field-offset data-compact-number class="form-control" id="qtd_2"
                     name="qtd_2" min="1" max="30">
             </div>
             <div class="form-group col-sm-1">
                 <label for="adicNeg2">Adicionar</label><br>
-                <input style="margin-left:30px" type="checkbox" id="adicNeg2" name="adicNeg2" value="adicNeg2">
+                <input data-check-offset type="checkbox" id="adicNeg2" name="adicNeg2" value="adicNeg2">
             </div>
         </div>
         <!-- NEGOCIACAO 3 -->
@@ -96,8 +96,8 @@
                 </select>
             </div>
             <div class="form-group col-sm-2">
-                <label class="control-label" style="margin-left:10px" for="troca_para_3">Acomodação Liberada</label>
-                <select class="form-control" style="margin-left:10px" id="troca_para_3" name="troca_para_3">
+                <label class="control-label" data-field-offset for="troca_para_3">Acomodação Liberada</label>
+                <select class="form-control" data-field-offset id="troca_para_3" name="troca_para_3">
                     <option value=""> </option>
                     <?php sort($dados_acomodacao, SORT_ASC);
                     foreach ($dados_acomodacao as $acomd) { ?>
@@ -106,8 +106,8 @@
                 </select>
             </div>
             <div class="form-group col-sm-2">
-                <label class="control-label" style="margin-left:10px" for="qtd_3">Qtd</label>
-                <input type="number" style="margin-left:10px" style="font-size:0.8em" class="form-control" id="qtd_3"
+                <label class="control-label" data-field-offset for="qtd_3">Qtd</label>
+                <input type="number" data-field-offset data-compact-number class="form-control" id="qtd_3"
                     name="qtd_3" min="1" max="30">
             </div>
         </div>

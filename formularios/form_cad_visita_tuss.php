@@ -1,13 +1,11 @@
-<div id="container-tuss" style="display:none; margin:5px">
+<div id="container-tuss" style="display:none;">
     <hr>
     <h7>Cadastrar dados do código TUSS</h7>
 
     <?php if (!empty($internacaoList['0']['tuss_solicitado'])): ?>
 
         <?php if (!empty($internacaoList['0']['tuss_solicitado'])): ?>
-            <div style="background-color: #eae6f7; color: #4a235a; text-align: center; 
-                    font-weight: bold; padding: 10px; border: 1px solid #dcdde1; 
-                    border-top-left-radius: 5px; border-top-right-radius: 5px;">
+            <div class="fc-additional-banner">
                 TUSS já liberados
             </div>
 
@@ -48,7 +46,7 @@
                     <!-- Linha de "Nenhum dado disponível" -->
                     <?php if (!$hasData): ?>
                         <tr>
-                            <td colspan="3" style="text-align: center; font-style: italic; color: #6c757d;">Nenhum TUSS liberado</td>
+                            <td colspan="3" class="text-muted text-center">Nenhum TUSS liberado</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -113,7 +111,7 @@
             </div>
             <div class="form-group col-sm-1">
                 <label for="adic1">Adicionar</label><br>
-                <input style="margin-left:30px" type="checkbox" id="adic1" name="adic1" value="adic1">
+                <input data-check-offset type="checkbox" id="adic1" name="adic1" value="adic1">
             </div>
         </div>
         <!-- bloco 2-->
@@ -155,7 +153,7 @@
             </div>
             <div class="form-group col-sm-1">
                 <label for="adic2">Adicionar</label><br>
-                <input style="margin-left:30px" type="checkbox" id="adic2" name="adic2" value="adic2">
+                <input data-check-offset type="checkbox" id="adic2" name="adic2" value="adic2">
             </div>
         </div>
 
@@ -198,7 +196,7 @@
             </div>
             <div class="form-group col-sm-1">
                 <label for="adic3">Adicionar</label><br>
-                <input style="margin-left:30px" type="checkbox" id="adic3" name="adic3" value="adic3">
+                <input data-check-offset type="checkbox" id="adic3" name="adic3" value="adic3">
             </div>
         </div>
 
@@ -241,7 +239,7 @@
             </div>
             <div class="form-group col-sm-1">
                 <label for="adic4">Adicionar</label><br>
-                <input style="margin-left:30px" type="checkbox" id="adic4" name="adic4" value="adic4">
+                <input data-check-offset type="checkbox" id="adic4" name="adic4" value="adic4">
             </div>
         </div>
 
@@ -284,7 +282,7 @@
             </div>
             <div class="form-group col-sm-1">
                 <label for="adic5">Adicionar</label><br>
-                <input style="margin-left:30px" type="checkbox" id="adic5" name="adic5" value="adic5">
+                <input data-check-offset type="checkbox" id="adic5" name="adic5" value="adic5">
             </div>
         </div>
 

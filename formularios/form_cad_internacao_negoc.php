@@ -1,125 +1,3 @@
-<style>
-.form-group.row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-start;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    margin-bottom: 2px;
-    font-weight: 400;
-}
-
-.form-control {
-    width: 100%;
-    padding: 5px;
-}
-
-.btn {
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btn-add {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-remove {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-trash-negoc-inline {
-    background: linear-gradient(180deg, #fff7f7 0%, #ffe9eb 100%);
-    color: #b42318;
-    border: 1px solid rgba(180, 35, 24, 0.18);
-    font-size: 0.85rem;
-}
-
-.btn-trash-negoc-inline:hover {
-    background: linear-gradient(180deg, #ffecef 0%, #ffd9de 100%);
-    color: #912018;
-}
-
-.negotiation-actions {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-}
-
-#container-negoc .adicional-card {
-    background: #f5f5f9;
-    border-radius: 22px;
-    border: 1px solid #ebe1f5;
-    box-shadow: 0 12px 28px rgba(45, 18, 70, .08);
-    padding: 22px 24px;
-}
-
-#container-negoc .adicional-card__header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 18px;
-}
-
-#container-negoc .adicional-card__title {
-    display: flex;
-    align-items: center;
-    margin: 0;
-    color: #2f1846;
-    font-weight: 600;
-}
-
-#container-negoc .adicional-card__marker {
-    width: 6px;
-    height: 26px;
-    border-radius: 10px;
-    margin-right: 12px;
-    background: linear-gradient(180deg, #b169d9, #d199ff);
-}
-
-#container-negoc .adicional-card .negotiation-field-container {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-    gap: 14px;
-    align-items: end;
-    width: 100%;
-}
-
-#container-negoc .adicional-card .negotiation-field-container > .form-group[class*="col-"] {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-#container-negoc .adicional-card .negotiation-field-container > [style*="display:none"] {
-    display: none !important;
-}
-
-#container-negoc .adicional-card .form-control,
-#container-negoc .adicional-card .form-control-sm.form-control {
-    width: 100% !important;
-    min-height: 42px !important;
-    height: 42px !important;
-}
-
-@media (max-width: 768px) {
-    #container-negoc .adicional-card .negotiation-field-container {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
 
 <?php
 if (!isset($dados_acomodacao) || !is_array($dados_acomodacao)) {
@@ -188,7 +66,7 @@ if (isset($acomodacao) && is_array($acomodacao)) {
 }
 ?>
 
-<div id="container-negoc" style="display:none; margin:5px">
+<div id="container-negoc" style="display:none;">
     <div class="adicional-card">
         <div class="adicional-card__header">
             <h4 class="adicional-card__title">
@@ -202,7 +80,7 @@ if (isset($acomodacao) && is_array($acomodacao)) {
             value="<?= htmlspecialchars($_SESSION["id_usuario"] ?? '', ENT_QUOTES, 'UTF-8') ?>" id="fk_usuario_neg"
             name="fk_usuario_neg">
 
-        <div id="negotiationFieldsContainer" style="margin:5px;">
+        <div id="negotiationFieldsContainer">
             <input type="hidden" id="negociacoes_json" name="negociacoes_json" value="">
 
             <!-- Primeira linha (SEM botão "-") -->
@@ -274,7 +152,7 @@ if (isset($acomodacao) && is_array($acomodacao)) {
                     <input type="hidden" name="saving" class="form-control">
                 </div>
 
-                <div class="form-group col-sm-1" style="margin-top:25px;">
+                <div class="form-group col-sm-1" data-action-offset>
                     <div class="negotiation-actions">
                         <button type="button" class="btn btn-add">+</button>
                     </div>
@@ -282,8 +160,7 @@ if (isset($acomodacao) && is_array($acomodacao)) {
             </div>
         </div>
 
-        <div id="mensagemAlerta"
-            style="display:none;background:#f8d7da;color:#721c24;padding:10px;margin:10px 0;border:1px solid #f5c6cb;border-radius:4px;">
+        <div id="mensagemAlerta" class="alert alert-danger" style="display:none;">
         </div>
     </div>
 </div>
@@ -526,7 +403,7 @@ function addNegotiationField() {
         <input type="hidden" name="saving" class="form-control">
       </div>
 
-      <div class="form-group col-sm-1" style="margin-top:25px;">
+      <div class="form-group col-sm-1" data-action-offset>
         <div class="negotiation-actions">
           <button type="button" class="btn btn-add">+</button>
           <button type="button" class="btn btn-remove">-</button>

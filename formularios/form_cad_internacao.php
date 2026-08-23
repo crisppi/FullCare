@@ -442,7 +442,7 @@
                                 <label for="data_visita_int">Data Visita</label>
                                 <input type="date" value='<?= $dataAtual; ?>' class="form-control input-lg-fullcare" id="data_visita_int"
                                     name="data_visita_int">
-                                <p id="error-message" style="color:red;display:none;font-size:.6em;"></p>
+                                <p id="error-message" class="fc-inline-error" style="display:none;"></p>
                             </div>
 
                             <div class="form-group essential-small">
@@ -779,23 +779,6 @@
                     </div>
                 </div>
 
-                <!-- Chat Widget -->
-                <!-- <div id="chat-widget" style="position: fixed; bottom: 20px; right: 20px; width: 300px; z-index: 9999;">
-                        <div id="chat-header" style="background-color: #007bff; color: white; padding: 10px; cursor: pointer;">
-                            Chat - Assistente Virtual
-                        </div>
-                        <div id="chat-body"
-                            style="display: none; border: 1px solid #ccc; background: white; max-height: 400px; overflow-y: auto;">
-                            <div id="chat-messages" style="padding: 10px; font-size: 0.9em;"></div>
-                            <div style="padding: 10px;">
-                                <input type="text" id="chat-input" placeholder="Digite sua mensagem..."
-                                    style="width: 100%; padding: 5px; border: 1px solid #ccc;">
-                                <button id="chat-send"
-                                    style="margin-top: 5px; width: 100%; background-color: #007bff; color: white; border: none; padding:5px;">Enviar</button>
-                            </div>
-                        </div>
-                    </div> -->
-
                 <div class="clinical-text-field">
                     <div class="clinical-text-field__head">
                         <label for="acoes_int">Ações da Auditoria</label>
@@ -986,27 +969,7 @@
             margin-right: 8px !important;
         }
 
-        .internacao-page #container-tuss .tuss-field-container,
-        .internacao-page #container-prorrog .field-container,
-        .internacao-page #container-uti .uti-grid-row,
-        .internacao-page #container-gestao .adicional-card > .form-group.row,
-        .internacao-page #container-gestao #div_evento > .form-group.row {
-            display: grid !important;
-            grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-            gap: 5px 8px !important;
-            align-items: end !important;
-            margin: 0 0 5px !important;
-            width: 100% !important;
-        }
 
-        .internacao-page #container-negoc .negotiation-field-container {
-            display: grid !important;
-            grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
-            gap: 5px 8px !important;
-            align-items: end !important;
-            margin: 0 !important;
-            width: 100% !important;
-        }
 
         .internacao-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .form-group[class*="col-"],
         .internacao-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .tuss-actions-col {
@@ -1018,13 +981,6 @@
             padding: 0 !important;
         }
 
-        .internacao-page :is(#div_rel_alto_custo, #div_rel_home_care, #div_rel_opme, #div_rel_desospitalizacao, #div_rel_evento) {
-            grid-column: 1 / -1 !important;
-            min-width: 0 !important;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
 
         .internacao-page #tutorial_alto {
             margin: 0 !important;
@@ -1212,13 +1168,6 @@
             line-height: 1.05 !important;
         }
 
-        #container-tuss .tuss-field-container {
-            display: grid !important;
-            grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.05fr) minmax(0, 1.05fr) minmax(0, 1.05fr) minmax(0, 1.05fr) 42px !important;
-            gap: 5px 8px !important;
-            align-items: end !important;
-            margin: 0 !important;
-        }
 
         #container-tuss .tuss-field-container > .form-group {
             min-width: 0 !important;
@@ -1309,14 +1258,6 @@
             padding: 0 !important;
         }
 
-        .internacao-page #detalhes-card-wrapper #div-detalhado > .form-group.row,
-        .internacao-page #detalhes-card-wrapper #div-detalhado > .row {
-            display: grid !important;
-            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-            gap: 5px 10px !important;
-            align-items: start !important;
-            margin: 0 0 5px !important;
-        }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado > input[type="hidden"] {
             display: none !important;
@@ -1331,24 +1272,9 @@
             padding: 0 !important;
         }
 
-        .internacao-page #detalhes-card-wrapper #div-detalhado .col-sm-3,
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has(#atb_uso_det),
-        .internacao-page #detalhes-card-wrapper #div-detalhado .form-group:has([name="qual_medicamento_det"]) {
-            grid-column: span 2 !important;
-        }
 
-        .internacao-page #detalhes-card-wrapper #div-detalhado .col-sm-1 {
-            grid-column: span 1 !important;
-        }
 
-        .internacao-page #detalhes-card-wrapper #div-detalhado .col-sm-2 {
-            grid-column: span 2 !important;
-        }
 
-        .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
-        .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
-            grid-column: 1 / -1 !important;
-        }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado label {
             min-height: 0 !important;
@@ -1393,13 +1319,6 @@
             line-height: 1.22 !important;
         }
 
-        .internacao-page #detalhes-card-wrapper #div-detalhado .d-flex.flex-wrap.align-items-center {
-            display: grid !important;
-            grid-template-columns: repeat(5, minmax(24px, 1fr)) !important;
-            gap: 4px !important;
-            align-items: center !important;
-            min-height: 28px !important;
-        }
 
         .internacao-page #detalhes-card-wrapper #div-detalhado .form-check {
             display: inline-flex !important;
@@ -1475,7 +1394,7 @@
                 </div>
             </div>
             <br><br>
-            <div style="width:500px;display:none" class="alert" id="alert" role="alert"></div>
+            <div style="display:none" class="alert fc-form-alert" id="alert" role="alert"></div>
         </div>
         </form>
     </div>

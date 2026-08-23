@@ -1,4 +1,4 @@
-<div id="container-gestao" style="display:none; margin:5px">
+<div id="container-gestao" style="display:none;">
     <hr>
     <h6 class="page-title">Cadastrar gestão</h6>
     <form class="formulario" action="<?= $BASE_URL ?>process_gestao.php" id="add-acomodacao-form" method="POST"
@@ -24,7 +24,7 @@
 
                 <div style="display:none" id="div_rel_alto_custo">
                     <label for="rel_alto_custo_ges">Relatório alto custo</label>
-                    <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarText('rel_alto_custo_ges')"
+                    <textarea type="textarea" data-no-resize rows="2" onclick="aumentarText('rel_alto_custo_ges')"
                         onblur="reduzirText('rel_alto_custo_ges', 3)" class="form-control" id="rel_alto_custo_ges"
                         name="rel_alto_custo_ges"></textarea>
                 </div>
@@ -37,7 +37,7 @@
                 </div>
                 <div style="display:none" id="div_rel_home_care">
                     <label for="rel_home_care_ges">Relatório Home care</label>
-                    <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarText('rel_home_care_ges')"
+                    <textarea type="textarea" data-no-resize rows="2" onclick="aumentarText('rel_home_care_ges')"
                         onblur="reduzirText('rel_home_care_ges', 3)" class="form-control" id="rel_home_care_ges"
                         name="rel_home_care_ges"></textarea>
                 </div>
@@ -50,7 +50,7 @@
                 </div>
                 <div style="display:none" id="div_rel_opme">
                     <label for="rel_opme_ges">Relatório OPME</label>
-                    <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarText('rel_opme_ges')"
+                    <textarea type="textarea" data-no-resize rows="2" onclick="aumentarText('rel_opme_ges')"
                         onblur="reduzirText('rel_opme_ges', 3)" class="form-control" id="rel_opme_ges"
                         name="rel_opme_ges"></textarea>
                 </div>
@@ -63,7 +63,7 @@
                 </div>
                 <div style="display:none" id="div_rel_desospitalizacao">
                     <label for="rel_desospitalizacao_ges">Relatório Desospitalização</label>
-                    <textarea type="textarea" style="resize:none" rows="2"
+                    <textarea type="textarea" data-no-resize rows="2"
                         onclick="aumentarText('rel_desospitalizacao_ges')"
                         onblur="reduzirText('rel_desospitalizacao_ges', 3)" class="form-control"
                         id="rel_desospitalizacao_ges" name="rel_desospitalizacao_ges"></textarea>
@@ -103,7 +103,7 @@
                     <div class="form-group row">
                         <div id="div_rel_evento">
                             <label for="rel_evento_adverso_ges">Relatório Evento Adverso</label>
-                            <textarea type="textarea" style="resize:none" rows="2"
+                            <textarea type="textarea" data-no-resize rows="2"
                                 onclick=" aumentarText('rel_evento_adverso_ges')"
                                 onblur="reduzirText('rel_evento_adverso_ges', 3)" class="form-control"
                                 id="rel_evento_adverso_ges" name="rel_evento_adverso_ges"></textarea>

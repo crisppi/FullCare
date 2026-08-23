@@ -1,107 +1,5 @@
-<style>
-.adicional-card {
-    background:#f5f5f9;
-    border-radius:12px;
-    border:1px solid #ebe1f5;
-    box-shadow:0 6px 14px rgba(45,18,70,.06);
-    padding:14px 16px;
-    margin-top:8px;
-}
-.adicional-card__header {
-    display:flex;
-    align-items:center;
-    margin-bottom:10px;
-}
-.adicional-card__title {
-    display:flex;
-    align-items:center;
-    margin:0;
-    color:#2f1846;
-    font-weight:600;
-    font-size:1rem;
-    line-height:1.15;
-}
-.adicional-card__marker {
-    width:5px;
-    height:22px;
-    border-radius:10px;
-    margin-right:10px;
-    background:linear-gradient(180deg,#2db6c4,#6be4dc);
-}
 
-#container-uti .uti-grid-row {
-    display: grid !important;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 8px 10px;
-    align-items: end;
-    width: 100%;
-    margin: 0 0 8px !important;
-}
-
-#container-uti .uti-grid-row > .form-group[class*="col-"] {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-#container-uti .uti-grid-row > [style*="display:none"] {
-    display: none !important;
-}
-
-#container-uti .adicional-card .form-control,
-#container-uti .adicional-card .form-control-sm.form-control {
-    width: 100% !important;
-    min-height: 32px !important;
-    height: 32px !important;
-    padding: 3px 24px 3px 8px !important;
-    font-size: .74rem !important;
-    line-height: 1.15 !important;
-}
-
-#container-uti .adicional-card select.form-control {
-    appearance: auto !important;
-    -webkit-appearance: auto !important;
-    -moz-appearance: auto !important;
-    background-image: initial !important;
-}
-
-#container-uti .adicional-card label {
-    min-height: 0 !important;
-    margin-bottom: 2px !important;
-    font-size: .68rem !important;
-    line-height: 1.08 !important;
-    font-weight: 600 !important;
-}
-
-#container-uti .adicional-card textarea.form-control {
-    min-height: 76px !important;
-    height: auto !important;
-    padding: 6px 8px !important;
-}
-
-#container-uti .uti-report {
-    width: 100%;
-    max-width: 720px;
-    margin-top: 4px;
-}
-
-@media (max-width: 1199.98px) {
-    #container-uti .uti-grid-row {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    #container-uti .uti-grid-row {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-
-<div id="container-uti" style="display:none; margin:5px">
+<div id="container-uti" style="display:none;">
     <div class="adicional-card">
         <div class="adicional-card__header">
             <h4 class="adicional-card__title">
@@ -238,8 +136,8 @@
             </div>
             <div class="form-group col-sm-9" id="justifique_uti_group" style="display: none;">
                 <label for="justifique_uti" id="justifique_uti_label">Justifique permanência - Critério baixo</label>
-                <p id="criteria_message" style="display: inline; margin-left: 10px; font-size: 0.9em; color: #555;"></p>
-                <textarea type="textarea" style="resize:none" rows="2" class="form-control" id="justifique_uti"
+                <p id="criteria_message" style="display:inline" data-criteria-message></p>
+                <textarea type="textarea" data-no-resize rows="2" class="form-control" id="justifique_uti"
                     name="justifique_uti"></textarea>
             </div>
 
@@ -256,14 +154,14 @@
                     <?php } ?>
                 </select>
             </div>
-            <div style="margin-top:30px " class="form-group col-sm-2">
-                <a style="color:blue; font-size:0.8em" href="https://www.rccc.eu/ppc/indicadores/saps3.html"
+            <div data-action-offset="large" class="form-group col-sm-2">
+                <a data-reference-link href="https://www.rccc.eu/ppc/indicadores/saps3.html"
                     target="_blank">Calcular SAPS</a>
             </div>
         </div>
         <div class="uti-report">
             <label for="rel_uti">Relatório UTI</label>
-            <textarea type="textarea" style="resize:none" onclick="aumentarTextUTI()" rows="2" class="form-control"
+            <textarea type="textarea" data-no-resize onclick="aumentarTextUTI()" rows="2" class="form-control"
                 id="rel_uti" name="rel_uti"></textarea>
         </div>
     </div>
@@ -281,16 +179,6 @@ function aumentarTextUTI() {
     }
 }
 </script>
-<style>
-#criteria_message {
-    display: inline;
-    /* Mantém na mesma linha */
-    margin-left: 10px;
-    /* Espaço entre o label e a mensagem */
-    font-size: 0.9em;
-    /* Tamanho da fonte ajustado */
-}
-</style>
 <script>
 // Selecionar os elementos necessários apenas uma vez
 const dva = document.querySelector("#dva_uti");

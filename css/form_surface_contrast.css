@@ -1997,6 +1997,22 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     font-weight: 750 !important;
 }
 
+/* Titulos internos das tabelas adicionais: compactos em todas as estruturas de pagina. */
+body #main-container#main-container :is(.internacao-page, .visita-page) :is(
+    .adicional-card__title,
+    .detalhes-card__title
+),
+body #main-container#main-container.cadastro-layout :is(
+    .adicional-card__title,
+    .detalhes-card__title
+) {
+    margin: 0 !important;
+    color: #2b2140 !important;
+    font-size: .72rem !important;
+    line-height: 1.1 !important;
+    font-weight: 700 !important;
+}
+
 body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
     .tabelas-adicionais-card,
     .visita-card--tabelas,
@@ -2399,6 +2415,85 @@ body #main-container .required-marker {
 
 body #main-container textarea.fc-no-resize {
     resize: none !important;
+}
+
+body #main-container textarea[data-no-resize] {
+    resize: none !important;
+}
+
+body #main-container [data-readonly-cursor] {
+    cursor: not-allowed !important;
+}
+
+body #main-container .fc-inline-error {
+    margin: 2px 0 0 !important;
+    color: #b4232f !important;
+    font-size: .60rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+}
+
+body #main-container .fc-form-alert {
+    width: 100% !important;
+    max-width: 500px !important;
+}
+
+body #main-container [data-field-offset] { margin-left: 10px !important; }
+body #main-container [data-check-offset] { margin-left: 30px !important; }
+body #main-container [data-action-offset] { margin-top: 25px !important; }
+body #main-container [data-action-offset="large"] { margin-top: 30px !important; }
+body #main-container [data-compact-number] { font-size: .8em !important; }
+body #main-container [data-readonly-summary] {
+    background: #d9e1e8 !important;
+    color: #354253 !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+}
+body #main-container [data-reference-link] {
+    color: #166fc3 !important;
+    font-size: .68rem !important;
+}
+body #main-container [data-criteria-message] {
+    margin-left: 10px !important;
+    color: #5f6570 !important;
+    font-size: .68rem !important;
+}
+body #main-container .fc-empty-message {
+    margin: 6px 0 !important;
+    color: #7b8490 !important;
+    font-size: .62rem !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+}
+body #main-container .fc-alert-spaced { margin-top: 10px !important; }
+body #main-container .fc-visit-summary {
+    display: flex !important; align-items: center !important; flex-wrap: wrap !important;
+    gap: 5px 14px !important; padding: 6px 8px !important;
+}
+body #main-container .fc-visit-summary__label { color: #5f6570 !important; font-size: .68rem !important; font-weight: 600 !important; }
+body #main-container .fc-visit-summary__value { color: #26364a !important; font-size: .70rem !important; font-weight: 700 !important; }
+body #main-container [data-centered-field] { text-align: center !important; }
+body #main-container input[data-centered-field] { font-weight: 700 !important; }
+body #main-container .fc-field-block { margin-bottom: var(--fc-form-section-gap, 8px) !important; }
+body #main-container .fc-legacy-submit { margin: 8px 0 !important; }
+body #main-container .fc-history-toggle { display: flex !important; align-items: center !important; gap: 8px !important; margin: 8px 0 !important; }
+body #main-container .fc-history-toggle label { margin: 0 !important; font-weight: 700 !important; }
+body #main-container .fc-history-toggle input { margin: 0 !important; }
+body #main-container .fc-status-check { color: #16833d !important; font-size: 1rem !important; font-weight: 800 !important; }
+body #main-container .fc-modal-header {
+    background: #5e2363 !important;
+    color: #fff !important;
+}
+body #main-container .fc-modal-header :is(.page-title, .page-description) { margin-top: 0 !important; color: #fff !important; }
+body #main-container .fc-additional-banner {
+    padding: 6px 8px !important;
+    border: 1px solid #d8e1eb !important;
+    border-radius: 7px !important;
+    background: #f8fafc !important;
+    color: #5f6570 !important;
+    font-size: .64rem !important;
+    font-weight: 700 !important;
+    text-align: center !important;
 }
 
 body #main-container #step-cpt-carencia .cpt-add-column {

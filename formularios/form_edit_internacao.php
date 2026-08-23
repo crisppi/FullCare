@@ -403,13 +403,6 @@
             visibility: hidden;
         }
 
-        .edit-head-grid {
-            display: grid;
-            grid-template-columns: repeat(12, minmax(0, 1fr));
-            gap: 14px 12px;
-            align-items: start;
-            width: 100%;
-        }
 
         .edit-head-grid .form-group {
             min-width: 0;
@@ -430,10 +423,6 @@
             margin-bottom: 4px !important;
         }
 
-        .edit-head-hospital,
-        .edit-head-patient {
-            grid-column: span 3;
-        }
 
         .edit-head-grid .edit-head-hospital,
         .edit-head-grid .edit-head-patient {
@@ -475,34 +464,10 @@
             box-shadow: 0 1px 0 rgba(255,255,255,.8), 0 0 0 3px rgba(94, 35, 99, .08);
         }
 
-        .edit-head-medium {
-            grid-column: span 2;
-        }
 
-        .edit-head-small {
-            grid-column: span 1;
-        }
 
-        .edit-head-launch {
-            grid-column: span 3;
-        }
 
-        .edit-primary-row {
-            display: grid;
-            grid-template-columns: 1.1fr 1fr 1.5fr 1.5fr 1.7fr 0.8fr 1.2fr 1.2fr;
-            gap: 12px;
-            align-items: end;
-            width: 100%;
-        }
 
-        .edit-secondary-row {
-            display: grid !important;
-            grid-template-columns: minmax(260px, 2fr) minmax(260px, 2fr) minmax(170px, 1.15fr) minmax(150px, 1fr) minmax(130px, .8fr) minmax(170px, 1fr) !important;
-            gap: 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-            margin: 4px 0 0 !important;
-        }
 
         .edit-secondary-row > .form-group {
             width: auto !important;
@@ -514,13 +479,6 @@
             padding-right: 0 !important;
         }
 
-        .edit-alta-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            align-items: end;
-            width: 100%;
-        }
 
         .edit-head-grid .form-control,
         .edit-head-grid .form-control-sm,
@@ -700,24 +658,7 @@
             width: 100%;
         }
 
-        #tabelas-adicionais-paineis-edit #container-gestao > .form-group.row {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 14px;
-            align-items: end;
-            width: 100%;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-        }
 
-        #tabelas-adicionais-paineis-edit #container-uti[style*="block"] > .form-group.row,
-        #tabelas-adicionais-paineis-edit #container-uti[style*="block"] .form-group.row {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 14px;
-            align-items: end;
-            width: 100%;
-        }
 
         #tabelas-adicionais-paineis-edit #container-gestao .form-group[class*="col-"],
         #tabelas-adicionais-paineis-edit #container-uti .form-group[class*="col-"] {
@@ -767,11 +708,6 @@
             opacity: 1 !important;
         }
 
-        #tabelas-adicionais-paineis-edit #container-gestao [id^="div_rel_"],
-        #tabelas-adicionais-paineis-edit #container-gestao #div_evento,
-        #tabelas-adicionais-paineis-edit #container-uti .form-group.col-sm-12 {
-            grid-column: 1 / -1;
-        }
 
         #tabelas-adicionais-paineis-edit #container-gestao #div_evento {
             width: 100% !important;
@@ -781,15 +717,6 @@
             padding-right: 0 !important;
         }
 
-        #tabelas-adicionais-paineis-edit #container-gestao #div_evento > .form-group.row {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 14px;
-            align-items: end;
-            width: 100%;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-        }
 
         @media (max-width: 991.98px) {
             .edit-head-grid,
@@ -899,7 +826,7 @@
                         <label class="control-label" for="data_lancamento_int">Data lançamento</label>
                         <input type="datetime-local" class="form-control form-control-sm" id="data_lancamento_int"
                             name="data_lancamento_int" value="<?= $dataLancamentoAtual ?>" readonly tabindex="-1"
-                            onfocus="this.blur();" onkeydown="return false;" style="cursor:not-allowed;">
+                            onfocus="this.blur();" onkeydown="return false;" data-readonly-cursor>
                     </div>
                 </div>
 
@@ -1321,16 +1248,16 @@
                     </div>
                 </div>
                 <div id="tabelas-adicionais-paineis-edit">
-                    <div id="container-tuss" style="display:none; margin:5px;">
+                    <div id="container-tuss" style="display:none;">
                         <?php include_once('formularios/form_edit_internacao_tuss2.php'); ?>
                     </div>
                     <?php include_once('formularios/form_edit_internacao_gestao2.php'); ?>
                     <?php include_once('formularios/form_edit_internacao_uti2.php'); ?>
-                    <div id="container-prorrog" style="display:none; margin:5px;">
+                    <div id="container-prorrog" style="display:none;">
                         <div id="edit-prorrog-focus"></div>
                         <?php include_once('formularios/form_edit_internacao_prorrog2.php'); ?>
                     </div>
-                    <div id="container-negoc" style="display:none; margin:5px;">
+                    <div id="container-negoc" style="display:none;">
                         <div id="edit-negoc-focus"></div>
                         <?php include_once('formularios/form_edit_internacao_negoc2.php'); ?>
                     </div>
@@ -2468,13 +2395,6 @@
             font-weight: 400 !important;
         }
 
-        /* Overrides finais da edicao: mantem Tabelas Adicionais compactas e no padrao atual */
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects {
-            display: grid !important;
-            grid-template-columns: repeat(6, minmax(150px, 1fr)) !important;
-            gap: 8px 10px !important;
-            align-items: end !important;
-        }
 
         #main-container .internacao-page .tabelas-adicionais-card .tabelas-col {
             width: auto !important;
@@ -2568,21 +2488,7 @@
             min-height: 70px !important;
         }
 
-        #tabelas-adicionais-paineis-edit .tuss-field .form-inline {
-            display: grid !important;
-            grid-template-columns: minmax(300px, 1fr) 130px 74px 74px 68px 76px !important;
-            gap: 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-        }
 
-        #tabelas-adicionais-paineis-edit .pror-row .form-grid {
-            display: grid !important;
-            grid-template-columns: minmax(160px, 1fr) 126px 126px 76px 96px 76px !important;
-            gap: 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-        }
 
         #tabelas-adicionais-paineis-edit .tuss-field .form-group,
         #tabelas-adicionais-paineis-edit .pror-row .form-group,
@@ -2619,19 +2525,7 @@
             justify-content: center !important;
         }
 
-        #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
-        #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
-            display: grid !important;
-            grid-template-columns: repeat(5, minmax(140px, 1fr)) !important;
-            gap: 8px 10px !important;
-            align-items: end !important;
-            width: 100% !important;
-            margin: 0 !important;
-        }
 
-        #tabelas-adicionais-paineis-edit #container-uti .form-group.col-sm-12 {
-            grid-column: 1 / -1 !important;
-        }
 
         #tabelas-adicionais-paineis-edit #container-uti a {
             font-size: .76rem !important;
@@ -2736,15 +2630,6 @@
             line-height: 1.05 !important;
         }
 
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects {
-            display: grid !important;
-            grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-            justify-content: initial !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
 
         #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .form-group,
         #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .tabelas-col,
@@ -2879,40 +2764,9 @@
             line-height: 1.25 !important;
         }
 
-        #tabelas-adicionais-paineis-edit .tuss-field .form-inline {
-            display: grid !important;
-            grid-template-columns: minmax(300px, 1fr) 122px 68px 68px 62px 72px !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-        }
 
-        #tabelas-adicionais-paineis-edit .pror-row .form-grid {
-            display: grid !important;
-            grid-template-columns: minmax(160px, 1fr) 118px 118px 68px 88px 72px !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-        }
 
-        #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
-        #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
-            display: grid !important;
-            grid-template-columns: repeat(5, minmax(120px, 1fr)) !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-            margin: 0 !important;
-        }
 
-        #tabelas-adicionais-paineis-edit #container-gestao[style*="block"] {
-            display: grid !important;
-            grid-template-columns: repeat(5, minmax(120px, 1fr)) !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-            margin: 8px 0 0 !important;
-        }
 
         #tabelas-adicionais-paineis-edit #container-gestao > input[type="hidden"] {
             display: none !important;
@@ -2959,47 +2813,19 @@
             line-height: 1.25 !important;
         }
 
-        #tabelas-adicionais-paineis-edit #container-gestao [id^="div_rel_"],
-        #tabelas-adicionais-paineis-edit #container-gestao #div_evento {
-            grid-column: 1 / -1 !important;
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: none !important;
-        }
 
         #tabelas-adicionais-paineis-edit #container-gestao [id^="div_rel_"][style*="none"],
         #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="none"] {
             display: none !important;
         }
 
-        #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="block"] {
-            display: grid !important;
-            grid-template-columns: repeat(5, minmax(120px, 1fr)) !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-        }
 
         #tabelas-adicionais-paineis-edit #container-gestao #div_evento > .form-group.row {
             display: contents !important;
             margin: 0 !important;
         }
 
-        #tabelas-adicionais-paineis-edit #container-gestao #rel_evento_adverso_ges,
-        #tabelas-adicionais-paineis-edit #container-gestao #div_evento > .form-group:has(#rel_evento_adverso_ges) {
-            grid-column: 1 / -1 !important;
-        }
 
-        #tabelas-adicionais-paineis-edit #container-negoc .negoc-row,
-        #tabelas-adicionais-paineis-edit .negoc-row,
-        #tabelas-adicionais-paineis-edit .negociation-field-container,
-        #tabelas-adicionais-paineis-edit .negotiation-field-container {
-            display: grid !important;
-            grid-template-columns: minmax(180px, 1fr) 118px 118px minmax(120px, 1fr) minmax(120px, 1fr) 66px 96px 72px !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-            margin-bottom: 8px !important;
-        }
 
         #tabelas-adicionais-paineis-edit .tuss-field .form-group,
         #tabelas-adicionais-paineis-edit .pror-row .form-group,
@@ -3077,13 +2903,6 @@
             font-weight: 600 !important;
         }
 
-        #tabelas-adicionais-paineis-edit .prorrog-inline-alta__grid {
-            display: grid !important;
-            grid-template-columns: 180px minmax(240px, 360px) !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-        }
 
         #tabelas-adicionais-paineis-edit .prorrog-inline-alta__grid .form-group {
             width: auto !important;
@@ -3126,14 +2945,6 @@
             margin-bottom: 8px !important;
         }
 
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
-            display: grid !important;
-            grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-            gap: 6px 8px !important;
-            align-items: end !important;
-            width: 100% !important;
-            margin: 0 !important;
-        }
 
         #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .form-group {
             width: auto !important;
@@ -3144,13 +2955,6 @@
             flex: none !important;
         }
 
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .detalhes-full-textarea {
-            grid-column: 1 / -1 !important;
-            display: block !important;
-            width: 100% !important;
-            max-width: none !important;
-            min-width: 0 !important;
-        }
 
         #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea textarea.form-control {
             min-height: 58px !important;
@@ -3343,9 +3147,6 @@
             font-size: .78rem !important;
         }
 
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {
-            grid-column: span 6 !important;
-        }
 
         #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea textarea.form-control {
             min-height: 56px !important;
@@ -3404,9 +3205,6 @@
             display: inline-flex !important;
         }
 
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-full-textarea {
-            grid-column: 1 / -1 !important;
-        }
 
         /* Padrao unico de seta dos selects: igual ao select nativo de Acomodacao. */
         #main-container .internacao-page select.form-control,
@@ -3445,15 +3243,6 @@
             pointer-events: none !important;
         }
 
-        /* Padrao atual do bloco Detalhes do relatorio no edit de internacao. */
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
-            display: grid !important;
-            grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-            gap: 8px 10px !important;
-            align-items: end !important;
-            width: 100% !important;
-            margin: 0 !important;
-        }
 
         #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .form-group {
             width: auto !important;
@@ -3464,21 +3253,9 @@
             padding: 0 !important;
         }
 
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-1 {
-            grid-column: span 1 !important;
-        }
 
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-2 {
-            grid-column: span 2 !important;
-        }
 
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-3 {
-            grid-column: span 3 !important;
-        }
 
-        #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .detalhes-full-textarea {
-            grid-column: 1 / -1 !important;
-        }
 
         #main-container .internacao-page #detalhes-card-wrapper #medicacaoDet.is-hidden {
             display: none !important;

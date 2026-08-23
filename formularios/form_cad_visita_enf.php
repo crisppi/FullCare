@@ -185,18 +185,16 @@
     ?><h4 class="page-title">Cadastrar visita</h4>
     <p class="page-description">Adicione informações sobre a visita</p>
 
-    <div id="view-contact-container" class="container-fluid" style="align-items:center">
+    <div id="view-contact-container" class="container-fluid fc-visit-summary">
         <hr>
-        <span style="font-weight: 500; margin:0px 5px 0px 40px ">Internação:</span>
-        <span style="font-weight: 800; margin:0px 80px 0px 5px "><?= $internacaoList['0']['id_internacao'] ?></span>
-        <span class="card-title bold" style="font-weight: 500; margin:0px 5px 0px 20px">Hospital:</span>
-        <span class="card-title bold"
-            style=" font-weight: 800; margin:0px 10px 0px 0px"><?= $internacaoList['0']['nome_hosp'] ?></span>
-        <span style="font-weight: 500; margin:0px 5px 0px 80px">Paciente:</span>
-        <span style=" font-weight: 800; margin:0px 10px 0px 0px"><?= $internacaoList['0']['nome_pac'] ?></span>
-        <span style="font-weight: 500; margin:0px 5px 0px 80px">Data internação:</span>
-        <span
-            style="font-weight: 800; margin:0px 80px 0px 0px"><?= date("d/m/Y", strtotime($internacaoList['0']['data_intern_int'])); ?></span>
+        <span class="fc-visit-summary__label">Internação:</span>
+        <span class="fc-visit-summary__value"><?= $internacaoList['0']['id_internacao'] ?></span>
+        <span class="card-title bold fc-visit-summary__label">Hospital:</span>
+        <span class="card-title bold fc-visit-summary__value"><?= $internacaoList['0']['nome_hosp'] ?></span>
+        <span class="fc-visit-summary__label">Paciente:</span>
+        <span class="fc-visit-summary__value"><?= $internacaoList['0']['nome_pac'] ?></span>
+        <span class="fc-visit-summary__label">Data internação:</span>
+        <span class="fc-visit-summary__value"><?= date("d/m/Y", strtotime($internacaoList['0']['data_intern_int'])); ?></span>
         <hr>
     </div>
 
@@ -212,8 +210,8 @@
         ?>
         <div class="form-group row">
             <div class="form-group col-sm-1">
-                <label style="text-align:center" for="visita_no_vis"> Visita No.</label>
-                <input type="text" readonly style="text-align:center; font-weight:800" value="<?= $contarVis + 1 ?>"
+                <label data-centered-field for="visita_no_vis"> Visita No.</label>
+                <input type="text" readonly data-centered-field value="<?= $contarVis + 1 ?>"
                     class="form-control" id="visita_no_vis" name="visita_no_vis">
             </div>
             <div class="form-group col-sm-4">
@@ -231,18 +229,18 @@
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="rel_visita_vis">Limpar formatação</button>
                     <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_visita_vis">Organizar com IA</button>
                 </div>
-                <div id="cronicos-relatorio-alert"
-                    style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff3cd,#ffe3a3);border:1px solid #f0c36d;color:#6a4a00;box-shadow:0 8px 20px rgba(240,195,109,.18);"
+                <div id="cronicos-relatorio-alert" class="fc-chronic-alert"
+                    style="display:none"
                     hidden>
-                    <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:4px;">
+                    <div class="fc-chronic-alert__title">
                         <i class="bi bi-exclamation-triangle-fill"></i>
                         Alerta de condição crônica
                     </div>
-                    <p style="margin:0;line-height:1.45;">
+                    <p class="fc-chronic-alert__text">
                         Foram identificados termos compatíveis com doenças crônicas no relatório:
                         <strong data-role="matched-list"></strong>.
                     </p>
-                    <p style="margin:4px 0 0;line-height:1.45;" data-role="auto-note"></p>
+                    <p class="fc-chronic-alert__note" data-role="auto-note"></p>
                 </div>
                 <textarea type="textarea" rows="2" onclick="aumentarTextAudit()" class="form-control"
                     id="rel_visita_vis" name="rel_visita_vis"></textarea>
@@ -250,7 +248,7 @@
                     <small class="text-muted" data-counter-for="rel_visita_vis">0/5000</small>
                 </div>
             </div>
-            <div style="margin-bottom:20px">
+            <div class="fc-field-block">
                 <label for="acoes_int_vis">Ações Auditoria</label>
                 <div class="d-flex justify-content-end flex-wrap gap-2 mb-2">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="acoes_int_vis">Limpar formatação</button>
@@ -262,7 +260,7 @@
                     <small class="text-muted" data-counter-for="acoes_int_vis">0/5000</small>
                 </div>
             </div>
-            <div style="margin-bottom:20px">
+            <div class="fc-field-block">
                 <label for="programacao_enf">Programação Terapêutica</label>
                 <div class="d-flex justify-content-end flex-wrap gap-2 mb-2">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="programacao_enf">Limpar formatação</button>
@@ -355,7 +353,7 @@
                 <label for="data_lancamento_vis">Data do lançamento</label>
                 <input type="date" class="form-control" id="data_lancamento_vis"
                     name="data_lancamento_vis" value="<?= $agoraLanc; ?>" readonly tabindex="-1"
-                    onfocus="this.blur();" onkeydown="return false;" style="cursor:not-allowed;">
+                    onfocus="this.blur();" onkeydown="return false;" data-readonly-cursor>
             </div>
             <div class="form-group col-sm-1">
                 <input type="hidden" class="form-control" id="visita_enf_vis" name="visita_enf_vis"
@@ -405,7 +403,7 @@
             </div>
             <div class="form-group row">
                 <div class="form-group col-sm-2">
-                    <label style="color:blue" class="control-label" for="select_prorrog">Tuss</label>
+                    <label class="control-label" for="select_prorrog">Tuss</label>
                     <select class="form-control" id="select_tuss" name="select_tuss">
                         <option value="">Selecione</option>
                         <option value="s">Sim</option>
@@ -413,7 +411,7 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label style="color:blue" class="control-label" for="select_prorrog">Prorrogação</label>
+                    <label class="control-label" for="select_prorrog">Prorrogação</label>
                     <select class="form-control" id="select_prorrog" name="select_prorrog">
                         <option value="">Selecione</option>
                         <option value="s">Sim</option>
@@ -421,7 +419,7 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label style="color:blue;" class="control-label" for="select_gestao">Gestão Assistencial</label>
+                    <label class="control-label" for="select_gestao">Gestão Assistencial</label>
 
                     <select class="form-control" id="select_gestao" name="select_gestao">
                         <option value="">Selecione</option>
@@ -430,7 +428,7 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label style="color:blue" class="control-label" for="select_uti">UTI</label>
+                    <label class="control-label" for="select_uti">UTI</label>
                     <select class="form-control" id="select_uti" name="select_uti">
                         <option value="">Selecione</option>
                         <option value="s">Sim</option>
@@ -438,7 +436,7 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label style="color:blue" class="control-label" for="select_negoc">Negociações</label>
+                    <label class="control-label" for="select_negoc">Negociações</label>
                     <select class="form-control" id="select_negoc" name="select_negoc">
                         <option value="">Selecione</option>
                         <option value="s">Sim</option>
@@ -462,17 +460,6 @@
             <!-- <FORMULARO DE NEGOCIACOES -->
             <?php include_once('formularios/form_cad_visita_negoc.php'); ?>
             <style>
-                #container-tuss .form-group.row > .form-group.row,
-                #container-gestao form > .form-group.row > .form-group.row,
-                #container-uti > .form-group.row,
-                #container-prorrog > .form-group.row,
-                #container-negoc .form-group.row {
-                    display: grid !important;
-                    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-                    gap: 14px;
-                    align-items: end;
-                    width: 100%;
-                }
 
                 #container-tuss .form-group.row > .form-group.row > .form-group[class*="col-"],
                 #container-gestao form > .form-group.row > .form-group.row > .form-group[class*="col-"],
@@ -522,16 +509,16 @@
                     <small id="clinical-autosave-status" class="text-muted">Rascunho automático: ativo</small>
                     <button type="button" class="btn btn-sm btn-outline-secondary fc-clear-draft" data-clear-clinical-draft="fields">Limpar rascunho</button>
                 </div>
-                <button style="margin:10px" type="submit" class="btn-sm btn-success btn-int-niveis">Cadastrar</button>
+                <button type="submit" class="btn-sm btn-success btn-int-niveis fc-legacy-submit">Cadastrar</button>
             </div>
     </form>
 </div>
 </div>
 <hr>
 <?php if ($contarVis > 0) { ?>
-<div style="margin:0 0px 20px 30px" class="form-group col-sm-3">
-    <label id="textVisita" style="font-weight:800" for="exibirVisita"><i class="bi bi-eye text-success"></i> Visualizar visitas anteriores</label>
-    <input style="margin-left:20px" type="checkbox" id="exibirVisita" name="exibirVisita" value="exibirVisita">
+<div class="form-group col-sm-3 fc-history-toggle">
+    <label id="textVisita" for="exibirVisita"><i class="bi bi-eye text-success"></i> Visualizar visitas anteriores</label>
+    <input type="checkbox" id="exibirVisita" name="exibirVisita" value="exibirVisita">
     <br>
 </div>
 <hr>
@@ -541,7 +528,7 @@
 
     if (!$visitas) {
         echo ("<br>");
-        echo ("<p style='margin-left:100px'> <b>-- Esta internação ainda não possui visita -- </b></p>");
+        echo ("<p class='fc-empty-message'> <b>-- Esta internação ainda não possui visita -- </b></p>");
         echo ("<br>");
     } else { ?>
     <h6 class="page-title">Relatórios anteriores</h6>
@@ -566,12 +553,10 @@
                 <td scope="row"><?= $intern["id_visita"] ?></td>
                 <td scope="row"><?= $intern["data_visita_vis"] ?></td>
                 <td scope="row" class="nome-coluna-table"><?php if ($intern["visita_med_vis"] == "s") { ?><span
-                        id="boot-icon" class="bi bi-check"
-                        style="font-size: 1.2rem; font-weight:800; color: rgb(0, 128, 55);"></span>
+                        id="boot-icon" class="bi bi-check fc-status-check"></span>
                     <?php }; ?></td>
                 <td scope="row" class="nome-coluna-table"><?php if ($internacaoList["visita_enf_vis"] == "s") { ?><span
-                        id="boot-icon" class="bi bi-check"
-                        style="font-size: 1.2rem; font-weight:800; color: rgb(0, 128, 55);"></span>
+                        id="boot-icon" class="bi bi-check fc-status-check"></span>
                     <?php }; ?>
                 </td>
                 <td scope="row"><?= $intern["rel_visita_vis"] ?></td>

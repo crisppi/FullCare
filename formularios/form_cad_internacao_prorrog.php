@@ -78,477 +78,6 @@ $prorrogInitialRows = $prorrogEditRows ?: [[
     'isol_1_pror' => 'n',
 ]];
 ?>
-<style>
-.prorrogacao-container .form-group.row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-start;
-}
-
-.prorrogacao-container .form-group {
-    margin-bottom: 15px;
-}
-
-.prorrogacao-container .form-group label {
-    margin-bottom: 2px;
-    font-weight: 400;
-}
-
-.prorrogacao-container .form-control {
-    width: 100%;
-    padding: 5px;
-}
-
-.prorrogacao-container .btn {
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.prorrogacao-container .btn-add {
-    background-color: #007bff;
-    color: white;
-}
-
-.prorrogacao-container .btn-remove {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-.prorrogacao-container #prorrogacoes-json {
-    margin-top: 20px;
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-}
-
-.prorrogacao-container .prorrog-alert {
-    display: none;
-    width: 100%;
-    margin: 4px 0 0;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #f5c2c7;
-    background: #f8d7da;
-    color: #8b1e25;
-    font-size: 0.85em;
-    line-height: 1.2;
-}
-.adicional-card {
-    background:#f5f5f9;
-    border-radius:12px;
-    border:1px solid #ebe1f5;
-    box-shadow:0 6px 14px rgba(45,18,70,.06);
-    padding:14px 16px;
-}
-.adicional-card__header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:.75rem;
-    margin-bottom:10px;
-}
-.adicional-card__title {
-    display:flex;
-    align-items:center;
-    margin:0;
-    color:#3a184f;
-    font-weight:600;
-    font-size:1rem;
-    line-height:1.15;
-}
-.adicional-card__marker {
-    width:5px;
-    height:22px;
-    border-radius:10px;
-    margin-right:10px;
-    background:linear-gradient(180deg,#8f5ff3,#b995ff);
-}
-
-#container-prorrog .adicional-card .field-container {
-    display: grid !important;
-    grid-template-columns: 1.15fr 1.15fr 1.15fr 1fr 1.15fr 42px;
-    gap: 8px 10px;
-    align-items: end;
-    width: 100%;
-}
-
-#container-prorrog .adicional-card .field-container > .form-group[class*="col-"] {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin: 0 !important;
-}
-
-#container-prorrog .adicional-card .field-container > [style*="display:none"] {
-    display: none !important;
-}
-
-#container-prorrog .adicional-card .form-control,
-#container-prorrog .adicional-card .form-control-sm.form-control {
-    width: 100% !important;
-    min-height: 32px !important;
-    height: 32px !important;
-    padding: 3px 24px 3px 8px !important;
-    font-size: .74rem !important;
-    line-height: 1.15 !important;
-}
-
-#container-prorrog .adicional-card select.form-control {
-    appearance: auto !important;
-    -webkit-appearance: auto !important;
-    -moz-appearance: auto !important;
-    background-image: initial !important;
-}
-
-#container-prorrog .adicional-card label {
-    min-height: 0 !important;
-    margin-bottom: 2px !important;
-    font-size: .68rem !important;
-    line-height: 1.08 !important;
-    font-weight: 600 !important;
-}
-
-#container-prorrog .adicional-card textarea.form-control {
-    min-height: 76px !important;
-    height: auto !important;
-    padding: 6px 8px !important;
-}
-
-#container-prorrog .adicional-card .btn-add,
-#container-prorrog .adicional-card .btn-remove {
-    min-width: 32px !important;
-    width: 32px !important;
-    min-height: 32px !important;
-    height: 32px !important;
-    padding: 0 !important;
-    font-size: .9rem !important;
-    line-height: 1 !important;
-}
-
-#container-prorrog .adicional-card .form-group[style*="margin-top:25px"],
-#container-prorrog .adicional-card .form-group[style*="margin-top: 25px"] {
-    margin-top: 0 !important;
-}
-
-@media (max-width: 1199.98px) {
-    #container-prorrog .adicional-card .field-container {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    #container-prorrog .adicional-card .field-container {
-        grid-template-columns: 1fr;
-    }
-    .prorrog-alta-fields > .form-group.row {
-        grid-template-columns: 1fr !important;
-        max-width: none !important;
-    }
-}
-.custom-dialog {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1050;
-    background: rgba(0, 0, 0, .4)
-}
-.custom-dialog-content {
-    background: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, .2)
-}
-.custom-dialog-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center
-}
-.custom-dialog-header .close {
-    cursor: pointer;
-    font-size: 1.5rem
-}
-.prorrog-alta-box {
-    margin-top: 12px;
-    padding: 12px 0 0;
-    border-top: 1px solid #e8eef6;
-    background: transparent;
-}
-.prorrog-alta-box__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    min-height: 34px;
-    margin-bottom: 8px;
-}
-.prorrog-alta-box__title {
-    margin: 0;
-    color: #2f2240;
-    font-size: .82rem;
-    font-weight: 800;
-    line-height: 1.15;
-}
-.prorrog-alta-box__hint {
-    display: none;
-}
-.prorrog-alta-toggle {
-    display: inline-flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-.prorrog-alta-toggle .btn {
-    min-width: 62px;
-    min-height: 30px !important;
-    height: 30px !important;
-    padding: 0 12px !important;
-    border-radius: 8px;
-    border: 1px solid #d7c5e4;
-    background: #fff;
-    color: #5e2363;
-    font-size: .76rem !important;
-    font-weight: 800;
-    line-height: 1 !important;
-}
-.prorrog-alta-toggle .btn.is-active {
-    background: #5e2363;
-    border-color: #5e2363;
-    color: #fff;
-}
-.prorrog-alta-fields {
-    display: none;
-}
-.prorrog-alta-fields.is-visible {
-    display: block;
-    padding-top: 4px;
-}
-.prorrog-alta-fields > .form-group.row {
-    display: grid !important;
-    grid-template-columns: minmax(180px, 220px) minmax(240px, 320px);
-    gap: 8px 10px;
-    align-items: end;
-    width: 100% !important;
-    max-width: 560px !important;
-    margin: 0 !important;
-}
-.prorrog-alta-fields > .form-group.row > .form-group[class*="col-"] {
-    flex: none !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-.prorrog-alta-fields .form-control,
-.prorrog-alta-fields .form-control-sm.form-control,
-.prorrog-alta-fields .bootstrap-select,
-.prorrog-alta-fields .bootstrap-select > .dropdown-toggle {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-}
-.prorrog-alta-fields .bootstrap-select .filter-option-inner-inner {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.prorrog-ia-box {
-    margin-top: 12px;
-    padding: 12px 0 0;
-    width: 100%;
-    max-width: none;
-    border-top: 1px solid #e8eef6;
-    background: transparent;
-    box-shadow: none;
-}
-.prorrog-ia-box__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-    min-height: 34px;
-    margin-bottom: 8px;
-}
-.prorrog-ia-box__title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-.prorrog-ia-box__eyebrow {
-    margin: 0 0 2px;
-    color: #2563eb;
-    font-size: .58rem;
-    font-weight: 800;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    line-height: 1;
-}
-.prorrog-ia-box__title {
-    margin: 0;
-    color: #2f2240;
-    font-size: .82rem;
-    font-weight: 800;
-    line-height: 1.15;
-}
-.prorrog-ia-powered {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    min-height: 24px;
-    padding: 3px 9px;
-    border-radius: 999px;
-    background: #fff;
-    border: 1px solid #dbe4ef;
-    color: #1d4ed8;
-    font-size: .68rem;
-    font-weight: 800;
-    letter-spacing: 0;
-    text-transform: uppercase;
-}
-.prorrog-ia-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.prorrog-ia-actions .btn {
-    min-height: 32px !important;
-    height: 32px !important;
-    padding: 5px 12px !important;
-    border-radius: 8px !important;
-    font-size: .78rem !important;
-    font-weight: 800 !important;
-    line-height: 1 !important;
-}
-.prorrog-ia-context-row {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
-.prorrog-ia-context-field {
-    display: block !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    flex: 0 0 100% !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-bottom: 0 !important;
-}
-.prorrog-ia-box textarea.form-control,
-#prorrog-ia-contexto {
-    display: block;
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    min-height: 42px !important;
-    height: 42px !important;
-    box-sizing: border-box !important;
-}
-.prorrog-ia-card {
-    width: 100%;
-    max-width: none;
-    margin-top: 8px;
-    border: 1px solid #dbe4ef;
-    border-radius: 8px;
-    background: #fff;
-    overflow: hidden;
-    box-shadow: none;
-}
-.prorrog-ia-card__header {
-    min-height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 6px 10px;
-    background: #f8fafc;
-    border-bottom: 1px solid #e8eef6;
-}
-.prorrog-ia-card__header h5 {
-    margin: 0;
-    color: #1f2937;
-    font-size: .82rem;
-    font-weight: 800;
-    line-height: 1.15;
-}
-.prorrog-ia-toggle {
-    width: 28px;
-    height: 28px;
-    border: 1px solid #cbd5e1;
-    border-radius: 7px;
-    background: #fff;
-    color: #374151;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-}
-.prorrog-ia-card__body {
-    padding: 10px;
-}
-.prorrog-ia-status {
-    margin: 8px 10px 0;
-    padding: 6px 8px;
-    border-radius: 7px;
-    font-weight: 700;
-    font-size: .76rem;
-}
-.prorrog-ia-status--info { background: #e0f2fe; color: #075985; }
-.prorrog-ia-status--success { background: #dcfce7; color: #166534; }
-.prorrog-ia-status--error { background: #fee2e2; color: #991b1b; }
-.prorrog-ia-badge {
-    display: inline-flex;
-    align-items: center;
-    min-height: 28px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: .78rem;
-    font-weight: 800;
-    letter-spacing: .04em;
-}
-.prorrog-ia-badge--ok { background: #dcfce7; color: #166534; }
-.prorrog-ia-badge--info { background: #dbeafe; color: #1d4ed8; }
-.prorrog-ia-badge--warn { background: #ffedd5; color: #c2410c; }
-.prorrog-ia-badge--danger { background: #fee2e2; color: #b91c1c; }
-.prorrog-ia-badge--neutral { background: #fef3c7; color: #92400e; }
-.prorrog-ia-result-head { margin-bottom: 10px; }
-.prorrog-ia-section {
-    margin-top: 10px;
-    color: #1f2937;
-}
-.prorrog-ia-section p,
-.prorrog-ia-section ul { margin: 4px 0 0; }
-.prorrog-ia-section ul { padding-left: 18px; }
-.prorrog-ia-empty {
-    margin: 0;
-    color: #6b7280;
-}
-.prorrog-ia-final-alert {
-    margin-top: 14px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #fecaca;
-    background: linear-gradient(135deg, #fff1f2, #fee2e2);
-    color: #b91c1c;
-    font-weight: 800;
-    line-height: 1.4;
-}
-</style>
 
 <?php
 if (!function_exists('prorrogNormAcomod')) {
@@ -654,7 +183,7 @@ if (isset($dados_alta) && is_array($dados_alta)) {
 
             <div class="form-group col-sm-1">
                 <label class="control-label" for="diarias_1_<?= $prorrogRowIndex ?>">Diárias</label>
-                <input type="text" style="text-align:center; font-weight:600; background-color:darkgray" readonly
+                <input type="text" data-readonly-summary readonly
                     class="form-control-sm form-control" id="diarias_1_<?= $prorrogRowIndex ?>" name="diarias_1" value="<?= htmlspecialchars($prorrogRowDiarias, ENT_QUOTES, 'UTF-8') ?>">
             </div>
 
@@ -667,7 +196,7 @@ if (isset($dados_alta) && is_array($dados_alta)) {
                 </select>
             </div>
 
-            <div class="form-group col-sm-2" style="margin-top:25px">
+            <div class="form-group col-sm-2" data-action-offset>
                 <?php if ($prorrogRowIndex > 0): ?>
                 <button type="button" class="btn btn-remove" onclick="removeField(this)">-</button>
                 <?php endif; ?>
@@ -764,16 +293,16 @@ if (isset($dados_alta) && is_array($dados_alta)) {
 <div class="modal fade" id="modalProrrog">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
-            <div class="modal-header" style="background:#5e2363;">
-                <h4 class="page-title" style="color:white">Prorrogações</h4>
-                <p class="page-description" style="color:white; margin-top:5px">Informações sobre prorrogações
+            <div class="modal-header fc-modal-header">
+                <h4 class="page-title">Prorrogações</h4>
+                <p class="page-description">Informações sobre prorrogações
                     anteriores</p>
             </div>
             <div class="modal-body">
                 <?php
                 if (empty($visitas)) {
                     echo ("<br>");
-                    echo ("<p style='margin-left:100px'> <b>-- Esta internação ainda não possui Prorrogações  -- </b></p>");
+                    echo ("<p class='fc-empty-message'> <b>-- Esta internação ainda não possui Prorrogações  -- </b></p>");
                     echo ("<br>");
                 } else { ?>
                 <table class="table table-sm table-striped table-hover table-condensed">
@@ -1099,7 +628,7 @@ function createProrrogationField() {
 
             <div class="form-group col-sm-1">
                 <label class="control-label">Diárias</label>
-                <input type="text" style="text-align:center; font-weight:600; background-color:darkgray" readonly class="form-control-sm form-control" name="diarias_1">
+                <input type="text" data-readonly-summary readonly class="form-control-sm form-control" name="diarias_1">
             </div>
 
             <div class="form-group col-sm-1">
@@ -1110,7 +639,7 @@ function createProrrogationField() {
                 </select>
             </div>
 
-            <div class="form-group col-sm-2" style="margin-top:25px">
+            <div class="form-group col-sm-2" data-action-offset>
                 <button type="button" class="btn btn-remove" onclick="removeField(this)">-</button>
                 <button type="button" class="btn btn-add" onclick="addField()">+</button>
             </div>

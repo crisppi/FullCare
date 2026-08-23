@@ -2,7 +2,7 @@
  $u = $utiList[0] ?? [];
  ?>
 
-<div id="container-uti" style="display:none; margin:5px">
+<div id="container-uti" style="display:none;">
     <!-- DADOS PARA FORMULÁRIO UTI -->
     <div class="form-group row">
 
@@ -165,15 +165,15 @@
                 </select>
             </div>
 
-            <div style="margin-top:30px" class="form-group col-sm-2">
-                <a style="color:blue; font-size:0.8em" href="https://www.rccc.eu/ppc/indicadores/saps3.html"
+            <div data-action-offset="large" class="form-group col-sm-2">
+                <a data-reference-link href="https://www.rccc.eu/ppc/indicadores/saps3.html"
                     target="_blank">Calcular SAPS</a>
             </div>
         </div>
 
         <div class="form-group col-sm-12">
             <label for="rel_uti">Relatório</label>
-            <textarea style="resize:none" onclick="aumentarTextUTI()" onblur="this.rows=2" onfocus="this.rows=6"
+            <textarea data-no-resize onclick="aumentarTextUTI()" onblur="this.rows=2" onfocus="this.rows=6"
                 rows="2" class="form-control" id="rel_uti"
                 name="rel_uti"><?= htmlspecialchars($u['rel_uti'] ?? '') ?></textarea>
         </div>

@@ -1,4 +1,4 @@
-<div id="container-uti" style="display:none; margin:5px">
+<div id="container-uti" style="display:none;">
     <hr>
     <h6 class="page-title">Adicione informações sobre a internação na UTI</h6>
     <input type="hidden" name="type" value="create">
@@ -130,8 +130,8 @@
         </div>
         <div class="form-group col-sm-10" id="justifique_uti" style="display: none;">
             <label for="justifique_uti">Justifique permanência - Critério baixo</label>
-            <p id="criteria_message" style="display: inline; margin-left: 10px; font-size: 0.9em; color: #555;"></p>
-            <textarea type="textarea" style="resize:none" rows="2" class="form-control" id="justifique_uti"
+            <p id="criteria_message" style="display:inline" data-criteria-message></p>
+            <textarea type="textarea" data-no-resize rows="2" class="form-control" id="justifique_uti"
                 name="justifique_uti"></textarea>
         </div>
 
@@ -148,14 +148,14 @@
                 <?php } ?>
             </select>
         </div>
-        <div style="margin-top:30px " class="form-group col-sm-2">
-            <a style="color:blue; font-size:0.8em" href="https://www.rccc.eu/ppc/indicadores/saps3.html"
+        <div data-action-offset="large" class="form-group col-sm-2">
+            <a data-reference-link href="https://www.rccc.eu/ppc/indicadores/saps3.html"
                 target="_blank">Calcular SAPS</a>
         </div>
     </div>
     <div>
         <label for="rel_uti">Relatório UTI</label>
-        <textarea type="textarea" style="resize:none" onclick="aumentarTextUTI()" rows="2" class="form-control"
+        <textarea type="textarea" data-no-resize onclick="aumentarTextUTI()" rows="2" class="form-control"
             id="rel_uti" name="rel_uti"></textarea>
     </div>
     <!-- Scripts no final do body -->

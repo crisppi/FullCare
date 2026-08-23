@@ -1,4 +1,4 @@
-<div id="container-tuss" style="display:none; margin:5px;">
+<div id="container-tuss" style="display:none;">
     <div class="adicional-card">
         <div class="adicional-card__header">
             <h4 class="adicional-card__title">
@@ -23,7 +23,7 @@
 
             <div class="form-group col-sm-3">
                 <label class="control-label">Descrição Tuss</label>
-                <div class="tuss-ac-wrap" style="position:relative">
+                <div class="tuss-ac-wrap" >
                     <input type="text" class="form-control-sm form-control tuss-ac-text"
                         placeholder="Digite código ou descrição" autocomplete="off">
                     <input type="hidden" name="tuss_solicitado" class="tuss-ac-val">
@@ -68,7 +68,7 @@
         </div>
     </div>
 
-        <div id="success-message" class="alert alert-success" style="display:none; margin-top:10px;">
+        <div id="success-message" class="alert alert-success fc-alert-spaced" style="display:none;">
             TUSS gravados com sucesso!
         </div>
     </div>
@@ -87,7 +87,7 @@
                 <?php
                 if (empty($visitas)) {
                     echo ("<br>");
-                    echo ("<p style='margin-left:100px'> <b>-- Esta internação ainda não possui TUSS liberados -- </b></p>");
+                    echo ("<p class='fc-empty-message'> <b>-- Esta internação ainda não possui TUSS liberados -- </b></p>");
                     echo ("<br>");
                 } else { ?>
                 <?php
@@ -161,37 +161,6 @@
     </div>
 </div>
 
-<style>
-.tuss-ac-drop {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 99999;
-    background: #fff;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    max-height: 220px;
-    overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,.15);
-}
-.tuss-ac-item {
-    padding: 7px 10px;
-    cursor: pointer;
-    font-size: .88rem;
-    line-height: 1.3;
-}
-.tuss-ac-item:hover, .tuss-ac-item.active {
-    background: #f0eaff;
-    color: #3a184f;
-}
-.tuss-ac-empty {
-    padding: 8px 10px;
-    color: #999;
-    font-size: .85rem;
-}
-</style>
 
 <script>
 var _tussAjaxUrl = '<?= $BASE_URL ?>ajax/search_tuss.php';
@@ -301,7 +270,7 @@ function addTussField() {
 
       <div class="form-group col-sm-3">
         <label class="control-label">Descrição Tuss</label>
-        <div class="tuss-ac-wrap" style="position:relative">
+        <div class="tuss-ac-wrap" >
           <input type="text" class="form-control-sm form-control tuss-ac-text"
               placeholder="Digite código ou descrição" autocomplete="off">
           <input type="hidden" name="tuss_solicitado" class="tuss-ac-val">

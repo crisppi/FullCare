@@ -160,14 +160,14 @@
         <div class="row g-2 mt-1">
             <div class="form-group col-12">
                         <label for="exames_det">Exames relevantes</label>
-                        <textarea type="textarea" style="resize:none" rows="3" onclick="aumentarText('exames_det')"
+                        <textarea type="textarea" data-no-resize rows="3" onclick="aumentarText('exames_det')"
                             onblur="reduzirText('exames_det', 3)" class="form-control" id="exames_det"
                             name="exames_det" autocomplete="off" autocorrect="off" autocapitalize="none"
                             spellcheck="false"></textarea>
             </div>
             <div class="form-group col-12">
                         <label for="oportunidades_det">Oportunidades</label>
-                        <textarea type="textarea" style="resize:none" rows="2"
+                        <textarea type="textarea" data-no-resize rows="2"
                             onclick="aumentarText('oportunidades_det')" class="form-control" id="oportunidades_det"
                             onblur="reduzirText('oportunidades_det', 3)" name="oportunidades_det" autocomplete="off"
                             autocorrect="off" autocapitalize="none" spellcheck="false"></textarea>

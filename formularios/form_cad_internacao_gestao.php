@@ -1,156 +1,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-maskmoney/3.0.2/jquery.maskMoney.min.js"></script>
 
-<style>
-.adicional-card {
-    background:#f5f5f9;
-    border-radius:22px;
-    border:1px solid #ebe1f5;
-    box-shadow:0 12px 28px rgba(45,18,70,.08);
-    padding:22px 24px;
-    margin-top:10px;
-}
-.adicional-card__header {
-    display:flex;
-    align-items:center;
-    margin-bottom:18px;
-}
-.adicional-card__title {
-    display:flex;
-    align-items:center;
-    margin:0;
-    color:#2f1846;
-    font-weight:600;
-}
-.adicional-card__marker {
-    width:6px;
-    height:26px;
-    border-radius:10px;
-    margin-right:12px;
-    background:linear-gradient(180deg,#4b9fa4,#7ad0c8);
-}
 
-#container-gestao .adicional-card > .form-group.row {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 14px;
-    align-items: end;
-    width: 100%;
-}
-
-#container-gestao .adicional-card > .form-group.row > .form-group[class*="col-"] {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-#container-gestao .adicional-card > .form-group.row > #div_evento,
-#container-gestao .adicional-card > .form-group.row > #div_rel_alto_custo,
-#container-gestao .adicional-card > .form-group.row > #div_rel_home_care,
-#container-gestao .adicional-card > .form-group.row > #div_rel_opme,
-#container-gestao .adicional-card > .form-group.row > #div_rel_desospitalizacao {
-    grid-column: 1 / -1;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-}
-
-#container-gestao .alto-custo-help {
-    align-self: end;
-    align-items: center;
-    background: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    color: #334155;
-    gap: 0;
-    grid-column: span 2;
-    margin: 0 !important;
-    max-width: 620px;
-    min-width: 0 !important;
-    min-height: 32px;
-    padding: 5px 10px;
-    box-shadow: 0 2px 5px rgba(30, 50, 74, .10);
-}
-
-#container-gestao .alto-custo-help p {
-    color: #475569;
-    font-size: .64rem;
-    line-height: 1.18;
-    margin: 0;
-    overflow-wrap: anywhere;
-    text-align: left;
-    white-space: normal;
-}
-
-#container-gestao .alto-custo-help p + p {
-    margin-top: 3px;
-}
-
-#container-gestao .alto-custo-help__title {
-    color: #1e3a5f;
-    font-size: .67rem;
-    font-weight: 800;
-}
-
-#container-gestao .adicional-card > .form-group.row > [style*="display:none"] {
-    display: none !important;
-}
-
-#container-gestao #div_evento > .form-group.row {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 14px;
-    align-items: end;
-    width: 100%;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
-
-#container-gestao #div_evento > .form-group.row > .form-group[class*="col-"],
-#container-gestao #div_evento #div_rel_evento {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    flex: none !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-#container-gestao #div_evento #div_rel_evento {
-    grid-column: 1 / -1;
-}
-
-#container-gestao .adicional-card .form-control,
-#container-gestao .adicional-card .form-control-sm.form-control {
-    width: 100% !important;
-    min-height: 42px !important;
-    height: 42px !important;
-}
-
-#container-gestao .adicional-card textarea.form-control {
-    min-height: 92px !important;
-    height: auto !important;
-}
-
-@media (max-width: 768px) {
-    #container-gestao .adicional-card > .form-group.row {
-        grid-template-columns: 1fr;
-    }
-
-    #container-gestao .alto-custo-help {
-        grid-column: 1 / -1;
-    }
-
-    #container-gestao .alto-custo-help p {
-        white-space: normal;
-    }
-}
-</style>
-
-<div id="container-gestao" style="display:none; margin:5px">
+<div id="container-gestao" style="display:none;">
     <div class="adicional-card">
         <div class="adicional-card__header">
             <h4 class="adicional-card__title">
@@ -189,7 +40,7 @@
 
         <div style="display:none" id="div_rel_alto_custo">
             <label for="rel_alto_custo_ges">Relatório alto custo</label>
-            <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarText('rel_alto_custo_ges')"
+            <textarea type="textarea" data-no-resize rows="2" onclick="aumentarText('rel_alto_custo_ges')"
                 onblur="reduzirText('rel_alto_custo_ges', 3)" class="form-control" id="rel_alto_custo_ges"
                 name="rel_alto_custo_ges"></textarea>
         </div>
@@ -202,7 +53,7 @@
         </div>
         <div style="display:none" id="div_rel_home_care">
             <label for="rel_home_care_ges">Relatório Home care</label>
-            <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarText('rel_home_care_ges')"
+            <textarea type="textarea" data-no-resize rows="2" onclick="aumentarText('rel_home_care_ges')"
                 onblur="reduzirText('rel_home_care_ges', 3)" class="form-control" id="rel_home_care_ges"
                 name="rel_home_care_ges"></textarea>
         </div>
@@ -215,7 +66,7 @@
         </div>
         <div style="display:none" id="div_rel_opme">
             <label for="rel_opme_ges">Relatório OPME</label>
-            <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarText('rel_opme_ges')"
+            <textarea type="textarea" data-no-resize rows="2" onclick="aumentarText('rel_opme_ges')"
                 onblur="reduzirText('rel_opme_ges', 3)" class="form-control" id="rel_opme_ges"
                 name="rel_opme_ges"></textarea>
         </div>
@@ -228,7 +79,7 @@
         </div>
         <div style="display:none" id="div_rel_desospitalizacao">
             <label for="rel_desospitalizacao_ges">Relatório Desospitalização</label>
-            <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarText('rel_desospitalizacao_ges')"
+            <textarea type="textarea" data-no-resize rows="2" onclick="aumentarText('rel_desospitalizacao_ges')"
                 onblur="reduzirText('rel_desospitalizacao_ges', 3)" class="form-control" id="rel_desospitalizacao_ges"
                 name="rel_desospitalizacao_ges"></textarea>
         </div>
@@ -267,7 +118,7 @@
             <div class="form-group row">
                 <div id="div_rel_evento">
                     <label for="rel_evento_adverso_ges">Relatório Evento Adverso</label>
-                    <textarea type="textarea" style="resize:none" rows="2"
+                    <textarea type="textarea" data-no-resize rows="2"
                         onclick=" aumentarText('rel_evento_adverso_ges')"
                         onblur="reduzirText('rel_evento_adverso_ges', 3)" class="form-control"
                         id="rel_evento_adverso_ges" name="rel_evento_adverso_ges"></textarea>
