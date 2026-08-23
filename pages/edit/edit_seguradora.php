@@ -307,7 +307,7 @@ if (empty($enderecosSeguradora) && !empty($seguradora->endereco_seg)) {
                 </div>
                 <div class="row seguradora-identificacao-row">
                     <div class="form-group col-md-6">
-                        <label for="seguradora_seg"><span style="color:red;">*</span> Seguradora</label>
+                        <label for="seguradora_seg"><span class="required-marker">*</span> Seguradora</label>
                         <input type="text" class="form-control" id="seguradora_seg" name="seguradora_seg"
                             value="<?= $seguradora->seguradora_seg ?>" required>
                     </div>

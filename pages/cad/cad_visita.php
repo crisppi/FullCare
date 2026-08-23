@@ -249,3 +249,5 @@ $antecedentesInternacaoIds = array_map('intval', array_column($antecedentesInter
     <!-- FORMULARIO INTERNACAO -->
     <?php include_once('formularios/form_cad_visita.php'); ?>
 </div>
+
+<?php require_once("templates/footer.php"); ?>

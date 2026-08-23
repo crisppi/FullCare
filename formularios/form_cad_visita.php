@@ -357,21 +357,21 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                                 <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_visita_vis">Organizar com IA</button>
                             </div>
                         </div>
-                        <div id="cronicos-relatorio-alert"
-                            style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff3cd,#ffe3a3);border:1px solid #f0c36d;color:#6a4a00;box-shadow:0 8px 20px rgba(240,195,109,.18);"
+                        <div id="cronicos-relatorio-alert" class="fc-chronic-alert"
+                            style="display:none"
                             hidden>
-                            <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:4px;">
+                            <div class="fc-chronic-alert__title">
                                 <i class="bi bi-exclamation-triangle-fill"></i>
                                 Alerta de condição crônica
                             </div>
-                            <p style="margin:0;line-height:1.45;">
+                            <p class="fc-chronic-alert__text">
                                 Foram identificados termos compatíveis com doenças crônicas no relatório:
                                 <strong data-role="matched-list"></strong>.
                             </p>
-                            <p style="margin:4px 0 0;line-height:1.45;" data-role="auto-note"></p>
+                            <p class="fc-chronic-alert__note" data-role="auto-note"></p>
                         </div>
-                        <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarTextAudit()"
-                            class="form-control" id="rel_visita_vis" name="rel_visita_vis" autocomplete="off"
+                        <textarea type="textarea" rows="2" onclick="aumentarTextAudit()" class="form-control fc-no-resize"
+                            id="rel_visita_vis" name="rel_visita_vis" autocomplete="off"
                             autocorrect="off" autocapitalize="none" spellcheck="false"></textarea>
                         <div class="d-flex justify-content-end mt-1">
                             <small class="text-muted" data-counter-for="rel_visita_vis">0/5000</small>
@@ -385,8 +385,8 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                                 <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="acoes_int_vis">Organizar com IA</button>
                             </div>
                         </div>
-                        <textarea type="textarea" style="resize:none" rows="2" onclick="aumentarTextAcoes()"
-                            class="form-control" id="acoes_int_vis" name="acoes_int_vis" autocomplete="off"
+                        <textarea type="textarea" rows="2" onclick="aumentarTextAcoes()" class="form-control fc-no-resize"
+                            id="acoes_int_vis" name="acoes_int_vis" autocomplete="off"
                             autocorrect="off" autocapitalize="none" spellcheck="false"></textarea>
                         <div class="d-flex justify-content-end mt-1">
                             <small class="text-muted" data-counter-for="acoes_int_vis">0/5000</small>
@@ -400,8 +400,8 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                                 <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="programacao_enf">Organizar com IA</button>
                             </div>
                         </div>
-                        <textarea type="textarea" style="resize:none" rows="2"
-                            onclick="aumentarTextProgVis()" class="form-control" id="programacao_enf"
+                        <textarea type="textarea" rows="2" class="form-control fc-no-resize"
+                            onclick="aumentarTextProgVis()" id="programacao_enf"
                             name="programacao_enf" autocomplete="off" autocorrect="off" autocapitalize="none"
                             spellcheck="false"></textarea>
                         <div class="d-flex justify-content-end mt-1">
@@ -464,10 +464,10 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                     name="internacao_ativa_int">
             </div>
             <div class="visita-card visita-card--tabelas">
-                <div class="visita-card__header tabelas-adicionais-card__header" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(111,69,162,.10);">
+                <div class="visita-card__header tabelas-adicionais-card__header">
                     <div>
-                        <p class="visita-card__eyebrow tabelas-adicionais-card__eyebrow" style="margin:0;text-transform:uppercase;letter-spacing:.18em;font-size:.72rem;font-weight:800;line-height:1.2;color:#6e4a96;">Tabelas adicionais</p>
-                        <h3 class="visita-card__title tabelas-adicionais-card__title" style="margin:5px 0 0;font-size:1.22rem;font-weight:800;color:#2a1b43;">Complementos da visita</h3>
+                        <p class="visita-card__eyebrow tabelas-adicionais-card__eyebrow">Tabelas adicionais</p>
+                        <h3 class="visita-card__title tabelas-adicionais-card__title">Complementos da visita</h3>
                     </div>
                 </div>
                 <div class="visita-card__body">
@@ -573,7 +573,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                 <button type="submit" class="btn btn-success btn-submit-standard" id="visita-submit-btn">
                     <i class="fas fa-check"></i> <span id="visita-submit-label">Cadastrar</span>
                 </button>
-                <button type="button" class="btn btn-sm btn-clear-draft" data-clear-clinical-draft="fields">Limpar rascunho</button>
+                <button type="button" class="btn btn-sm btn-clear-draft fc-clear-draft" data-clear-clinical-draft="fields">Limpar rascunho</button>
                 <div class="alert" id="alert" role="alert"></div>
             </div>
     </form>
@@ -644,13 +644,11 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
                                                         : date("d/m/Y", strtotime($intern['data_visita_int']));; ?>
                             </td>
                             <td scope="row" class="nome-coluna-table">
-                                <?php if ($intern["visita_med_vis"] == "s") { ?><span id="boot-icon" class="bi bi-check"
-                                    style="font-size: 1.2rem; font-weight:800; color: rgb(0, 128, 55);"></span>
+                                <?php if ($intern["visita_med_vis"] == "s") { ?><span id="boot-icon" class="bi bi-check fc-status-check"></span>
                                 <?php }; ?>
                             </td>
                             <td scope="row" class="nome-coluna-table">
-                                <?php if ($intern["visita_enf_vis"] == "s") { ?><span id="boot-icon" class="bi bi-check"
-                                    style="font-size: 1.2rem; font-weight:800; color: rgb(0, 128, 55);"></span>
+                                <?php if ($intern["visita_enf_vis"] == "s") { ?><span id="boot-icon" class="bi bi-check fc-status-check"></span>
                                 <?php }; ?>
                             </td>
                             <td scope="row"><?= $intern['rel_visita_vis'] = !empty($intern['rel_visita_vis']) ? $intern['rel_visita_vis'] : $intern['rel_int'];
@@ -4423,8 +4421,6 @@ window.setTimeout(signalEditAdditionalSelectsFromServer, 0);
     margin-top: 7px !important;
 }
 </style>
-<link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
-
 <script src="<?= $BASE_URL ?>js/internacao_cronicos_alert.js"></script>
 <script>
 window.visitaAiConfig = Object.assign({}, window.visitaAiConfig || {}, {

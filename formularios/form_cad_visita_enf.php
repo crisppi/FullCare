@@ -534,7 +534,7 @@
             <div>
                 <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
                     <small id="clinical-autosave-status" class="text-muted">Rascunho automático: ativo</small>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-clinical-draft="fields">Limpar rascunho</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary fc-clear-draft" data-clear-clinical-draft="fields">Limpar rascunho</button>
                 </div>
                 <button style="margin:10px" type="submit" class="btn-sm btn-success btn-int-niveis">Cadastrar</button>
             </div>

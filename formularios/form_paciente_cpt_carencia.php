@@ -53,50 +53,6 @@ if (!$cptCarenciasPaciente && !empty($id_paciente) && isset($conn)) {
         </div>
     </div>
 </div>
-<style>
-#step-cpt-carencia .cpt-add-column {
-    display: flex !important;
-    align-items: flex-end !important;
-    justify-content: flex-start !important;
-}
-#step-cpt-carencia #btnAddCptInline {
-    width: 28px !important;
-    min-width: 28px !important;
-    max-width: 28px !important;
-    height: 28px !important;
-    min-height: 28px !important;
-    max-height: 28px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    align-self: flex-end !important;
-}
-#step-cpt-carencia .table-responsive table {
-    font-size: .68rem !important;
-}
-#step-cpt-carencia .table-responsive thead th {
-    box-sizing: border-box !important;
-    height: auto !important;
-    min-height: 0 !important;
-    padding: 1px 6px !important;
-    font-size: .6rem !important;
-    line-height: 1 !important;
-    vertical-align: middle !important;
-    white-space: nowrap;
-}
-#step-cpt-carencia .table-responsive thead tr {
-    height: auto !important;
-}
-#step-cpt-carencia .table-responsive thead {
-    height: 26px !important;
-    min-height: 0 !important;
-}
-#step-cpt-carencia .table-responsive tbody td {
-    padding: 4px 8px !important;
-    font-size: .68rem !important;
-    line-height: 1.15 !important;
-    vertical-align: middle !important;
-}
-</style>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const body = document.getElementById('cptTableBody');

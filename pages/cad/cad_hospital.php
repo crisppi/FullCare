@@ -443,8 +443,6 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
         box-shadow: 0 5px 12px rgba(21, 69, 105, .18) !important;
     }
 </style>
-<link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../../css/form_surface_contrast.css') ?>" rel="stylesheet">
-
 <div class="internacao-page cadastro-layout cadastro-hospital-page" id="main-container">
     <div class="internacao-page__hero">
         <div>
@@ -488,7 +486,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     <div class="invalid-feedback">Por favor, insira um CNPJ válido.</div>
                 </div>
                 <div class="form-group col-md-6 mb-3">
-                    <label for="nome_hosp"><span style="color:red;">*</span> Nome do Hospital</label>
+                    <label for="nome_hosp"><span class="required-marker">*</span> Nome do Hospital</label>
                     <input type="text" class="form-control" id="nome_hosp" name="nome_hosp" required
                         placeholder="Digite o nome do hospital">
                     <div class="invalid-feedback">Por favor, insira o nome do hospital.</div>

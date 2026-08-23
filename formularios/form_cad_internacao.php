@@ -247,7 +247,7 @@
                         <div class="internacao-card__title-wrap">
                             <h2 class="internacao-card__title">Dados da internação</h2>
                         </div>
-                        <div class="d-flex align-items-center" style="gap: 8px;">
+                        <div class="d-flex align-items-center gap-2">
                             <span class="internacao-card__tag internacao-card__tag--critical">Campos principais</span>
                             <span class="internacao-card__tag js-internacao-id-previsto"
                                 title="O ID definitivo é confirmado pelo banco ao salvar.">
@@ -262,7 +262,7 @@
                             <div class="form-group hospital-col">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="control-label mb-0" for="hospital_selected">
-                                        <span style="color:red;">*</span> Hospital
+                                        <span class="required-marker">*</span> Hospital
                                     </label>
                                     <button type="button" id="hospitalTipButton" class="patient-insight-inline-btn"
                                         style="display:none;" title="Mostrar indicadores do hospital"
@@ -274,7 +274,7 @@
                                         name="hospital_selected" required data-live-search="true"
                                         data-live-search-placeholder="Pesquise por Hospital" data-none-selected-text="Pesquise por Hospital"
                                         data-width="100%" data-style="input-lg-fullcare"
-                                        style="font-size:1em;background-color:#fff;color:#000;">
+                                        >
                                         <option value=""></option>
                                         <?php if (!empty($listaHospitais)): ?>
                                             <?php foreach ($listaHospitais as $h): ?>
@@ -301,7 +301,7 @@
                             <div class="form-group patient-col">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="control-label mb-0" for="fk_paciente_int">
-                                        <span style="color:red;">*</span> Paciente
+                                        <span class="required-marker">*</span> Paciente
                                     </label>
                                     <div class="patient-label-actions">
                                         <a class="patient-inline-link"
@@ -424,7 +424,7 @@
                             </div>
 
                             <div class="form-group essential-medium">
-                                <label class="control-label" for="data_intern_int_dt"><span style="color:red;">*</span> Data
+                                <label class="control-label" for="data_intern_int_dt"><span class="required-marker">*</span> Data
                                     Internação</label>
                                 <input type="datetime-local" class="form-control input-lg-fullcare" id="data_intern_int_dt" required
                                     value="" name="data_intern_int_dt">
@@ -508,14 +508,14 @@
                                 </div>
                             <?php endif; ?>
 
-                            <div class="form-group essential-full mb-2" style="flex:1 1 100%;">
+                            <div class="form-group essential-full mb-2">
                                 <div id="erro-data-internacao" class="alert d-none w-100 mb-0" role="alert"></div>
                             </div>
 
-                            <div class="form-group essential-full d-none" id="alta-obrigatoria-container" style="flex:1 1 100%;">
+                            <div class="form-group essential-full d-none" id="alta-obrigatoria-container">
                                 <div class="alta-obrigatoria-box">
                                     <div class="alta-obrigatoria-box__title">
-                                        <span style="color:red;">*</span> Alta obrigatória para internação retroativa (paciente internado em outro hospital)
+                                        <span class="required-marker">*</span> Alta obrigatória para internação retroativa (paciente internado em outro hospital)
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-sm-3 mb-0" id="div-data-alta" style="display:none">
@@ -549,7 +549,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group essential-full d-none" id="retroativa-container" style="flex:1 1 100%;">
+                            <div class="form-group essential-full d-none" id="retroativa-container">
                                 <div id="retroativa-alert" class="retroativa-banner d-none">
                                     <i class="fa-solid fa-rotate-left"></i>
                                     <span id="retroativa-alert-text"></span>
@@ -653,7 +653,7 @@
 
                         <div class="form-group row" id="row-int-pertinente" style="display:none;">
                             <div style="display:none;" id="div_int_pertinente_int" class="form-group col-sm-2">
-                                <label class="control-label" for="int_pertinente_int"><span style="color:red;">*</span> Internação
+                                <label class="control-label" for="int_pertinente_int"><span class="required-marker">*</span> Internação
                                     pertinente?</label>
                                 <select class="input-lg-fullcare form-control" id="int_pertinente_int" name="int_pertinente_int">
                                     <option value=""></option>
@@ -663,7 +663,7 @@
                             </div>
                             <div id="div_rel_pertinente_int" style="display:none;" class="form-group col-sm-8">
                                 <label for="rel_pertinente_int">Justifique não pertinência</label>
-                                <textarea data-saude-autocomplete="true" style="resize:none" rows="3" class="form-control"
+                                <textarea data-saude-autocomplete="true" rows="3" class="form-control fc-no-resize"
                                     id="rel_pertinente_int" name="rel_pertinente_int"></textarea>
                             </div>
                         </div>
@@ -759,21 +759,21 @@
                             <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_int">Organizar com IA</button>
                         </div>
                     </div>
-                    <div id="cronicos-relatorio-alert"
-                        style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff3cd,#ffe3a3);border:1px solid #f0c36d;color:#6a4a00;box-shadow:0 8px 20px rgba(240,195,109,.18);"
+                    <div id="cronicos-relatorio-alert" class="fc-chronic-alert"
+                        style="display:none"
                         hidden>
-                        <div style="display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:4px;">
+                        <div class="fc-chronic-alert__title">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             Alerta de condição crônica
                         </div>
-                        <p style="margin:0;line-height:1.45;">
+                        <p class="fc-chronic-alert__text">
                             Foram identificados termos compatíveis com doenças crônicas no relatório:
                             <strong data-role="matched-list"></strong>.
                         </p>
-                        <p style="margin:4px 0 0;line-height:1.45;" data-role="auto-note"></p>
+                        <p class="fc-chronic-alert__note" data-role="auto-note"></p>
                     </div>
-                    <textarea data-saude-autocomplete="true" maxlength="5000" style="resize:none" rows="2"
-                        onclick="aumentarText('rel_int')" class="form-control" id="rel_int" name="rel_int"></textarea>
+                    <textarea data-saude-autocomplete="true" maxlength="5000" rows="2" class="form-control fc-no-resize"
+                        onclick="aumentarText('rel_int')" id="rel_int" name="rel_int"></textarea>
                     <div class="d-flex justify-content-end mt-1">
                         <small class="text-muted" data-counter-for="rel_int">0/5000</small>
                     </div>
@@ -804,8 +804,8 @@
                         <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="acoes_int">Organizar com IA</button>
                         </div>
                     </div>
-                    <textarea data-saude-autocomplete="true" rows="2" style="resize:none"
-                        onclick="aumentarText('acoes_int')" class="form-control" maxlength="5000" id="acoes_int"
+                    <textarea data-saude-autocomplete="true" rows="2" class="form-control fc-no-resize"
+                        onclick="aumentarText('acoes_int')" maxlength="5000" id="acoes_int"
                         name="acoes_int"></textarea>
                     <div class="d-flex justify-content-end mt-1">
                         <small class="text-muted" data-counter-for="acoes_int">0/5000</small>
@@ -820,8 +820,8 @@
                         <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="programacao_int">Organizar com IA</button>
                         </div>
                     </div>
-                    <textarea data-saude-autocomplete="true" style="resize:none" maxlength="5000" rows="2"
-                        onclick="aumentarText('programacao_int')" class="form-control" id="programacao_int"
+                    <textarea data-saude-autocomplete="true" maxlength="5000" rows="2" class="form-control fc-no-resize"
+                        onclick="aumentarText('programacao_int')" id="programacao_int"
                         name="programacao_int"></textarea>
                     <div class="d-flex justify-content-end mt-1">
                         <small class="text-muted" data-counter-for="programacao_int">0/5000</small>
@@ -1466,12 +1466,12 @@
         <div>
             <div class="internacao-form-actions">
                 <button type="submit" class="btn btn-success fixed-submit btn-submit-standard">
-                    <i class="fas fa-save edit-icon" style="font-size:1rem;"></i>
+                    <i class="fas fa-save edit-icon"></i>
                     Cadastrar
                 </button>
                 <div class="internacao-draft-actions">
                     <small id="autosave-status" class="text-muted">Rascunho automático: ativo</small>
-                    <button type="button" id="btn-clear-draft" class="btn btn-sm btn-outline-secondary">Limpar rascunho</button>
+                    <button type="button" id="btn-clear-draft" class="btn btn-sm btn-outline-secondary fc-clear-draft">Limpar rascunho</button>
                 </div>
             </div>
             <br><br>
@@ -1874,6 +1874,4 @@
             window.validateDataInternacaoFuture = validateFutureInternacaoDate;
         })();
     </script>
-    <!-- Padronizacao visual carregada por ultimo para ser a fonte definitiva da tela. -->
-    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
     <!-- <script src="<?= $BASE_URL ?>js/saude-autocomplete.js?v=2"></script> -->

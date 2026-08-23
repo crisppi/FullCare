@@ -429,7 +429,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                     <div class="invalid-feedback">Por favor, insira um CNPJ válido.</div>
                 </div>
                 <div class="form-group col-md-6 mb-3">
-                    <label for="nome_hosp"><span style="color:red;">*</span> Nome do Hospital</label>
+                    <label for="nome_hosp"><span class="required-marker">*</span> Nome do Hospital</label>
                     <input type="text" class="form-control" id="nome_hosp" value="<?= $hospital->nome_hosp ?>"
                         name="nome_hosp" required>
                     <div class="invalid-feedback">Por favor, insira o nome do hospital.</div>
@@ -914,7 +914,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
         </div>
 
             <div class="entity-actions-bar">
-                <div class="d-flex align-items-center gap-2 flex-wrap" style="margin: 0">
+                <div class="d-flex align-items-center gap-2 flex-wrap m-0">
                 <button type="submit" class="btn btn-success">
                     <i class="fas fa-check"></i> Atualizar
                 </button>

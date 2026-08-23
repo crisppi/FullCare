@@ -398,7 +398,6 @@
 
     <link href="<?= $BASE_URL ?>css/style.css" rel="stylesheet">
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">
     <style>
         .internacao-page {
             visibility: hidden;
@@ -917,7 +916,7 @@
                     <!-- Data Internação -->
                     <div class="form-group edit-head-medium">
                         <label class="control-label" for="data_intern_int">
-                            <span style="color: red;">*</span> Data Internação
+                            <span class="required-marker">*</span> Data Internação
                         </label>
                         <input type="date" class="form-control form-control-sm" id="data_intern_int"
                             name="data_intern_int" value="<?= $intern["data_intern_int"] ?>" required>
@@ -953,7 +952,7 @@
                 ?>
                 <div class="edit-primary-row">
                     <div class="form-group mb-2">
-                        <label for="data_visita_int"><span style="color: red;">*</span> Data Visita</label>
+                        <label for="data_visita_int"><span class="required-marker">*</span> Data Visita</label>
                         <?php
                         $dataVisitaEdit = trim((string)($intern['data_visita_int'] ?? ''));
                         if ($dataVisitaEdit !== '') {
@@ -1155,7 +1154,7 @@
                 <div class="form-group row">
                     <div style="display: <?= ($intern['int_pertinente_int'] !== '') ? 'block' : 'none'; ?>"
                         id="div_int_pertinente_int" class="form-group col-sm-2">
-                        <label class="control-label" for="int_pertinente_int"><span style="color: red;">*</span>
+                        <label class="control-label" for="int_pertinente_int"><span class="required-marker">*</span>
                             Internação
                             pertinente?</label>
                         <select class="form-control-sm form-control" id="int_pertinente_int" name="int_pertinente_int">
@@ -1170,7 +1169,7 @@
                         style="display: <?= ($intern['int_pertinente_int'] == 'n') ? 'block' : 'none'; ?>"
                         class="form-group col-sm-8">
                         <label for="rel_pertinente_int">Justifique não pertinência</label>
-                        <textarea type="textarea" style="resize:none" rows="3" class="form-control"
+                        <textarea type="textarea" rows="3" class="form-control fc-no-resize"
                             id="rel_pertinente_int"
                             name="rel_pertinente_int"><?= $intern['rel_pertinente_int']; ?></textarea>
                     </div>
@@ -1190,7 +1189,7 @@
                 <div>
                     <br>
                 </div>
-                <div class="form-group edit-clinical-block" style="margin-left:0px; margin-top:-15px">
+                <div class="form-group edit-clinical-block">
                     <div class="clinical-text-field clinical-text-field--compact">
                         <div class="clinical-text-field__head">
                             <label for="rel_int">Relatório de Auditoria</label>
@@ -1199,14 +1198,14 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_int">Organizar com IA</button>
                             </div>
                         </div>
-                        <textarea id="rel_int" name="rel_int" maxlength="5000" class="form-control" style="resize:none"
+                        <textarea id="rel_int" name="rel_int" maxlength="5000" class="form-control fc-no-resize"
                             rows="2" onclick="aumentarText('rel_int')" onblur="reduzirText('rel_int', 2)"><?= htmlspecialchars($intern['rel_int'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
                         <div class="d-flex justify-content-end mt-1">
                             <small class="text-muted" data-counter-for="rel_int">0/5000</small>
                         </div>
                     </div>
 
-                    <div class="clinical-text-field clinical-text-field--compact" style="margin-top: 8px;">
+                    <div class="clinical-text-field clinical-text-field--compact">
                         <div class="clinical-text-field__head">
                             <label for="acoes_int">Ações da Auditoria</label>
                             <div class="clinical-text-field__actions">
@@ -1214,15 +1213,15 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="acoes_int">Organizar com IA</button>
                             </div>
                         </div>
-                        <textarea id="acoes_int" name="acoes_int" rows="2" maxlength="5000" class="form-control"
-                            style="resize:none" onclick="aumentarText('acoes_int')"
+                        <textarea id="acoes_int" name="acoes_int" rows="2" maxlength="5000" class="form-control fc-no-resize"
+                            onclick="aumentarText('acoes_int')"
                             onblur="reduzirText('acoes_int', 2)"><?= htmlspecialchars($intern['acoes_int'] ?? ''); ?></textarea>
                         <div class="d-flex justify-content-end mt-1">
                             <small class="text-muted" data-counter-for="acoes_int">0/5000</small>
                         </div>
                     </div>
 
-                    <div class="clinical-text-field clinical-text-field--compact" style="margin-top: 8px;">
+                    <div class="clinical-text-field clinical-text-field--compact">
                         <div class="clinical-text-field__head">
                             <label for="programacao_int">Programação Terapêutica</label>
                             <div class="clinical-text-field__actions">
@@ -1230,9 +1229,9 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="programacao_int">Organizar com IA</button>
                             </div>
                         </div>
-                        <textarea type="textarea" style="resize:none" maxlength="5000" rows="2"
+                        <textarea type="textarea" maxlength="5000" rows="2" class="form-control fc-no-resize"
                             onclick="aumentarText('programacao_int')" onblur="reduzirText('programacao_int', 2)"
-                            class="form-control" id="programacao_int"
+                            id="programacao_int"
                             name="programacao_int"><?= htmlspecialchars($intern['programacao_int'] ?? ''); ?></textarea>
                         <div class="d-flex justify-content-end mt-1">
                             <small class="text-muted" data-counter-for="programacao_int">0/5000</small>
@@ -1378,7 +1377,7 @@
                         Detalhes do relatório
                     </h4>
                 </div>
-                <div id="div-detalhado" class="form-group row" style="margin-left:-12px; display:none;">
+                <div id="div-detalhado" class="form-group row" style="display:none;">
                     <div class="form-group row">
 
                         <?php
@@ -1470,31 +1469,31 @@
                                 ?>
 
                                 <div class="form-check">
-                                    <label style="margin-left:-30px" class="control-label" for="tqt_det">TQT</label>
+                                    <label class="control-label" for="tqt_det">TQT</label>
                                     <input class="form-check-input" type="checkbox" name="tqt_det" id="tqt_det"
                                         value="TQT" <?= $tqt === 'TQT' ? 'checked' : '' ?>>
                                 </div>
 
                                 <div class="form-check">
-                                    <label style="margin-left:-30px" class="control-label" for="svd_det">SVD</label>
+                                    <label class="control-label" for="svd_det">SVD</label>
                                     <input class="form-check-input" type="checkbox" name="svd_det" id="svd_det"
                                         value="SVD" <?= $svd === 'SVD' ? 'checked' : '' ?>>
                                 </div>
 
-                                <div class="form-check" style="text-align: center;">
-                                    <label style="margin-left:-30px" class="control-label" for="sne_det">SNE</label>
+                                <div class="form-check">
+                                    <label class="control-label" for="sne_det">SNE</label>
                                     <input class="form-check-input" type="checkbox" name="sne_det" id="sne_det"
                                         value="SNE" <?= $sne === 'SNE' ? 'checked' : '' ?>>
                                 </div>
 
                                 <div class="form-check">
-                                    <label style="margin-left:-30px" class="control-label" for="gtt_det">GTT</label>
+                                    <label class="control-label" for="gtt_det">GTT</label>
                                     <input class="form-check-input" type="checkbox" name="gtt_det" id="gtt_det"
                                         value="GTT" <?= $gtt === 'GTT' ? 'checked' : '' ?>>
                                 </div>
 
                                 <div class="form-check">
-                                    <label style="margin-left:-30px" class="control-label" for="dreno_det">Dreno</label>
+                                    <label class="control-label" for="dreno_det">Dreno</label>
                                     <input class="form-check-input" type="checkbox" name="dreno_det" id="dreno_det"
                                         value="Dreno" <?= $dreno === 'Dreno' ? 'checked' : '' ?>>
                                 </div>
@@ -1613,14 +1612,14 @@
 
                         <div class="form-group col-sm-12 detalhes-full-textarea">
                             <label for="exames_det">Exames relevantes</label>
-                            <textarea type="textarea" style="resize:none" maxlength="5000" rows="3"
+                            <textarea type="textarea" maxlength="5000" rows="3" class="form-control fc-no-resize"
                                 onclick="aumentarText('exames_det')" onblur="reduzirText('exames_det', 3)"
                                 class="form-control" id="exames_det" name="exames_det"><?= $exames ?></textarea>
                         </div>
 
                         <div class="form-group col-sm-12 detalhes-full-textarea">
                             <label for="oportunidades_det">Oportunidades</label>
-                            <textarea type="textarea" style="resize:none" maxlength="5000" rows="2"
+                            <textarea type="textarea" maxlength="5000" rows="2" class="form-control fc-no-resize"
                                 onclick="aumentarText('oportunidades_det')" onblur="reduzirText('oportunidades_det', 3)"
                                 class="form-control" id="oportunidades_det"
                                 name="oportunidades_det"><?= $oportunidades ?></textarea>
@@ -1688,12 +1687,12 @@
 
                 <div class="edit-form-actions">
                     <button type="submit" class="btn btn-success btn-submit-standard">
-                        <i class="fas fa-check edit-icon" style="font-size:1rem;"></i>
+                        <i class="fas fa-check edit-icon"></i>
                         Atualizar
                     </button>
                     <div class="edit-draft-actions">
                         <small id="clinical-autosave-status" class="text-muted">Alterações salvam somente ao clicar em Atualizar</small>
-                        <button type="button" class="btn btn-sm btn-clear-draft" data-clear-clinical-draft>
+                        <button type="button" class="btn btn-sm btn-clear-draft fc-clear-draft" data-clear-clinical-draft>
                             <i class="fas fa-eraser me-1"></i>Limpar rascunho
                         </button>
                     </div>
@@ -3776,5 +3775,3 @@
             padding: 0 !important;
         }
     </style>
-    <!-- Fonte visual definitiva, carregada depois de todos os estilos locais. -->
-    <link href="<?= $BASE_URL ?>css/form_surface_contrast.css?v=<?= filemtime(__DIR__ . '/../css/form_surface_contrast.css') ?>" rel="stylesheet">

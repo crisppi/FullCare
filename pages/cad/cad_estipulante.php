@@ -465,7 +465,7 @@ if (empty($id_estipulante)) {
                         name="cnpj_est" placeholder="00.000.000/0000-00">
                 </div>
                 <div class="form-group col-md-6 mb-3">
-                    <label for="nome_est"><span style="color:red;">*</span> Estipulante</label>
+                    <label for="nome_est"><span class="required-marker">*</span> Estipulante</label>
                     <input type="text" class="form-control" id="nome_est" name="nome_est" required
                         placeholder="Nome do estipulante">
                 </div>
