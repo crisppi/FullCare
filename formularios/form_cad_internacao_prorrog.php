@@ -290,13 +290,14 @@ if (isset($dados_alta) && is_array($dados_alta)) {
     </div>
 </div>
 
-<div class="modal fade" id="modalProrrog">
+<div class="modal fade fc-form-modal fc-form-modal--history" id="modalProrrog">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header fc-modal-header">
                 <h4 class="page-title">Prorrogações</h4>
                 <p class="page-description">Informações sobre prorrogações
                     anteriores</p>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
                 <?php

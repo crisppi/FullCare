@@ -580,7 +580,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
     </div>
 </div>
 
-<div class="modal fade" id="modalNovoLancamento" tabindex="-1" aria-hidden="true">
+<div class="modal fade fc-form-modal fc-form-modal--confirmation" id="modalNovoLancamento" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -598,7 +598,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
 </div>
 
 <!-- Modal para abrir tela de cadastro -->
-<div class="modal fade fc-history-modal" id="myModal1">
+<div class="modal fade fc-history-modal fc-form-modal fc-form-modal--history" id="myModal1">
     <div class="modal-dialog  modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -727,7 +727,7 @@ $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
     });
 })();
 </script>
-<div class="modal fade" id="modalDeleteVisitaList" tabindex="-1" aria-hidden="true">
+<div class="modal fade fc-form-modal fc-form-modal--danger" id="modalDeleteVisitaList" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -1101,39 +1101,9 @@ function aumentarTextProgramacao() {
     color: #c4c4c4;
 }
 
-.visita-inline-clear {
-    position: relative;
-}
 
-.visita-inline-clear select {
-    padding-right: 38px;
-}
 
-.visita-inline-clear__btn {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    z-index: 3;
-    width: 18px;
-    height: 18px;
-    border: 0;
-    border-radius: 999px;
-    background: rgba(94, 35, 99, 0.10);
-    color: #5e2363;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 18px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
 
-.visita-inline-clear__btn:hover {
-    background: rgba(94, 35, 99, 0.18);
-    color: #4b1850;
-}
 
 /* Cadastro central: remove halo/sombra azul dos selects de auditor */
 #cadastro-central-visita .form-select,
@@ -1791,29 +1761,7 @@ function aumentarTextProgramacao() {
     line-height: 1.25;
 }
 
-@media (max-width: 991.98px) {
-    .visita-dados-row,
-    .visita-summary-grid,
-    .visita-head-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 
-    .visita-summary-card--small,
-    .visita-summary-card--medium,
-    .visita-summary-card--wide,
-    .visita-head-field--small,
-    .visita-head-field--wide {
-        grid-column: span 1;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .visita-dados-row,
-    .visita-summary-grid,
-    .visita-head-grid {
-        grid-template-columns: 1fr;
-    }
-}
 
 .visita-card--tabelas .adicional-card textarea.form-control,
 .visita-card--tabelas .tabelas-detalhes-block textarea.form-control {
@@ -1822,29 +1770,8 @@ function aumentarTextProgramacao() {
     padding: 10px 12px;
 }
 
-.visita-card--tabelas .adicional-card .bootstrap-select,
-.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle {
-    width: 100% !important;
-    min-height: 42px !important;
-    height: 42px !important;
-}
 
-.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle .filter-option {
-    display: flex;
-    align-items: center;
-}
 
-.visita-card--tabelas .tabelas-selects .form-control,
-.visita-card--tabelas .tabelas-selects .detail-select,
-.visita-card--tabelas .tabelas-selects .select-purple,
-.visita-card--tabelas .tabelas-selects .bootstrap-select > .dropdown-toggle,
-.visita-card--tabelas .tabelas-selects .bootstrap-select > .dropdown-toggle .filter-option,
-.visita-card--tabelas .tabelas-selects .bootstrap-select > .dropdown-toggle .filter-option-inner-inner,
-.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle,
-.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle .filter-option,
-.visita-card--tabelas .adicional-card .bootstrap-select > .dropdown-toggle .filter-option-inner-inner {
-    font-weight: 400 !important;
-}
 
 .visita-card--tabelas .adicional-card .btn-add,
 .visita-card--tabelas .adicional-card .btn-remove {
@@ -1917,24 +1844,7 @@ function aumentarTextProgramacao() {
     padding: 10px 12px !important;
 }
 
-#container-tuss .bootstrap-select,
-#container-gestao .bootstrap-select,
-#container-uti .bootstrap-select,
-#container-negoc .bootstrap-select,
-#container-tuss .bootstrap-select > .dropdown-toggle,
-#container-gestao .bootstrap-select > .dropdown-toggle,
-#container-uti .bootstrap-select > .dropdown-toggle,
-#container-negoc .bootstrap-select > .dropdown-toggle {
-    width: 100% !important;
-    min-height: 42px !important;
-    height: 42px !important;
-}
 
-#container-tuss .bootstrap-select,
-#container-tuss .bootstrap-select > .dropdown-toggle {
-    box-shadow: none !important;
-    background-image: none !important;
-}
 
 
 
@@ -2057,22 +1967,6 @@ function aumentarTextProgramacao() {
     letter-spacing: 0 !important;
 }
 
-.visita-summary-card__input,
-.visita-head-field .form-control,
-.visita-head-field .form-select,
-.visita-head-field select,
-.visita-card .form-control,
-.visita-card .bootstrap-select > .dropdown-toggle {
-    min-height: 36px !important;
-    height: 36px !important;
-    border-radius: 8px !important;
-    padding-top: 3px !important;
-    padding-bottom: 3px !important;
-    font-size: .84rem !important;
-    font-weight: 500 !important;
-    line-height: 20px !important;
-    box-shadow: none !important;
-}
 
 .visita-summary-card__input {
     font-weight: 600 !important;
@@ -2155,33 +2049,6 @@ function aumentarTextProgramacao() {
     font-size: .78rem !important;
 }
 
-@media (max-width: 991.98px) {
-    .visita-hero {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .visita-actions {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .visita-actions .alert {
-        width: 100%;
-    }
-    .visita-card--tabelas .adicional-card .form-group[class*="col-"],
-    .visita-card--tabelas .tabelas-detalhes-block .form-group[class*="col-"] {
-        min-width: 160px;
-        flex-basis: 160px;
-    }
-    #container-tuss .form-group[class*="col-"],
-    #container-prorrog .form-group[class*="col-"],
-    #container-gestao .form-group[class*="col-"],
-    #container-uti .form-group[class*="col-"],
-    #container-negoc .form-group[class*="col-"],
-    #detalhes-card-wrapper .form-group[class*="col-"] {
-        min-width: 160px;
-        flex-basis: 160px !important;
-    }
-}
 
 /* Ajuste final de escala da tela de cadastro de visita */
 .visita-page {
@@ -2276,33 +2143,8 @@ function aumentarTextProgramacao() {
     font-weight: 600 !important;
 }
 
-.visita-summary-card__input,
-.visita-head-field .form-control,
-.visita-head-field .form-select,
-.visita-head-field select,
-.visita-card .form-control,
-.visita-card .form-select,
-.visita-card .bootstrap-select > .dropdown-toggle {
-    min-height: 28px !important;
-    height: 28px !important;
-    border-radius: 7px !important;
-    padding: 2px 7px !important;
-    font-size: .68rem !important;
-    line-height: 1.1 !important;
-    font-weight: 500 !important;
-}
 
-.visita-inline-clear select {
-    padding-right: 30px !important;
-}
 
-.visita-inline-clear__btn {
-    width: 16px !important;
-    height: 16px !important;
-    right: 8px !important;
-    font-size: 10px !important;
-    line-height: 16px !important;
-}
 
 .clinical-text-field,
 .ia-highlight-box {
@@ -2480,26 +2322,6 @@ function aumentarTextProgramacao() {
     color: #5f6673 !important;
 }
 
-#main-container .visita-page .visita-card--tabelas .tabelas-selects .form-control,
-#main-container .visita-page .visita-card--tabelas .tabelas-selects .detail-select,
-#main-container .visita-page .visita-card--tabelas .tabelas-selects .select-purple,
-#main-container .visita-page .visita-card--tabelas .tabelas-selects select[id^="select_"],
-#main-container .visita-page .visita-card--tabelas .tabelas-selects .bootstrap-select,
-#main-container .visita-page .visita-card--tabelas .tabelas-selects .bootstrap-select > .dropdown-toggle {
-    min-height: 30px !important;
-    height: 30px !important;
-    padding: 0 26px 0 7px !important;
-    border-radius: 7px !important;
-    border: 1px solid #dfe4ec !important;
-    background-color: #fff !important;
-    background-image: none !important;
-    box-shadow: none !important;
-    color: #5f6673 !important;
-    font-size: .68rem !important;
-    font-weight: 500 !important;
-    line-height: 1 !important;
-    transform: none !important;
-}
 
 #main-container .visita-page #detalhes-card-wrapper {
     margin-top: 8px !important;
@@ -2530,22 +2352,6 @@ function aumentarTextProgramacao() {
 
 
 
-#main-container .visita-page #detalhes-card-wrapper .form-control,
-#main-container .visita-page #detalhes-card-wrapper .form-control-sm.form-control,
-#main-container .visita-page #detalhes-card-wrapper .bootstrap-select,
-#main-container .visita-page #detalhes-card-wrapper .bootstrap-select > .dropdown-toggle {
-    min-height: 30px !important;
-    height: 30px !important;
-    padding: 0 26px 0 7px !important;
-    border-radius: 7px !important;
-    border: 1px solid #dfe4ec !important;
-    background-color: #fff !important;
-    box-shadow: none !important;
-    color: #5f6673 !important;
-    font-size: .68rem !important;
-    font-weight: 500 !important;
-    line-height: 1 !important;
-}
 
 #main-container .visita-page #detalhes-card-wrapper textarea.form-control {
     min-height: 58px !important;
@@ -2554,30 +2360,8 @@ function aumentarTextProgramacao() {
     line-height: 1.25 !important;
 }
 
-#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control),
-#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle {
-    background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #1f2937 !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .95),
-        0 1px 2px rgba(15, 23, 42, .10) !important;
-}
 
-#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):hover,
-#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:hover {
-    border-color: #94a3b8 !important;
-}
 
-#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):focus,
-#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select.show > .dropdown-toggle,
-#main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:focus {
-    border-color: #3b82f6 !important;
-    box-shadow:
-        0 0 0 .14rem rgba(59, 130, 246, .16),
-        0 1px 2px rgba(15, 23, 42, .10) !important;
-    outline: none !important;
-}
 
 #main-container .visita-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, textarea.form-control)::placeholder {
     color: #8b95a5 !important;
@@ -2665,17 +2449,6 @@ function aumentarTextProgramacao() {
 }
 
 
-@media (max-width: 1199.98px) {
-    #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .row,
-    #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .form-group.row {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
-
-    #main-container .visita-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
-    #main-container .visita-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
-        grid-column: 1 / -1 !important;
-    }
-}
 
 #main-container .visita-page input[type="file"] {
     max-width: 500px !important;
@@ -2760,47 +2533,10 @@ function aumentarTextProgramacao() {
     border-bottom-color: #e0e7f0 !important;
 }
 
-#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
-#main-container #add-visita-form .bootstrap-select > .dropdown-toggle,
-#main-container .visita-page .visita-summary-card__input,
-#main-container .visita-page .visita-card--tabelas .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
-    background-color: #f8fbff !important;
-    border: 1px solid #aebdce !important;
-    color: #1f2937 !important;
-    box-shadow:
-        inset 0 1px 2px rgba(15, 23, 42, .08),
-        0 1px 0 rgba(255, 255, 255, .8) !important;
-}
 
-#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):hover,
-#main-container #add-visita-form .bootstrap-select > .dropdown-toggle:hover {
-    border-color: #7f94aa !important;
-    background-color: #ffffff !important;
-}
 
-#main-container #add-visita-form :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):focus,
-#main-container #add-visita-form .bootstrap-select.show > .dropdown-toggle,
-#main-container #add-visita-form .bootstrap-select > .dropdown-toggle:focus {
-    border-color: #2f89bd !important;
-    background-color: #ffffff !important;
-    box-shadow:
-        0 0 0 .14rem rgba(47, 137, 189, .18),
-        inset 0 1px 2px rgba(15, 23, 42, .08) !important;
-}
 
-@media (max-width: 1199.98px) {
-    #main-container .visita-page .visita-card--tabelas .tabelas-selects,
-    #main-container .visita-page #detalhes-card-wrapper .row {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
-}
 
-@media (max-width: 767.98px) {
-    #main-container .visita-page .visita-card--tabelas .tabelas-selects,
-    #main-container .visita-page #detalhes-card-wrapper .row {
-        grid-template-columns: 1fr !important;
-    }
-}
 
 /* Ajuste final dos blocos internos: TUSS, Prorrogação, Gestão, UTI e Negociações */
 .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) {
@@ -2856,15 +2592,6 @@ function aumentarTextProgramacao() {
     white-space: nowrap !important;
 }
 
-@media (max-width: 768px) {
-    .visita-page #tutorial_alto {
-        grid-column: 1 / -1 !important;
-    }
-
-    .visita-page #tutorial_alto p {
-        white-space: normal !important;
-    }
-}
 
 .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) label {
     min-height: 0 !important;
@@ -2875,21 +2602,6 @@ function aumentarTextProgramacao() {
     color: #5f6673 !important;
 }
 
-.visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(.form-control, .form-control-sm.form-control),
-.visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select,
-.visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle {
-    min-height: 30px !important;
-    height: 30px !important;
-    padding: 0 26px 0 7px !important;
-    border-radius: 7px !important;
-    border: 1px solid #dfe4ec !important;
-    background-color: #fff !important;
-    box-shadow: none !important;
-    color: #5f6673 !important;
-    font-size: .68rem !important;
-    font-weight: 500 !important;
-    line-height: 1 !important;
-}
 
 .visita-page :is(#container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) textarea.form-control,
 .visita-page #container-prorrog #prorrog-ia-contexto {
@@ -3053,29 +2765,7 @@ function aumentarTextProgramacao() {
     font-size: .72rem !important;
 }
 
-.visita-card--tabelas > .visita-card__body > .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc),
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="relatorio-detalhado"],
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_tuss"],
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_prorrog"],
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_gestao"],
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_uti"],
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_negoc"] {
-    border-color: #879bb3 !important;
-    background: #ffffff !important;
-    color: #1f2937 !important;
-    font-weight: 600 !important;
-    box-shadow: 0 2px 5px rgba(30, 50, 74, .18) !important;
-}
 
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="relatorio-detalhado"] .filter-option-inner-inner,
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_tuss"] .filter-option-inner-inner,
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_prorrog"] .filter-option-inner-inner,
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_gestao"] .filter-option-inner-inner,
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_uti"] .filter-option-inner-inner,
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id="select_negoc"] .filter-option-inner-inner {
-    color: #1f2937 !important;
-    font-weight: 600 !important;
-}
 
 .visita-card--tabelas > .visita-card__body > .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
     appearance: auto !important;
@@ -3087,68 +2777,15 @@ function aumentarTextProgramacao() {
     background-size: initial !important;
 }
 
-.visita-card--tabelas > .visita-card__body > .tabelas-selects .bootstrap-select > button.dropdown-toggle[data-id]::after {
-    content: "" !important;
-    position: absolute !important;
-    right: 12px !important;
-    top: 50% !important;
-    display: block !important;
-    width: 0 !important;
-    height: 0 !important;
-    margin: -2px 0 0 0 !important;
-    border-top: 5px solid #111827 !important;
-    border-right: 5px solid transparent !important;
-    border-bottom: 0 !important;
-    border-left: 5px solid transparent !important;
-    pointer-events: none !important;
-}
 
-#add-visita-form .visita-summary-card__input,
-#add-visita-form .visita-head-field :is(input.form-control, select.form-control, textarea.form-control, .form-select),
-#add-visita-form .visita-card:not(.visita-card--tabelas) :is(input.form-control, select.form-control, textarea.form-control, .form-select),
-#add-visita-form .clinical-text-field textarea.form-control,
-#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control),
-#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle {
-    background-color: #ffffff !important;
-    border: 1px solid #b8c4d6 !important;
-    color: #1f2937 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
-}
 
-#add-visita-form .visita-head-field :is(input.form-control, select.form-control, textarea.form-control, .form-select):hover,
-#add-visita-form .visita-card:not(.visita-card--tabelas) :is(input.form-control, select.form-control, textarea.form-control, .form-select):hover,
-#add-visita-form .clinical-text-field textarea.form-control:hover,
-#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):hover,
-#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:hover {
-    border-color: #8796aa !important;
-}
 
-#add-visita-form .visita-head-field :is(input.form-control, select.form-control, textarea.form-control, .form-select):focus,
-#add-visita-form .visita-card:not(.visita-card--tabelas) :is(input.form-control, select.form-control, textarea.form-control, .form-select):focus,
-#add-visita-form .clinical-text-field textarea.form-control:focus,
-#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):focus,
-#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select.show > .dropdown-toggle,
-#add-visita-form :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16), 0 1px 3px rgba(15, 23, 42, .16) !important;
-    outline: none !important;
-}
 
 #add-visita-form :is(input.form-control, textarea.form-control)::placeholder {
     color: #8b95a5 !important;
     opacity: 1 !important;
 }
 
-@media (max-width: 1199.98px) {
-    .visita-page #container-tuss .tuss-field-container,
-    .visita-page #container-prorrog .field-container,
-    .visita-page #container-uti .uti-grid-row,
-    .visita-page #container-gestao .adicional-card > .form-group.row,
-    .visita-page #container-gestao #div_evento > .form-group.row,
-    .visita-page #container-negoc .negotiation-field-container {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
-}
 
 #main-container .visita-page .visita-card--tabelas .tabelas-selects > .tabelas-col {
     position: relative !important;
@@ -3169,9 +2806,6 @@ function aumentarTextProgramacao() {
     z-index: 20;
 }
 
-#main-container .visita-page .visita-card--tabelas .tabelas-selects :is(select, .bootstrap-select > .dropdown-toggle) {
-    padding-right: 32px !important;
-}
 
 #main-container .visita-page .visita-card--tabelas .tabelas-selects :is(
     #relatorio-detalhado.select-placeholder,

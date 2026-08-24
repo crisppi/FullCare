@@ -492,15 +492,6 @@
                     height: auto !important;
                 }
 
-                @media (max-width: 768px) {
-                    #container-tuss .form-group.row > .form-group.row,
-                    #container-gestao form > .form-group.row > .form-group.row,
-                    #container-uti > .form-group.row,
-                    #container-prorrog > .form-group.row,
-                    #container-negoc .form-group.row {
-                        grid-template-columns: 1fr;
-                    }
-                }
             </style>
             <br>
 

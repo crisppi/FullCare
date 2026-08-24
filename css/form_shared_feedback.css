@@ -1,0 +1,164 @@
+/* Feedback compartilhado dos formularios. Nao controla visibilidade. */
+body #main-container#main-container {
+    --fc-feedback-radius: 8px;
+    --fc-feedback-pad-y: 7px;
+    --fc-feedback-pad-x: 9px;
+    --fc-feedback-font: .68rem;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert,
+body #main-container#main-container.cadastro-layout .alert {
+    margin: 6px 0 0 !important;
+    padding: var(--fc-feedback-pad-y) var(--fc-feedback-pad-x) !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-radius: var(--fc-feedback-radius) !important;
+    font-family: inherit !important;
+    font-size: var(--fc-feedback-font) !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert-success,
+body #main-container#main-container.cadastro-layout .alert-success {
+    border-color: #a9d7bc !important;
+    background: #eef9f2 !important;
+    color: #23633c !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(.alert-danger, .alert-error),
+body #main-container#main-container.cadastro-layout :is(.alert-danger, .alert-error) {
+    border-color: #e2b2b7 !important;
+    background: #fff2f3 !important;
+    color: #8d2933 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert-warning,
+body #main-container#main-container.cadastro-layout .alert-warning {
+    border-color: #e4c979 !important;
+    background: #fff9e5 !important;
+    color: #76540b !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .alert-info,
+body #main-container#main-container.cadastro-layout .alert-info {
+    border-color: #a9cde4 !important;
+    background: #eef7fc !important;
+    color: #245d7d !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .fc-inline-error,
+    .invalid-feedback,
+    .error-message:not(.prorrog-alert)
+) {
+    margin: 3px 0 0 !important;
+    padding: 0 !important;
+    color: #a72d38 !important;
+    font-family: inherit !important;
+    font-size: .61rem !important;
+    line-height: 1.25 !important;
+    font-weight: 650 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(input, select, textarea).is-invalid {
+    border-color: #cf6570 !important;
+    box-shadow: 0 0 0 2px rgba(207, 101, 112, .10) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(input, select, textarea).is-valid {
+    border-color: #65a87e !important;
+    box-shadow: 0 0 0 2px rgba(101, 168, 126, .08) !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .retroativa-banner,
+    .hospital-uti-alert,
+    .patient-care-program-alert,
+    .fc-chronic-alert,
+    .prorrog-alert
+) {
+    width: 100% !important;
+    margin: 6px 0 0 !important;
+    padding: var(--fc-feedback-pad-y) var(--fc-feedback-pad-x) !important;
+    border-radius: var(--fc-feedback-radius) !important;
+    font-family: inherit !important;
+    font-size: var(--fc-feedback-font) !important;
+    line-height: 1.4 !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .retroativa-banner,
+    .hospital-uti-alert,
+    .prorrog-alert
+) {
+    border: 1px solid #e2b2b7 !important;
+    background: #fff2f3 !important;
+    color: #8d2933 !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) :is(
+    .patient-care-program-alert,
+    .fc-chronic-alert
+) {
+    border: 1px solid #e4c979 !important;
+    background: #fff9e5 !important;
+    color: #76540b !important;
+}
+
+body #main-container#main-container .fc-chronic-alert__title {
+    gap: 6px !important;
+    margin: 0 0 3px !important;
+    color: inherit !important;
+    font-size: .69rem !important;
+    line-height: 1.25 !important;
+    font-weight: 750 !important;
+}
+
+body #main-container#main-container :is(.fc-chronic-alert__text, .fc-chronic-alert__note) {
+    margin: 0 !important;
+    color: inherit !important;
+    font-size: .66rem !important;
+    line-height: 1.4 !important;
+}
+
+body #main-container#main-container .fc-chronic-alert__note {
+    margin-top: 3px !important;
+}
+
+body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .fc-empty-message,
+.fc-form-modal .fc-empty-message {
+    margin: 8px 0 !important;
+    padding: 12px !important;
+    border: 1px dashed #c7d3df !important;
+    border-radius: var(--fc-feedback-radius, 8px) !important;
+    background: #f7f9fb !important;
+    color: #717d8c !important;
+    font-family: inherit !important;
+    font-size: .66rem !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+}
+
+body #main-container#main-container .fc-form-alert {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+body #main-container#main-container :is(.hosp-modal__loading, [data-loading-state]) {
+    gap: 8px !important;
+    color: #687383 !important;
+    font-size: .68rem !important;
+    line-height: 1.35 !important;
+}
+
+@media (max-width: 767.98px) {
+    body #main-container#main-container {
+        --fc-feedback-pad-y: 7px;
+        --fc-feedback-pad-x: 8px;
+    }
+}

@@ -3,4 +3,329 @@
  * Carregada depois dos grids estruturais e antes da camada visual.
  */
 
+/* Origem: formularios/form_cad_internacao.php | @media (max-width: 1199.98px) */
+@media (max-width: 1199.98px) {
+            .internacao-page #container-tuss .tuss-field-container,
+            .internacao-page #container-prorrog .field-container,
+            .internacao-page #container-uti .uti-grid-row,
+            .internacao-page #container-gestao .adicional-card > .form-group.row,
+            .internacao-page #container-gestao #div_evento > .form-group.row,
+            .internacao-page #container-negoc .negotiation-field-container,
+            .internacao-page #detalhes-card-wrapper #div-detalhado {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            }
+
+            .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
+            .internacao-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
+                grid-column: 1 / -1 !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 1199.98px) */
+@media (max-width: 1199.98px) {
+            .edit-secondary-row {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 767.98px) */
+@media (max-width: 767.98px) {
+            .edit-secondary-row {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 640px) */
+@media (max-width: 640px) {
+            .edit-form-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .edit-draft-actions {
+                justify-content: flex-start;
+            }
+
+            .edit-form-actions .btn-submit-standard {
+                width: 100%;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 991.98px) */
+@media (max-width: 991.98px) {
+            .edit-head-grid,
+            .edit-primary-row,
+            .edit-secondary-row,
+            .edit-alta-row,
+            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] .form-group.row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .edit-head-hospital,
+            .edit-head-patient {
+                grid-column: span 2;
+            }
+
+            .edit-head-medium,
+            .edit-head-small,
+            .edit-head-launch {
+                grid-column: span 1;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 575.98px) */
+@media (max-width: 575.98px) {
+            .edit-head-grid,
+            .edit-primary-row,
+            .edit-secondary-row,
+            .edit-alta-row,
+            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] .form-group.row {
+                grid-template-columns: 1fr;
+            }
+
+            .edit-head-hospital,
+            .edit-head-patient,
+            .edit-head-medium,
+            .edit-head-small,
+            .edit-head-launch {
+                grid-column: span 1;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 1199.98px) */
+@media (max-width: 1199.98px) {
+            #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects {
+                grid-template-columns: repeat(3, minmax(150px, 1fr)) !important;
+            }
+
+            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
+            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
+            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
+                grid-template-columns: repeat(3, minmax(140px, 1fr)) !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 767.98px) */
+@media (max-width: 767.98px) {
+            #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects,
+            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
+            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
+            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 1199.98px) */
+@media (max-width: 1199.98px) {
+            #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects,
+            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
+            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
+            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-negoc .negoc-row,
+            #tabelas-adicionais-paineis-edit .negoc-row,
+            #tabelas-adicionais-paineis-edit .negociation-field-container,
+            #tabelas-adicionais-paineis-edit .negotiation-field-container {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 767.98px) */
+@media (max-width: 767.98px) {
+            #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects,
+            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
+            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
+            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="block"],
+            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-uti .form-group.row,
+            #tabelas-adicionais-paineis-edit #container-negoc .negoc-row,
+            #tabelas-adicionais-paineis-edit .negoc-row,
+            #tabelas-adicionais-paineis-edit .negociation-field-container,
+            #tabelas-adicionais-paineis-edit .negotiation-field-container {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 575.98px) */
+@media (max-width: 575.98px) {
+            #main-container:has(.internacao-page) {
+                padding-left: 2px !important;
+                padding-right: 2px !important;
+            }
+
+            #main-container .internacao-page {
+                padding-left: 4px !important;
+                padding-right: 4px !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 1199.98px) */
+@media (max-width: 1199.98px) {
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+                grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+            }
+        }
+
+
+/* Origem: formularios/form_edit_internacao.php | @media (max-width: 767.98px) */
+@media (max-width: 767.98px) {
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-1,
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-2,
+            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-3 {
+                grid-column: span 1 !important;
+            }
+        }
+
+
+/* Origem: formularios/form_cad_visita.php | @media (max-width: 991.98px) */
+@media (max-width: 991.98px) {
+    .visita-dados-row,
+    .visita-summary-grid,
+    .visita-head-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .visita-summary-card--small,
+    .visita-summary-card--medium,
+    .visita-summary-card--wide,
+    .visita-head-field--small,
+    .visita-head-field--wide {
+        grid-column: span 1;
+    }
+}
+
+
+/* Origem: formularios/form_cad_visita.php | @media (max-width: 575.98px) */
+@media (max-width: 575.98px) {
+    .visita-dados-row,
+    .visita-summary-grid,
+    .visita-head-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* Origem: formularios/form_cad_visita.php | @media (max-width: 991.98px) */
+@media (max-width: 991.98px) {
+    .visita-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .visita-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .visita-actions .alert {
+        width: 100%;
+    }
+    .visita-card--tabelas .adicional-card .form-group[class*="col-"],
+    .visita-card--tabelas .tabelas-detalhes-block .form-group[class*="col-"] {
+        min-width: 160px;
+        flex-basis: 160px;
+    }
+    #container-tuss .form-group[class*="col-"],
+    #container-prorrog .form-group[class*="col-"],
+    #container-gestao .form-group[class*="col-"],
+    #container-uti .form-group[class*="col-"],
+    #container-negoc .form-group[class*="col-"],
+    #detalhes-card-wrapper .form-group[class*="col-"] {
+        min-width: 160px;
+        flex-basis: 160px !important;
+    }
+}
+
+
+/* Origem: formularios/form_cad_visita.php | @media (max-width: 1199.98px) */
+@media (max-width: 1199.98px) {
+    #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .row,
+    #main-container .visita-page #detalhes-card-wrapper #div-detalhado > .form-group.row {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    #main-container .visita-page #detalhes-card-wrapper #div-detalhado div:has(#exames_det),
+    #main-container .visita-page #detalhes-card-wrapper #div-detalhado div:has(#oportunidades_det) {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+
+/* Origem: formularios/form_cad_visita.php | @media (max-width: 1199.98px) */
+@media (max-width: 1199.98px) {
+    #main-container .visita-page .visita-card--tabelas .tabelas-selects,
+    #main-container .visita-page #detalhes-card-wrapper .row {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+
+/* Origem: formularios/form_cad_visita.php | @media (max-width: 767.98px) */
+@media (max-width: 767.98px) {
+    #main-container .visita-page .visita-card--tabelas .tabelas-selects,
+    #main-container .visita-page #detalhes-card-wrapper .row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+/* Origem: formularios/form_cad_visita.php | @media (max-width: 767.98px) */
+@media (max-width: 767.98px) {
+    .visita-page #tutorial_alto {
+        grid-column: 1 / -1 !important;
+    }
+
+    .visita-page #tutorial_alto p {
+        white-space: normal !important;
+    }
+}
+
+
+/* Origem: formularios/form_cad_visita.php | @media (max-width: 1199.98px) */
+@media (max-width: 1199.98px) {
+    .visita-page #container-tuss .tuss-field-container,
+    .visita-page #container-prorrog .field-container,
+    .visita-page #container-uti .uti-grid-row,
+    .visita-page #container-gestao .adicional-card > .form-group.row,
+    .visita-page #container-gestao #div_evento > .form-group.row,
+    .visita-page #container-negoc .negotiation-field-container {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+
+/* Origem: formularios/form_cad_visita_enf.php | @media (max-width: 767.98px) */
+@media (max-width: 767.98px) {
+                    #container-tuss .form-group.row > .form-group.row,
+                    #container-gestao form > .form-group.row > .form-group.row,
+                    #container-uti > .form-group.row,
+                    #container-prorrog > .form-group.row,
+                    #container-negoc .form-group.row {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+
 /* FC_SHARED_RESPONSIVE_END */

@@ -75,7 +75,7 @@
 </div>
 
 <!-- ===== Modal ===== -->
-<div class="modal fade fc-history-modal" id="modalTUSS">
+<div class="modal fade fc-history-modal fc-form-modal fc-form-modal--history" id="modalTUSS">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">

@@ -2673,6 +2673,9 @@ body #main-container#main-container.cadastro-layout .entity-step-toggle {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    gap: 6px !important;
+    flex: 0 0 auto !important;
+    min-width: 52px !important;
     min-height: 23px !important;
     padding: 2px 8px !important;
     border: 1px solid #d8d0dd !important;

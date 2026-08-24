@@ -480,78 +480,14 @@
         }
 
 
-        .edit-head-grid .form-control,
-        .edit-head-grid .form-control-sm,
-        .edit-primary-row .form-control,
-        .edit-primary-row .form-control-sm,
-        .edit-top-row .form-control,
-        .edit-top-row .form-control-sm,
-        .edit-secondary-row .form-control,
-        .edit-secondary-row .form-control-sm,
-        .edit-secondary-row .bootstrap-select > .dropdown-toggle,
-        .edit-alta-row .form-control,
-        .edit-alta-row .form-control-sm {
-            min-height: 44px;
-            height: 44px;
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
 
-        .assist-select-clear {
-            position: relative;
-        }
 
-        .assist-select-clear .bootstrap-select,
-        .assist-select-clear>select {
-            width: 100% !important;
-        }
 
-        @media (max-width: 1199.98px) {
-            .edit-secondary-row {
-                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            }
-        }
 
-        @media (max-width: 767.98px) {
-            .edit-secondary-row {
-                grid-template-columns: 1fr !important;
-            }
-        }
 
-        #fk_cid_int.selectpicker.bs-select-hidden,
-        #fk_patologia2.selectpicker.bs-select-hidden {
-            display: none !important;
-        }
 
-        .assist-select-clear .bootstrap-select>.dropdown-toggle {
-            padding-right: 46px !important;
-        }
 
-        .assist-clear-btn {
-            position: absolute;
-            top: 50%;
-            right: 28px;
-            transform: translateY(-50%);
-            z-index: 4;
-            width: 18px;
-            height: 18px;
-            border: 0;
-            border-radius: 999px;
-            background: rgba(94, 35, 99, 0.10);
-            color: #5e2363;
-            font-size: 12px;
-            font-weight: 700;
-            line-height: 18px;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
 
-        .assist-clear-btn:hover {
-            background: rgba(94, 35, 99, 0.18);
-            color: #4b1850;
-        }
 
         .tabelas-col.has-saved-record {
             border-radius: 13px;
@@ -638,20 +574,6 @@
             outline: none !important;
         }
 
-        @media (max-width: 640px) {
-            .edit-form-actions {
-                align-items: stretch;
-                flex-direction: column;
-            }
-
-            .edit-draft-actions {
-                justify-content: flex-start;
-            }
-
-            .edit-form-actions .btn-submit-standard {
-                width: 100%;
-            }
-        }
 
         #tabelas-adicionais-paineis-edit #container-gestao[style*="block"] {
             display: block !important;
@@ -678,30 +600,8 @@
             height: auto !important;
         }
 
-        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control),
-        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle {
-            background-color: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            color: #1f2937 !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, .95),
-                0 1px 2px rgba(15, 23, 42, .10) !important;
-        }
 
-        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):hover,
-        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:hover {
-            border-color: #94a3b8 !important;
-        }
 
-        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, select.form-control, textarea.form-control, .form-control-sm.form-control):focus,
-        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select.show > .dropdown-toggle,
-        #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) .bootstrap-select > .dropdown-toggle:focus {
-            border-color: #3b82f6 !important;
-            box-shadow:
-                0 0 0 .14rem rgba(59, 130, 246, .16),
-                0 1px 2px rgba(15, 23, 42, .10) !important;
-            outline: none !important;
-        }
 
         #main-container .internacao-page :is(#detalhes-card-wrapper, #container-tuss, #container-prorrog, #container-gestao, #container-uti, #container-negoc) :is(input.form-control, textarea.form-control)::placeholder {
             color: #8b95a5 !important;
@@ -718,48 +618,7 @@
         }
 
 
-        @media (max-width: 991.98px) {
-            .edit-head-grid,
-            .edit-primary-row,
-            .edit-secondary-row,
-            .edit-alta-row,
-            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
-            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] > .form-group.row,
-            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] .form-group.row {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
 
-            .edit-head-hospital,
-            .edit-head-patient {
-                grid-column: span 2;
-            }
-
-            .edit-head-medium,
-            .edit-head-small,
-            .edit-head-launch {
-                grid-column: span 1;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .edit-head-grid,
-            .edit-primary-row,
-            .edit-secondary-row,
-            .edit-alta-row,
-            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
-            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] > .form-group.row,
-            #tabelas-adicionais-paineis-edit #container-uti[style*="block"] .form-group.row {
-                grid-template-columns: 1fr;
-            }
-
-            .edit-head-hospital,
-            .edit-head-patient,
-            .edit-head-medium,
-            .edit-head-small,
-            .edit-head-launch {
-                grid-column: span 1;
-            }
-        }
     </style>
     <div class="internacao-page">
         <div class="internacao-page__hero">
@@ -2349,30 +2208,8 @@
             font-size: 0.9rem;
         }
 
-        #main-container .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control),
-        #main-container .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle {
-            background-color: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            color: #1f2937 !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, .95),
-                0 1px 2px rgba(15, 23, 42, .10) !important;
-        }
 
-        #main-container .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):hover,
-        #main-container .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle:hover {
-            border-color: #94a3b8 !important;
-        }
 
-        #main-container .internacao-page .internacao-card :is(input.form-control, select.form-control, textarea.form-control):focus,
-        #main-container .internacao-page .internacao-card .bootstrap-select.show > .dropdown-toggle,
-        #main-container .internacao-page .internacao-card .bootstrap-select > .dropdown-toggle:focus {
-            border-color: #3b82f6 !important;
-            box-shadow:
-                0 0 0 .14rem rgba(59, 130, 246, .16),
-                0 1px 2px rgba(15, 23, 42, .10) !important;
-            outline: none !important;
-        }
 
         #main-container .internacao-page .internacao-card :is(input.form-control, textarea.form-control)::placeholder {
             color: #8b95a5 !important;
@@ -2385,14 +2222,6 @@
             background-color: #d7ebff !important;
             color: #111827 !important;
             border-color: #8fc7f5 !important;
-        }
-        /* Selects azuis - bootstrap-select: alvo é o BOTÃO */
-        #main-container .tabelas-adicionais-card .tabelas-selects .bootstrap-select > button.dropdown-toggle,
-        #main-container .tabelas-adicionais-card .tabelas-selects .bootstrap-select > button.dropdown-toggle .filter-option-inner-inner {
-            background-color: #d7ebff !important;
-            color: #111827 !important;
-            border-color: #8fc7f5 !important;
-            font-weight: 400 !important;
         }
 
 
@@ -2590,28 +2419,7 @@
             line-height: 1.2 !important;
         }
 
-        @media (max-width: 1199.98px) {
-            #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects {
-                grid-template-columns: repeat(3, minmax(150px, 1fr)) !important;
-            }
 
-            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
-            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
-            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
-            #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
-                grid-template-columns: repeat(3, minmax(140px, 1fr)) !important;
-            }
-        }
-
-        @media (max-width: 767.98px) {
-            #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects,
-            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
-            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
-            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
-            #tabelas-adicionais-paineis-edit #container-uti .form-group.row {
-                grid-template-columns: 1fr !important;
-            }
-        }
 
         /* Padrao final compacto: igual ao restante das telas atuais */
         #main-container .internacao-page .tabelas-adicionais-card {
@@ -2969,37 +2777,7 @@
             height: 92px !important;
         }
 
-        @media (max-width: 1199.98px) {
-            #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects,
-            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
-            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
-            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
-            #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="block"],
-            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
-            #tabelas-adicionais-paineis-edit #container-uti .form-group.row,
-            #tabelas-adicionais-paineis-edit #container-negoc .negoc-row,
-            #tabelas-adicionais-paineis-edit .negoc-row,
-            #tabelas-adicionais-paineis-edit .negociation-field-container,
-            #tabelas-adicionais-paineis-edit .negotiation-field-container {
-                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            }
-        }
 
-        @media (max-width: 767.98px) {
-            #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects,
-            #tabelas-adicionais-paineis-edit .tuss-field .form-inline,
-            #tabelas-adicionais-paineis-edit .pror-row .form-grid,
-            #tabelas-adicionais-paineis-edit #container-gestao[style*="block"],
-            #tabelas-adicionais-paineis-edit #container-gestao #div_evento[style*="block"],
-            #tabelas-adicionais-paineis-edit #container-uti > .form-group.row,
-            #tabelas-adicionais-paineis-edit #container-uti .form-group.row,
-            #tabelas-adicionais-paineis-edit #container-negoc .negoc-row,
-            #tabelas-adicionais-paineis-edit .negoc-row,
-            #tabelas-adicionais-paineis-edit .negociation-field-container,
-            #tabelas-adicionais-paineis-edit .negotiation-field-container {
-                grid-template-columns: 1fr !important;
-            }
-        }
 
         /* Contraste visual alinhado ao cadastro de visita. */
         #main-container:has(.internacao-page) {
@@ -3023,17 +2801,6 @@
                 #dfe7f1 !important;
         }
 
-        @media (max-width: 575.98px) {
-            #main-container:has(.internacao-page) {
-                padding-left: 2px !important;
-                padding-right: 2px !important;
-            }
-
-            #main-container .internacao-page {
-                padding-left: 4px !important;
-                padding-right: 4px !important;
-            }
-        }
 
         #main-container .internacao-page .internacao-page__content {
             gap: 12px !important;
@@ -3084,32 +2851,8 @@
             line-height: 1 !important;
         }
 
-        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
-        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle,
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects :is(#relatorio-detalhado, #select_tuss, #select_prorrog, #select_gestao, #select_uti, #select_negoc) {
-            background-color: #f8fbff !important;
-            border: 1px solid #aebdce !important;
-            color: #1f2937 !important;
-            box-shadow:
-                inset 0 1px 2px rgba(15, 23, 42, .08),
-                0 1px 0 rgba(255, 255, 255, .8) !important;
-        }
 
-        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):hover,
-        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle:hover {
-            border-color: #7f94aa !important;
-            background-color: #ffffff !important;
-        }
 
-        #main-container .internacao-page #myForm :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control):focus,
-        #main-container .internacao-page #myForm .bootstrap-select.show > .dropdown-toggle,
-        #main-container .internacao-page #myForm .bootstrap-select > .dropdown-toggle:focus {
-            border-color: #2f89bd !important;
-            background-color: #ffffff !important;
-            box-shadow:
-                0 0 0 .14rem rgba(47, 137, 189, .18),
-                inset 0 1px 2px rgba(15, 23, 42, .08) !important;
-        }
 
         /* Reparos finais das tabelas adicionais na edicao: setas e escala compacta. */
         #main-container .internacao-page :is(
@@ -3124,18 +2867,6 @@
             padding-right: 24px !important;
         }
 
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects .bootstrap-select > .dropdown-toggle::after,
-        #main-container .internacao-page #tabelas-adicionais-paineis-edit .bootstrap-select > .dropdown-toggle::after,
-        #main-container .internacao-page #detalhes-card-wrapper .bootstrap-select > .dropdown-toggle::after {
-            display: inline-block !important;
-            margin-left: .255em !important;
-            vertical-align: .255em !important;
-            content: "" !important;
-            border-top: .3em solid !important;
-            border-right: .3em solid transparent !important;
-            border-bottom: 0 !important;
-            border-left: .3em solid transparent !important;
-        }
 
         #main-container .internacao-page :is(
             #tabelas-adicionais-paineis-edit #container-tuss,
@@ -3155,55 +2886,11 @@
             line-height: 1.2 !important;
         }
 
-        #main-container .internacao-page .assist-select-clear {
-            position: relative !important;
-            overflow: visible !important;
-            min-height: 32px !important;
-            height: 32px !important;
-        }
 
-        #main-container .internacao-page .assist-select-clear .bootstrap-select {
-            min-height: 32px !important;
-            height: 32px !important;
-        }
 
-        #main-container .internacao-page .assist-select-clear .bootstrap-select > .dropdown-toggle {
-            min-height: 32px !important;
-            height: 32px !important;
-            padding-right: 42px !important;
-        }
 
-        #main-container .internacao-page .assist-clear-btn {
-            position: absolute !important;
-            top: 50% !important;
-            right: 25px !important;
-            z-index: 6 !important;
-            width: 16px !important;
-            height: 16px !important;
-            min-width: 16px !important;
-            min-height: 16px !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            transform: translateY(-50%) !important;
-            border: 0 !important;
-            border-radius: 999px !important;
-            background: rgba(94, 35, 99, .10) !important;
-            color: #5e2363 !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-size: 10px !important;
-            font-weight: 700 !important;
-            line-height: 16px !important;
-        }
 
-        #main-container .internacao-page .assist-select-clear:not(.has-value) .assist-clear-btn {
-            display: none !important;
-        }
 
-        #main-container .internacao-page .assist-select-clear.has-value .assist-clear-btn {
-            display: inline-flex !important;
-        }
 
 
         /* Padrao unico de seta dos selects: igual ao select nativo de Acomodacao. */
@@ -3221,27 +2908,7 @@
             padding-right: 24px !important;
         }
 
-        #main-container .internacao-page .bootstrap-select > .dropdown-toggle {
-            position: relative !important;
-            padding-right: 24px !important;
-        }
 
-        #main-container .internacao-page .bootstrap-select > .dropdown-toggle::after {
-            content: "" !important;
-            position: absolute !important;
-            right: 12px !important;
-            top: 50% !important;
-            display: block !important;
-            width: 0 !important;
-            height: 0 !important;
-            margin: -2px 0 0 0 !important;
-            vertical-align: 0 !important;
-            border-top: 5px solid #111827 !important;
-            border-right: 5px solid transparent !important;
-            border-bottom: 0 !important;
-            border-left: 5px solid transparent !important;
-            pointer-events: none !important;
-        }
 
 
         #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .form-group {
@@ -3265,57 +2932,8 @@
             width: 100% !important;
         }
 
-        @media (max-width: 1200px) {
-            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
-                grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-            }
-        }
 
-        @media (max-width: 768px) {
-            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row {
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            }
 
-            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-1,
-            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-2,
-            #main-container .internacao-page #detalhes-card-wrapper .detalhes-grid-row > .col-sm-3 {
-                grid-column: span 1 !important;
-            }
-        }
-
-        /* Placeholder dos selects nas tabelas adicionais: apenas option vazio. */
-        #main-container .internacao-page :is(
-            .tabelas-adicionais-card,
-            #tabelas-adicionais-paineis-edit,
-            #detalhes-card-wrapper,
-            #container-tuss,
-            #container-prorrog,
-            #container-gestao,
-            #container-uti,
-            #container-negoc
-        ) select:is(.form-control, .form-control-sm, .form-select, .select-purple, .detail-select):has(> option[value=""]:checked),
-        #main-container .internacao-page :is(
-            .tabelas-adicionais-card,
-            #tabelas-adicionais-paineis-edit,
-            #container-tuss,
-            #container-prorrog,
-            #container-gestao,
-            #container-uti,
-            #container-negoc
-        ) .bootstrap-select > .dropdown-toggle.bs-placeholder,
-        #main-container .internacao-page :is(
-            .tabelas-adicionais-card,
-            #tabelas-adicionais-paineis-edit,
-            #container-tuss,
-            #container-prorrog,
-            #container-gestao,
-            #container-uti,
-            #container-negoc
-        ) .bootstrap-select > .dropdown-toggle.bs-placeholder :is(.filter-option, .filter-option-inner, .filter-option-inner-inner) {
-            color: #c4c4c4 !important;
-            opacity: 1 !important;
-            font-weight: 500 !important;
-        }
 
         #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects :is(
             #select_relatorio_detalhado.select-placeholder,
@@ -3410,26 +3028,6 @@
             letter-spacing: 0 !important;
         }
 
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.form-control,
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.detail-select,
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.select-purple,
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.has-saved-record,
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects .bootstrap-select > .dropdown-toggle,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_tuss,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_prorrog,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_gestao,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_uti,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_negoc {
-            border: 1px solid #8fc7f5 !important;
-            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
-            background-color: #d7ebff !important;
-            color: #17446f !important;
-            font-size: .72rem !important;
-            font-weight: 700 !important;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72) !important;
-            outline: none !important;
-        }
 
         #main-container .internacao-page .tabelas-adicionais-card .tabelas-col.has-saved-record .form-control,
         #main-container .internacao-page .tabelas-adicionais-card .tabelas-col.has-saved-record select,
@@ -3440,21 +3038,6 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72) !important;
         }
 
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.form-control:focus,
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.detail-select:focus,
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects select.select-purple:focus,
-        #main-container .internacao-page .tabelas-adicionais-card .tabelas-selects .bootstrap-select > .dropdown-toggle:focus,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_relatorio_detalhado:focus,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_tuss:focus,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_prorrog:focus,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_gestao:focus,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_uti:focus,
-        #main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects #select_negoc:focus {
-            border-color: #62aee8 !important;
-            background: linear-gradient(180deg, #eef7ff 0%, #d7ebff 100%) !important;
-            background-color: #d7ebff !important;
-            box-shadow: 0 0 0 .10rem rgba(47, 137, 189, .10), inset 0 1px 0 rgba(255, 255, 255, .72) !important;
-        }
 
         #main-container .internacao-page #container-negoc .edit-negoc-card,
         #main-container .internacao-page #container-negoc .adicional-card--negoc {

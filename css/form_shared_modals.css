@@ -1,0 +1,213 @@
+/* Modais compartilhados dos formularios de internacao e visita. */
+.fc-form-modal {
+    --fc-modal-accent: #347ead;
+    --fc-modal-accent-end: #58afd0;
+    --fc-modal-border: #cbd6e2;
+    --fc-modal-text: #2b3442;
+    --fc-modal-muted: #687383;
+}
+
+.fc-form-modal.fc-form-modal--warning {
+    --fc-modal-accent: #b97922;
+    --fc-modal-accent-end: #dfaa51;
+}
+
+.fc-form-modal.fc-form-modal--danger {
+    --fc-modal-accent: #a9414a;
+    --fc-modal-accent-end: #d9656d;
+}
+
+.fc-form-modal .modal-dialog:not(.modal-xl):not(.modal-lg) {
+    width: min(500px, calc(100vw - 24px));
+    max-width: min(500px, calc(100vw - 24px));
+}
+
+.fc-form-modal .modal-content {
+    overflow: hidden;
+    border: 1px solid var(--fc-modal-border) !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    color: var(--fc-modal-text) !important;
+    box-shadow: 0 18px 44px rgba(25, 42, 62, .22) !important;
+}
+
+.fc-form-modal .modal-header,
+.fc-form-modal .fc-modal-header,
+.fc-form-modal .hosp-modal__header {
+    display: flex !important;
+    align-items: center !important;
+    min-height: 48px !important;
+    padding: 9px 12px !important;
+    gap: 10px !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, .25) !important;
+    background: linear-gradient(110deg, var(--fc-modal-accent), var(--fc-modal-accent-end)) !important;
+    color: #fff !important;
+}
+
+body #main-container .fc-form-modal .fc-modal-header {
+    background: linear-gradient(110deg, var(--fc-modal-accent), var(--fc-modal-accent-end)) !important;
+}
+
+.fc-form-modal .modal-header :is(.modal-title, .page-title),
+.fc-form-modal .fc-modal-header :is(.modal-title, .page-title),
+.fc-form-modal .hosp-modal__title {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #fff !important;
+    font-family: inherit !important;
+    font-size: .88rem !important;
+    line-height: 1.15 !important;
+    font-weight: 750 !important;
+}
+
+.fc-form-modal .modal-header .page-description,
+.fc-form-modal .fc-modal-header .page-description,
+.fc-form-modal .hosp-modal__eyebrow {
+    margin: 0 0 0 auto !important;
+    color: rgba(255, 255, 255, .88) !important;
+    font-family: inherit !important;
+    font-size: .68rem !important;
+    line-height: 1.15 !important;
+    font-weight: 600 !important;
+}
+
+.fc-form-modal .hosp-modal__eyebrow {
+    margin: 0 0 2px !important;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.fc-form-modal .modal-header .btn-close,
+.fc-form-modal .fc-modal-header .btn-close,
+.fc-form-modal .hosp-modal__header .btn-close {
+    flex: 0 0 auto !important;
+    width: 26px !important;
+    height: 26px !important;
+    margin: 0 0 0 auto !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+    background-color: rgba(255, 255, 255, .14) !important;
+    background-size: 9px !important;
+    opacity: .92 !important;
+    box-shadow: none !important;
+}
+
+.fc-form-modal .modal-header .btn-close:hover,
+.fc-form-modal .fc-modal-header .btn-close:hover,
+.fc-form-modal .hosp-modal__header .btn-close:hover {
+    background-color: rgba(255, 255, 255, .24) !important;
+    opacity: 1 !important;
+}
+
+.fc-form-modal .modal-body {
+    padding: 12px 14px !important;
+    background: #fff !important;
+    color: var(--fc-modal-text) !important;
+    font-family: inherit !important;
+    font-size: .76rem !important;
+    line-height: 1.45 !important;
+}
+
+.fc-form-modal .modal-body p:last-child {
+    margin-bottom: 0 !important;
+}
+
+.fc-form-modal .modal-footer {
+    min-height: 48px !important;
+    padding: 8px 12px !important;
+    gap: 7px !important;
+    border-top: 1px solid #e2e8ef !important;
+    background: #f7f9fb !important;
+}
+
+.fc-form-modal .modal-footer .btn {
+    min-width: 76px !important;
+    min-height: 30px !important;
+    padding: 5px 11px !important;
+    border-radius: 7px !important;
+    font-family: inherit !important;
+    font-size: .7rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+.fc-form-modal .modal-footer :is(.btn-light, .btn-outline-secondary, .btn-secondary) {
+    border: 1px solid #c6d0dc !important;
+    background: #fff !important;
+    color: #536071 !important;
+}
+
+.fc-form-modal .modal-footer :is(.btn-light, .btn-outline-secondary, .btn-secondary):hover {
+    border-color: #9eacbc !important;
+    background: #eef3f7 !important;
+    color: #344153 !important;
+}
+
+.fc-form-modal .modal-footer :is(.btn-primary, .btn-success) {
+    border-color: #1677e8 !important;
+    background: #1677e8 !important;
+    color: #fff !important;
+}
+
+.fc-form-modal .modal-footer .btn-danger {
+    border-color: #c74b54 !important;
+    background: #c74b54 !important;
+    color: #fff !important;
+}
+
+.fc-form-modal--history .modal-dialog,
+.fc-form-modal--hospital .modal-dialog {
+    width: min(1180px, calc(100vw - 32px)) !important;
+    max-width: min(1180px, calc(100vw - 32px)) !important;
+}
+
+.fc-form-modal--history .modal-body,
+.fc-form-modal--hospital .modal-body {
+    padding: 10px 12px 12px !important;
+}
+
+.fc-form-modal--history .modal-body {
+    max-height: min(72vh, 680px);
+    overflow: auto;
+}
+
+.fc-form-modal .fc-empty-message {
+    margin: 12px 0 !important;
+    padding: 14px !important;
+    border: 1px dashed #c8d3df !important;
+    border-radius: 8px !important;
+    background: #f7f9fb !important;
+    color: var(--fc-modal-muted) !important;
+    text-align: center !important;
+    font-size: .72rem !important;
+}
+
+@media (max-width: 767.98px) {
+    .fc-form-modal .modal-dialog,
+    .fc-form-modal--history .modal-dialog,
+    .fc-form-modal--hospital .modal-dialog {
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        margin: 8px auto !important;
+    }
+
+    .fc-form-modal .modal-header,
+    .fc-form-modal .fc-modal-header,
+    .fc-form-modal .hosp-modal__header {
+        min-height: 44px !important;
+        padding: 8px 10px !important;
+    }
+
+    .fc-form-modal .modal-header .page-description,
+    .fc-form-modal .fc-modal-header .page-description {
+        display: none !important;
+    }
+
+    .fc-form-modal .modal-body {
+        padding: 10px !important;
+    }
+}
