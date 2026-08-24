@@ -186,3 +186,17 @@
 [2026-08-11 22:03:16] VISITA create ok id_int=683 id_visita=727
 [2026-08-11 22:03:16] GESTAO skip id_int=683 select= evento=n tipo=
 [2026-08-11 22:03:16] END ok id=683
+[2026-08-24 01:23:41] START type=create select_gestao= evento_adverso_ges=n tipo_evento=
+[2026-08-24 01:23:41] CREATE internacao ok id=835
+[2026-08-24 01:23:41] VISITA create ok id_int=835 id_visita=880
+[2026-08-24 01:23:41] GESTAO skip id_int=835 select= evento=n tipo=
+[2026-08-24 01:24:12] START type=create select_gestao= evento_adverso_ges= tipo_evento=
+[2026-08-24 01:24:12] CREATE internacao ok id=836
+[2026-08-24 01:24:12] VISITA create ok id_int=836 id_visita=881
+[2026-08-24 01:24:12] GESTAO skip id_int=836 select= evento=n tipo=
+[2026-08-24 01:24:12] END ok id=836
+[2026-08-24 01:24:38] START type=create select_gestao= evento_adverso_ges= tipo_evento=
+[2026-08-24 01:24:38] CREATE internacao ok id=837
+[2026-08-24 01:24:38] VISITA create ok id_int=837 id_visita=882
+[2026-08-24 01:24:38] GESTAO skip id_int=837 select= evento=n tipo=
+[2026-08-24 01:24:38] END ok id=837

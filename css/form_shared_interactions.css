@@ -804,3 +804,50 @@
 
 
 /* FC_SHARED_INTERACTIONS_END */
+/* Estados essenciais do formulario unificado de visita (cadastro e edicao). */
+body #main-container .visita-page {
+    visibility: visible !important;
+}
+
+body #main-container .visita-page :is(
+    .form-select-placeholder,
+    #add-visita-form select.select-placeholder,
+    #add-visita-form select:required:invalid
+) {
+    color: #c4c4c4 !important;
+}
+
+body #main-container .visita-page #add-visita-form :is(input, textarea)::placeholder {
+    color: #c4c4c4 !important;
+    opacity: 1;
+}
+
+body #main-container .visita-page #add-visita-form option[value=""] {
+    color: #c4c4c4;
+}
+
+body #main-container .visita-page #cadastro-central-visita .form-select:is(
+    :focus,
+    :active,
+    :focus-visible
+),
+body #main-container .visita-page #cadastro-central-visita .form-select {
+    box-shadow: none !important;
+    outline: none !important;
+    border-color: #ced4da !important;
+}
+
+body #main-container .visita-page #add-visita-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* A visita usa o proprio modal como camada de fundo. */
+body:has(#main-container .visita-page) > .modal-backdrop {
+    display: none;
+}
+
+body:has(#main-container .visita-page) > .modal {
+    background: rgba(0, 0, 0, .5);
+}

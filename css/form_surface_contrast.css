@@ -1940,7 +1940,7 @@ body #main-container#main-container.cadastro-layout:is(.cadastro-paciente-page, 
 }
 
 /* Padrao definitivo das tabelas adicionais em cadastro e edicao. */
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .tabelas-adicionais-card,
     .visita-card--tabelas,
     .inline-manager-card,
@@ -1959,7 +1959,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     box-shadow: 0 3px 9px rgba(30, 50, 74, .08) !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .tabelas-adicionais-card__header,
     .visita-card--tabelas > .visita-card__header,
     .adicional-card__header,
@@ -1972,7 +1972,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     background: #fff !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .tabelas-adicionais-card__eyebrow,
     .visita-card--tabelas .visita-card__eyebrow
 ) {
@@ -1984,7 +1984,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     letter-spacing: .08em !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .tabelas-adicionais-card__title,
     .visita-card--tabelas .visita-card__title,
     .adicional-card__title,
@@ -2013,7 +2013,7 @@ body #main-container#main-container.cadastro-layout :is(
     font-weight: 700 !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .tabelas-adicionais-card,
     .visita-card--tabelas,
     .inline-manager-card,
@@ -2034,7 +2034,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     text-transform: none !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .tabelas-adicionais-card,
     .visita-card--tabelas,
     .inline-manager-card,
@@ -2058,7 +2058,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08), 0 1px 3px rgba(30, 50, 74, .14) !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .tabelas-adicionais-card,
     .visita-card--tabelas,
     .inline-manager-card,
@@ -2074,7 +2074,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     height: auto !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .inline-manager-card,
     #acomodacao-inline-card,
     .adicional-card,
@@ -2087,13 +2087,13 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     overflow: hidden !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .inline-manager-card,
     #acomodacao-inline-card,
     .adicional-card,
     .detalhes-card
 ) table thead,
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .inline-manager-card,
     #acomodacao-inline-card,
     .adicional-card,
@@ -2104,7 +2104,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro
     background: #2f6f9f !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .inline-manager-card,
     #acomodacao-inline-card,
     .adicional-card,
@@ -2897,6 +2897,72 @@ body #main-container#main-container :is(.internacao-page, .visita-page, .cadastr
     padding: var(--fc-form-body-pad-y) var(--fc-form-body-pad-x) !important;
 }
 
+/* Acoes finais identicas no cadastro e na edicao de internacao. */
+body #main-container#main-container:has(.internacao-page) :is(.internacao-form-actions, .edit-form-actions) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    min-height: 56px !important;
+    margin-top: var(--fc-form-section-gap) !important;
+    padding: 8px 10px !important;
+    border: 1px solid #cbd6e2 !important;
+    border-radius: 9px !important;
+    background: #fff !important;
+    box-shadow: 0 3px 9px rgba(30, 50, 74, .08) !important;
+}
+
+body #main-container#main-container:has(.internacao-page) :is(.internacao-form-actions, .edit-form-actions) .btn-submit-standard {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    width: auto !important;
+    min-width: 120px !important;
+    max-width: none !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 14px !important;
+    border-radius: 7px !important;
+    font-size: .78rem !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+}
+
+body #main-container#main-container:has(.internacao-page) :is(.internacao-draft-actions, .edit-draft-actions) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+
+body #main-container#main-container:has(.internacao-page) :is(.internacao-draft-actions, .edit-draft-actions) small {
+    color: #737d89 !important;
+    font-size: .66rem !important;
+    line-height: 1.2 !important;
+}
+
+/* Contorno e contraste unicos dos campos de internacao. */
+body #main-container#main-container:has(.internacao-page) .internacao-page :is(
+    input.form-control:not([type="hidden"]):not([type="file"]),
+    select.form-control:not(.selectpicker),
+    textarea.form-control,
+    .tabelas-adicionais-card select.form-control
+) {
+    border-color: #9fb0c2 !important;
+    background-color: #edf3f8 !important;
+    color: #26364a !important;
+    font-weight: 500 !important;
+    box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08), 0 1px 3px rgba(30, 50, 74, .12) !important;
+}
+
+body #main-container#main-container:has(.internacao-page) .internacao-page > .intern-files-row {
+    width: 100% !important;
+    margin: var(--fc-form-section-gap) 0 0 !important;
+    padding: 0 6px !important;
+}
+
 body #main-container#main-container :is(.internacao-page, .visita-page) :is(
     #relatorio-detalhado#relatorio-detalhado,
     #select_relatorio_detalhado#select_relatorio_detalhado,
@@ -2915,7 +2981,7 @@ body #main-container#main-container :is(.internacao-page, .visita-page) :is(
 }
 
 /* Neutraliza as cores legadas dos seletores que ligam os complementos. */
-body #main-container#main-container:is(.internacao-page, .visita-page) .tabelas-adicionais-card > .tabelas-selects :is(
+body #main-container#main-container:is(:has(.internacao-page), :has(.visita-page)) .tabelas-adicionais-card > .tabelas-selects :is(
     #relatorio-detalhado,
     #select_relatorio_detalhado,
     #select_tuss,
@@ -2924,7 +2990,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page) .tabelas-
     #select_uti,
     #select_negoc
 ),
-body #main-container#main-container:is(.internacao-page, .visita-page) .visita-card--tabelas .tabelas-selects :is(
+body #main-container#main-container:is(:has(.internacao-page), :has(.visita-page)) .visita-card--tabelas .tabelas-selects :is(
     #relatorio-detalhado,
     #select_relatorio_detalhado,
     #select_tuss,
@@ -2933,7 +2999,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page) .visita-c
     #select_uti,
     #select_negoc
 ),
-body #main-container#main-container:is(.internacao-page, .visita-page) :is(
+body #main-container#main-container:is(:has(.internacao-page), :has(.visita-page)) :is(
     #detalhes-card-wrapper,
     #container-tuss,
     #container-prorrog,
@@ -2941,7 +3007,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page) :is(
     #container-uti,
     #container-negoc
 ) :is(input.form-control, select.form-control, textarea.form-control, .form-select, .form-control-sm.form-control),
-body #main-container#main-container:is(.internacao-page, .visita-page) :is(
+body #main-container#main-container:is(:has(.internacao-page), :has(.visita-page)) :is(
     #detalhes-card-wrapper,
     #container-tuss,
     #container-prorrog,
@@ -2962,7 +3028,7 @@ body #main-container#main-container:is(.internacao-page, .visita-page) :is(
     box-shadow: inset 0 1px 2px rgba(30, 50, 74, .08), 0 1px 3px rgba(30, 50, 74, .14) !important;
 }
 
-body #main-container#main-container:is(.internacao-page, .visita-page, .cadastro-layout) :is(
+body #main-container#main-container:is(.cadastro-layout, :has(.internacao-page), :has(.visita-page)) :is(
     .inline-manager-card,
     #acomodacao-inline-card,
     .adicional-card,

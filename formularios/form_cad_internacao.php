@@ -228,7 +228,6 @@
     }
     ?>
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
-    <link href="<?= $BASE_URL ?>css/form_cad_internacao_page.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao_page.css') ?>" rel="stylesheet">
 
     <div class="internacao-page">
         <div class="internacao-page__hero">
@@ -946,7 +945,7 @@
         <input type="hidden" class="form-control" value="n" id="em_auditoria_cap" name="em_auditoria_cap">
         <input type="hidden" class="form-control" value="n" id="senha_finalizada" name="senha_finalizada">
 
-        <div class="row">
+        <div class="row intern-files-row">
             <div class="form-group col-md-6">
                 <label for="intern_files">Arquivos</label>
                 <div class="intern-files-control">

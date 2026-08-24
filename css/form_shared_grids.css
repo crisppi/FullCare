@@ -437,6 +437,17 @@
     align-items: start;
 }
 
+/* As colunas Bootstrap da UTI devem ocupar a celula do grid, sem somar larguras percentuais. */
+#tabelas-adicionais-paineis-edit #container-uti > .form-group.row > .form-group[class*="col-"],
+#tabelas-adicionais-paineis-edit #container-uti .form-group.row > .form-group[class*="col-"] {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
 
 /* Origem: formularios/form_cad_visita.php | .visita-summary-grid */
 .visita-summary-grid {
