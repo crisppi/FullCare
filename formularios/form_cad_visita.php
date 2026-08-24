@@ -150,6 +150,7 @@ $internacaoDataBR = $internacaoDataRaw ? date('d/m/Y', strtotime((string)$intern
 $internacaoHospitalId = $internacaoAtual['id_hospital'] ?? '';
 $internacaoPacienteId = $internacaoAtual['fk_paciente_int'] ?? '';
 ?>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_cad_visita_ai.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_visita_ai.css') ?>">
 
 <div class="visita-page" style="visibility:hidden;">
     <div class="visita-hero">
