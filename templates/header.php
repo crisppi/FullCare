@@ -291,24 +291,10 @@ if (!empty($sessionIdUsuario)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/font-awesome-5/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/mdi-font/css/material-design-iconic-font.min.css"
-        rel="stylesheet" media="all">
-    <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/animsition/animsition.min.css" rel="stylesheet"
-        media="all">
-    <link
-        href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css"
-        rel="stylesheet" media="all">
-    <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/wow/animate.css" rel="stylesheet" media="all">
-    <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/css-hamburgers/hamburgers.min.css" rel="stylesheet"
-        media="all">
-    <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/slick/slick.css" rel="stylesheet" media="all">
-    <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/select2/select2.min.css" rel="stylesheet" media="all">
-    <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/vendor/perfect-scrollbar/perfect-scrollbar.css"
-        rel="stylesheet" media="all">
     <link href="<?= $BASE_URL ?>diversos/CoolAdmin-master/css/theme.css" rel="stylesheet" media="all">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css">
@@ -1222,26 +1208,11 @@ if (!empty($sessionIdUsuario)) {
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 
 <!-- Bootstrap JS-->
-<script src="./diversos/CoolAdmin-master/vendor/bootstrap-4.1/popper.min.js"></script>
-<script src="./diversos/CoolAdmin-master/vendor/bootstrap-4.1/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous">
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
-<!-- Vendor JS       -->
-<script src="./diversos/CoolAdmin-master/vendor/slick/slick.min.js">
-</script>
-<script src="./diversos/CoolAdmin-master/vendor/wow/wow.min.js"></script>
-<script src="./diversos/CoolAdmin-master/vendor/animsition/animsition.min.js"></script>
-<script src="./diversos/CoolAdmin-master/vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">
-</script>
-<script src="./diversos/CoolAdmin-master/vendor/counter-up/jquery.waypoints.min.js"></script>
-<script src="./diversos/CoolAdmin-master/vendor/counter-up/jquery.counterup.min.js">
-</script>
-<script src="./diversos/CoolAdmin-master/vendor/circle-progress/circle-progress.min.js"></script>
-<script src="./diversos/CoolAdmin-master/vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
 <script src="diversos/chartjs/Chart.min.js"></script>
-<script src="./diversos/CoolAdmin-master/vendor/select2/select2.min.js"></script>
 <script src="./scripts/cadastro/general.js"></script>
 <script src="<?= $BASE_URL ?>js/stepper.js?v=<?= rawurlencode(defined('APP_VERSION') ? APP_VERSION : '1') ?>"></script>
 <script src="js/show_internacao_visitas.js"></script>

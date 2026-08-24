@@ -723,7 +723,18 @@ if (empty($telefonesPaciente)) {
             if (!add || !body || !empty || !wrap) return;
             add.addEventListener('click', function () {
                 const item = cfg.read();
-                if (!item) return;
+                if (!item) {
+                    const requiredField = document.getElementById(cfg.required);
+                    if (requiredField) {
+                        requiredField.classList.add('is-invalid');
+                        requiredField.focus();
+                        requiredField.addEventListener('input', function clearInlineError() {
+                            requiredField.classList.remove('is-invalid');
+                            requiredField.removeEventListener('input', clearInlineError);
+                        });
+                    }
+                    return;
+                }
                 empty.style.display = 'none';
                 const tr = document.createElement('tr');
                 tr.innerHTML = cfg.row(item);
@@ -745,7 +756,7 @@ if (empty($telefonesPaciente)) {
         bindExistingRemovers('telefonesTableBody', 'telefonesTableEmpty');
         bindExistingRemovers('contatosTableBody', 'contatosTableEmpty');
         bindInline({
-            add: 'btnAddEnderecoInline', body: 'enderecosTableBody', empty: 'enderecosTableEmpty', wrap: 'enderecosHiddenContainer',
+            add: 'btnAddEnderecoInline', body: 'enderecosTableBody', empty: 'enderecosTableEmpty', wrap: 'enderecosHiddenContainer', required: 'end_logradouro_inline',
             read: () => {
                 const item = {
                     tipo: (document.getElementById('end_tipo_inline').value || '').trim(),
@@ -765,7 +776,7 @@ if (empty($telefonesPaciente)) {
             clear: () => { ['end_tipo_inline','end_cep_inline','end_logradouro_inline','end_numero_inline','end_bairro_inline','end_cidade_inline','end_estado_inline','end_complemento_inline'].forEach(id => document.getElementById(id).value = ''); document.getElementById('end_principal_inline').value = 'n'; }
         });
         bindInline({
-            add: 'btnAddEmailInline', body: 'emailsTableBody', empty: 'emailsTableEmpty', wrap: 'emailsHiddenContainer',
+            add: 'btnAddEmailInline', body: 'emailsTableBody', empty: 'emailsTableEmpty', wrap: 'emailsHiddenContainer', required: 'email_email_inline',
             read: () => {
                 const item = {
                     tipo: (document.getElementById('email_tipo_inline').value || '').trim(),
@@ -779,7 +790,7 @@ if (empty($telefonesPaciente)) {
             clear: () => { ['email_tipo_inline','email_email_inline'].forEach(id => document.getElementById(id).value = ''); document.getElementById('email_principal_inline').value = 'n'; }
         });
         bindInline({
-            add: 'btnAddTelefoneInline', body: 'telefonesTableBody', empty: 'telefonesTableEmpty', wrap: 'telefonesHiddenContainer',
+            add: 'btnAddTelefoneInline', body: 'telefonesTableBody', empty: 'telefonesTableEmpty', wrap: 'telefonesHiddenContainer', required: 'tel_numero_inline',
             read: () => {
                 const item = {
                     tipo: (document.getElementById('tel_tipo_inline').value || '').trim(),
@@ -795,7 +806,7 @@ if (empty($telefonesPaciente)) {
             clear: () => { ['tel_tipo_inline','tel_numero_inline','tel_ramal_inline','tel_contato_inline'].forEach(id => document.getElementById(id).value = ''); document.getElementById('tel_principal_inline').value = 'n'; }
         });
         bindInline({
-            add: 'btnAddContatoInline', body: 'contatosTableBody', empty: 'contatosTableEmpty', wrap: 'contatosHiddenContainer',
+            add: 'btnAddContatoInline', body: 'contatosTableBody', empty: 'contatosTableEmpty', wrap: 'contatosHiddenContainer', required: 'cont_nome_inline',
             read: () => {
                 const item = {
                     nome: (document.getElementById('cont_nome_inline').value || '').trim(),

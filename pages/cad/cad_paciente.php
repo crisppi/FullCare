@@ -524,7 +524,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
             addButton.addEventListener('click', function () {
                 const item = config.read();
-                if (!item) return;
+                if (!item) {
+                    const requiredField = document.getElementById(config.required);
+                    if (requiredField) {
+                        requiredField.classList.add('is-invalid');
+                        requiredField.focus();
+                        requiredField.addEventListener('input', function clearInlineError() {
+                            requiredField.classList.remove('is-invalid');
+                            requiredField.removeEventListener('input', clearInlineError);
+                        });
+                    }
+                    return;
+                }
 
                 empty.style.display = 'none';
                 const row = document.createElement('tr');
@@ -549,7 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         bindInline({
-            add: 'btnAddEnderecoInline', body: 'enderecosTableBody', empty: 'enderecosTableEmpty', wrap: 'enderecosHiddenContainer',
+            add: 'btnAddEnderecoInline', body: 'enderecosTableBody', empty: 'enderecosTableEmpty', wrap: 'enderecosHiddenContainer', required: 'end_logradouro_inline',
             read: function () {
                 const item = {
                     tipo: (document.getElementById('end_tipo_inline').value || '').trim(),
@@ -573,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         bindInline({
-            add: 'btnAddEmailInline', body: 'emailsTableBody', empty: 'emailsTableEmpty', wrap: 'emailsHiddenContainer',
+            add: 'btnAddEmailInline', body: 'emailsTableBody', empty: 'emailsTableEmpty', wrap: 'emailsHiddenContainer', required: 'email_email_inline',
             read: function () {
                 const item = {
                     tipo: (document.getElementById('email_tipo_inline').value || '').trim(),
@@ -591,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         bindInline({
-            add: 'btnAddTelefoneInline', body: 'telefonesTableBody', empty: 'telefonesTableEmpty', wrap: 'telefonesHiddenContainer',
+            add: 'btnAddTelefoneInline', body: 'telefonesTableBody', empty: 'telefonesTableEmpty', wrap: 'telefonesHiddenContainer', required: 'tel_numero_inline',
             read: function () {
                 const item = {
                     tipo: (document.getElementById('tel_tipo_inline').value || '').trim(),
@@ -611,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         bindInline({
-            add: 'btnAddContatoInline', body: 'contatosTableBody', empty: 'contatosTableEmpty', wrap: 'contatosHiddenContainer',
+            add: 'btnAddContatoInline', body: 'contatosTableBody', empty: 'contatosTableEmpty', wrap: 'contatosHiddenContainer', required: 'cont_nome_inline',
             read: function () {
                 const item = {
                     nome: (document.getElementById('cont_nome_inline').value || '').trim(),

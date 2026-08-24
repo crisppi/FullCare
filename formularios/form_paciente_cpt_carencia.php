@@ -66,7 +66,16 @@ document.addEventListener('DOMContentLoaded', function () {
     body.querySelectorAll('.btn-remove-cpt').forEach(bindRemove);
     add.addEventListener('click', function () {
         const item = {tipo:document.getElementById('cpt_tipo_inline').value, descricao:document.getElementById('cpt_descricao_inline').value.trim(), inicio:document.getElementById('cpt_inicio_inline').value, fim:document.getElementById('cpt_fim_inline').value, status:document.getElementById('cpt_status_inline').value, observacao:document.getElementById('cpt_observacao_inline').value.trim()};
-        if (!item.descricao) { document.getElementById('cpt_descricao_inline').focus(); return; }
+        if (!item.descricao) {
+            const descricaoField = document.getElementById('cpt_descricao_inline');
+            descricaoField.classList.add('is-invalid');
+            descricaoField.focus();
+            descricaoField.addEventListener('input', function clearCptError() {
+                descricaoField.classList.remove('is-invalid');
+                descricaoField.removeEventListener('input', clearCptError);
+            });
+            return;
+        }
         if (item.inicio && item.fim && item.fim < item.inicio) { document.getElementById('cpt_fim_inline').setCustomValidity('A data final não pode ser anterior à data inicial.'); document.getElementById('cpt_fim_inline').reportValidity(); return; }
         document.getElementById('cpt_fim_inline').setCustomValidity('');
         const row = document.createElement('tr');
