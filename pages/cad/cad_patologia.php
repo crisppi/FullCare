@@ -16,7 +16,8 @@ $cids = $cid->findAll();
 $id_patologia = filter_input(INPUT_GET, "id_patologia");
 
 ?>
-<div id="main-container" class="container">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_simple_crud.css?v=<?= filemtime(__DIR__ . '/../../css/form_simple_crud.css') ?>">
+<div id="main-container" class="container simple-crud-page">
     <div class="row">
         <form action="<?= $BASE_URL ?>process_patologia.php" class="container-fluid fundo_tela_cadastros"
             id="add-movie-form" method="POST" enctype="multipart/form-data">
@@ -64,9 +65,9 @@ $id_patologia = filter_input(INPUT_GET, "id_patologia");
             </div>
 
             <hr>
-            <button type="submit" class="btn btn-success" style="margin-bottom:10px;">
-                <i style="font-size: 1rem;margin-right:5px;" name="type" value="edite"
-                    class="fa-solid fa-check edit-icon"></i>Cadastrar
+            <button type="submit" class="btn btn-success form-action-button">
+                <i name="type" value="edite"
+                    class="fa-solid fa-check edit-icon form-action-icon"></i>Cadastrar
             </button>
            
         </form>

@@ -1,0 +1,21 @@
+/* Ajustes compartilhados por formulários CRUD simples. */
+#main-container.simple-crud-page {
+    margin-top: 16px;
+}
+
+#main-container.simple-crud-page .form-action-button {
+    margin-bottom: 10px;
+}
+
+#main-container.simple-crud-page .form-action-icon {
+    margin-right: 5px;
+    font-size: 1rem;
+}
+
+#main-container.simple-crud-page .form-alert-spaced {
+    margin-top: 10px;
+}
+
+#main-container.simple-crud-page .form-control--white {
+    background: #ffffff !important;
+}

@@ -23,7 +23,8 @@ $patologia = $patologiaDao->findById($id_patologia);
 
 ?>
 <!-- formulario update -->
-<div id="main-container" class="container">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_simple_crud.css?v=<?= filemtime(__DIR__ . '/../../css/form_simple_crud.css') ?>">
+<div id="main-container" class="container simple-crud-page">
     <div class="row">
         <form action="<?= $BASE_URL ?>process_patologia.php" class="container-fluid fundo_tela_cadastros"
             id="add-movie-form" method="POST" enctype="multipart/form-data">
@@ -54,7 +55,7 @@ $patologia = $patologiaDao->findById($id_patologia);
             <div class="form-group row">
                 <div class="form-group col-sm-6">
                     <label class="control-label" for="cid_pat">CID</label>
-                    <select class="form-control selectpicker show-tick" style="background: white !important"
+                    <select class="form-control selectpicker show-tick form-control--white"
                         data-size="5" id="cid_pat" name="cid_pat" data-live-search="true" required>
                         <option value="<?= $patologia->fk_cid_10_pat ?>">
                             <?= $patologia->cat . " - " . $patologia->descricao ?>
@@ -74,8 +75,8 @@ $patologia = $patologiaDao->findById($id_patologia);
             </div>
 
             <hr>
-            <button type="submit" class="btn btn-success" style="margin-bottom:10px;">
-                <i style="font-size: 1rem;margin-right:5px;" class="fa-solid fa-check edit-icon"></i>Atualizar
+            <button type="submit" class="btn btn-success form-action-button">
+                <i class="fa-solid fa-check edit-icon form-action-icon"></i>Atualizar
             </button>
         </form>
     </div>

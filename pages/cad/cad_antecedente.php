@@ -26,8 +26,10 @@ $id_antecedente = filter_input(INPUT_GET, "id_antecedente", FILTER_VALIDATE_INT)
 
 ?>
 
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_simple_crud.css?v=<?= filemtime(__DIR__ . '/../../css/form_simple_crud.css') ?>">
+
 <script src="js/timeout.js"></script>
-<div id="main-container" class="container">
+<div id="main-container" class="container simple-crud-page">
 
     <div class="row">
 
@@ -65,9 +67,9 @@ $id_antecedente = filter_input(INPUT_GET, "id_antecedente", FILTER_VALIDATE_INT)
                 </div>
             </div>
             <hr>
-            <button type="submit" class="btn btn-success" style="margin-bottom:10px"><i
-                    style="font-size: 1rem;margin-right:5px;" name="type" value="edite"
-                    class="fa-solid fa-check edit-icon"></i>Cadastrar</button>
+            <button type="submit" class="btn btn-success form-action-button"><i
+                    name="type" value="edite"
+                    class="fa-solid fa-check edit-icon form-action-icon"></i>Cadastrar</button>
 
             <br>
     </div>

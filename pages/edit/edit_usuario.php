@@ -37,180 +37,7 @@ $cargoAtualNorm = usuarioCargoNormalizado($usuario->cargo_user ?? '');
 $isGestorSeguradoraUser = strpos($cargoAtualNorm, 'gestorseguradora') === 0;
 ?>
 <link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/../../css/form_cad_internacao.css') ?>">
-<style>
-    #main-container.internacao-page.cadastro-usuario-page {
-        margin: 2px 0 0 !important;
-        padding-inline: 2px !important;
-        padding-top: 0 !important;
-        width: auto !important;
-        max-width: 100% !important;
-        overflow-x: hidden;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .internacao-page__hero {
-        min-height: 50px !important;
-        margin: 0 0 4px !important;
-        padding: 10px 12px !important;
-        border-radius: 16px !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .internacao-page__hero h1 {
-        font-size: 1.02rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .hero-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .hero-back-btn {
-        border-radius: 999px;
-        border: 1px solid #d9c3f4;
-        color: #5e2363;
-        padding: 5px 10px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: .72rem;
-        background: #f4ecfb;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .internacao-page__tag,
-    #main-container.internacao-page.cadastro-usuario-page .internacao-card__tag {
-        padding: 4px 8px !important;
-        font-size: .6rem !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .internacao-page__content {
-        display: block !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .internacao-card {
-        padding: 5px 8px 7px !important;
-        border-radius: 8px !important;
-        background: #ffffff !important;
-        border: 1px solid rgba(94, 35, 99, .08) !important;
-        box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .internacao-card__header {
-        min-height: 0 !important;
-        margin-bottom: 3px !important;
-        padding: 4px 8px 2px !important;
-        align-items: center !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .internacao-card__title {
-        font-size: .82rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .internacao-card__body {
-        gap: 4px !important;
-        padding: 2px 8px 6px !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-step-card {
-        padding: 7px 8px 8px 12px !important;
-        border-radius: 8px !important;
-        border: 1px solid rgba(94, 35, 99, .10) !important;
-        background: linear-gradient(180deg, rgba(255, 255, 255, .98) 0%, rgba(248, 244, 253, .94) 100%) !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 5px 12px rgba(37, 18, 54, .045) !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-step-card::before {
-        display: block !important;
-        width: 3px !important;
-        border-radius: 8px 0 0 8px !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-step-card + .entity-step-card {
-        margin-top: 5px !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-step-header {
-        align-items: center !important;
-        margin-bottom: 6px !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-form .row {
-        column-gap: 0 !important;
-        row-gap: 4px !important;
-        margin-left: -5px !important;
-        margin-right: -5px !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-form .row > [class*="col-"] {
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .usuario-identificacao-row {
-        flex-wrap: nowrap !important;
-        align-items: flex-end !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-form .form-group,
-    #main-container.internacao-page.cadastro-usuario-page .entity-form [class*="col-md-"].form-group,
-    #main-container.internacao-page.cadastro-usuario-page .entity-form [class*="col-sm-"].form-group {
-        margin-bottom: 1px !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-form .form-group label {
-        min-height: 0 !important;
-        margin-bottom: 2px !important;
-        font-size: .62rem !important;
-        line-height: 1.05 !important;
-        font-weight: 600 !important;
-        color: #3b2b4b !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page #add-movie-form .form-control,
-    #main-container.internacao-page.cadastro-usuario-page #add-movie-form select.form-control {
-        min-height: 28px !important;
-        height: 28px !important;
-        padding: 2px 7px !important;
-        border-radius: 7px !important;
-        border: 1px solid #b8c4d6 !important;
-        background-color: #ffffff !important;
-        font-size: .68rem !important;
-        line-height: 1.1 !important;
-        font-weight: 500 !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page #add-movie-form textarea.form-control {
-        min-height: 58px !important;
-        height: auto !important;
-        padding: 5px 7px !important;
-        line-height: 1.22 !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-actions-bar {
-        margin-top: 5px !important;
-        padding: 7px 8px !important;
-        border-radius: 8px !important;
-        border: 1px solid rgba(94, 35, 99, .08) !important;
-        background: #ffffff !important;
-        box-shadow: 0 5px 12px rgba(37, 18, 54, .045) !important;
-    }
-
-    #main-container.internacao-page.cadastro-usuario-page .entity-actions-bar .btn {
-        min-height: 28px !important;
-        height: 28px !important;
-        padding: 2px 12px !important;
-        border-radius: 7px !important;
-        font-size: .68rem !important;
-        line-height: 1 !important;
-    }
-
-    @media (max-width: 991.98px) {
-        #main-container.internacao-page.cadastro-usuario-page .usuario-identificacao-row {
-            flex-wrap: wrap !important;
-        }
-    }
-</style>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_usuario_page.css?v=<?= filemtime(__DIR__ . '/../../css/form_usuario_page.css') ?>">
 
 <div id="main-container" class="internacao-page cadastro-layout cadastro-usuario-page">
     <div class="internacao-page__hero">
@@ -383,7 +210,7 @@ $isGestorSeguradoraUser = strpos($cargoAtualNorm, 'gestorseguradora') === 0;
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="form-group col-sm-2" id="seguradora-wrap" style="<?= $isGestorSeguradoraUser ? '' : 'display:none;' ?>">
+                            <div class="form-group col-sm-2" id="seguradora-wrap"<?= $isGestorSeguradoraUser ? '' : ' hidden' ?>>
                                 <label class="control-label" for="fk_seguradora_user">Seguradora</label>
                                 <select class="form-control" id="fk_seguradora_user" name="fk_seguradora_user">
                                     <option value="">Selecione</option>
@@ -543,7 +370,7 @@ function toggleSeguradoraField() {
     if (!cargoSel || !wrap || !segSel) return;
     var cargoNorm = cargoSel.value.toString().trim().toLowerCase().replace(/[^a-z]/g, '');
     var isGestor = cargoNorm.indexOf('gestorseguradora') === 0;
-    wrap.style.display = isGestor ? '' : 'none';
+    wrap.hidden = !isGestor;
     segSel.required = isGestor;
     if (!isGestor) segSel.value = '';
 }

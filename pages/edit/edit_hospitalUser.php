@@ -86,16 +86,18 @@ $selUserId = isset($hospitalUser['fk_usuario_hosp']) ? (int)$hospitalUser['fk_us
 ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<div id="main-container" class="container">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_simple_crud.css?v=<?= filemtime(__DIR__ . '/../../css/form_simple_crud.css') ?>">
+
+<div id="main-container" class="container simple-crud-page">
     <div class="row">
         <h4 class="page-title">Atualizar Hospital por Usuário</h4>
 
         <?php if (!$idParam): ?>
-        <div class="alert alert-warning" style="margin-top:10px;">
+        <div class="alert alert-warning form-alert-spaced">
             Parâmetro de identificação ausente. Use <code>?id_hospitalUser=</code> ou <code>?id=</code>.
         </div>
         <?php elseif (!$hospitalUser): ?>
-        <div class="alert alert-danger" style="margin-top:10px;">
+        <div class="alert alert-danger form-alert-spaced">
             Vínculo não encontrado para o identificador <strong><?= (int)$idParam ?></strong>.
         </div>
         <?php endif; ?>
@@ -147,7 +149,7 @@ $selUserId = isset($hospitalUser['fk_usuario_hosp']) ? (int)$hospitalUser['fk_us
 
             <br>
             <button type="submit" class="btn btn-primary">
-                <i style="font-size:1rem;margin-right:5px;" class="fa-solid fa-check edit-icon"></i>
+                <i class="fa-solid fa-check edit-icon form-action-icon"></i>
                 Atualizar
             </button>
         </form>

@@ -71,7 +71,8 @@ $hospitalUserDao = new hospitalUserDAO($conn, $BASE_URL);
 $id_hospitalUser = filter_input(INPUT_GET, "id_hospitalUser", FILTER_VALIDATE_INT);
 
 ?>
-<div id="main-container" class="container form_container" style="margin-top:16px;">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_simple_crud.css?v=<?= filemtime(__DIR__ . '/../../css/form_simple_crud.css') ?>">
+<div id="main-container" class="container form_container simple-crud-page">
     <div class="row">
         <form class="formulario-borderless" action="<?= htmlspecialchars($BASE_URL) ?>process_hospitalUser.php"
             id="add-movie-form" method="POST" enctype="multipart/form-data">
@@ -121,7 +122,7 @@ $id_hospitalUser = filter_input(INPUT_GET, "id_hospitalUser", FILTER_VALIDATE_IN
 
             <br>
             <button type="submit" class="btn btn-primary">
-                <i style="font-size:1rem;margin-right:5px;" class="fa-solid fa-check edit-icon"></i>
+                <i class="fa-solid fa-check edit-icon form-action-icon"></i>
                 Cadastrar
             </button>
             <br>

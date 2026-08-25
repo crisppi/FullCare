@@ -18,10 +18,12 @@ $acomodacao = $acomodacaoDao->joinAcomodacaoHospitalshow($id_acomodacao);
 
 ?>
 
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_simple_crud.css?v=<?= filemtime(__DIR__ . '/../../css/form_simple_crud.css') ?>">
+
 <!-- formulario update -->
 <!-- formulario update -->
 <!-- formulario update -->
-<div id="main-container" class="container">
+<div id="main-container" class="container simple-crud-page">
     <div class="row">
 
         <form class="borderless" action="<?= $BASE_URL ?>process_acomodacao.php" id="add-acomodacao-form" method="POST"
@@ -78,8 +80,8 @@ $acomodacao = $acomodacaoDao->joinAcomodacaoHospitalshow($id_acomodacao);
 
             <hr>
             <button type="submit" class="btn btn-success">
-                <i style="font-size: 1rem;margin-right:5px;" name="type" value="edite"
-                    class="fa-solid fa-check edit-icon"></i>Atualizar
+                <i name="type" value="edite"
+                    class="fa-solid fa-check edit-icon form-action-icon"></i>Atualizar
             </button>
         </form>
     </div>

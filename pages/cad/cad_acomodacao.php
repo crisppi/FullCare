@@ -36,6 +36,8 @@ if (empty($id_acomodacao)) {
 
 ?>
 
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_simple_crud.css?v=<?= filemtime(__DIR__ . '/../../css/form_simple_crud.css') ?>">
+
 <script src="js/timeout.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -43,7 +45,7 @@ if (empty($id_acomodacao)) {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-maskmoney/3.0.2/jquery.maskMoney.min.js"></script>
 
-<div id="main-container" class="container">
+<div id="main-container" class="container simple-crud-page">
     <div class="row">
 
         <form action="<?= $BASE_URL ?>process_acomodacao.php" class="borderless" id="add-acomodacao-form" method="POST"
@@ -104,9 +106,9 @@ if (empty($id_acomodacao)) {
 
             <hr>
             <div>
-                <button type="submit" class="btn btn-success" style="margin-bottom:10px;">
-                    <i style="font-size: 1rem;margin-right:5px;" name="type" value="edite"
-                        class="fa-solid fa-check edit-icon"></i>Cadastrar
+                <button type="submit" class="btn btn-success form-action-button">
+                    <i name="type" value="edite"
+                        class="fa-solid fa-check edit-icon form-action-icon"></i>Cadastrar
                 </button>
             </div>
         </form>
