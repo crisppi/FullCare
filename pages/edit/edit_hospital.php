@@ -148,220 +148,8 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
     }
 }
 ?>
-<script src="css/ocultar.css"></script>
-<link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/../../css/form_cad_internacao.css') ?>">
-<style>
-    #main-container.internacao-page {
-        margin: 2px 0 0 !important;
-        padding-inline: 5px !important;
-        padding-top: 0 !important;
-        width: auto !important;
-        max-width: 100% !important;
-        overflow-x: hidden;
-    }
-
-    #main-container.internacao-page .internacao-page__hero {
-        margin: 0 0 6px !important;
-    }
-
-    #main-container.internacao-page .hero-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-
-
-
-    #main-container.internacao-page .internacao-card__eyebrow {
-        font-weight: 700 !important;
-    }
-
-    #multi-step-form .form-control {
-        min-height: 42px;
-        border-radius: 8px;
-    }
-
-    #multi-step-form select.form-control {
-        height: 42px;
-    }
-
-    .confirm-delete-modal .modal-content {
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid #cfd4dc;
-    }
-
-    .confirm-delete-modal .modal-header {
-        background: #8b95a5;
-        color: #fff !important;
-        border-bottom: 0;
-        padding: 10px 14px;
-    }
-
-    .confirm-delete-modal .modal-title {
-        font-size: 1rem;
-        font-weight: 700;
-        margin: 0;
-        color: #ffffff !important;
-    }
-
-    .confirm-delete-modal .close {
-        color: #fff;
-        opacity: .9;
-        text-shadow: none;
-    }
-
-    .confirm-delete-modal .close:hover {
-        color: #fff;
-        opacity: 1;
-    }
-
-    .confirm-delete-modal .modal-body {
-        padding: 14px;
-    }
-
-    .confirm-delete-modal .modal-footer {
-        border-top: 1px solid #e8ebf0;
-    }
-
-
-
-    #main-container.compact-edit-layout .hospital-grid-row {
-        display: grid !important;
-        column-gap: 10px !important;
-        row-gap: 4px !important;
-        align-items: flex-end !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row > [class*="col-"] {
-        display: block !important;
-        width: auto !important;
-        max-width: none !important;
-        flex: none !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        margin-bottom: 1px !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row .form-control,
-    #main-container.compact-edit-layout .hospital-grid-row select.form-control {
-        min-height: 28px !important;
-        height: 28px !important;
-        padding: 2px 7px !important;
-        border-radius: 7px !important;
-        border: 1px solid #b8c4d6 !important;
-        background-color: #ffffff !important;
-        font-size: .68rem !important;
-        line-height: 1.1 !important;
-        font-weight: 500 !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 3px rgba(15, 23, 42, .16) !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row .form-control:hover,
-    #main-container.compact-edit-layout .hospital-grid-row select.form-control:hover {
-        border-color: #8796aa !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row .form-control:focus,
-    #main-container.compact-edit-layout .hospital-grid-row select.form-control:focus {
-        border-color: #3b82f6 !important;
-        box-shadow: 0 0 0 .14rem rgba(59, 130, 246, .16), 0 1px 3px rgba(15, 23, 42, .16) !important;
-        outline: none !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row label {
-        min-height: 0 !important;
-        margin-bottom: 2px !important;
-        font-size: .62rem !important;
-        line-height: 1.05 !important;
-        font-weight: 600 !important;
-        color: #3b2b4b !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row .inline-add-btn {
-        width: 28px !important;
-        min-width: 28px !important;
-        max-width: 28px !important;
-        height: 28px !important;
-        min-height: 28px !important;
-        padding: 0 !important;
-        border-radius: 7px !important;
-        align-self: end !important;
-        justify-self: end !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--identificacao {
-        grid-template-columns: minmax(170px, 1fr) minmax(0, 2.5fr) !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--endereco-main {
-        grid-template-columns: minmax(150px, 1fr) minmax(0, 4.2fr) !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--endereco-secondary {
-        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(120px, .9fr) minmax(120px, .9fr) !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--endereco-inline-main {
-        grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(0, 2.5fr) minmax(74px, .55fr) minmax(120px, 1fr) 30px !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--endereco-inline-secondary {
-        grid-template-columns: minmax(0, 1.35fr) minmax(110px, .8fr) minmax(0, 2fr) minmax(120px, .9fr) !important;
-        margin-top: 4px !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-inline-section-title {
-        margin-top: 14px !important;
-        margin-bottom: 6px !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--contato-base,
-    #main-container.compact-edit-layout .hospital-grid-row--telefone-base,
-    #main-container.compact-edit-layout .hospital-grid-row--dados-top {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--telefone-inline {
-        grid-template-columns: minmax(120px, 1fr) minmax(150px, 1.3fr) minmax(95px, .75fr) minmax(0, 1.5fr) minmax(120px, .9fr) 30px !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--contato-inline {
-        grid-template-columns: minmax(120px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(0, 1.35fr) minmax(140px, 1fr) minmax(120px, .85fr) 30px !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--ativo {
-        grid-template-columns: minmax(150px, 1fr) !important;
-        max-width: 520px;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--dados-bottom {
-        grid-template-columns: minmax(0, 1.6fr) minmax(120px, .8fr) minmax(120px, .8fr) !important;
-    }
-
-    #main-container.compact-edit-layout .hospital-grid-row--acomodacao-inline {
-        grid-template-columns: minmax(0, 1.7fr) minmax(150px, 1.2fr) minmax(150px, 1fr) 30px !important;
-    }
-
-    @media (max-width: 991.98px) {
-        #main-container.compact-edit-layout .hospital-grid-row {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        }
-    }
-
-    @media (max-width: 575.98px) {
-        #main-container.compact-edit-layout .hospital-grid-row {
-            grid-template-columns: 1fr !important;
-        }
-    }
-
-    #main-container.compact-edit-layout [hidden] {
-        display: none !important;
-    }
-</style>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_hospital_page.css?v=<?= filemtime(__DIR__ . '/../../css/form_hospital_page.css') ?>">
 
 <div class="internacao-page cadastro-layout compact-edit-layout" id="main-container">
     <div class="internacao-page__hero">
@@ -516,7 +304,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                             </tr>
                         </thead>
                         <tbody id="enderecosTableBody">
-                            <tr id="enderecosTableEmpty" style="display: <?= empty($enderecosHospital) ? '' : 'none' ?>;">
+                            <tr id="enderecosTableEmpty" <?= empty($enderecosHospital) ? '' : 'hidden' ?>>
                                 <td colspan="5" class="text-muted text-center">Nenhum endereço adicional.</td>
                             </tr>
                             <?php foreach ($enderecosHospital as $i => $end): ?>
@@ -537,7 +325,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                                     <td><?= htmlspecialchars($endCidVal . ($endUfVal ? '/' . $endUfVal : ''), ENT_QUOTES, 'UTF-8') ?></td>
                                     <td><?= $endPrincipalVal === 's' ? 'Sim' : 'Não' ?></td>
                                     <td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td>
-                                    <td style="display:none;">
+                                    <td hidden>
                                         <input type="hidden" name="end_tipo[]" value="<?= htmlspecialchars($endTipoVal, ENT_QUOTES, 'UTF-8') ?>">
                                         <input type="hidden" name="end_cep[]" value="<?= htmlspecialchars($endCepVal, ENT_QUOTES, 'UTF-8') ?>">
                                         <input type="hidden" name="end_logradouro[]" value="<?= htmlspecialchars($endLogVal, ENT_QUOTES, 'UTF-8') ?>">
@@ -638,7 +426,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                             </tr>
                         </thead>
                         <tbody id="telefonesTableBody">
-                            <tr id="telefonesTableEmpty" style="display: <?= empty($telefonesHospital) ? '' : 'none' ?>;">
+                            <tr id="telefonesTableEmpty" <?= empty($telefonesHospital) ? '' : 'hidden' ?>>
                                 <td colspan="6" class="text-muted text-center">Nenhum telefone adicional.</td>
                             </tr>
                             <?php foreach ($telefonesHospital as $tel): ?>
@@ -662,7 +450,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                                     <td><?= htmlspecialchars($telContatoVal ?: '-', ENT_QUOTES, 'UTF-8') ?></td>
                                     <td><?= $telPrincipalVal === 's' ? 'Sim' : 'Não' ?></td>
                                     <td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td>
-                                    <td style="display:none;">
+                                    <td hidden>
                                         <input type="hidden" name="tel_tipo[]" value="<?= htmlspecialchars($telTipoVal, ENT_QUOTES, 'UTF-8') ?>">
                                         <input type="hidden" name="tel_numero[]" value="<?= htmlspecialchars($telNumFmt, ENT_QUOTES, 'UTF-8') ?>">
                                         <input type="hidden" name="tel_ramal[]" value="<?= htmlspecialchars($telRamalVal, ENT_QUOTES, 'UTF-8') ?>">
@@ -724,7 +512,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                             </tr>
                         </thead>
                         <tbody id="contatosTableBody">
-                            <tr id="contatosTableEmpty" style="display: <?= empty($contatosHospital) ? '' : 'none' ?>;">
+                            <tr id="contatosTableEmpty" <?= empty($contatosHospital) ? '' : 'hidden' ?>>
                                 <td colspan="6" class="text-muted text-center">Nenhum contato adicional.</td>
                             </tr>
                             <?php foreach ($contatosHospital as $cont): ?>
@@ -749,7 +537,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                                     <td><?= htmlspecialchars($contTelFmt ?: '-', ENT_QUOTES, 'UTF-8') ?></td>
                                     <td><?= $contPrincipalVal === 's' ? 'Sim' : 'Não' ?></td>
                                     <td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td>
-                                    <td style="display:none;">
+                                    <td hidden>
                                         <input type="hidden" name="cont_nome[]" value="<?= htmlspecialchars($contNomeVal, ENT_QUOTES, 'UTF-8') ?>">
                                         <input type="hidden" name="cont_cargo[]" value="<?= htmlspecialchars($contCargoVal, ENT_QUOTES, 'UTF-8') ?>">
                                         <input type="hidden" name="cont_setor[]" value="<?= htmlspecialchars($contSetorVal, ENT_QUOTES, 'UTF-8') ?>">
@@ -897,7 +685,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </button>
                 </div>
             </div>
-        <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="display:none;">
+        <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" hidden>
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -921,7 +709,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
             function showConfirmDelete() {
                 const modalEl = document.getElementById("modalConfirmDelete");
                 if (!modalEl) return;
-                modalEl.style.display = "block";
+                modalEl.hidden = false;
                 modalEl.classList.add("show");
                 modalEl.removeAttribute("aria-hidden");
                 modalEl.setAttribute("aria-modal", "true");
@@ -940,7 +728,7 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 const modalEl = document.getElementById("modalConfirmDelete");
                 if (!modalEl) return;
                 modalEl.classList.remove("show");
-                modalEl.style.display = "none";
+                modalEl.hidden = true;
                 modalEl.setAttribute("aria-hidden", "true");
                 modalEl.removeAttribute("aria-modal");
                 document.body.classList.remove("modal-open");

@@ -43,54 +43,9 @@
         display: block !important;
     }
 
-    #main-container.internacao-page.cadastro-paciente-page .internacao-card {
-        background: transparent !important;
-        border: 0 !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .internacao-card__header {
-        padding: 8px 8px 2px !important;
-        border-bottom: 0 !important;
-    }
-
     #main-container.internacao-page.cadastro-paciente-page .internacao-card__title {
         font-size: .82rem !important;
         line-height: 1.1 !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .internacao-card__body {
-        padding: 4px 8px 10px !important;
-        gap: 5px !important;
-        background: transparent !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-step-card {
-        padding: 7px 8px 8px !important;
-        border-radius: 0 !important;
-        border: 0 !important;
-        border-top: 1px solid rgba(94, 35, 99, 0.12) !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-step-card::before {
-        display: none !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-step-card + .entity-step-card {
-        margin-top: 3px !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-step-header {
-        align-items: center !important;
-        margin-bottom: 7px !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-step-kicker {
-        margin-bottom: 1px !important;
-        font-size: .52rem !important;
     }
 
     #main-container.internacao-page.cadastro-paciente-page .entity-step-title {
@@ -100,56 +55,6 @@
 
     #main-container.internacao-page.cadastro-paciente-page .entity-step-desc {
         display: none !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-form .form-group,
-    #main-container.internacao-page.cadastro-paciente-page .entity-form [class*="col-md-"].form-group {
-        margin-bottom: 8px !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-form .form-group label {
-        margin-bottom: 3px !important;
-        font-size: .64rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #main-container.cadastro-paciente-page #multi-step-form .form-control {
-        min-height: 36px !important;
-        height: 36px !important;
-        border-radius: 9px;
-        font-size: .72rem !important;
-        padding-top: 4px !important;
-        padding-bottom: 4px !important;
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-    }
-
-    #main-container.cadastro-paciente-page #multi-step-form select.form-control {
-        height: 36px !important;
-        min-height: 36px !important;
-    }
-
-    #main-container.cadastro-paciente-page #multi-step-form textarea.form-control {
-        min-height: 58px !important;
-        height: auto !important;
-        border-radius: 9px;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-actions-bar {
-        margin-top: 8px !important;
-        padding: 12px 8px !important;
-        border: 0 !important;
-        border-top: 1px solid rgba(94, 35, 99, 0.12) !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    #main-container.internacao-page.cadastro-paciente-page .entity-actions-bar .btn {
-        min-height: 36px !important;
-        padding: 6px 14px !important;
-        border-radius: 10px !important;
-        font-size: .72rem !important;
     }
 
     #main-container.internacao-page.cadastro-paciente-page .entity-step-card--collapsible .entity-step-header {

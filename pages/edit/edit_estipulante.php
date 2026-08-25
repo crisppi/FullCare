@@ -97,220 +97,8 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
 }
 
 ?>
-<script src="css/ocultar.css"></script>
-<link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/form_cad_internacao.css?v=<?= @filemtime(__DIR__ . '/../../css/form_cad_internacao.css') ?>">
-<style>
-    #main-container.internacao-page {
-        margin: 2px 0 0 !important;
-        padding-inline: 2px !important;
-        padding-top: 0 !important;
-        width: auto !important;
-        max-width: 100% !important;
-        overflow-x: hidden;
-    }
-
-    #main-container.internacao-page .internacao-page__hero {
-        min-height: 58px !important;
-        margin: 0 0 5px !important;
-        padding: 14px 14px !important;
-        border-radius: 18px !important;
-    }
-
-    #main-container.internacao-page .internacao-page__hero h1 {
-        font-size: 1.2rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #main-container.internacao-page .hero-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-
-
-
-    #main-container.internacao-page .internacao-card__eyebrow {
-        font-weight: 700 !important;
-    }
-
-    #main-container.compact-edit-layout .estipulante-inline-section-title {
-        margin-top: 14px !important;
-        margin-bottom: 6px !important;
-    }
-
-    #main-container.estipulante-edit-layout [hidden] {
-        display: none !important;
-    }
-
-    #main-container.estipulante-edit-layout .entity-form .row:not([hidden]) {
-        display: grid !important;
-        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-        gap: 4px 10px !important;
-        align-items: flex-end !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-
-    #main-container.estipulante-edit-layout .entity-form .row > [class*="col-"] {
-        width: auto !important;
-        max-width: none !important;
-        min-width: 0 !important;
-        flex: none !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-
-    #main-container.estipulante-edit-layout .entity-form .row > .col-md-1 { grid-column: span 1 !important; }
-    #main-container.estipulante-edit-layout .entity-form .row > .col-md-2 { grid-column: span 2 !important; }
-    #main-container.estipulante-edit-layout .entity-form .row > .col-md-3 { grid-column: span 3 !important; }
-    #main-container.estipulante-edit-layout .entity-form .row > .col-md-4 { grid-column: span 4 !important; }
-    #main-container.estipulante-edit-layout .entity-form .row > .col-md-6 { grid-column: span 6 !important; }
-
-    @media (max-width: 575.98px) {
-        #main-container.estipulante-edit-layout .entity-form .row > .col-md-1,
-        #main-container.estipulante-edit-layout .entity-form .row > .col-md-2,
-        #main-container.estipulante-edit-layout .entity-form .row > .col-md-3,
-        #main-container.estipulante-edit-layout .entity-form .row > .col-md-4,
-        #main-container.estipulante-edit-layout .entity-form .row > .col-md-6 {
-            grid-column: span 6 !important;
-        }
-    }
-
-    #main-container.internacao-page .internacao-page__content {
-        display: block !important;
-    }
-
-    #main-container.internacao-page .internacao-page__tag,
-    #main-container.internacao-page .internacao-card__tag {
-        padding: 4px 8px !important;
-        font-size: .6rem !important;
-    }
-
-    #main-container.internacao-page .internacao-card {
-        background: transparent !important;
-        border: 0 !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-    }
-
-    #main-container.internacao-page .internacao-card__header {
-        padding: 8px 8px 2px !important;
-        border-bottom: 0 !important;
-    }
-
-    #main-container.internacao-page .internacao-card__title {
-        font-size: .9rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #main-container.internacao-page .internacao-card__body {
-        padding: 4px 8px 10px !important;
-        gap: 5px !important;
-        background: transparent !important;
-    }
-
-    #main-container.internacao-page .entity-step-card {
-        padding: 7px 8px 8px !important;
-        border-radius: 0 !important;
-        border: 0 !important;
-        border-top: 1px solid rgba(94, 35, 99, 0.12) !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    #main-container.internacao-page .entity-step-card::before {
-        display: none !important;
-    }
-
-    #main-container.internacao-page .entity-step-card + .entity-step-card {
-        margin-top: 3px !important;
-    }
-
-    #main-container.internacao-page .entity-step-header {
-        align-items: center !important;
-        margin-bottom: 7px !important;
-    }
-
-    #main-container.internacao-page .entity-step-kicker {
-        margin-bottom: 1px !important;
-        font-size: .52rem !important;
-    }
-
-    #main-container.internacao-page .entity-step-title {
-        font-size: .92rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #main-container.internacao-page .entity-step-desc {
-        display: none !important;
-    }
-
-    #main-container.internacao-page .entity-form .form-group,
-    #main-container.internacao-page .entity-form [class*="col-md-"].form-group {
-        margin-bottom: 8px !important;
-    }
-
-    #main-container.internacao-page .entity-form .form-group label {
-        margin-bottom: 3px !important;
-        font-size: .7rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #multi-step-form .form-control {
-        min-height: 40px !important;
-        height: 40px !important;
-        border-radius: 9px;
-        font-size: .78rem !important;
-        padding-top: 5px !important;
-        padding-bottom: 5px !important;
-    }
-
-    #multi-step-form select.form-control {
-        height: 40px !important;
-        min-height: 40px !important;
-    }
-
-    .confirm-delete-modal .modal-content {
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid #cfd4dc;
-    }
-
-    .confirm-delete-modal .modal-header {
-        background: #8b95a5;
-        color: #fff !important;
-        border-bottom: 0;
-        padding: 10px 14px;
-    }
-
-    .confirm-delete-modal .modal-title {
-        font-size: 1rem;
-        font-weight: 700;
-        margin: 0;
-        color: #ffffff !important;
-    }
-
-    .confirm-delete-modal .close {
-        color: #fff;
-        opacity: .9;
-        text-shadow: none;
-    }
-
-    .confirm-delete-modal .close:hover {
-        color: #fff;
-        opacity: 1;
-    }
-
-    .confirm-delete-modal .modal-body {
-        padding: 14px;
-    }
-
-    .confirm-delete-modal .modal-footer {
-        border-top: 1px solid #e8ebf0;
-    }
-
-</style>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_estipulante_page.css?v=<?= filemtime(__DIR__ . '/../../css/form_estipulante_page.css') ?>">
 
 <!-- Formulário de Edição -->
 <div id="main-container" class="internacao-page cadastro-layout compact-edit-layout estipulante-edit-layout">
@@ -421,10 +209,10 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                     <div class="form-group col-md-2 mb-2"><label for="end_complemento_inline">Complemento</label><input type="text" class="form-control" id="end_complemento_inline"></div>
                     <div class="form-group col-md-2 mb-2"><label for="end_principal_inline">Principal</label><select class="form-control" id="end_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
                 </div>
-                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Endereço</th><th>Cidade/UF</th><th>P</th><th>Ação</th></tr></thead><tbody id="enderecosTableBody"><tr id="enderecosTableEmpty" style="display: <?= empty($enderecosEstipulante) ? '' : 'none' ?>;"><td colspan="5" class="text-muted text-center">Nenhum endereço adicional.</td></tr>
+                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Endereço</th><th>Cidade/UF</th><th>P</th><th>Ação</th></tr></thead><tbody id="enderecosTableBody"><tr id="enderecosTableEmpty"<?= empty($enderecosEstipulante) ? '' : ' hidden' ?>><td colspan="5" class="text-muted text-center">Nenhum endereço adicional.</td></tr>
                     <?php foreach ($enderecosEstipulante as $end): ?>
                         <?php $p = ((int)($end['principal_endereco'] ?? 0) === 1) ? 's' : 'n'; ?>
-                        <tr><td><?= htmlspecialchars((string)($end['tipo_endereco'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($end['endereco_endereco'] ?? '') . (!empty($end['numero_endereco']) ? ', ' . $end['numero_endereco'] : ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($end['cidade_endereco'] ?? '-') . (!empty($end['estado_endereco']) ? '/' . $end['estado_endereco'] : ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= $p === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td style="display:none;"><input type="hidden" name="end_tipo[]" value="<?= htmlspecialchars((string)($end['tipo_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_cep[]" value="<?= htmlspecialchars((string)($end['cep_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_logradouro[]" value="<?= htmlspecialchars((string)($end['endereco_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_numero[]" value="<?= htmlspecialchars((string)($end['numero_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_bairro[]" value="<?= htmlspecialchars((string)($end['bairro_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_cidade[]" value="<?= htmlspecialchars((string)($end['cidade_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_estado[]" value="<?= htmlspecialchars((string)($end['estado_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_complemento[]" value="<?= htmlspecialchars((string)($end['complemento_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_principal[]" value="<?= $p ?>"></td></tr>
+                        <tr><td><?= htmlspecialchars((string)($end['tipo_endereco'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($end['endereco_endereco'] ?? '') . (!empty($end['numero_endereco']) ? ', ' . $end['numero_endereco'] : ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($end['cidade_endereco'] ?? '-') . (!empty($end['estado_endereco']) ? '/' . $end['estado_endereco'] : ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= $p === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td hidden><input type="hidden" name="end_tipo[]" value="<?= htmlspecialchars((string)($end['tipo_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_cep[]" value="<?= htmlspecialchars((string)($end['cep_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_logradouro[]" value="<?= htmlspecialchars((string)($end['endereco_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_numero[]" value="<?= htmlspecialchars((string)($end['numero_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_bairro[]" value="<?= htmlspecialchars((string)($end['bairro_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_cidade[]" value="<?= htmlspecialchars((string)($end['cidade_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_estado[]" value="<?= htmlspecialchars((string)($end['estado_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_complemento[]" value="<?= htmlspecialchars((string)($end['complemento_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_principal[]" value="<?= $p ?>"></td></tr>
                     <?php endforeach; ?>
                 </tbody></table></div>
                 <div id="enderecosHiddenContainer"></div>
@@ -478,10 +266,10 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                     <div class="form-group col-md-1 mb-2"><label for="tel_principal_inline">Principal</label><select class="form-control" id="tel_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
                     <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddTelefoneInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar telefone">+</button></div>
                 </div>
-                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Número</th><th>Ramal</th><th>Contato</th><th>P</th><th>Ação</th></tr></thead><tbody id="telefonesTableBody"><tr id="telefonesTableEmpty" style="display: <?= empty($telefonesEstipulante) ? '' : 'none' ?>;"><td colspan="6" class="text-muted text-center">Nenhum telefone adicional.</td></tr>
+                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Número</th><th>Ramal</th><th>Contato</th><th>P</th><th>Ação</th></tr></thead><tbody id="telefonesTableBody"><tr id="telefonesTableEmpty"<?= empty($telefonesEstipulante) ? '' : ' hidden' ?>><td colspan="6" class="text-muted text-center">Nenhum telefone adicional.</td></tr>
                     <?php foreach ($telefonesEstipulante as $tel): ?>
                         <?php $tp = ((int)($tel['principal_telefone'] ?? 0) === 1) ? 's' : 'n'; $nd = preg_replace('/\D+/', '', (string)($tel['numero_telefone'] ?? '')); $nf = $nd; if (strlen($nd)===11) { $nf = '(' . substr($nd,0,2) . ') ' . substr($nd,2,5) . '-' . substr($nd,7,4);} elseif (strlen($nd)===10) { $nf = '(' . substr($nd,0,2) . ') ' . substr($nd,2,4) . '-' . substr($nd,6,4);} ?>
-                        <tr><td><?= htmlspecialchars((string)($tel['tipo_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars($nf ?: '-', ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($tel['ramal_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($tel['contato_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= $tp === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td style="display:none;"><input type="hidden" name="tel_tipo[]" value="<?= htmlspecialchars((string)($tel['tipo_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_numero[]" value="<?= htmlspecialchars($nf, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_ramal[]" value="<?= htmlspecialchars((string)($tel['ramal_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_contato[]" value="<?= htmlspecialchars((string)($tel['contato_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_principal[]" value="<?= $tp ?>"></td></tr>
+                        <tr><td><?= htmlspecialchars((string)($tel['tipo_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars($nf ?: '-', ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($tel['ramal_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($tel['contato_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= $tp === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td hidden><input type="hidden" name="tel_tipo[]" value="<?= htmlspecialchars((string)($tel['tipo_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_numero[]" value="<?= htmlspecialchars($nf, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_ramal[]" value="<?= htmlspecialchars((string)($tel['ramal_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_contato[]" value="<?= htmlspecialchars((string)($tel['contato_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_principal[]" value="<?= $tp ?>"></td></tr>
                     <?php endforeach; ?>
                 </tbody></table></div>
                 <div id="telefonesHiddenContainer"></div>
@@ -510,10 +298,10 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                     <div class="form-group col-md-1 mb-2"><label for="cont_principal_inline">Principal</label><select class="form-control" id="cont_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
                     <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddContatoInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar contato">+</button></div>
                 </div>
-                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Nome</th><th>Cargo/Setor</th><th>Email</th><th>Telefone</th><th>P</th><th>Ação</th></tr></thead><tbody id="contatosTableBody"><tr id="contatosTableEmpty" style="display: <?= empty($contatosEstipulante) ? '' : 'none' ?>;"><td colspan="6" class="text-muted text-center">Nenhum contato adicional.</td></tr>
+                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Nome</th><th>Cargo/Setor</th><th>Email</th><th>Telefone</th><th>P</th><th>Ação</th></tr></thead><tbody id="contatosTableBody"><tr id="contatosTableEmpty"<?= empty($contatosEstipulante) ? '' : ' hidden' ?>><td colspan="6" class="text-muted text-center">Nenhum contato adicional.</td></tr>
                     <?php foreach ($contatosEstipulante as $ct): ?>
                         <?php $cp = ((int)($ct['principal_contato'] ?? 0) === 1) ? 's' : 'n'; $nd = preg_replace('/\D+/', '', (string)($ct['telefone_contato'] ?? '')); $nf = $nd; if (strlen($nd)===11) { $nf = '(' . substr($nd,0,2) . ') ' . substr($nd,2,5) . '-' . substr($nd,7,4);} elseif (strlen($nd)===10) { $nf = '(' . substr($nd,0,2) . ') ' . substr($nd,2,4) . '-' . substr($nd,6,4);} ?>
-                        <tr><td><?= htmlspecialchars((string)($ct['nome_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars(((string)($ct['cargo_contato'] ?? '-')) . (!empty($ct['setor_contato']) ? ' / ' . $ct['setor_contato'] : ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($ct['email_contato'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars($nf ?: '-', ENT_QUOTES, 'UTF-8') ?></td><td><?= $cp === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td style="display:none;"><input type="hidden" name="cont_nome[]" value="<?= htmlspecialchars((string)($ct['nome_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_cargo[]" value="<?= htmlspecialchars((string)($ct['cargo_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_setor[]" value="<?= htmlspecialchars((string)($ct['setor_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_email[]" value="<?= htmlspecialchars((string)($ct['email_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_telefone[]" value="<?= htmlspecialchars($nf, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_principal[]" value="<?= $cp ?>"></td></tr>
+                        <tr><td><?= htmlspecialchars((string)($ct['nome_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars(((string)($ct['cargo_contato'] ?? '-')) . (!empty($ct['setor_contato']) ? ' / ' . $ct['setor_contato'] : ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($ct['email_contato'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars($nf ?: '-', ENT_QUOTES, 'UTF-8') ?></td><td><?= $cp === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td hidden><input type="hidden" name="cont_nome[]" value="<?= htmlspecialchars((string)($ct['nome_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_cargo[]" value="<?= htmlspecialchars((string)($ct['cargo_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_setor[]" value="<?= htmlspecialchars((string)($ct['setor_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_email[]" value="<?= htmlspecialchars((string)($ct['email_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_telefone[]" value="<?= htmlspecialchars($nf, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_principal[]" value="<?= $cp ?>"></td></tr>
                     <?php endforeach; ?>
                 </tbody></table></div>
                 <div id="contatosHiddenContainer"></div>
@@ -523,7 +311,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                     <label for="logo_est">Logo</label>
                     <input type="file" class="form-control" name="logo_est" id="logo_est"
                         accept="image/png, image/jpeg">
-                    <div class="notif-input oculto" id="notifImagem">Tamanho do arquivo inválido!</div>
+                    <div class="notif-input" id="notifImagem" hidden>Tamanho do arquivo inválido!</div>
                 </div>
             </div>
         </div>
@@ -537,7 +325,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
                 </button>
                 </div>
             </div>
-        <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="display:none;">
+        <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" hidden>
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -561,7 +349,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
         function showConfirmDelete() {
             const modalEl = document.getElementById("modalConfirmDelete");
             if (!modalEl) return;
-            modalEl.style.display = "block";
+            modalEl.hidden = false;
             modalEl.classList.add("show");
             modalEl.removeAttribute("aria-hidden");
             modalEl.setAttribute("aria-modal", "true");
@@ -580,7 +368,7 @@ if (empty($enderecosEstipulante) && !empty($estipulante->endereco_est)) {
             const modalEl = document.getElementById("modalConfirmDelete");
             if (!modalEl) return;
             modalEl.classList.remove("show");
-            modalEl.style.display = "none";
+            modalEl.hidden = true;
             modalEl.setAttribute("aria-hidden", "true");
             modalEl.removeAttribute("aria-modal");
             document.body.classList.remove("modal-open");
@@ -713,7 +501,7 @@ if (imagem) {
         if (!imagem.files || !imagem.files[0]) return;
         if (imagem.files[0].size > (1024 * 1024 * 2)) {
             var notifImagem = document.querySelector("#notifImagem");
-            if (notifImagem) notifImagem.style.display = "block";
+            if (notifImagem) notifImagem.hidden = false;
             imagem.value = '';
         }
     })
@@ -721,7 +509,7 @@ if (imagem) {
 
 function novoArquivo() {
     var notifImagem = document.querySelector("#notifImagem");
-    if (notifImagem) notifImagem.style.display = "none";
+    if (notifImagem) notifImagem.hidden = true;
 }
 
 (function () {
