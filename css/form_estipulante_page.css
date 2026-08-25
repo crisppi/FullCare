@@ -175,7 +175,7 @@
     }
 
     #main-container.internacao-page.cadastro-estipulante-page .entity-step-card--collapsible .entity-step-header:hover {
-        background: rgba(94, 35, 99, .06);
+        background: rgba(47, 137, 189, .10);
     }
 
     #main-container.internacao-page.cadastro-estipulante-page .entity-step-kicker {
@@ -444,4 +444,3 @@
 #main-container.estipulante-edit-layout .confirm-delete-modal.show:not([hidden]) {
     display: block;
 }
-

@@ -1214,7 +1214,7 @@ if (!empty($sessionIdUsuario)) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
 <script src="diversos/chartjs/Chart.min.js"></script>
 <script src="./scripts/cadastro/general.js"></script>
-<script src="<?= $BASE_URL ?>js/stepper.js?v=<?= rawurlencode(defined('APP_VERSION') ? APP_VERSION : '1') ?>"></script>
+<script src="<?= $BASE_URL ?>js/stepper.js?v=<?= @filemtime(__DIR__ . '/../js/stepper.js') ?>"></script>
 <script src="js/show_internacao_visitas.js"></script>
 <script src="<?= $BASE_URL ?>js/contextual-assistant.js"></script>
 <script>

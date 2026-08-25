@@ -108,7 +108,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     <div class="invalid-feedback">
                         Por favor, insira um CPF válido.
                     </div>
-                    <div class="invalid-feedback" id="validar_cpf" style="display: none;">
+                    <div class="invalid-feedback" id="validar_cpf" hidden>
                         CPF já cadastrado.
                     </div>
                 </div>
@@ -137,12 +137,12 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 </div>
             </div>
             <div class="row">
-                <!-- <div class="invalid-feedback" id="validar_matricula_rn" style="display: none;">
+                <!-- <div class="invalid-feedback" id="validar_matricula_rn" hidden>
                     Matrícula já cadastrada para RN.
                 </div> -->
 
                 <!-- Número RN -->
-                <div class="form-group col-md-2 mb-3" id="numero_recem_nascido_group" style="display:none;">
+                <div class="form-group col-md-2 mb-3" id="numero_recem_nascido_group" hidden>
                     <label for="numero_recem_nascido_pac">Número RN</label>
                     <input type="text" class="form-control" id="numero_recem_nascido_pac"
                         onkeyup="validarMatriculaExistente()" name="numero_recem_nascido_pac" placeholder="Ex: 1, 2..."
@@ -151,7 +151,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 </div>
 
                 <!-- Select: Mãe Titular -->
-                <div class="form-group col-md-2 mb-3" id="mae_titular_group" style="display: none;">
+                <div class="form-group col-md-2 mb-3" id="mae_titular_group" hidden>
                     <label for="mae_titular_pac">Mãe Titular?</label>
                     <select class="form-control" id="mae_titular_pac" name="mae_titular_pac"
                         onchange="handleMaeTitularChange()">
@@ -164,7 +164,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
 
 
                 <!-- Input: Matrícula da Titular -->
-                <div class="form-group col-md-4 mb-3" id="matricula_titular_group" style="display: none;">
+                <div class="form-group col-md-4 mb-3" id="matricula_titular_group" hidden>
                     <label for="matricula_titular_pac">Matrícula do Titular</label>
                     <input type="text" class="form-control" id="matricula_titular_pac" name="matricula_titular_pac">
                 </div>
@@ -177,7 +177,7 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     <div class="invalid-feedback">
                         Por favor, insira a matrícula.
                     </div>
-                    <div class="invalid-feedback" id="validar_matricula" style="display: none;">
+                    <div class="invalid-feedback" id="validar_matricula" hidden>
                         Matrícula já cadastrada.
                     </div>
 
@@ -512,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const empty = document.getElementById(emptyId);
             if (!body || !empty) return;
             const rows = Array.from(body.querySelectorAll('tr')).filter(row => row.id !== emptyId);
-            empty.style.display = rows.length ? 'none' : '';
+            empty.hidden = rows.length > 0;
         }
 
         function bindInline(config) {
@@ -537,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                empty.style.display = 'none';
+                empty.hidden = true;
                 const row = document.createElement('tr');
                 row.innerHTML = config.row(item);
 

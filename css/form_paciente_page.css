@@ -65,7 +65,7 @@
     }
 
     #main-container.internacao-page.cadastro-paciente-page .entity-step-card--collapsible .entity-step-header:hover {
-        background: rgba(94, 35, 99, .06);
+        background: rgba(47, 137, 189, .10);
     }
 
 
@@ -338,6 +338,10 @@
         border-top: 1px solid #e8ebf0;
     }
 
+    #main-container.compact-edit-layout .confirm-delete-modal.show:not([hidden]) {
+        display: block;
+    }
+
     #main-container.internacao-page.compact-edit-layout .entity-step-card--collapsible .entity-step-header {
         cursor: pointer;
         border-radius: 10px;
@@ -346,7 +350,7 @@
     }
 
     #main-container.internacao-page.compact-edit-layout .entity-step-card--collapsible .entity-step-header:hover {
-        background: rgba(94, 35, 99, .06);
+        background: rgba(47, 137, 189, .10);
     }
 
 

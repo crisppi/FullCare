@@ -208,16 +208,14 @@ if (empty($telefonesPaciente)) {
                 // mostrar o campo somente quando for RN
                 $showNumeroRN = $isRN;
                 ?>
-                <div class="form-group col-md-2 mb-3" id="numero_recem_nascido_group"
-                    style="display: <?= $showNumeroRN ? 'block' : 'none' ?>;">
+                <div class="form-group col-md-2 mb-3" id="numero_recem_nascido_group"<?= $showNumeroRN ? '' : ' hidden' ?>>
                     <label for="numero_recem_nascido_pac">Número RN</label>
                     <input type="number" class="form-control" id="numero_recem_nascido_pac"
                         onkeyup="validarMatriculaExistente()" name="numero_recem_nascido_pac"
                         value="<?= htmlspecialchars($numeroRN) ?>" <?= $showNumeroRN ? '' : 'disabled' ?>
                         <?= $showNumeroRN ? 'required' : '' ?> min="0" step="1" placeholder="Ex: 1, 2...">
                 </div>
-                <div class="form-group col-md-4 mb-3" id="mae_titular_group"
-                    style="display: <?= $isRN ? 'block' : 'none' ?>;">
+                <div class="form-group col-md-4 mb-3" id="mae_titular_group"<?= $isRN ? '' : ' hidden' ?>>
                     <label for="mae_titular_pac">Mãe Titular?</label>
                     <select class="form-control" id="mae_titular_pac" name="mae_titular_pac"
                         onchange="handleMaeTitularChange()">
@@ -232,8 +230,7 @@ if (empty($telefonesPaciente)) {
                 $showMatTit = $isRN && ($maeTit === 'n');
                 $matTitVal = $paciente['0']['matricula_titular_pac'] ?? '';
                 ?>
-                <div class="form-group col-md-2 mb-3" id="matricula_titular_group"
-                    style="display: <?= $showMatTit ? 'block' : 'none' ?>;">
+                <div class="form-group col-md-2 mb-3" id="matricula_titular_group"<?= $showMatTit ? '' : ' hidden' ?>>
                     <label for="matricula_titular_pac">Matrícula da Titular</label>
                     <input type="text" class="form-control" id="matricula_titular_pac" name="matricula_titular_pac"
                         value="<?= htmlspecialchars($matTitVal) ?>" <?= $showMatTit ? '' : 'disabled' ?> <?= $showMatTit ? '' : '' ?>>
@@ -248,7 +245,7 @@ if (empty($telefonesPaciente)) {
                     <div class="invalid-feedback">
                         Por favor, insira a matrícula.
                     </div>
-                    <div class="invalid-feedback" id="validar_matricula" style="display: none;">
+                    <div class="invalid-feedback" id="validar_matricula" hidden>
                         Matrícula já cadastrada.
                     </div>
                 </div>
@@ -393,10 +390,10 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-2 mb-2"><label for="end_estado_inline">UF</label><input type="text" class="form-control" id="end_estado_inline"></div>
                     <div class="form-group col-md-4 mb-2"><label for="end_complemento_inline">Complemento</label><input type="text" class="form-control" id="end_complemento_inline"></div>
                 </div>
-                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Endereço</th><th>Cidade/UF</th><th>P</th><th>Ação</th></tr></thead><tbody id="enderecosTableBody"><tr id="enderecosTableEmpty" style="display: <?= empty($enderecosPaciente) ? '' : 'none' ?>;"><td colspan="5" class="text-muted text-center">Nenhum endereço adicional.</td></tr>
+                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Endereço</th><th>Cidade/UF</th><th>P</th><th>Ação</th></tr></thead><tbody id="enderecosTableBody"><tr id="enderecosTableEmpty"<?= empty($enderecosPaciente) ? '' : ' hidden' ?>><td colspan="5" class="text-muted text-center">Nenhum endereço adicional.</td></tr>
                     <?php foreach ($enderecosPaciente as $end): ?>
                         <?php $ep = ((int)($end['principal_endereco'] ?? 0) === 1) ? 's' : 'n'; ?>
-                        <tr><td><?= htmlspecialchars((string)($end['tipo_endereco'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($end['endereco_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?><?= !empty($end['numero_endereco']) ? ', ' . htmlspecialchars((string)$end['numero_endereco'], ENT_QUOTES, 'UTF-8') : '' ?></td><td><?= htmlspecialchars((string)($end['cidade_endereco'] ?? '-'), ENT_QUOTES, 'UTF-8') ?><?= !empty($end['estado_endereco']) ? '/' . htmlspecialchars((string)$end['estado_endereco'], ENT_QUOTES, 'UTF-8') : '' ?></td><td><?= $ep === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td style="display:none;"><input type="hidden" name="end_tipo[]" value="<?= htmlspecialchars((string)($end['tipo_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_cep[]" value="<?= htmlspecialchars((string)($end['cep_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_logradouro[]" value="<?= htmlspecialchars((string)($end['endereco_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_numero[]" value="<?= htmlspecialchars((string)($end['numero_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_bairro[]" value="<?= htmlspecialchars((string)($end['bairro_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_cidade[]" value="<?= htmlspecialchars((string)($end['cidade_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_estado[]" value="<?= htmlspecialchars((string)($end['estado_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_complemento[]" value="<?= htmlspecialchars((string)($end['complemento_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_principal[]" value="<?= $ep ?>"></td></tr>
+                        <tr><td><?= htmlspecialchars((string)($end['tipo_endereco'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($end['endereco_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?><?= !empty($end['numero_endereco']) ? ', ' . htmlspecialchars((string)$end['numero_endereco'], ENT_QUOTES, 'UTF-8') : '' ?></td><td><?= htmlspecialchars((string)($end['cidade_endereco'] ?? '-'), ENT_QUOTES, 'UTF-8') ?><?= !empty($end['estado_endereco']) ? '/' . htmlspecialchars((string)$end['estado_endereco'], ENT_QUOTES, 'UTF-8') : '' ?></td><td><?= $ep === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td hidden><input type="hidden" name="end_tipo[]" value="<?= htmlspecialchars((string)($end['tipo_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_cep[]" value="<?= htmlspecialchars((string)($end['cep_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_logradouro[]" value="<?= htmlspecialchars((string)($end['endereco_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_numero[]" value="<?= htmlspecialchars((string)($end['numero_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_bairro[]" value="<?= htmlspecialchars((string)($end['bairro_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_cidade[]" value="<?= htmlspecialchars((string)($end['cidade_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_estado[]" value="<?= htmlspecialchars((string)($end['estado_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_complemento[]" value="<?= htmlspecialchars((string)($end['complemento_endereco'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="end_principal[]" value="<?= $ep ?>"></td></tr>
                     <?php endforeach; ?>
                 </tbody></table></div>
                 <div id="enderecosHiddenContainer"></div>
@@ -437,10 +434,10 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-2 mb-2"><label for="email_principal_inline">Principal</label><select class="form-control" id="email_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
                     <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddEmailInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar email">+</button></div>
                 </div>
-                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Email</th><th>P</th><th>Ação</th></tr></thead><tbody id="emailsTableBody"><tr id="emailsTableEmpty" style="display: <?= empty($emailsPaciente) ? '' : 'none' ?>;"><td colspan="4" class="text-muted text-center">Nenhum email adicional.</td></tr>
+                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Email</th><th>P</th><th>Ação</th></tr></thead><tbody id="emailsTableBody"><tr id="emailsTableEmpty"<?= empty($emailsPaciente) ? '' : ' hidden' ?>><td colspan="4" class="text-muted text-center">Nenhum email adicional.</td></tr>
                     <?php foreach ($emailsPaciente as $emailItem): ?>
                         <?php $emP = ((int)($emailItem['principal_email'] ?? 0) === 1) ? 's' : 'n'; ?>
-                        <tr><td><?= htmlspecialchars((string)($emailItem['tipo_email'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($emailItem['email_email'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= $emP === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td style="display:none;"><input type="hidden" name="email_tipo[]" value="<?= htmlspecialchars((string)($emailItem['tipo_email'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="email_email[]" value="<?= htmlspecialchars((string)($emailItem['email_email'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="email_principal[]" value="<?= $emP ?>"></td></tr>
+                        <tr><td><?= htmlspecialchars((string)($emailItem['tipo_email'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($emailItem['email_email'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= $emP === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td hidden><input type="hidden" name="email_tipo[]" value="<?= htmlspecialchars((string)($emailItem['tipo_email'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="email_email[]" value="<?= htmlspecialchars((string)($emailItem['email_email'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="email_principal[]" value="<?= $emP ?>"></td></tr>
                     <?php endforeach; ?>
                 </tbody></table></div>
                 <div id="emailsHiddenContainer"></div>
@@ -471,10 +468,10 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-1 mb-2"><label for="tel_principal_inline">Principal</label><select class="form-control" id="tel_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
                     <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddTelefoneInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar telefone">+</button></div>
                 </div>
-                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Número</th><th>Ramal</th><th>Contato</th><th>P</th><th>Ação</th></tr></thead><tbody id="telefonesTableBody"><tr id="telefonesTableEmpty" style="display: <?= empty($telefonesPaciente) ? '' : 'none' ?>;"><td colspan="6" class="text-muted text-center">Nenhum telefone adicional.</td></tr>
+                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Tipo</th><th>Número</th><th>Ramal</th><th>Contato</th><th>P</th><th>Ação</th></tr></thead><tbody id="telefonesTableBody"><tr id="telefonesTableEmpty"<?= empty($telefonesPaciente) ? '' : ' hidden' ?>><td colspan="6" class="text-muted text-center">Nenhum telefone adicional.</td></tr>
                     <?php foreach ($telefonesPaciente as $tel): ?>
                         <?php $tp = ((int)($tel['principal_telefone'] ?? 0) === 1) ? 's' : 'n'; $tf = formatPhone((string)($tel['numero_telefone'] ?? '')); ?>
-                        <tr><td><?= htmlspecialchars((string)($tel['tipo_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars($tf ?: '-', ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($tel['ramal_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($tel['contato_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= $tp === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td style="display:none;"><input type="hidden" name="tel_tipo[]" value="<?= htmlspecialchars((string)($tel['tipo_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_numero[]" value="<?= htmlspecialchars($tf, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_ramal[]" value="<?= htmlspecialchars((string)($tel['ramal_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_contato[]" value="<?= htmlspecialchars((string)($tel['contato_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_principal[]" value="<?= $tp ?>"></td></tr>
+                        <tr><td><?= htmlspecialchars((string)($tel['tipo_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars($tf ?: '-', ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($tel['ramal_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($tel['contato_telefone'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= $tp === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td hidden><input type="hidden" name="tel_tipo[]" value="<?= htmlspecialchars((string)($tel['tipo_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_numero[]" value="<?= htmlspecialchars($tf, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_ramal[]" value="<?= htmlspecialchars((string)($tel['ramal_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_contato[]" value="<?= htmlspecialchars((string)($tel['contato_telefone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="tel_principal[]" value="<?= $tp ?>"></td></tr>
                     <?php endforeach; ?>
                 </tbody></table></div>
                 <div id="telefonesHiddenContainer"></div>
@@ -490,10 +487,10 @@ if (empty($telefonesPaciente)) {
                     <div class="form-group col-md-1 mb-2"><label for="cont_principal_inline">Principal</label><select class="form-control" id="cont_principal_inline"><option value="n">Não</option><option value="s">Sim</option></select></div>
                     <div class="form-group col-md-1 mb-2 d-flex align-items-end"><button type="button" id="btnAddContatoInline" class="btn btn-primary inline-add-btn" aria-label="Adicionar contato">+</button></div>
                 </div>
-                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Nome</th><th>Parentesco</th><th>Email</th><th>Telefone</th><th>P</th><th>Ação</th></tr></thead><tbody id="contatosTableBody"><tr id="contatosTableEmpty" style="display: <?= empty($contatosPaciente) ? '' : 'none' ?>;"><td colspan="6" class="text-muted text-center">Nenhum contato adicional.</td></tr>
+                <div class="table-responsive mt-2"><table class="table table-sm table-striped mb-0"><thead><tr><th>Nome</th><th>Parentesco</th><th>Email</th><th>Telefone</th><th>P</th><th>Ação</th></tr></thead><tbody id="contatosTableBody"><tr id="contatosTableEmpty"<?= empty($contatosPaciente) ? '' : ' hidden' ?>><td colspan="6" class="text-muted text-center">Nenhum contato adicional.</td></tr>
                     <?php foreach ($contatosPaciente as $ct): ?>
                         <?php $cp = ((int)($ct['principal_contato'] ?? 0) === 1) ? 's' : 'n'; $ctTel = formatPhone((string)($ct['telefone_contato'] ?? '')); ?>
-                        <tr><td><?= htmlspecialchars((string)($ct['nome_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($ct['parentesco_contato'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($ct['email_contato'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars($ctTel ?: '-', ENT_QUOTES, 'UTF-8') ?></td><td><?= $cp === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td style="display:none;"><input type="hidden" name="cont_nome[]" value="<?= htmlspecialchars((string)($ct['nome_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_parentesco[]" value="<?= htmlspecialchars((string)($ct['parentesco_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_email[]" value="<?= htmlspecialchars((string)($ct['email_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_telefone[]" value="<?= htmlspecialchars($ctTel, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_observacao[]" value="<?= htmlspecialchars((string)($ct['observacao_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_principal[]" value="<?= $cp ?>"></td></tr>
+                        <tr><td><?= htmlspecialchars((string)($ct['nome_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($ct['parentesco_contato'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars((string)($ct['email_contato'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></td><td><?= htmlspecialchars($ctTel ?: '-', ENT_QUOTES, 'UTF-8') ?></td><td><?= $cp === 's' ? 'Sim' : 'Não' ?></td><td><button type="button" class="btn btn-sm btn-outline-danger btn-remove-inline">Remover</button></td><td hidden><input type="hidden" name="cont_nome[]" value="<?= htmlspecialchars((string)($ct['nome_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_parentesco[]" value="<?= htmlspecialchars((string)($ct['parentesco_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_email[]" value="<?= htmlspecialchars((string)($ct['email_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_telefone[]" value="<?= htmlspecialchars($ctTel, ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_observacao[]" value="<?= htmlspecialchars((string)($ct['observacao_contato'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><input type="hidden" name="cont_principal[]" value="<?= $cp ?>"></td></tr>
                     <?php endforeach; ?>
                 </tbody></table></div>
                 <div id="contatosHiddenContainer"></div>
@@ -518,7 +515,7 @@ if (empty($telefonesPaciente)) {
                 </div>
             </div>
 
-        <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" style="display:none;">
+        <div class="modal fade confirm-delete-modal" id="modalConfirmDelete" tabindex="-1" aria-hidden="true" hidden>
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -542,7 +539,7 @@ if (empty($telefonesPaciente)) {
         function showConfirmDelete() {
             const modalEl = document.getElementById("modalConfirmDelete");
             if (!modalEl) return;
-            modalEl.style.display = "block";
+            modalEl.hidden = false;
             modalEl.classList.add("show");
             modalEl.removeAttribute("aria-hidden");
             modalEl.setAttribute("aria-modal", "true");
@@ -561,7 +558,7 @@ if (empty($telefonesPaciente)) {
                 const modalEl = document.getElementById("modalConfirmDelete");
                 if (!modalEl) return;
                 modalEl.classList.remove("show");
-                modalEl.style.display = "none";
+                modalEl.hidden = true;
                 modalEl.setAttribute("aria-hidden", "true");
                 modalEl.removeAttribute("aria-modal");
                 document.body.classList.remove("modal-open");
@@ -701,7 +698,7 @@ if (empty($telefonesPaciente)) {
             const empty = document.getElementById(emptyId);
             if (!body || !empty) return;
             const rows = Array.from(body.querySelectorAll('tr')).filter(row => row.id !== emptyId);
-            empty.style.display = rows.length ? 'none' : '';
+            empty.hidden = rows.length > 0;
         }
         function bindExistingRemovers(bodyId, emptyId) {
             const body = document.getElementById(bodyId);
@@ -735,7 +732,7 @@ if (empty($telefonesPaciente)) {
                     }
                     return;
                 }
-                empty.style.display = 'none';
+                empty.hidden = true;
                 const tr = document.createElement('tr');
                 tr.innerHTML = cfg.row(item);
                 const holder = document.createElement('div');

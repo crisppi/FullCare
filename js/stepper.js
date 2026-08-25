@@ -115,10 +115,10 @@ function validarCpfExistente(i, t) {
             data: formData, // Dados a serem enviados
             success: function (response) {
                 if (response == 0) {
-                    document.getElementById("validar_cpf").style.display = 'none'
+                    document.getElementById("validar_cpf").hidden = true
                     document.getElementById("step-1").disabled = false
                 } else {
-                    document.getElementById("validar_cpf").style.display = 'block'
+                    document.getElementById("validar_cpf").hidden = false
                     document.getElementById("step-1").disabled = true
                 }
 
@@ -150,7 +150,7 @@ function validarMatriculaExistente() {
     formData.append('matricula', v);
 
     if (v.length === 0) {
-        if (feedbackMatricula) feedbackMatricula.style.display = 'none';
+        if (feedbackMatricula) feedbackMatricula.hidden = true;
         if (botaoFinalizar) botaoFinalizar.disabled = false;
         return;
     }
@@ -170,15 +170,15 @@ function validarMatriculaExistente() {
                 var existe = !!(response && response.exists);
 
                 if (!existe) {
-                    if (feedbackMatricula) feedbackMatricula.style.display = 'none';
+                    if (feedbackMatricula) feedbackMatricula.hidden = true;
                     if (botaoFinalizar) botaoFinalizar.disabled = false;
                 } else {
-                    if (feedbackMatricula) feedbackMatricula.style.display = 'block';
+                    if (feedbackMatricula) feedbackMatricula.hidden = false;
                     if (botaoFinalizar) botaoFinalizar.disabled = true;
                 }
             },
             error: function () {
-                if (feedbackMatricula) feedbackMatricula.style.display = 'none';
+                if (feedbackMatricula) feedbackMatricula.hidden = true;
                 if (botaoFinalizar) botaoFinalizar.disabled = false;
             }
         });
@@ -201,8 +201,8 @@ function enableAndRequire(input, { required = false } = {}) {
     input.required = !!required;
 }
 
-function show(el) { if (el) el.style.display = 'block'; }
-function hide(el) { if (el) el.style.display = 'none'; }
+function show(el) { if (el) el.hidden = false; }
+function hide(el) { if (el) el.hidden = true; }
 
 function handleRecemNascidoChange() {
     const recem = document.getElementById('recem_nascido_pac');
@@ -501,12 +501,12 @@ function handleMaeTitularChange() {
     if (recem.value !== 's') return;
     if (maeTitularSelect.value === 'n') {
         // Mãe NÃO é titular -> pedir matrícula da titular
-        matriculaTitularGroup.style.display = 'block';
+        matriculaTitularGroup.hidden = false;
         matriculaInput.disabled = false;
         matriculaInput.required = true;
     } else {
         // Mãe é titular (ou não selecionado) -> esconder e limpar matrícula
-        matriculaTitularGroup.style.display = 'none';
+        matriculaTitularGroup.hidden = true;
         matriculaInput.value = '';
         matriculaInput.required = false;
         matriculaInput.disabled = true;
