@@ -543,9 +543,9 @@ $acessosRows = array_slice($acessosRows, 0, 30);
 </style>
 
 <div class="container-fluid form_container operational-report-page logs-report-page" style="margin-top:15px;">
-    <div class="fc-module-header fc-module-header--gestao">
+    <div class="fc-module-header fc-module-header--inteligencia">
         <div class="fc-module-header__copy">
-            <p class="fc-module-header__kicker">Gestão</p>
+            <p class="fc-module-header__kicker">Inteligência Operacional</p>
             <h1 class="fc-module-header__title">Logs por Usuário</h1>
             <p class="fc-module-header__subtitle">Acessos, navegação e registros operacionais por usuário.</p>
         </div>

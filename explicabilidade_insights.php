@@ -139,10 +139,11 @@ include_once("templates/header.php");
     <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 </head>
 <body>
-    <div class="container-fluid operational-report-page" style="margin-top:24px; padding:0 0 16px;">
-        <div class="row mb-2">
-            <div class="col-12">
-                <h2 class="mb-0 fw-semibold" style="color:#2f6f9f;">Insights explicáveis</h2>
+    <main class="container-fluid listagem-page operational-report-page" style="margin-top:8px;">
+        <div class="listagem-hero listagem-hero--module listagem-hero--inteligencia">
+            <div class="listagem-hero__copy">
+                <div class="listagem-kicker">Inteligência Operacional</div>
+                <h1 class="listagem-title">Insights explicáveis</h1>
             </div>
         </div>
         <div class="row mb-2">
@@ -155,9 +156,9 @@ include_once("templates/header.php");
             </div>
         </div>
 
-        <div class="insight-card">
+        <div class="insight-card listagem-panel">
             <?php if (!empty($drivers['available'])): ?>
-            <div class="table-responsive insight-table-wrap">
+            <div class="table-responsive listagem-table-wrap insight-table-wrap">
                 <table class="table table-hover align-middle insight-table">
                     <colgroup>
                         <col class="patient-col">
@@ -224,6 +225,6 @@ include_once("templates/header.php");
             </p>
             <?php endif; ?>
         </div>
-    </div>
+    </main>
 </body>
 </html>

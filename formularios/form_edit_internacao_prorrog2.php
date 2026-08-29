@@ -217,7 +217,7 @@ $prorrogAltaAtiva = $prorrogAltaDataValue !== '' || !empty($altaAtual['tipo_alta
                 </div>
 
                 <div class="form-group w-btns">
-                    <label style="visibility:hidden">Ações</label>
+                    <label class="prorrog-action-label">Ações</label>
                     <div class="btn-group">
                         <button type="button" class="btn btn-success btn-sm btn-add-pror">+</button>
                         <button type="button" class="btn btn-danger  btn-sm btn-del-pror">−</button>

@@ -106,7 +106,7 @@ $jsonTuss = htmlspecialchars(json_encode($tussInt, JSON_UNESCAPED_UNICODE), ENT_
 
             <!-- Botões -->
             <div class="form-group w-btns">
-                <label style="visibility:hidden">Ações</label>
+                <label class="additional-action-label">Ações</label>
                 <div>
                     <button type="button" class="btn btn-success btn-sm btn-add">+</button>
                     <button type="button" class="btn btn-danger btn-sm btn-remove">&minus;</button>

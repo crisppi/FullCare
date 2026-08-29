@@ -574,6 +574,7 @@ if ($semAtualizacaoLabel !== '') {
     .hc-kpis { grid-template-columns: 1fr; }
 }
 </style>
+<link href="<?= $BASE_URL ?>css/home_care_gestao.css?v=<?= @filemtime(__DIR__ . '/css/home_care_gestao.css') ?>" rel="stylesheet">
 
 <div class="hc-shell">
     <div class="fc-module-header fc-module-header--cuidado">
@@ -716,7 +717,7 @@ if ($semAtualizacaoLabel !== '') {
                                         <label>Hospital</label>
                                         <strong><?= e($row['nome_hosp'] ?? 'Sem hospital') ?></strong>
                                         <?php if (($row['sinalizado_hc'] ?? 'n') === 's'): ?>
-                                            <div class="hc-sub" style="margin-top:6px;color:#2a78c2;font-weight:700;">Sinalizado em gestão</div>
+                                            <div class="hc-sub hc-sub--spaced hc-sub--signal">Sinalizado em gestão</div>
                                         <?php endif; ?>
                                     </div>
                                     <div class="hc-meta">
@@ -724,17 +725,17 @@ if ($semAtualizacaoLabel !== '') {
                                         <div class="hc-chip <?= ($row['nead_elegivel_hc'] ?? 'n') === 's' ? 'hc-chip--ok' : 'hc-chip--warn' ?>">
                                             <?= ($row['nead_elegivel_hc'] ?? 'n') === 's' ? 'Elegível' : 'Pendente / não elegível' ?>
                                         </div>
-                                        <div class="hc-sub" style="margin-top:6px;">Score: <?= number_format((int)($row['nead_pontuacao_hc'] ?? 0), 0, ',', '.') ?></div>
+                                        <div class="hc-sub hc-sub--spaced">Score: <?= number_format((int)($row['nead_pontuacao_hc'] ?? 0), 0, ',', '.') ?></div>
                                     </div>
                                     <div class="hc-meta">
                                         <label>Status</label>
                                         <div class="<?= $statusChip ?>"><?= e($statusOptions[$row['status_hc']] ?? 'Sem status') ?></div>
-                                        <div class="hc-sub" style="margin-top:6px;"><?= e($row['modalidade_aprovada_hc'] ?? $modalidadeOptions[$row['modalidade_sugerida_hc']] ?? 'Sem modalidade') ?></div>
+                                        <div class="hc-sub hc-sub--spaced"><?= e($row['modalidade_aprovada_hc'] ?? $modalidadeOptions[$row['modalidade_sugerida_hc']] ?? 'Sem modalidade') ?></div>
                                     </div>
                                     <div class="hc-meta">
                                         <label>Implantação</label>
                                         <div class="<?= $reviewChip ?>"><?= e($reviewLabel) ?></div>
-                                        <div class="hc-sub" style="margin-top:6px;">
+                                        <div class="hc-sub hc-sub--spaced">
                                             <?= !empty($row['previsao_implantacao_hc']) ? 'Prev. ' . e(date('d/m/Y', strtotime((string)$row['previsao_implantacao_hc']))) : 'Sem previsão' ?>
                                         </div>
                                     </div>
@@ -742,7 +743,7 @@ if ($semAtualizacaoLabel !== '') {
                                         <label>Barreira</label>
                                         <div><?= e($barreiraOptions[$row['barreira_principal_hc']] ?? ($row['barreira_principal_hc'] ?? '-')) ?></div>
                                         <?php if (!empty($row['fornecedor_hc'])): ?>
-                                            <div class="hc-sub" style="margin-top:6px;">Fornecedor: <?= e($row['fornecedor_hc']) ?></div>
+                                            <div class="hc-sub hc-sub--spaced">Fornecedor: <?= e($row['fornecedor_hc']) ?></div>
                                         <?php endif; ?>
                                     </div>
                                 </div>

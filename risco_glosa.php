@@ -110,10 +110,11 @@ include_once("templates/header.php");
     <link href="<?= $BASE_URL ?>css/operational_reports.css?v=<?= @filemtime(__DIR__ . '/css/operational_reports.css') ?>" rel="stylesheet">
 </head>
 <body>
-    <div class="container-fluid operational-report-page" style="margin-top:24px; padding:0 0 16px;">
-        <div class="row mb-2">
-            <div class="col-12">
-                <h2 class="mb-0 fw-semibold" style="color:#2f6f9f;">Painel de oportunidade de glosa</h2>
+    <main class="container-fluid listagem-page operational-report-page" style="margin-top:8px;">
+        <div class="listagem-hero listagem-hero--module listagem-hero--inteligencia">
+            <div class="listagem-hero__copy">
+                <div class="listagem-kicker">Inteligência Operacional</div>
+                <h1 class="listagem-title">Painel de oportunidade de glosa</h1>
             </div>
         </div>
         <div class="row mb-2">
@@ -125,7 +126,7 @@ include_once("templates/header.php");
             </div>
         </div>
 
-        <div class="insight-card">
+        <div class="insight-card listagem-panel">
             <?php if (!empty($glosaData['available'])): ?>
             <?php
                 $pagination = $glosaData['pagination'] ?? ['page' => 1, 'per_page' => $perPage, 'total' => count($glosaData['entries'] ?? []), 'pages' => 1];
@@ -152,7 +153,7 @@ include_once("templates/header.php");
                     <input type="hidden" name="pag" value="1">
                 </form>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive listagem-table-wrap">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
@@ -238,6 +239,6 @@ include_once("templates/header.php");
             <p class="text-muted mb-0"><?= htmlspecialchars($glosaData['message'] ?? 'Sem dados para análise.') ?></p>
             <?php endif; ?>
         </div>
-    </div>
+    </main>
 </body>
 </html>

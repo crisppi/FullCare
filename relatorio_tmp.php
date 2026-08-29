@@ -93,75 +93,50 @@ $stmt->execute($params);
 $tmpConv = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
+<link href="<?= $BASE_URL ?>css/listagem_padrao.css?v=<?= @filemtime(__DIR__ . '/css/listagem_padrao.css') ?>" rel="stylesheet">
 <style>
-.report-wrapper {
-    width: 100%;
-    max-width: none;
-    margin: 8px 0 44px;
-    padding: 0 24px;
+.tmp-list-page .tmp-list-panel {
+    padding: 10px 10px 16px;
 }
-.report-header {
-    background: linear-gradient(120deg, #f4faff, #e8f4fb);
-    border-radius: 18px;
-    padding: 18px 22px;
-    border: 1px solid rgba(76, 142, 187, .12);
-    margin-bottom: 16px;
+
+.tmp-list-page .tmp-filter-card {
+    margin: 0 0 10px;
+    padding: 0 0 9px;
+    border-bottom: 1px solid rgba(47, 111, 159, .10);
 }
-.report-header h1 {
-    margin: 0 0 4px;
-    font-weight: 700;
+
+.tmp-list-page .tmp-list-section + .tmp-list-section {
+    margin-top: 12px;
+}
+
+.tmp-list-page .tmp-list-title {
+    margin: 0 0 6px 2px;
     color: #24384f;
-    font-size: 1.06rem;
-}
-.report-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 14px 18px;
-    border: 1px solid rgba(76, 142, 187, .08);
-    box-shadow: 0 10px 24px rgba(35, 102, 147, .08);
-    margin-bottom: 14px;
-}
-.report-wrapper .text-muted,
-.report-wrapper .form-label,
-.report-wrapper .form-control,
-.report-wrapper .form-select,
-.report-wrapper .table,
-.report-wrapper small {
-    font-size: .78rem;
-}
-.report-wrapper .row.g-3 {
-    --bs-gutter-y: .6rem;
-    --bs-gutter-x: .8rem;
-}
-.table thead th {
-    background: #f4faff;
-    color: #24384f;
-    font-size: .7rem;
-    padding-top: .65rem;
-    padding-bottom: .65rem;
+    font-size: .76rem;
+    font-weight: 800;
 }
 </style>
 
-<div class="report-wrapper">
-    <div class="report-header">
-        <h1>TMP por CID, procedimento e operadora</h1>
-        <div class="text-muted">Tempo médio de permanência (dias) no período selecionado.</div>
+<main class="container-fluid listagem-page tmp-list-page" id="main-container">
+    <div class="listagem-hero listagem-hero--module listagem-hero--inteligencia">
+        <div class="listagem-hero__copy">
+            <div class="listagem-kicker">Inteligência Operacional</div>
+            <h1 class="listagem-title">TMP por CID, procedimento e operadora</h1>
+        </div>
     </div>
 
-    <form class="report-card" method="get">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label">Data inicial</label>
-                <input type="date" class="form-control" name="data_ini" value="<?= e($dataIni) ?>">
+    <div class="complete-table listagem-panel tmp-list-panel">
+    <form class="tmp-filter-card table-filters" method="get">
+        <div class="tmp-filter-row filter-inline-row">
+            <div class="tmp-filter-field filter-inline-field filter-inline--date">
+                <input type="date" class="form-control form-control-sm" name="data_ini" value="<?= e($dataIni) ?>" aria-label="Data inicial">
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Data final</label>
-                <input type="date" class="form-control" name="data_fim" value="<?= e($dataFim) ?>">
+            <div class="tmp-filter-field filter-inline-field filter-inline--date">
+                <input type="date" class="form-control form-control-sm" name="data_fim" value="<?= e($dataFim) ?>" aria-label="Data final">
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Hospital</label>
-                <select class="form-select" name="hospital_id">
-                    <option value="">Todos</option>
+            <div class="tmp-filter-field filter-inline-field filter-inline--wide">
+                <select class="form-select form-control-sm" name="hospital_id" aria-label="Hospital">
+                    <option value="">Hospital: todos</option>
                     <?php foreach ($hospitais as $h): ?>
                         <option value="<?= (int)$h['id_hospital'] ?>" <?= $hospitalId == $h['id_hospital'] ? 'selected' : '' ?>>
                             <?= e($h['nome_hosp']) ?>
@@ -169,10 +144,9 @@ $tmpConv = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Operadora</label>
-                <select class="form-select" name="seguradora_id">
-                    <option value="">Todos</option>
+            <div class="tmp-filter-field filter-inline-field filter-inline--wide">
+                <select class="form-select form-control-sm" name="seguradora_id" aria-label="Operadora">
+                    <option value="">Operadora: todas</option>
                     <?php foreach ($seguradoras as $s): ?>
                         <option value="<?= (int)$s['id_seguradora'] ?>" <?= $seguradoraId == $s['id_seguradora'] ? 'selected' : '' ?>>
                             <?= e($s['seguradora_seg']) ?>
@@ -180,16 +154,21 @@ $tmpConv = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-12">
-                <button class="btn btn-primary" type="submit">Aplicar filtros</button>
+            <div class="tmp-filter-actions filter-inline-field filter-inline--icon">
+                <button class="btn btn-primary btn-filtro-buscar btn-filtro-limpar-icon" type="submit" title="Pesquisar" aria-label="Pesquisar">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                </button>
+                <a class="btn btn-light btn-sm btn-filtro-limpar btn-filtro-limpar-icon" href="<?= htmlspecialchars($BASE_URL . 'inteligencia/tmp', ENT_QUOTES, 'UTF-8') ?>" title="Limpar filtros" aria-label="Limpar filtros">
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                </a>
             </div>
         </div>
     </form>
 
-    <div class="report-card">
-        <h5 class="mb-3">TMP por CID</h5>
-        <div class="table-responsive">
-            <table class="table table-sm table-striped align-middle">
+    <section class="tmp-list-section">
+        <h2 class="tmp-list-title">TMP por CID</h2>
+        <div class="table-responsive listagem-table-wrap tmp-list-table-wrap">
+            <table class="table table-sm table-striped table-hover table-condensed align-middle">
                 <thead>
                     <tr>
                         <th>CID</th>
@@ -213,12 +192,12 @@ $tmpConv = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 
-    <div class="report-card">
-        <h5 class="mb-3">TMP por Procedimento</h5>
-        <div class="table-responsive">
-            <table class="table table-sm table-striped align-middle">
+    <section class="tmp-list-section">
+        <h2 class="tmp-list-title">TMP por Procedimento</h2>
+        <div class="table-responsive listagem-table-wrap tmp-list-table-wrap">
+            <table class="table table-sm table-striped table-hover table-condensed align-middle">
                 <thead>
                     <tr>
                         <th>Procedimento</th>
@@ -240,12 +219,12 @@ $tmpConv = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 
-    <div class="report-card">
-        <h5 class="mb-3">TMP por Operadora</h5>
-        <div class="table-responsive">
-            <table class="table table-sm table-striped align-middle">
+    <section class="tmp-list-section">
+        <h2 class="tmp-list-title">TMP por Operadora</h2>
+        <div class="table-responsive listagem-table-wrap tmp-list-table-wrap">
+            <table class="table table-sm table-striped table-hover table-condensed align-middle">
                 <thead>
                     <tr>
                         <th>Operadora</th>
@@ -267,7 +246,8 @@ $tmpConv = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </tbody>
             </table>
         </div>
+    </section>
     </div>
-</div>
+</main>
 
 <?php require_once("templates/footer.php"); ?>

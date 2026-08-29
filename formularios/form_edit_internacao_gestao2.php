@@ -39,7 +39,7 @@ $showGestaoContainer = isset($activeEditSection) && $activeEditSection === 'gest
 ?>
 
 <!-- --------------------- HTML / BOOTSTRAP --------------------------- -->
-<div id="container-gestao" style="display:<?= $showGestaoContainer ? 'block' : 'none' ?>; margin:5px;">
+<div id="container-gestao" style="display:<?= $showGestaoContainer ? 'block' : 'none' ?>;">
 
     <!-- FK internação -->
     <input type="hidden" name="fk_internacao_ges" value="<?= $intern['id_internacao'] ?>">

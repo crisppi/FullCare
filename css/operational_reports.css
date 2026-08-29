@@ -813,6 +813,51 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,.9) !important;
 }
 
+/* Base visual das listagens para relatórios de Inteligência Operacional. */
+.report-wrapper,
+.forecast-wrapper,
+.monthly-dashboard {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+}
+
+.report-wrapper .report-header,
+.prorrog-report-wrapper .report-header,
+.operator-report-wrapper .report-header,
+.forecast-wrapper .forecast-hero,
+.monthly-dashboard .monthly-header {
+    margin-bottom: 12px !important;
+    padding: 8px 14px !important;
+    border: 1px solid rgba(255, 255, 255, .16) !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #3f689e 0%, #5a7faf 54%, #778fc6 100%) !important;
+    box-shadow: 0 8px 16px rgba(63, 104, 158, .16) !important;
+    color: #fff !important;
+}
+
+.report-wrapper .report-header h1,
+.prorrog-report-wrapper .report-header h1,
+.operator-report-wrapper .report-header h1,
+.forecast-wrapper .forecast-hero h1,
+.monthly-dashboard .monthly-header h4 {
+    margin: 0 !important;
+    color: #fff !important;
+    font-size: 1.08rem !important;
+    line-height: 1.15 !important;
+    font-weight: 800 !important;
+}
+
+.report-wrapper .report-header .text-muted,
+.prorrog-report-wrapper .report-header .text-muted,
+.operator-report-wrapper .report-header .text-muted,
+.forecast-wrapper .forecast-hero p,
+.monthly-dashboard .monthly-header .text-muted {
+    margin-top: 2px !important;
+    color: rgba(255, 255, 255, .88) !important;
+    font-size: .66rem !important;
+    line-height: 1.25 !important;
+}
+
 .operator-report-wrapper .operator-filter-field {
     display: flex !important;
     align-items: center !important;

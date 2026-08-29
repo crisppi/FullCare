@@ -586,6 +586,10 @@ if (!empty($sessionIdUsuario)) {
                                                    ></i>
                                                 Internações sem senha</a></li>
                                         <?php if (!$isPerfilMedicoMenu || $isDiretoria) { ?>
+                                            <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/central-operacional"><i
+                                                        class="bi bi-command fc-inline-25"
+                                                       ></i>
+                                                    Central Operacional</a></li>
                                             <li><a class="dropdown-item" href="<?= $BASE_URL ?>gestao/pendencias-operacionais"><i
                                                         class="bi bi-exclamation-diamond fc-inline-25"
                                                        ></i>

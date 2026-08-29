@@ -400,15 +400,17 @@ $hospital_name = (!empty($filtered_hospital) && !empty($filtered_hospital[0]['no
     ? ucwords(strtolower($filtered_hospital[0]['nome_hosp']))
     : 'Todos Hospitais';
 
-$hospitalOpportunityRows = dashCacheGet($cacheBase . '_hospital_opportunities_v2', 90);
+$hospitalOpportunityRows = dashCacheGet($cacheBase . '_hospital_opportunities_v3', 90);
 if (!is_array($hospitalOpportunityRows)) {
     $hospitalOpportunityRows = [];
     try {
         $hospitalOpportunityIds = array_map(static function ($h) {
             return (int)($h['id_hospital'] ?? 0);
         }, $dados_hospital_select);
-        $hospitalOpportunityRows = (new HospitalOpportunityService($conn))->hospitalRows($hospitalOpportunityIds, 8);
-        dashCacheSet($cacheBase . '_hospital_opportunities_v2', $hospitalOpportunityRows);
+        // A interface pagina os hospitais no navegador; carregamos todo o escopo
+        // razoável para permitir busca sem transformar a página em uma grade infinita.
+        $hospitalOpportunityRows = (new HospitalOpportunityService($conn))->hospitalRows($hospitalOpportunityIds, 100);
+        dashCacheSet($cacheBase . '_hospital_opportunities_v3', $hospitalOpportunityRows);
     } catch (Throwable $e) {
         error_log('[MENU_APP][HOSPITAL_OPPORTUNITIES] ' . $e->getMessage());
         $hospitalOpportunityRows = [];
@@ -1832,10 +1834,9 @@ try {
 .hospital-opportunity-panel {
     margin: 10px 0 12px;
     border-radius: 16px;
-    border: 1px solid rgba(76, 111, 151, 0.26);
-    background:
-        linear-gradient(145deg, #e7eef5 0%, #f1f5f8 45%, #e3edf3 100%);
-    box-shadow: 0 12px 24px rgba(35, 102, 147, 0.12);
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
     overflow: hidden;
 }
 
@@ -1845,8 +1846,8 @@ try {
     justify-content: space-between;
     gap: 12px;
     padding: 11px 12px 9px;
-    background: linear-gradient(90deg, #dcecf8 0%, #edf6fc 100%);
-    border-bottom: 1px solid rgba(76, 111, 151, 0.28);
+    background: #ffffff;
+    border-bottom: 1px solid #dbe4ee;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .70);
 }
 
@@ -1869,9 +1870,9 @@ try {
 
 .hospital-opportunity-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(220px, 1fr));
-    gap: 10px;
-    padding: 12px;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: 14px;
+    padding: 14px;
 }
 
 .hospital-opportunity-card {
@@ -1881,13 +1882,16 @@ try {
     min-height: 210px;
     padding: 12px 12px 14px;
     border-radius: 14px;
-    border: 1px solid rgba(74, 112, 151, 0.30);
-    background:
-        linear-gradient(145deg, #eef5fa 0%, #f7fbfd 54%, #e5eff6 100%);
+    border: 1px solid #b8c8d8;
+    border-top: 3px solid #2f6f9f;
+    background: #ffffff;
     color: #24384f;
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .78),
-        0 8px 18px rgba(35, 102, 147, 0.12);
+        0 6px 16px rgba(15, 23, 42, 0.09);
+}
+
+.hospital-opportunity-card[hidden] {
+    display: none !important;
 }
 
 .hospital-opportunity-top {
@@ -1958,9 +1962,9 @@ try {
     min-height: 54px;
     padding: 8px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid rgba(83, 109, 151, 0.18);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .86);
+    background: #f1f5f9;
+    border: 1px solid #d8e1eb;
+    box-shadow: none;
     text-align: center;
 }
 
@@ -2050,6 +2054,84 @@ try {
     text-align: center;
 }
 
+.hospital-opportunity-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px 0;
+}
+
+.hospital-opportunity-search {
+    position: relative;
+    flex: 1;
+    max-width: 380px;
+}
+
+.hospital-opportunity-search i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+}
+
+.hospital-opportunity-search input {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px 0 34px;
+    border: 1px solid #b8c8d8;
+    border-radius: 9px;
+    background: #fff;
+    color: #24384f;
+    font-size: .72rem;
+    outline: none;
+}
+
+.hospital-opportunity-search input:focus {
+    border-color: #2f6f9f;
+    box-shadow: 0 0 0 3px rgba(47, 111, 159, .12);
+}
+
+.hospital-opportunity-count {
+    color: #64748b;
+    font-size: .68rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.hospital-opportunity-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 2px 14px 14px;
+}
+
+.hospital-opportunity-pagination button {
+    min-width: 82px;
+    height: 32px;
+    border: 1px solid #b8c8d8;
+    border-radius: 8px;
+    background: #fff;
+    color: #2f5f82;
+    font-size: .68rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.hospital-opportunity-pagination button:disabled {
+    opacity: .42;
+    cursor: default;
+}
+
+.hospital-opportunity-page-status {
+    min-width: 90px;
+    color: #526985;
+    font-size: .68rem;
+    font-weight: 700;
+    text-align: center;
+}
+
 @media (max-width: 1100px) {
     .menu-workspace-head {
         flex-direction: column;
@@ -2128,6 +2210,15 @@ try {
 
     .hospital-opportunity-grid {
         grid-template-columns: 1fr;
+    }
+
+    .hospital-opportunity-tools {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .hospital-opportunity-search {
+        max-width: none;
     }
 
     .hospital-opportunity-metrics {
@@ -2525,14 +2616,21 @@ try {
                     </div>
                     <span class="menu-workspace-pill">
                         <i class="bi bi-diagram-3"></i>
-                        <?= number_format(count($hospitalOpportunityRows), 0, ',', '.') ?> em destaque
+                        <?= number_format(count($hospitalOpportunityRows), 0, ',', '.') ?> <?= count($hospitalOpportunityRows) === 1 ? 'hospital' : 'hospitais' ?>
                     </span>
                 </div>
                 <?php if (empty($hospitalOpportunityRows)): ?>
                     <div class="hospital-opportunity-empty">Nenhum hospital com dados para exibir no momento.</div>
                 <?php else: ?>
+                    <div class="hospital-opportunity-tools">
+                        <label class="hospital-opportunity-search" for="hospital-opportunity-search">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            <input id="hospital-opportunity-search" type="search" placeholder="Buscar hospital..." autocomplete="off">
+                        </label>
+                        <span class="hospital-opportunity-count" id="hospital-opportunity-count" aria-live="polite"></span>
+                    </div>
                     <div class="hospital-opportunity-grid">
-                        <?php foreach ($hospitalOpportunityRows as $hospitalOpp): ?>
+                        <?php foreach ($hospitalOpportunityRows as $hospitalOppIndex => $hospitalOpp): ?>
                             <?php
                             $oppNivel = (string)($hospitalOpp['nivel'] ?? 'baixo');
                             $oppIcon = preg_match('/^[a-z0-9-]+$/i', (string)($hospitalOpp['nivel_icon'] ?? ''))
@@ -2540,7 +2638,7 @@ try {
                                 : 'bi-check-circle-fill';
                             $glosaTipos = (array)($hospitalOpp['glosa_tipos'] ?? []);
                             ?>
-                            <article class="hospital-opportunity-card">
+                            <article class="hospital-opportunity-card" data-hospital-name="<?= htmlspecialchars(mb_strtolower((string)($hospitalOpp['nome_hosp'] ?? 'Hospital'), 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>"<?= $hospitalOppIndex >= 6 ? ' hidden' : '' ?>>
                                 <div class="hospital-opportunity-top">
                                     <div class="hospital-opportunity-name">
                                         <strong><?= htmlspecialchars((string)($hospitalOpp['nome_hosp'] ?? 'Hospital'), ENT_QUOTES, 'UTF-8') ?></strong>
@@ -2604,6 +2702,12 @@ try {
                             </article>
                         <?php endforeach; ?>
                     </div>
+                    <div class="hospital-opportunity-empty" id="hospital-opportunity-no-results" hidden>Nenhum hospital encontrado para esta busca.</div>
+                    <nav class="hospital-opportunity-pagination" aria-label="Paginação de hospitais">
+                        <button type="button" id="hospital-opportunity-prev"><i class="bi bi-chevron-left"></i> Anterior</button>
+                        <span class="hospital-opportunity-page-status" id="hospital-opportunity-page-status"></span>
+                        <button type="button" id="hospital-opportunity-next">Próxima <i class="bi bi-chevron-right"></i></button>
+                    </nav>
                 <?php endif; ?>
             </div>
         </section>
@@ -3241,7 +3345,66 @@ try {
             });
         });
 
+        initHospitalOpportunityList();
+
         loadDashTables();
+    }
+
+    function initHospitalOpportunityList() {
+        const cards = Array.from(document.querySelectorAll('.hospital-opportunity-card'));
+        const search = document.getElementById('hospital-opportunity-search');
+        const count = document.getElementById('hospital-opportunity-count');
+        const status = document.getElementById('hospital-opportunity-page-status');
+        const previous = document.getElementById('hospital-opportunity-prev');
+        const next = document.getElementById('hospital-opportunity-next');
+        const noResults = document.getElementById('hospital-opportunity-no-results');
+        if (!cards.length || !search || !count || !status || !previous || !next || !noResults) return;
+
+        const pageSize = 6;
+        let page = 1;
+
+        function normalize(value) {
+            return (value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        function render() {
+            const term = normalize(search.value);
+            const matches = cards.filter(function(card) {
+                return normalize(card.dataset.hospitalName).includes(term);
+            });
+            const pages = Math.max(1, Math.ceil(matches.length / pageSize));
+            page = Math.min(page, pages);
+            const start = (page - 1) * pageSize;
+            const visible = new Set(matches.slice(start, start + pageSize));
+
+            cards.forEach(function(card) {
+                card.hidden = !visible.has(card);
+            });
+
+            noResults.hidden = matches.length !== 0;
+            const scopeLabel = cards.length === 1 ? ' hospital no seu escopo' : ' hospitais no seu escopo';
+            const totalLabel = cards.length === 1 ? ' hospital' : ' hospitais';
+            count.textContent = matches.length === cards.length
+                ? cards.length + scopeLabel
+                : matches.length + ' de ' + cards.length + totalLabel;
+            status.textContent = matches.length ? 'Página ' + page + ' de ' + pages : 'Sem resultados';
+            previous.disabled = page <= 1 || matches.length === 0;
+            next.disabled = page >= pages || matches.length === 0;
+        }
+
+        search.addEventListener('input', function() {
+            page = 1;
+            render();
+        });
+        previous.addEventListener('click', function() {
+            if (page > 1) page--;
+            render();
+        });
+        next.addEventListener('click', function() {
+            page++;
+            render();
+        });
+        render();
     }
 
     if (!window.__dashSortBound) {

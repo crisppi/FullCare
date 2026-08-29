@@ -19,3 +19,11 @@
 #main-container.simple-crud-page .form-control--white {
     background: #ffffff !important;
 }
+
+#main-container.simple-crud-page .form-upload-submit {
+    margin: 30px 0 40px 10px;
+}
+
+#main-container.simple-crud-page .form-list-link {
+    margin-left: 10px;
+}

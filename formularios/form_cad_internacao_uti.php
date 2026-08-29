@@ -136,7 +136,7 @@
             </div>
             <div class="form-group col-sm-9" id="justifique_uti_group" style="display: none;">
                 <label for="justifique_uti" id="justifique_uti_label">Justifique permanência - Critério baixo</label>
-                <p id="criteria_message" style="display:inline" data-criteria-message></p>
+                <p id="criteria_message" class="uti-criteria-message" data-criteria-message></p>
                 <textarea type="textarea" data-no-resize rows="2" class="form-control" id="justifique_uti"
                     name="justifique_uti"></textarea>
             </div>

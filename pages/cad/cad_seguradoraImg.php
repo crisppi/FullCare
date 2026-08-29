@@ -11,7 +11,8 @@ $imagemDao = new imagemDAO($conn, $BASE_URL);
 // $id_imagem = filter_input(INPUT_GET, "id_imagem");
 
 ?>
-<div id="main-container" class="container">
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/form_simple_crud.css?v=<?= filemtime(__DIR__ . '/../../css/form_simple_crud.css') ?>">
+<div id="main-container" class="container simple-crud-page">
     <div class="row">
         <h2 class="page-title">Cadastrar imagem</h2>
         <p class="page-description">Adicione informações sobre a imagem</p>
@@ -33,12 +34,12 @@ $imagemDao = new imagemDAO($conn, $BASE_URL);
             </div>
 
             <br>
-            <button style="margin:30px 0px 40px 10px" type="submit" class="btn-sm btn-primary">Cadastrar</button>
+            <button type="submit" class="btn-sm btn-primary form-upload-submit">Cadastrar</button>
             <br>
     </div>
     </form>
     <div>
-        <a class="btn btn-success" style="margin-left:10px" href="list_imagem.php">Listar
+        <a class="btn btn-success form-list-link" href="list_imagem.php">Listar
         </a>
     </div>
 </div>

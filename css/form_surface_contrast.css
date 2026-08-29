@@ -2271,6 +2271,204 @@ body #main-container#main-container :is(.internacao-page, .visita-page) .saved-i
     line-height: 1 !important;
 }
 
+/* Tabelas adicionais da internacao: mesma escala visual dos formularios. */
+body #main-container#main-container .internacao-page .tabelas-adicionais-card__title {
+    margin: 0 !important;
+    font-size: .72rem !important;
+    line-height: 1.1 !important;
+    font-weight: 700 !important;
+}
+
+body #main-container#main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects > .tabelas-col > label.control-label {
+    min-height: 0 !important;
+    margin: 0 0 3px !important;
+    color: #5f6570 !important;
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+    font-weight: 650 !important;
+}
+
+body #main-container#main-container .internacao-page .tabelas-adicionais-card > .tabelas-selects :is(
+    select.form-control,
+    select.detail-select,
+    select.select-purple,
+    .bootstrap-select > .dropdown-toggle
+) {
+    min-height: 32px !important;
+    height: 32px !important;
+    border: 1px solid #aebfd1 !important;
+    border-radius: 8px !important;
+    background-color: #edf4fa !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px rgba(30, 50, 74, .12) !important;
+}
+
+/* Formularios internos das tabelas adicionais: superficie, tipografia e campos unificados. */
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit {
+    margin-top: 0 !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit > :is(
+    #container-tuss,
+    #container-prorrog,
+    #container-gestao,
+    #container-uti,
+    #container-negoc
+) {
+    margin: 0 !important;
+    padding: 10px !important;
+    border: 1px solid #cbd6e2 !important;
+    border-radius: 9px !important;
+    background: #f8fafc !important;
+    box-shadow: 0 3px 9px rgba(30, 50, 74, .06) !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit :is(h4, h5) {
+    margin: 0 0 8px !important;
+    color: #2b2140 !important;
+    font-size: .78rem !important;
+    line-height: 1.15 !important;
+    font-weight: 700 !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit label {
+    min-height: 0 !important;
+    margin: 0 0 3px !important;
+    color: #5f6570 !important;
+    font-size: .68rem !important;
+    line-height: 1.1 !important;
+    font-weight: 650 !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit :is(
+    input.form-control,
+    select.form-control,
+    textarea.form-control,
+    .bootstrap-select > .dropdown-toggle
+) {
+    border: 1px solid #aebfd1 !important;
+    border-radius: 8px !important;
+    background-color: #edf4fa !important;
+    color: #26364a !important;
+    font-size: .72rem !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(30, 50, 74, .12) !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit :is(
+    input.form-control,
+    select.form-control,
+    .bootstrap-select > .dropdown-toggle
+) {
+    width: 100% !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+}
+
+/* TUSS: descricao ocupa o espaco disponivel e as acoes ficam compactas. */
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit #tussFieldsContainer {
+    margin-top: 0 !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit .tuss-field {
+    margin: 0 !important;
+    padding: 10px !important;
+    border: 1px solid #d8e1eb !important;
+    border-radius: 8px !important;
+    background: #f8fafc !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit .tuss-field .form-inline {
+    grid-template-columns: minmax(280px, 1fr) 150px 82px 82px 88px 66px !important;
+    gap: 6px 8px !important;
+    width: 100% !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit .tuss-field :is(.w-desc, .w-date, .w-qty, .w-ok, .w-btns) {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit .tuss-field .w-btns > div,
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit .pror-row .w-btns > .btn-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: 32px !important;
+}
+
+/* Um unico padrao para adicionar e remover linhas em todas as tabelas adicionais. */
+body #main-container#main-container .internacao-page :is(
+    #tabelas-adicionais-paineis-edit,
+    #container-tuss,
+    #container-prorrog,
+    #container-negoc
+) :is(.btn-add, .btn-add-pror, .btn-add-negoc) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 !important;
+    border: 1px solid #1677e8 !important;
+    border-radius: 7px !important;
+    background: #1677e8 !important;
+    color: #fff !important;
+    font-size: .82rem !important;
+    line-height: 1 !important;
+    font-weight: 750 !important;
+    box-shadow: none !important;
+}
+
+body #main-container#main-container .internacao-page :is(
+    #tabelas-adicionais-paineis-edit,
+    #container-tuss,
+    #container-prorrog,
+    #container-negoc
+) :is(.btn-remove, .btn-del-pror, .btn-del-negoc) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 !important;
+    border: 1px solid #d9a9ae !important;
+    border-radius: 7px !important;
+    background: #fff7f7 !important;
+    color: #b4232f !important;
+    font-size: .82rem !important;
+    line-height: 1 !important;
+    font-weight: 750 !important;
+    box-shadow: none !important;
+}
+
+/* UTI: a grade interna ocupa a linha inteira, sem comprimir os campos. */
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit #container-uti > .form-group.row > .form-group.row {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+}
+
+body #main-container#main-container .internacao-page #tabelas-adicionais-paineis-edit #container-uti :is(
+    .form-group.col-sm-12,
+    textarea.form-control
+) {
+    width: 100% !important;
+}
+
 body #main-container#main-container :is(.internacao-page, .visita-page, .cadastro-layout) .invalid-feedback {
     margin-top: 2px !important;
     color: #b4232f !important;

@@ -230,6 +230,7 @@ function cc_action_label(string $action): string
         line-height: 1.25;
     }
 </style>
+<link href="<?= $BASE_URL ?>css/cuidado_continuado_cronicos.css?v=<?= @filemtime(__DIR__ . '/css/cuidado_continuado_cronicos.css') ?>" rel="stylesheet">
 
 <div class="cc-module-shell">
     <div class="container-fluid">
@@ -330,7 +331,7 @@ function cc_action_label(string $action): string
                                         <td>
                                             <div class="cc-mini-note"><?= htmlspecialchars((string)($item['resumo_clinico'] ?: 'Sem resumo clínico disponível.')) ?></div>
                                         </td>
-                                        <td class="text-end" style="min-width:280px;">
+                                        <td class="text-end cc-prelist-actions">
                                             <form method="post" class="mb-2">
                                                 <input type="hidden" name="cc_action" value="admitir_prelista">
                                                 <input type="hidden" name="candidate_id" value="<?= (int)$item['id_prelista'] ?>">
@@ -399,7 +400,7 @@ function cc_action_label(string $action): string
                                             <div class="small text-muted"><?= htmlspecialchars(cc_fmt_datetime($row['ultima_acao_em'] ?? null)) ?></div>
                                         </td>
                                         <td><?= htmlspecialchars(cc_fmt_date($row['proximo_contato'] ?? null)) ?></td>
-                                        <td class="text-end" style="min-width:330px;">
+                                        <td class="text-end cc-followup-actions">
                                             <form method="post" class="cc-quick-form">
                                                 <input type="hidden" name="cc_action" value="registrar_acompanhamento">
                                                 <input type="hidden" name="cronico_id" value="<?= (int)$row['id_cronico'] ?>">

@@ -542,9 +542,9 @@ if (!is_array($prioridades)) {
 </style>
 
 <div class="dashboard-wrapper">
-    <div class="listagem-hero listagem-hero--module listagem-hero--gestao dash-hero">
+    <div class="listagem-hero listagem-hero--module listagem-hero--inteligencia dash-hero">
         <div class="listagem-hero__copy">
-            <p class="listagem-kicker">Gestão</p>
+            <p class="listagem-kicker">Inteligência Operacional</p>
             <h1 class="listagem-title">Painel Operacional 360°</h1>
             <p class="listagem-subtitle">Resumo em tempo real das principais frentes operacionais.</p>
         </div>
