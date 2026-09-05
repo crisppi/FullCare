@@ -1,0 +1,310 @@
+/* IA Graficos: estilos consolidados na escala compacta das telas de IA. */
+.ai-chart-page {
+    padding: 0 4px 14px;
+    color: #27364a;
+    font-size: .72rem;
+    line-height: 1.3;
+}
+.ai-chart-page .fc-module-header {
+    margin-bottom: 8px;
+}
+.ai-chart-shell {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+}
+.ai-chart-panel {
+    background: #fff;
+    border: 1px solid rgba(47, 111, 159, .16);
+    border-radius: 8px;
+    box-shadow: 0 8px 18px rgba(35, 102, 147, .08);
+    min-width: 0;
+}
+.ai-chart-sidebar {
+    padding: 10px;
+    background: linear-gradient(165deg, rgba(47, 111, 159, .98) 0%, rgba(35, 82, 124, .98) 52%, rgba(32, 139, 122, .96) 100%);
+    border-color: rgba(31, 76, 110, .22);
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(31, 76, 110, .16);
+    overflow: hidden;
+}
+.ai-chart-sidebar h2 {
+    margin: 0 0 8px;
+    font-size: .68rem;
+    text-transform: uppercase;
+    color: #fff;
+    font-weight: 820;
+    letter-spacing: .06em;
+    line-height: 1.25;
+}
+.ai-chart-table h2 {
+    margin: 0 0 8px;
+    font-size: .68rem;
+    text-transform: uppercase;
+    color: #2f6f9f;
+    font-weight: 820;
+    letter-spacing: .06em;
+    line-height: 1.25;
+}
+.ai-chart-insight h2 {
+    margin: 0 0 8px;
+    font-size: .68rem;
+    text-transform: uppercase;
+    color: #2f6f9f;
+    font-weight: 820;
+    letter-spacing: .06em;
+    line-height: 1.25;
+}
+.ai-chart-field {
+    margin-bottom: 8px;
+}
+.ai-chart-field label {
+    display: block;
+    margin-bottom: 3px;
+    color: #526277;
+    font-size: .62rem;
+    font-weight: 760;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+.ai-chart-sidebar .ai-chart-field label {
+    color: rgba(255, 255, 255, .78);
+}
+.ai-chart-field select {
+    width: 100%;
+    border: 1px solid #cadde8;
+    border-radius: 8px;
+    color: #26384f;
+    background: #f9fcff;
+    height: 27px;
+    padding: 0 22px 0 8px;
+    font-size: .61rem;
+}
+.ai-chart-prompt textarea {
+    width: 100%;
+    border: 1px solid #cadde8;
+    border-radius: 8px;
+    color: #26384f;
+    background: #f9fcff;
+    min-height: 44px;
+    max-height: 140px;
+    resize: vertical;
+    padding: 6px 8px;
+    border-color: #bfd4e6;
+    font-size: .72rem;
+    min-width: 0;
+    height: 44px;
+    line-height: 1.3;
+}
+.ai-chart-sidebar .ai-chart-field select {
+    border-color: rgba(255, 255, 255, .28);
+    background: rgba(255, 255, 255, .96);
+    color: #223247;
+    box-shadow: 0 7px 14px rgba(18, 48, 78, .14);
+}
+.ai-chart-prompt {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 32px 32px;
+    gap: 6px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e2edf4;
+}
+.ai-chart-submit {
+    border: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #2f6f9f, #55b4d4);
+    color: #fff;
+    font-size: .82rem;
+    box-shadow: 0 7px 15px rgba(35, 102, 147, .16);
+    min-height: 32px;
+}
+.ai-chart-clear {
+    border: 1px solid #d5e3ec;
+    border-radius: 8px;
+    background: #f7fbfd;
+    color: #5c6f84;
+    font-size: .82rem;
+    min-height: 32px;
+}
+.ai-chart-clear:hover {
+    background: #edf5fa;
+    color: #26384f;
+}
+.ai-chart-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+.ai-chart-suggestion {
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-left: 4px solid rgba(255, 255, 255, .72);
+    background: rgba(255, 255, 255, .14);
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 8px;
+    text-align: left;
+    font-size: .68rem;
+    font-weight: 740;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14);
+    line-height: 1.25;
+}
+.ai-chart-suggestion:hover {
+    background: rgba(255, 255, 255, .24);
+    border-top-color: rgba(255, 255, 255, .34);
+    border-right-color: rgba(255, 255, 255, .34);
+    border-bottom-color: rgba(255, 255, 255, .34);
+    transform: translateY(-1px);
+}
+.ai-chart-suggestion:nth-child(4n + 1) {
+    border-left-color: #8fd6ff;
+}
+.ai-chart-suggestion:nth-child(4n + 2) {
+    border-left-color: #b7f0cf;
+}
+.ai-chart-suggestion:nth-child(4n + 3) {
+    border-left-color: #ffd36e;
+}
+.ai-chart-suggestion:nth-child(4n + 4) {
+    border-left-color: #ff9aa6;
+}
+.ai-chart-suggestion:active {
+    transform: translateY(0);
+}
+.ai-chart-main {
+    min-width: 0;
+}
+.ai-chart-stage {
+    padding: 10px;
+}
+.ai-chart-stage-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+.ai-chart-stage-title {
+    margin: 0;
+    color: #21364f;
+    font-size: .78rem;
+    font-weight: 820;
+    line-height: 1.2;
+}
+.ai-chart-stage-meta {
+    color: #63758b;
+    font-size: .64rem;
+    font-weight: 720;
+}
+.ai-chart-canvas-wrap {
+    position: relative;
+    height: 280px;
+    border: 1px solid #d8e9f2;
+    border-radius: 10px;
+    padding: 8px;
+    background: linear-gradient(180deg, #fff 0%, #f7fbfe 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9);
+    border-color: #d7e6f1;
+}
+.ai-chart-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    color: #63758b;
+    text-align: center;
+    font-size: .72rem;
+    background: linear-gradient(180deg, rgba(247, 251, 254, .86), rgba(255, 255, 255, .92)),
+        radial-gradient(circle at 50% 0%, rgba(94, 180, 216, .10), transparent 30%);
+    border: 1px dashed #c9ddeb;
+    border-radius: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+}
+.ai-chart-insight {
+    margin-top: 8px;
+    padding: 10px;
+}
+.ai-chart-insight-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 6px;
+    color: #637286;
+    font-size: .62rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.ai-chart-insight-speaker {
+    color: #24384f;
+}
+.ai-chart-insight-time {
+    color: #7b8ca0;
+    font-weight: 600;
+}
+.ai-chart-insight-text {
+    margin: 0;
+    padding: 8px 10px;
+    white-space: pre-wrap;
+    color: #2f3f55;
+    line-height: 1.38;
+    font-size: .72rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f2f8fc 100%);
+    border: 1px solid #c7deea;
+    border-left: 4px solid #5eb4d8;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(31, 76, 110, .08);
+    border-left-width: 3px;
+    overflow-wrap: anywhere;
+}
+.ai-chart-table {
+    margin-top: 8px;
+    padding: 10px;
+    overflow-x: auto;
+}
+.ai-chart-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .72rem;
+}
+.ai-chart-table th {
+    background: #2f6f9f;
+    color: #fff;
+    border: 0;
+    padding: 7px 8px;
+    text-transform: uppercase;
+    font-size: .62rem;
+    letter-spacing: 0;
+    font-weight: 820;
+}
+.ai-chart-table td {
+    border-bottom: 1px solid #e8eef3;
+    padding: 7px 8px;
+    color: #334155;
+}
+.ai-chart-table td:last-child {
+    text-align: right;
+    font-weight: 800;
+    color: #2f6f9f;
+}
+.ai-chart-help-example {
+    background: #fff;
+    border: 1px solid #c9ddeb;
+    border-left: 4px solid #2f6f9f;
+    border-radius: 10px;
+    color: #25364b;
+    font-size: .68rem;
+    font-weight: 740;
+    padding: 6px 8px;
+}
+.ai-chart-help-example:hover {
+    background: #eef7fc;
+}
+@media (max-width: 980px) {
+    .ai-chart-shell {
+        grid-template-columns: 1fr;
+    }
+}

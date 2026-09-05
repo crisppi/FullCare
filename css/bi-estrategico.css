@@ -138,3 +138,78 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Ranking de qualidade: uma linha por hospital, sem sobreposicao de rotulos. */
+.bi-strategic-grid.bi-quality-detail-grid {
+    grid-auto-rows: minmax(190px, auto);
+}
+
+.bi-quality-ranking__hint,
+.bi-quality-ranking__empty {
+    margin: 6px 0 8px;
+    color: var(--bi-muted);
+    font-size: .62rem;
+    line-height: 1.3;
+}
+
+.bi-quality-ranking__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.bi-quality-ranking__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 10px;
+    min-height: 28px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+    font-size: .64rem;
+    line-height: 1.25;
+}
+
+.bi-quality-ranking__row:last-child {
+    border-bottom: 0;
+}
+
+.bi-quality-ranking__name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--bi-text);
+}
+
+.bi-quality-ranking__value {
+    color: var(--bi-text);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: .66rem;
+}
+
+.bi-quality-ranking__bar {
+    appearance: none;
+    width: 100%;
+    height: 9px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .12);
+    overflow: hidden;
+}
+
+.bi-quality-ranking__bar::-webkit-meter-bar {
+    background: rgba(255, 255, 255, .12);
+    border: 0;
+    border-radius: 999px;
+    height: 9px;
+}
+
+.bi-quality-ranking__bar::-webkit-meter-optimum-value {
+    background: #8ed6ee;
+    border-radius: 999px;
+}
+
+.bi-quality-ranking__bar::-moz-meter-bar {
+    background: #8ed6ee;
+    border-radius: 999px;
+}

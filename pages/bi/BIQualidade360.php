@@ -117,7 +117,7 @@ bi_render_kpis([
     ]); ?>
 </div>
 
-<div class="bi-strategic-grid">
+<div class="bi-strategic-grid bi-quality-detail-grid">
     <?php bi_render_table('Qualidade documental por hospital', ['Hospital', 'Visitas', 'Completas', 'Completude'], $docRows, [
         'hospital',
         fn($r) => bi_num($r['visitas'] ?? 0),
@@ -125,22 +125,28 @@ bi_render_kpis([
         fn($r) => ((int)($r['visitas'] ?? 0) > 0 ? bi_pct(((int)$r['completas'] / (int)$r['visitas']) * 100) : '0,0%'),
     ]); ?>
 
-    <div class="bi-panel bi-strategic-chart">
-        <h3>Hospitais críticos por score</h3>
-        <div class="bi-chart"><canvas id="chartQualidadeScore"></canvas></div>
-    </div>
+    <section class="bi-panel bi-quality-ranking" aria-labelledby="qualityRankingTitle">
+        <h3 id="qualityRankingTitle">Hospitais críticos por score</h3>
+        <p class="bi-quality-ranking__hint">Menores scores primeiro · escala de 0 a 100</p>
+        <?php if (!$hospitalScore): ?>
+            <p class="bi-quality-ranking__empty">Nenhum hospital encontrado para os filtros selecionados.</p>
+        <?php else: ?>
+            <ol class="bi-quality-ranking__list">
+                <?php foreach (array_slice($hospitalScore, 0, 10) as $hospital): ?>
+                    <li class="bi-quality-ranking__row">
+                        <span class="bi-quality-ranking__name"><?= e($hospital['hospital']) ?></span>
+                        <meter class="bi-quality-ranking__bar" min="0" max="100"
+                            value="<?= (float)$hospital['score'] ?>"
+                            aria-label="<?= e('Score de ' . $hospital['hospital']) ?>">
+                            <?= bi_num($hospital['score'], 1) ?> de 100
+                        </meter>
+                        <strong class="bi-quality-ranking__value"><?= bi_num($hospital['score'], 1) ?></strong>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        <?php endif; ?>
+    </section>
 </div>
-
-<script>
-new Chart(document.getElementById('chartQualidadeScore'), {
-    type: 'horizontalBar',
-    data: {
-        labels: <?= json_encode(array_column(array_slice($hospitalScore, 0, 10), 'hospital')) ?>,
-        datasets: [{ data: <?= json_encode(array_map('floatval', array_column(array_slice($hospitalScore, 0, 10), 'score'))) ?>, backgroundColor: 'rgba(241, 132, 181, 0.78)' }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, legend: { display: false }, scales: window.biChartScales ? window.biChartScales() : undefined }
-});
-</script>
 
 </div>
 <?php require_once("templates/footer.php"); ?>
