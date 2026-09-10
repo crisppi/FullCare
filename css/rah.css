@@ -535,13 +535,14 @@ form#form-capeante-rah label.form-label {
 form#form-capeante-rah input.form-control,
 form#form-capeante-rah select.form-select,
 form#form-capeante-rah textarea.form-control {
-  background-color: #f8fbff !important;
-  border: 1px solid #aebdce !important;
+  background-color: #edf3f8 !important;
+  border: 1px solid #9fb0c2 !important;
   border-radius: 7px !important;
-  color: #232a34 !important;
+  color: #26364a !important;
   box-shadow:
-    inset 0 1px 2px rgba(15, 23, 42, .08),
-    0 1px 0 rgba(255, 255, 255, .8) !important;
+    inset 0 1px 2px rgba(30, 50, 74, .08),
+    0 1px 3px rgba(30, 50, 74, .12) !important;
+  font-weight: 500 !important;
   font-size: .74rem !important;
   line-height: 1.15 !important;
   min-height: 32px !important;
@@ -583,8 +584,14 @@ form#form-capeante-rah textarea.form-control:hover {
 
 form#form-capeante-rah #inp_val_glosa[readonly],
 form#form-capeante-rah .rah-liberado[readonly] {
-  background: #eef2f7 !important;
-  color: #5f6875 !important;
+  background: #dfe7f0 !important;
+  color: #475569 !important;
+}
+
+form#form-capeante-rah input.form-control::placeholder,
+form#form-capeante-rah textarea.form-control::placeholder {
+  color: #66778a !important;
+  opacity: 1 !important;
 }
 
 form#form-capeante-rah small.text-muted {

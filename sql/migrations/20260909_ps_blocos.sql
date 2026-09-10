@@ -1,0 +1,1 @@
+ALTER TABLE tb_ps_item ADD COLUMN detalhes MEDIUMTEXT NULL;

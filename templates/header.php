@@ -508,6 +508,9 @@ if (!empty($sessionIdUsuario)) {
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/auditar">
                                                 <i class="bi bi-currency-dollar text-success me-2"></i>Contas para Auditar
                                             </a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/pronto-socorro">
+                                                <i class="bi bi-bandaid text-info me-2"></i>Auditoria de PS
+                                            </a></li>
                                         <li><a class="dropdown-item" href="<?= $BASE_URL ?>contas/finalizadas">
                                                 <i class="bi bi-shield-check text-primary me-2"></i>Contas Finalizadas
                                             </a></li>

@@ -120,7 +120,7 @@ final class FullCareAccess
             'permissoes' => ['administracao/permissoes', 'permiss', 'access_profile'],
             'usuarios' => ['/usuarios', 'usuario', 'hospitaluser', 'reset_senha'],
             'altas' => ['gerar-alta', 'gerar_alta', 'reverter-alta', 'process_alta', 'edit_alta', 'internacao_alta', 'alta_reverter'],
-            'contas' => ['/contas', 'capeante', 'process_rah', '_rah', '/negociacoes', 'negociacoes_', 'faturamento'],
+            'contas' => ['/contas', 'contas_ps.php', 'capeante', 'process_rah', '_rah', '/negociacoes', 'negociacoes_', 'faturamento'],
             'visitas' => ['/visitas', 'visita'],
             'censo' => ['/censo', 'censo'],
             'pacientes' => ['/pacientes', 'paciente', 'hub_paciente'],

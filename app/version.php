@@ -22,6 +22,7 @@ if (!function_exists('app_latest_version')) {
             $stmt = $conn->query("
                 SELECT version
                   FROM schema_version
+                 WHERE version REGEXP '^v?[0-9]+([.][0-9]+){1,3}$'
                  ORDER BY applied_at DESC, id DESC
                  LIMIT 1
             ");

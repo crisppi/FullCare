@@ -273,6 +273,7 @@ RewriteRule ^hub_paciente/paciente([0-9]+)/?$ hub_paciente.php?id_paciente=$1 [L
 RewriteRule ^hub_paciente/?$ hub_paciente.php [L,QSA]
 RewriteRule ^hub-paciente/([0-9]+)/?$ hub_paciente.php?id_paciente=$1 [L,QSA]
 RewriteRule ^contas/auditoria/?$ list_internacao_cap.php [L,QSA]
+RewriteRule ^contas/pronto-socorro/?$ contas_ps.php [L,QSA]
 RewriteRule ^contas/auditar/?$ list_internacao_cap_rah.php [L,QSA]
 RewriteRule ^contas/auditar/([0-9]+)/?$ cad_capeante_rah.php?id_capeante=$1 [L,QSA]
 RewriteRule ^contas/nova/internacao/([0-9]+)/?$ cad_capeante_rah.php?id_internacao=$1&type=create [L,QSA]
