@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/text_formatters.php";
+require_once __DIR__ . "/ProrrogacaoTimeline.php";
 
 if (!function_exists('fullcare_prorrog_alta_has_hora_column')) {
     function fullcare_prorrog_alta_has_hora_column(PDO $conn): bool
@@ -64,6 +65,11 @@ if (!function_exists('fullcare_upsert_prorrog_alta')) {
         if ($internacaoId <= 0) {
             return;
         }
+
+        $context = ProrrogacaoTimeline::context($conn, $internacaoId, $conn->inTransaction());
+        $discharge = ProrrogacaoTimeline::date($payload['data_alta_alt'] ?? null);
+        if (!$discharge || $discharge < $context['admission']) throw new DomainException('A alta não pode ser anterior à internação.');
+        ProrrogacaoTimeline::assertRows($context['rows'], $context['admission'], $discharge);
 
         $hasHora = fullcare_prorrog_alta_has_hora_column($conn);
 

@@ -138,8 +138,10 @@ class prorrogacaoDAO implements prorrogacaoDAOInterface
         $stmt->bindParam(":diarias_1", $prorrogacao->diarias_1);
 
         $stmt->execute();
+        $prorrogacao->id_prorrogacao = (int)$this->conn->lastInsertId();
     
             if ($ownsTransaction) $this->conn->commit();
+            return $prorrogacao->id_prorrogacao;
         } catch (Throwable $e) {
             if ($ownsTransaction && $this->conn->inTransaction()) $this->conn->rollBack();
             throw $e;

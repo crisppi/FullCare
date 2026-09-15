@@ -25,63 +25,12 @@ function optAcomod(array $lista, $sel = ''): string
 
 function dateToTs(?string $date): ?int
 {
-    if (!$date) return null;
-    $ts = strtotime(substr((string)$date, 0, 10));
-    return $ts ? (int)$ts : null;
+    $day = ProrrogacaoTimeline::date($date);
+    return $day ? strtotime($day) : null;
 }
-function daysExclusive(int $startTs, int $endTs): int
-{
-    if ($endTs <= $startTs) return 0;
-    return (int)floor(($endTs - $startTs) / 86400);
-}
-function computeCoverageAndGaps(array $intervals, int $startTs, int $endTs): array
-{
-    $totalDays = daysExclusive($startTs, $endTs);
-    if ($totalDays <= 0) {
-        return [0, 0, []];
-    }
 
-    if (!$intervals) {
-        return [0, $totalDays, [[date('d/m/Y', $startTs), date('d/m/Y', $endTs - 86400)]]];
-    }
-
-    usort($intervals, fn($a, $b) => $a['s'] <=> $b['s']);
-    $merged = [];
-    foreach ($intervals as $it) {
-        if (empty($merged)) {
-            $merged[] = $it;
-            continue;
-        }
-        $lastIdx = count($merged) - 1;
-        if ($it['s'] <= $merged[$lastIdx]['e']) {
-            if ($it['e'] > $merged[$lastIdx]['e']) {
-                $merged[$lastIdx]['e'] = $it['e'];
-            }
-            continue;
-        }
-        $merged[] = $it;
-    }
-
-    $coveredDays = 0;
-    $gaps = [];
-    $cursor = $startTs;
-    foreach ($merged as $range) {
-        if ($range['s'] > $cursor) {
-            $gaps[] = [date('d/m/Y', $cursor), date('d/m/Y', $range['s'] - 86400)];
-        }
-        $coveredDays += daysExclusive($range['s'], $range['e']);
-        if ($range['e'] > $cursor) {
-            $cursor = $range['e'];
-        }
-    }
-
-    if ($cursor < $endTs) {
-        $gaps[] = [date('d/m/Y', $cursor), date('d/m/Y', $endTs - 86400)];
-    }
-
-    $missingDays = max(0, $totalDays - $coveredDays);
-    return [$coveredDays, $missingDays, $gaps];
-}
+$timelineEditingAll = true;
+require __DIR__ . '/prorrogacao_timeline.php';
 
 /* garante pelo menos 1 linha exibida */
 $prorList = array_map(fn($r) => (array)$r, $prorList ?? []);
@@ -113,24 +62,11 @@ $todayTs = strtotime(date('Y-m-d'));
 $maxProrTs = $internEndTs ? min($internEndTs, $todayTs) : $todayTs;
 $maxProrDate = date('Y-m-d', $maxProrTs);
 
-if ($internStartTs && $internEndTs && $internEndTs > $internStartTs) {
-    $intervals = [];
-    foreach ($prorList as $p) {
-        $iniTs = dateToTs($p['ini'] ?? null);
-        if (!$iniTs) continue;
-        $fimBaseTs = dateToTs($p['fim'] ?? null) ?: ($internEndTs - 86400);
-        $fimTs = $fimBaseTs + 86400;
-        if ($fimTs <= $internStartTs || $iniTs >= $internEndTs) continue;
-        $iniTs = max($iniTs, $internStartTs);
-        $fimTs = min($fimTs, $internEndTs);
-        $intervals[] = ['s' => $iniTs, 'e' => $fimTs];
-    }
-    $coverageStartTs = $intervals ? min(array_column($intervals, 's')) : $internStartTs;
-    [$coveredDays, $missingDays, $gaps] = computeCoverageAndGaps($intervals, $coverageStartTs, $internEndTs);
-    if ($missingDays > 0) {
-        $parts = array_map(fn($g) => $g[0] . ' → ' . $g[1], $gaps);
-        $pr_pendente_label = $missingDays . ' dias | ' . implode(' • ', $parts);
-    }
+$coverage = ProrrogacaoTimeline::coverage($timelineContext['rows'], $timelineContext['admission'], $timelineContext['discharge']);
+$defaultIni = $coverage['next']['ini'] ?? '';
+if ($coverage['missingDays'] > 0) {
+    $parts = array_map(static fn($g) => date('d/m/Y', strtotime($g['ini'])) . ' → ' . date('d/m/Y', strtotime($g['fim'])), $coverage['gaps']);
+    $pr_pendente_label = $coverage['missingDays'] . ' diárias | ' . implode(' • ', $parts);
 }
 $dadosAltaProrrog = [];
 if (isset($dados_alta) && is_array($dados_alta)) {
@@ -593,15 +529,7 @@ $(function() {
     syncProrrogInlineAltaBounds();
 
     function getSuggestedIni() {
-        let last = '';
-        $container.find('.pror-row').each(function() {
-            const $row = $(this);
-            const fim = $row.find('[name$="[fim]"]').val();
-            const ini = $row.find('[name$="[ini]"]').val();
-            if (fim) last = fim;
-            else if (ini) last = ini;
-        });
-        return last;
+        return window.FullCareProrrog.suggest();
     }
 
     // change das datas com cálculo e popup
@@ -612,7 +540,9 @@ $(function() {
 
     // adicionar linha
     $container.on('click', '.btn-add-pror', function() {
-        const suggestedIni = getSuggestedIni();
+        const suggestion = getSuggestedIni();
+        if (!suggestion) { openErrorDialog('Todas as diárias até a alta já estão preenchidas. Edite um período existente para corrigir.'); return; }
+        const suggestedIni = suggestion.ini;
         const $clone = $container.find('.pror-row').last().clone();
         $clone.find('[name]').each(function() {
             this.value = '';
@@ -620,7 +550,7 @@ $(function() {
         $clone.find('[name$="[fim]"]').removeAttr('min');
         if (suggestedIni) {
             $clone.find('[name$="[ini]"]').val(suggestedIni);
-            $clone.find('[name$="[fim]"]').attr('min', suggestedIni);
+            $clone.find('[name$="[fim]"]').attr('min', suggestedIni).val(suggestion.fim || '');
         }
         $container.append($clone);
         reindexNames();

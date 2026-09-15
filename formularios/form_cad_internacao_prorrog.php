@@ -70,6 +70,12 @@ usort($prorrogEditRows, static function ($a, $b) {
     }
     return $aDate <=> $bDate;
 });
+$timelineEditingAll = false;
+require __DIR__ . '/prorrogacao_timeline.php';
+if (!$prorrogEditRows && $timelineContext['admission']) {
+    $nextPeriod = ProrrogacaoTimeline::coverage($timelineContext['rows'], $timelineContext['admission'], $timelineContext['discharge'])['next'];
+    $prorrogDefaultIni = $nextPeriod['ini'] ?? '';
+}
 $prorrogInitialRows = $prorrogEditRows ?: [[
     'acomod1_pror' => $prorrogDefaultAcomod,
     'prorrog1_ini_pror' => $prorrogDefaultIni,
@@ -397,7 +403,7 @@ function getInternacaoDateForProrrog() {
     const hidden = document.getElementById("data_intern_int");
     const visibleDt = document.getElementById("data_intern_int_dt");
 
-    if (hidden && hidden.value) return hidden.value;
+    if (hidden && hidden.value) return String(hidden.value).trim().slice(0, 10);
     if (visibleDt && visibleDt.value) {
         const parts = String(visibleDt.value).split("T");
         return parts[0] || "";
@@ -419,7 +425,8 @@ function setFirstProrrogationDate() {
     }
 
     if (iniInput && !iniInput.value) {
-        iniInput.value = defaults.prorrog1_ini_pror || dataInternacao || '';
+        const suggestion = window.FullCareProrrog?.suggest(firstContainer);
+        iniInput.value = suggestion ? suggestion.ini : (window.FullCareProrrog ? '' : (defaults.prorrog1_ini_pror || dataInternacao || ''));
     }
 }
 
@@ -657,14 +664,16 @@ function addField() {
     fieldsContainer.insertAdjacentHTML("beforeend", newField);
 
     const fieldContainers = document.querySelectorAll("#fieldsContainer .field-container");
-    if (fieldContainers.length > 1) {
-        const lastContainer = fieldContainers[fieldContainers.length - 2];
-        const newContainer = fieldContainers[fieldContainers.length - 1];
-        const lastEndDate = lastContainer.querySelector('[name="prorrog1_fim_pror"]').value;
-        if (lastEndDate) {
-            newContainer.querySelector('[name="prorrog1_ini_pror"]').value = lastEndDate;
-        }
+    const newContainer = fieldContainers[fieldContainers.length - 1];
+    const suggestion = window.FullCareProrrog.suggest(newContainer);
+    if (!suggestion) {
+        newContainer.remove();
+        openProrrogError('Todas as diárias até a alta já estão preenchidas. Edite um período existente para corrigir.');
+        return;
     }
+    newContainer.querySelector('[name="prorrog1_ini_pror"]').value = suggestion.ini || '';
+    newContainer.querySelector('[name="prorrog1_fim_pror"]').value = suggestion.fim || '';
+    window.FullCareProrrog.refresh();
     generateProrJSON();
 }
 

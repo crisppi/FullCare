@@ -63,8 +63,7 @@ if ($type === "create-pror") {
     
         $prorrogacao->fk_usuario_pror = $fk_usuario_pror;
 
-        $prorrogacaoDao->create($prorrogacao);
-        $novoIdProrrogacao = (int)$conn->lastInsertId();
+        $novoIdProrrogacao = $prorrogacaoDao->create($prorrogacao);
         $prorrogacaoCriada = $novoIdProrrogacao > 0 ? $prorrogacaoDao->findById($novoIdProrrogacao) : null;
         fullcareAuditLog($conn, [
             'action' => 'create',
@@ -109,8 +108,7 @@ if ($type === "create-vis") {
         $prorrogacao->prorrog1_ini_pror = $prorrog1_ini_pror;
         
 
-        $prorrogacaoDao->create($prorrogacao);
-        $novoIdProrrogacao = (int)$conn->lastInsertId();
+        $novoIdProrrogacao = $prorrogacaoDao->create($prorrogacao);
         $prorrogacaoCriada = $novoIdProrrogacao > 0 ? $prorrogacaoDao->findById($novoIdProrrogacao) : null;
         fullcareAuditLog($conn, [
             'action' => 'create',

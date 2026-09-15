@@ -781,6 +781,23 @@ if ($type === "create") {
         exit;
     }
 
+    // Valida todo o lote antes de criar a internação e seus registros relacionados.
+    if ($select_prorrog === 's') {
+        try {
+            $timelineInput = json_decode((string)($_POST['prorrogacoes-json'] ?? ''), true);
+            if (!is_array($timelineInput['prorrogations'] ?? null)) throw new DomainException('Dados de prorrogação inválidos.');
+            $timelineAdmission = ProrrogacaoTimeline::date($data_intern_int);
+            if (!$timelineAdmission) throw new DomainException('Data da internação inválida.');
+            $timelineDischarge = ProrrogacaoTimeline::date($_POST['prorrog_data_alta_alt'] ?? null)
+                ?: ($internado_int === 'n' ? ProrrogacaoTimeline::date($data_alta_alt) : null);
+            ProrrogacaoTimeline::assertRows($timelineInput['prorrogations'], $timelineAdmission, $timelineDischarge);
+        } catch (DomainException $e) {
+            http_response_code(422);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+    }
     $lastIntern = $internacaoDao->create($internacao);
     if ($lastIntern) {
         flowLog($flowCtx, 'create.internacao.persist', 'INFO', ['status' => 'ok']);
@@ -1180,7 +1197,7 @@ if ($type === "create") {
             $acomodacao_int,
             filter_var($fk_usuario_int, FILTER_VALIDATE_INT) ?: null
         );
-        if ($initialProrrogRow) {
+        if ($initialProrrogRow && $select_prorrog !== 's') {
             $prorrogacao = new prorrogacao();
             $prorrogacao->fk_internacao_pror = $lastId; // [FK:$lastId]
             $prorrogacao->fk_usuario_pror = $initialProrrogRow['fk_usuario_pror'];
@@ -1209,7 +1226,7 @@ if ($type === "create") {
                             . ' ini=' . (string)($prorrogacaoData['prorrog1_ini_pror'] ?? '')
                             . ' fim=' . (string)($prorrogacaoData['prorrog1_fim_pror'] ?? '')
                         );
-                        continue;
+                        throw new DomainException('Prorrogação inválida: preencha acomodação, início e fim.');
                     }
                     $prorrogacao = new prorrogacao();
                     $prorrogacao->fk_internacao_pror = $lastId; // [FK:$lastId]
@@ -1622,7 +1639,7 @@ if ($type == "update") {
                         . ' ini=' . (string)($prorrogacaoData['prorrog1_ini_pror'] ?? '')
                         . ' fim=' . (string)($prorrogacaoData['prorrog1_fim_pror'] ?? '')
                     );
-                    continue;
+                    throw new DomainException('Prorrogação inválida: preencha acomodação, início e fim.');
                 }
                 $prorrogacao = new prorrogacao();
                 $prorrogacao->fk_internacao_pror = $id_internacao; // mantém UPDATE

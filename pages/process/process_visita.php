@@ -820,7 +820,7 @@ function processProrrogacoesEntries(
     }
     if ($flag !== 's') return;
     $decoded = decodeJsonArray($jsonRaw);
-    if (!is_array($decoded) || !isset($decoded['prorrogations']) || !is_array($decoded['prorrogations'])) return;
+    if (!is_array($decoded) || !isset($decoded['prorrogations']) || !is_array($decoded['prorrogations'])) throw new DomainException('Dados de prorrogação inválidos.');
     foreach ($decoded['prorrogations'] as $row) {
         if (!is_array($row)) continue;
         $pr = new prorrogacao();
@@ -1077,6 +1077,10 @@ if ($type === "create") {
             'timer_vis'               => $visitaEmEdicao['timer_vis'] ?? $timer_vis
         ];
         try {
+            // Inicializar o schema antes da transação: DDL no MySQL faz commit implícito.
+            ensure_cuidado_continuado_schema($conn);
+            $conn->beginTransaction();
+            ProrrogacaoTimeline::context($conn, (int)$fk_internacao_vis, true);
             if (!$visitaDao->updateDirect($dadosAtualizados)) {
                 throw new RuntimeException('Falha ao atualizar visita.');
             }
@@ -1122,14 +1126,16 @@ if ($type === "create") {
                 'condicoes_cronicas' => $cronicosAtualizados,
                 'condicoes_antecedentes' => $cronicosAntecedentes
             ]);
+            $conn->commit();
         } catch (Throwable $e) {
+            if ($conn->inTransaction()) $conn->rollBack();
             flowLog($flowCtx, 'create.edit_mode.error', 'ERROR', ['error' => $e->getMessage(), 'id_visita' => $id_visita_edit]);
             error_log("Erro ao atualizar visita: " . $e->getMessage());
             if ($__DEBUG) {
                 dbg("ERRO update visita", $e->getMessage());
                 exit;
             }
-            $message->setMessage("Erro ao atualizar visita.", "error", "back");
+            $message->setMessage($e instanceof DomainException ? $e->getMessage() : "Erro ao atualizar visita.", "error", "back");
             exit;
         }
 
@@ -1166,6 +1172,10 @@ if ($type === "create") {
 
     // ------------------- Persistência VISITA --------------------------
     try {
+        // Os helpers de crônicos reutilizam esta inicialização durante a gravação.
+        ensure_cuidado_continuado_schema($conn);
+        $conn->beginTransaction();
+        ProrrogacaoTimeline::context($conn, (int)$fk_internacao_vis, true);
         $novoIdVisita = $visitaDao->create($visita);
         fullcareAuditLog($conn, [
             'action' => 'create',
@@ -1205,14 +1215,16 @@ if ($type === "create") {
             'condicoes_antecedentes' => $cronicosAntecedentes
         ]);
         if ($__DEBUG) dbg("VISITA criada", $visita);
+        $conn->commit();
     } catch (Throwable $e) {
+        if ($conn->inTransaction()) $conn->rollBack();
         flowLog($flowCtx, 'create.error', 'ERROR', ['error' => $e->getMessage(), 'fk_internacao_vis' => $fk_internacao_vis]);
         error_log("Erro ao criar visita: " . $e->getMessage());
         if ($__DEBUG) {
             dbg("ERRO create visita", $e->getMessage());
             exit;
         }
-        $message->setMessage("Erro ao salvar visita.", "error", "back");
+        $message->setMessage($e instanceof DomainException ? $e->getMessage() : "Erro ao salvar visita.", "error", "back");
         exit;
     }
 

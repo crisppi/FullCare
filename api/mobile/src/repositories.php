@@ -910,9 +910,19 @@ function mobileCreateAdmissionExtension(PDO $conn, array $authUser, array $input
     $endDate = trim((string)($input['end_date'] ?? ''));
 
     if ($startDate !== '' && $endDate === '' && $days > 0) {
-        $endDate = date('Y-m-d', strtotime($startDate . ' +' . max(0, $days - 1) . ' days'));
+        $endDate = date('Y-m-d', strtotime($startDate . ' +' . $days . ' days'));
     }
 
+    require_once __DIR__ . '/../../../app/ProrrogacaoTimeline.php';
+    $ownsTransaction = !$conn->inTransaction();
+    if ($ownsTransaction) $conn->beginTransaction();
+    try {
+        $context = ProrrogacaoTimeline::context($conn, (int)($input['admission_id'] ?? 0), true);
+        $candidate = ['ini' => $startDate, 'fim' => $endDate, 'acomod' => $input['accommodation'] ?? ''];
+        ProrrogacaoTimeline::assertRows(array_merge($context['rows'], [$candidate]), $context['admission'], $context['discharge']);
+        $startDate = ProrrogacaoTimeline::date($startDate);
+        $endDate = ProrrogacaoTimeline::date($endDate);
+        $days = ProrrogacaoTimeline::days($startDate, $endDate);
     $stmt = $conn->prepare("
         INSERT INTO tb_prorrogacao (
             fk_internacao_pror,
@@ -942,6 +952,11 @@ function mobileCreateAdmissionExtension(PDO $conn, array $authUser, array $input
     $stmt->execute();
 
     $id = (int)$conn->lastInsertId();
+    if ($ownsTransaction) $conn->commit();
+    } catch (Throwable $e) {
+        if ($ownsTransaction && $conn->inTransaction()) $conn->rollBack();
+        throw $e;
+    }
     $items = mobileListAdmissionExtensions($conn, (int)($input['admission_id'] ?? 0));
     foreach ($items as $item) {
         if ((int)$item['id'] === $id) {
