@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../check_logado.php'; ?>
 <head>
     <link rel="icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">
     <link rel="shortcut icon" type="image/png" href="/FullCare/assets/fullcare-icon.png?v=fullcare2">

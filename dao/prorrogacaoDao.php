@@ -4,6 +4,8 @@ require_once("./models/prorrogacao.php");
 require_once("./models/hospital.php");
 require_once("./models/message.php");
 
+require_once __DIR__ . '/../app/ProrrogacaoTimeline.php';
+
 // Review DAO
 require_once("dao/prorrogacaoDao.php");
 
@@ -44,65 +46,57 @@ class prorrogacaoDAO implements prorrogacaoDAOInterface
         return $prorrogacao;
     }
 
-    private function normalizeDateOnly($value): ?string
+    private array $batchIds = [];
+    private int $batchInternacao = 0;
+
+    public function prepareBatch(int $internacao, array $rows): void
     {
-        $value = trim((string)($value ?? ''));
-        if ($value === '') {
-            return null;
+        if (!$this->conn->inTransaction()) throw new LogicException('Edição em lote exige transação.');
+        $context = ProrrogacaoTimeline::context($this->conn, $internacao, true);
+        $ids = array_map('intval', array_column($context['rows'], 'id_prorrogacao'));
+        $posted = [];
+        foreach ($rows as $row) {
+            $id = (int)($row['id_prorrogacao'] ?? 0);
+            if ($id && (!in_array($id, $ids, true) || in_array($id, $posted, true))) {
+                throw new DomainException('Prorrogação inválida para esta internação.');
+            }
+            if ($id) $posted[] = $id;
         }
-        $ts = strtotime(substr($value, 0, 10));
-        return $ts ? date('Y-m-d', $ts) : null;
+        ProrrogacaoTimeline::assertRows($rows, $context['admission'], $context['discharge']);
+        $this->batchIds = $ids;
+        $this->batchInternacao = $internacao;
+    }
+
+    public function finishBatch(): void
+    {
+        $this->batchIds = [];
+        $this->batchInternacao = 0;
     }
 
     private function assertNoPeriodConflict(prorrogacao $prorrogacao, int $excludeId = 0): void
     {
-        $fkInternacao = (int)($prorrogacao->fk_internacao_pror ?? 0);
-        $ini = $this->normalizeDateOnly($prorrogacao->prorrog1_ini_pror ?? null);
-        $fim = $this->normalizeDateOnly($prorrogacao->prorrog1_fim_pror ?? null);
-
-        if ($fkInternacao <= 0 || !$ini || !$fim) {
-            return;
+        $id = (int)$prorrogacao->fk_internacao_pror;
+        $context = ProrrogacaoTimeline::context($this->conn, $id, true);
+        if ($excludeId && !in_array($excludeId, array_map('intval', array_column($context['rows'], 'id_prorrogacao')), true)) {
+            throw new DomainException('Prorrogação não pertence a esta internação.');
         }
-
-        if (strtotime($fim) <= strtotime($ini)) {
-            throw new RuntimeException('A data final da prorrogação precisa ser maior que a data inicial.');
-        }
-
-        $sql = "
-            SELECT id_prorrogacao, prorrog1_ini_pror, prorrog1_fim_pror
-            FROM tb_prorrogacao
-            WHERE fk_internacao_pror = :fk
-              AND prorrog1_ini_pror IS NOT NULL
-              AND prorrog1_fim_pror IS NOT NULL
-              AND DATE(prorrog1_ini_pror) < :fim
-              AND DATE(prorrog1_fim_pror) > :ini
-        ";
-
-        if ($excludeId > 0) {
-            $sql .= " AND id_prorrogacao <> :exclude_id";
-        }
-
-        $sql .= " LIMIT 1";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':fk', $fkInternacao, PDO::PARAM_INT);
-        $stmt->bindValue(':ini', $ini);
-        $stmt->bindValue(':fim', $fim);
-        if ($excludeId > 0) {
-            $stmt->bindValue(':exclude_id', $excludeId, PDO::PARAM_INT);
-        }
-        $stmt->execute();
-        $conflict = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($conflict) {
-            $iniBr = date('d/m/Y', strtotime((string)$conflict['prorrog1_ini_pror']));
-            $fimBr = date('d/m/Y', strtotime((string)$conflict['prorrog1_fim_pror']));
-            throw new RuntimeException("Já existe prorrogação cadastrada no período {$iniBr} a {$fimBr}.");
-        }
+        $rows = array_values(array_filter($context['rows'], function ($row) use ($excludeId, $id) {
+            $existingId = (int)$row['id_prorrogacao'];
+            return $existingId !== $excludeId && !($this->batchInternacao === $id && in_array($existingId, $this->batchIds, true));
+        }));
+        $rows[] = get_object_vars($prorrogacao);
+        ProrrogacaoTimeline::assertRows($rows, $context['admission'], $context['discharge']);
+        $prorrogacao->prorrog1_ini_pror = ProrrogacaoTimeline::date($prorrogacao->prorrog1_ini_pror);
+        $prorrogacao->prorrog1_fim_pror = ProrrogacaoTimeline::date($prorrogacao->prorrog1_fim_pror);
+        $prorrogacao->diarias_1 = ProrrogacaoTimeline::days($prorrogacao->prorrog1_ini_pror, $prorrogacao->prorrog1_fim_pror);
     }
 
     public function create(prorrogacao $prorrogacao)
     {
+        $ownsTransaction = !$this->conn->inTransaction();
+        if ($ownsTransaction) $this->conn->beginTransaction();
+        try {
+
         if (($prorrogacao->fk_usuario_pror ?? null) !== null && (int)$prorrogacao->fk_usuario_pror > 0) {
             $stmtUser = $this->conn->prepare("SELECT 1 FROM tb_user WHERE id_usuario = :id LIMIT 1");
             $stmtUser->bindValue(':id', (int)$prorrogacao->fk_usuario_pror, PDO::PARAM_INT);
@@ -144,6 +138,12 @@ class prorrogacaoDAO implements prorrogacaoDAOInterface
         $stmt->bindParam(":diarias_1", $prorrogacao->diarias_1);
 
         $stmt->execute();
+    
+            if ($ownsTransaction) $this->conn->commit();
+        } catch (Throwable $e) {
+            if ($ownsTransaction && $this->conn->inTransaction()) $this->conn->rollBack();
+            throw $e;
+        }
     }
     public function joinprorrogacaoHospital()
     {
@@ -244,6 +244,10 @@ class prorrogacaoDAO implements prorrogacaoDAOInterface
 
     public function update($prorrogacao)
     {
+        $ownsTransaction = !$this->conn->inTransaction();
+        if ($ownsTransaction) $this->conn->beginTransaction();
+        try {
+
         if (($prorrogacao->fk_usuario_pror ?? null) !== null && (int)$prorrogacao->fk_usuario_pror > 0) {
             $stmtUser = $this->conn->prepare("SELECT 1 FROM tb_user WHERE id_usuario = :id LIMIT 1");
             $stmtUser->bindValue(':id', (int)$prorrogacao->fk_usuario_pror, PDO::PARAM_INT);
@@ -276,6 +280,12 @@ class prorrogacaoDAO implements prorrogacaoDAOInterface
         $stmt->bindParam(":id_prorrogacao", $prorrogacao->id_prorrogacao);
         $stmt->execute();
 
+    
+            if ($ownsTransaction) $this->conn->commit();
+        } catch (Throwable $e) {
+            if ($ownsTransaction && $this->conn->inTransaction()) $this->conn->rollBack();
+            throw $e;
+        }
     }
     public function findByIdUpdate($prorrogacao)
     {

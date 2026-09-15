@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../check_logado.php'; ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <script src="js/timeout.js"></script>

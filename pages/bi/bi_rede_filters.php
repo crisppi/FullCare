@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../check_logado.php';
 $clearUrl = $clearUrl ?? 'bi/rede-comparativa';
 ?>
 <form class="bi-panel bi-filters bi-filters-wrap bi-filters-compact" method="get">

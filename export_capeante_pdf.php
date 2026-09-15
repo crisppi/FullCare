@@ -9,6 +9,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . "/check_logado.php";
+
 // ===================== CONFIG BÁSICA =====================
 $DEBUG = isset($_GET['debug']) && $_GET['debug'] == '1';
 error_reporting(E_ALL);

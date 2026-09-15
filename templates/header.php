@@ -277,6 +277,16 @@ if (!empty($sessionIdUsuario)) {
 <html lang="pt-br">
 
 <head>
+    <?php if (fullcare_session_authenticated($_SESSION)): ?>
+    <script id="fullcare-idle-config" type="application/json"><?= json_encode(array_merge(fullcare_idle_status(time()), [
+        'endpoint' => $BASE_URL . 'ajax/session_activity.php',
+        'loginUrl' => $BASE_URL . 'index.php',
+        'csrf' => (string)$_SESSION['csrf'],
+        'channel' => (string)$_SESSION['idle_channel'],
+    ]), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+    <link rel="stylesheet" href="<?= $BASE_URL ?>css/session_idle.css?v=<?= filemtime(__DIR__ . '/../css/session_idle.css') ?>">
+    <script defer src="<?= $BASE_URL ?>js/timeout.js?v=<?= filemtime(__DIR__ . '/../js/timeout.js') ?>"></script>
+    <?php endif; ?>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

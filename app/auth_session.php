@@ -37,6 +37,9 @@ if (!function_exists('fullcare_login_session_start')) {
             ? (int)$user['fk_seguradora_user']
             : null;
         $_SESSION['user_db_synced_at'] = time();
+        $_SESSION['idle_last_activity'] = time();
+        $_SESSION['idle_channel'] = bin2hex(random_bytes(16));
+        unset($_SESSION['session_expired']);
 
         unset(
             $_SESSION['mfa_pending_user_id'],
@@ -69,6 +72,8 @@ if (!function_exists('fullcare_login_session_clear')) {
             $_SESSION['cargo'],
             $_SESSION['fk_seguradora_user'],
             $_SESSION['user_db_synced_at'],
+            $_SESSION['idle_last_activity'],
+            $_SESSION['idle_channel'],
             $_SESSION['mfa_local_bypass_email'],
             $_SESSION['mfa_local_bypass_user_id']
         );

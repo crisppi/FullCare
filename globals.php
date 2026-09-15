@@ -125,6 +125,19 @@ if (empty($_SESSION['csrf'])) {
     }
 }
 
+// Bloqueia visitantes antes de consultar o banco ou renderizar conteúdo.
+require_once __DIR__ . '/app/security/session_guard.php';
+require_once __DIR__ . '/app/security/session_idle.php';
+if (PHP_SAPI !== 'cli') fullcare_idle_check(time());
+$__requiresSession = PHP_SAPI !== 'cli'
+    && !fullcare_is_public_session_route((string)($_SERVER['SCRIPT_FILENAME'] ?? ''));
+if ($__requiresSession) {
+    header('Cache-Control: no-store, private');
+    if ((int)($_SESSION['id_usuario'] ?? 0) <= 0) {
+        enforce_authenticated_session($BASE_URL);
+    }
+}
+
 // ------------------ 5) DB primeiro -------------------------
 require_once __DIR__ . '/db.php';   // aqui dentro você cria $conn (PDO)
 
@@ -175,6 +188,10 @@ if (!function_exists('fullcare_sync_session_user')) {
                 $stmtById->bindValue(':id', $sessionId, PDO::PARAM_INT);
                 $stmtById->execute();
                 $user = $stmtById->fetch(PDO::FETCH_ASSOC) ?: null;
+                if (!is_array($user)) {
+                    $_SESSION['ativo'] = 'n';
+                    return;
+                }
             }
 
             if (!is_array($user)) {
@@ -239,61 +256,22 @@ fullcare_sync_session_user($conn);
 require_once __DIR__ . '/authz.php';
 require_once __DIR__ . '/app/security/FullCareAccess.php';
 
-if (!function_exists('enforce_authenticated_session')) {
-    function enforce_authenticated_session(string $BASE_URL): void
-    {
-        $idUser = (int)($_SESSION['id_usuario'] ?? 0);
-        $ativo  = strtolower((string)($_SESSION['ativo'] ?? ''));
-        $isAuth = $idUser > 0 && $ativo === 's';
-        if ($isAuth) return;
-
-        $accept = strtolower($_SERVER['HTTP_ACCEPT'] ?? '');
-        $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower((string)$_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
-            || str_contains($accept, 'application/json')
-            || str_contains(strtolower($_SERVER['CONTENT_TYPE'] ?? ''), 'application/json');
-
-        if ($isAjax) {
-            http_response_code(401);
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['status' => 'error', 'message' => 'Não autenticado.'], JSON_UNESCAPED_UNICODE);
-            exit;
-        }
-
-        header('Location: ' . rtrim($BASE_URL, '/') . '/index.php', true, 303);
-        exit;
-    }
-}
-
-// Métodos que alteram estado
-$__method     = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-$__scriptBase = strtolower(basename($_SERVER['SCRIPT_NAME'] ?? ''));
-
-// Endpoints liberados do Guard (não exigem sessão prévia)
-$__guardSkip = [
-    'check_login.php',   // login
-    'logout.php',        // logout
-    'index.php',         // tela de login
-    'index_novo.php',    // sua tela de login nova
-    'process_mfa_verify.php', // segunda etapa do login, ainda sem sessão completa
-    'nova_senha.php',    // troca de senha inicial
-    'process_recuperar_senha.php',
-    'process_redefinir_senha.php',
-    // acrescente aqui quaisquer webhooks ou callbacks públicos, se existirem
-];
-
-// Qualquer endpoint process_* (exceto os públicos acima) exige sessão válida,
-// inclusive em GET, para bloquear execução por link direto sem autenticação.
-if (str_starts_with($__scriptBase, 'process_') && !in_array($__scriptBase, $__guardSkip, true)) {
+// Revalida também GET, exportações e páginas que só incluem o header.
+if ($__requiresSession) {
     enforce_authenticated_session($BASE_URL);
+    if (basename((string)($_SERVER['SCRIPT_FILENAME'] ?? '')) !== 'session_activity.php'
+        && fullcare_idle_is_navigation($_SERVER)) {
+        $_SESSION['idle_last_activity'] = time();
+    }
 }
 
 // A autorização central protege páginas GET e endpoints mutantes com a mesma matriz.
 // Rotas ainda não classificadas continuam sob autenticação e guards específicos
 // até entrarem explicitamente no mapa do FullCareAccess.
-$__accessAuthenticated = (int)($_SESSION['id_usuario'] ?? 0) > 0
-    && strtolower((string)($_SESSION['ativo'] ?? '')) === 's';
-if ($__accessAuthenticated && !in_array($__scriptBase, $__guardSkip, true)) {
+$__accessAuthenticated = fullcare_session_authenticated($_SESSION);
+if ($__accessAuthenticated && $__requiresSession) {
     FullCareAccess::enforceCurrentRequest($conn, $BASE_URL);
+    require_once __DIR__ . "/check_logado.php";
 }
 
 // Disponibiliza os helpers de schema, mas alterações estruturais são executadas

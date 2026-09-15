@@ -1,5 +1,8 @@
 RewriteEngine On
 
+# Acesso direto aos arquivos movidos usa a entrada da raiz e seu bootstrap.
+RewriteRule ^pages/(?:account|bi|cad|del|edit|list|process|show)/([^/]+\.php)$ $1 [L,QSA]
+
 # --------------------------------------------------
 # Performance: cache e compressao de arquivos estaticos
 # --------------------------------------------------

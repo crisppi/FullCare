@@ -952,14 +952,7 @@ try {
 
             $invalidReasons = internacaoEditProrrogInvalidReasons($p);
             if ($invalidReasons) {
-                internacaoEditarDebugLog(
-                    'PRORROG skip invalid id_int=' . (int)$idInt
-                    . ' id_pror=' . $idPror
-                    . ' reasons=' . implode(',', $invalidReasons)
-                    . ' ini=' . (string)($p['ini'] ?? '')
-                    . ' fim=' . (string)($p['fim'] ?? '')
-                );
-                continue;
+                throw new DomainException('Preencha acomodação e datas válidas em todas as prorrogações antes de salvar.');
             }
 
             $prArray[] = $p;
@@ -970,6 +963,7 @@ try {
             if (!empty($p['id_prorrogacao'])) $postedIds[] = (int) $p['id_prorrogacao'];
         }
 
+        $prorrogDao->prepareBatch($idInt, $prArray);
         $toDelete = array_diff($existingIds, $postedIds);
         foreach ($toDelete as $delId) {
             $beforePror = $existingById[(int)$delId] ?? null;
@@ -1045,6 +1039,7 @@ try {
 
         }
 
+        $prorrogDao->finishBatch();
         $prorrogAltaPayload = fullcare_prorrog_alta_payload_from_post(
             $_POST,
             'normalizeDateTimeInput',
