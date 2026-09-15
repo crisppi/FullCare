@@ -586,6 +586,8 @@ if ($semAtualizacaoLabel !== '') {
         <div class="fc-module-header__actions">
             <span class="badge rounded-pill bg-light text-primary"><?= number_format($totais['casos'], 0, ',', '.') ?> casos</span>
             <span class="badge rounded-pill bg-light text-primary"><?= number_format($totais['elegiveis'], 0, ',', '.') ?> elegíveis</span>
+            <a class="btn btn-light" href="<?= $BASE_URL ?>cuidado-continuado/home-care/pacientes">Pacientes em home care</a>
+            <a class="btn btn-light" href="<?= $BASE_URL ?>cuidado-continuado/home-care/prorrogacoes">Prorrogações</a>
             <a class="btn btn-light" href="<?= $BASE_URL ?>bi/home-care">Voltar ao BI</a>
         </div>
     </div>

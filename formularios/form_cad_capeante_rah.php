@@ -1282,7 +1282,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     </div>
 
     <!-- OBSERVAÇÕES FINAIS -->
-    <div class="block">
+    <div class="block rah-notes-card">
         <div id="alertPeriodo" class="alert alert-danger d-none" role="alert">
             A data final não pode ser anterior à data inicial.
         </div>
@@ -1303,7 +1303,7 @@ $admSelecionado = (int)($fv('fk_id_aud_adm') ?? 0);
     </div>
 
     <!-- AÇÕES -->
-    <div class="block">
+    <div class="block rah-actions-card">
         <div class="actions rah-actions">
             <button type="submit" class="btn btn-success rah-btn rah-btn-primary"><i class="bi bi-check-lg"></i> Salvar</button>
             <button type="button" class="btn btn-outline-primary rah-btn rah-btn-outline" id="btnSalvarPDF"><i class="bi bi-download"></i>

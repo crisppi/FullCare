@@ -10,6 +10,7 @@ $appRoot = dirname(__DIR__);
 require_once $appRoot . '/db.php';
 require_once $appRoot . '/app/schemaEnsurer.php';
 require_once $appRoot . '/app/services/ProntoSocorroAuditService.php';
+require_once $appRoot . '/app/services/HomeCareExtensionService.php';
 
 $tasks = [
     'visita.timer' => 'ensure_visita_timer_column',
@@ -20,6 +21,7 @@ $tasks = [
     'internacao.forecast' => 'ensure_internacao_forecast_columns',
     'schema.version' => 'ensure_schema_version_table',
     'contas.ps' => [ProntoSocorroAuditService::class, 'migrate'],
+    'home_care.prorrogacoes' => [HomeCareExtensionService::class, 'migrate'],
     'password_reset' => 'ensure_password_reset_table',
     'operational.indexes' => 'ensure_operational_list_indexes',
     'hospital.related' => 'ensure_hospital_related_tables',

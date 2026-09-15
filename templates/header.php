@@ -664,6 +664,8 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-house-heart fc-inline-32"
                                                    ></i>
                                                 Home Care</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/home-care/pacientes"><i class="bi bi-house-heart me-2"></i>Pacientes em Home Care</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/home-care/prorrogacoes"><i class="bi bi-calendar-plus me-2"></i>Prorrogações de Home Care</a></li>
                                     </ul>
                                 </li>
                             <?php }; ?>
@@ -761,6 +763,8 @@ if (!empty($sessionIdUsuario)) {
                                                     class="bi bi-house-heart fc-inline-45"
                                                    ></i>
                                                 Gestão Home Care</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/home-care/pacientes"><i class="bi bi-house-heart me-2"></i>Pacientes em Home Care</a></li>
+                                        <li><a class="dropdown-item" href="<?= $BASE_URL ?>cuidado-continuado/home-care/prorrogacoes"><i class="bi bi-calendar-plus me-2"></i>Prorrogações de Home Care</a></li>
                                     </ul>
                                 </li>
                             <?php }; ?>

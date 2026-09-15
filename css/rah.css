@@ -667,10 +667,15 @@ form#form-capeante-rah .tg-lab {
   font-size: .78rem;
 }
 
+form#form-capeante-rah .block.rah-notes-card,
+form#form-capeante-rah .block.rah-actions-card {
+  padding: 12px 14px !important;
+}
+
 form#form-capeante-rah .rah-notes-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
+  gap: 12px;
   align-items: start;
 }
 

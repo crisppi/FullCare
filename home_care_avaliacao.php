@@ -42,55 +42,13 @@ if (!$latest) {
 }
 ?>
 
-<style>
-.hce-shell { padding:20px 18px 34px; background:linear-gradient(180deg, #f5f8fc 0%, #eef4fb 100%); min-height:calc(100vh - 100px); }
-.hce-hero { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center; margin-bottom:16px; }
-.hce-hero-card { background:linear-gradient(135deg, #1e5f95, #5ca6ea); color:#fff; border-radius:22px; padding:22px 24px; box-shadow:0 20px 42px rgba(29,84,141,.22); }
-.hce-overline { text-transform:uppercase; letter-spacing:.14em; font-size:.72rem; opacity:.86; font-weight:700; }
-.hce-hero h1 { margin:4px 0 0; font-size:2rem; color:#fff; }
-.hce-meta { display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; font-size:.88rem; opacity:.95; }
-.hce-btn { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:0 15px; border-radius:12px; background:#fff; color:#235685; font-weight:700; text-decoration:none; border:1px solid rgba(34,88,148,.14); }
-.hce-strip { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:16px; }
-.hce-pillcard, .hce-kpi, .hce-card { background:#fff; border:1px solid rgba(34,88,148,.08); border-radius:18px; box-shadow:0 16px 34px rgba(30,60,110,.08); }
-.hce-pillcard { padding:14px 16px; }
-.hce-pillcard small, .hce-kpi small { display:block; color:#728198; text-transform:uppercase; letter-spacing:.08em; font-size:.66rem; margin-bottom:6px; }
-.hce-pillcard strong, .hce-kpi strong { font-size:1.25rem; color:#1f3150; }
-.hce-kpis { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:16px; }
-.hce-kpi { padding:14px 16px; }
-.hce-layout { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr); gap:16px; }
-.hce-card__head { padding:16px 18px 12px; border-bottom:1px solid rgba(34,88,148,.08); display:flex; align-items:center; justify-content:space-between; gap:12px; }
-.hce-card__head h2 { margin:0; font-size:1.02rem; color:#1f3150; }
-.hce-card__body { padding:18px; }
-.hce-form-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px 16px; }
-.hce-form-grid--full { grid-template-columns:1fr; }
-.hce-field label { display:block; margin-bottom:6px; font-weight:700; color:#38506d; font-size:.82rem; }
-.hce-field input, .hce-field select, .hce-field textarea { width:100%; min-height:40px; border-radius:12px; border:1px solid #d7e1ef; padding:9px 12px; font-size:.88rem; color:#243d5c; background:#fff; }
-.hce-field textarea { min-height:92px; resize:vertical; }
-.hce-section-title { margin:0 0 10px; font-size:.88rem; color:#5c6d86; text-transform:uppercase; letter-spacing:.1em; font-weight:700; }
-.hce-checkgrid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-top:6px; }
-.hce-check { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border:1px solid #dce6f2; border-radius:12px; background:#f9fbfe; }
-.hce-check input { width:auto; min-height:auto; margin-top:2px; }
-.hce-scoregrid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
-.hce-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
-.hce-submit { min-height:42px; padding:0 18px; border:none; border-radius:12px; background:linear-gradient(135deg, #2a78c2, #58a0eb); color:#fff; font-weight:700; }
-.hce-secondary { min-height:42px; padding:0 18px; border-radius:12px; border:1px solid rgba(34,88,148,.14); background:#fff; color:#235685; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; }
-.hce-history { display:grid; gap:12px; }
-.hce-history-card { border:1px solid #e1eaf5; border-radius:16px; padding:14px 15px; background:#fbfdff; }
-.hce-history-head { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
-.hce-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:.72rem; font-weight:700; }
-.hce-chip--ok { background:#e6f7ec; color:#2b7a46; }
-.hce-chip--warn { background:#fff2da; color:#946200; }
-.hce-chip--neutral { background:#eef5ff; color:#315b8d; }
-.hce-sub { color:#7b8ba3; font-size:.78rem; }
-@media (max-width: 1100px) { .hce-layout, .hce-kpis, .hce-strip { grid-template-columns:1fr 1fr; } }
-@media (max-width: 760px) { .hce-hero { grid-template-columns:1fr; } .hce-layout, .hce-kpis, .hce-strip, .hce-form-grid, .hce-checkgrid, .hce-scoregrid { grid-template-columns:1fr; } }
-</style>
+<link rel="stylesheet" href="<?= $BASE_URL ?>css/home_care_avaliacao.css?v=<?= filemtime(__DIR__ . '/css/home_care_avaliacao.css') ?>">
 
 <div class="hce-shell">
-    <div class="hce-hero">
-        <div class="hce-hero-card">
-            <div class="hce-overline">Fluxo Home Care</div>
-            <h1>Avaliação e gestão do caso</h1>
+    <div class="fc-module-header fc-module-header--cuidado">
+        <div class="fc-module-header__copy">
+            <div class="fc-module-header__kicker">Fluxo Home Care</div>
+            <h1 class="fc-module-header__title">Avaliação e gestão do caso</h1>
             <div class="hce-meta">
                 <span><strong>Paciente:</strong> <?= e($context['nome_pac'] ?? 'Sem nome') ?></span>
                 <span><strong>Hospital:</strong> <?= e($context['nome_hosp'] ?? 'Sem hospital') ?></span>
@@ -98,8 +56,10 @@ if (!$latest) {
                 <span><strong>Dias internado:</strong> <?= number_format((int)($context['diarias'] ?? 0), 0, ',', '.') ?></span>
             </div>
         </div>
-        <div>
-            <a class="hce-btn" href="<?= $BASE_URL ?>home_care_gestao.php">Voltar à fila</a>
+        <div class="fc-module-header__actions">
+            <a class="btn btn-light" href="<?= $BASE_URL ?>home_care_gestao.php">Voltar à fila</a>
+            <a class="btn btn-light" href="<?= $BASE_URL ?>cuidado-continuado/home-care/pacientes">Pacientes em home care</a>
+            <a class="btn btn-light" href="<?= $BASE_URL ?>cuidado-continuado/home-care/prorrogacoes?caso=<?= (int)$internacaoId ?>">Prorrogações</a>
         </div>
     </div>
 
@@ -171,14 +131,14 @@ if (!$latest) {
                         </div>
                     </div>
 
-                    <h3 class="hce-section-title" style="margin-top:18px;">Tabela NEAD - Grupo 1 (elegibilidade)</h3>
+                    <h3 class="hce-section-title hce-section-title--spaced">Tabela NEAD - Grupo 1 (elegibilidade)</h3>
                     <div class="hce-checkgrid">
                         <label class="hce-check"><input type="checkbox" name="nead_grupo1_cuidador_hc" value="s" <?= (($latest['nead_grupo1_cuidador_hc'] ?? '') === 's') ? 'checked' : '' ?>><span>Cuidador integral disponível</span></label>
                         <label class="hce-check"><input type="checkbox" name="nead_grupo1_ambiente_hc" value="s" <?= (($latest['nead_grupo1_ambiente_hc'] ?? '') === 's') ? 'checked' : '' ?>><span>Domicílio com condições mínimas</span></label>
                         <label class="hce-check"><input type="checkbox" name="nead_grupo1_locomocao_hc" value="s" <?= (($latest['nead_grupo1_locomocao_hc'] ?? '') === 's') ? 'checked' : '' ?>><span>Dificuldade / impossibilidade de locomoção para cuidado convencional</span></label>
                     </div>
 
-                    <h3 class="hce-section-title" style="margin-top:18px;">Tabela NEAD - Grupo 2 (indicação imediata)</h3>
+                    <h3 class="hce-section-title hce-section-title--spaced">Tabela NEAD - Grupo 2 (indicação imediata)</h3>
                     <div class="hce-checkgrid">
                         <label class="hce-check"><input type="checkbox" name="nead_grupo2_vm_hc" value="s" <?= (($latest['nead_grupo2_vm_hc'] ?? '') === 's') ? 'checked' : '' ?>><span>Ventilação mecânica / suporte ventilatório complexo</span></label>
                         <label class="hce-check"><input type="checkbox" name="nead_grupo2_aspiracao_hc" value="s" <?= (($latest['nead_grupo2_aspiracao_hc'] ?? '') === 's') ? 'checked' : '' ?>><span>Aspiração frequente / manejo intensivo de vias aéreas</span></label>
@@ -187,7 +147,7 @@ if (!$latest) {
                         <label class="hce-check"><input type="checkbox" name="nead_grupo2_lesao_complexa_hc" value="s" <?= (($latest['nead_grupo2_lesao_complexa_hc'] ?? '') === 's') ? 'checked' : '' ?>><span>Lesão complexa / curativo avançado intensivo</span></label>
                     </div>
 
-                    <h3 class="hce-section-title" style="margin-top:18px;">Tabela NEAD - Grupo 3 (pontuação de apoio)</h3>
+                    <h3 class="hce-section-title hce-section-title--spaced">Tabela NEAD - Grupo 3 (pontuação de apoio)</h3>
                     <div class="hce-scoregrid">
                         <div class="hce-field">
                             <label>Katz / dependência funcional</label>
@@ -231,7 +191,7 @@ if (!$latest) {
                         </div>
                     </div>
 
-                    <h3 class="hce-section-title" style="margin-top:18px;">Plano de transição e custos</h3>
+                    <h3 class="hce-section-title hce-section-title--spaced">Plano de transição e custos</h3>
                     <div class="hce-form-grid">
                         <div class="hce-field">
                             <label>Custo hospitalar / dia</label>
@@ -251,7 +211,7 @@ if (!$latest) {
                         </div>
                     </div>
 
-                    <div class="hce-form-grid hce-form-grid--full" style="margin-top:14px;">
+                    <div class="hce-form-grid hce-form-grid--full hce-form-grid--spaced">
                         <div class="hce-field">
                             <label>Plano de transição</label>
                             <textarea name="plano_transicao_hc" placeholder="Plano assistencial e operacional para implantação do Home Care"><?= e($latest['plano_transicao_hc'] ?? '') ?></textarea>
@@ -311,7 +271,7 @@ if (!$latest) {
                                     <div class="hce-sub">Barreira: <?= e($barreiraOptions[$item['barreira_principal_hc']] ?? $item['barreira_principal_hc']) ?></div>
                                 <?php endif; ?>
                                 <?php if (!empty($item['plano_transicao_hc'])): ?>
-                                    <div style="margin-top:8px; color:#30445f; font-size:.84rem;"><?= nl2br(e($item['plano_transicao_hc'])) ?></div>
+                                    <div class="hce-history-plan"><?= nl2br(e($item['plano_transicao_hc'])) ?></div>
                                 <?php endif; ?>
                             </div>
                         <?php endforeach; ?>

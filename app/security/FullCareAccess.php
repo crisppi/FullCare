@@ -116,6 +116,8 @@ final class FullCareAccess
     private static function detectModule(string $script, string $uri): ?string
     {
         $haystack = $uri . ' ' . $script;
+        if (str_contains($script, 'home_care_pacientes') || str_contains($uri, '/cuidado-continuado/home-care/pacientes')) return 'cuidado_continuado';
+        if (str_contains($script, 'home_care_prorrogacao') || str_contains($uri, '/cuidado-continuado/home-care/prorrogacoes')) return 'cuidado_continuado';
         $rules = [
             'permissoes' => ['administracao/permissoes', 'permiss', 'access_profile'],
             'usuarios' => ['/usuarios', 'usuario', 'hospitaluser', 'reset_senha'],
