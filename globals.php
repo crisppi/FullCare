@@ -128,7 +128,7 @@ if (empty($_SESSION['csrf'])) {
 // Bloqueia visitantes antes de consultar o banco ou renderizar conteúdo.
 require_once __DIR__ . '/app/security/session_guard.php';
 require_once __DIR__ . '/app/security/session_idle.php';
-if (PHP_SAPI !== 'cli') fullcare_idle_check(time());
+if (PHP_SAPI !== 'cli') fullcare_idle_check(time(), !fullcare_is_public_session_route((string)($_SERVER['SCRIPT_FILENAME'] ?? '')));
 $__requiresSession = PHP_SAPI !== 'cli'
     && !fullcare_is_public_session_route((string)($_SERVER['SCRIPT_FILENAME'] ?? ''));
 if ($__requiresSession) {
@@ -253,6 +253,7 @@ if (!function_exists('fullcare_sync_session_user')) {
 fullcare_sync_session_user($conn);
 
 // ------------------ 6) Guard (autorização) -----------------
+require_once __DIR__ . '/app/security/gestor_scope.php';
 require_once __DIR__ . '/authz.php';
 require_once __DIR__ . '/app/security/FullCareAccess.php';
 

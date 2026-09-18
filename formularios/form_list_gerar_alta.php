@@ -37,7 +37,8 @@ if ($pesquisa_matricula !== '') {
     $condicoes[] = 'pa.matricula_pac LIKE :pesquisa_matricula';
     $whereParams[':pesquisa_matricula'] = '%' . $pesquisa_matricula . '%';
 }
-$where = implode(' AND ', $condicoes);
+if (ge_enabled()) $condicoes[] = ge_internacao_sql('ac');
+        $where = implode(' AND ', $condicoes);
 
 $dadosTotais = $internacaoDao->selectAllInternacaoList($where, $ordenar, null, $whereParams);
 $qtdItens = is_array($dadosTotais) ? count($dadosTotais) : 0;
@@ -50,7 +51,7 @@ sort($dadosAlta);
 ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/css/listagem_padrao.css?v=' . @filemtime(__DIR__ . '/../css/listagem_padrao.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-<div class="container-fluid form_container listagem-page" id="main-container">
+<div class="container-fluid form_container listagem-page gerar-altas-page" id="main-container">
     <div class="listagem-hero listagem-hero--module listagem-hero--internacoes">
         <div class="listagem-hero__copy">
             <div class="listagem-kicker">Internações abertas</div>
@@ -58,7 +59,7 @@ sort($dadosAlta);
         </div>
     </div>
 
-    <div class="card shadow-sm mb-3 gerar-alta-filter-card">
+    <div class="gerar-alta-filter-card">
         <div class="card-body">
             <form class="gerar-alta-filter-form">
                 <div class="gerar-alta-filter-grid">
@@ -115,373 +116,10 @@ sort($dadosAlta);
         </div>
     </div>
 
-    <style>
-        .listagem-page { padding: 4px 4px 14px; }
-        .gerar-alta-hero {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            gap: 16px;
-            margin: 0 0 10px;
-            padding: 2px 4px 0;
-        }
-        .gerar-alta-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #7b5a9a;
-            font-size: .58rem;
-            font-weight: 800;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
-        .gerar-alta-kicker::before {
-            content: "";
-            width: 18px;
-            height: 2px;
-            border-radius: 999px;
-            background: currentColor;
-        }
-        .gerar-alta-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 2px 0 0 !important;
-            color: #2d203d;
-            font-size: 1.08rem !important;
-            font-weight: 800;
-        }
-        .gerar-alta-title i {
-            color: #5e2363;
-            font-size: 1rem;
-        }
-        .gerar-alta-subtitle {
-            margin: 3px 0 0;
-            color: #7b7b8d;
-            font-size: .72rem;
-        }
-        #main-container .card { border-radius: 16px; border:1px solid #eee8f6; box-shadow: 0 10px 28px -22px rgba(89,46,131,.28); }
-        #main-container .form-label { font-size: .66rem; margin-bottom: 4px; }
-        #main-container .form-control,
-        #main-container .form-select,
-        #main-container .btn { min-height: 32px; height: 32px; font-size: .72rem; line-height: 1.2; }
-        #main-container .btn-lg { min-height: 32px; padding: 6px 12px !important; font-size: .72rem; }
-        .gerar-alta-filter-card {
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(180deg, #fff 0%, #fbf8fe 100%);
-        }
-        .gerar-alta-filter-card::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 5px;
-            background: #5e2363;
-        }
-        .gerar-alta-filter-card .card-body { padding: .9rem 1rem .95rem 1.15rem; }
-        .gerar-alta-filter-form { margin: 0; }
-        .gerar-alta-filter-grid {
-            display: grid;
-            grid-template-columns: minmax(230px, 1.65fr) minmax(190px, 1.25fr) minmax(180px, 1fr) minmax(130px, .62fr) auto;
-            align-items: end;
-            gap: 10px;
-        }
-        .gerar-alta-filter-field,
-        .gerar-alta-filter-actions {
-            min-width: 0;
-        }
-        .gerar-alta-filter-card .input-group { min-width: 0; }
-        .gerar-alta-filter-card .input-group-text {
-            min-width: 34px;
-            justify-content: center;
-            border-color: #ddd6e7;
-            background: #f8f2fd;
-            color: #5e2363;
-            padding-left: .55rem;
-            padding-right: .55rem;
-        }
-        .gerar-alta-filter-card .input-group .form-control,
-        .gerar-alta-filter-card .input-group .form-select {
-            border-color: #ddd6e7;
-            background-color: #fff;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
-        }
-        .gerar-alta-filter-card .input-group:focus-within .input-group-text,
-        .gerar-alta-filter-card .input-group:focus-within .form-control,
-        .gerar-alta-filter-card .input-group:focus-within .form-select {
-            border-color: #cdb8dd;
-        }
-        .gerar-alta-filter-actions {
-            display: flex;
-            align-items: end;
-            gap: 8px;
-            padding-bottom: 0;
-        }
-        #main-container .gerar-alta-filter-actions .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            min-width: 34px;
-            max-width: 34px;
-            padding: 0 !important;
-            border-radius: 10px;
-        }
-        #main-container .gerar-alta-filter-actions .btn-primary {
-            background: #5e2363;
-            border-color: #5e2363;
-            box-shadow: 0 8px 16px rgba(94, 35, 99, 0.16);
-        }
-        #main-container .gerar-alta-filter-actions .btn-filtro-limpar {
-            border-color: #eadff3;
-            background: linear-gradient(180deg, #fff 0%, #f8f2fd 100%);
-            color: #8b5a7a;
-            box-shadow: 0 8px 16px rgba(94, 35, 99, 0.08);
-        }
-        #main-container .gerar-alta-filter-actions .btn i {
-            margin: 0;
-            font-size: .95rem;
-            line-height: 1;
-        }
-        #main-container .gerar-alta-filter-actions .material-icons {
-            margin: 0;
-            font-size: 16px;
-            line-height: 1;
-        }
-        .gerar-alta-actionbar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            padding: 10px 12px;
-            border: 1px solid #eee6f5;
-            border-radius: 14px;
-            background: #fff;
-            color: #767184;
-            font-size: .76rem;
-            box-shadow: 0 10px 24px -22px rgba(94, 35, 99, .45);
-        }
-        #main-container .gerar-alta-submit {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            min-height: 36px;
-            height: 36px;
-            border: 0;
-            border-radius: 11px !important;
-            padding: 0 14px !important;
-            background: linear-gradient(135deg, #5e2363 0%, #7b2dbf 100%) !important;
-            box-shadow: 0 10px 18px rgba(94, 35, 99, .18);
-        }
-        .gerar-alta-card {
-            position: relative;
-            border-radius: 8px;
-            padding: .42rem .62rem .5rem .9rem;
-            margin-bottom: .56rem;
-            background: linear-gradient(180deg, #ffffff 0%, #fbf8ff 100%);
-            border: 1px solid #dbc7ec;
-            box-shadow:
-                0 10px 22px -17px rgba(94, 35, 99, .5),
-                0 2px 0 rgba(94, 35, 99, .06);
-        }
-        .gerar-alta-card + .gerar-alta-card {
-            margin-top: .56rem;
-        }
-        .gerar-alta-card::before {
-            content: "";
-            position: absolute;
-            left: .48rem;
-            top: .42rem;
-            bottom: .42rem;
-            width: 4px;
-            border-radius: 10px;
-            background: linear-gradient(180deg, #6d28a8 0%, #c35c91 100%);
-            box-shadow: 0 0 0 3px rgba(123, 45, 191, .08);
-        }
-        .gerar-alta-meta-grid {
-            display: grid;
-            grid-template-columns: minmax(210px, 1.45fr) minmax(210px, 1.45fr) minmax(140px, .75fr) minmax(95px, .5fr);
-            gap: 5px;
-        }
-        .gerar-alta-meta-card {
-            min-width: 0;
-            min-height: 40px;
-            padding: .26rem .42rem;
-            border: 1px solid #dfcdea;
-            border-left: 3px solid #7b5a9a;
-            border-radius: 8px;
-            background: linear-gradient(180deg, #fff 0%, #f8f2fd 100%);
-            box-shadow: 0 8px 16px rgba(94, 35, 99, .06), inset 0 1px 0 rgba(255,255,255,.9);
-        }
-        .gerar-alta-meta-card strong,
-        .gerar-alta-meta-card small {
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .gerar-alta-meta-card strong {
-            margin-top: 1px;
-            color: #2c2742;
-            font-size: .68rem;
-            font-weight: 700;
-        }
-        .gerar-alta-meta-card small {
-            margin-top: 0;
-            min-height: .9em;
-            color: #8b8ca5;
-            font-size: .54rem;
-        }
-        .gerar-alta-meta-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            color: #5e2363;
-            font-size: .51rem;
-            font-weight: 800;
-            letter-spacing: .08em;
-            line-height: 1;
-            text-transform: uppercase;
-        }
-        .gerar-alta-meta-label i {
-            font-size: .6rem;
-            letter-spacing: 0;
-        }
-        .gerar-alta-meta-card-id {
-            text-align: center;
-        }
-        .gerar-alta-meta-card-id .gerar-alta-meta-label {
-            justify-content: center;
-        }
-        .gerar-alta-card .tag {
-            font-size: .52rem;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            color: #8b8ca5;
-        }
-        .gerar-alta-card .shadow-field {
-            background: #ffffff;
-            border-radius: 8px;
-            padding: .24rem .48rem;
-            border: 1px solid #cbd5e1;
-            min-height: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            box-shadow:
-                0 1px 2px rgba(15, 23, 42, .10),
-                inset 0 1px 0 rgba(255, 255, 255, .95);
-        }
-        .gerar-alta-card .shadow-field .form-control,
-        .gerar-alta-card .shadow-field .form-select {
-            width: 100%;
-            font-size: .78rem;
-            line-height: 1.1;
-            color: #1f2937;
-            font-weight: 400;
-        }
-
-        .gerar-alta-card input[type="date"].form-control,
-        .gerar-alta-card input[type="datetime-local"].form-control,
-        .gerar-alta-card input[type="time"].form-control {
-            font-size: .78rem !important;
-            font-weight: 400 !important;
-            line-height: 1.1 !important;
-            color: #1f2937 !important;
-        }
-
-        .gerar-alta-card .shadow-field:focus-within {
-            border-color: #3b82f6;
-            box-shadow:
-                0 0 0 .14rem rgba(59, 130, 246, .16),
-                0 1px 2px rgba(15, 23, 42, .10);
-        }
-
-        .gerar-alta-card .row.g-3 {
-            --bs-gutter-x: .5rem;
-            --bs-gutter-y: .3rem;
-        }
-        .gerar-alta-card .shadow-field.bg-light {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            height: 30px;
-            min-height: 30px;
-            padding: .24rem .5rem;
-            border-color: #fecaca;
-            background: #fff7f7;
-        }
-        .gerar-alta-card .shadow-field.bg-light span,
-        .gerar-alta-card .shadow-field.bg-light small {
-            display: inline;
-            margin: 0;
-            font-size: .72rem;
-            line-height: 1;
-        }
-        .gerar-alta-card .shadow-field.bg-light span {
-            font-weight: 700 !important;
-        }
-        .gerar-alta-card .shadow-field.bg-light small {
-            color: #7b7280 !important;
-        }
-        .gerar-alta-card .gerar-alta-check-field {
-            justify-content: center;
-            cursor: pointer;
-        }
-        .gerar-alta-card .gerar-alta-check-field .form-check-input {
-            width: .9rem;
-            height: .9rem;
-            margin: 0;
-            cursor: pointer;
-        }
-        .gerar-alta-card hr {
-            margin: .38rem 0;
-            opacity: .12;
-            border-color: #7b2dbf;
-        }
-        .gerar-alta-total {
-            display: inline-flex;
-            justify-content: flex-end;
-            font-size: .68rem;
-            font-weight: 600;
-            line-height: 1;
-        }
-        @media (max-width: 991px) {
-            .gerar-alta-filter-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-            .gerar-alta-filter-actions {
-                justify-content: flex-start;
-            }
-            .gerar-alta-meta-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-            .gerar-alta-card {
-                padding: .8rem 1rem;
-            }
-        }
-        @media (max-width: 575px) {
-            .gerar-alta-filter-grid {
-                grid-template-columns: 1fr;
-            }
-            .gerar-alta-meta-grid {
-                grid-template-columns: 1fr;
-            }
-            .gerar-alta-meta-card-id,
-            .gerar-alta-meta-card-id .gerar-alta-meta-label {
-                text-align: left;
-                justify-content: flex-start;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="<?= htmlspecialchars($BASE_URL, ENT_QUOTES, 'UTF-8') ?>css/gerar_altas.css?v=<?= filemtime(__DIR__.'/../css/gerar_altas.css') ?>">
 
     <form action="process_gerar_altas.php" method="POST" id="form-gerar-altas">
+<?php if (ge_enabled()): ?><input type="hidden" name="csrf" value="<?=htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8')?>"><?php endif; ?>
         <input type="hidden" name="type" value="gerar_altas">
         <?php if ($lista): ?>
         <div class="gerar-alta-actionbar">
@@ -495,8 +133,8 @@ sort($dadosAlta);
         </div>
         <?php endif; ?>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
+        <div class="gerar-alta-list">
+            <div class="gerar-alta-list-body">
                 <?php if (!$lista): ?>
                 <div class="text-center text-muted py-4">Nenhum paciente internado.</div>
                 <?php else: ?>
@@ -517,15 +155,14 @@ sort($dadosAlta);
                     <input type="hidden" name="<?= $fieldPrefix ?>_uti_fk" value="<?= $fkInternacaoUti ?>">
                     <?php endif; ?>
                 <div class="gerar-alta-meta-grid">
+                    <div class="gerar-alta-meta-card gerar-alta-patient">
+                        <span class="gerar-alta-meta-label"><i class="bi bi-person" aria-hidden="true"></i>Paciente</span>
+                        <strong><?= htmlspecialchars($row['nome_pac'] ?? '-') ?></strong>
+                    </div>
                     <div class="gerar-alta-meta-card">
                         <span class="gerar-alta-meta-label"><i class="bi bi-hospital" aria-hidden="true"></i>Hospital</span>
                         <strong><?= htmlspecialchars($row['nome_hosp'] ?? '-') ?></strong>
                         <small><?= htmlspecialchars($row['acomodacao_int'] ?? '') ?></small>
-                    </div>
-                    <div class="gerar-alta-meta-card">
-                        <span class="gerar-alta-meta-label"><i class="bi bi-person" aria-hidden="true"></i>Paciente</span>
-                        <strong><?= htmlspecialchars($row['nome_pac'] ?? '-') ?></strong>
-                        <small><?= htmlspecialchars($row['titular_int'] ?? '') ?></small>
                     </div>
                     <div class="gerar-alta-meta-card">
                         <span class="gerar-alta-meta-label"><i class="bi bi-calendar2-plus" aria-hidden="true"></i>Internação</span>
@@ -539,7 +176,7 @@ sort($dadosAlta);
 
                 <hr>
 
-                <div class="row g-3 align-items-end">
+                <div class="gerar-alta-fields">
                     <?php if ($internadoUti && $idUti): ?>
                     <div class="col-12">
                         <div class="shadow-field bg-light">
@@ -548,25 +185,25 @@ sort($dadosAlta);
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="tag mb-1">Data alta UTI</div>
+                        <label class="tag mb-1" for="<?= $fieldPrefix ?>_uti_data">Data alta UTI</label>
                         <div class="shadow-field">
                             <input type="date" class="form-control form-control-sm border-0 bg-transparent p-0"
-                                name="<?= $fieldPrefix ?>_uti_data">
+                                id="<?= $fieldPrefix ?>_uti_data" name="<?= $fieldPrefix ?>_uti_data">
                         </div>
                     </div>
                     <?php endif; ?>
                     <div class="col-md-4">
-                        <div class="tag mb-1">Data/Hora da alta</div>
+                        <label class="tag mb-1" for="<?= $fieldPrefix ?>_data_hora">Data/Hora da alta</label>
                         <div class="shadow-field">
                             <input type="datetime-local" class="form-control form-control-sm border-0 bg-transparent p-0"
-                                name="<?= $fieldPrefix ?>_data_hora" step="60">
+                                id="<?= $fieldPrefix ?>_data_hora" name="<?= $fieldPrefix ?>_data_hora" step="60">
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="tag mb-1">Motivo da alta</div>
+                        <label class="tag mb-1" for="<?= $fieldPrefix ?>_motivo">Motivo da alta</label>
                         <div class="shadow-field">
                             <select class="form-select form-select-sm border-0 bg-transparent p-0"
-                                name="<?= $fieldPrefix ?>_motivo">
+                                id="<?= $fieldPrefix ?>_motivo" name="<?= $fieldPrefix ?>_motivo">
                                 <option value="">Selecione...</option>
                                 <?php foreach ($dadosAlta as $motivo): ?>
                                 <option value="<?= htmlspecialchars($motivo) ?>"><?= htmlspecialchars($motivo) ?></option>
@@ -574,10 +211,11 @@ sort($dadosAlta);
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-1">
-                        <div class="tag mb-1">Gerar</div>
+                    <div class="gerar-alta-selection">
+                        <div class="tag mb-1">Seleção</div>
                         <label class="shadow-field gerar-alta-check-field">
-                            <input type="checkbox" class="form-check-input" name="gerar[]" value="<?= $idIntern ?>">
+                            <input type="checkbox" class="form-check-input" name="gerar[]" value="<?= $idIntern ?>" aria-label="Selecionar alta da internação <?= $idIntern ?>">
+                            <span>Selecionar alta</span>
                         </label>
                     </div>
                 </div>
@@ -590,20 +228,36 @@ sort($dadosAlta);
 
     </form>
 
-    <div class="d-flex flex-column flex-md-row justify-content-end align-items-center gap-3 mt-2">
-        <span class="text-muted gerar-alta-total">Total encontrado: <?= $qtdItens ?></span>
+    <div class="listagem-footer-row gerar-alta-footer">
+        <div class="listagem-pagination-slot">
         <?php if ($totalPages > 1): ?>
         <nav aria-label="Paginação">
             <ul class="pagination justify-content-center mb-0">
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <?php
+                $blockStart = intdiv(max(1, $pagAtual) - 1, 5) * 5 + 1;
+                $blockEnd = min($blockStart + 4, $totalPages);
+                $pageUrl = static function (int $page) use ($BASE_URL, $limite, $pesquisa_hosp, $pesquisa_pac, $pesquisa_matricula, $ordenar): string {
+                    return htmlspecialchars($BASE_URL . 'list_internacao_gerar_alta.php?' . http_build_query([
+                        'pag'=>$page, 'limite'=>$limite, 'pesquisa_hosp'=>$pesquisa_hosp,
+                        'pesquisa_pac'=>$pesquisa_pac, 'pesquisa_matricula'=>$pesquisa_matricula, 'ordenar'=>$ordenar
+                    ]), ENT_QUOTES, 'UTF-8');
+                };
+                ?>
+                <?php if ($blockStart > 1): ?>
+                <li class="page-item"><a class="page-link" href="<?= $pageUrl(max(1, $blockStart - 5)) ?>" aria-label="Cinco páginas anteriores" title="Cinco páginas anteriores">&laquo;</a></li>
+                <?php endif; ?>
+                <?php for ($i = $blockStart; $i <= $blockEnd; $i++): ?>
                 <li class="page-item <?= $i == $pagAtual ? 'active' : '' ?>">
-                    <a class="page-link" href="<?= 'internacoes/gerar-alta/pagina/' . $i ?>">
-                        <?= $i ?>
-                    </a>
+                    <a class="page-link" <?= $i == $pagAtual ? 'aria-current="page"' : '' ?> href="<?= $pageUrl($i) ?>"><?= $i ?></a>
                 </li>
                 <?php endfor; ?>
+                <?php if ($blockEnd < $totalPages): ?>
+                <li class="page-item"><a class="page-link" href="<?= $pageUrl($blockEnd + 1) ?>" aria-label="Próximas cinco páginas" title="Próximas cinco páginas">&raquo;</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
         <?php endif; ?>
+        </div>
+        <span class="text-muted gerar-alta-total">Total: <?= $qtdItens ?></span>
     </div>
 </div>

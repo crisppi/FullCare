@@ -243,6 +243,9 @@ if ($type === "create") {
         $hospitalDao->create($hospital);
 
         $id_hospital_novo = (int) $conn->lastInsertId();
+        if (ge_enabled()) {
+            $conn->prepare('INSERT INTO ge_escopo (usuario_id,hospital_id,estipulante_id,todos_pacientes) VALUES (?,?,?,0)')->execute([(int)$_SESSION['id_usuario'],$id_hospital_novo,(int)$_POST['ge_estipulante_id']]);
+        }
         ensureHospitalUserLink($conn, $id_hospital_novo, $creatorUserId);
 
         $enderecos = [];

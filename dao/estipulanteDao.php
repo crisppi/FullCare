@@ -55,7 +55,8 @@ class EstipulanteDAO implements EstipulanteDAOInterface
     {
         $estipulante = [];
 
-        $stmt = $this->conn->prepare("SELECT * FROM tb_estipulante
+        $scope = function_exists('ge_enabled') && ge_enabled() ? ge_estipulante_sql() : '1=1';
+        $stmt = $this->conn->prepare("SELECT * FROM tb_estipulante WHERE ($scope)
         ORDER BY id_estipulante DESC");
 
         $stmt->execute();

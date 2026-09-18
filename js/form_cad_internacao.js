@@ -760,6 +760,7 @@ const hospitalInsightsHelper = (function() {
         setLoading(hospitalName || 'hospital selecionado');
         try {
             const baseUrl = config.baseUrl || '';
+            if (document.body.classList.contains('gestor-native')) return;
             const response = await fetch(baseUrl + 'ajax/hospital_insights.php?id_hospital=' + encodeURIComponent(hospitalId), {
                 credentials: 'same-origin'
             });
@@ -946,6 +947,7 @@ const patientInsightsHelper = (function() {
         setMessage(`Carregando dados de <strong>${pacName || 'paciente'}</strong>...`);
         disableHub();
         try {
+            if (document.body.classList.contains('gestor-native')) return;
             const response = await fetch('ajax/paciente_insights.php?id_paciente=' + encodeURIComponent(pacId), {
                 credentials: 'same-origin'
             });

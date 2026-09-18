@@ -285,6 +285,7 @@ function mobileFindUserByEmail(PDO $conn, string $email): ?array
             mfa_recovery_generated_at
         FROM tb_user
         WHERE email_user = :email
+          AND NOT EXISTS (SELECT 1 FROM tb_access_profile ap WHERE ap.id_access_profile=tb_user.fk_access_profile AND ap.slug IN ('gestor_estipulante_med','gestor_estipulante_enf','gerente_estipulante'))
         LIMIT 1
     ";
 
@@ -315,6 +316,7 @@ function mobileFindUserById(PDO $conn, int $userId): ?array
             mfa_recovery_generated_at
         FROM tb_user
         WHERE id_usuario = :id
+          AND NOT EXISTS (SELECT 1 FROM tb_access_profile ap WHERE ap.id_access_profile=tb_user.fk_access_profile AND ap.slug IN ('gestor_estipulante_med','gestor_estipulante_enf','gerente_estipulante'))
         LIMIT 1
     ");
     $stmt->bindValue(':id', $userId, PDO::PARAM_INT);

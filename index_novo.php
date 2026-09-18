@@ -344,6 +344,16 @@
         width: 100%;
     }
 
+    .login-session-notice {
+        margin-top: 16px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #edf4fa;
+        color: #365b78;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
     /* error toast */
     .error-message {
         position: fixed;
@@ -506,6 +516,12 @@
             <div class="forgot">
                 <a href="<?= htmlspecialchars($assetBase, ENT_QUOTES, 'UTF-8') ?>/esqueci_senha.php">Esqueci minha senha</a>
             </div>
+
+            <?php if (fullcare_idle_take_notice(time())) { ?>
+            <div class="login-session-notice" role="status">
+                Sua sessão anterior expirou por inatividade. Entre novamente para continuar.
+            </div>
+            <?php } ?>
 
             <?php if (isset($_SESSION['login_error']) && $_SESSION['login_error'] !== "") { ?>
             <div class="error-message">

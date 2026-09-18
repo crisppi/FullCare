@@ -86,7 +86,7 @@ $ultimoReg = ($a["ultimoReg"]);
 
 // Selecionar hospitais por usuário
 $id_user = $_SESSION['id_usuario'];
-if ($_SESSION['nivel'] > 3) {
+if (ge_enabled() || $_SESSION['nivel'] > 3) {
     $listHopitaisPerfil = $hospital_geral->findGeral();
 } else {
     include_once("models/hospitalUser.php");

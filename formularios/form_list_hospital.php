@@ -117,7 +117,7 @@
         <div class="complete-table">
             <div id="navbarToggleExternalContent" class="table-filters">
 
-                <form id="form_pesquisa" method="GET">
+                <form id="form_pesquisa" method="GET" action="<?= htmlspecialchars(rtrim($BASE_URL, '/') . '/hospitais', ENT_QUOTES, 'UTF-8') ?>">
                     <div class="row">
                         <div class="form-group col-sm-2" style="padding:2px !important;padding-left:16px !important;">
 
@@ -127,7 +127,7 @@
                         </div>
                         <div class="col-sm-1" style="padding:2px !important">
                             <select class="form-control mb-3 form-control-sm" style="margin-top:7px;" id="limite"
-                                name="limite">
+                                name="limite_pag">
                                 <option value="">Reg por página</option>
                                 <option value="5" <?= $limite == '5' ? 'selected' : null ?>>Reg por pág = 5
                                 </option>
@@ -276,8 +276,7 @@
                                         ]);
                                         ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($firstPageUrl) ?>"
-                                        onclick="return paginateHospitais('<?= htmlspecialchars($firstPageUrl, ENT_QUOTES) ?>');">
+                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($firstPageUrl) ?>">
                                         <i class="fas fa-angle-double-left"></i></a>
                                 </li>
                                 <?php endif; ?>
@@ -289,8 +288,7 @@
                                         ]);
                                         ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="<?= htmlspecialchars($prevPageUrl) ?>"
-                                        onclick="return paginateHospitais('<?= htmlspecialchars($prevPageUrl, ENT_QUOTES) ?>');">
+                                    <a class="page-link" href="<?= htmlspecialchars($prevPageUrl) ?>">
                                         <i class="fas fa-angle-left"></i> </a>
                                 </li>
                                 <?php endif; ?>
@@ -304,8 +302,7 @@
                                         ?>
                                 <li class="page-item <?php print ($_GET['pag'] ?? 1) == $i ? "active" : "" ?>">
 
-                                    <a class="page-link" href="<?= htmlspecialchars($pageUrl) ?>"
-                                        onclick="return paginateHospitais('<?= htmlspecialchars($pageUrl, ENT_QUOTES) ?>');">
+                                    <a class="page-link" href="<?= htmlspecialchars($pageUrl) ?>">
                                         <?php echo $i; ?>
                                     </a>
                                 </li>
@@ -319,8 +316,7 @@
                                         ]);
                                         ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($nextPageUrl) ?>"
-                                        onclick="return paginateHospitais('<?= htmlspecialchars($nextPageUrl, ENT_QUOTES) ?>');"><i
+                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($nextPageUrl) ?>"><i
                                             class="fas fa-angle-right"></i></a>
                                 </li>
                                 <?php endif; ?>
@@ -332,8 +328,7 @@
                                         ]);
                                         ?>
                                 <li class="page-item">
-                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($lastPageUrl) ?>"
-                                        onclick="return paginateHospitais('<?= htmlspecialchars($lastPageUrl, ENT_QUOTES) ?>');"><i
+                                    <a class="page-link" id="blocoNovo" href="<?= htmlspecialchars($lastPageUrl) ?>"><i
                                             class="fas fa-angle-double-right"></i></a>
                                 </li>
                                 <?php endif; ?>
@@ -353,60 +348,6 @@
         </div>
     </div>
 </body>
-
-<script>
-// ajax para submit do formulario de pesquisa
-$(document).ready(function() {
-    $('#form_pesquisa').submit(function(e) {
-        e.preventDefault(); // Impede o comportamento padrão de enviar o formulário
-
-        var formData = $(this).serialize(); // Serializa os dados do formulário
-
-        $.ajax({
-            url: $(this).attr('action'), // URL do formulário
-            type: $(this).attr('method'), // Método do formulário (POST)
-            data: formData, // Dados serializados do formulário
-            success: function(response) {
-                // Crie um elemento temporário para armazenar a resposta HTML
-                var tempElement = document.createElement('div');
-                tempElement.innerHTML = response;
-
-                // Encontre o elemento com o ID "table-content" dentro do elemento temporário
-                var tableContent = tempElement.querySelector('#table-content');
-                $('#table-content').html(tableContent);
-            },
-            error: function() {
-                $('#responseMessage').html('Ocorreu um erro ao enviar o formulário.');
-            }
-        });
-    });
-});
-
-$(document).ready(function() {
-    var initialHospUrl = '<?= htmlspecialchars(buildHospitalPaginationUrl(
-        $hospitalPaginationBaseParams,
-        [
-            'pag' => $_GET['pag'] ?? 1,
-            'bl'  => $_GET['bl'] ?? 0
-        ]
-    ), ENT_QUOTES) ?>';
-    if (typeof loadContent === 'function') {
-        loadContent(initialHospUrl);
-    }
-});
-</script>
-<script>
-if (typeof window.paginateHospitais !== 'function') {
-    window.paginateHospitais = function(url) {
-        if (typeof loadContent === 'function') {
-            loadContent(url);
-            return false;
-        }
-        window.location.href = url;
-        return false;
-    };
-}
-</script>
 
 <script src="./js/input-estilo.js"></script>
 

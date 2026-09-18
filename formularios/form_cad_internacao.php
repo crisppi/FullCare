@@ -93,8 +93,8 @@
     };
     $normCargoSessao = $normalizeCargoSessao($cargoSessao);
     $isCrisppiSessao = mb_strtolower(trim((string)$emailSessao), 'UTF-8') === 'crisppi@fullcare.com.br';
-    $isMedSessao = strpos($normCargoSessao, 'med') === 0 || strpos($normCargoSessao, 'medico') === 0 || $isCrisppiSessao;
-    $isEnfSessao = strpos($normCargoSessao, 'enf') === 0 || strpos($normCargoSessao, 'enfer') === 0;
+    $isMedSessao = ($GLOBALS['ge_profile']??'')==='gestor_estipulante_med' || strpos($normCargoSessao, 'med') === 0 || strpos($normCargoSessao, 'medico') === 0 || $isCrisppiSessao;
+    $isEnfSessao = ($GLOBALS['ge_profile']??'')==='gestor_estipulante_enf' || strpos($normCargoSessao, 'enf') === 0 || strpos($normCargoSessao, 'enfer') === 0;
     $isMedOuEnf = $isMedSessao || $isEnfSessao;
     $cargoSessaoLower = mb_strtolower((string) $cargoSessao, 'UTF-8');
     $isDiretorSessao = (mb_stripos($cargoSessaoLower, 'diretor') !== false)
@@ -121,7 +121,7 @@
     $medicosAud = [];
     $enfsAud = [];
     try {
-        $todos = $usuarioDao->findMedicosEnfermeiros();
+        $todos = ge_enabled() ? [] : $usuarioDao->findMedicosEnfermeiros();
         if (!is_array($todos))
             $todos = [];
         foreach ($todos as $u) {
@@ -158,7 +158,7 @@
         $userIdSessao = (int) ($_SESSION['id_usuario'] ?? 0);
         $nivelSessaoLista = $nivelSessaoInt;
 
-        if ($nivelSessaoLista > 3) {
+        if (ge_enabled() || $nivelSessaoLista > 3) {
             $rawHospitais = $hospitalDao->findGeral();
         } else {
             $rawHospitais = $hospitalUserDao->listarPorUsuario($userIdSessao);
@@ -183,7 +183,7 @@
     }
     $hospitalUsuariosMap = [];
     try {
-        $hospitalUsuariosRows = $hospitalUserDao->joinHospitalUserAll();
+        $hospitalUsuariosRows = ge_enabled() ? [] : $hospitalUserDao->joinHospitalUserAll();
         if (is_array($hospitalUsuariosRows)) {
             foreach ($hospitalUsuariosRows as $hu) {
                 $hid = (int) ($hu['fk_hospital_user'] ?? $hu['id_hospital'] ?? 0);
@@ -206,10 +206,12 @@
 
     $patientCareProgramMap = [];
     try {
+        $gePatientScope=ge_patient_sql('gp');
         $cronicosStmt = $conn->query("
             SELECT fk_paciente,
                    GROUP_CONCAT(DISTINCT condicao ORDER BY condicao SEPARATOR ', ') AS condicoes
               FROM tb_paciente_cronico
+             WHERE fk_paciente IN (SELECT gp.id_paciente FROM tb_paciente gp WHERE ($gePatientScope))
              GROUP BY fk_paciente
         ");
         foreach (($cronicosStmt ? $cronicosStmt->fetchAll(PDO::FETCH_ASSOC) : []) as $row) {
@@ -229,7 +231,7 @@
     ?>
     <link href="<?= $BASE_URL ?>css/form_cad_internacao.css?v=<?= filemtime(__DIR__ . '/../css/form_cad_internacao.css') ?>" rel="stylesheet">
 
-    <div class="internacao-page">
+    <div class="internacao-page" data-gestor-estipulante="<?=ge_enabled()?'1':'0'?>">
         <div class="internacao-page__hero">
             <div class="internacao-page__hero-main">
                 <p class="internacao-page__eyebrow">Fluxo assistencial</p>
@@ -572,7 +574,8 @@
                         </div>
                     </div>
                 </div>
-                <input type="hidden" name="type" value="create">
+                <?php if (ge_enabled()): ?><input type="hidden" name="csrf" value="<?=htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8')?>"><?php endif; ?>
+<input type="hidden" name="type" value="create">
                 <input type="hidden" name="timer_int" id="timer_int" value="">
                 <p style="display:none" id="proximoId_int">0</p>
                 <input type="hidden" value="n" id="censo_int" name="censo_int">
@@ -752,10 +755,10 @@
             <div class="internacao-card__body">
                 <div class="clinical-text-field">
                     <div class="clinical-text-field__head">
-                        <label for="rel_int">Relatório da Auditoria</label>
+                        <label for="rel_int"><?=ge_enabled()?'Relatório clínico':'Relatório da Auditoria'?></label>
                         <div class="clinical-text-field__actions">
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="rel_int">Limpar formatação</button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_int">Organizar com IA</button>
+                            <?php if(!ge_enabled()): ?><button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="rel_int">Organizar com IA</button><?php endif; ?>
                         </div>
                     </div>
                     <div id="cronicos-relatorio-alert" class="fc-chronic-alert"
@@ -780,10 +783,10 @@
 
                 <div class="clinical-text-field">
                     <div class="clinical-text-field__head">
-                        <label for="acoes_int">Ações da Auditoria</label>
+                        <label for="acoes_int"><?=ge_enabled()?'Plano assistencial':'Ações da Auditoria'?></label>
                         <div class="clinical-text-field__actions">
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="acoes_int">Limpar formatação</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="acoes_int">Organizar com IA</button>
+                        <?php if(!ge_enabled()): ?><button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="acoes_int">Organizar com IA</button><?php endif; ?>
                         </div>
                     </div>
                     <textarea data-saude-autocomplete="true" rows="2" class="form-control fc-no-resize"
@@ -799,7 +802,7 @@
                         <label for="programacao_int">Programação Terapêutica</label>
                         <div class="clinical-text-field__actions">
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-clean-text="programacao_int">Limpar formatação</button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="programacao_int">Organizar com IA</button>
+                        <?php if(!ge_enabled()): ?><button type="button" class="btn btn-sm btn-outline-primary" data-ai-improve="programacao_int">Organizar com IA</button><?php endif; ?>
                         </div>
                     </div>
                     <textarea data-saude-autocomplete="true" maxlength="5000" rows="2" class="form-control fc-no-resize"
@@ -810,7 +813,7 @@
                     </div>
                 </div>
 
-                <div class="ia-highlight-box">
+                <div class="ia-highlight-box<?=ge_enabled()?' ge-audit-only':''?>">
                     <div class="ia-highlight-box__header">
                         <div class="ia-highlight-box__title-wrap">
                             <div>
@@ -858,7 +861,7 @@
             </div>
         </div>
 
-            <div class="tabelas-adicionais-card">
+            <?php if(!ge_enabled()): ?><div class="tabelas-adicionais-card">
                 <div class="tabelas-adicionais-card__header">
                     <div>
                         <p class="tabelas-adicionais-card__eyebrow">Tabelas adicionais</p>
@@ -938,6 +941,7 @@
             </div>
 
 
+<?php endif; ?>
         <input type="hidden" class="form-control" value="<?= ($ultimoReg + 1) ?>" id="fk_int_capeante"
             name="fk_int_capeante">
         <input type="hidden" class="form-control" value="n" id="encerrado_cap" name="encerrado_cap">

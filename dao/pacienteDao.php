@@ -542,7 +542,8 @@ class PacienteDAO implements PacienteDAOInterface
 
         $pacientes = [];
 
-        $stmt = $this->conn->query("SELECT * FROM tb_paciente where deletado_pac <> 's' ORDER BY id_paciente");
+        $scope = function_exists('ge_enabled') && ge_enabled() ? ge_patient_sql('tb_paciente') : '1=1';
+        $stmt = $this->conn->query("SELECT * FROM tb_paciente where deletado_pac <> 's' AND ($scope) ORDER BY id_paciente");
 
         $stmt->execute();
 
@@ -554,9 +555,10 @@ class PacienteDAO implements PacienteDAOInterface
     {
         // Base do WHERE (mantendo seu filtro de "não deletado")
         $whereClause = 'pa.deletado_pac <> "s"';
+        if (function_exists('ge_enabled') && ge_enabled()) $whereClause .= ' AND (' . ge_patient_sql('pa') . ')';
         if (strlen((string)$where)) {
             // aceita as condições já montadas fora (ex.: nome_pac LIKE ...)
-            $whereClause .= ' AND ' . $where;
+            $whereClause .= ' AND (' . $where . ')';
         }
 
         // ORDER BY seguro (whitelist simples)
@@ -637,7 +639,7 @@ class PacienteDAO implements PacienteDAOInterface
         //DADOS DA QUERY
         $whereClause = 'deletado_pac <> "s"';
         if (strlen($where)) {
-            $whereClause .= ' AND ' . $where;
+            $whereClause .= ' AND (' . $where . ')';
         }
         $whereSql = 'WHERE ' . $whereClause;
 

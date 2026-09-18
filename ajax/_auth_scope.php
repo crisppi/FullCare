@@ -116,6 +116,7 @@ function ajax_scope_mode(array $ctx): string
 
 function ajax_scope_clause_for_internacao(array $ctx, string $alias, array &$params, string $prefix = 'scp'): string
 {
+    if (function_exists('ge_enabled') && ge_enabled()) return ' AND (' . ge_internacao_sql($alias) . ')';
     $mode = ajax_scope_mode($ctx);
     if ($mode === 'full') {
         return '';

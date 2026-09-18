@@ -18,7 +18,7 @@ include_once("models/patologia.php");
 include_once("dao/patologiaDao.php");
 
 include_once("models/paciente.php");
-include_once("dao/pacienteDAO.php");
+include_once("dao/pacienteDao.php");
 
 include_once("models/uti.php");
 include_once("dao/utiDao.php");
@@ -81,16 +81,16 @@ $negociacaoLast = new negociacaoDAO($conn, $BASE_URL);
         <?php include_once('formularios/form_cad_censo.php'); ?>
 
         <!-- FORMULARIO DE GESTÃO -->
-        <?php include_once('formularios/form_cad_internacao_gestao.php'); ?>
+        <?php if(!ge_enabled()) include_once('formularios/form_cad_internacao_gestao.php'); ?>
 
         <!-- FORMULARIO DE UTI -->
-        <?php include_once('formularios/form_cad_internacao_uti.php'); ?>
+        <?php if(!ge_enabled()) include_once('formularios/form_cad_internacao_uti.php'); ?>
 
         <!-- FORMULARIO DE PRORROGACOES -->
-        <?php include_once('formularios/form_cad_internacao_prorrog.php'); ?>
+        <?php if(!ge_enabled()) include_once('formularios/form_cad_internacao_prorrog.php'); ?>
 
         <!-- <FORMULARO DE NEGOCIACOES -->
-        <?php include_once('formularios/form_cad_internacao_negoc.php'); ?>
+        <?php if(!ge_enabled()) include_once('formularios/form_cad_internacao_negoc.php'); ?>
 
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>

@@ -38,6 +38,8 @@ if ($hospitalId) {
     $params[':hospital_id'] = $hospitalId;
 }
 
+if (ge_enabled()) $where .= ' AND (' . ge_internacao_sql('i') . ')';
+
 $sqlBase = "
     FROM tb_internacao i
     LEFT JOIN (

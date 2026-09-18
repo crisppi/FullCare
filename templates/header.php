@@ -104,7 +104,7 @@ $isDiretoria = in_array($accessProfileSlug, ['diretoria', 'superadministrador'],
 $canSeeInteligenciaMenu = $accessCan('bi_estrategico', 'view');
 $canSeeUsuariosCadastro = $accessCan('usuarios', 'view');
 $canSeeFullMenu = $accessCan('dashboard', 'view') && !$isBiHubOnly;
-$hasHeaderMenuAccess = $canSeeFullMenu || $isBiHubOnly;
+$hasHeaderMenuAccess = ($canSeeFullMenu || $isBiHubOnly) && !(function_exists('ge_enabled') && ge_enabled());
 $cadastroScripts = [
     'list_paciente.php',
     'cad_paciente.php',
@@ -331,9 +331,10 @@ if (!empty($sessionIdUsuario)) {
         <link href="<?= $BASE_URL ?>css/operational_intelligence_pages.css?v=<?= @filemtime(__DIR__ . '/../css/operational_intelligence_pages.css') ?>" rel="stylesheet">
     <?php endif; ?>
 
+<?php if (function_exists('ge_enabled') && ge_enabled()): ?><link rel="stylesheet" href="<?= $BASE_URL ?>css/gestor_native.css?v=<?= filemtime(__DIR__.'/../css/gestor_native.css') ?>"><?php endif; ?>
 </head>
 
-<body>
+<body<?= function_exists('ge_enabled') && ge_enabled() ? (ge_writer() ? ' class="gestor-native"' : ' class="gestor-native ge-readonly"') : '' ?>>
     <div class="col-md-12 fc-inline-1">
         <nav class="navbar navbar-expand-lg navbar-light bg-light nav_bar_custom fixed-top">
             <div class="bar_color fc-inline-2">
@@ -356,6 +357,7 @@ if (!empty($sessionIdUsuario)) {
                 <div class="collapse navbar-collapse" id="navbarScroll">
                     <ul class="nav-tabs navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll align-items-center fc-inline-3"
                        >
+                        <?php if (function_exists('ge_enabled') && ge_enabled()) { include __DIR__ . '/gestor_menu.php'; } ?>
                         <!-- Ícone de mensagem -->
 
                         <?php if ($hasHeaderMenuAccess) { ?>
@@ -1135,7 +1137,7 @@ if (!empty($sessionIdUsuario)) {
 <script src="js/fix-header.js"></script>
 <script>
     window.FullCareListUserId = <?= json_encode((string)($sessionIdUsuario ?? 'anon')) ?>;
-    window.FullCareChatUnreadUrl = <?= json_encode($BASE_URL . 'ajax/chat_unread_count.php') ?>;
+    window.FullCareChatUnreadUrl = <?= json_encode(ge_enabled() ? null : $BASE_URL . 'ajax/chat_unread_count.php') ?>;
 
     function updateHeaderChatBadge(count) {
         const btn = document.getElementById('header-chat-launcher');
@@ -1220,8 +1222,10 @@ if (!empty($sessionIdUsuario)) {
         document.documentElement.style.zoom = '';
         setupHeaderAccountDropdown();
         updateHeaderChatBadge(document.getElementById('header-chat-launcher')?.dataset.unreadCount || 0);
-        refreshHeaderChatBadge();
-        window.setInterval(refreshHeaderChatBadge, 30000);
+        if (window.FullCareChatUnreadUrl) {
+            refreshHeaderChatBadge();
+            window.setInterval(refreshHeaderChatBadge, 30000);
+        }
     });
 </script>
 

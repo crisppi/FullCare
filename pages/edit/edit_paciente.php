@@ -154,7 +154,8 @@ if (empty($telefonesPaciente)) {
             </div>
             <div class="internacao-card__body">
 
-        <input type="hidden" name="type" value="update">
+        <?php if (ge_enabled()): ?><input type="hidden" name="csrf" value="<?=htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8')?>"><?php endif; ?>
+<input type="hidden" name="type" value="update">
         <input type="hidden" name="id_paciente" value="<?= $paciente['0']['id_paciente'] ?>">
 
         <!-- Step 1: Informações Pessoais -->

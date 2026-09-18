@@ -87,7 +87,8 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                 </div>
                 <div class="internacao-card__body">
 
-                    <input type="hidden" name="type" value="create">
+                    <?php if (ge_enabled()): ?><input type="hidden" name="csrf" value="<?=htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8')?>"><?php endif; ?>
+<input type="hidden" name="type" value="create">
                     <input type="hidden" name="deletado_pac" value="n">
                     <input type="hidden" name="confirmar_homonimo_pac" id="confirmar_homonimo_pac" value="0">
 

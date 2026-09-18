@@ -259,6 +259,18 @@ $featuredLinks = [
     ['label' => 'BI Preditivo', 'caption' => 'Risco e prevenção', 'href' => 'bi/preditivo', 'icon' => 'bi-bullseye', 'theme' => 'prevencao'],
 ];
 
+if (ge_enabled()) {
+    $navGroups = [['title'=>'Internações e permanência','key'=>'gestor','items'=>[
+        ['label'=>'Tipos de internação','href'=>'TipoInternacaoBI.php'],
+        ['label'=>'Longa permanência','href'=>'LongaPermanenciaBI.php'],
+        ['label'=>'Acompanhamento de casos e alertas','href'=>'gestor_estipulante.php']
+    ]]];
+    $featuredLinks = [
+        ['label'=>'Tipos de internação','caption'=>'Perfil de admissões','href'=>'TipoInternacaoBI.php','icon'=>'bi-hospital','theme'=>'estrategico'],
+        ['label'=>'Longa permanência','caption'=>'Dias de internação e acompanhamento','href'=>'LongaPermanenciaBI.php','icon'=>'bi-clock-history','theme'=>'auditoria'],
+    ];
+}
+
 $totalLinks = array_sum(array_map(static fn($group) => count($group['items']), $navGroups));
 ?>
 

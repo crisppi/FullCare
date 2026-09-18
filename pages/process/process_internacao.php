@@ -911,7 +911,7 @@ if ($type === "create") {
         $capeante->enfer_check = 'n';
         $capeante->adm_check = 'n';
         $capeante->fk_user_cap = $fk_user_cap;
-        $capeanteDao->create($capeante);
+        if (!ge_enabled()) $capeanteDao->create($capeante);
 
         // VISITA inicial (#1) automática
         $visita = new visita();
@@ -1197,7 +1197,7 @@ if ($type === "create") {
             $acomodacao_int,
             filter_var($fk_usuario_int, FILTER_VALIDATE_INT) ?: null
         );
-        if ($initialProrrogRow && $select_prorrog !== 's') {
+        if (!ge_enabled() && $initialProrrogRow && $select_prorrog !== 's') {
             $prorrogacao = new prorrogacao();
             $prorrogacao->fk_internacao_pror = $lastId; // [FK:$lastId]
             $prorrogacao->fk_usuario_pror = $initialProrrogRow['fk_usuario_pror'];

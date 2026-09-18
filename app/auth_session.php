@@ -3,6 +3,13 @@
 if (!function_exists('fullcare_post_login_target')) {
     function fullcare_post_login_target(string $baseUrl, array $user): string
     {
+        if (isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof PDO) {
+            $stmt = $GLOBALS['conn']->prepare('SELECT slug FROM tb_access_profile WHERE id_access_profile=? AND ativo=1');
+            $stmt->execute([(int)($user['fk_access_profile'] ?? 0)]);
+            if (in_array($stmt->fetchColumn(), ['gestor_estipulante_med', 'gestor_estipulante_enf', 'gerente_estipulante'], true)) {
+                return $baseUrl . 'gestor_estipulante.php';
+            }
+        }
         $nivel = (int)($user['nivel_user'] ?? 0);
         $cargo = trim((string)($user['cargo_user'] ?? ''));
         $cargo = mb_strtolower($cargo, 'UTF-8');
@@ -39,7 +46,7 @@ if (!function_exists('fullcare_login_session_start')) {
         $_SESSION['user_db_synced_at'] = time();
         $_SESSION['idle_last_activity'] = time();
         $_SESSION['idle_channel'] = bin2hex(random_bytes(16));
-        unset($_SESSION['session_expired']);
+        unset($_SESSION['session_expired'], $_SESSION['idle_notice_at']);
 
         unset(
             $_SESSION['mfa_pending_user_id'],
@@ -74,6 +81,8 @@ if (!function_exists('fullcare_login_session_clear')) {
             $_SESSION['user_db_synced_at'],
             $_SESSION['idle_last_activity'],
             $_SESSION['idle_channel'],
+            $_SESSION['idle_notice_at'],
+            $_SESSION['session_expired'],
             $_SESSION['mfa_local_bypass_email'],
             $_SESSION['mfa_local_bypass_user_id']
         );

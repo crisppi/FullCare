@@ -11,9 +11,11 @@ function e($v)
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
 
-$hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital ORDER BY nome_hosp")
+$geHospitalScope=ge_hospital_sql();
+$geInternScope=ge_internacao_sql('tb_internacao');
+$hospitais = $conn->query("SELECT id_hospital, nome_hosp FROM tb_hospital WHERE ($geHospitalScope) ORDER BY nome_hosp")
     ->fetchAll(PDO::FETCH_ASSOC);
-$anos = $conn->query("SELECT DISTINCT YEAR(data_intern_int) AS ano FROM tb_internacao WHERE data_intern_int IS NOT NULL AND data_intern_int <> '0000-00-00' ORDER BY ano DESC")
+$anos = $conn->query("SELECT DISTINCT YEAR(data_intern_int) AS ano FROM tb_internacao WHERE ($geInternScope) AND data_intern_int IS NOT NULL AND data_intern_int <> '0000-00-00' ORDER BY ano DESC")
     ->fetchAll(PDO::FETCH_COLUMN);
 
 $anoInput = filter_input(INPUT_GET, 'ano', FILTER_VALIDATE_INT);
@@ -54,6 +56,8 @@ if ($limiarSelecionado !== null) {
 } else {
     $params[':limiar_padrao'] = $limiarPadrao;
 }
+
+if (ge_enabled()) $where .= ' AND (' . ge_internacao_sql('i') . ')';
 
 $sqlBase = "
     FROM tb_internacao i

@@ -1,0 +1,5 @@
+/* Complementos do subproduto sobre o layout original FullCare. */
+.gestor-native .ge-scope-notice{margin:18px 22px;padding:12px 16px;border-left:4px solid #5e2363;background:#f8f2fb;border-radius:8px;color:#5e2363;font-size:13px}
+.gestor-native a[href*="list_hospitalUser"],.gestor-native a[href*="hospitaluser"],.gestor-native a[href*="usuarios/"],.gestor-native a[href*="importar-ia"],.gestor-native a[href*="visitas/lista"],.gestor-native #header-chat-launcher,.gestor-native #global-patient-search,.gestor-native a[href*="usuario/sessoes"]{display:none!important}
+.gestor-native.ge-readonly a[href*="/novo"],.gestor-native.ge-readonly a[href*="/nova"],.gestor-native.ge-readonly a[href*="cad_"],.gestor-native.ge-readonly a[href*="edit_"],.gestor-native.ge-readonly a[href*="/editar"],.gestor-native.ge-readonly button[onclick*="edit"],.gestor-native.ge-readonly button[onclick*="delete"],.gestor-native.ge-readonly form[method="POST"]{display:none!important}
+.gestor-native .ge-audit-only,.gestor-native [data-ai-format],.gestor-native .clinical-ai-trigger{display:none!important}

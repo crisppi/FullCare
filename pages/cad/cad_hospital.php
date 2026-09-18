@@ -39,9 +39,13 @@ $id_hospital = filter_input(INPUT_GET, "id_hospital");
                     <span class="internacao-card__tag internacao-card__tag--critical">Cadastro institucional</span>
                 </div>
                 <div class="internacao-card__body">
-        <input type="hidden" name="type" value="create">
+        <?php if (ge_enabled()): ?><input type="hidden" name="csrf" value="<?=htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8')?>"><?php endif; ?>
+<input type="hidden" name="type" value="create">
         <input type="hidden" name="deletado_hosp" value="n">
 
+<?php if(ge_enabled()): $geEstips=$conn->query('SELECT id_estipulante,nome_est FROM tb_estipulante WHERE '.ge_estipulante_sql())->fetchAll(PDO::FETCH_ASSOC); ?>
+<div class="form-group mb-3"><label for="ge_estipulante_id">Estipulante do hospital</label><select class="form-select" name="ge_estipulante_id" id="ge_estipulante_id" required><option value="">Selecione o vínculo</option><?php foreach($geEstips as $geEst):?><option value="<?=(int)$geEst['id_estipulante']?>"><?=htmlspecialchars($geEst['nome_est'],ENT_QUOTES,'UTF-8')?></option><?php endforeach;?></select></div>
+<?php endif;?>
         <!-- Step 1: Informações Básicas -->
         <div id="step-1" class="step entity-step-card">
             <div class="entity-step-header">

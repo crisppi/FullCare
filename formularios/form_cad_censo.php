@@ -42,7 +42,8 @@
     <!-- FORMULARIO DE CADASTRO DO CENSO -->
     <form id="myForm" action="<?= $BASE_URL ?>process_censo.php" id="add-internacao-form" method="POST"
         enctype="multipart/form-data">
-        <input type="hidden" name="type" value="<?= $editandoCenso ? 'update' : 'create' ?>">
+        <?php if (ge_enabled()): ?><input type="hidden" name="csrf" value="<?=htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8')?>"><?php endif; ?>
+<input type="hidden" name="type" value="<?= $editandoCenso ? 'update' : 'create' ?>">
         <?php if ($editandoCenso): ?>
             <input type="hidden" name="id_censo" value="<?= (int)$censoEdicao->id_censo ?>">
         <?php endif; ?>

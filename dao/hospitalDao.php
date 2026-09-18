@@ -139,6 +139,7 @@ class HospitalDAO implements HospitalDAOInterface
 
     private function buildHospitalScopeFilter($hospitalExpr = 'tb_hospital.id_hospital')
     {
+        if (function_exists('ge_enabled') && ge_enabled()) return ['sql'=>ge_hospital_sql($hospitalExpr),'params'=>[]];
         $ctx = $this->getScopeContext();
         $mode = $this->resolveScopeMode($ctx);
 
@@ -474,9 +475,13 @@ class HospitalDAO implements HospitalDAOInterface
 
     public function selectAllhospital($where = null, $order = null, $limit = null)
     {
+        if (function_exists('ge_enabled') && ge_enabled()) {
+            $order = preg_match('/^(id_hospital|nome_hosp|cidade_hosp|estado_hosp)( (ASC|DESC))?$/i', (string)$order) ? $order : 'id_hospital DESC';
+            $limit = preg_match('/^\d+(\s*,\s*\d+)?$/', (string)$limit) ? $limit : null;
+        }
         $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
         $conds = array();
-        if (strlen((string)$where)) $conds[] = $where;
+        if (strlen((string)$where)) $conds[] = '(' . $where . ')';
         $conds[] = "deletado_hosp <> 's'";
         if ($scope['sql'] !== '') $conds[] = $scope['sql'];
 
@@ -495,7 +500,7 @@ class HospitalDAO implements HospitalDAOInterface
     {
         $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
         $conds = array();
-        if (strlen((string)$where)) $conds[] = $where;
+        if (strlen((string)$where)) $conds[] = '(' . $where . ')';
         if ($scope['sql'] !== '') $conds[] = $scope['sql'];
 
         $sql = "SELECT * FROM tb_hospital";
@@ -513,7 +518,7 @@ class HospitalDAO implements HospitalDAOInterface
     {
         $scope = $this->buildHospitalScopeFilter('tb_hospital.id_hospital');
         $conds = array();
-        if (strlen((string)$where))  $conds[] = $where;
+        if (strlen((string)$where))  $conds[] = '(' . $where . ')';
         if ($scope['sql'] !== '') $conds[] = $scope['sql'];
 
         $sql = "SELECT COUNT(id_hospital) AS qtd FROM tb_hospital";

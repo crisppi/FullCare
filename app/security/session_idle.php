@@ -19,13 +19,13 @@ function fullcare_idle_is_navigation(array $server): bool
     return strpos(strtolower((string)($server['HTTP_ACCEPT'] ?? '')), 'text/html') !== false;
 }
 
-function fullcare_idle_check(int $now): void
+function fullcare_idle_check(int $now, bool $notify = true): void
 {
     if (fullcare_idle_expired($_SESSION, $now)) {
         // Limpa também email/nome, evitando reidratação de uma sessão expirada.
         $_SESSION = [
             'session_expired' => true,
-            'login_error' => 'Sua sessão foi encerrada após 20 minutos de inatividade. Entre novamente.',
+            'idle_notice_at' => $notify ? $now : 0,
         ];
         if (session_status() === PHP_SESSION_ACTIVE && !headers_sent()) session_regenerate_id(true);
         return;
@@ -44,4 +44,16 @@ function fullcare_idle_status(int $now): array
         'expiresAt' => (int)$_SESSION['idle_last_activity'] + FULLCARE_IDLE_SECONDS,
         'warningSeconds' => FULLCARE_IDLE_WARNING_SECONDS,
     ];
+}
+
+// Aviso informativo de uso único; não reaparece numa visita posterior ao login.
+function fullcare_idle_take_notice(int $now): bool
+{
+    $issued = (int)($_SESSION['idle_notice_at'] ?? 0);
+    unset($_SESSION['idle_notice_at']);
+    // Compatibilidade com sessões criadas antes da separação dos avisos.
+    if (($_SESSION['login_error'] ?? '') === 'Sua sessão foi encerrada após 20 minutos de inatividade. Entre novamente.') {
+        unset($_SESSION['login_error']);
+    }
+    return $issued > 0 && $issued <= $now && $now - $issued <= 60;
 }

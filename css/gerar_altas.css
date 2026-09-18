@@ -1,0 +1,117 @@
+/* Uma lista contínua; identificação sem caixas internas. */
+#main-container.gerar-altas-page { padding: 4px 12px 24px; color: #263445; }
+.gerar-altas-page .gerar-alta-filter-card { margin: 0 0 16px; border-bottom: 1px solid #dce3e9; background: #fff; }
+.gerar-altas-page .gerar-alta-filter-card .card-body { padding: 16px 4px; }
+.gerar-altas-page .gerar-alta-filter-form { margin: 0; }
+.gerar-altas-page .gerar-alta-filter-grid { display: grid; grid-template-columns: 1.5fr 1.4fr 1fr 150px auto; gap: 14px; align-items: end; }
+.gerar-altas-page .gerar-alta-filter-field { min-width: 0; }
+.gerar-altas-page .form-label { color: #526273 !important; font-size: .8rem; font-weight: 600; }
+.gerar-altas-page .input-group-text { background: #f4f7fa; color: #53708a; border-color: #ced8e1; }
+.gerar-altas-page .gerar-alta-filter-actions { display: flex; gap: 8px; }
+.gerar-altas-page .gerar-alta-filter-actions .btn { min-height: 36px; }
+.gerar-altas-page .gerar-alta-actionbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 8px 4px 20px; color: #526273; font-size: .85rem; }
+#main-container .gerar-alta-submit { background: #5e2363; border: 1px solid #5e2363; border-radius: 6px; padding: 10px 18px; font-size: .85rem; white-space: nowrap; box-shadow: none; }
+.gerar-altas-page .gerar-alta-list { background: #fff; border: 1px solid #dce3e9; border-radius: 8px; overflow: hidden; }
+.gerar-altas-page .gerar-alta-card { padding: 22px 24px; margin: 0; border: 0; border-bottom: 1px solid #dce3e9; border-radius: 0; box-shadow: none; background: #fff; }
+.gerar-altas-page .gerar-alta-card:last-child { border-bottom: 0; }
+.gerar-altas-page .gerar-alta-card:nth-child(even) { background: #f7f9fb; }
+.gerar-altas-page .gerar-alta-card:has(input[name="gerar[]"]:checked) { background: #f3edf6; box-shadow: inset 4px 0 #5e2363; }
+.gerar-altas-page .gerar-alta-meta-grid { display: grid; grid-template-columns: 1.6fr 1.5fr .7fr 80px; gap: 24px; align-items: start; }
+.gerar-altas-page .gerar-alta-meta-card { min-width: 0; border: 0; background: none; padding: 0; box-shadow: none; }
+.gerar-altas-page .gerar-alta-meta-label { display: block; color: #647487; font-size: .72rem; font-weight: 500; margin-bottom: 5px; }
+.gerar-altas-page .gerar-alta-meta-label i { display: none; }
+.gerar-altas-page .gerar-alta-meta-card strong { display: block; font-size: .87rem; color: #344457; font-weight: 500; overflow-wrap: anywhere; }
+.gerar-altas-page .gerar-alta-patient strong { font-size: 1rem; font-weight: 700; color: #234b6b; }
+.gerar-altas-page .gerar-alta-meta-card small { display: block; color: #647487; font-size: .76rem; margin-top: 4px; }
+.gerar-altas-page .gerar-alta-meta-card small:empty { display: none; }
+.gerar-altas-page .gerar-alta-card hr { display: none; }
+.gerar-altas-page .gerar-alta-fields { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-top: 20px; align-items: end; }
+.gerar-altas-page .gerar-alta-fields > div { flex: 1 1 220px; width: auto; min-width: 0; }
+.gerar-altas-page .gerar-alta-fields > .col-12 { flex-basis: 100%; }
+.gerar-altas-page .gerar-alta-fields > .gerar-alta-selection { flex: 0 0 180px; }
+.gerar-altas-page .tag { display: block; color: #526273; font-size: .76rem; font-weight: 600; }
+.gerar-altas-page .shadow-field { background: #fff; border: 1px solid #b9c8d5; border-radius: 5px; padding: 7px 10px; min-height: 40px; display: flex; align-items: center; box-shadow: none; }
+.gerar-altas-page .shadow-field .form-control, .gerar-altas-page .shadow-field .form-select { font-size: .85rem; height: auto; min-height: 24px; color: #263445; box-shadow: none; }
+.gerar-altas-page .shadow-field:focus-within { outline: 2px solid #38759e; outline-offset: 2px; }
+.gerar-altas-page .shadow-field.bg-light { background: #fff5ee !important; border: 0; color: #8c431b; gap: 12px; flex-wrap: wrap; }
+.gerar-altas-page .gerar-alta-check-field { border: 0; background: none; padding: 8px 0; gap: 10px; cursor: pointer; font-size: .85rem; color: #5e2363; font-weight: 600; }
+.gerar-altas-page .gerar-alta-check-field input { margin: 0; width: 20px; height: 20px; flex-shrink: 0; }
+.gerar-altas-page .gerar-alta-check-field input:checked { background-color: #5e2363; border-color: #5e2363; }
+.gerar-altas-page .gerar-alta-total { font-size: .8rem; }
+@media(max-width: 991px) {
+ .gerar-altas-page .gerar-alta-filter-grid { grid-template-columns: 1fr 1fr; }
+ .gerar-altas-page .gerar-alta-meta-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+}
+@media(max-width: 575px) {
+ #main-container.gerar-altas-page { padding: 4px 8px 20px; }
+ .gerar-altas-page .gerar-alta-filter-grid { grid-template-columns: 1fr; }
+ .gerar-altas-page .gerar-alta-actionbar { flex-direction: column; align-items: stretch; }
+ .gerar-altas-page .gerar-alta-card { padding: 18px 14px; }
+ .gerar-altas-page .gerar-alta-meta-grid { grid-template-columns: 1fr 80px; }
+ .gerar-altas-page .gerar-alta-meta-grid > :nth-child(-n+2) { grid-column: 1 / -1; }
+ .gerar-altas-page .gerar-alta-fields > div { flex-basis: 100%; }
+}
+/* Densidade da lista: um bloco baixo e separado para cada internação. */
+.gerar-altas-page .gerar-alta-filter-card { margin-bottom: 8px; }
+.gerar-altas-page .gerar-alta-filter-card .card-body { padding: 10px 4px; }
+.gerar-altas-page .gerar-alta-actionbar { padding: 4px 4px 12px; font-size: .78rem; }
+#main-container .gerar-alta-submit { padding: 8px 14px; font-size: .78rem; }
+.gerar-altas-page .gerar-alta-list { border: 0; border-radius: 0; background: transparent; overflow: visible; }
+.gerar-altas-page .gerar-alta-list-body { display: grid; gap: 12px; }
+.gerar-altas-page .gerar-alta-card,
+.gerar-altas-page .gerar-alta-card:last-child,
+.gerar-altas-page .gerar-alta-card:nth-child(even) {
+ padding: 12px 14px; border: 1px solid #ccd7e0; border-left: 3px solid #537f9e;
+ border-radius: 6px; background: #fff;
+}
+.gerar-altas-page .gerar-alta-meta-grid { gap: 14px; }
+.gerar-altas-page .gerar-alta-meta-label { font-size: .66rem; margin-bottom: 3px; }
+.gerar-altas-page .gerar-alta-meta-card strong { font-size: .76rem; }
+.gerar-altas-page .gerar-alta-patient strong { font-size: .82rem; }
+.gerar-altas-page .gerar-alta-meta-card small { font-size: .68rem; margin-top: 2px; }
+.gerar-altas-page .gerar-alta-fields { margin-top: 10px; gap: 8px 12px; }
+.gerar-altas-page .tag { font-size: .68rem; }
+.gerar-altas-page .shadow-field { min-height: 32px; padding: 4px 7px; }
+.gerar-altas-page .shadow-field .form-control,
+.gerar-altas-page .shadow-field .form-select { font-size: .76rem; min-height: 22px; }
+.gerar-altas-page .gerar-alta-check-field { font-size: .73rem; gap: 6px; padding: 4px 0; }
+.gerar-altas-page .gerar-alta-check-field input { width: 17px; height: 17px; }
+.gerar-altas-page .gerar-alta-fields > .gerar-alta-selection { flex-basis: 125px; }
+@media(min-width: 1200px) {
+ .gerar-altas-page .gerar-alta-card { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px; align-items: center; }
+ .gerar-altas-page .gerar-alta-meta-grid { grid-template-columns: 1.4fr 1.3fr .65fr 40px; }
+ .gerar-altas-page .gerar-alta-fields { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(150px, 1fr) 120px; margin: 0; }
+ .gerar-altas-page .gerar-alta-fields > .col-12 { grid-column: 1 / -1; }
+ .gerar-altas-page .gerar-alta-fields:has(input[type="date"]) { grid-template-columns: 1fr 1fr; }
+ .gerar-altas-page .gerar-alta-fields > div { width: auto; }
+}
+
+.gerar-altas-page .gerar-alta-footer { margin-bottom: 64px; }
+.gerar-altas-page .gerar-alta-footer .pagination { flex-wrap: wrap; justify-content: center; }
+.gerar-altas-page .gerar-alta-total { white-space: nowrap; }
+@media(max-width: 575px) {
+ .gerar-altas-page .gerar-alta-footer { flex-wrap: wrap; }
+ .gerar-altas-page .gerar-alta-footer .listagem-pagination-slot { flex-basis: 100%; }
+ .gerar-altas-page .gerar-alta-total { margin-left: auto; }
+}
+.gerar-altas-page .gerar-alta-fields .shadow-field.bg-light {
+ min-height: 28px;
+ padding: 5px 8px;
+ gap: 4px 8px;
+ line-height: 1.35;
+}
+.gerar-altas-page .gerar-alta-fields .shadow-field.bg-light span,
+.gerar-altas-page .gerar-alta-fields .shadow-field.bg-light small {
+ font-size: .68rem;
+ line-height: 1.35;
+ margin: 0;
+}
+/* Destaque individual das internações, sem alterar o espaçamento. */
+.gerar-altas-page .gerar-alta-card,
+.gerar-altas-page .gerar-alta-card:last-child,
+.gerar-altas-page .gerar-alta-card:nth-child(even) {
+ box-shadow: 0 2px 6px rgba(35, 61, 82, .10), 0 5px 12px rgba(35, 61, 82, .06);
+}
+.gerar-altas-page .gerar-alta-card:has(input[name="gerar[]"]:checked) {
+ box-shadow: inset 4px 0 #5e2363, 0 2px 6px rgba(35, 61, 82, .10), 0 5px 12px rgba(35, 61, 82, .06);
+}

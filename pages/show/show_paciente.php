@@ -76,7 +76,7 @@ function coletarIndicadoresPaciente(PDO $conn, int $pacienteId): array
                 ) AS longos
             FROM tb_internacao ac
             LEFT JOIN tb_alta al ON al.fk_id_int_alt = ac.id_internacao
-            WHERE ac.fk_paciente_int = :pac
+            WHERE ac.fk_paciente_int = :pac AND (" . ge_internacao_sql('ac') . ")
         ");
         $stmtResumo->bindValue(':pac', $pacienteId, PDO::PARAM_INT);
         $stmtResumo->execute();
@@ -90,7 +90,7 @@ function coletarIndicadoresPaciente(PDO $conn, int $pacienteId): array
             SELECT COUNT(*)
               FROM tb_gestao ge
               INNER JOIN tb_internacao ac ON ac.id_internacao = ge.fk_internacao_ges
-             WHERE ac.fk_paciente_int = :pac
+             WHERE ac.fk_paciente_int = :pac AND (" . ge_internacao_sql('ac') . ")
                AND LOWER(IFNULL(ge.evento_adverso_ges,'')) = 's'
         ");
         $stmtEventos->bindValue(':pac', $pacienteId, PDO::PARAM_INT);
@@ -239,14 +239,14 @@ try {
     $stmtUltimaInt = $conn->prepare("
         SELECT id_internacao
           FROM tb_internacao
-         WHERE fk_paciente_int = :paciente
+         WHERE fk_paciente_int = :paciente AND (" . ge_internacao_sql('tb_internacao') . ")
          ORDER BY COALESCE(data_intern_int, '0000-00-00') DESC, id_internacao DESC
          LIMIT 1
     ");
     $stmtUltimaInt->bindValue(':paciente', (int)$id_paciente, PDO::PARAM_INT);
     $stmtUltimaInt->execute();
     $lastInternacaoId = (int)($stmtUltimaInt->fetchColumn() ?: 0);
-    if ($lastInternacaoId) {
+    if ($lastInternacaoId && !ge_enabled()) {
         $riskService = new ReadmissionRiskService($conn);
         $riskOverview = $riskService->scoreInternacao($lastInternacaoId);
         $riskOverview['internacao_referencia'] = $lastInternacaoId;

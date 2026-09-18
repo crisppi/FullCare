@@ -170,7 +170,8 @@ if (empty($telefonesHospital) && (!empty($telefone01_hosp) || !empty($telefone02
                 </div>
             </div>
             <div class="internacao-card__body">
-        <input type="hidden" name="type" value="update">
+        <?php if (ge_enabled()): ?><input type="hidden" name="csrf" value="<?=htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8')?>"><?php endif; ?>
+<input type="hidden" name="type" value="update">
         <input type="hidden" class="form-control" id="id_hospital" value="<?= $hospital->id_hospital ?>"
             name="id_hospital">
 

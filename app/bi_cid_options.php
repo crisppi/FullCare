@@ -42,6 +42,7 @@ if (!function_exists('bi_apply_internacao_option_filters')) {
     function bi_apply_internacao_option_filters(array $filters, string $dateExpr, array &$joins, array &$where, array &$params, array $exclude = []): void
     {
         $skip = array_fill_keys($exclude, true);
+        if (function_exists('ge_enabled') && ge_enabled()) $where[] = ge_internacao_sql('i');
 
         $needsCapeante = strpos($dateExpr, 'ca.') !== false;
         if ($needsCapeante) {

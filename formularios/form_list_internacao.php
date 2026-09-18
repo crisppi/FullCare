@@ -192,7 +192,7 @@ try {
     $usuarioSessaoId = (int) ($_SESSION['id_usuario'] ?? 0);
     $rawHospitais    = [];
 
-    if ($nivelSessao >= 4) {
+    if (ge_enabled() || $nivelSessao >= 4) {
         $rawHospitais = $hospital_geral->findGeral();
     } elseif ($hospitalUserDao && $usuarioSessaoId) {
         $rawHospitais = $hospitalUserDao->listarPorUsuario($usuarioSessaoId);
@@ -1017,6 +1017,7 @@ if (typeof jQuery !== 'undefined') {
             }
         }
 
+        if (ge_enabled()) $condicoes[] = ge_internacao_sql('ac');
         $where     = implode(' AND ', $condicoes);
 
         $sortableColumns = [
@@ -1340,7 +1341,7 @@ if (typeof jQuery !== 'undefined') {
                                         aria-expanded="false">
                                         <i class="bi bi-stack"></i>
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="acoesInternacaoDropdown<?= (int)$intern['id_internacao'] ?>">
+                                    <ul class="dropdown-menu" aria-labelledby="acoesInternacaoDropdown<?= (int)$intern['id_internacao'] ?>"><?php if(ge_enabled()): ?><li><a class="dropdown-item" href="<?=$BASE_URL?>gestor_estipulante.php?caso=<?=(int)$intern['id_internacao']?>">Acompanhamento e evolução</a></li><?php else: ?>
                                         <?php if ($pesqInternado == "s" and $intern['censo_int'] <> "s") { ?>
                                         <li>
                                             <button class="btn btn-default"
@@ -1439,7 +1440,7 @@ if (typeof jQuery !== 'undefined') {
                                                 </form>
                                             </li>
                                         <?php } ?>
-                                    </ul>
+                                    <?php endif; ?></ul>
                                 </div>
                             </td>
                         </tr>

@@ -409,7 +409,7 @@ if ($type === "create") {
             $stmtDupNome = $conn->prepare("
                 SELECT id_paciente, nome_pac, matricula_pac, cpf_pac, data_nasc_pac
                   FROM tb_paciente
-                 WHERE {$whereNome}
+                 WHERE ({$whereNome}) AND (" . ge_patient_sql('tb_paciente') . ")
                    AND IFNULL(deletado_pac, 'n') <> 's'
                  LIMIT 1
             ");

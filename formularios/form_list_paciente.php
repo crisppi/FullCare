@@ -60,10 +60,11 @@
     $autocompletePacientes = [];
     if (isset($conn) && $conn instanceof PDO) {
         try {
+            $gePatientScope = ge_patient_sql('tb_paciente');
             $stmt = $conn->query("
                 SELECT nome_pac, matricula_pac, recem_nascido_pac, IFNULL(numero_rn_pac, '') AS numero_rn_pac
                 FROM tb_paciente
-                WHERE deletado_pac <> 's'
+                WHERE deletado_pac <> 's' AND ($gePatientScope)
                 ORDER BY nome_pac ASC
                 LIMIT 200
             ");

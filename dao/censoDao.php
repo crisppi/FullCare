@@ -113,6 +113,11 @@ class censoDAO implements censoDAOInterface
 
     public function selectAllCensoList($where = null, $order = null, $limit = null)
     {
+        if (function_exists('ge_enabled') && ge_enabled()) {
+            $order = preg_match('/^(ac\.)?(id_censo|data_censo)( (ASC|DESC))?$/i', (string)$order) ? $order : 'ac.id_censo DESC';
+            $limit = preg_match('/^\d+(\s*,\s*\d+)?$/', (string)$limit) ? $limit : null;
+        }
+        if (function_exists('ge_enabled') && ge_enabled()) $where = '(' . ($where ?: '1=1') . ') AND (' . ge_pair_sql('ac.fk_hospital_censo','ac.fk_paciente_censo') . ')';
         //DADOS DA QUERY
         $where = strlen((string)$where) ? 'WHERE ' . $where : '';
         $order = strlen((string)$order) ? 'ORDER BY ' . $order : '';
@@ -156,7 +161,7 @@ class censoDAO implements censoDAOInterface
             ac.fk_paciente_censo = pa.id_paciente 
 
             LEFT JOIN tb_internacao AS it ON
-            ac.fk_paciente_censo = it.fk_paciente_int 
+            ac.fk_paciente_censo = it.fk_paciente_int AND ac.fk_hospital_censo = it.fk_hospital_int
             
              ' . $where . ' ' . $group . ' ' . $order . ' ' . $limit);
 

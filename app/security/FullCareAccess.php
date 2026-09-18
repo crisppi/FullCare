@@ -89,6 +89,22 @@ final class FullCareAccess
 
     public static function enforceCurrentRequest(PDO $conn, string $baseUrl): void
     {
+        $profile = self::profile($conn);
+        require_once __DIR__ . '/gestor_scope.php';
+        $GLOBALS['ge_profile'] = (string)($profile['slug'] ?? '');
+        if (ge_enabled()) {
+            $script = basename((string)($_SERVER['SCRIPT_FILENAME'] ?? ''));
+            if (in_array($script, ['menu_app.php','menu.php','inicio.php','central_trabalho.php'], true)) {
+                header('Location: ' . $baseUrl . 'gestor_estipulante.php', true, 303); exit;
+            }
+            ge_enforce_native($conn, $script);
+            $route = ge_native_routes()[$script] ?? null;
+            if ($route) {
+                $action = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? (($script === 'process_gerar_altas.php') ? 'discharge' : 'create') : $route[1];
+                self::enforce($conn, $baseUrl, $route[0], $action);
+            }
+            return;
+        }
         $access = self::currentRequestAccess();
         if ($access === null) return;
         self::enforce($conn, $baseUrl, $access['module'], $access['action']);
@@ -118,6 +134,7 @@ final class FullCareAccess
         $haystack = $uri . ' ' . $script;
         if (str_contains($script, 'home_care_pacientes') || str_contains($uri, '/cuidado-continuado/home-care/pacientes')) return 'cuidado_continuado';
         if (str_contains($script, 'home_care_prorrogacao') || str_contains($uri, '/cuidado-continuado/home-care/prorrogacoes')) return 'cuidado_continuado';
+        if ($script === 'gestor_estipulante.php') return 'gestor_estipulante';
         $rules = [
             'permissoes' => ['administracao/permissoes', 'permiss', 'access_profile'],
             'usuarios' => ['/usuarios', 'usuario', 'hospitaluser', 'reset_senha'],
